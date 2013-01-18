@@ -670,6 +670,940 @@ class UnitTest extends \lithium\test\Unit {
 		$result = $this->test->methods();
 		$this->assertIdentical($expected, $result);
 	}
+
+	public function testAssertCountTrue() {
+		$this->assertTrue($this->test->assertCount(1, array('foo')));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertCountFalse() {
+		$this->assertFalse($this->test->assertCount(2, array('foo', 'bar', 'bar')));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertIdentical(array(
+			'expected' => 2,
+			'result' => 3
+		), $result['data']);
+	}
+
+	public function testAssertNotCountTrue() {
+		$this->assertTrue($this->test->assertNotCount(2, array('foo', 'bar', 'bar')));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertNotCountFalse() {
+		$this->assertFalse($this->test->assertNotCount(1, array('foo')));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertIdentical(array(
+			'expected' => 1,
+			'result' => 1
+		), $result['data']);
+	}
+
+	public function testArrayHasKeyTrue() {
+		$this->assertTrue($this->test->assertArrayHasKey('bar', array('bar' => 'baz')));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testArrayHasKeyFalse() {
+		$this->assertFalse($this->test->assertArrayHasKey('foo', array('bar' => 'baz')));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertIdentical(array(
+			'expected' => 'foo',
+			'result' => array('bar' => 'baz')
+		), $result['data']);
+	}
+
+	public function testArrayNotHasKeyTrue() {
+		$this->assertTrue($this->test->assertArrayNotHasKey('foo', array('bar' => 'baz')));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testArrayNotHasKeyFalse() {
+		$this->assertFalse($this->test->assertArrayNotHasKey('bar', array('bar' => 'baz')));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertIdentical(array(
+			'expected' => 'bar',
+			'result' => array('bar' => 'baz')
+		), $result['data']);
+	}
+
+	public function testClassHasAttributeTrue() {
+		$this->assertTrue($this->test->assertClassHasAttribute('name', '\ReflectionClass'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testClassHasAttributeFalse() {
+		$this->assertFalse($this->test->assertClassHasAttribute('foo', '\ReflectionClass'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'foo',
+			'result' => array(
+				new \ReflectionProperty('ReflectionClass', 'name')
+			)
+		), $result['data']);
+	}
+
+	public function testClassHasAttributeWrongClassType() {
+		$self =& $this;
+		$this->assertException('InvalidArgumentException', function() use($self) {
+			$self->test->assertClassHasAttribute('foo', new \stdClass);
+		});
+	}
+
+	public function testClassHasAttributeClassNotFound() {
+		$self =& $this;
+		$this->assertException('ReflectionException', function() use($self) {
+			$self->test->assertClassHasAttribute('foo', '\foo\bar\baz');
+		});
+	}
+
+	public function testClassNotHasAttributeTrue() {
+		$this->assertTrue($this->test->assertClassNotHasAttribute('foo', '\ReflectionClass'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testClassNotHasAttributeFalse() {
+		$this->assertFalse($this->test->assertClassNotHasAttribute('name', '\ReflectionClass'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'name',
+			'result' => array(
+				new \ReflectionProperty('ReflectionClass', 'name')
+			)
+		), $result['data']);
+	}
+
+	public function testClassNotHasAttributeClassNotFound() {
+		$self =& $this;
+		$this->assertException('ReflectionException', function() use($self) {
+			$self->test->assertClassNotHasAttribute('foo', '\foo\bar\baz');
+		});
+	}
+
+	public function testClassNotHasAttributeWrongClassType() {
+		$self =& $this;
+		$this->assertException('InvalidArgumentException', function() use($self) {
+			$self->test->assertClassNotHasAttribute('foo', new \stdClass);
+		});
+	}
+
+	public function testClassHasStaticAttributeTrue() {
+		$class = '\lithium\core\StaticObject';
+		$this->assertTrue($this->test->assertClassHasStaticAttribute('_methodFilters', $class));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testClassHasStaticAttributeFalse() {
+		$class = '\lithium\core\StaticObject';
+		$this->assertFalse($this->test->assertClassHasStaticAttribute('foobar', $class));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'foobar',
+			'result' => array(
+				new \ReflectionProperty('lithium\\core\\StaticObject', '_methodFilters'),
+				new \ReflectionProperty('lithium\\core\\StaticObject', '_parents')
+			)
+		), $result['data']);
+	}
+
+	public function testClassHasStaticAttributeClassNotFound() {
+		$self =& $this;
+		$this->assertException('ReflectionException', function() use($self) {
+			$self->test->assertClassHasStaticAttribute('foo', '\foo\bar\baz');
+		});
+	}
+
+	public function testClassNotHasStaticAttributeTrue() {
+		$class = '\lithium\core\StaticObject';
+		$this->assertTrue($this->test->assertClassNotHasStaticAttribute('foobar', $class));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testClassNotHasStaticAttributeFalse() {
+		$class = '\lithium\core\StaticObject';
+		$this->assertFalse($this->test->assertClassNotHasStaticAttribute('_methodFilters', $class));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => '_methodFilters',
+			'result' => array(
+				new \ReflectionProperty('lithium\\core\\StaticObject', '_methodFilters'),
+				new \ReflectionProperty('lithium\\core\\StaticObject', '_parents')
+			)
+		), $result['data']);
+	}
+
+	public function testClassNotHasStaticAttributeClassNotFound() {
+		$self =& $this;
+		$this->assertException('ReflectionException', function() use($self) {
+			$self->test->assertClassNotHasStaticAttribute('foo', '\foo\bar\baz');
+		});
+	}
+
+	public function testAssertContainsStringInStrTrue() {
+		$this->assertTrue($this->test->assertContains('foo', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertContainsStringInStrFalse() {
+		$this->assertFalse($this->test->assertContains('baz', 'foobar'));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'baz',
+			'result' => 'foobar'
+		), $result['data']);
+	}
+
+	public function testAssertContainsTrue() {
+		$this->assertTrue($this->test->assertContains('bar', array('foo', 'bar', 'baz')));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertContainsFalse() {
+		$this->assertFalse($this->test->assertContains('foobar', array('foo', 'bar', 'baz')));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'foobar',
+			'result' => array(
+				'foo', 'bar', 'baz'
+			)
+		), $result['data']);
+	}
+
+	public function testAssertNotContainsStringInStrTrue() {
+		$this->assertTrue($this->test->assertNotContains('baz', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertNotContainsStringInStrFalse() {
+		$this->assertFalse($this->test->assertNotContains('foo', 'foobar'));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'foo',
+			'result' => 'foobar'
+		), $result['data']);
+	}
+
+	public function testAssertNotContainsTrue() {
+		$this->assertTrue($this->test->assertNotContains('foobar', array('foo', 'bar', 'baz')));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertNotContainsFalse() {
+		$this->assertFalse($this->test->assertNotContains('bar', array('foo', 'bar', 'baz')));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'bar',
+			'result' => array(
+				'foo', 'bar', 'baz'
+			)
+		), $result['data']);
+	}
+
+	public function testAssertContainsOnlyTrue() {
+		$this->assertTrue($this->test->assertContainsOnly('int', array(1,2,3)));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertContainsOnlyFalse() {
+		$this->assertFalse($this->test->assertContainsOnly('string', array(1,2,3)));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'string',
+			'result' => array(
+				1,2,3
+			)
+		), $result['data']);
+	}
+
+	public function testAssertNotContainsOnlyTrue() {
+		$this->assertTrue($this->test->assertNotContainsOnly('string', array(1,2,3)));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertNotContainsOnlyFalse() {
+		$this->assertFalse($this->test->assertNotContainsOnly('int', array(1,2,3)));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'int',
+			'result' => array(
+				1,2,3
+			)
+		), $result['data']);
+	}
+
+	public function testAssertContainsOnlyInstanceOfTrue() {
+		$obj = new \stdClass;
+		$this->assertTrue($this->test->assertContainsOnlyInstancesOf('stdClass', array($obj)));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertContainsOnlyInstanceOfFalse() {
+		$obj = new \lithium\test\Unit;
+		$this->assertFalse($this->test->assertContainsOnlyInstancesOf('stdClass', array($obj)));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'stdClass',
+			'result' => array(
+				0 => new \lithium\test\Unit
+			)
+		), $result['data']);
+	}
+
+	public function testAssertEmptyTrue() {
+		$this->assertTrue($this->test->assertEmpty(array()));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertEmptyFalse() {
+		$this->assertFalse($this->test->assertEmpty(array(1)));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => array(1),
+			'result' => false
+		), $result['data']);
+	}
+
+	public function testAssertNotEmptyTrue() {
+		$this->assertTrue($this->test->assertNotEmpty(array(1)));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertNotEmptyFalse() {
+		$this->assertFalse($this->test->assertNotEmpty(array()));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => array(),
+			'result' => false
+		), $result['data']);
+	}
+
+	public function testAssertFileEqualsTrue() {
+		$file1 = __DIR__ . '/UnitTest.php';
+		$file2 = __DIR__ . '/UnitTest.php';
+		$this->assertTrue($this->test->assertFileEquals($file1, $file2));
+	}
+
+	public function testAssertFileEqualsFalse() {
+		$file1 = __DIR__ . '/UnitTest.php';
+		$file2 = __DIR__ . '/ReportTest.php';
+		$this->assertFalse($this->test->assertFileEquals($file1, $file2));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => md5_file($file1),
+			'result' => md5_file($file2)
+		), $result['data']);
+	}
+
+	public function testAssertFileNotEqualsTrue() {
+		$file1 = __DIR__ . '/UnitTest.php';
+		$file2 = __DIR__ . '/ReportTest.php';
+		$this->assertTrue($this->test->assertFileNotEquals($file1, $file2));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertFileNotEqualsFalse() {
+		$file1 = __DIR__ . '/UnitTest.php';
+		$file2 = __DIR__ . '/UnitTest.php';
+		$this->assertFalse($this->test->assertFileNotEquals($file1, $file2));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => md5_file($file1),
+			'result' => md5_file($file2)
+		), $result['data']);
+	}
+
+	public function testAssertFileExistsTrue() {
+		$file1 = __FILE__;
+		$this->assertTrue($this->test->assertFileExists($file1));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertFileExistsFalse() {
+		$file1 = __DIR__ . '/does/not/exist.txt';
+		$this->assertFalse($this->test->assertFileExists($file1));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => __DIR__ . '/does/not/exist.txt',
+			'result' => false
+		), $result['data']);
+	}
+
+	public function testAssertFileNotExistsTrue() {
+		$file1 = __DIR__ . '/does/not/exist.txt';
+		$this->assertTrue($this->test->assertFileNotExists($file1));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertFileNotExistsFalse() {
+		$file1 = __FILE__;
+		$this->assertFalse($this->test->assertFileNotExists($file1));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => __FILE__,
+			'result' => false
+		), $result['data']);
+	}
+
+	public function testAssertGreaterThanTrue() {
+		$this->assertTrue($this->test->assertGreaterThan(5, 3));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertGreaterThanFalse() {
+		$this->assertFalse($this->test->assertGreaterThan(3, 5));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 3,
+			'result' => 5
+		), $result['data']);
+	}
+
+	public function testAssertGreaterThanOrEqualTrue() {
+		$this->assertTrue($this->test->assertGreaterThanOrEqual(5, 5));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertGreaterThanOrEqualFalse() {
+		$this->assertFalse($this->test->assertGreaterThanOrEqual(3, 5));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 3,
+			'result' => 5
+		), $result['data']);
+	}
+
+	public function testAssertLessThanTrue() {
+		$this->assertTrue($this->test->assertLessThan(3, 5));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertLessThanFalse() {
+		$this->assertFalse($this->test->assertLessThan(5, 3));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 5,
+			'result' => 3
+		), $result['data']);
+	}
+
+	public function testAssertLessThanOrEqualTrue() {
+		$this->assertTrue($this->test->assertLessThanOrEqual(5, 5));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertLessThanOrEqualFalse() {
+		$this->assertFalse($this->test->assertLessThanOrEqual(5, 3));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 5,
+			'result' => 3
+		), $result['data']);
+	}
+
+	public function testAssertInstanceOfTrue() {
+		$this->assertTrue($this->test->assertInstanceOf('\stdClass', new \stdClass));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertInstanceOfFalse() {
+		$this->assertFalse($this->test->assertInstanceOf('\ReflectionClass', new \stdClass));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => '\ReflectionClass',
+			'result' => 'stdClass'
+		), $result['data']);
+	}
+
+	public function testAssertNotInstanceOfTrue() {
+		$this->assertTrue($this->test->assertNotInstanceOf('\ReflectionClass', new \stdClass));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertNotInstanceOfFalse() {
+		$this->assertFalse($this->test->assertNotInstanceOf('\stdClass', new \stdClass));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => '\stdClass',
+			'result' => 'stdClass'
+		), $result['data']);
+	}
+
+	public function testAssertInternalTypeTrue() {
+		$this->assertTrue($this->test->assertInternalType('string', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertInternalTypeFalse() {
+		$this->assertFalse($this->test->assertInternalType('int', 'foobar'));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'int',
+			'result' => 'string'
+		), $result['data']);
+	}
+
+	public function testAssertNotInternalTypeTrue() {
+		$this->assertTrue($this->test->assertNotInternalType('int', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertNotInternalTypeFalse() {
+		$this->assertFalse($this->test->assertNotInternalType('string', 'foobar'));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'string',
+			'result' => 'string'
+		), $result['data']);
+	}
+
+	public function testAssertNotNullTrue() {
+		$this->assertTrue($this->test->assertNotNull(1));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertNotNullFalse() {
+		$this->assertFalse($this->test->assertNotNull(null));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => NULL,
+			'actual' => 'NULL',
+		), $result['data']);
+	}
+
+	public function testObjectHasAttributeTrue() {
+		$obj = new \ReflectionClass(new \stdClass);
+		$this->assertTrue($this->test->assertObjectHasAttribute('name', $obj));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testObjectHasAttributeFalse() {
+		$obj = new \ReflectionClass(new \stdClass);
+		$this->assertFalse($this->test->assertObjectHasAttribute('foo', $obj));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'foo',
+			'result' => array(
+				new \ReflectionProperty('ReflectionClass', 'name')
+			)
+		), $result['data']);
+	}
+
+	public function testObjectHasAttributeWrongClassType() {
+		$self =& $this;
+		$this->assertException('InvalidArgumentException', function() use($self) {
+			$self->test->assertObjectHasAttribute('foo', '\stdClass');
+		});
+	}
+
+	public function testObjectNotHasAttributeTrue() {
+		$obj = new \ReflectionClass(new \stdClass);
+		$this->assertTrue($this->test->assertObjectNotHasAttribute('foo', $obj));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testObjectNotHasAttributeFalse() {
+		$obj = new \ReflectionClass(new \stdClass);
+		$this->assertFalse($this->test->assertObjectNotHasAttribute('name', $obj));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'name',
+			'result' => array(
+				new \ReflectionProperty('ReflectionClass', 'name')
+			)
+		), $result['data']);
+	}
+
+	public function testObjectNotHasAttributeWrongClassType() {
+		$self =& $this;
+		$this->assertException('InvalidArgumentException', function() use($self) {
+			$self->test->assertObjectNotHasAttribute('foo', 'new \stdClass');
+		});
+	}
+
+	public function testAssertRegExpTrue() {
+		$this->assertTrue($this->test->assertRegExp('/^foo/', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertRegExpFalse() {
+		$this->assertFalse($this->test->assertRegExp('/^bar/', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => '/^bar/',
+			'result' => array()
+		), $result['data']);
+	}
+
+	public function testAssertNotRegExpTrue() {
+		$this->assertTrue($this->test->assertNotRegExp('/^bar/', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertNotRegExpFalse() {
+		$this->assertFalse($this->test->assertNotRegExp('/^foo/', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => '/^foo/',
+			'result' => array('foo')
+		), $result['data']);
+	}
+
+	public function testAssertStringMatchesFormatTrue() {
+		$this->assertTrue($this->test->assertStringMatchesFormat('%d', '10'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertStringMatchesFormatFalse() {
+		$this->assertFalse($this->test->assertStringMatchesFormat('%d', '10.555'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => '%d',
+			'result' => array('10')
+		), $result['data']);
+	}
+
+	public function testAssertStringNotMatchesFormatTrue() {
+		$this->assertTrue($this->test->assertStringNotMatchesFormat('%d', '10.555'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertStringNotMatchesFormatFalse() {
+		$this->assertFalse($this->test->assertStringNotMatchesFormat('%d', '10'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => '%d',
+			'result' => array('10')
+		), $result['data']);
+	}
+
+	public function testAssertStringEndsWithTrue() {
+		$this->assertTrue($this->test->assertStringEndsWith('bar', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertStringEndsWithFalse() {
+		$this->assertFalse($this->test->assertStringEndsWith('foo', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'foo',
+			'result' => 'foobar'
+		), $result['data']);
+	}
+
+	public function testAssertStringStartsWithTrue() {
+		$this->assertTrue($this->test->assertStringStartsWith('foo', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('pass', $result['result']);
+	}
+
+	public function testAssertStringStartsWithFalse() {
+		$this->assertFalse($this->test->assertStringStartsWith('bar', 'foobar'));
+		
+		$results = $this->test->results();
+		$result = array_pop($results);
+		
+		$this->assertEqual('fail', $result['result']);
+		$this->assertEqual(array(
+			'expected' => 'bar',
+			'result' => 'foobar'
+		), $result['data']);
+	}
+
 }
 
 ?>
