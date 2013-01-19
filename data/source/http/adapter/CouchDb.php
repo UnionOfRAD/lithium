@@ -236,7 +236,8 @@ class CouchDb extends \lithium\data\source\Http {
 			}
 			$path = "{$config['database']}/{$_path}";
 			$args = (array) $conditions + (array) $limit + (array) $order;
-			$result = (array) json_decode($conn->get($path, $args), true);
+			$result = $conn->get($path, $args);
+			$result = is_string($result) ? json_decode($result, true) : $result;
 			$data = $stats = array();
 
 			if (isset($result['_id'])) {
@@ -488,13 +489,10 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	protected function _format(array $data) {
-		if (isset($data['_id'])) {
-			$data['id'] = $data['_id'];
+		foreach (array("id", "rev") as $key) {
+			$data[$key] = isset($data["_{$key}"]) ? $data["_{$key}"] : null;
+			unset($data["_{$key}"]);
 		}
-		if (isset($data['_rev'])) {
-			$data['rev'] = $data['_rev'];
-		}
-		unset($data['_id'], $data['_rev']);
 		return $data;
 	}
 }
