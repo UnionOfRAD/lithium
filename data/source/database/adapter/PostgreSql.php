@@ -81,7 +81,12 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * list of active connections.
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('host' => 'localhost:5432', 'encoding' => null, 'schema' => 'public');
+		$defaults = array(
+			'host' => 'localhost:5432',
+			'encoding' => null,
+			'schema' => 'public',
+			'timezone' => null
+		);
 		parent::__construct($config + $defaults);
 	}
 
@@ -229,6 +234,25 @@ class PostgreSql extends \lithium\data\source\Database {
 		}
 		try{
 			$this->connection->exec("SET search_path TO ${search_path}");
+			return true;
+		} catch (PDOException $e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Gets or sets the time zone for the connection
+	 * @param $timezone
+	 * @return mixed If setting the time zone; returns true on success, else false
+	 *         When getting, returns the time zone
+	 */
+	public function timezone($timezone = null) {
+		if (empty($timezone)) {
+			$query = $this->connection->query('SHOW TIME ZONE');
+			return $query->fetchColumn();
+		}
+		try {
+			$this->connection->exec("SET TIME ZONE '{$timezone}'");
 			return true;
 		} catch (PDOException $e) {
 			return false;
