@@ -52,7 +52,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 			'autoConnect' => false, 'encoding' => null,'persistent' => true,
 			'host' => 'localhost:5432', 'login' => 'root', 'password' => '',
 			'database' => null, 'dsn' => null, 'options' => array(),
-			'init' => true, 'schema' => 'public'
+			'init' => true, 'schema' => 'public', 'timezone' => null
 		);
 		$this->assertEqual($expected, $result);
 	}
@@ -91,6 +91,15 @@ class PostgreSqlTest extends \lithium\test\Unit {
 
 		$this->assertTrue($this->db->encoding('UTF-8'));
 		$this->assertEqual('UTF-8', $this->db->encoding());
+	}
+
+	public function testDatabaseTimezone() {
+		$this->assertTrue($this->db->isConnected());
+		$this->assertTrue($this->db->timezone('UTC'));
+		$this->assertEqual('UTC', $this->db->timezone());
+
+		$this->assertTrue($this->db->timezone('US/Eastern'));
+		$this->assertEqual('US/Eastern', $this->db->timezone());
 	}
 
 	public function testValueByIntrospect() {
@@ -149,7 +158,12 @@ class PostgreSqlTest extends \lithium\test\Unit {
 		$this->assertTrue(is_numeric($result[0]['id']));
 		unset($result[0]['id']);
 
-		$expected = array('name' => 'Test', 'active' => true, 'created' => null, 'modified' => null);
+		$expected = array(
+			'name' => 'Test',
+			'active' => true,
+			'created' => null,
+			'modified' => null
+		);
 		$this->assertIdentical($expected, $result[0]);
 
 		$this->assertTrue($this->db->delete('DELETE From companies WHERE name = {:name}', array(
