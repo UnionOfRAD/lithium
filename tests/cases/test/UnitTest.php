@@ -9,6 +9,8 @@
 namespace lithium\tests\cases\test;
 
 use Exception;
+use ReflectionClass;
+use stdClass;
 use lithium\core\Libraries;
 use lithium\tests\mocks\test\MockUnitTest;
 use lithium\tests\mocks\test\cases\MockSkipThrowsException;
@@ -220,6 +222,16 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $results[0]['result']);
 	}
 
+	public function testAssertNotIdentical() {
+		$expected = true;
+		$result = 1;
+		$this->test->assertNotIdentical($expected, $result);
+		$results = $this->test->results();
+
+		$expected = 'pass';
+		$this->assertEqual($expected, $results[0]['result']);
+	}
+
 	public function testAssertIdenticalArray() {
 		$expected = array('1', '2', '3');
 		$result = array('1', '3', '4');
@@ -231,6 +243,16 @@ class UnitTest extends \lithium\test\Unit {
 
 		$expected = "trace: [1]\nexpected: '2'\nresult: '3'\n";
 		$this->assertEqual($expected, $results[0]['message']);
+	}
+
+	public function testAssertNotIdenticalArray() {
+		$expected = array('1' => true, '2' => true, '3' => true);
+		$result = array('1' => true, '3' => true, '2' => true);
+		$this->test->assertNotIdentical($expected, $result);
+		$results = $this->test->results();
+
+		$expected = 'pass';
+		$this->assertEqual($expected, $results[0]['result']);
 	}
 
 	public function testAssertNull() {
@@ -760,7 +782,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testClassHasAttributeTrue() {
-		$this->assertTrue($this->test->assertClassHasAttribute('name', '\ReflectionClass'));
+		$this->assertTrue($this->test->assertClassHasAttribute('name', 'ReflectionClass'));
 		
 		$results = $this->test->results();
 		$result = array_pop($results);
@@ -769,7 +791,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testClassHasAttributeFalse() {
-		$this->assertFalse($this->test->assertClassHasAttribute('foo', '\ReflectionClass'));
+		$this->assertFalse($this->test->assertClassHasAttribute('foo', 'ReflectionClass'));
 		
 		$results = $this->test->results();
 		$result = array_pop($results);
@@ -786,7 +808,7 @@ class UnitTest extends \lithium\test\Unit {
 	public function testClassHasAttributeWrongClassType() {
 		$self =& $this;
 		$this->assertException('InvalidArgumentException', function() use($self) {
-			$self->test->assertClassHasAttribute('foo', new \stdClass);
+			$self->test->assertClassHasAttribute('foo', new stdClass);
 		});
 	}
 
@@ -798,7 +820,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testClassNotHasAttributeTrue() {
-		$this->assertTrue($this->test->assertClassNotHasAttribute('foo', '\ReflectionClass'));
+		$this->assertTrue($this->test->assertClassNotHasAttribute('foo', 'ReflectionClass'));
 		
 		$results = $this->test->results();
 		$result = array_pop($results);
@@ -807,7 +829,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testClassNotHasAttributeFalse() {
-		$this->assertFalse($this->test->assertClassNotHasAttribute('name', '\ReflectionClass'));
+		$this->assertFalse($this->test->assertClassNotHasAttribute('name', 'ReflectionClass'));
 		
 		$results = $this->test->results();
 		$result = array_pop($results);
@@ -831,7 +853,7 @@ class UnitTest extends \lithium\test\Unit {
 	public function testClassNotHasAttributeWrongClassType() {
 		$self =& $this;
 		$this->assertException('InvalidArgumentException', function() use($self) {
-			$self->test->assertClassNotHasAttribute('foo', new \stdClass);
+			$self->test->assertClassNotHasAttribute('foo', new stdClass);
 		});
 	}
 
@@ -1044,7 +1066,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testAssertContainsOnlyInstanceOfTrue() {
-		$obj = new \stdClass;
+		$obj = new stdClass;
 		$this->assertTrue($this->test->assertContainsOnlyInstancesOf('stdClass', array($obj)));
 		
 		$results = $this->test->results();
@@ -1066,50 +1088,6 @@ class UnitTest extends \lithium\test\Unit {
 			'result' => array(
 				0 => new \lithium\test\Unit
 			)
-		), $result['data']);
-	}
-
-	public function testAssertEmptyTrue() {
-		$this->assertTrue($this->test->assertEmpty(array()));
-		
-		$results = $this->test->results();
-		$result = array_pop($results);
-		
-		$this->assertEqual('pass', $result['result']);
-	}
-
-	public function testAssertEmptyFalse() {
-		$this->assertFalse($this->test->assertEmpty(array(1)));
-
-		$results = $this->test->results();
-		$result = array_pop($results);
-		
-		$this->assertEqual('fail', $result['result']);
-		$this->assertEqual(array(
-			'expected' => array(1),
-			'result' => false
-		), $result['data']);
-	}
-
-	public function testAssertNotEmptyTrue() {
-		$this->assertTrue($this->test->assertNotEmpty(array(1)));
-		
-		$results = $this->test->results();
-		$result = array_pop($results);
-		
-		$this->assertEqual('pass', $result['result']);
-	}
-
-	public function testAssertNotEmptyFalse() {
-		$this->assertFalse($this->test->assertNotEmpty(array()));
-
-		$results = $this->test->results();
-		$result = array_pop($results);
-		
-		$this->assertEqual('fail', $result['result']);
-		$this->assertEqual(array(
-			'expected' => array(),
-			'result' => false
 		), $result['data']);
 	}
 
@@ -1297,7 +1275,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testAssertInstanceOfTrue() {
-		$this->assertTrue($this->test->assertInstanceOf('\stdClass', new \stdClass));
+		$this->assertTrue($this->test->assertInstanceOf('stdClass', new stdClass));
 		
 		$results = $this->test->results();
 		$result = array_pop($results);
@@ -1306,20 +1284,20 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testAssertInstanceOfFalse() {
-		$this->assertFalse($this->test->assertInstanceOf('\ReflectionClass', new \stdClass));
+		$this->assertFalse($this->test->assertInstanceOf('ReflectionClass', new stdClass));
 
 		$results = $this->test->results();
 		$result = array_pop($results);
 
 		$this->assertEqual('fail', $result['result']);
 		$this->assertEqual(array(
-			'expected' => '\ReflectionClass',
+			'expected' => 'ReflectionClass',
 			'result' => 'stdClass'
 		), $result['data']);
 	}
 
 	public function testAssertNotInstanceOfTrue() {
-		$this->assertTrue($this->test->assertNotInstanceOf('\ReflectionClass', new \stdClass));
+		$this->assertTrue($this->test->assertNotInstanceOf('ReflectionClass', new stdClass));
 		
 		$results = $this->test->results();
 		$result = array_pop($results);
@@ -1328,14 +1306,14 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testAssertNotInstanceOfFalse() {
-		$this->assertFalse($this->test->assertNotInstanceOf('\stdClass', new \stdClass));
+		$this->assertFalse($this->test->assertNotInstanceOf('stdClass', new stdClass));
 
 		$results = $this->test->results();
 		$result = array_pop($results);
 
 		$this->assertEqual('fail', $result['result']);
 		$this->assertEqual(array(
-			'expected' => '\stdClass',
+			'expected' => 'stdClass',
 			'result' => 'stdClass'
 		), $result['data']);
 	}
@@ -1401,13 +1379,13 @@ class UnitTest extends \lithium\test\Unit {
 
 		$this->assertEqual('fail', $result['result']);
 		$this->assertEqual(array(
-			'expected' => NULL,
-			'actual' => 'NULL',
+			'expected' => null,
+			'result' => null,
 		), $result['data']);
 	}
 
 	public function testObjectHasAttributeTrue() {
-		$obj = new \ReflectionClass(new \stdClass);
+		$obj = new ReflectionClass(new stdClass);
 		$this->assertTrue($this->test->assertObjectHasAttribute('name', $obj));
 		
 		$results = $this->test->results();
@@ -1417,7 +1395,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testObjectHasAttributeFalse() {
-		$obj = new \ReflectionClass(new \stdClass);
+		$obj = new ReflectionClass(new stdClass);
 		$this->assertFalse($this->test->assertObjectHasAttribute('foo', $obj));
 		
 		$results = $this->test->results();
@@ -1435,12 +1413,12 @@ class UnitTest extends \lithium\test\Unit {
 	public function testObjectHasAttributeWrongClassType() {
 		$self =& $this;
 		$this->assertException('InvalidArgumentException', function() use($self) {
-			$self->test->assertObjectHasAttribute('foo', '\stdClass');
+			$self->test->assertObjectHasAttribute('foo', 'stdClass');
 		});
 	}
 
 	public function testObjectNotHasAttributeTrue() {
-		$obj = new \ReflectionClass(new \stdClass);
+		$obj = new ReflectionClass(new stdClass);
 		$this->assertTrue($this->test->assertObjectNotHasAttribute('foo', $obj));
 		
 		$results = $this->test->results();
@@ -1450,7 +1428,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testObjectNotHasAttributeFalse() {
-		$obj = new \ReflectionClass(new \stdClass);
+		$obj = new ReflectionClass(new stdClass);
 		$this->assertFalse($this->test->assertObjectNotHasAttribute('name', $obj));
 		
 		$results = $this->test->results();
@@ -1468,52 +1446,8 @@ class UnitTest extends \lithium\test\Unit {
 	public function testObjectNotHasAttributeWrongClassType() {
 		$self =& $this;
 		$this->assertException('InvalidArgumentException', function() use($self) {
-			$self->test->assertObjectNotHasAttribute('foo', 'new \stdClass');
+			$self->test->assertObjectNotHasAttribute('foo', 'new stdClass');
 		});
-	}
-
-	public function testAssertRegExpTrue() {
-		$this->assertTrue($this->test->assertRegExp('/^foo/', 'foobar'));
-		
-		$results = $this->test->results();
-		$result = array_pop($results);
-		
-		$this->assertEqual('pass', $result['result']);
-	}
-
-	public function testAssertRegExpFalse() {
-		$this->assertFalse($this->test->assertRegExp('/^bar/', 'foobar'));
-		
-		$results = $this->test->results();
-		$result = array_pop($results);
-		
-		$this->assertEqual('fail', $result['result']);
-		$this->assertEqual(array(
-			'expected' => '/^bar/',
-			'result' => array()
-		), $result['data']);
-	}
-
-	public function testAssertNotRegExpTrue() {
-		$this->assertTrue($this->test->assertNotRegExp('/^bar/', 'foobar'));
-		
-		$results = $this->test->results();
-		$result = array_pop($results);
-		
-		$this->assertEqual('pass', $result['result']);
-	}
-
-	public function testAssertNotRegExpFalse() {
-		$this->assertFalse($this->test->assertNotRegExp('/^foo/', 'foobar'));
-		
-		$results = $this->test->results();
-		$result = array_pop($results);
-		
-		$this->assertEqual('fail', $result['result']);
-		$this->assertEqual(array(
-			'expected' => '/^foo/',
-			'result' => array('foo')
-		), $result['data']);
 	}
 
 	public function testAssertStringMatchesFormatTrue() {
