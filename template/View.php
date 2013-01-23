@@ -382,11 +382,15 @@ class View extends \lithium\core\Object {
 		$_renderer = $this->_renderer;
 		$_loader = $this->_loader;
 		$filters = $this->outputFilters;
-		$params = compact('step', 'params', 'options') + array('data' => $data + $filters);
+		$params = compact('step', 'params', 'options') + array(
+			'data' => $data + $filters, 
+			'loader' => $_loader, 
+			'renderer' => $_renderer
+		);
 
-		$filter = function($self, $params) use (&$_renderer, &$_loader) {
-			$template = $_loader->template($params['step']['path'], $params['params']);
-			return $_renderer->render($template, $params['data'], $params['options']);
+		$filter = function($self, $params) {
+			$template = $params['loader']->template($params['step']['path'], $params['params']);
+			return $params['renderer']->render($template, $params['data'], $params['options']);
 		};
 		$result = $this->_filter(__METHOD__, $params, $filter);
 
