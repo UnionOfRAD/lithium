@@ -979,8 +979,8 @@ class Libraries {
 		$suffix = $options['namespaces'] ? '' : $config['suffix'];
 		$suffix = ($options['suffix'] === null) ? $suffix : $options['suffix'];
 
-		$dFlags = GLOB_ONLYDIR;
-		$libs = (array) glob($path . $suffix, $options['namespaces'] ? $dFlags : 0);
+		$dFlags = GLOB_ONLYDIR & GLOB_BRACE;
+		$libs = (array) glob($path . $suffix, $options['namespaces'] ? $dFlags : GLOB_BRACE);
 
 		if ($options['recursive']) {
 			list($current, $match) = explode('/*', $path, 2);
