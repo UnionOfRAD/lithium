@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\template;
 
 use Closure;
+use lithium\core\Libraries;
 use lithium\template\View;
 use lithium\action\Response;
 use lithium\template\view\adapter\Simple;
@@ -174,6 +175,50 @@ class ViewTest extends \lithium\test\Unit {
 		$this->assertTrue($renderData[0]['data']['h'] instanceof Closure);
 		unset($renderData[0]['data']['h']);
 		$this->assertEqual($expected, $renderData);
+	}
+
+	public function testElementRenderingOptions() {
+		$tmpDir = realpath(Libraries::get(true, 'resources') . '/tmp');
+		$this->skipIf(!is_writable($tmpDir), "Can't write to resources directory.");
+
+		$testApp = $tmpDir . '/tests/test_app';
+		$viewDir = $testApp . '/views';
+		mkdir($viewDir, 0777, true);
+		Libraries::add('test_app', array('path' => $testApp));
+
+		$body = '<?php echo isset($this->_options[$option]) ? $this->_options[$option] : ""; ?>';
+		$template = $viewDir . '/template.html.php';
+
+		file_put_contents($template, $body);
+
+		$view = new View(array(
+			'paths' => array(
+				'template' => '{:library}/views/{:template}.html.php',
+				'layout' => false
+			)
+		));
+
+		$options = array(
+			'template' => 'template',
+			'library' => 'test_app'
+		);
+		$result = $view->render('all', array('option' => 'custom'), $options);
+		$this->assertIdentical('', $result);
+		$result = $view->render('all', array('option' => 'library'), $options);
+		$this->assertIdentical('test_app', $result);
+
+		$options = array(
+			'template' => 'template',
+			'library' => 'test_app',
+			'custom' => 'custom option'
+		);
+		$result = $view->render('all', array('option' => 'custom'), $options);
+		$this->assertIdentical('custom option', $result);
+		$result = $view->render('all', array('option' => 'library'), $options);
+		$this->assertIdentical('test_app', $result);
+
+		Libraries::remove('test_app');
+		$this->_cleanUp();
 	}
 }
 
