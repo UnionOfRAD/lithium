@@ -133,6 +133,14 @@ abstract class Renderer extends \lithium\core\Object {
 	protected $_vars = array();
 
 	/**
+	 * Available options accepted by `template\View::render()`, used when rendering.
+	 *
+	 * @see lithium\template\View::render()
+	 * @var array
+	 */
+	protected $_options = array();
+
+	/**
 	 * Render the template with given data. Abstract; must be added to subclasses.
 	 *
 	 * @param string $template
@@ -487,10 +495,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @return string Returns a the rendered template content as a string.
 	 */
 	protected function _render($type, $template, array $data = array(), array $options = array()) {
-		if ($this->_request) {
-			$library = $this->_request->library;
-			$options += compact('library');
-		}
+		$options += $this->_options;
 		return $this->_view->render($type, $data + $this->_data, compact('template') + $options);
 	}
 }
