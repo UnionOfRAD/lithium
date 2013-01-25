@@ -436,6 +436,10 @@ class ValidatorTest extends \lithium\test\Unit {
 
 		$this->assertFalse(Validator::isInList(2, null, array('list' => array('0', '1'))));
 		$this->assertFalse(Validator::isInList('2', null, array('list' => array('0', '1'))));
+
+		$this->assertFalse(Validator::isInList(0, null, array('list' => array('a', 'b'))));
+		$this->assertFalse(Validator::isInList(10, null, array('list' => array(0, '10a'))));
+		$this->assertFalse(Validator::isInList(1.1, null, array('list' => array(0, '1.1a'))));
 	}
 
 
