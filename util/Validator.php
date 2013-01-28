@@ -274,6 +274,9 @@ class Validator extends \lithium\core\StaticObject {
 			'inList' => function($value, $format, $options) {
 				$options += array('list' => array());
 				$strict = is_bool($value) || $value === '';
+				if (is_int($value) || is_float($value)) {
+					$value = strval($value);
+				}
 				return in_array($value, $options['list'], $strict);
 			},
 			'lengthBetween' => function($value, $format, $options) {
