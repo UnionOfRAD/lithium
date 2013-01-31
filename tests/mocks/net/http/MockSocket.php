@@ -32,7 +32,7 @@ class MockSocket extends \lithium\net\Socket {
 	}
 
 	public function read() {
-		if ($this->data->path == '/http_auth/') {
+		if ($this->data->path === '/http_auth/') {
 			if (is_array($this->data->auth)) {
 				$request = $this->data->to('array');
 				$data = $this->data->auth;
@@ -51,8 +51,8 @@ class MockSocket extends \lithium\net\Socket {
 					return 'success';
 				}
 			}
-			$header = 'Digest realm="app",qop="auth",nonce="4bca0fbca7bd0",'
-				. 'opaque="d3fb67a7aa4d887ec4bf83040a820a46";';
+			$header = 'Digest realm="app",qop="auth",nonce="4bca0fbca7bd0",';
+			$header .= 'opaque="d3fb67a7aa4d887ec4bf83040a820a46";';
 			$this->data->headers('WWW-Authenticate', $header);
 			$status = "GET HTTP/1.1 401 Authorization Required";
 			$response = array($status, join("\r\n", $this->data->headers()), "", "not authorized");

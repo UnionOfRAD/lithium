@@ -48,10 +48,10 @@ class SourceTest extends \lithium\test\Integration {
 	public function skip() {
 		$connection = 'lithium_couch_test';
 		$config = Connections::get($connection, array('config' => true));
-		$isAvailable = (
-			$config &&
-			Connections::get($connection)->isConnected(array('autoConnect' => true))
-		);
+		$isConnected = $config && Connections::get($connection)->isConnected(array(
+			'autoConnect' => true
+		));
+		$isAvailable = $config && $isConnected;
 		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
 
 		$this->_key = Companies::key();
@@ -172,7 +172,7 @@ class SourceTest extends \lithium\test\Integration {
 		}
 		$all = Companies::all();
 
-		$result = $all->first(function($doc) { return $doc->name == 'StuffMart'; });
+		$result = $all->first(function($doc) { return $doc->name === 'StuffMart'; });
 		$this->assertEqual('StuffMart', $result->name);
 
 		$result = $result->data();

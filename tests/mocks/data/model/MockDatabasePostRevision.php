@@ -16,7 +16,7 @@ class MockDatabasePostRevision extends \lithium\tests\mocks\data\MockBase {
 
 	protected $_meta = array('connection' => null);
 
-    protected $_schema = array(
+	protected $_schema = array(
 		'id' => array('type' => 'integer'),
 		'post_id' => array('type' => 'integer'),
 		'author_id' => array('type' => 'integer'),

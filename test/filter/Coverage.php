@@ -147,8 +147,10 @@ class Coverage extends \lithium\test\Filter {
 							'data' => $contents[$i + 1]
 						);
 					}
-				} elseif (isset($out[$i - 1]) && $out[$i - 1]['data'] !== '...'
-						&& !isset($out[$i]) && !isset($out[$i + 1])) {
+				} elseif (
+					isset($out[$i - 1]) && $out[$i - 1]['data'] !== '...' &&
+					!isset($out[$i]) && !isset($out[$i + 1])
+				) {
 					$out[$i] = array(
 						'class' => 'ignored',
 						'data' => '...'

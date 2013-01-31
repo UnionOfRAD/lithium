@@ -274,7 +274,7 @@ abstract class Database extends \lithium\data\Source {
 			preg_match('/SQLSTATE\[(.+?)\]/', $e->getMessage(), $code);
 			$code = $code[1] ?: 0;
 			switch (true) {
-			case $code == 'HY000' || substr($code, 0, 2) == '08':
+			case $code === 'HY000' || substr($code, 0, 2) === '08':
 				$msg = "Unable to connect to host `{$config['host']}`.";
 				throw new NetworkException($msg, null, $e);
 			case in_array($code, array('28000', '42000')):
@@ -287,7 +287,7 @@ abstract class Database extends \lithium\data\Source {
 
 		if ($this->_config['encoding']) {
 			$this->encoding($this->_config['encoding']);
-	   	}
+		}
 		return $this->_isConnected;
 	}
 
@@ -513,7 +513,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function &_queryExport($query) {
 		$data = $query->export($this);
-		if ($query->limit() && ($model = $query-> model())) {
+		if ($query->limit() && ($model = $query->model())) {
 			foreach ($query->relationships() as $relation) {
 				if ($relation['type'] === 'hasMany') {
 					$name = $model::meta('name');
@@ -629,14 +629,14 @@ abstract class Database extends \lithium\data\Source {
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
-		$field = Inflector::underscore(Inflector::singularize($name));//($type == 'hasMany') ?  : ;
+		$field = Inflector::underscore(Inflector::singularize($name));
 		$key = "{$field}_id";
 		$primary = $class::meta('key');
 
 		if (is_array($primary)) {
 			$key = array_combine($primary, $primary);
-		} elseif ($type == 'hasMany' || $type == 'hasOne') {
-			if ($type == 'hasMany') {
+		} elseif ($type === 'hasMany' || $type === 'hasOne') {
+			if ($type === 'hasMany') {
 				$field = Inflector::pluralize($field);
 			}
 			$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
@@ -713,7 +713,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @param data\model\Query $query A Query instance.
 	 * @param array $fields Array of formatted fields.
 	 */
-	public function _schema($query, $fields = null) {
+	protected function _schema($query, $fields = null) {
 		$model = $query->model();
 		$paths = $query->paths($this);
 		$models = $query->models($this);
@@ -855,7 +855,7 @@ abstract class Database extends \lithium\data\Source {
 		return ($options['prepend'] && $result) ? $options['prepend'] . " {$result}" : $result;
 	}
 
-	public function _processConditions($key, $value, $context, $schema = null, $glue = 'AND') {
+	protected function _processConditions($key, $value, $context, $schema = null, $glue = 'AND') {
 		$constraintTypes =& $this->_constraintTypes;
 		$model = $context->model();
 		$models = $context->models();
@@ -876,7 +876,7 @@ abstract class Database extends \lithium\data\Source {
 					return $this->value($value);
 				}
 			case is_scalar($value) || is_null($value):
-				if ($context && ($context->type() == 'read') && ($alias = $context->alias())) {
+				if ($context && ($context->type() === 'read') && ($alias = $context->alias())) {
 					$key = $this->_aliasing($key, $alias);
 				}
 				if (isset($value)) {
@@ -1008,9 +1008,9 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	protected function _fieldsReturn($type, $context, $fields, $schema) {
-		if ($type == 'create' || $type == 'update') {
+		if ($type === 'create' || $type === 'update') {
 			$data = $context->data();
-			if (isset($data['data']) && is_array($data['data']) && count($data) == 1){
+			if (isset($data['data']) && is_array($data['data']) && count($data) === 1) {
 				$data = $data['data'];
 			}
 
@@ -1096,7 +1096,7 @@ abstract class Database extends \lithium\data\Source {
 		foreach ($constraints as &$value) {
 			if (is_string($value)) {
 				$value = (object) $this->name($value);
-			} elseif (is_array($value)){
+			} elseif (is_array($value)) {
 				$value = $this->_constraints($value);
 			}
 		}
@@ -1190,7 +1190,7 @@ abstract class Database extends \lithium\data\Source {
 		if (is_object($value) || $value === null) {
 			return $value;
 		}
-		if ($type == 'boolean') {
+		if ($type === 'boolean') {
 			return $this->_toNativeBoolean($value);
 		}
 		if (!isset($this->_columns[$type]) || !isset($this->_columns[$type]['formatter'])) {
@@ -1334,7 +1334,7 @@ abstract class Database extends \lithium\data\Source {
 			return ($value !== 0);
 		}
 		if (is_string($value)) {
-			return ($value == 't' || $value == 'T' || $value == 'true');
+			return ($value === 't' || $value === 'T' || $value === 'true');
 		}
 		return (boolean) $value;
 	}
@@ -1423,7 +1423,7 @@ abstract class Database extends \lithium\data\Source {
 		list($first, $second) = $this->_splitFieldname($name);
 		if (!$first && preg_match('/^[a-z0-9_-]+$/i', $second)) {
 			return $alias . "." . $second;
-		} elseif(isset($map[$first])) {
+		} elseif (isset($map[$first])) {
 			return $map[$first] . "." . $second;
 		}
 		return $name;
@@ -1461,8 +1461,11 @@ abstract class Database extends \lithium\data\Source {
 	protected function _on(array $constraints, $aliasFrom, $aliasTo, $mapAlias = array()) {
 		$result = array();
 		foreach ($constraints as $key => $value) {
-			if (!is_numeric($key) && !isset($this->_constraintTypes[$key])
-					&& !isset($this->_operators[$key])) {
+			if (
+				!is_numeric($key) &&
+				!isset($this->_constraintTypes[$key]) &&
+				!isset($this->_operators[$key])
+			) {
 				$key = $this->_aliasing($key, $aliasFrom, $mapAlias);
 			}
 			if (is_string($value)) {

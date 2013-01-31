@@ -38,7 +38,7 @@ class MockDocumentMultipleKey extends \lithium\data\Model {
 	}
 
 	public static function find($type = 'all', array $options = array()) {
-		if ($type == 'first') {
+		if ($type === 'first') {
 			return new Document(array('data' => array(
 				'id' => 2, 'rev' => '1-1', 'name' => 'Two', 'content' => 'Lorem ipsum two'
 			)));

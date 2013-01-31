@@ -20,7 +20,7 @@ class MockGettext extends \lithium\g11n\catalog\adapter\Gettext {
 		foreach ($files as $key => $file) {
 			$extension = pathinfo($file, PATHINFO_EXTENSION);
 
-			if ((!$this->mo && $extension == 'mo') || (!$this->po && $extension == 'po')) {
+			if ((!$this->mo && $extension === 'mo') || (!$this->po && $extension === 'po')) {
 				unset($files[$key]);
 			}
 		}

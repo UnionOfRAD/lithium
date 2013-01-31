@@ -196,7 +196,7 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testDelete() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$this->query->data(array('id' => 12345, 'rev'=> '1-1', 'name' => 'Acme Inc'));
+		$this->query->data(array('id' => 12345, 'rev' => '1-1', 'name' => 'Acme Inc'));
 
 		$result = $couchdb->delete($this->query);
 		$this->assertTrue($result);

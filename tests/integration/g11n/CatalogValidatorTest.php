@@ -63,7 +63,7 @@ class CatalogValidatorTest extends \lithium\test\Integration {
 		Catalog::write('runtime', 'validation.phone', 'en_GB', $data);
 
 		Validator::add('phone', array(
-			'en_US'	=> Catalog::read('runtime', 'validation.phone', 'en_US'),
+			'en_US' => Catalog::read('runtime', 'validation.phone', 'en_US'),
 			'en_GB' => Catalog::read('runtime', 'validation.phone', 'en_GB')
 		));
 

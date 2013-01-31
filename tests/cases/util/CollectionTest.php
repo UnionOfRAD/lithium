@@ -96,7 +96,7 @@ class CollectionTest extends \lithium\test\Unit {
 		)));
 		$this->assertEqual(20, count($collection->to('array')));
 
-		$filter = function($item) { return $item == 1; };
+		$filter = function($item) { return $item === 1; };
 		$result = $collection->find($filter);
 		$this->assertTrue($result instanceof Collection);
 		$this->assertEqual(array_fill(0, 10, 1), $result->to('array'));
@@ -346,7 +346,7 @@ class CollectionTest extends \lithium\test\Unit {
 
 		$collection = new Collection(array('data' => array(5,3,4,1,2)));
 		$collection->sort(function ($a,$b) {
-			if ($a == $b) {
+			if ($a === $b) {
 				return 0;
 			}
 			return ($b > $a ? 1 : -1);
@@ -367,7 +367,7 @@ class CollectionTest extends \lithium\test\Unit {
 
 		$cpt = 0;
 		foreach ($collection as $i => $word) {
-			if ($word == 'Delete me') {
+			if ($word === 'Delete me') {
 				unset($collection[$i]);
 			}
 			$cpt++;
@@ -390,7 +390,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertIdentical($data, $collection->to('array'));
 
 		foreach ($collection as $i => $word) {
-			if ($word == 'Delete me') {
+			if ($word === 'Delete me') {
 				unset($collection[$i]);
 			}
 		}
@@ -413,7 +413,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertIdentical($data, $collection->to('array'));
 
 		foreach ($collection as $i => $word) {
-			if ($word == 'Delete me') {
+			if ($word === 'Delete me') {
 				unset($collection[$i]);
 			}
 		}

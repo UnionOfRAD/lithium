@@ -138,7 +138,7 @@ class Form extends \lithium\template\Helper {
 					if (in_array($method, array('create', 'end', 'label', 'error'))) {
 						return;
 					}
-					if (!$name || ($method == 'hidden' && $name == '_method')) {
+					if (!$name || ($method === 'hidden' && $name === '_method')) {
 						return;
 					}
 					$info = $self->binding($name);
@@ -296,14 +296,14 @@ class Form extends \lithium\template\Helper {
 			$append = null;
 			$scope['method'] = strtolower($scope['method']);
 
-			if ($scope['type'] == 'file') {
-				if ($scope['method'] == 'get') {
+			if ($scope['type'] === 'file') {
+				if ($scope['method'] === 'get') {
 					$scope['method'] = 'post';
 				}
 				$options['enctype'] = 'multipart/form-data';
 			}
 
-			if (!($scope['method'] == 'get' || $scope['method'] == 'post')) {
+			if (!($scope['method'] === 'get' || $scope['method'] === 'post')) {
 				$append = $self->hidden('_method', array('value' => strtoupper($scope['method'])));
 				$scope['method'] = 'post';
 			}
@@ -452,19 +452,19 @@ class Form extends \lithium\template\Helper {
 		$type = $options['type'];
 		$list = $options['list'];
 		$template = $options['template'];
-		$notText = $template == 'field' && $type != 'text';
+		$notText = $template === 'field' && $type !== 'text';
 
 		if ($notText && $this->_context->strings('field-' . $type)) {
 			$template = 'field-' . $type;
 		}
-		if (($options['label'] === null || $options['label']) && $options['type'] != 'hidden') {
+		if (($options['label'] === null || $options['label']) && $options['type'] !== 'hidden') {
 			if (!$options['label']) {
 				$options['label'] = Inflector::humanize(preg_replace('/[\[\]\.]/', '_', $name));
 			}
 			$label = $this->label(isset($options['id']) ? $options['id'] : '', $options['label']);
 		}
 
-		$call = ($type == 'select') ? array($name, $list, $field) : array($name, $field);
+		$call = ($type === 'select') ? array($name, $list, $field) : array($name, $field);
 		$input = call_user_func_array(array($this, $type), $call);
 		$error = ($this->_binding) ? $this->error($name) : null;
 		return $this->_render(__METHOD__, $template, compact('wrap', 'label', 'input', 'error'));
@@ -579,7 +579,7 @@ class Form extends \lithium\template\Helper {
 		if ($scope['empty']) {
 			$list = array('' => ($scope['empty'] === true) ? '' : $scope['empty']) + $list;
 		}
-		if ($template == __FUNCTION__ && $scope['multiple']) {
+		if ($template === __FUNCTION__ && $scope['multiple']) {
 			$template = 'select-multi';
 		}
 		$raw = $this->_selectOptions($list, $scope);
@@ -840,7 +840,7 @@ class Form extends \lithium\template\Helper {
 	 */
 	protected function _generators($method, $name, $options) {
 		foreach ($this->_config['attributes'] as $key => $generator) {
-			if ($key == 'name') {
+			if ($key === 'name') {
 				continue;
 			}
 			if ($generator && !isset($options[$key])) {

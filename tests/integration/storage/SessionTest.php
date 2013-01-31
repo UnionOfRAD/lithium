@@ -13,7 +13,7 @@ use lithium\storage\Session;
 class SessionTest extends \lithium\test\Integration {
 
 	public function skip() {
-		$this->skipIf(PHP_SAPI == 'cli', 'No session support in cli SAPI');
+		$this->skipIf(PHP_SAPI === 'cli', 'No session support in cli SAPI');
 	}
 
 	public function tearDown() {

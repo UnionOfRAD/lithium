@@ -14,7 +14,7 @@ class MockImageTag extends \lithium\tests\mocks\data\MockBase {
 		'Image' => array('to' => 'lithium\tests\mocks\data\model\MockImage'),
 		'Tag' => array('to' => 'lithium\tests\mocks\data\model\MockTag'));
 
-    public static $connection = null;
+	public static $connection = null;
 
 	protected $_meta = array(
 		'key' => 'id',

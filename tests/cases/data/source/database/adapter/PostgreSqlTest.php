@@ -30,7 +30,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 
 		$adapter = 'PostgreSql';
 		$this->_dbConfig = Connections::get('test', array('config' => true));
-		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == $adapter);
+		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] === $adapter);
 		$message = 'Test database is either unavailable, or not using a PostgreSQL adapter';
 		$this->skipIf(!$hasDb, $message);
 
@@ -73,7 +73,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 		$db = new PostgreSql(array(
 			'autoConnect' => false, 'encoding' => null,'persistent' => false,
 			'host' => 'localhost:5432', 'login' => 'garbage', 'password' => '',
-			'database' => 'garbage', 'init' => true, 'schema'=>'garbage'
+			'database' => 'garbage', 'init' => true, 'schema' => 'garbage'
 		) + $this->_dbConfig);
 
 		$this->expectException();

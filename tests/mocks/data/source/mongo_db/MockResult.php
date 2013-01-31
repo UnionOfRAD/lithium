@@ -54,10 +54,6 @@ class MockResult extends \lithium\data\source\Result {
 		return $this->_name;
 	}
 
-	/*public function __call($method, $arguments) {
-		exit();
-	}*/
-
 	protected function _close() {
 	}
 

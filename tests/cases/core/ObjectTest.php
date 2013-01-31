@@ -70,7 +70,7 @@ class ObjectTest extends \lithium\test\Unit {
 	/**
 	 * Verifies workaround for accessing protected properties in filtered methods.
 	 */
-	function testFilteringWithProtectedAccess() {
+	public function testFilteringWithProtectedAccess() {
 		$object = new MockExposed();
 		$this->assertEqual($object->get(), 'secret');
 		$this->assertTrue($object->tamper());
@@ -80,7 +80,7 @@ class ObjectTest extends \lithium\test\Unit {
 	/**
 	 * Attaches a single filter to multiple methods.
 	 */
-	function testMultipleMethodFiltering() {
+	public function testMultipleMethodFiltering() {
 		$object = new MockMethodFiltering();
 		$this->assertIdentical($object->method2(), array());
 

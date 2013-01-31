@@ -165,12 +165,10 @@ class XCache extends \lithium\core\Object {
 		}
 
 		if (isset($_SERVER['PHP_AUTH_USER'])) {
-			$_SERVER['PHP_AUTH_USER'] =
-				($credentials['username'] !== null) ? $credentials['username'] : null;
+			$_SERVER['PHP_AUTH_USER'] = $credentials['username'];
 		}
 		if (isset($_SERVER['PHP_AUTH_PW'])) {
-			$_SERVER['PHP_AUTH_PW'] =
-				($credentials['password'] !== null) ? $credentials['password'] : null;
+			$_SERVER['PHP_AUTH_PW'] = $credentials['password'];
 		}
 		return true;
 	}

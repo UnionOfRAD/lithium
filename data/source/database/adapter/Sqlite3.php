@@ -297,20 +297,20 @@ class Sqlite3 extends \lithium\data\source\Database {
 		switch (true) {
 			case in_array($column['type'], array('date', 'time', 'datetime', 'timestamp')):
 				return $column;
-			case ($column['type'] == 'tinyint' && $column['length'] == '1'):
-			case ($column['type'] == 'boolean'):
+			case ($column['type'] === 'tinyint' && $column['length'] == '1'):
+			case ($column['type'] === 'boolean'):
 				return array('type' => 'boolean');
 			break;
 			case (strpos($column['type'], 'int') !== false):
 				$column['type'] = 'integer';
 			break;
-			case (strpos($column['type'], 'char') !== false || $column['type'] == 'tinytext'):
+			case (strpos($column['type'], 'char') !== false || $column['type'] === 'tinytext'):
 				$column['type'] = 'string';
 			break;
 			case (strpos($column['type'], 'text') !== false):
 				$column['type'] = 'text';
 			break;
-			case (strpos($column['type'], 'blob') !== false || $column['type'] == 'binary'):
+			case (strpos($column['type'], 'blob') !== false || $column['type'] === 'binary'):
 				$column['type'] = 'binary';
 			break;
 			case preg_match('/float|double|decimal/', $column['type']):

@@ -390,7 +390,7 @@ class MongoDb extends \lithium\data\Source {
 			$data    = $_exp::get('create', $args['data']);
 			$source  = $args['source'];
 
-			if ($source == "{$_config['gridPrefix']}.files" && isset($data['create']['file'])) {
+			if ($source === "{$_config['gridPrefix']}.files" && isset($data['create']['file'])) {
 				$result = array('ok' => true);
 				$data['create']['_id'] = $self->invokeMethod('_saveFile', array($data['create']));
 			} else {
@@ -468,7 +468,7 @@ class MongoDb extends \lithium\data\Source {
 			}
 			$collection = $self->connection->{$source};
 
-			if ($source == "{$_config['gridPrefix']}.files") {
+			if ($source === "{$_config['gridPrefix']}.files") {
 				$collection = $self->connection->getGridFS($_config['gridPrefix']);
 			}
 			$result = $collection->find($args['conditions'], $args['fields']);
@@ -528,7 +528,7 @@ class MongoDb extends \lithium\data\Source {
 				$data = $_exp::get('update', $data);
 			}
 
-			if ($source == "{$_config['gridPrefix']}.files" && isset($data['update']['file'])) {
+			if ($source === "{$_config['gridPrefix']}.files" && isset($data['update']['file'])) {
 				$args['data']['_id'] = $self->invokeMethod('_saveFile', array($data['update']));
 			}
 			$update = $query->entity() ? $_exp::toCommand($data) : $data;
@@ -566,7 +566,7 @@ class MongoDb extends \lithium\data\Source {
 			$source = $args['source'];
 			$conditions = $args['conditions'];
 
-			if ($source == "{$_config['gridPrefix']}.files") {
+			if ($source === "{$_config['gridPrefix']}.files") {
 				$result = $self->invokeMethod('_deleteFile', array($conditions));
 			} else {
 				$result = $self->connection->{$args['source']}->remove($conditions, $options);
@@ -581,7 +581,9 @@ class MongoDb extends \lithium\data\Source {
 	protected function _deleteFile($conditions, $options = array()) {
 		$defaults = array('safe' => true);
 		$options += $defaults;
-		return $this->connection->getGridFS($this->_config['gridPrefix'])->remove($conditions, $options);
+		return $this->connection
+			->getGridFS($this->_config['gridPrefix'])
+			->remove($conditions, $options);
 	}
 
 	/**
@@ -612,7 +614,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
-		$key = Inflector::camelize($type == 'belongsTo' ? $class::meta('name') : $name, false);
+		$key = Inflector::camelize($type === 'belongsTo' ? $class::meta('name') : $name, false);
 
 		$config += compact('name', 'type', 'key');
 		$config['from'] = $class;
@@ -814,7 +816,7 @@ class MongoDb extends \lithium\data\Source {
 				continue;
 			}
 			if (is_string($value)) {
-				$order[$key] = strtolower($value) == 'asc' ? 1 : -1;
+				$order[$key] = strtolower($value) === 'asc' ? 1 : -1;
 			}
 		}
 		return $order;

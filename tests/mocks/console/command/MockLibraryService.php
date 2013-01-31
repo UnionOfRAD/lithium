@@ -14,51 +14,51 @@ use lithium\net\http\Response;
 class MockLibraryService extends \lithium\net\http\Service {
 
 	public function send($method, $path = null, $data = array(), array $options = array()) {
-		if ($this->_config['host'] == 'localhost') {
+		if ($this->_config['host'] === 'localhost') {
 			return null;
 		}
-		if ($method == 'post') {
+		if ($method === 'post') {
 			$this->request = $this->_request($method, $path, $data, $options);
 			if (!empty($this->request->username)) {
 				$user =  array(
 					'method' => 'Basic', 'username' => 'gwoo', 'password' => 'password'
 				);
 				if ($this->request->username !== $user['username']) {
-					$this->last = (object) array('response' =>  new Response());
+					$this->last = (object) array('response' => new Response());
 					$this->last->response->status(401);
 					return json_encode(array(
 						'error' => 'Invalid username/password.'
 					));
 				}
 			}
-			$this->last = (object) array('response' =>  new Response());
+			$this->last = (object) array('response' => new Response());
 			$this->last->response->status(201);
-			return json_encode($this->__data('plugins', 1));
+			return json_encode($this->_data('plugins', 1));
 		}
-		if ($path == 'lab/plugins') {
-			return json_encode($this->__data('plugins'));
+		if ($path === 'lab/plugins') {
+			return json_encode($this->_data('plugins'));
 		}
-		if ($path == 'lab/extensions') {
-			return json_encode($this->__data('extensions'));
+		if ($path === 'lab/extensions') {
+			return json_encode($this->_data('extensions'));
 		}
 		if (preg_match("/lab\/plugins/", $path, $match)) {
-			return json_encode($this->__data('plugins'));
+			return json_encode($this->_data('plugins'));
 		}
 		if (preg_match("/lab\/extensions/", $path, $match)) {
-			return json_encode($this->__data('extensions'));
+			return json_encode($this->_data('extensions'));
 		}
 		if (preg_match("/lab\/li3_lab.json/", $path, $match)) {
-			return json_encode($this->__data('plugins', 0));
+			return json_encode($this->_data('plugins', 0));
 		}
 		if (preg_match("/lab\/library_test_plugin.json/", $path, $match)) {
-			return json_encode($this->__data('plugins', 1));
+			return json_encode($this->_data('plugins', 1));
 		}
 		if (preg_match("/lab\/li3_docs.json/", $path, $match)) {
-			return json_encode($this->__data('plugins', 2));
+			return json_encode($this->_data('plugins', 2));
 		}
 	}
 
-	protected function __data($type, $key = null) {
+	protected function _data($type, $key = null) {
 		$resources = Libraries::get(true, 'resources');
 
 		$plugins = array(
@@ -92,7 +92,7 @@ class MockLibraryService extends \lithium\net\http\Service {
 				'created' => '2009-11-30', 'updated' => '2009-11-30',
 				'rating' => '9.9', 'downloads' => '1000',
 				'sources' => array(
-					'phar' =>  "{$resources}/tmp/tests/library_test_plugin.phar.gz"
+					'phar' => "{$resources}/tmp/tests/library_test_plugin.phar.gz"
 				),
 				'requires' => array(
 					'li3_lab' => array('version' => '<=1.0')

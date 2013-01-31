@@ -94,7 +94,7 @@ class File extends \lithium\core\Object {
 			$path = "$path/$key";
 			$file = new SplFileInfo($path);
 
-			if (!$file->isFile() || !$file->isReadable())  {
+			if (!$file->isFile() || !$file->isReadable()) {
 				return false;
 			}
 
@@ -124,7 +124,7 @@ class File extends \lithium\core\Object {
 			$path = "$path/$key";
 			$file = new SplFileInfo($path);
 
-			if ($file->isFile() && $file->isReadable())  {
+			if ($file->isFile() && $file->isReadable()) {
 				return unlink($path);
 			}
 			return false;

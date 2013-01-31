@@ -298,12 +298,12 @@ class SetTest extends \lithium\test\Unit {
 				'keep' => array()
 			),
 			'Comment' => array(
-				'keep' => array('Attachment' =>  array('fields' => array('attachment')))
+				'keep' => array('Attachment' => array('fields' => array('attachment')))
 			),
 			'User' => array('keep' => array()),
 			'Article' => array(
 				'keep' => array(
-					'Comment' =>  array('fields' => array('comment', 'published')),
+					'Comment' => array('fields' => array('comment', 'published')),
 					'User' => array('fields' => array('user'))
 				)
 			)
@@ -581,7 +581,7 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	function testExtractAssociatedHasMany() {
+	public function testExtractAssociatedHasMany() {
 		$common = array(
 			array(
 				'Article' => array('id' => 1, 'name' => 'Article 1'),
@@ -1434,10 +1434,16 @@ class SetTest extends \lithium\test\Unit {
 
 		$expected = array(
 			'ModelOne' => array(
-				'id' => 1001, 'field_one' => 's1.0.m1.f1', 'field_two' => 's1.0.m1.f2', 'field_three' => 's1.0.m1.f3'
+				'id' => 1001,
+				'field_one' => 's1.0.m1.f1',
+				'field_two' => 's1.0.m1.f2',
+				'field_three' => 's1.0.m1.f3'
 			),
 			'ModelTwo' => array(
-				'id' => 1002, 'field_one' => 's1.0.m2.f1', 'field_two' => 's1.0.m2.f2', 'field_three' => 's1.0.m2.f3'
+				'id' => 1002,
+				'field_one' => 's1.0.m2.f1',
+				'field_two' => 's1.0.m2.f2',
+				'field_three' => 's1.0.m2.f3'
 			)
 		);
 		$this->assertIdentical($expected, $result);
