@@ -456,7 +456,7 @@ class Libraries {
 		$options += $defaults;
 		$libs = array();
 
-		if ($options['namespaces'] && $options['filter'] == $defaults['filter']) {
+		if ($options['namespaces'] && $options['filter'] === $defaults['filter']) {
 			$options['format'] = function($class, $config) use ($format, $defaults) {
 				if (is_dir($class)) {
 					return $format($class, $config);
@@ -616,9 +616,9 @@ class Libraries {
 		list(, $relativePath, $pharPath) = $pathComponents;
 
 		$pharPath = implode('/', array_reduce(explode('/', $pharPath), function ($parts, $value) {
-			if ($value == '..') {
+			if ($value === '..') {
 				array_pop($parts);
-			} elseif ($value != '.') {
+			} elseif ($value !== '.') {
 				$parts[] = $value;
 			}
 			return $parts;

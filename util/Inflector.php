@@ -235,7 +235,7 @@ class Inflector {
 				$_config = array();
 
 				foreach ($config as $key => $val) {
-					if ($key[0] != '/') {
+					if ($key[0] !== '/') {
 						$key = '/' . join('|', array_filter(preg_split('//u', $key))) . '/';
 					}
 					$_config[$key] = $val;
@@ -259,8 +259,8 @@ class Inflector {
 					foreach ($config as $rType => $set) {
 						static::${$var}[$rType] = array_merge($set, static::${$var}[$rType], $set);
 
-						if ($rType == 'irregular') {
-							$swap = ($type == 'singular' ? '_plural' : '_singular');
+						if ($rType === 'irregular') {
+							$swap = ($type === 'singular' ? '_plural' : '_singular');
 							static::${$swap}[$rType] = array_flip(static::${$var}[$rType]);
 						}
 					}

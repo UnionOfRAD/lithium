@@ -83,12 +83,10 @@ class DatabaseTest extends \lithium\test\Integration {
 		$this->_dbConfig = Connections::get($connection, array(
 			'config' => true
 		));
-		$isAvailable = (
-			$this->_dbConfig &&
-			Connections::get($connection)->isConnected(array(
-				'autoConnect' => true
-			))
-		);
+		$isConnected = $this->_dbConfig && Connections::get($connection)->isConnected(array(
+			'autoConnect' => true
+		));
+		$isAvailable = $this->_dbConfig && $isConnected;
 		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
 
 		$this->db = Connections::get($connection);

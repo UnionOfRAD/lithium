@@ -139,7 +139,7 @@ class Cookie extends \lithium\core\Object {
 		$config = $this->_config;
 		$cookieClass = __CLASS__;
 
-		if ($expire && $key != $config['name']) {
+		if ($expire && $key !== $config['name']) {
 			return null;
 		}
 		$expires = (isset($options['expire'])) ? $options['expire'] : $config['expire'];

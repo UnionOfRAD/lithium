@@ -56,7 +56,7 @@ class Http extends \lithium\data\Source {
 	 */
 	protected $_methods = array(
 		'create' => array('method' => 'post', 'path' => "/{:source}"),
-		'read'	 => array('method' => 'get', 'path' => "/{:source}"),
+		'read'   => array('method' => 'get', 'path' => "/{:source}"),
 		'update' => array('method' => 'put', 'path' => "/{:source}/{:id}"),
 		'delete' => array('method' => 'delete', 'path' => "/{:source}/{:id}")
 	);
@@ -68,7 +68,7 @@ class Http extends \lithium\data\Source {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'adapter'	 => null,
+			'adapter'    => null,
 			'persistent' => false,
 			'scheme'     => 'http',
 			'host'       => 'localhost',
@@ -125,7 +125,7 @@ class Http extends \lithium\data\Source {
 		if (!is_object($params[0])) {
 			$config = (array) $params[0];
 
-			if (count($config) == count($config, COUNT_RECURSIVE)) {
+			if (count($config) === count($config, COUNT_RECURSIVE)) {
 				$config = array('data' => $config);
 			}
 			$params[0] = new Query($this->_methods[$method] + $config);

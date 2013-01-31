@@ -28,7 +28,7 @@ class LoggerTest extends \lithium\test\Integration {
 		});
 
 		$config = array('default' => array(
-			'adapter' => 'File', 'timestamp' => false,	'format' => "{:message}\n"
+			'adapter' => 'File', 'timestamp' => false, 'format' => "{:message}\n"
 		));
 		Logger::config($config);
 

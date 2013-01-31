@@ -202,7 +202,7 @@ class DispatcherTest extends \lithium\test\Unit {
 	}
 
 	public static function process($request) {
-		if ($request->url == '/auto') {
+		if ($request->url === '/auto') {
 			return new Response(array('location' => '/redirect'));
 		}
 

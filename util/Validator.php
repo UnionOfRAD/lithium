@@ -295,7 +295,7 @@ class Validator extends \lithium\core\StaticObject {
 					$number = $value[$position] * 2;
 					$sum += ($number < 10) ? $number : $number - 9;
 				}
-				return ($sum % 10 == 0);
+				return ($sum % 10 === 0);
 			},
 			'numeric' => function($value) {
 				return is_numeric($value);
@@ -329,7 +329,7 @@ class Validator extends \lithium\core\StaticObject {
 
 		$isEmpty = function($self, $params, $chain) {
 			extract($params);
-			return (empty($value) && $value != '0') ? false : $chain->next($self, $params, $chain);
+			return (empty($value) && $value !== '0') ? false : $chain->next($self, $params, $chain);
 		};
 
 		static::$_methodFilters[$class]['alphaNumeric'] = array($isEmpty);
@@ -639,7 +639,7 @@ class Validator extends \lithium\core\StaticObject {
 			$options += $defaults;
 
 			$formats = (array) $format;
-			$options['all'] = ($format == 'any');
+			$options['all'] = ($format === 'any');
 
 			foreach ($rules as $index => $check) {
 				if (!$options['all'] && !(in_array($index, $formats) || isset($formats[$index]))) {

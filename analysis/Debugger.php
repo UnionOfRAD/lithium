@@ -87,7 +87,7 @@ class Debugger extends \lithium\core\StaticObject {
 			}
 			$trace['functionRef'] = $function;
 
-			if ($options['format'] == 'points' && $trace['file'] != '[internal]') {
+			if ($options['format'] === 'points' && $trace['file'] !== '[internal]') {
 				$back[] = array('file' => $trace['file'], 'line' => $trace['line']);
 			} elseif (is_string($options['format']) && $options['format'] != 'array') {
 				$back[] = String::insert($options['format'], array_map(
@@ -108,7 +108,7 @@ class Debugger extends \lithium\core\StaticObject {
 			}
 		}
 
-		if ($options['format'] == 'array' || $options['format'] == 'points') {
+		if ($options['format'] === 'array' || $options['format'] === 'points') {
 			return $back;
 		}
 		return join("\n", $back);

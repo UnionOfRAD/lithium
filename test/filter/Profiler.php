@@ -138,7 +138,7 @@ class Profiler extends \lithium\test\Filter {
 
 		foreach ($results as $testCase) {
 			foreach ((array) $testCase as $assertion) {
-				if ($assertion['result'] != 'pass' && $assertion['result'] != 'fail') {
+				if ($assertion['result'] !== 'pass' && $assertion['result'] !== 'fail') {
 					continue;
 				}
 				$class = $classMap[$assertion['class']];

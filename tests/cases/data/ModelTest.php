@@ -146,7 +146,10 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue(empty($methods));
 
 		MockPost::instanceMethods(array(
-			'first' => array('lithium\tests\mocks\data\source\MockMongoPost', 'testInstanceMethods'),
+			'first' => array(
+				'lithium\tests\mocks\data\source\MockMongoPost',
+				'testInstanceMethods'
+			),
 			'second' => function($entity) {}
 		));
 
@@ -342,7 +345,7 @@ class ModelTest extends \lithium\test\Unit {
 		MockComment::applyFilter('find', function($self, $params, $chain) {
 			$result = $chain->next($self, $params, $chain);
 
-			if ($result != null) {
+			if ($result !== null) {
 				$result->filtered = true;
 			}
 			return $result;
@@ -581,7 +584,7 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array(
 			'name' => 'Moe',
 			'sign' => 'bar',
-			'age' =>  0
+			'age' => 0
 		);
 		$result = $creator->data();
 		$this->assertEqual($expected, $result);
@@ -590,7 +593,7 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array(
 			'name' => 'Homer',
 			'sign' => 'bar',
-			'age' =>  0
+			'age' => 0
 		);
 		$result = $creator->data();
 		$this->assertEqual($expected, $result);
@@ -602,7 +605,7 @@ class ModelTest extends \lithium\test\Unit {
 			'name' => 'Moe',
 			'sign' => 'Beer',
 			'skin' => 'yellow',
-			'age' =>  12,
+			'age' => 12,
 			'hair' => false
 		);
 		$result = $creator->data();
@@ -665,7 +668,11 @@ class ModelTest extends \lithium\test\Unit {
 	public function testSaveWithFailedValidation() {
 		$data = array('title' => '', 'author_id' => 13);
 		$record = MockPost::create($data);
-		$result = $record->save(null, array('validate' => array('title' => 'A title must be present')));
+		$result = $record->save(null, array(
+			'validate' => array(
+				'title' => 'A title must be present'
+			)
+		));
 		$this->assertIdentical(false, $result);
 	}
 
@@ -855,7 +862,7 @@ class ModelTest extends \lithium\test\Unit {
 		MockPost::config($config);
 		$this->assertIdentical('cool_posts', MockPost::meta('source'));
 		$this->assertIdentical('label1', MockPost::meta('title'));
-		$this->assertFalse('label2' == MockPost::meta('title'));
+		$this->assertFalse('label2' === MockPost::meta('title'));
 		$this->assertIdentical('label1', MockPost::meta('title'));
 		$meta = MockPost::meta();
 		$this->assertIdentical('label1', $meta['title']);

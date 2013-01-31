@@ -52,7 +52,7 @@ class MockDocumentPost extends \lithium\tests\mocks\data\MockBase {
 				));
 			break;
 			case 'all':
-			default :
+			default:
 				return new DocumentSet(array(
 					'data' => array(
 						array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),

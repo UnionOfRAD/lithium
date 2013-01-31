@@ -195,7 +195,7 @@ class Locale extends \lithium\core\StaticObject {
 		while ($count > 0) {
 			if (($key = array_search(static::compose($tags), $locales)) !== false) {
 				return $locales[$key];
-			} elseif ($count == 1) {
+			} elseif ($count === 1) {
 				foreach ($locales as $currentLocale) {
 					if (strpos($currentLocale, current($tags) . '_') === 0) {
 						return $currentLocale;
@@ -296,7 +296,7 @@ class Locale extends \lithium\core\StaticObject {
 		foreach (array('LC_ALL', 'LANG') as $variable)  {
 			$value = $request->env($variable);
 
-			if (!$value || $value == 'C' || $value == 'POSIX') {
+			if (!$value || $value === 'C' || $value === 'POSIX') {
 				continue;
 			}
 			if (preg_match("/{$regex}/", $value, $matches)) {

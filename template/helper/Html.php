@@ -231,7 +231,7 @@ class Html extends \lithium\template\Helper {
 		$type = $scope['type'];
 		$params = compact('type', 'path', 'options');
 		$filter = function($self, $params, $chain) use ($defaults, $method) {
-			$template = ($params['type'] == 'import') ? 'style-import' : 'style-link';
+			$template = ($params['type'] === 'import') ? 'style-import' : 'style-link';
 			return $self->invokeMethod('_render', array($method, $template, $params));
 		};
 		$style = $this->_filter($method, $params, $filter);
@@ -277,9 +277,9 @@ class Html extends \lithium\template\Helper {
 	 *
 	 * @param string $path Path to the image file. If the filename is prefixed with
 	 *               `'/'`, the path will be relative to the base path of your application.
-	 *               Otherwise the path will be relative to the images directory, usually `app/webroot/img/`.
-	 *               If the name starts with `'http://'`, this is treated as an external url used as the `src`
-	 *               attribute.
+	 *               Otherwise the path will be relative to the images directory, usually
+	 *               `app/webroot/img/`. If the name starts with `'http://'`, this is treated
+	 *               as an external url used as the `src` attribute.
 	 * @param array $options Array of HTML attributes.
 	 * @return string Returns a formatted `<img />` tag.
 	 * @filter This method can be filtered.
@@ -308,7 +308,7 @@ class Html extends \lithium\template\Helper {
 	protected function _metaLink($type, $url = null, array $options = array()) {
 		$options += isset($this->_metaLinks[$type]) ? $this->_metaLinks[$type] : array();
 
-		if ($type == 'icon') {
+		if ($type === 'icon') {
 			$url = $url ?: 'favicon.ico';
 			$standard = $this->_render(__METHOD__, 'meta-link', compact('url', 'options'), array(
 				'handlers' => array('url' => 'path')

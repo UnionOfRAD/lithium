@@ -209,7 +209,7 @@ class Create extends \lithium\console\Command {
 
 			return new $class(array(
 				'request' => $this->request,
-				'classes'=> $this->_classes
+				'classes' => $this->_classes
 			));
 		}
 		return parent::_instance($name, $config);
@@ -245,7 +245,7 @@ class Create extends \lithium\console\Command {
 		if (file_exists($file)) {
 			$prompt = "{$relative} already exists. Overwrite?";
 			$choices = array('y', 'n');
-			if ($this->in($prompt, compact('choices')) != 'y') {
+			if ($this->in($prompt, compact('choices')) !== 'y') {
 				return "{$params['class']} skipped.";
 			}
 		}

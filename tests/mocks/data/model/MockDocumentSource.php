@@ -27,8 +27,8 @@ class MockDocumentSource extends \lithium\data\Source {
 	public function update($query, array $options = array()) {}
 	public function delete($query, array $options = array()) {}
 
-	protected $point = 0;
-	protected $result = null;
+	public $point = 0;
+	public $result = null;
 
 	public function read($query = null, array $options = array()) {
 		$this->point = 0;
@@ -57,7 +57,7 @@ class MockDocumentSource extends \lithium\data\Source {
 	}
 
 	public function relationship($class, $type, $name, array $options = array()) {
-		$key = Inflector::camelize($type == 'belongsTo' ? $name : $class::meta('name'));
+		$key = Inflector::camelize($type === 'belongsTo' ? $name : $class::meta('name'));
 
 		$options += compact('name', 'type', 'key');
 		$options['from'] = $class;

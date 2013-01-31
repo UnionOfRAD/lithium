@@ -19,7 +19,7 @@ class MockCollectionMarker {
 		return true;
 	}
 
-	function mapArray() {
+	public function mapArray() {
 		return array('foo');
 	}
 }

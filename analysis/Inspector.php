@@ -88,7 +88,7 @@ class Inspector extends \lithium\core\StaticObject {
 		$result = array();
 		$class = null;
 
-		if ($type == 'method' || $type == 'property') {
+		if ($type === 'method' || $type === 'property') {
 			list($class, $identifier) = explode('::', $identifier);
 
 			try {
@@ -97,7 +97,7 @@ class Inspector extends \lithium\core\StaticObject {
 				return null;
 			}
 
-			if ($type == 'property') {
+			if ($type === 'property') {
 				$identifier = substr($identifier, 1);
 				$accessor = 'getProperty';
 			} else {
@@ -111,7 +111,7 @@ class Inspector extends \lithium\core\StaticObject {
 				return null;
 			}
 			$result['modifiers'] = static::_modifiers($inspector);
-		} elseif ($type == 'class') {
+		} elseif ($type === 'class') {
 			$inspector = new ReflectionClass($identifier);
 		} else {
 			return null;
@@ -123,7 +123,7 @@ class Inspector extends \lithium\core\StaticObject {
 			}
 			if (method_exists($inspector, static::$_methodMap[$key])) {
 				$setAccess = (
-					($type == 'method' || $type == 'property') &&
+					($type === 'method' || $type === 'property') &&
 					array_intersect($result['modifiers'], array('private', 'protected')) != array()
 					&& method_exists($inspector, 'setAccessible')
 				);
@@ -140,7 +140,7 @@ class Inspector extends \lithium\core\StaticObject {
 			}
 		}
 
-		if ($type == 'property' && !$classInspector->isAbstract()) {
+		if ($type === 'property' && !$classInspector->isAbstract()) {
 			$inspector->setAccessible(true);
 
 			try {
@@ -231,7 +231,7 @@ class Inspector extends \lithium\core\StaticObject {
 			$result = array_keys(array_filter($lines, function($line) use ($options) {
 				$line = trim($line);
 				$empty = preg_match($options['pattern'], $line);
-				return $empty ? false : (str_replace($options['empty'], '', $line) != '');
+				return $empty ? false : (str_replace($options['empty'], '', $line) !== '');
 			}));
 		}
 		return $result;
@@ -373,7 +373,7 @@ class Inspector extends \lithium\core\StaticObject {
 
 			$file = new SplFileObject($data);
 			foreach ($file as $current) {
-				$c[$file->key()+1] = rtrim($file->current());
+				$c[$file->key() + 1] = rtrim($file->current());
 			}
 		}
 
@@ -434,7 +434,7 @@ class Inspector extends \lithium\core\StaticObject {
 				include $file;
 				$list = array_diff(get_declared_classes(), $list);
 			} else {
-				$filter = function($class) use ($file) { return $class->getFileName() == $file; };
+				$filter = function($class) use ($file) { return $class->getFileName() === $file; };
 				$list = $loaded->find($filter)->getName();
 			}
 		}
@@ -442,9 +442,9 @@ class Inspector extends \lithium\core\StaticObject {
 		foreach ($list as $class) {
 			$inspector = new ReflectionClass($class);
 
-			if ($options['group'] == 'classes') {
+			if ($options['group'] === 'classes') {
 				$inspector->getFileName() ? $classes[$class] = $inspector->getFileName() : null;
-			} elseif ($options['group'] == 'files') {
+			} elseif ($options['group'] === 'files') {
 				$classes[$inspector->getFileName()][] = $inspector;
 			}
 		}
@@ -543,7 +543,7 @@ class Inspector extends \lithium\core\StaticObject {
 
 		if ($options['self']) {
 			$data = array_filter($data, function($item) use ($class) {
-				return ($item->getDeclaringClass()->getName() == $class->getName());
+				return ($item->getDeclaringClass()->getName() === $class->getName());
 			});
 		}
 

@@ -143,7 +143,7 @@ class CouchDb extends \lithium\data\source\Http {
 			}
 			if (!$this->_db) {
 				if (isset($result->error)) {
-					if ($result->error == 'not_found') {
+					if ($result->error === 'not_found') {
 						$result = $this->put($database);
 					}
 				}
@@ -456,7 +456,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $context
 	 * @return array
 	 */
-	function order($order, $context) {
+	public function order($order, $context) {
 		return (array) $order ?: array();
 	}
 

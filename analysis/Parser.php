@@ -270,13 +270,13 @@ class Parser extends \lithium\core\StaticObject {
 		$match = $pattern['content'];
 		$content = $token['content'];
 
-		if ($pattern['name'] == 'T_VARIABLE') {
+		if ($pattern['name'] === 'T_VARIABLE') {
 			$match = substr($match, 1);
 			$content = substr($content, 1);
 		}
 
 		switch (true) {
-			case ($match == '_' || $match == $content):
+			case ($match === '_' || $match == $content):
 				return true;
 		}
 		return false;

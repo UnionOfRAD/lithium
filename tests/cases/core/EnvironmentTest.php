@@ -177,10 +177,10 @@ class EnvironmentTest extends \lithium\test\Unit {
 	 */
 	public function testCustomDetector() {
 		Environment::is(function($request) {
-			if ($request->env('HTTP_HOST') == 'localhost') {
+			if ($request->env('HTTP_HOST') === 'localhost') {
 				return 'development';
 			}
-			if ($request->env('HTTP_HOST') == 'staging.server') {
+			if ($request->env('HTTP_HOST') === 'staging.server') {
 				return 'test';
 			}
 			return 'production';

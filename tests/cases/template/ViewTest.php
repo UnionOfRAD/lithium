@@ -148,8 +148,7 @@ class ViewTest extends \lithium\test\Unit {
 		$expectedPath .= '/lithium/tests/mocks/template/view/adapters/testFile.html.php';
 		$expected = array (array (
 				'type' => 'template',
-				'params' =>
-				array (
+				'params' => array (
 					'template' => 'testFile',
 					'library' => LITHIUM_LIBRARY_PATH . '/lithium',
 					'type' => 'html'

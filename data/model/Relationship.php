@@ -112,7 +112,7 @@ class Relationship extends \lithium\core\Object {
 		$config =& $this->_config;
 		$type = $config['type'];
 
-		$name = ($type == 'hasOne') ? Inflector::pluralize($config['name']) : $config['name'];
+		$name = ($type === 'hasOne') ? Inflector::pluralize($config['name']) : $config['name'];
 		$config['fieldName'] = $config['fieldName'] ?: lcfirst($name);
 
 		if (!$config['to']) {
@@ -137,7 +137,7 @@ class Relationship extends \lithium\core\Object {
 
 	protected function _keys($keys) {
 		$config = $this->_config;
-		$hasRel = ($related = ($config['type'] == 'belongsTo') ? $config['to'] : $config['from']);
+		$hasRel = ($related = ($config['type'] === 'belongsTo') ? $config['to'] : $config['from']);
 
 		if (!$hasRel || !$keys) {
 			return array();
@@ -151,7 +151,7 @@ class Relationship extends \lithium\core\Object {
 		$keys = (array) $keys;
 		$related = (array) $related::key();
 
-		if (count($keys) != count($related)) {
+		if (count($keys) !== count($related)) {
 			$msg  = "Unmatched keys in relationship `{$config['name']}` between models ";
 			$msg .= "`{$config['from']}` and `{$config['to']}`.";
 			throw new ConfigException($msg);

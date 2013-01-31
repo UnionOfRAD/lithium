@@ -390,7 +390,8 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertNoPattern($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
-		return $this->assert(!preg_match($expected, $result), $message, compact('expected', 'result'));
+		$params = compact('expected', 'result');
+		return $this->assert(!preg_match($expected, $result), $message, $params);
 	}
 
 	/**
@@ -402,7 +403,8 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertPattern($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
-		return $this->assert(!!preg_match($expected, $result), $message, compact('expected', 'result'));
+		$params = compact('expected', 'result');
+		return $this->assert(!!preg_match($expected, $result), $message, $params);
 	}
 
 	/**
@@ -443,7 +445,7 @@ class Unit extends \lithium\core\Object {
 	 * @param array $expected An array, see above
 	 * @return boolean
 	 */
-	function assertTags($string, $expected) {
+	public function assertTags($string, $expected) {
 		$regex = array();
 		$normalized = array();
 
@@ -458,7 +460,7 @@ class Unit extends \lithium\core\Object {
 
 		foreach ($normalized as $tags) {
 			$i++;
-			if (is_string($tags) && $tags{0} == '<') {
+			if (is_string($tags) && $tags{0} === '<') {
 				$tags = array(substr($tags, 1) => array());
 			} elseif (is_string($tags)) {
 				$tagsTrimmed = preg_replace('/\s+/m', '', $tags);
@@ -466,7 +468,7 @@ class Unit extends \lithium\core\Object {
 				if (preg_match('/^\*?\//', $tags, $match) && $tagsTrimmed !== '//') {
 					$prefix = array(null, null);
 
-					if ($match[0] == '*/') {
+					if ($match[0] === '*/') {
 						$prefix = array('Anything, ', '.*?');
 					}
 					$regex[] = array(
@@ -586,11 +588,11 @@ class Unit extends \lithium\core\Object {
 			$class = get_class($e);
 			$eMessage = $e->getMessage();
 
-			if (get_class($e) == $expected) {
+			if (get_class($e) === $expected) {
 				$result = $class;
 				return $this->assert(true, $message, compact('expected', 'result'));
 			}
-			if ($eMessage == $expected) {
+			if ($eMessage === $expected) {
 				$result = $eMessage;
 				return $this->assert(true, $message, compact('expected', 'result'));
 			}
@@ -670,7 +672,7 @@ class Unit extends \lithium\core\Object {
 		$value = preg_quote(urlencode($expected['value']), '/');
 
 		$key = explode('.', $expected['key']);
-		$key = (count($key) == 1) ? '[' . current($key) . ']' : ('[' . join('][', $key) . ']');
+		$key = (count($key) === 1) ? '[' . current($key) . ']' : ('[' . join('][', $key) . ']');
 		$key = preg_quote($key, '/');
 
 		if (isset($expected['expires'])) {
@@ -824,7 +826,7 @@ class Unit extends \lithium\core\Object {
 	protected function _reportException($exception, $lineFlag = null) {
 		$message = $exception['message'];
 
-		$isExpected = (($exp = end($this->_expected)) && ($exp === true || $exp == $message || (
+		$isExpected = (($exp = end($this->_expected)) && ($exp === true || $exp === $message || (
 			Validator::isRegex($exp) && preg_match($exp, $message)
 		)));
 		if ($isExpected) {
@@ -1233,7 +1235,7 @@ class Unit extends \lithium\core\Object {
 	 * @return bool
 	 */
 	public function assertClassHasAttribute($attributeName, $class, $message = '{:message}') {
-		if(!is_string($class)) {
+		if (!is_string($class)) {
 			throw new InvalidArgumentException('Argument $class must be a string');
 		}
 		$object = new ReflectionClass($class);
@@ -1263,7 +1265,7 @@ class Unit extends \lithium\core\Object {
 	 * @return bool
 	 */
 	public function assertClassNotHasAttribute($attributeName, $class, $message = '{:message}') {
-		if(!is_string($class)) {
+		if (!is_string($class)) {
 			throw new InvalidArgumentException('Argument $class must be a string.');
 		}
 		$object = new ReflectionClass($class);
@@ -1391,14 +1393,14 @@ class Unit extends \lithium\core\Object {
 	 * @return bool
 	 */
 	public function assertNotContains($needle, $haystack, $message = '{:message}') {
-		if(is_string($haystack)) {
+		if (is_string($haystack)) {
 			return $this->assert(strpos($haystack, $needle) === false, $message, array(
 				'expected' => $needle,
 				'result' => $haystack
 			));
 		}
-		foreach($haystack as $key => $value) {
-			if($value === $needle) {
+		foreach ($haystack as $key => $value) {
+			if ($value === $needle) {
 				return $this->assert(false, $message, array(
 					'expected' => $needle,
 					'result' => $haystack
@@ -1429,8 +1431,8 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertContainsOnly($type, $haystack, $message = '{:message}') {
 		$method = self::$_internalTypes[$type];
-		foreach($haystack as $key => $value) {
-			if(!$method($value)) {
+		foreach ($haystack as $key => $value) {
+			if (!$method($value)) {
 				return $this->assert(false, $message, array(
 					'expected' => $type,
 					'result' => $haystack
@@ -1493,8 +1495,8 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertContainsOnlyInstancesOf($class, $haystack, $message = '{:message}') {
 		$result = array();
-		foreach($haystack as $key => &$value) {
-			if(!is_a($value, $class)) {
+		foreach ($haystack as $key => &$value) {
+			if (!is_a($value, $class)) {
 				$result[$key] =& $value;
 				break;
 			}
@@ -1874,7 +1876,7 @@ class Unit extends \lithium\core\Object {
 	 * @return bool
 	 */
 	public function assertObjectHasAttribute($attributeName, $object, $message = '{:message}') {
-		if(!is_object($object)) {
+		if (!is_object($object)) {
 			throw new InvalidArgumentException('Second argument $object must be an object.');
 		}
 		$object = new ReflectionClass($object);
@@ -1903,7 +1905,7 @@ class Unit extends \lithium\core\Object {
 	 * @return bool
 	 */
 	public function assertObjectNotHasAttribute($attributeName, $object, $message = '{:message}') {
-		if(!is_object($object)) {
+		if (!is_object($object)) {
 			throw new InvalidArgumentException('Second argument $object must be an object');
 		}
 		$object = new ReflectionClass($object);

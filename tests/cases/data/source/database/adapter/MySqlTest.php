@@ -27,7 +27,7 @@ class MySqlTest extends \lithium\test\Unit {
 		$this->skipIf(!MySql::enabled(), 'MySQL Extension is not loaded');
 
 		$this->_dbConfig = Connections::get('test', array('config' => true));
-		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'MySql');
+		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] === 'MySql');
 		$message = 'Test database is either unavailable, or not using a MySQL adapter';
 		$this->skipIf(!$hasDb, $message);
 

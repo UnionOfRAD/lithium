@@ -153,7 +153,7 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	 *
 	 * @return boolean Return `true` on success or `false` otherwise.
 	 */
-	function _fetch() {
+	protected function _fetch() {
 		$this->_init = true;
 		if ($this->_fetchFromCache() || $this->_fetchFromResource()) {
 			return true;

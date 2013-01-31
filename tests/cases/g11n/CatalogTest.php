@@ -286,7 +286,7 @@ class CatalogTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testDataTypeSupport() {
-		$data = function($n) { return $n == 1 ? 0 : 1; };
+		$data = function($n) { return $n === 1 ? 0 : 1; };
 		Catalog::write('runtime', 'message.pluralRule', 'en', $data);
 		$result = Catalog::read('runtime', 'message.pluralRule', 'en');
 		$this->assertEqual($data, $result);
@@ -376,7 +376,7 @@ class CatalogTest extends \lithium\test\Unit {
 
 	public function testInvalidWrite() {
 		Catalog::reset();
-		$data = array('house'	=> array('id' => 'house'));
+		$data = array('house' => array('id' => 'house'));
 		$this->expectException("Configuration `runtime` has not been defined.");
 		$this->assertFalse(Catalog::write('runtime', 'message', 'de', $data));
 	}

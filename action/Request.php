@@ -231,12 +231,12 @@ class Request extends \lithium\net\http\Request {
 	 * @todo Refactor to lazy-load environment settings
 	 */
 	public function env($key) {
-		if (strtolower($key) == 'base') {
+		if (strtolower($key) === 'base') {
 			return $this->_base;
 		}
 
-		if ($key == 'SCRIPT_NAME' && !isset($this->_env['SCRIPT_NAME'])) {
-			if ($this->_env['PLATFORM'] == 'CGI' || isset($this->_env['SCRIPT_URL'])) {
+		if ($key === 'SCRIPT_NAME' && !isset($this->_env['SCRIPT_NAME'])) {
+			if ($this->_env['PLATFORM'] === 'CGI' || isset($this->_env['SCRIPT_URL'])) {
 				$key = 'SCRIPT_URL';
 			}
 		}
@@ -245,7 +245,8 @@ class Request extends \lithium\net\http\Request {
 		$this->_env[$key] = $val;
 
 		if ($key == 'REMOTE_ADDR') {
-			foreach (array('HTTP_X_FORWARDED_FOR', 'HTTP_PC_REMOTE_ADDR', 'HTTP_X_REAL_IP') as $altKey) {
+			$https = array('HTTP_X_FORWARDED_FOR', 'HTTP_PC_REMOTE_ADDR', 'HTTP_X_REAL_IP');
+			foreach ($https as $altKey) {
 				if ($addr = $this->env($altKey)) {
 					$val = $addr;
 					break;
@@ -287,7 +288,7 @@ class Request extends \lithium\net\http\Request {
 				));
 			case 'CGI':
 			case 'CGI_MODE':
-				return ($this->_env['PLATFORM'] == 'CGI');
+				return ($this->_env['PLATFORM'] === 'CGI');
 			case 'HTTP_BASE':
 				return preg_replace('/^([^.])*/i', null, $this->_env['HTTP_HOST']);
 		}
@@ -327,7 +328,7 @@ class Request extends \lithium\net\http\Request {
 		foreach (array_reverse($accept) as $i => $type) {
 			unset($accept[$i]);
 			list($type, $q) = (explode(';q=', $type, 2) + array($type, 1.0 + $i / 100));
-			$accept[$type] = ($type == '*/*') ? 0.1 : floatval($q);
+			$accept[$type] = ($type === '*/*') ? 0.1 : floatval($q);
 		}
 		arsort($accept, SORT_NUMERIC);
 
@@ -513,7 +514,7 @@ class Request extends \lithium\net\http\Request {
 			if (!$local) {
 				return $ref;
 			}
-			if (strpos($ref, '://') == false) {
+			if (strpos($ref, '://') === false) {
 				return $ref;
 			}
 		}
@@ -581,7 +582,7 @@ class Request extends \lithium\net\http\Request {
 		if (isset($this->_config['url'])) {
 			return rtrim($this->_config['url'], '/');
 		}
-		if (!empty($_GET['url']) ) {
+		if (!empty($_GET['url'])) {
 			return rtrim($_GET['url'], '/');
 		}
 		if ($uri = $this->env('REQUEST_URI')) {
