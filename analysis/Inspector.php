@@ -435,7 +435,9 @@ class Inspector extends \lithium\core\StaticObject {
 				$list = array_diff(get_declared_classes(), $list);
 			} else {
 				$filter = function($class) use ($file) { return $class->getFileName() === $file; };
-				$list = $loaded->find($filter)->getName();
+				$list = $loaded->find($filter)->map(function ($class) {
+					return $class->getName() ?: $class->name;
+				}, array('collect' => false));
 			}
 		}
 
