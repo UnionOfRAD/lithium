@@ -60,14 +60,18 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 
 		$model = $this->_model;
 
-		$this->_recordSet = new MockMultiKeyRecordSet(compact('result', 'model') + array('exists' => true));
+		$this->_recordSet = new MockMultiKeyRecordSet(compact('result', 'model') + array(
+			'exists' => true
+		));
 
 		$result = new MockResult(array('records' => $this->_records));
 
 		foreach ($this->_records as $i => $record) {
 			$this->_objectRecords[$i] = new MockPostObject($record);
 		}
-		$this->_objectRecordSet = new MockMultiKeyRecordSet(compact('result', 'model') + array('exists' => true));
+		$this->_objectRecordSet = new MockMultiKeyRecordSet(compact('result', 'model') + array(
+			'exists' => true
+		));
 	}
 
 	public function tearDown() {
@@ -248,12 +252,16 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual($expected->id, $item->id);
 		$this->assertEqual($expected->data, $item->data);
 
-		$this->_objectRecordSet[] = $expected = new MockPostObject(array('id' => 6, 'data' => 'data6 new'));
+		$this->_objectRecordSet[] = $expected = new MockPostObject(array(
+			'id' => 6, 'data' => 'data6 new'
+		));
 		$item = $this->_objectRecordSet[6];
 		$this->assertEqual($expected->id, $item->id);
 		$this->assertEqual($expected->data, $item->data);
 
-		$this->_objectRecordSet[] = $expected = new MockPostObject(array('id' => 6, 'data' => 'data6 new2'));
+		$this->_objectRecordSet[] = $expected = new MockPostObject(array(
+			'id' => 6, 'data' => 'data6 new2'
+		));
 		$item = $this->_objectRecordSet[6];
 		$this->assertEqual($expected->id, $item->id);
 		$this->assertEqual($expected->data, $item->data);
@@ -487,8 +495,8 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $this->_recordSet->to('array'));
 
-		$expected = '{"1":{"id":1,"data":"data1"},"2":{"id":2,"data":"data2"},'
-			. '"3":{"id":3,"data":"data3"},"4":{"id":4,"data":"data4"}}';
+		$expected = '{"1":{"id":1,"data":"data1"},"2":{"id":2,"data":"data2"},';
+		$expected .= '"3":{"id":3,"data":"data3"},"4":{"id":4,"data":"data4"}}';
 		$this->assertEqual($expected, $this->_recordSet->to('json'));
 	}
 
@@ -719,12 +727,14 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 
 		$model = $this->_model;
 
-		$recordSet = new MockMultiKeyRecordSet(compact('result', 'model') + array('exists' => true));
+		$recordSet = new MockMultiKeyRecordSet(compact('result', 'model') + array(
+			'exists' => true
+		));
 
 		$cpt = 0;
 		foreach ($recordSet as $i => $word) {
 			$array = $word->to('array');
-			if ($array['data'] == 'delete') {
+			if ($array['data'] === 'delete') {
 				unset($recordSet[$i]);
 			}
 			$cpt++;
@@ -747,11 +757,13 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 
 		$model = $this->_model;
 
-		$recordSet = new MockMultiKeyRecordSet(compact('result', 'model') + array('exists' => true));
+		$recordSet = new MockMultiKeyRecordSet(compact('result', 'model') + array(
+			'exists' => true
+		));
 
 		foreach ($recordSet as $i => $word) {
 			$array = $word->to('array');
-			if ($array['data'] == 'delete') {
+			if ($array['data'] === 'delete') {
 				unset($recordSet[$i]);
 			}
 		}
@@ -803,14 +815,18 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		$payments = new MockMultiKeyRecordSet(array('data' => $data, 'model' => $this->_model2));
 		$this->assertEqual(3, count($payments->get('_data')));
 
-		$this->assertEqual($data[0], $payments[array('client_id' => 1, 'invoice_id' => 4)]->data());
-		$this->assertEqual($data[2], $payments[array('client_id' => 3, 'invoice_id' => 6)]->data());
+		$index = array('client_id' => 1, 'invoice_id' => 4);
+		$this->assertEqual($data[0], $payments[$index]->data());
+
+		$index = array('client_id' => 3, 'invoice_id' => 6);
+		$this->assertEqual($data[2], $payments[$index]->data());
 
 		$this->assertNull($payments[array('client_id' => 3, 'invoice_id' => 3)]);
 		$this->assertNull($payments[array('client_id' => 2)]);
 		$this->assertNull($payments[array('invoice_id' => 6)]);
 
-		$this->assertEqual($data[1], $payments[array('client_id' => 2, 'invoice_id' => 5)]->data());
+		$index = array('client_id' => 2, 'invoice_id' => 5);
+		$this->assertEqual($data[1], $payments[$index]->data());
 	}
 
 	public function testKeyCastingManagment() {
@@ -850,7 +866,9 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 
 		$result = new MockResult(array('records' => $records));
 
-		$payments = new MockMultiKeyRecordSet(array('result' => $result, 'model' => $this->_model2));
+		$payments = new MockMultiKeyRecordSet(array(
+			'result' => $result, 'model' => $this->_model2
+		));
 		$this->assertEqual(0, count($payments->get('_data')));
 
 		$result = $payments[array('client_id' => 1, 'invoice_id' => 4)]->to('array');

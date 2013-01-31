@@ -37,7 +37,7 @@ class Integration extends \lithium\test\Unit {
 
 			while (count($after) > count($before)) {
 				$result = array_pop($after);
-				if ($result['result'] == 'fail') {
+				if ($result['result'] === 'fail') {
 					return false;
 				}
 			}

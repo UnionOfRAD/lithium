@@ -44,10 +44,11 @@ class CrudTest extends \lithium\test\Integration {
 	public function skip() {
 		$connection = 'lithium_couch_test';
 		$config = Connections::get($connection, array('config' => true));
-		$isAvailable = (
-			$config &&
-			Connections::get($connection)->isConnected(array('autoConnect' => true))
-		);
+
+		$isConnected = $config && Connections::get($connection)->isConnected(array(
+			'autoConnect' => true
+		));
+		$isAvailable = $config && $isConnected;
 		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
 
 		$this->_key = Companies::key();
@@ -129,7 +130,7 @@ class CrudTest extends \lithium\test\Integration {
 		$this->assertEqual(3, $all->count());
 
 		$match = 'BigBoxMart';
-		$filter = function($entity) use (&$match) { return $entity->name == $match; };
+		$filter = function($entity) use (&$match) { return $entity->name === $match; };
 
 		foreach (array('BigBoxMart', 'Acme, Inc.', 'Ma & Pa\'s') as $match) {
 			$this->assertTrue($all->first($filter)->exists());

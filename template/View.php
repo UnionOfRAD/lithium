@@ -383,8 +383,8 @@ class View extends \lithium\core\Object {
 		$_loader = $this->_loader;
 		$filters = $this->outputFilters;
 		$params = compact('step', 'params', 'options') + array(
-			'data' => $data + $filters, 
-			'loader' => $_loader, 
+			'data' => $data + $filters,
+			'loader' => $_loader,
 			'renderer' => $_renderer
 		);
 
@@ -457,7 +457,7 @@ class View extends \lithium\core\Object {
 	 * @return array Returns a converted set of rendering steps, to be executed in `render()`.
 	 */
 	protected function _convertSteps(array $command, array &$params, $defaults) {
-		if (count($command) == 1) {
+		if (count($command) === 1) {
 			$params['template'] = current($command);
 			return array(array('path' => key($command)) + $defaults);
 		}

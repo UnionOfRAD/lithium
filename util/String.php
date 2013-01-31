@@ -101,7 +101,7 @@ class String {
 		$source = static::$_source ?: static::_source();
 		$result = $source($bytes);
 
-		if ($options['encode'] != static::ENCODE_BASE_64) {
+		if ($options['encode'] !== static::ENCODE_BASE_64) {
 			return $result;
 		}
 		return strtr(rtrim(base64_encode($result), '='), '+', '.');
@@ -196,7 +196,7 @@ class String {
 	public static function compare($left, $right) {
 		$result = true;
 
-		if (($length = strlen($left)) != strlen($right)) {
+		if (($length = strlen($left)) !== strlen($right)) {
 			return false;
 		}
 		for ($i = 0; $i < $length; $i++) {
@@ -246,7 +246,7 @@ class String {
 		$format = $options['format'];
 		reset($data);
 
-		if ($format == 'regex' || (!$format && $options['escape'])) {
+		if ($format === 'regex' || (!$format && $options['escape'])) {
 			$format = sprintf(
 				'/(?<!%s)%s%%s%s/',
 				preg_quote($options['escape'], '/'),
@@ -412,7 +412,7 @@ class String {
 			);
 
 			for ($i = 0; $i < 3; $i++) {
-				if ($offsets[$i] !== false && ($offsets[$i] < $tmpOffset || $tmpOffset == -1)) {
+				if ($offsets[$i] !== false && ($offsets[$i] < $tmpOffset || $tmpOffset === -1)) {
 					$tmpOffset = $offsets[$i];
 				}
 			}
@@ -424,25 +424,25 @@ class String {
 			}
 			$buffer .= substr($data, $offset, ($tmpOffset - $offset));
 
-			if ($data{$tmpOffset} == $separator && $depth == 0) {
+			if ($data{$tmpOffset} === $separator && $depth === 0) {
 				$results[] = $buffer;
 				$buffer = '';
 			} else {
 				$buffer .= $data{$tmpOffset};
 			}
 
-			if ($leftBound != $rightBound) {
-				if ($data{$tmpOffset} == $leftBound) {
+			if ($leftBound !== $rightBound) {
+				if ($data{$tmpOffset} === $leftBound) {
 					$depth++;
 				}
-				if ($data{$tmpOffset} == $rightBound) {
+				if ($data{$tmpOffset} === $rightBound) {
 					$depth--;
 				}
 				$offset = ++$tmpOffset;
 				continue;
 			}
 
-			if ($data{$tmpOffset} == $leftBound) {
+			if ($data{$tmpOffset} === $leftBound) {
 				($open) ? $depth-- : $depth++;
 				$open = !$open;
 			}

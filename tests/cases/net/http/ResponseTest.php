@@ -180,7 +180,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	function testToString() {
+	public function testToString() {
 		$expected = join("\r\n", array(
 			'HTTP/1.1 200 OK',
 			'Header: Value',
@@ -261,7 +261,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	function testTransferEncodingChunkedDecode()  {
+	public function testTransferEncodingChunkedDecode()  {
 		$headers = join("\r\n", array(
 			'HTTP/1.1 200 OK',
 			'Server: CouchDB/0.10.0 (Erlang OTP/R13B)',

@@ -365,7 +365,8 @@ class Entity extends \lithium\core\Object {
 	 * @param string The field name to check its state.
 	 * @return mixed Returns `true` if a field is given and was updated, `false` otherwise and
 	 *		   `null` if the field was not set at all. If no field is given returns an arra
-	 *		   where the keys are entity field names, and the values are `true` for changed fields.
+	 *		   where the keys are entity field names, and the values are `true` for changed
+	 *         fields.
 	 */
 	public function modified($field = null) {
 		if ($field) {
@@ -382,7 +383,9 @@ class Entity extends \lithium\core\Object {
 				$modified = $value->modified();
 				return $modified === true || is_array($modified) && in_array(true, $modified, true);
 			}
-			return !isset($this->_data[$field]) || ($this->_data[$field] !== $this->_updated[$field]);
+
+			$isSet = isset($this->_data[$field]);
+			return !$isSet || ($this->_data[$field] !== $this->_updated[$field]);
 		}
 
 		$fields = array_fill_keys(array_keys($this->_data), false);
@@ -400,8 +403,7 @@ class Entity extends \lithium\core\Object {
 				);
 			} else {
 				$fields[$field] = (
-					!isset($fields[$field]) ||
-					$this->_data[$field] !== $this->_updated[$field]
+					!isset($fields[$field]) || $this->_data[$field] !== $this->_updated[$field]
 				);
 			}
 		}

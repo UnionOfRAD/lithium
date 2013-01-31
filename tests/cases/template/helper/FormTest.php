@@ -412,8 +412,13 @@ class FormTest extends \lithium\test\Unit {
 			))
 		));
 
-		$document = new Document(array('model' => $this->_model, 'data' =>
-			array('subdocument' => array('foo' => true))
+		$document = new Document(array(
+			'model' => $this->_model,
+			'data' => array(
+				'subdocument' => array(
+					'foo' => true
+				)
+			)
 		));
 		$this->form->create($document);
 
@@ -773,7 +778,7 @@ class FormTest extends \lithium\test\Unit {
 			)
 		);
 		$result = $this->form->select('opsys', $list, array(
-			'empty' =>  'Select one', 'value' => '5'
+			'empty' => 'Select one', 'value' => '5'
 		));
 
 		$this->assertTags($result, array(
@@ -1280,7 +1285,8 @@ class FormTest extends \lithium\test\Unit {
 		$result = $this->form->create(null, array('url' => '/foo'));
 
 		$this->assertTags($result, array('form' => array(
-			'action' => "/bbq/foo", 'method'=> "post"
+			'action' => "/bbq/foo",
+			'method' => "post"
 		)));
 	}
 

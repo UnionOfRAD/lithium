@@ -40,9 +40,6 @@ class MockPostsController extends \lithium\action\Controller {
 	}
 
 	public function view($id = null) {
-		if (!empty($id)) {
-			// throw new NotFoundException();
-		}
 		$this->render(array('text', 'data' => 'This is a post'));
 	}
 

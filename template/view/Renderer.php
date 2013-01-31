@@ -132,7 +132,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 */
 	protected $_vars = array();
 
-	/*
+	/**
 	 * Available options accepted by `template\View::render()`, used when rendering.
 	 *
 	 * @see lithium\template\View::render()

@@ -70,7 +70,7 @@ class MockerChain extends \lithium\core\Object {
 
 	/**
 	 * Validates that a given methodis called a set number of times.
-	 * 
+	 *
 	 * @param  string $comparison Comparison type 'gt', 'gte', 'lt', 'lte', or 'eq'.
 	 * @param  array  $args       The first argument is the expected result.
 	 * @return object
@@ -122,7 +122,7 @@ class MockerChain extends \lithium\core\Object {
 	 * @param  string $method Method to assert
 	 * @return object
 	 */
-	function called($method) {
+	public function called($method) {
 		if (!$this->_data['success']) {
 			return $this;
 		}

@@ -273,13 +273,13 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->db->connection->resultSets = array(array());
 		$this->query->conditions(array('title' => 'Nonexistent Post'));
 		$result = $this->db->read($this->query);
-		$this->assertTrue($result == true);
+		$this->assertTrue($result);
 		$this->assertEqual(0, $result->count());
 
 		$this->db->connection->resultSets = array(array($data));
 		$this->query->conditions($data);
 		$result = $this->db->read($this->query);
-		$this->assertTrue($result == true);
+		$this->assertTrue($result);
 		$this->assertEqual(1, $result->count());
 		$this->db->connection = $connection;
 	}
@@ -446,7 +446,11 @@ class MongoDbTest extends \lithium\test\Unit {
 			'safe' => false,
 			'fsync' => false
 		);
-		$baseInsert = array('type' => 'insert', 'collection' => 'ordered_docs', 'options' => $createOpts);
+		$baseInsert = array(
+			'type' => 'insert',
+			'collection' => 'ordered_docs',
+			'options' => $createOpts
+		);
 
 		$expected = array(
 			$baseInsert + array('data' => array('_id' => $result[0]['data']['_id']) + $third),
@@ -466,10 +470,14 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual($third['title'], $documents[2]->title);
 
 		$expected = array(
-			'type' => 'find', 'collection' => 'ordered_docs', 'conditions' => array(), 'fields' => array()
+			'type' => 'find',
+			'collection' => 'ordered_docs',
+			'conditions' => array(),
+			'fields' => array()
 		);
 		$this->assertEqual($expected, array_pop($this->db->connection->queries));
-		$this->assertEqual(array('position' => 1), $documents->result()->resource()->query['sort']);
+		$result = $documents->result()->resource()->query['sort'];
+		$this->assertEqual(array('position' => 1), $result);
 
 		array_push($this->db->connection->results, new MockResult(array(
 			'data' => array($first, $second, $third)
@@ -481,7 +489,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual($third['title'], $documents[2]->title);
 
 		$this->assertEqual($expected, array_pop($this->db->connection->queries));
-		$this->assertEqual(array('position' => 1), $documents->result()->resource()->query['sort']);
+		$result = $documents->result()->resource()->query['sort'];
+		$this->assertEqual(array('position' => 1), $result);
 
 		array_push($this->db->connection->results, new MockResult(array(
 			'data' => array($third, $second, $first)
@@ -493,7 +502,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual($first['title'], $documents[2]->title);
 
 		$this->assertEqual($expected, array_pop($this->db->connection->queries));
-		$this->assertEqual(array('position' => -1), $documents->result()->resource()->query['sort']);
+		$result = $documents->result()->resource()->query['sort'];
+		$this->assertEqual(array('position' => -1), $result);
 	}
 
 	public function testMongoIdPreservation() {

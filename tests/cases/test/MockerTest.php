@@ -55,7 +55,7 @@ class MockerTest extends \lithium\test\Unit {
 
 	public function testFilteringNonStaticClass() {
 		$dispatcher = new \lithium\console\dispatcher\Mock();
-		
+
 		$originalResult = $dispatcher->config(array());
 
 		$dispatcher->applyFilter('config', function($self, $params, $chain) {
@@ -70,7 +70,7 @@ class MockerTest extends \lithium\test\Unit {
 
 	public function testFilteringNonStaticClassCanReturnOriginal() {
 		$response = new \lithium\console\response\Mock();
-		
+
 		$originalResult = $response->styles();
 
 		$response->applyFilter('styles', function($self, $params, $chain) {
@@ -86,7 +86,7 @@ class MockerTest extends \lithium\test\Unit {
 		$mockee = 'lithium\analysis\parser\Mock';
 
 		$code = 'echo "foobar";';
-		
+
 		$originalResult = $mockee::tokenize($code, array('wrap' => true));
 
 		$mockee::applyFilter('tokenize', function($self, $params, $chain) {
@@ -101,7 +101,7 @@ class MockerTest extends \lithium\test\Unit {
 
 	public function testFilteringStaticClassCanReturnOriginal() {
 		$mockee = 'lithium\analysis\inspector\Mock';
-		
+
 		$originalResult = $mockee::methods('lithium\analysis\Inspector');
 
 		$mockee::applyFilter('tokenize', function($self, $params, $chain) {

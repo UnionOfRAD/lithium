@@ -16,7 +16,7 @@ use Reflection;
 /**
  * The Mocker class aids in the creation of Mocks on the fly, allowing you to
  * use Lithium filters on most methods in the class.
- * 
+ *
  * To enable the autoloading of mocks you simply need to make a simple method
  * call.
  * {{{
@@ -26,7 +26,7 @@ use Reflection;
  * 	Mocker::register();
  * }
  * }}}
- * 
+ *
  * You can also enable autoloading inside the setup of a unit test class. This
  * method can be called redundantly.
  * {{{
@@ -37,7 +37,7 @@ use Reflection;
  * 	}
  * }
  * }}}
- * 
+ *
  * Using Mocker is the fun magical part, it's autoloaded so simply call the
  * class you want to mock with the '\Mock' at the end. The autoloader will
  * detect you want to autoload it, and create it for you. Now you can filter
@@ -63,7 +63,7 @@ class Mocker {
 
 	/**
 	 * A list of code to be generated for the delegator.
-	 * 
+	 *
 	 * The MockDelgate directly extends the mocker and makes all methods
 	 * publically available to other classes but should not be accessed directly
 	 * by any other application. This should be called only by the mocker and

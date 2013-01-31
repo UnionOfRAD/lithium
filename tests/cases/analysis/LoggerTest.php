@@ -149,7 +149,9 @@ class LoggerTest extends \lithium\test\Unit {
 
 		$this->assertFalse(file_exists($base . '/info_default.log'));
 
-		$this->assertTrue(Logger::write('info', 'Default Message line 1', array('name' => 'default')));
+		$this->assertTrue(Logger::write('info', 'Default Message line 1', array(
+			'name' => 'default'
+		)));
 
 		$this->assertTrue(file_exists($base . '/info_default.log'));
 
@@ -182,7 +184,9 @@ class LoggerTest extends \lithium\test\Unit {
 
 		$this->assertFalse(file_exists($base . '/info_secondary.log'));
 
-		$this->assertTrue(Logger::write('info', 'Secondary Message line 1', array('name' => 'secondary')));
+		$this->assertTrue(Logger::write('info', 'Secondary Message line 1', array(
+			'name' => 'secondary'
+		)));
 
 		$this->assertTrue(file_exists($base . '/info_secondary.log'));
 

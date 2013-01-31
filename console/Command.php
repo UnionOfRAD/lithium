@@ -224,7 +224,7 @@ class Command extends \lithium\core\Object {
 		} while (
 			!empty($options['choices']) && !in_array($result, $options['choices'], true)
 			&& (empty($options['quit']) || $result !== $options['quit'])
-			&& ($options['default'] == null || $result !== '')
+			&& (!$options['default'] || $result !== '')
 		);
 
 		if ($result == $options['quit']) {
