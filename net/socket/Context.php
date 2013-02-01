@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -102,8 +102,11 @@ class Context extends \lithium\net\Socket {
 			return false;
 		}
 		$meta = stream_get_meta_data($this->_resource);
-		$headers = isset($meta['wrapper_data'])
-			? join("\r\n", $meta['wrapper_data']) . "\r\n\r\n" : null;
+		if (isset($meta['wrapper_data'])) {
+			$headers = join("\r\n", $meta['wrapper_data']) . "\r\n\r\n";
+		} else {
+			$headers = null;
+		}
 		return $headers . stream_get_contents($this->_resource);
 	}
 

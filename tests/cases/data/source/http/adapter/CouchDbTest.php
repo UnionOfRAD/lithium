@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -196,7 +196,7 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testDelete() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$this->query->data(array('id' => 12345, 'rev'=> '1-1', 'name' => 'Acme Inc'));
+		$this->query->data(array('id' => 12345, 'rev' => '1-1', 'name' => 'Acme Inc'));
 
 		$result = $couchdb->delete($this->query);
 		$this->assertTrue($result);
@@ -218,6 +218,13 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual(CouchDb::enabled('booleans'), true);
 		$this->assertEqual(CouchDb::enabled('relationships'), false);
 	}
+
+	public function testRespondsTo() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$this->assertTrue($couchdb->respondsTo('foobarbaz'));
+		$this->assertFalse($couchdb->respondsTo(0));
+	}
+
 }
 
 ?>

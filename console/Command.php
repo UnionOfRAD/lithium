@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -224,7 +224,7 @@ class Command extends \lithium\core\Object {
 		} while (
 			!empty($options['choices']) && !in_array($result, $options['choices'], true)
 			&& (empty($options['quit']) || $result !== $options['quit'])
-			&& ($options['default'] == null || $result !== '')
+			&& (!$options['default'] || $result !== '')
 		);
 
 		if ($result == $options['quit']) {

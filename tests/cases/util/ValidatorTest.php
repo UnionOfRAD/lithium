@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -33,8 +33,10 @@ class ValidatorTest extends \lithium\test\Unit {
 				'number' => array('one', 'two', 'three'),
 				'name' => array('bob', 'bill')
 			);
-			return isset($options['field']) && isset($existing[$options['field']]) &&
-				in_array($data,$existing[$options['field']]);
+
+			$isSet = isset($existing[$options['field']]);
+			$inArray = in_array($data,$existing[$options['field']]);
+			return isset($options['field']) && $isSet && $inArray;
 		});
 
 		$fieldValidationRules = array(
@@ -105,7 +107,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$rFormat = null;
 		$function = function(&$value, $format = null, array $options = array()) use (&$rFormat) {
 			$rFormat = $format;
-			if ($format == 'string') {
+			if ($format === 'string') {
 				return true;
 			}
 		};
@@ -268,7 +270,7 @@ class ValidatorTest extends \lithium\test\Unit {
 	/**
 	 * Test basic decimal number validation.
 	 */
-	function testDecimal() {
+	public function testDecimal() {
 		$this->assertTrue(Validator::isDecimal('0.0'));
 		$this->assertTrue(Validator::isDecimal('0.000'));
 		$this->assertTrue(Validator::isDecimal('1.1'));
@@ -410,7 +412,7 @@ class ValidatorTest extends \lithium\test\Unit {
 	/**
 	 * Tests 'inList' validation.
 	 */
-	function testInList() {
+	public function testInList() {
 		$this->assertTrue(Validator::isInList('one', null, array('list' => array('one', 'two'))));
 		$this->assertTrue(Validator::isInList('two', null, array('list' => array('one', 'two'))));
 		$this->assertFalse(Validator::isInList('3', null, array('list' => array('one', 'two'))));
@@ -1137,7 +1139,7 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	public function testValidationWithContextData() {
 		Validator::add('someModelRule', function($value, $format, $options) {
-			return $value == 'Title' && $options['values']['body'] == 'Body';
+			return $value === 'Title' && $options['values']['body'] === 'Body';
 		});
 
 		$result = Validator::check(
@@ -1207,6 +1209,18 @@ class ValidatorTest extends \lithium\test\Unit {
 		$result = Validator::check($data, $rules);
 		$this->assertEqual(array('id' => array('Bad ID')), $result);
 	}
+
+	public function testRespondsToParentCall() {
+		$this->assertTrue(Validator::respondsTo('applyFilter'));
+		$this->assertFalse(Validator::respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToMagic() {
+		$this->assertTrue(Validator::respondsTo('isAlphaNumeric'));
+		$this->assertTrue(Validator::respondsTo('isCreditCard'));
+		$this->assertFalse(Validator::respondsTo('isFoobar'));
+	}
+
 }
 
 ?>

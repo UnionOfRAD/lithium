@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/mit-license.php The MIT License
  */
 
@@ -235,7 +235,7 @@ class Inflector {
 				$_config = array();
 
 				foreach ($config as $key => $val) {
-					if ($key[0] != '/') {
+					if ($key[0] !== '/') {
 						$key = '/' . join('|', array_filter(preg_split('//u', $key))) . '/';
 					}
 					$_config[$key] = $val;
@@ -259,8 +259,8 @@ class Inflector {
 					foreach ($config as $rType => $set) {
 						static::${$var}[$rType] = array_merge($set, static::${$var}[$rType], $set);
 
-						if ($rType == 'irregular') {
-							$swap = ($type == 'singular' ? '_plural' : '_singular');
+						if ($rType === 'irregular') {
+							$swap = ($type === 'singular' ? '_plural' : '_singular');
 							static::${$swap}[$rType] = array_flip(static::${$var}[$rType]);
 						}
 					}

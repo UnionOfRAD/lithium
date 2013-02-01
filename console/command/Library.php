@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -321,7 +321,7 @@ class Library extends \lithium\console\Command {
 
 		if (dirname(LITHIUM_APP_PATH) . '/libraries' !== $this->lithiumLibraryPath) {
 			$pathinfo = pathinfo($this->lithiumLibraryPath);
-			if ($pathinfo['dirname'] != '.') {
+			if ($pathinfo['dirname'] !== '.') {
 				$this->lithiumLibraryPath = "'" . $this->lithiumLibraryPath . "'";
 			}
 
@@ -379,7 +379,7 @@ class Library extends \lithium\console\Command {
 	 */
 	protected function _wildcardPaths($path, $base = '') {
 		if (strpos($path, '*') === false) {
-			return array($base .  '/' . $path);
+			return array($base . '/' . $path);
 		}
 		if ($path[0] === '*') {
 			$paths = array();
@@ -395,7 +395,7 @@ class Library extends \lithium\console\Command {
 				);
 			}
 		} else {
-			$paths = array_filter(glob($base .  '/' . $path), function($path) {
+			$paths = array_filter(glob($base . '/' . $path), function($path) {
 				$basename = basename($path);
 				return $basename !== '.' && $basename !== '..';
 			});
@@ -418,7 +418,7 @@ class Library extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	public function archive($name = null, $result = null) {
-		if (ini_get('phar.readonly') == '1') {
+		if (ini_get('phar.readonly') === '1') {
 			throw new RuntimeException('Set `phar.readonly` to `0` in `php.ini`.');
 		}
 		$from = $name;
@@ -438,7 +438,7 @@ class Library extends \lithium\console\Command {
 			Phar::unlinkArchive("{$path}.phar");
 		}
 		try {
-	 		$archive = new Phar("{$path}.phar");
+			$archive = new Phar("{$path}.phar");
 		} catch (Exception $e) {
 			$this->error($e->getMessage());
 			return false;
@@ -470,13 +470,14 @@ class Library extends \lithium\console\Command {
 	 * List all the plugins and extensions available on the server.
 	 *
 	 * @param string $type plugins|extensions
-	 * @return void
 	 */
 	public function find($type = 'plugins') {
 		$results = array();
 
 		foreach ($this->_settings['servers'] as $server => $enabled) {
-			if (!$enabled) { continue; }
+			if (!$enabled) {
+				continue;
+			}
 			$service = $this->_instance('service', array(
 				'host' => $server, 'port' => $this->port
 			));
@@ -552,7 +553,7 @@ class Library extends \lithium\console\Command {
 			}
 			$url = parse_url($source);
 
-			if (!empty($url['scheme']) && $url['scheme'] == 'git' && $hasGit()) {
+			if (!empty($url['scheme']) && $url['scheme'] === 'git' && $hasGit()) {
 				$cmd = "cd {$this->path} && git clone --quiet {$source} {$plugin->name}";
 				$result = shell_exec($cmd);
 
@@ -710,7 +711,7 @@ class Library extends \lithium\console\Command {
 	 */
 	protected function _toPath($name = null) {
 		$pathinfo = pathinfo($name);
-		if ($name && $pathinfo['dirname'] != '.') {
+		if ($name && $pathinfo['dirname'] !== '.') {
 			return $name;
 		}
 

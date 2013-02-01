@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright	 Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright	 Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license	   http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -63,6 +63,23 @@ class LibrariesTest extends \lithium\test\Unit {
 
 		Libraries::paths($paths + array('authAdapter' => false));
 		$this->assertEqual($paths, Libraries::paths());
+	}
+
+	public function testPathTemplateWithGlobBrace() {
+		Libraries::paths(array(
+			'analysis' => array(
+				'{:library}\analysis\*{Docblock,Debugger}',
+			),
+		));
+
+		$analysis = list($docblock, $debugger) = Libraries::locate('analysis', null, array(
+			'recursive' => false,
+			'format' => false,
+		));
+
+		$this->assertCount(2, $analysis);
+		$this->assertPattern('/Docblock\.php/', $docblock);
+		$this->assertPattern('/Debugger\.php/', $debugger);
 	}
 
 	public function testPathTransform() {

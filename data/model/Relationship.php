@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -112,7 +112,7 @@ class Relationship extends \lithium\core\Object {
 		$config =& $this->_config;
 		$type = $config['type'];
 
-		$name = ($type == 'hasOne') ? Inflector::pluralize($config['name']) : $config['name'];
+		$name = ($type === 'hasOne') ? Inflector::pluralize($config['name']) : $config['name'];
 		$config['fieldName'] = $config['fieldName'] ?: lcfirst($name);
 
 		if (!$config['to']) {
@@ -135,9 +135,20 @@ class Relationship extends \lithium\core\Object {
 		return $this->data($name);
 	}
 
+	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		return is_callable(array($this, $method), true);
+	}
+
 	protected function _keys($keys) {
 		$config = $this->_config;
-		$hasRel = ($related = ($config['type'] == 'belongsTo') ? $config['to'] : $config['from']);
+		$hasRel = ($related = ($config['type'] === 'belongsTo') ? $config['to'] : $config['from']);
 
 		if (!$hasRel || !$keys) {
 			return array();
@@ -151,7 +162,7 @@ class Relationship extends \lithium\core\Object {
 		$keys = (array) $keys;
 		$related = (array) $related::key();
 
-		if (count($keys) != count($related)) {
+		if (count($keys) !== count($related)) {
 			$msg  = "Unmatched keys in relationship `{$config['name']}` between models ";
 			$msg .= "`{$config['from']}` and `{$config['to']}`.";
 			throw new ConfigException($msg);

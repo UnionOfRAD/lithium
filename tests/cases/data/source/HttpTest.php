@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -337,6 +337,20 @@ class HttpTest extends \lithium\test\Unit {
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testRespondsTo() {
+		$http = new Http();
+		$this->assertFalse($http->respondsTo('refactor'));
+		$this->assertTrue($http->respondsTo('create'));
+		$this->assertTrue($http->respondsTo('read'));
+	}
+
+	public function testRespondsToParentCall() {
+		$http = new Http();
+		$this->assertTrue($http->respondsTo('applyFilter'));
+		$this->assertFalse($http->respondsTo('fooBarBaz'));
+	}
+
 }
 
 ?>

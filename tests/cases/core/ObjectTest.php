@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -70,7 +70,7 @@ class ObjectTest extends \lithium\test\Unit {
 	/**
 	 * Verifies workaround for accessing protected properties in filtered methods.
 	 */
-	function testFilteringWithProtectedAccess() {
+	public function testFilteringWithProtectedAccess() {
 		$object = new MockExposed();
 		$this->assertEqual($object->get(), 'secret');
 		$this->assertTrue($object->tamper());
@@ -80,7 +80,7 @@ class ObjectTest extends \lithium\test\Unit {
 	/**
 	 * Attaches a single filter to multiple methods.
 	 */
-	function testMultipleMethodFiltering() {
+	public function testMultipleMethodFiltering() {
 		$object = new MockMethodFiltering();
 		$this->assertIdentical($object->method2(), array());
 
@@ -213,6 +213,65 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->expectException('/^Invalid class lookup/');
 		$object->instance(false);
 	}
+
+	public function testResetMethodFilter() {
+		$obj = new MockMethodFiltering();
+		$obj->applyFilter(false);
+		$obj->applyFilter('method2', function($self, $params, $chain) {
+			return false;
+		});
+
+		$this->assertIdentical(false, $obj->method2());
+
+		$obj->applyFilter('method2', false);
+
+		$this->assertTrue($obj->method2() !== false);
+	}
+
+	public function testResetMultipleFilters() {
+		$obj = new MockMethodFiltering();
+		$obj->applyFilter(false);
+		$obj->applyFilter(array('method2', 'manual'), function($self, $params, $chain) {
+			return false;
+		});
+
+		$this->assertIdentical(false, $obj->method2());
+		$this->assertIdentical(false, $obj->manual(array()));
+
+		$obj->applyFilter('method2', false);
+
+		$this->assertTrue($obj->method2() !== false);
+		$this->assertIdentical(false, $obj->manual(array()));
+	}
+
+	public function testResetClass() {
+		$obj = new MockMethodFiltering();
+		$obj->applyFilter(false);
+		$obj->applyFilter(array('method2', 'manual'), function($self, $params, $chain) {
+			return false;
+		});
+
+		$this->assertIdentical(false, $obj->method2());
+		$this->assertIdentical(false, $obj->manual(array()));
+
+		$obj->applyFilter(false);
+
+		$this->assertTrue($obj->method2() !== false);
+		$this->assertTrue($obj->manual(array()) !== false);
+	}
+
+	public function testRespondsTo() {
+		$obj = new MockMethodFiltering();
+		$this->assertTrue($this->respondsTo('applyFilter'));
+		$this->assertFalse($this->respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToProtectedMethod() {
+		$obj = new MockMethodFiltering();
+		$this->assertFalse($this->respondsTo('_parents'));
+		$this->assertTrue($this->respondsTo('_parents', 1));
+	}
+
 }
 
 ?>

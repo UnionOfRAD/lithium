@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -13,7 +13,7 @@ use lithium\storage\Session;
 class SessionTest extends \lithium\test\Integration {
 
 	public function skip() {
-		$this->skipIf(PHP_SAPI == 'cli', 'No session support in cli SAPI');
+		$this->skipIf(PHP_SAPI === 'cli', 'No session support in cli SAPI');
 	}
 
 	public function tearDown() {

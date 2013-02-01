@@ -68,7 +68,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		static::$_checks = array(
 			'type'  => function($config, $info) {
 				return (boolean) array_filter((array) $config['type'], function($type) use ($info) {
-					return $type == $info['type'] || is_subclass_of($info['type'], $type);
+					return $type === $info['type'] || is_subclass_of($info['type'], $type);
 				});
 			},
 			'code' => function($config, $info) {
@@ -216,10 +216,10 @@ class ErrorHandler extends \lithium\core\StaticObject {
 
 		foreach ($rules as $config) {
 			foreach (array_keys($config) as $key) {
-				if ($key == 'conditions' || $key == 'scope' || $key == 'handler') {
+				if ($key === 'conditions' || $key === 'scope' || $key === 'handler') {
 					continue;
 				}
-				if (!isset($info[$key])  || !isset($checks[$key])) {
+				if (!isset($info[$key]) || !isset($checks[$key])) {
 					continue 2;
 				}
 				if (($check = $checks[$key]) && !$check($config, $info)) {
@@ -285,7 +285,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		$info = is_object($info) ? $handler($info, true) : $info;
 
 		foreach (array_keys($conditions) as $key) {
-			if ($key == 'conditions' || $key == 'scope' || $key == 'handler') {
+			if ($key === 'conditions' || $key === 'scope' || $key === 'handler') {
 				continue;
 			}
 			if (!isset($info[$key]) || !isset($checks[$key])) {

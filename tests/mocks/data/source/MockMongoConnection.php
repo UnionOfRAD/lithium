@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -17,6 +17,8 @@ class MockMongoConnection {
 	public $results = array();
 
 	protected $_collection = null;
+
+	public $gridFsPrefix = null;
 
 	public function connect() {
 		return false;
@@ -56,6 +58,15 @@ class MockMongoConnection {
 
 	public function listCollections() {
 		return $this->_record(__FUNCTION__);
+	}
+
+	public function getGridFS($prefix = "fs") {
+		$this->gridFsPrefix = $prefix;
+		return $this;
+	}
+
+	public function storeBytes($bytes = null, array $extra = array(), array $options = array()) {
+		return;
 	}
 }
 

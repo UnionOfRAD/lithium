@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -102,6 +102,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 
 		$this->_context = $options['context'] + $this->_context;
 		$this->_data = (array) $data + $this->_vars;
+		$this->_options = $options;
 		$template__ = $template;
 		unset($options, $template, $defaults, $data);
 

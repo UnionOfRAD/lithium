@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -10,6 +10,7 @@ namespace lithium\core;
 
 use lithium\core\Libraries;
 use lithium\util\collection\Filters;
+use lithium\analysis\Inspector;
 
 /**
  * Provides a base class for all static classes in the Lithium framework. Similar to its
@@ -40,17 +41,25 @@ class StaticObject {
 	 * @see lithium\core\StaticObject::_filter()
 	 * @see lithium\util\collection\Filters
 	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
-	 *        method name as a string, or an array of method names.
-	 * @param closure $filter The closure that is used to filter the method.
+	 *        method name as a string, or an array of method names. Can also be false to remove
+	 *        all filters on the current object.
+	 * @param closure $filter The closure that is used to filter the method(s), can also be false
+	 *        to remove all the current filters for the given method.
 	 * @return void
 	 */
 	public static function applyFilter($method, $filter = null) {
 		$class = get_called_class();
+		if ($method === false) {
+			static::$_methodFilters[$class] = array();
+			return;
+		}
 		foreach ((array) $method as $m) {
-			if (!isset(static::$_methodFilters[$class][$m])) {
+			if (!isset(static::$_methodFilters[$class][$m]) || $filter === false) {
 				static::$_methodFilters[$class][$m] = array();
 			}
-			static::$_methodFilters[$class][$m][] = $filter;
+			if ($filter !== false) {
+				static::$_methodFilters[$class][$m][] = $filter;
+			}
 		}
 	}
 
@@ -80,6 +89,17 @@ class StaticObject {
 			default:
 				return forward_static_call_array(array(get_called_class(), $method), $params);
 		}
+	}
+
+	/**
+	 * Will determine if a method can be called.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public static function respondsTo($method, $internal = false) {
+		return Inspector::isCallable(get_called_class(), $method, $internal);
 	}
 
 	/**
@@ -149,6 +169,7 @@ class StaticObject {
 	protected static function _stop($status = 0) {
 		exit($status);
 	}
+
 }
 
 ?>

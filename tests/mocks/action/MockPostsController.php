@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -40,9 +40,6 @@ class MockPostsController extends \lithium\action\Controller {
 	}
 
 	public function view($id = null) {
-		if (!empty($id)) {
-			// throw new NotFoundException();
-		}
 		$this->render(array('text', 'data' => 'This is a post'));
 	}
 

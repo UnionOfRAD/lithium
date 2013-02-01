@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -401,7 +401,7 @@ class Model extends \lithium\core\StaticObject {
 					${$key} = is_array($val) ? ${$key} + $val : $val;
 				}
 			}
-			if ($parent == __CLASS__) {
+			if ($parent === __CLASS__) {
 				break;
 			}
 		}
@@ -483,7 +483,7 @@ class Model extends \lithium\core\StaticObject {
 			$params = array($params[1] + array($method => $params[0]));
 		}
 
-		if ($method == 'all' || $isFinder) {
+		if ($method === 'all' || $isFinder) {
 			if ($params && !is_array($params[0])) {
 				$params[0] = array('conditions' => static::key($params[0]));
 			}
@@ -501,7 +501,7 @@ class Model extends \lithium\core\StaticObject {
 		$type[0] = strtolower($type[0]);
 
 		$conditions = array($field => array_shift($params));
-		$params = (isset($params[0]) && count($params) == 1) ? $params[0] : $params;
+		$params = (isset($params[0]) && count($params) === 1) ? $params[0] : $params;
 		return $self::find($type, compact('conditions') + $params);
 	}
 
@@ -521,6 +521,23 @@ class Model extends \lithium\core\StaticObject {
 		}
 		$message = "Unhandled method call `{$method}`.";
 		throw new BadMethodCallException($message);
+	}
+
+	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public static function respondsTo($method, $internal = false) {
+		$self = static::_object();
+		$methods = static::instanceMethods();
+		$isFinder = isset($self->_finders[$method]);
+		preg_match('/^findBy(?P<field>\w+)$|^find(?P<type>\w+)By(?P<fields>\w+)$/', $method, $args);
+		$staticRepondsTo = $isFinder || $method === 'all' || !!$args;
+		$instanceRespondsTo = isset($methods[$method]);
+		return $instanceRespondsTo || $staticRepondsTo || parent::respondsTo($method, $internal);
 	}
 
 	/**
@@ -560,7 +577,7 @@ class Model extends \lithium\core\StaticObject {
 		}
 		$isFinder = is_string($type) && isset($self->_finders[$type]);
 
-		if ($type != 'all' && !is_array($type) && !$isFinder) {
+		if ($type !== 'all' && !is_array($type) && !$isFinder) {
 			$options['conditions'] = static::key($type);
 			$type = 'first';
 		}
@@ -798,13 +815,13 @@ class Model extends \lithium\core\StaticObject {
 			return $self->_relations;
 		}
 		foreach ($self->_relationsToLoad as $name => $t) {
-			if ($type == $t) {
+			if ($type === $t) {
 				static::bind($t, $name, (array) $self->{$t}[$name]);
 				unset($self->_relationsToLoad[$name]);
 			}
 		}
 		return array_filter($self->_relations, function($i) use ($type) {
-			return $i->data('type') == $type;
+			return $i->data('type') === $type;
 		});
 	}
 

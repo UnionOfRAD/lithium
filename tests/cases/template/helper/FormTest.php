@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -396,13 +396,29 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertTags($result, array(
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
-				'type' => 'checkbox', 'value' => '1', 'name' => 'foo',
-				'checked' => 'checked', 'id' => 'MockFormPostFoo'
+				'type' => 'checkbox', 'value' => '1', 'name' => 'foo', 'id' => 'MockFormPostFoo',
+				'checked' => 'checked'
 			))
 		));
 
-		$document = new Document(array('model' => $this->_model, 'data' =>
-			array('subdocument' => array('foo' => true))
+		$record = new Record(array('model' => $this->_model, 'data' => array('foo' => false)));
+		$this->form->create($record);
+
+		$result = $this->form->checkbox('foo');
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => '1', 'name' => 'foo', 'id' => 'MockFormPostFoo'
+			))
+		));
+
+		$document = new Document(array(
+			'model' => $this->_model,
+			'data' => array(
+				'subdocument' => array(
+					'foo' => true
+				)
+			)
 		));
 		$this->form->create($document);
 
@@ -497,6 +513,17 @@ class FormTest extends \lithium\test\Unit {
 				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo', 'id' => 'MockFormPostFoo'
 			))
 		));
+
+		$record = new Record(array('model' => $this->_model, 'data' => array('foo' => false)));
+		$this->form->create($record);
+		$result = $this->form->checkbox('foo', array('value' => '0'));
+		$this->assertTags($result, array(
+			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
+			array('input' => array(
+				'type' => 'checkbox', 'value' => '0', 'name' => 'foo', 'id' => 'MockFormPostFoo',
+				'checked' => 'checked'
+			))
+		));
 	}
 
 	public function testRadioGeneration() {
@@ -527,8 +554,18 @@ class FormTest extends \lithium\test\Unit {
 		$result = $this->form->radio('foo');
 		$this->assertTags($result, array(
 			array('input' => array(
-				'type' => 'radio', 'value' => '1', 'name' => 'foo',
-				'checked' => 'checked', 'id' => 'MockFormPostFoo'
+				'type' => 'radio', 'value' => '1', 'name' => 'foo', 'id' => 'MockFormPostFoo',
+				'checked' => 'checked'
+			))
+		));
+
+		$record = new Record(array('model' => $this->_model, 'data' => array('foo' => false)));
+		$this->form->create($record);
+
+		$result = $this->form->radio('foo');
+		$this->assertTags($result, array(
+			array('input' => array(
+				'type' => 'radio', 'value' => '1', 'name' => 'foo', 'id' => 'MockFormPostFoo'
 			))
 		));
 	}
@@ -603,6 +640,16 @@ class FormTest extends \lithium\test\Unit {
 			array('input' => array('type' => 'hidden', 'value' => '', 'name' => 'foo')),
 			array('input' => array(
 				'type' => 'checkbox', 'value' => 'nose', 'name' => 'foo', 'id' => 'MockFormPostFoo'
+			))
+		));
+
+		$record = new Record(array('model' => $this->_model, 'data' => array('foo' => false)));
+		$this->form->create($record);
+		$result = $this->form->radio('foo', array('value' => '0'));
+		$this->assertTags($result, array(
+			array('input' => array(
+				'type' => 'radio', 'value' => '0',  'name' => 'foo',
+				'id' => 'MockFormPostFoo', 'checked' => 'checked'
 			))
 		));
 	}
@@ -731,7 +778,7 @@ class FormTest extends \lithium\test\Unit {
 			)
 		);
 		$result = $this->form->select('opsys', $list, array(
-			'empty' =>  'Select one', 'value' => '5'
+			'empty' => 'Select one', 'value' => '5'
 		));
 
 		$this->assertTags($result, array(
@@ -1238,7 +1285,8 @@ class FormTest extends \lithium\test\Unit {
 		$result = $this->form->create(null, array('url' => '/foo'));
 
 		$this->assertTags($result, array('form' => array(
-			'action' => "/bbq/foo", 'method'=> "post"
+			'action' => "/bbq/foo",
+			'method' => "post"
 		)));
 	}
 
@@ -1413,6 +1461,12 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertEqual($post, $this->form->binding('post'));
 		$this->assertEqual($info, $this->form->binding('info'));
 	}
+
+	public function testRespondsTo() {
+		$this->assertTrue($this->form->respondsTo('foobarbaz'));
+		$this->assertFalse($this->form->respondsTo(0));
+	}
+
 }
 
 ?>

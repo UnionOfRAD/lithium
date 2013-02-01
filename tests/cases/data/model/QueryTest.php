@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -199,7 +199,7 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $queryRecord->title;
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue($record == $query->entity());
+		$this->assertTrue($record === $query->entity());
 	}
 
 	public function testComment() {
@@ -556,8 +556,10 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertIdentical('MockQueryComment2', $query->alias());
 		$this->assertIdentical('MockQueryComment2', $query->alias(true));
 
-		$this->assertIdentical('MockQueryComment__2', $query->alias('MockQueryComment', 'Model1'));
-		$this->assertIdentical('MockQueryComment2__2', $query->alias('MockQueryComment2', 'Model2'));
+		$result = $query->alias('MockQueryComment', 'Model1');
+		$this->assertIdentical('MockQueryComment__2', $result);
+		$result = $query->alias('MockQueryComment2', 'Model2');
+		$this->assertIdentical('MockQueryComment2__2', $result);
 
 		$this->assertIdentical('MockQueryComment__2', $query->alias(true, 'Model1'));
 		$this->assertIdentical('MockQueryComment2__2', $query->alias(true, 'Model2'));
@@ -570,9 +572,12 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertIdentical('{my_custom_table}', $result['source']);
 		$this->assertIdentical('AS {MyCustomAlias}', $result['alias']);
 
-		$this->assertIdentical('MyCustomAlias__2', $query->alias('MyCustomAlias', 'Relation1'));
-		$this->assertIdentical('MyCustomAlias__3', $query->alias('MyCustomAlias', 'Other.Relation2'));
-		$this->assertIdentical('MyCustomAlias2', $query->alias('MyCustomAlias2', 'Other.Other.Relation3'));
+		$result = $query->alias('MyCustomAlias', 'Relation1');
+		$this->assertIdentical('MyCustomAlias__2', $result);
+		$result = $query->alias('MyCustomAlias', 'Other.Relation2');
+		$this->assertIdentical('MyCustomAlias__3', $result);
+		$result = $query->alias('MyCustomAlias2', 'Other.Other.Relation3');
+		$this->assertIdentical('MyCustomAlias2', $result);
 
 		$this->assertIdentical('MyCustomAlias', $query->alias());
 		$this->assertIdentical('MyCustomAlias__2', $query->alias(true, 'Relation1'));
@@ -725,6 +730,13 @@ class QueryTest extends \lithium\test\Unit {
 		$this->expectException('Undefined query strategy `custom`.');
 		$export = $query->export($this->db);
 	}
+
+	public function testRespondsTo() {
+		$query = new Query();
+		$this->assertTrue($query->respondsTo('calculate'));
+		$this->assertFalse($query->respondsTo('foobarbaz'));
+	}
+
 }
 
 ?>

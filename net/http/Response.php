@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -182,13 +182,13 @@ class Response extends \lithium\net\http\Message {
 	 * @return After parsing out other message components, returns just the message body.
 	 */
 	protected function _parseMessage($body) {
-		if (!($parts = explode("\r\n\r\n", $body, 2)) || count($parts) == 1) {
+		if (!($parts = explode("\r\n\r\n", $body, 2)) || count($parts) === 1) {
 			return trim($body);
 		}
 		list($headers, $body) = $parts;
 		$headers = str_replace("\r", "", explode("\n", $headers));
 
-		if (array_filter($headers) == array()) {
+		if (array_filter($headers) === array()) {
 			return trim($body);
 		}
 		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)(?:\s+(.*))?/i', array_shift($headers), $match);

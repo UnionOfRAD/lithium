@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -138,7 +138,7 @@ class Form extends \lithium\template\Helper {
 					if (in_array($method, array('create', 'end', 'label', 'error'))) {
 						return;
 					}
-					if (!$name || ($method == 'hidden' && $name == '_method')) {
+					if (!$name || ($method === 'hidden' && $name === '_method')) {
 						return;
 					}
 					$info = $self->binding($name);
@@ -296,14 +296,14 @@ class Form extends \lithium\template\Helper {
 			$append = null;
 			$scope['method'] = strtolower($scope['method']);
 
-			if ($scope['type'] == 'file') {
-				if ($scope['method'] == 'get') {
+			if ($scope['type'] === 'file') {
+				if ($scope['method'] === 'get') {
 					$scope['method'] = 'post';
 				}
 				$options['enctype'] = 'multipart/form-data';
 			}
 
-			if (!($scope['method'] == 'get' || $scope['method'] == 'post')) {
+			if (!($scope['method'] === 'get' || $scope['method'] === 'post')) {
 				$append = $self->hidden('_method', array('value' => strtoupper($scope['method'])));
 				$scope['method'] = 'post';
 			}
@@ -398,6 +398,17 @@ class Form extends \lithium\template\Helper {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		return is_callable(array($this, $method), true);
+	}
+
+	/**
 	 * Generates a form field with a label, input, and error message (if applicable), all contained
 	 * within a wrapping element.
 	 *
@@ -452,19 +463,19 @@ class Form extends \lithium\template\Helper {
 		$type = $options['type'];
 		$list = $options['list'];
 		$template = $options['template'];
-		$notText = $template == 'field' && $type != 'text';
+		$notText = $template === 'field' && $type !== 'text';
 
 		if ($notText && $this->_context->strings('field-' . $type)) {
 			$template = 'field-' . $type;
 		}
-		if (($options['label'] === null || $options['label']) && $options['type'] != 'hidden') {
+		if (($options['label'] === null || $options['label']) && $options['type'] !== 'hidden') {
 			if (!$options['label']) {
 				$options['label'] = Inflector::humanize(preg_replace('/[\[\]\.]/', '_', $name));
 			}
 			$label = $this->label(isset($options['id']) ? $options['id'] : '', $options['label']);
 		}
 
-		$call = ($type == 'select') ? array($name, $list, $field) : array($name, $field);
+		$call = ($type === 'select') ? array($name, $list, $field) : array($name, $field);
 		$input = call_user_func_array(array($this, $type), $call);
 		$error = ($this->_binding) ? $this->error($name) : null;
 		return $this->_render(__METHOD__, $template, compact('wrap', 'label', 'input', 'error'));
@@ -579,7 +590,7 @@ class Form extends \lithium\template\Helper {
 		if ($scope['empty']) {
 			$list = array('' => ($scope['empty'] === true) ? '' : $scope['empty']) + $list;
 		}
-		if ($template == __FUNCTION__ && $scope['multiple']) {
+		if ($template === __FUNCTION__ && $scope['multiple']) {
 			$template = 'select-multi';
 		}
 		$raw = $this->_selectOptions($list, $scope);
@@ -645,8 +656,8 @@ class Form extends \lithium\template\Helper {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
-		if (!isset($options['checked']) && ($bound = $this->binding($key)->data)) {
-			$options['checked'] = ($bound == $default);
+		if (!isset($options['checked'])) {
+			$options['checked'] = ($this->binding($key)->data == $default);
 		}
 		if ($scope['hidden']) {
 			$out = $this->hidden($name, array('value' => '', 'id' => false));
@@ -674,8 +685,8 @@ class Form extends \lithium\template\Helper {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
-		if (!isset($options['checked']) && ($bound = $this->binding($name)->data)) {
-			$options['checked'] = ($bound == $default);
+		if (!isset($options['checked'])) {
+			$options['checked'] = ($this->binding($name)->data == $default);
 		}
 
 		$options['value'] = $scope['value'];
@@ -840,7 +851,7 @@ class Form extends \lithium\template\Helper {
 	 */
 	protected function _generators($method, $name, $options) {
 		foreach ($this->_config['attributes'] as $key => $generator) {
-			if ($key == 'name') {
+			if ($key === 'name') {
 				continue;
 			}
 			if ($generator && !isset($options[$key])) {

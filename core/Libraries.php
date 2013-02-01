@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -456,7 +456,7 @@ class Libraries {
 		$options += $defaults;
 		$libs = array();
 
-		if ($options['namespaces'] && $options['filter'] == $defaults['filter']) {
+		if ($options['namespaces'] && $options['filter'] === $defaults['filter']) {
 			$options['format'] = function($class, $config) use ($format, $defaults) {
 				if (is_dir($class)) {
 					return $format($class, $config);
@@ -616,9 +616,9 @@ class Libraries {
 		list(, $relativePath, $pharPath) = $pathComponents;
 
 		$pharPath = implode('/', array_reduce(explode('/', $pharPath), function ($parts, $value) {
-			if ($value == '..') {
+			if ($value === '..') {
 				array_pop($parts);
-			} elseif ($value != '.') {
+			} elseif ($value !== '.') {
 				$parts[] = $value;
 			}
 			return $parts;
@@ -979,8 +979,8 @@ class Libraries {
 		$suffix = $options['namespaces'] ? '' : $config['suffix'];
 		$suffix = ($options['suffix'] === null) ? $suffix : $options['suffix'];
 
-		$dFlags = GLOB_ONLYDIR;
-		$libs = (array) glob($path . $suffix, $options['namespaces'] ? $dFlags : 0);
+		$dFlags = GLOB_ONLYDIR & GLOB_BRACE;
+		$libs = (array) glob($path . $suffix, $options['namespaces'] ? $dFlags : GLOB_BRACE);
 
 		if ($options['recursive']) {
 			list($current, $match) = explode('/*', $path, 2);

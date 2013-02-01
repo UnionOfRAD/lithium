@@ -225,8 +225,8 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testSimpleQueryRender() {
-		$fieldList = '{MockDatabasePost}.{id}, {MockDatabasePost}.{title},'
-						. ' {MockDatabasePost}.{created}';
+		$fieldList = '{MockDatabasePost}.{id}, {MockDatabasePost}.{title},';
+		$fieldList .= ' {MockDatabasePost}.{created}';
 		$table = '{mock_database_posts} AS {MockDatabasePost}';
 
 		$result = $this->db->renderCommand(new Query(array(
@@ -834,8 +834,9 @@ class DatabaseTest extends \lithium\test\Unit {
 		$sql .= '{mock_database_comments} AS {MockDatabaseComment} ON ';
 		$sql .= '(({MockDatabasePost}.{custom_id} = {MockDatabasePost}.{value_id}) OR ';
 		$sql .= '({MockDatabasePost}.{custom_id} = {MockDatabaseComment}.{id}) OR ';
-		$sql .= '({MockDatabasePost}.{id} = {MockDatabasePost}.{id} AND {MockDatabasePost}.{title} ';
-		$sql .= '= {MockDatabasePost}.{title}) OR ({MockDatabasePost}.{title} = \'value2\') ';
+		$sql .= '({MockDatabasePost}.{id} = {MockDatabasePost}.{id} ';
+		$sql .= 'AND {MockDatabasePost}.{title} = {MockDatabasePost}.{title}) ';
+		$sql .= 'OR ({MockDatabasePost}.{title} = \'value2\') ';
 		$sql .= 'OR ({MockDatabasePost}.{title} IS NULL)) AND {MockDatabasePost}.{id} = 5;';
 
 		$this->assertEqual($sql, $this->db->renderCommand($query));
@@ -990,7 +991,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ';
 		$expected .= '{mock_database_post_revisions} AS {MockDatabasePostRevision} ON ';
 		$expected .= '{MockDatabasePostRevision}.{deleted} IS NULL AND ';
-		$expected .= '{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id};';
+		$expected .= '{MockDatabasePost}.{id} = {MockDatabasePostRevision}.';
+		$expected .= '{mock_database_post_id};';
 		$this->assertEqual($expected, $this->db->sql);
 	}
 
@@ -1136,8 +1138,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->db->log = false;
 
 		$result = MockDatabasePost::$connection->logs[0];
-		$expected = "SELECT DISTINCT({MockDatabasePost}.{id}) AS _ID_ FROM {mock_database_posts} AS ";
-		$expected .= "{MockDatabasePost} LEFT JOIN {mock_database_comments} AS ";
+		$expected = "SELECT DISTINCT({MockDatabasePost}.{id}) AS _ID_ FROM {mock_database_posts}";
+		$expected .= " AS {MockDatabasePost} LEFT JOIN {mock_database_comments} AS ";
 		$expected .= "{MockDatabaseComment} ON {MockDatabasePost}.{id} = ";
 		$expected .= "{MockDatabaseComment}.{mock_database_post_id} WHERE ";
 		$expected .= "{MockDatabasePost}.{id} = 5 LIMIT 1;";
@@ -1166,12 +1168,14 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected = array(
 			'MockDatabasePost.id' => 'MockDatabaseComment.mock_database_post_id'
 		);
-		$this->assertEqual($expected, $conn->on(MockDatabasePost::relations('MockDatabaseComment')));
+		$result = $conn->on(MockDatabasePost::relations('MockDatabaseComment'));
+		$this->assertEqual($expected, $result);
 
 		$expected = array(
 			'MockDatabaseComment.mock_database_post_id' => 'MockDatabasePost.id'
 		);
-		$this->assertEqual($expected, $conn->on(MockDatabaseComment::relations('MockDatabasePost')));
+		$result = $conn->on(MockDatabaseComment::relations('MockDatabasePost'));
+		$this->assertEqual($expected, $result);
 
 		$expected = array(
 			'MockDatabasePost.id' => 'MockDatabaseComment.mock_database_post_id',
@@ -1252,7 +1256,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->read(new Query($options));
 		$expected = 'SELECT * FROM {mock_gallery} AS {Gallery} ';
 		$expected .= 'LEFT JOIN {mock_image} AS {Image} ON {Image}.{title} = \'MyImage\' ';
-		$expected .= 'AND {Gallery}.{id} = {Image}.{gallery_id} LEFT JOIN {mock_image_tag} AS {ImageTag} ON ';
+		$expected .= 'AND {Gallery}.{id} = {Image}.{gallery_id} LEFT JOIN ';
+		$expected .= '{mock_image_tag} AS {ImageTag} ON ';
 		$expected .= '{Image}.{id} = {ImageTag}.{image_id} LEFT JOIN {mock_tag} AS {Tag} ON ';
 		$expected .= '{Tag}.{name} = \'MyTag\' AND {ImageTag}.{tag_id} = {Tag}.{id};';
 		$this->assertEqual($expected, $this->db->sql);
@@ -1273,8 +1278,8 @@ class DatabaseTest extends \lithium\test\Unit {
 				)
 			)
 		)));
-		$expected = 'SELECT * FROM {mock_gallery} AS {Gallery} LEFT JOIN {mock_image} AS {Image} ';
-		$expected .= 'ON {Gallery}.{id} = {Image}.{gallery_id} LEFT JOIN {mock_gallery} AS ';
+		$expected = 'SELECT * FROM {mock_gallery} AS {Gallery} LEFT JOIN {mock_image} AS {Image}';
+		$expected .= ' ON {Gallery}.{id} = {Image}.{gallery_id} LEFT JOIN {mock_gallery} AS ';
 		$expected .= '{Gallery2} ON {Gallery}.{custom_id} = {Gallery2}.{id} AND ';
 		$expected .= '{Image}.{gallery_id} = {Gallery2}.{id};';
 		$this->assertEqual($expected, $this->db->sql);
@@ -1321,7 +1326,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ';
 		$expected .= '{mock_database_post_revisions} AS {MockDatabasePostRevision} ON ';
 		$expected .= '{MockDatabasePostRevision}.{deleted} IS NULL AND ';
-		$expected .= '{MockDatabasePost}.{id} = {MockDatabasePostRevision}.{mock_database_post_id};';
+		$expected .= '{MockDatabasePost}.{id} = {MockDatabasePostRevision}.';
+		$expected .= '{mock_database_post_id};';
 		$this->assertEqual($expected, $this->db->sql);
 	}
 
@@ -1506,7 +1512,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$query = new Query(array(
 			'type' => 'read',
 			'model' => $this->_gallery,
-			'fields' => array('count(Image.id) as count', 'Image'),
+			'fields' => array((object) 'count(Image.id) as count', 'Image'),
 			'group' => 'Gallery.id',
 			'with' => array('Image')
 		));

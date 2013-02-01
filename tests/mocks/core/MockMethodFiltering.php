@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -27,6 +27,14 @@ class MockMethodFiltering extends \lithium\core\Object {
 		};
 		return $this->_filter(__METHOD__, array(), $method);
 	}
+
+	public function manual($filters) {
+		$method = function($self, $params, $chain) {
+			return "Working";
+		};
+		return $this->_filter(__METHOD__, array(), $method, $filters);
+	}
+
 }
 
 ?>

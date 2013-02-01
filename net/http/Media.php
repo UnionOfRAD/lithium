@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -326,7 +326,7 @@ class Media extends \lithium\core\StaticObject {
 
 		foreach ($conditions as $key => $value) {
 			switch (true) {
-				case $key == 'type':
+				case $key === 'type':
 					if ($value !== ($request->type === $config['name'])) {
 						return false;
 					}
@@ -806,11 +806,11 @@ class Media extends \lithium\core\StaticObject {
 		$result = array();
 
 		foreach ($types as $name => $cTypes) {
-			if ($type == $cTypes || (is_array($cTypes) && in_array($type, $cTypes))) {
+			if ($type === $cTypes || (is_array($cTypes) && in_array($type, $cTypes))) {
 				$result[] = $name;
 			}
 		}
-		if (count($result) == 1) {
+		if (count($result) === 1) {
 			return reset($result);
 		}
 		return $result ?: null;

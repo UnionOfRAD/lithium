@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -17,7 +17,7 @@ use lithium\data\source\database\adapter\pdo\Result;
 class ResultTest extends \lithium\test\Unit {
 
 	public $db = null;
-	public $mock_prefix = '';
+	public $mockPrefix = '';
 
 	protected $_mockData = array(
 		1 => array(1, 'Foo Company'),
@@ -33,26 +33,26 @@ class ResultTest extends \lithium\test\Unit {
 		$this->skipIf(!$enabled, 'MySQL or PostgreSQL Extension is not loaded');
 
 		$dbConfig = Connections::get('test', array('config' => true));
-		$valid_adapter = in_array($dbConfig['adapter'], array('MySql', 'PostgreSql'));
-		$hasDb = (isset($dbConfig['adapter']) && $valid_adapter);
+		$validAdapter = in_array($dbConfig['adapter'], array('MySql', 'PostgreSql'));
+		$hasDb = (isset($dbConfig['adapter']) && $validAdapter);
 		$message = 'Test database is either unavailable, or not using a MySQL/PostgreSQL adapter';
 		$this->skipIf(!$hasDb, $message);
 
 		switch ($dbConfig['adapter']) {
 			case "MySql":
 				$this->db = new MySql($dbConfig);
-				$this->mock_prefix = 'mysql';
+				$this->mockPrefix = 'mysql';
 			break;
 			case "PostgreSql":
 				$this->db = new PostgreSql($dbConfig);
-				$this->mock_prefix = 'postgresql';
+				$this->mockPrefix = 'postgresql';
 			break;
 		}
 	}
 
 	public function setUp() {
 		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
-		$prefix = $this->mock_prefix;
+		$prefix = $this->mockPrefix;
 		$sqlFile = $lithium . "/tests/mocks/data/source/database/adapter/{$prefix}_companies.sql";
 		$sql = file_get_contents($sqlFile);
 		$this->db->read($sql, array('return' => 'resource'));

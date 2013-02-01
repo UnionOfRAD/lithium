@@ -37,12 +37,10 @@ class FieldsTest extends \lithium\test\Integration {
 		$this->_dbConfig = Connections::get($connection, array(
 			'config' => true
 		));
-		$isAvailable = (
-			$this->_dbConfig &&
-			Connections::get($connection)->isConnected(array(
-				'autoConnect' => true
-			))
-		);
+		$isConnected = $this->_dbConfig && Connections::get($connection)->isConnected(array(
+			'autoConnect' => true
+		));
+		$isAvailable = $this->_dbConfig && $isConnected;
 		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
 
 		$this->db = Connections::get($connection);
@@ -101,7 +99,7 @@ class FieldsTest extends \lithium\test\Integration {
 		$new->delete();
 	}
 
-	function testFieldsWithJoins() {
+	public function testFieldsWithJoins() {
 		$new = MockCompanies::create(array('name' => 'Acme, Inc.'));
 		$cKey = MockCompanies::meta('key');
 		$result = $new->save();
@@ -131,8 +129,7 @@ class FieldsTest extends \lithium\test\Integration {
 		$expected = array(
 			'id' => $cId,
 			'name' => 'Acme, Inc.',
-			'employees' =>
-			array (
+			'employees' => array (
 				$eId => array (
 					'id' => $eId,
 					'name' => 'John Doe'

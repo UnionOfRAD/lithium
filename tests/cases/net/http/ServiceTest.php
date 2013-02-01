@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -289,6 +289,13 @@ class ServiceTest extends \lithium\test\Unit {
 		$response = $http->get('/http_auth/', array(), array('return' => 'response'));
 		$this->assertEqual('success', $response->body());
 	}
+
+	public function testRespondsTo() {
+		$query = new Service();
+		$this->assertTrue($query->respondsTo('foobarbaz'));
+		$this->assertFalse($query->respondsTo(0));
+	}
+
 }
 
 ?>

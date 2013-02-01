@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -884,7 +884,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$message = 'The `_id` key should not be set.';
 		$this->assertFalse(array_key_exists('_id', $document->data()), $message);
 
-		$document->_id == "";
+		$document->_id === "";
 		$this->assertFalse(array_key_exists('_id', $document->data()), $message);
 	}
 

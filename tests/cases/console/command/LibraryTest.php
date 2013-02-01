@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -156,7 +156,7 @@ class LibraryTest extends \lithium\test\Unit {
 
 	public function testArchive() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
-		$this->skipIf(ini_get('phar.readonly') == '1', 'INI setting phar.readonly = On');
+		$this->skipIf(ini_get('phar.readonly') === '1', 'INI setting phar.readonly = On');
 
 		$this->library->library = 'library_test';
 
@@ -173,10 +173,8 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testExtractWithFullPaths() {
-		$this->skipIf(
-			!file_exists("{$this->_testPath}/library_test.phar.gz"),
-			'Depends on ' . __CLASS__  . '::testArchive()'
-		);
+		$fileExists = file_exists("{$this->_testPath}/library_test.phar.gz");
+		$this->skipIf(!$fileExists, 'Depends on ' . __CLASS__ . '::testArchive()');
 		$this->library->library = 'library_test';
 
 		$result = $this->library->extract(
@@ -203,7 +201,7 @@ class LibraryTest extends \lithium\test\Unit {
 	public function testArchiveNoLibrary() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
-			ini_get('phar.readonly') == '1',
+			ini_get('phar.readonly') === '1',
 			'INI setting phar.readonly = On'
 		);
 
@@ -350,7 +348,7 @@ class LibraryTest extends \lithium\test\Unit {
 	public function testPush() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
-			ini_get('phar.readonly') == '1',
+			ini_get('phar.readonly') === '1',
 			'INI setting phar.readonly = On'
 		);
 
@@ -400,7 +398,7 @@ class LibraryTest extends \lithium\test\Unit {
 	public function testInstall() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
-			ini_get('phar.readonly') == '1',
+			ini_get('phar.readonly') === '1',
 			'Relies on ' . __CLASS__ . '::testPush()'
 		);
 		$this->library->path = $this->_testPath;
@@ -439,7 +437,7 @@ class LibraryTest extends \lithium\test\Unit {
 
 	public function testNoInstalLab() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
-		$this->skipIf(ini_get('phar.readonly') == '1', 'Relies on ' . __CLASS__  . '::testPush()');
+		$this->skipIf(ini_get('phar.readonly') === '1', 'Relies on ' . __CLASS__ . '::testPush()');
 		$this->library->path = $this->_testPath;
 		$result = $this->library->install('li3_lab');
 
@@ -504,7 +502,7 @@ test;
 	public function testForceArchive() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
-			ini_get('phar.readonly') == '1',
+			ini_get('phar.readonly') === '1',
 			'INI setting phar.readonly = On'
 		);
 		$result = $this->library->extract('plugin', $this->_testPath . '/library_test_plugin');
@@ -584,7 +582,7 @@ test;
 	public function testPushWithAuth() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
-			ini_get('phar.readonly') == '1',
+			ini_get('phar.readonly') === '1',
 			'INI setting phar.readonly = On'
 		);
 		$result = $this->library->extract('plugin', $this->_testPath . '/library_test_plugin');
@@ -648,7 +646,7 @@ test;
 	public function testPushNotValid() {
 		$this->skipIf(!extension_loaded('zlib'), 'The zlib extension is not loaded.');
 		$this->skipIf(
-			ini_get('phar.readonly') == '1',
+			ini_get('phar.readonly') === '1',
 			'INI setting phar.readonly = On'
 		);
 		$this->library->library = 'library_plugin_test';
@@ -701,7 +699,7 @@ test;
 
 	public function testNoArchive() {
 		$this->skipIf(
-			ini_get('phar.readonly') == '1',
+			ini_get('phar.readonly') === '1',
 			'INI setting phar.readonly = On'
 		);
 		$result = $this->library->archive(

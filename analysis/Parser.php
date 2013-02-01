@@ -75,9 +75,7 @@ class Parser extends \lithium\core\StaticObject {
 			}
 			$tokens[] = array('id' => $id, 'name' => $name, 'content' => $content, 'line' => $line);
 
-			if ($id === T_WHITESPACE) {
-				$line += count(preg_split('/\r\n|\r|\n/', $content)) - 1;
-			}
+			$line += count(preg_split('/\r\n|\r|\n/', $content)) - 1;
 		}
 
 		if ($options['wrap'] && empty($options['include'])) {
@@ -272,13 +270,13 @@ class Parser extends \lithium\core\StaticObject {
 		$match = $pattern['content'];
 		$content = $token['content'];
 
-		if ($pattern['name'] == 'T_VARIABLE') {
+		if ($pattern['name'] === 'T_VARIABLE') {
 			$match = substr($match, 1);
 			$content = substr($content, 1);
 		}
 
 		switch (true) {
-			case ($match == '_' || $match == $content):
+			case ($match === '_' || $match == $content):
 				return true;
 		}
 		return false;

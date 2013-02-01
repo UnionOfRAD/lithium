@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -36,10 +36,11 @@ class ComplexityTest extends \lithium\test\Unit {
 	protected $_metrics = array(
 		'invokeMethod' => 8,
 		'_filter' => 3,
-		'applyFilter' => 3,
+		'applyFilter' => 5,
 		'_parents' => 2,
 		'_instance' => 2,
-		'_stop' => 1
+		'_stop' => 1,
+		'respondsTo' => 1,
 	);
 
 	/**
@@ -86,12 +87,13 @@ class ComplexityTest extends \lithium\test\Unit {
 		Complexity::apply($this->report, $group->tests());
 
 		$results = Complexity::analyze($this->report);
-		$expected = array('class' => array($testClass => 3));
+		$expected = array('class' => array($testClass => 3.1));
 		foreach ($this->_metrics as $method => $metric) {
 			$expected['max'][$testClass . '::' . $method . '()'] = $metric;
 		}
 		$this->assertEqual($expected['max'], $results['max']);
-		$this->assertEqual($expected['class'][$testClass], round($results['class'][$testClass]));
+		$result = round($results['class'][$testClass], 1);
+		$this->assertIdentical($expected['class'][$testClass], $result);
 	}
 
 	/**

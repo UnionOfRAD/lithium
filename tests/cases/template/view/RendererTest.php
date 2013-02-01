@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -267,6 +267,12 @@ class RendererTest extends \lithium\test\Unit {
 		$this->assertEqual("foo\n\tbar", trim($this->subject->head('bar')));
 		$this->assertEqual("foo\n\tbar", trim($this->subject->head()));
 	}
+
+	public function testRespondsTo() {
+		$this->assertTrue($this->subject->respondsTo('foobarbaz'));
+		$this->assertFalse($this->subject->respondsTo(0));
+	}
+
 }
 
 ?>

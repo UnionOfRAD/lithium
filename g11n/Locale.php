@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -79,6 +79,17 @@ class Locale extends \lithium\core\StaticObject {
 			throw new BadMethodCallException("Invalid locale tag `{$method}`.");
 		}
 		return isset($tags[$method]) ? $tags[$method] : null;
+	}
+
+	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public static function respondsTo($method, $internal = false) {
+		return isset(static::$_tags[$method]) || parent::respondsTo($method, $internal);
 	}
 
 	/**
@@ -195,7 +206,7 @@ class Locale extends \lithium\core\StaticObject {
 		while ($count > 0) {
 			if (($key = array_search(static::compose($tags), $locales)) !== false) {
 				return $locales[$key];
-			} elseif ($count == 1) {
+			} elseif ($count === 1) {
 				foreach ($locales as $currentLocale) {
 					if (strpos($currentLocale, current($tags) . '_') === 0) {
 						return $currentLocale;
@@ -296,7 +307,7 @@ class Locale extends \lithium\core\StaticObject {
 		foreach (array('LC_ALL', 'LANG') as $variable)  {
 			$value = $request->env($variable);
 
-			if (!$value || $value == 'C' || $value == 'POSIX') {
+			if (!$value || $value === 'C' || $value === 'POSIX') {
 				continue;
 			}
 			if (preg_match("/{$regex}/", $value, $matches)) {

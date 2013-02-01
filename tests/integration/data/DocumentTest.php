@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -39,10 +39,10 @@ class DocumentTest extends \lithium\test\Integration {
 	public function skip() {
 		$connection = 'lithium_couch_test';
 		$config = Connections::get($connection, array('config' => true));
-		$isAvailable = (
-			$config &&
-			Connections::get($connection)->isConnected(array('autoConnect' => true))
-		);
+		$isConnected = $config && Connections::get($connection)->isConnected(array(
+			'autoConnect' => true
+		));
+		$isAvailable = $config && $isConnected;
 		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
 
 		$this->_key = Companies::key();

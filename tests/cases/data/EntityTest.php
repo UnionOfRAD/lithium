@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -102,6 +102,14 @@ class EntityTest extends \lithium\test\Unit {
 		$entity->foo();
 	}
 
+	public function testMethodDispatchWithEntityAsModel() {
+		$data = array('foo' => true);
+		$model = 'lithium\data\Entity';
+		$entity = new Entity(compact('model', 'data'));
+		$this->expectException("/^No model bound to call `foo`.$/");
+		$entity->foo();
+	}
+
 	public function testErrors() {
 		$entity = new Entity();
 		$errors = array('foo' => 'Something bad happened.');
@@ -133,6 +141,9 @@ class EntityTest extends \lithium\test\Unit {
 		$this->assertTrue($entity->modified('foo'));
 		$this->assertTrue($entity->modified('baz'));
 
+		/**
+		 * and last, checking a non-existing field
+		 */
 		$this->assertNull($entity->modified('ole'));
 
 		$subentity = new Entity();
@@ -143,6 +154,25 @@ class EntityTest extends \lithium\test\Unit {
 		$this->assertTrue($entity->ble->modified('foo'));
 		$this->assertFalse($entity->ble->modified('iak'));
 		$this->assertEqual($entity->ble->modified(), array('foo' => true, 'baz' => true));
+
+		$data = array('foo' => 'bar', 'baz' => 'dib'); //it's the default data array in the test
+		$entity = new Entity();
+		$entity->set($data);
+		$entity->sync();
+
+		/**
+		 * Checking empty values
+		 */
+		$entity->foo = '';
+		$this->assertTrue($entity->modified('foo'));
+		$this->assertEqual(array('foo' => true, 'baz' => false), $entity->modified());
+
+		/**
+		 * and checking null values
+		 */
+		$entity->sync();
+		$entity->foo = null;
+		$this->assertTrue($entity->modified('foo'));
 	}
 
 	/**
@@ -163,6 +193,28 @@ class EntityTest extends \lithium\test\Unit {
 
 		$model::meta('title', $old);
 	}
+
+	public function testRespondsTo() {
+		$model = $this->_model;
+		$data = array('foo' => true);
+		$entity = new Entity(compact('model', 'data'));
+
+		$this->assertTrue($entity->respondsTo('foobar'));
+		$this->assertTrue($entity->respondsTo('findByFoo'));
+		$this->assertFalse($entity->respondsTo('barbaz'));
+		$this->assertTrue($entity->respondsTo('model'));
+		$this->assertTrue($entity->respondsTo('instances'));
+	}
+
+	public function testRespondsToParentCall() {
+		$model = $this->_model;
+		$data = array('foo' => true);
+		$entity = new Entity(compact('model', 'data'));
+
+		$this->assertTrue($entity->respondsTo('applyFilter'));
+		$this->assertFalse($entity->respondsTo('fooBarBaz'));
+	}
+
 }
 
 ?>

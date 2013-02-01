@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -139,7 +139,7 @@ class Cookie extends \lithium\core\Object {
 		$config = $this->_config;
 		$cookieClass = __CLASS__;
 
-		if ($expire && $key != $config['name']) {
+		if ($expire && $key !== $config['name']) {
 			return null;
 		}
 		$expires = (isset($options['expire'])) ? $options['expire'] : $config['expire'];

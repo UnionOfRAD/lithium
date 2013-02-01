@@ -115,6 +115,18 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		$parentRespondsTo = parent::respondsTo($method, $internal);
+		return $parentRespondsTo || is_callable(array($this->connection, $method));
+	}
+
+	/**
 	 * Returns an array of object types accessible through this database.
 	 *
 	 * @param object $class
@@ -143,7 +155,7 @@ class CouchDb extends \lithium\data\source\Http {
 			}
 			if (!$this->_db) {
 				if (isset($result->error)) {
-					if ($result->error == 'not_found') {
+					if ($result->error === 'not_found') {
 						$result = $this->put($database);
 					}
 				}
@@ -236,7 +248,8 @@ class CouchDb extends \lithium\data\source\Http {
 			}
 			$path = "{$config['database']}/{$_path}";
 			$args = (array) $conditions + (array) $limit + (array) $order;
-			$result = (array) json_decode($conn->get($path, $args), true);
+			$result = $conn->get($path, $args);
+			$result = is_string($result) ? json_decode($result, true) : $result;
 			$data = $stats = array();
 
 			if (isset($result['_id'])) {
@@ -455,7 +468,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $context
 	 * @return array
 	 */
-	function order($order, $context) {
+	public function order($order, $context) {
 		return (array) $order ?: array();
 	}
 
@@ -488,13 +501,10 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	protected function _format(array $data) {
-		if (isset($data['_id'])) {
-			$data['id'] = $data['_id'];
+		foreach (array("id", "rev") as $key) {
+			$data[$key] = isset($data["_{$key}"]) ? $data["_{$key}"] : null;
+			unset($data["_{$key}"]);
 		}
-		if (isset($data['_rev'])) {
-			$data['rev'] = $data['_rev'];
-		}
-		unset($data['_id'], $data['_rev']);
 		return $data;
 	}
 }

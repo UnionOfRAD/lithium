@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -123,7 +123,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 				$data['pluralRule'] = array(
 					'id' => 'pluralRule',
 					'translated' => function($count) {
-						return $count != 1;
+						return $count !== 1;
 					}
 				);
 				return $data;
@@ -172,7 +172,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			return array("{$path}/{$category}_{$scope}.pot");
 		}
 
-		if ($category == 'message') {
+		if ($category === 'message') {
 			$category = 'messages';
 		}
 		$category = strtoupper($category);

@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -207,7 +207,7 @@ class Report extends \lithium\core\Object {
 		$count = array_map(
 			function($value) { return is_array($value) ? count($value) : $value; }, $stats
 		);
-		$success = $count['passes'] == $count['asserts'] && $count['errors'] === 0;
+		$success = $count['passes'] === $count['asserts'] && $count['errors'] === 0;
 		return compact('stats', 'count', 'success');
 	}
 
@@ -222,7 +222,7 @@ class Report extends \lithium\core\Object {
 	public function render($template, $data = array()) {
 		$config = $this->_config;
 
-		if ($template == "stats" && !$data) {
+		if ($template === "stats" && !$data) {
 			$data = $this->stats();
 		}
 		$template = Libraries::locate('test.templates', $template, array(

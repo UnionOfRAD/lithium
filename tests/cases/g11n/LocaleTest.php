@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -478,6 +478,18 @@ class LocaleTest extends \lithium\test\Unit {
 		$result = Locale::preferred($request, $available);
 		$this->assertNull($result);
 	}
+
+	public function testRespondsToParentCall() {
+		$this->assertTrue(Locale::respondsTo('applyFilter'));
+		$this->assertFalse(Locale::respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToMagic() {
+		$this->assertTrue(Locale::respondsTo('language'));
+		$this->assertTrue(Locale::respondsTo('territory'));
+		$this->assertFalse(Locale::respondsTo('foobar'));
+	}
+
 }
 
 ?>

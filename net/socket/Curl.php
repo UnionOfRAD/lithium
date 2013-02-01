@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -71,7 +71,7 @@ class Curl extends \lithium\net\Socket {
 		$this->_resource = curl_init($url);
 		$this->set(array(
 			CURLOPT_PORT => $config['port'],
-			CURLOPT_HEADER =>  true,
+			CURLOPT_HEADER => true,
 			CURLOPT_RETURNTRANSFER => true
 		));
 
@@ -150,11 +150,14 @@ class Curl extends \lithium\net\Socket {
 			if (isset($data->headers)) {
 				$this->set(CURLOPT_HTTPHEADER, $data->headers());
 			}
-			if (isset($data->method) && $data->method == 'POST') {
+			if (isset($data->method) && $data->method === 'POST') {
 				$this->set(array(CURLOPT_POST => true, CURLOPT_POSTFIELDS => $data->body()));
 			}
-			if (isset($data->method) && $data->method == 'PUT') {
-				$this->set(array(CURLOPT_CUSTOMREQUEST => 'PUT', CURLOPT_POSTFIELDS => $data->body()));
+			if (isset($data->method) && $data->method === 'PUT') {
+				$this->set(array(
+					CURLOPT_CUSTOMREQUEST => 'PUT',
+					CURLOPT_POSTFIELDS => $data->body()
+				));
 			}
 		}
 		return (boolean) curl_setopt_array($this->_resource, $this->options);

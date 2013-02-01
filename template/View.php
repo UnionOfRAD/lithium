@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -382,11 +382,15 @@ class View extends \lithium\core\Object {
 		$_renderer = $this->_renderer;
 		$_loader = $this->_loader;
 		$filters = $this->outputFilters;
-		$params = compact('step', 'params', 'options') + array('data' => $data + $filters);
+		$params = compact('step', 'params', 'options') + array(
+			'data' => $data + $filters,
+			'loader' => $_loader,
+			'renderer' => $_renderer
+		);
 
-		$filter = function($self, $params) use (&$_renderer, &$_loader) {
-			$template = $_loader->template($params['step']['path'], $params['params']);
-			return $_renderer->render($template, $params['data'], $params['options']);
+		$filter = function($self, $params) {
+			$template = $params['loader']->template($params['step']['path'], $params['params']);
+			return $params['renderer']->render($template, $params['data'], $params['options']);
 		};
 		$result = $this->_filter(__METHOD__, $params, $filter);
 
@@ -453,7 +457,7 @@ class View extends \lithium\core\Object {
 	 * @return array Returns a converted set of rendering steps, to be executed in `render()`.
 	 */
 	protected function _convertSteps(array $command, array &$params, $defaults) {
-		if (count($command) == 1) {
+		if (count($command) === 1) {
 			$params['template'] = current($command);
 			return array(array('path' => key($command)) + $defaults);
 		}

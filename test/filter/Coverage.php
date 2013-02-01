@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -147,8 +147,10 @@ class Coverage extends \lithium\test\Filter {
 							'data' => $contents[$i + 1]
 						);
 					}
-				} elseif (isset($out[$i - 1]) && $out[$i - 1]['data'] !== '...'
-						&& !isset($out[$i]) && !isset($out[$i + 1])) {
+				} elseif (
+					isset($out[$i - 1]) && $out[$i - 1]['data'] !== '...' &&
+					!isset($out[$i]) && !isset($out[$i + 1])
+				) {
 					$out[$i] = array(
 						'class' => 'ignored',
 						'data' => '...'

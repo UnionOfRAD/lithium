@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -11,6 +11,7 @@ namespace lithium\data;
 use BadMethodCallException;
 use UnexpectedValueException;
 use lithium\data\Collection;
+use lithium\analysis\Inspector;
 
 /**
  * `Entity` is a smart data object which represents data such as a row or document in a
@@ -187,13 +188,34 @@ class Entity extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function __call($method, $params) {
-		if ($model = $this->_model) {
+		if (($model = $this->_model) && method_exists($model, '_object')) {
 			array_unshift($params, $this);
 			$class = $model::invokeMethod('_object');
 			return call_user_func_array(array(&$class, $method), $params);
 		}
 		$message = "No model bound to call `{$method}`.";
 		throw new BadMethodCallException($message);
+	}
+
+	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		$class = $this->_model;
+		$modelRespondsTo = false;
+		$parentRespondsTo = parent::respondsTo($method, $internal);
+		$staticRespondsTo = $class::respondsTo($method, $internal);
+		if (method_exists($class, '_object')) {
+			$model = $class::invokeMethod('_object');
+			$modelRespondsTo = $model->respondsTo($method);
+		} else {
+			$modelRespondsTo = Inspector::isCallable($class, $method, $internal);
+		}
+		return $parentRespondsTo || $staticRespondsTo || $modelRespondsTo;
 	}
 
 	/**
@@ -365,7 +387,8 @@ class Entity extends \lithium\core\Object {
 	 * @param string The field name to check its state.
 	 * @return mixed Returns `true` if a field is given and was updated, `false` otherwise and
 	 *		   `null` if the field was not set at all. If no field is given returns an arra
-	 *		   where the keys are entity field names, and the values are `true` for changed fields.
+	 *		   where the keys are entity field names, and the values are `true` for changed
+	 *         fields.
 	 */
 	public function modified($field = null) {
 		if ($field) {
@@ -373,14 +396,18 @@ class Entity extends \lithium\core\Object {
 				return null;
 			}
 
-			$value = !($value = isset($this->_updated[$field])) ?: $this->_updated[$field];
-			if (!$value) {
+			if (!array_key_exists($field, $this->_updated)) {
 				return false;
-			} elseif (is_object($value) && method_exists($value, 'modified')) {
+			}
+
+			$value = $this->_updated[$field];
+			if (is_object($value) && method_exists($value, 'modified')) {
 				$modified = $value->modified();
 				return $modified === true || is_array($modified) && in_array(true, $modified, true);
 			}
-			return !isset($this->_data[$field]) || $this->_data[$field] !== $this->_updated[$field];
+
+			$isSet = isset($this->_data[$field]);
+			return !$isSet || ($this->_data[$field] !== $this->_updated[$field]);
 		}
 
 		$fields = array_fill_keys(array_keys($this->_data), false);
@@ -398,8 +425,7 @@ class Entity extends \lithium\core\Object {
 				);
 			} else {
 				$fields[$field] = (
-					!isset($fields[$field]) ||
-					$this->_data[$field] !== $this->_updated[$field]
+					!isset($fields[$field]) || $this->_data[$field] !== $this->_updated[$field]
 				);
 			}
 		}

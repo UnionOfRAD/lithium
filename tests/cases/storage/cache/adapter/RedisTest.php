@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -402,6 +402,18 @@ class RedisTest extends \lithium\test\Unit {
 		$result = $this->redis->info();
 		$this->assertTrue(is_array($result), 'redis method dispatch failed');
 	}
+
+	public function testRespondsTo() {
+		$this->assertTrue($this->redis->respondsTo('bgsave'));
+		$this->assertTrue($this->redis->respondsTo('dbSize'));
+		$this->assertFalse($this->redis->respondsTo('foobarbaz'));
+	}
+
+	public function testRespondsToParentCall() {
+		$this->assertTrue($this->redis->respondsTo('applyFilter'));
+		$this->assertFalse($this->redis->respondsTo('fooBarBaz'));
+	}
+
 }
 
 ?>

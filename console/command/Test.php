@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -127,7 +127,7 @@ class Test extends \lithium\console\Command {
 					$reporter = function($result) use ($command, &$i, $columns, $colorize) {
 						$shorten = array('fail', 'skip', 'exception');
 
-						if ($result['result'] == 'pass') {
+						if ($result['result'] === 'pass') {
 							$symbol = '.';
 						} elseif (in_array($result['result'], $shorten)) {
 							$symbol = strtoupper($result['result'][0]);
@@ -281,10 +281,10 @@ class Test extends \lithium\console\Command {
 			$this->error('Please provide a path to tests.');
 			return false;
 		}
-		if ($path[0] == '/') {
+		if ($path[0] === '/') {
 			$library = $this->_library($path);
 		}
-		if ($path[0] != '/') {
+		if ($path[0] !== '/') {
 			$libraries = array_reduce(Libraries::get(), function($v, $w) {
 				$v[] = basename($w['path']);
 				return $v;
@@ -294,7 +294,7 @@ class Test extends \lithium\console\Command {
 			$parts = explode('/', str_replace("../", "", $path));
 			$plugin = array_shift($parts);
 
-			if ($plugin == 'libraries') {
+			if ($plugin === 'libraries') {
 				$plugin = array_shift($parts);
 			}
 			if (in_array($plugin, $libraries)) {

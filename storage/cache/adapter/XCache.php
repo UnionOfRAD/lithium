@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -165,12 +165,10 @@ class XCache extends \lithium\core\Object {
 		}
 
 		if (isset($_SERVER['PHP_AUTH_USER'])) {
-			$_SERVER['PHP_AUTH_USER'] =
-				($credentials['username'] !== null) ? $credentials['username'] : null;
+			$_SERVER['PHP_AUTH_USER'] = $credentials['username'];
 		}
 		if (isset($_SERVER['PHP_AUTH_PW'])) {
-			$_SERVER['PHP_AUTH_PW'] =
-				($credentials['password'] !== null) ? $credentials['password'] : null;
+			$_SERVER['PHP_AUTH_PW'] = $credentials['password'];
 		}
 		return true;
 	}

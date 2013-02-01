@@ -386,7 +386,7 @@ class FormTest extends \lithium\test\Unit {
 			'fields' => array('name' => 'user.name', 'password' => 'user.password'),
 			'validators' => array(
 				'password' => function ($form, $data) {
-					if ($form == $data) {
+					if ($form === $data) {
 						return true;
 					}
 					return false;

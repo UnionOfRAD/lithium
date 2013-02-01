@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -273,13 +273,13 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->db->connection->resultSets = array(array());
 		$this->query->conditions(array('title' => 'Nonexistent Post'));
 		$result = $this->db->read($this->query);
-		$this->assertTrue($result == true);
+		$this->assertTrue($result);
 		$this->assertEqual(0, $result->count());
 
 		$this->db->connection->resultSets = array(array($data));
 		$this->query->conditions($data);
 		$result = $this->db->read($this->query);
-		$this->assertTrue($result == true);
+		$this->assertTrue($result);
 		$this->assertEqual(1, $result->count());
 		$this->db->connection = $connection;
 	}
@@ -446,7 +446,11 @@ class MongoDbTest extends \lithium\test\Unit {
 			'safe' => false,
 			'fsync' => false
 		);
-		$baseInsert = array('type' => 'insert', 'collection' => 'ordered_docs', 'options' => $createOpts);
+		$baseInsert = array(
+			'type' => 'insert',
+			'collection' => 'ordered_docs',
+			'options' => $createOpts
+		);
 
 		$expected = array(
 			$baseInsert + array('data' => array('_id' => $result[0]['data']['_id']) + $third),
@@ -466,10 +470,14 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual($third['title'], $documents[2]->title);
 
 		$expected = array(
-			'type' => 'find', 'collection' => 'ordered_docs', 'conditions' => array(), 'fields' => array()
+			'type' => 'find',
+			'collection' => 'ordered_docs',
+			'conditions' => array(),
+			'fields' => array()
 		);
 		$this->assertEqual($expected, array_pop($this->db->connection->queries));
-		$this->assertEqual(array('position' => 1), $documents->result()->resource()->query['sort']);
+		$result = $documents->result()->resource()->query['sort'];
+		$this->assertEqual(array('position' => 1), $result);
 
 		array_push($this->db->connection->results, new MockResult(array(
 			'data' => array($first, $second, $third)
@@ -481,7 +489,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual($third['title'], $documents[2]->title);
 
 		$this->assertEqual($expected, array_pop($this->db->connection->queries));
-		$this->assertEqual(array('position' => 1), $documents->result()->resource()->query['sort']);
+		$result = $documents->result()->resource()->query['sort'];
+		$this->assertEqual(array('position' => 1), $result);
 
 		array_push($this->db->connection->results, new MockResult(array(
 			'data' => array($third, $second, $first)
@@ -493,7 +502,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual($first['title'], $documents[2]->title);
 
 		$this->assertEqual($expected, array_pop($this->db->connection->queries));
-		$this->assertEqual(array('position' => -1), $documents->result()->resource()->query['sort']);
+		$result = $documents->result()->resource()->query['sort'];
+		$this->assertEqual(array('position' => -1), $result);
 	}
 
 	public function testMongoIdPreservation() {
@@ -838,6 +848,110 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual('remove', $result['method']);
 		$this->assertEqual($expected, $result['params'][1]);
 	}
+
+	public function testGridFsCRUDWithDefaultPrefix() {
+		$model = $this->_model;
+		$source = 'fs.files';
+		$data = array('filename' => 'lithium', 'file' => 'some_datas');
+
+		$model::config(array('meta' => array('source' => $source, 'locked' => false)));
+		$this->assertIdentical(true, $model::create()->save($data));
+		$this->assertIdentical('fs', $this->db->connection->gridFsPrefix);
+		$this->db->connection->gridFsPrefix = null;
+
+		$model::config(array('meta' => array('source' => $source, 'locked' => false)));
+		$this->db->connection->results = array(new MockResult(array('data' => $data)));
+		$this->assertTrue($model::find('all'));
+		$this->assertIdentical('fs', $this->db->connection->gridFsPrefix);
+		$this->db->connection->gridFsPrefix = null;
+
+		$model::create($data + array('_id' => new MongoId), array('exists' => true))->delete();
+		$this->assertIdentical('fs', $this->db->connection->gridFsPrefix);
+		$this->db->connection->gridFsPrefix = null;
+
+	}
+
+	public function testGridFsCreateWithCustomPrefix() {
+		$model = $this->_model;
+		$data = array('filename' => 'lithium', 'file' => 'some_datas');
+
+		$db = new MongoDb($this->_testConfig + array('gridPrefix' => 'custom'));
+		$db->server = new MockMongoConnection();
+		$db->connection = new MockMongoConnection();
+		$db->server->connected = true;
+		$model::$connection = $db;
+
+		$model::config(array('meta' => array('source' => 'fs.files', 'locked' => false)));
+		$this->assertIdentical(false, $model::create()->save($data));
+		$this->assertIdentical(null, $db->connection->gridFsPrefix);
+
+		$model::config(array('meta' => array('source' => 'custom.files', 'locked' => false)));
+		$this->assertIdentical(true, $model::create()->save($data));
+		$this->assertIdentical('custom', $db->connection->gridFsPrefix);
+	}
+
+	public function testGridFsReadWithCustomPrefix() {
+		$model = $this->_model;
+		$data = array('filename' => 'lithium', 'file' => 'some_datas');
+		$result = new MockResult(array('data' => array(
+			array('filename' => 'lithium', 'file' => 'some_datas')
+		)));
+
+		$db = new MongoDb($this->_testConfig + array('gridPrefix' => 'custom'));
+		$db->server = new MockMongoConnection();
+		$db->connection = new MockMongoConnection();
+		$db->server->connected = true;
+		$model::$connection = $db;
+
+		$model::config(array('meta' => array('source' => 'fs.files', 'locked' => false)));
+		$db->connection->results = array($result);
+		$this->assertTrue($model::find('all'));
+		$this->assertIdentical(null, $db->connection->gridFsPrefix);
+
+		$model::config(array('meta' => array('source' => 'custom.files', 'locked' => false)));
+		$db->connection->results = array($result);
+		$this->assertTrue($model::find('all'));
+		$this->assertIdentical('custom', $db->connection->gridFsPrefix);
+	}
+
+	public function testGridFsDeleteWithCustomPrefix() {
+		$model = $this->_model;
+		$data = array('_id' => new MongoId);
+
+		$db = new MongoDb($this->_testConfig + array('gridPrefix' => 'custom'));
+		$db->server = new MockMongoConnection();
+		$db->connection = new MockMongoConnection();
+		$db->server->connected = true;
+		$model::$connection = $db;
+
+		$model::config(array('meta' => array('source' => 'fs.files', 'locked' => false)));
+		$model::create($data, array('exists' => true))->delete();
+		$this->assertIdentical(null, $db->connection->gridFsPrefix);
+
+		$model::config(array('meta' => array('source' => 'custom.files', 'locked' => false)));
+		$model::create($data, array('exists' => true))->delete();
+		$this->assertIdentical('custom', $db->connection->gridFsPrefix);
+	}
+
+	public function testRespondsToParentCall() {
+		$db = new MongoDb($this->_testConfig);
+		$this->assertTrue($db->respondsTo('applyFilter'));
+		$this->assertFalse($db->respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToWithNoServer() {
+		$db = new MongoDb($this->_testConfig);
+		$this->assertFalse($db->respondsTo('listDBs'));
+		$this->assertFalse($db->respondsTo('foobarbaz'));
+	}
+
+	public function testRespondsToWithServer() {
+		$db = new MongoDb($this->_testConfig);
+		$db->server = new MockMongoConnection();
+		$this->assertTrue($db->respondsTo('listDBs'));
+		$this->assertFalse($db->respondsTo('foobarbaz'));
+	}
+
 }
 
 ?>

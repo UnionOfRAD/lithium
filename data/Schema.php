@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -142,9 +142,9 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 	/**
 	 * Merges another `Schema` object into the current one.
 	 *
-	 * @param object $schema Another `Schema` class object to be merged into the current one. If this schema
-	 *               contains field names that conflict with existing field names, the existing fields will not
-	 *               be overwritten.
+	 * @param object $schema Another `Schema` class object to be merged into the current one.
+	 *               If this schema contains field names that conflict with existing field names,
+	 *               the existing fields will not be overwritten.
 	 * @return void
 	 */
 	public function merge($schema) {

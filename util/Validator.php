@@ -295,7 +295,7 @@ class Validator extends \lithium\core\StaticObject {
 					$number = $value[$position] * 2;
 					$sum += ($number < 10) ? $number : $number - 9;
 				}
-				return ($sum % 10 == 0);
+				return ($sum % 10 === 0);
 			},
 			'numeric' => function($value) {
 				return is_numeric($value);
@@ -329,7 +329,7 @@ class Validator extends \lithium\core\StaticObject {
 
 		$isEmpty = function($self, $params, $chain) {
 			extract($params);
-			return (empty($value) && $value != '0') ? false : $chain->next($self, $params, $chain);
+			return (empty($value) && $value !== '0') ? false : $chain->next($self, $params, $chain);
 		};
 
 		static::$_methodFilters[$class]['alphaNumeric'] = array($isEmpty);
@@ -385,6 +385,19 @@ class Validator extends \lithium\core\StaticObject {
 		$rule = preg_replace("/^is([A-Z][A-Za-z0-9]+)$/", '$1', $method);
 		$rule[0] = strtolower($rule[0]);
 		return static::rule($rule, $args[0], $args[1], $args[2]);
+	}
+
+	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public static function respondsTo($method, $internal = false) {
+		$rule = preg_replace("/^is([A-Z][A-Za-z0-9]+)$/", '$1', $method);
+		$rule[0] = strtolower($rule[0]);
+		return isset(static::$_rules[$rule]) || parent::respondsTo($method, $internal);
 	}
 
 	/**
@@ -639,7 +652,7 @@ class Validator extends \lithium\core\StaticObject {
 			$options += $defaults;
 
 			$formats = (array) $format;
-			$options['all'] = ($format == 'any');
+			$options['all'] = ($format === 'any');
 
 			foreach ($rules as $index => $check) {
 				if (!$options['all'] && !(in_array($index, $formats) || isset($formats[$index]))) {

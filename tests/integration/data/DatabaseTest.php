@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -83,12 +83,10 @@ class DatabaseTest extends \lithium\test\Integration {
 		$this->_dbConfig = Connections::get($connection, array(
 			'config' => true
 		));
-		$isAvailable = (
-			$this->_dbConfig &&
-			Connections::get($connection)->isConnected(array(
-				'autoConnect' => true
-			))
-		);
+		$isConnected = $this->_dbConfig && Connections::get($connection)->isConnected(array(
+			'autoConnect' => true
+		));
+		$isAvailable = $this->_dbConfig && $isConnected;
 		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
 
 		$this->db = Connections::get($connection);

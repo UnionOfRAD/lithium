@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -70,7 +70,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 				array(
 					'_id' => '4cb4ab6d7addf98506010003',
 					'body' => 'body2',
-					'foo' =>  (object) array('bar' => '2')
+					'foo' => (object) array('bar' => '2')
 				),
 				array(
 					'_id' => '4cb4ab6d7addf98506010004',
@@ -142,7 +142,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$this->assertIdentical($data, $doc->data());
 
 		foreach ($doc as $i => $word) {
-			if ($word == 'Delete me') {
+			if ($word === 'Delete me') {
 				unset($doc[$i]);
 			}
 		}
@@ -153,7 +153,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$doc = new DocumentSet(compact('data'));
 
 		foreach ($doc as $i => $word) {
-			if ($word == 'Delete me') {
+			if ($word === 'Delete me') {
 				unset($doc[$i]);
 			}
 		}

@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -131,6 +131,14 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @var array Key/value pairs of variables
 	 */
 	protected $_vars = array();
+
+	/**
+	 * Available options accepted by `template\View::render()`, used when rendering.
+	 *
+	 * @see lithium\template\View::render()
+	 * @var array
+	 */
+	protected $_options = array();
 
 	/**
 	 * Render the template with given data. Abstract; must be added to subclasses.
@@ -287,6 +295,17 @@ abstract class Renderer extends \lithium\core\Object {
 			return $this->applyHandler(null, null, $method, $params[0], $params[1]);
 		}
 		return $this->applyHandler(null, null, $method, $this->_context[$method]);
+	}
+
+	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		return is_callable(array($this, $method), true);
 	}
 
 	/**
@@ -487,10 +506,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @return string Returns a the rendered template content as a string.
 	 */
 	protected function _render($type, $template, array $data = array(), array $options = array()) {
-		if ($this->_request) {
-			$library = $this->_request->library;
-			$options += compact('library');
-		}
+		$options += $this->_options;
 		return $this->_view->render($type, $data + $this->_data, compact('template') + $options);
 	}
 }

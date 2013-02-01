@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -56,7 +56,7 @@ class Http extends \lithium\data\Source {
 	 */
 	protected $_methods = array(
 		'create' => array('method' => 'post', 'path' => "/{:source}"),
-		'read'	 => array('method' => 'get', 'path' => "/{:source}"),
+		'read'   => array('method' => 'get', 'path' => "/{:source}"),
 		'update' => array('method' => 'put', 'path' => "/{:source}/{:id}"),
 		'delete' => array('method' => 'delete', 'path' => "/{:source}/{:id}")
 	);
@@ -68,7 +68,7 @@ class Http extends \lithium\data\Source {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'adapter'	 => null,
+			'adapter'    => null,
 			'persistent' => false,
 			'scheme'     => 'http',
 			'host'       => 'localhost',
@@ -125,7 +125,7 @@ class Http extends \lithium\data\Source {
 		if (!is_object($params[0])) {
 			$config = (array) $params[0];
 
-			if (count($config) == count($config, COUNT_RECURSIVE)) {
+			if (count($config) === count($config, COUNT_RECURSIVE)) {
 				$config = array('data' => $config);
 			}
 			$params[0] = new Query($this->_methods[$method] + $config);
@@ -136,6 +136,17 @@ class Http extends \lithium\data\Source {
 			list($query, $options) = $params;
 			return $self->send($query, $options);
 		});
+	}
+
+	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		return isset($this->_methods[$method]) || parent::respondsTo($method, $internal);
 	}
 
 	/**

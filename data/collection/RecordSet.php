@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -120,14 +120,18 @@ class RecordSet extends \lithium\data\Collection {
 			}
 			foreach ($this->_columns as $name => $fields) {
 				$fieldCount = count($fields);
-				$record[$i][$name] = array_combine($fields, array_slice($data, $offset, $fieldCount));
+				$record[$i][$name] = array_combine(
+					$fields, array_slice($data, $offset, $fieldCount)
+				);
 				$offset += $fieldCount;
 			}
 			$i++;
 		} while ($main && $data = $this->_result->next());
 
 		$relMap = $this->_query->relationships();
-		return $this->_hydrateRecord($this->_dependencies, $primary, $record, 0, $i, '', $relMap, $conn);
+		return $this->_hydrateRecord(
+			$this->_dependencies, $primary, $record, 0, $i, '', $relMap, $conn
+		);
 	}
 
 	/**
@@ -161,23 +165,31 @@ class RecordSet extends \lithium\data\Collection {
 					while ($j < $max) {
 						$keys = $relModel::key($record[$j][$relName]);
 						if ($main != $keys) {
-							$rel[] = $this->_hydrateRecord($subrelations, $relModel, $record, $i, $j, $relName, $relMap, $conn);
+							$rel[] = $this->_hydrateRecord(
+								$subrelations, $relModel, $record, $i, $j, $relName, $relMap, $conn
+							);
 							$main = $keys;
 							$i = $j;
 						}
 						$j++;
 					}
 					if (array_filter($record[$i][$relName])) {
-						$rel[] = $this->_hydrateRecord($subrelations, $relModel, $record, $i, $j, $relName, $relMap, $conn);
+						$rel[] = $this->_hydrateRecord(
+							$subrelations, $relModel, $record, $i, $j, $relName, $relMap, $conn
+						);
 					}
 					$opts = array('class' => 'set') + $options;
 					$record[$min][$name][$field] = $conn->item($primary, $rel, $opts);
 				} else {
-					$record[$min][$name][$field] = $this->_hydrateRecord($subrelations, $relModel, $record, $min, $max, $relName, $relMap, $conn);
+					$record[$min][$name][$field] = $this->_hydrateRecord(
+						$subrelations, $relModel, $record, $min, $max, $relName, $relMap, $conn
+					);
 				}
 			}
 		}
-		return $conn->item($primary, isset($record[$min][$name]) ? $record[$min][$name] : array(), $options);
+		return $conn->item(
+			$primary, isset($record[$min][$name]) ? $record[$min][$name] : array(), $options
+		);
 	}
 
 	protected function _columnMap() {
@@ -212,7 +224,7 @@ class RecordSet extends \lithium\data\Collection {
 		}
 		$index = 0;
 		foreach ($this->_columns as $key => $value) {
-			if ($key == $name) {
+			if ($key === $name) {
 				$flip = array_flip($value);
 				$keys = $model::meta('key');
 				if (!is_array($keys)) {

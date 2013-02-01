@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -153,7 +153,7 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	 *
 	 * @return boolean Return `true` on success or `false` otherwise.
 	 */
-	function _fetch() {
+	protected function _fetch() {
 		$this->_init = true;
 		if ($this->_fetchFromCache() || $this->_fetchFromResource()) {
 			return true;

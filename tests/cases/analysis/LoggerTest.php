@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -149,7 +149,9 @@ class LoggerTest extends \lithium\test\Unit {
 
 		$this->assertFalse(file_exists($base . '/info_default.log'));
 
-		$this->assertTrue(Logger::write('info', 'Default Message line 1', array('name' => 'default')));
+		$this->assertTrue(Logger::write('info', 'Default Message line 1', array(
+			'name' => 'default'
+		)));
 
 		$this->assertTrue(file_exists($base . '/info_default.log'));
 
@@ -182,7 +184,9 @@ class LoggerTest extends \lithium\test\Unit {
 
 		$this->assertFalse(file_exists($base . '/info_secondary.log'));
 
-		$this->assertTrue(Logger::write('info', 'Secondary Message line 1', array('name' => 'secondary')));
+		$this->assertTrue(Logger::write('info', 'Secondary Message line 1', array(
+			'name' => 'secondary'
+		)));
 
 		$this->assertTrue(file_exists($base . '/info_secondary.log'));
 
@@ -193,6 +197,18 @@ class LoggerTest extends \lithium\test\Unit {
 		unlink($base . '/info_secondary.log');
 
 	}
+
+	public function testRespondsToParentCall() {
+		$this->assertTrue(Logger::respondsTo('applyFilter'));
+		$this->assertFalse(Logger::respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToMagic() {
+		$this->assertTrue(Logger::respondsTo('emergency'));
+		$this->assertTrue(Logger::respondsTo('debug'));
+		$this->assertFalse(Logger::respondsTo('foobar'));
+	}
+
 }
 
 ?>
