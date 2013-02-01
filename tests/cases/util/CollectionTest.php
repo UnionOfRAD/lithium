@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\util;
 
 use stdClass;
+use lithium\data\Entity;
 use lithium\util\Collection;
 use lithium\tests\mocks\util\MockCollectionMarker;
 use lithium\tests\mocks\util\MockCollectionObject;
@@ -459,6 +460,27 @@ class CollectionTest extends \lithium\test\Unit {
 		$collection = new Collection(array('data' => array(1, 5)));
 		$this->assertTrue($collection->valid());
 	}
+
+	public function testRespondsToParent() {
+		$collection = new Collection();
+		$this->assertTrue($collection->respondsTo('applyFilter'));
+		$this->assertFalse($collection->respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToMagic() {
+		$collection = new Collection(array(
+			'data' => array(
+				new Entity(array(
+					'model' => 'lithium\tests\mocks\data\MockPost',
+					'data' => array('stats' => array('foo' => 'bar')),
+				))
+			)
+		));
+		$this->assertTrue($collection->respondsTo('instances'));
+		$this->assertTrue($collection->respondsTo('foobar'));
+		$this->assertFalse($collection->respondsTo('foobarbaz'));
+	}
+
 }
 
 ?>

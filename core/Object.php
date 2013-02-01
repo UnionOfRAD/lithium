@@ -10,6 +10,7 @@ namespace lithium\core;
 
 use lithium\core\Libraries;
 use lithium\util\collection\Filters;
+use lithium\analysis\Inspector;
 
 /**
  * Base class in Lithium's hierarchy, from which all concrete classes inherit. This class defines
@@ -203,6 +204,17 @@ class Object {
 			$object->{$property} = $value;
 		}
 		return $object;
+	}
+
+	/**
+	 * Will determine if a method can be called.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		return Inspector::isCallable($this, $method, $internal);
 	}
 
 	/**

@@ -12,6 +12,7 @@ use ReflectionMethod;
 use lithium\analysis\Inspector;
 use lithium\core\Libraries;
 use lithium\tests\mocks\analysis\MockEmptyClass;
+use lithium\tests\mocks\core\MockMethodFiltering;
 
 class InspectorTest extends \lithium\test\Unit {
 
@@ -109,8 +110,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = array(__LINE__ - 2 => "\tpublic function testLineIntrospection() {");
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::lines(__CLASS__, array(16));
-		$expected = array(16 => 'class InspectorTest extends \lithium\test\Unit {');
+		$result = Inspector::lines(__CLASS__, array(17));
+		$expected = array(17 => 'class InspectorTest extends \lithium\test\Unit {');
 		$this->assertEqual($expected, $result);
 
 		$lines = 'This is the first line.' . PHP_EOL . 'And this the second.';
@@ -314,6 +315,41 @@ class InspectorTest extends \lithium\test\Unit {
 
 		$this->assertNull(Inspector::properties('\lithium\core\Foo'));
 	}
+
+	public function testCallableObjectWithBadMethods() {
+		$stdObj = new MockEmptyClass;
+		$this->assertFalse(Inspector::isCallable($stdObj, 'foo', 0));
+		$this->assertFalse(Inspector::isCallable($stdObj, 'bar', 0));
+		$this->assertFalse(Inspector::isCallable($stdObj, 'baz', 0));
+	}
+
+	public function testCallableClassWithBadMethods() {
+		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', 'foo', 0));
+		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', 'bar', 0));
+		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', 'baz', 0));
+	}
+
+	public function testCallableObjectWithRealMethods() {
+		$obj = new MockMethodFiltering();
+		$this->assertTrue(Inspector::isCallable($obj, 'method', 0));
+		$this->assertTrue(Inspector::isCallable($obj, 'method2', 0));
+		$this->assertTrue(Inspector::isCallable($obj, 'manual', 0));
+	}
+
+	public function testCallableClassWithRealMethods() {
+		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', 'config', 0));
+		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', 'run', 0));
+		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', 'applyRules', 0));
+	}
+
+	public function testCallableVisibility() {
+		$obj = new MockMethodFiltering();
+		$this->assertTrue(Inspector::isCallable($obj, 'method', 0));
+		$this->assertTrue(Inspector::isCallable($obj, 'method', 1));
+		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', '_callable', 0));
+		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', '_callable', 1));
+	}
+
 }
 
 ?>

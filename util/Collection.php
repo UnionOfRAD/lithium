@@ -210,6 +210,18 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		$magicMethod = count($this->_data) > 0 && $this->_data[0]->respondsTo($method, $internal);
+		return $magicMethod || parent::respondsTo($method, $internal);
+	}
+
+	/**
 	 * Converts a `Collection` object to another type of object, or a simple type such as an array.
 	 * The supported values of `$format` depend on the format handlers registered in the static
 	 * property `Collection::$_formats`. The `Collection` class comes with built-in support for

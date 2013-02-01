@@ -139,6 +139,17 @@ class Http extends \lithium\data\Source {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		return isset($this->_methods[$method]) || parent::respondsTo($method, $internal);
+	}
+
+	/**
 	 * Method to send to a specific resource.
 	 *
 	 * @param array $query a query object

@@ -730,6 +730,13 @@ class QueryTest extends \lithium\test\Unit {
 		$this->expectException('Undefined query strategy `custom`.');
 		$export = $query->export($this->db);
 	}
+
+	public function testRespondsTo() {
+		$query = new Query();
+		$this->assertTrue($query->respondsTo('calculate'));
+		$this->assertFalse($query->respondsTo('foobarbaz'));
+	}
+
 }
 
 ?>

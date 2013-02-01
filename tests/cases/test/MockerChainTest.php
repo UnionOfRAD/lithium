@@ -122,6 +122,19 @@ class MockerChainTest extends \lithium\test\Unit {
 			->called('method1')->with()->eq(1)->success());
 	}
 
+	public function testRespondsToParentCall() {
+		$chain = Mocker::chain(array());
+		$this->assertTrue($chain->respondsTo('applyFilter'));
+		$this->assertFalse($chain->respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToMagic() {
+		$chain = Mocker::chain(array());
+		$this->assertTrue($chain->respondsTo('gt'));
+		$this->assertTrue($chain->respondsTo('lt'));
+		$this->assertFalse($chain->respondsTo('et'));
+	}
+
 }
 
 ?>

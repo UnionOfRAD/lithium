@@ -117,6 +117,18 @@ class MockerChain extends \lithium\core\Object {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		$methodExists = in_array($method, array('gt', 'gte', 'lt', 'lte', 'eq'), true);
+		return $methodExists || parent::respondsTo($method, $internal);
+	}
+
+	/**
 	 * Valides the method was called after the last call.
 	 *
 	 * @param  string $method Method to assert

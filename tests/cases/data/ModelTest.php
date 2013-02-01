@@ -890,6 +890,26 @@ class ModelTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, MockPost::meta());
 	}
+
+	public function testRespondsTo() {
+		$this->assertTrue(MockPost::respondsTo('findByFoo'));
+		$this->assertTrue(MockPost::respondsTo('findFooByBar'));
+		$this->assertFalse(MockPost::respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToParentCall() {
+		$this->assertTrue(MockPost::respondsTo('applyFilter'));
+		$this->assertFalse(MockPost::respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToInstanceMethod() {
+		$this->assertFalse(MockPost::respondsTo('foo_Bar_Baz'));
+		MockPost::instanceMethods(array(
+		    'foo_Bar_Baz' => function($entity) {}
+		));
+		$this->assertTrue(MockPost::respondsTo('foo_Bar_Baz'));
+	}
+
 }
 
 ?>

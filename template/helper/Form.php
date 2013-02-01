@@ -398,6 +398,17 @@ class Form extends \lithium\template\Helper {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		return is_callable(array($this, $method), true);
+	}
+
+	/**
 	 * Generates a form field with a label, input, and error message (if applicable), all contained
 	 * within a wrapping element.
 	 *

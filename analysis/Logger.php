@@ -140,6 +140,17 @@ class Logger extends \lithium\core\Adaptable {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public static function respondsTo($method, $internal = false) {
+		return isset(static::$_priorities[$method]) || parent::respondsTo($method, $internal);
+	}
+
+	/**
 	 * This method is called automatically to initialize the default configuration of a log adapter,
 	 * such that the adapter defaults to accepting log messages of any priority (i.e. the
 	 * `'priority'` key is set to `true`).

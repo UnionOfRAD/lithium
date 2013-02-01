@@ -766,6 +766,17 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		return isset($this->_config[$method]) || parent::respondsTo($method, $internal);
+	}
+
+	/**
 	 * Will return a find first condition on the associated model if a record is connected.
 	 * Called by conditions when it is called as a get and no condition is set.
 	 *

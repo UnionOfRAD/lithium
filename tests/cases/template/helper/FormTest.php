@@ -1461,6 +1461,12 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertEqual($post, $this->form->binding('post'));
 		$this->assertEqual($info, $this->form->binding('info'));
 	}
+
+	public function testRespondsTo() {
+		$this->assertTrue($this->form->respondsTo('foobarbaz'));
+		$this->assertFalse($this->form->respondsTo(0));
+	}
+
 }
 
 ?>
