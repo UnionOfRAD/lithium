@@ -524,6 +524,23 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public static function respondsTo($method, $internal = false) {
+		$self = static::_object();
+		$methods = static::instanceMethods();
+		$isFinder = isset($self->_finders[$method]);
+		preg_match('/^findBy(?P<field>\w+)$|^find(?P<type>\w+)By(?P<fields>\w+)$/', $method, $args);
+		$staticRepondsTo = $isFinder || $method === 'all' || !!$args;
+		$instanceRespondsTo = isset($methods[$method]);
+		return $instanceRespondsTo || $staticRepondsTo || parent::respondsTo($method, $internal);
+	}
+
+	/**
 	 * The `find` method allows you to retrieve data from the connected data source.
 	 *
 	 * Examples:

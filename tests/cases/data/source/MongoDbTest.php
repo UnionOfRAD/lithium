@@ -922,6 +922,26 @@ class MongoDbTest extends \lithium\test\Unit {
 		$model::create($data, array('exists' => true))->delete();
 		$this->assertIdentical('custom', $db->connection->gridFsPrefix);
 	}
+
+	public function testRespondsToParentCall() {
+		$db = new MongoDb($this->_testConfig);
+		$this->assertTrue($db->respondsTo('applyFilter'));
+		$this->assertFalse($db->respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToWithNoServer() {
+		$db = new MongoDb($this->_testConfig);
+		$this->assertFalse($db->respondsTo('listDBs'));
+		$this->assertFalse($db->respondsTo('foobarbaz'));
+	}
+
+	public function testRespondsToWithServer() {
+		$db = new MongoDb($this->_testConfig);
+		$db->server = new MockMongoConnection();
+		$this->assertTrue($db->respondsTo('listDBs'));
+		$this->assertFalse($db->respondsTo('foobarbaz'));
+	}
+
 }
 
 ?>

@@ -115,6 +115,18 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		$parentRespondsTo = parent::respondsTo($method, $internal);
+		return $parentRespondsTo || is_callable(array($this->connection, $method));
+	}
+
+	/**
 	 * Returns an array of object types accessible through this database.
 	 *
 	 * @param object $class

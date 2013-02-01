@@ -11,6 +11,7 @@ namespace lithium\data;
 use BadMethodCallException;
 use UnexpectedValueException;
 use lithium\data\Collection;
+use lithium\analysis\Inspector;
 
 /**
  * `Entity` is a smart data object which represents data such as a row or document in a
@@ -194,6 +195,27 @@ class Entity extends \lithium\core\Object {
 		}
 		$message = "No model bound to call `{$method}`.";
 		throw new BadMethodCallException($message);
+	}
+
+	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		$class = $this->_model;
+		$modelRespondsTo = false;
+		$parentRespondsTo = parent::respondsTo($method, $internal);
+		$staticRespondsTo = $class::respondsTo($method, $internal);
+		if (method_exists($class, '_object')) {
+			$model = $class::invokeMethod('_object');
+			$modelRespondsTo = $model->respondsTo($method);
+		} else {
+			$modelRespondsTo = Inspector::isCallable($class, $method, $internal);
+		}
+		return $parentRespondsTo || $staticRespondsTo || $modelRespondsTo;
 	}
 
 	/**

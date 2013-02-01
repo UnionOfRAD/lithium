@@ -135,6 +135,17 @@ class Relationship extends \lithium\core\Object {
 		return $this->data($name);
 	}
 
+	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		return is_callable(array($this, $method), true);
+	}
+
 	protected function _keys($keys) {
 		$config = $this->_config;
 		$hasRel = ($related = ($config['type'] == 'belongsTo') ? $config['to'] : $config['from']);

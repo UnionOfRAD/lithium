@@ -1207,6 +1207,18 @@ class ValidatorTest extends \lithium\test\Unit {
 		$result = Validator::check($data, $rules);
 		$this->assertEqual(array('id' => array('Bad ID')), $result);
 	}
+
+	public function testRespondsToParentCall() {
+		$this->assertTrue(Validator::respondsTo('applyFilter'));
+		$this->assertFalse(Validator::respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToMagic() {
+		$this->assertTrue(Validator::respondsTo('isAlphaNumeric'));
+		$this->assertTrue(Validator::respondsTo('isCreditCard'));
+		$this->assertFalse(Validator::respondsTo('isFoobar'));
+	}
+
 }
 
 ?>

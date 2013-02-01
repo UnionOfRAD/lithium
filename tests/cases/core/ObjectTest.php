@@ -260,6 +260,18 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->assertTrue($obj->manual(array()) !== false);
 	}
 
+	public function testRespondsTo() {
+		$obj = new MockMethodFiltering();
+		$this->assertTrue($this->respondsTo('applyFilter'));
+		$this->assertFalse($this->respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToProtectedMethod() {
+		$obj = new MockMethodFiltering();
+		$this->assertFalse($this->respondsTo('_parents'));
+		$this->assertTrue($this->respondsTo('_parents', 1));
+	}
+
 }
 
 ?>

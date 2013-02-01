@@ -352,6 +352,18 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		$childRespondsTo = is_object($this->server) && is_callable(array($this->server, $method));
+		return parent::respondsTo($method, $internal) || $childRespondsTo;
+	}
+
+	/**
 	 * Normally used in cases where the query is a raw string (as opposed to a `Query` object),
 	 * to database must determine the correct column names from the result resource. Not
 	 * applicable to this data source.

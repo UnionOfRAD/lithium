@@ -478,6 +478,18 @@ class LocaleTest extends \lithium\test\Unit {
 		$result = Locale::preferred($request, $available);
 		$this->assertNull($result);
 	}
+
+	public function testRespondsToParentCall() {
+		$this->assertTrue(Locale::respondsTo('applyFilter'));
+		$this->assertFalse(Locale::respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToMagic() {
+		$this->assertTrue(Locale::respondsTo('language'));
+		$this->assertTrue(Locale::respondsTo('territory'));
+		$this->assertFalse(Locale::respondsTo('foobar'));
+	}
+
 }
 
 ?>

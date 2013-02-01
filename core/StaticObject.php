@@ -10,6 +10,7 @@ namespace lithium\core;
 
 use lithium\core\Libraries;
 use lithium\util\collection\Filters;
+use lithium\analysis\Inspector;
 
 /**
  * Provides a base class for all static classes in the Lithium framework. Similar to its
@@ -88,6 +89,17 @@ class StaticObject {
 			default:
 				return forward_static_call_array(array(get_called_class(), $method), $params);
 		}
+	}
+
+	/**
+	 * Will determine if a method can be called.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public static function respondsTo($method, $internal = false) {
+		return Inspector::isCallable(get_called_class(), $method, $internal);
 	}
 
 	/**

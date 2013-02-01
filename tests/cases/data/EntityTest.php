@@ -193,6 +193,28 @@ class EntityTest extends \lithium\test\Unit {
 
 		$model::meta('title', $old);
 	}
+
+	public function testRespondsTo() {
+		$model = $this->_model;
+		$data = array('foo' => true);
+		$entity = new Entity(compact('model', 'data'));
+
+		$this->assertTrue($entity->respondsTo('foobar'));
+		$this->assertTrue($entity->respondsTo('findByFoo'));
+		$this->assertFalse($entity->respondsTo('barbaz'));
+		$this->assertTrue($entity->respondsTo('model'));
+		$this->assertTrue($entity->respondsTo('instances'));
+	}
+
+	public function testRespondsToParentCall() {
+		$model = $this->_model;
+		$data = array('foo' => true);
+		$entity = new Entity(compact('model', 'data'));
+
+		$this->assertTrue($entity->respondsTo('applyFilter'));
+		$this->assertFalse($entity->respondsTo('fooBarBaz'));
+	}
+
 }
 
 ?>

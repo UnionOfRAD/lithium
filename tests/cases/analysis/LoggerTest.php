@@ -193,6 +193,18 @@ class LoggerTest extends \lithium\test\Unit {
 		unlink($base . '/info_secondary.log');
 
 	}
+
+	public function testRespondsToParentCall() {
+		$this->assertTrue(Logger::respondsTo('applyFilter'));
+		$this->assertFalse(Logger::respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToMagic() {
+		$this->assertTrue(Logger::respondsTo('emergency'));
+		$this->assertTrue(Logger::respondsTo('debug'));
+		$this->assertFalse(Logger::respondsTo('foobar'));
+	}
+
 }
 
 ?>

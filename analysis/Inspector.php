@@ -49,6 +49,22 @@ class Inspector extends \lithium\core\StaticObject {
 	);
 
 	/**
+	 * Will determine if a method can be called.
+	 *
+	 * @param  string|object $class      Class to inspect.
+	 * @param  string        $method     Method name.
+	 * @param  bool          $internal   Interal call or not.
+	 * @return bool
+	 */
+	public static function isCallable($object, $method, $internal = false) {
+		$methodExists = method_exists($object, $method);
+		$callable = function($object, $method) {
+			return is_callable(array($object, $method));
+		};
+		return $internal ? $methodExists : $methodExists && $callable($object, $method);
+	}
+
+	/**
 	 * Determines if a given $identifier is a class property, a class method, a class itself,
 	 * or a namespace identifier.
 	 *

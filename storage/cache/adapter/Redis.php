@@ -121,6 +121,18 @@ class Redis extends \lithium\core\Object {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = 0) {
+		$parentRespondsTo = parent::respondsTo($method, $internal);
+		return $parentRespondsTo || is_callable(array($this->connection, $method));
+	}
+
+	/**
 	 * Sets expiration time for cache keys
 	 *
 	 * @param string $key The key to uniquely identify the cached item

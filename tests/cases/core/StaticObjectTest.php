@@ -209,6 +209,16 @@ class StaticObjectTest extends \lithium\test\Unit {
 		$this->assertTrue($class::manual(array()) !== false);
 	}
 
+	public function testRespondsTo() {
+		$this->assertTrue(MockStaticInstantiator::respondsTo('applyFilter'));
+		$this->assertFalse(MockStaticInstantiator::respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToProtectedMethod() {
+		$this->assertFalse(MockStaticInstantiator::respondsTo('_foo'));
+		$this->assertTrue(MockStaticInstantiator::respondsTo('_foo', 1));
+	}
+
 }
 
 ?>

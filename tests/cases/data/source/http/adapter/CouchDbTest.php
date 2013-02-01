@@ -218,6 +218,13 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual(CouchDb::enabled('booleans'), true);
 		$this->assertEqual(CouchDb::enabled('relationships'), false);
 	}
+
+	public function testRespondsTo() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$this->assertTrue($couchdb->respondsTo('foobarbaz'));
+		$this->assertFalse($couchdb->respondsTo(0));
+	}
+
 }
 
 ?>

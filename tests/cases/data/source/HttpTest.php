@@ -337,6 +337,20 @@ class HttpTest extends \lithium\test\Unit {
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testRespondsTo() {
+		$http = new Http();
+		$this->assertFalse($http->respondsTo('refactor'));
+		$this->assertTrue($http->respondsTo('create'));
+		$this->assertTrue($http->respondsTo('read'));
+	}
+
+	public function testRespondsToParentCall() {
+		$http = new Http();
+		$this->assertTrue($http->respondsTo('applyFilter'));
+		$this->assertFalse($http->respondsTo('fooBarBaz'));
+	}
+
 }
 
 ?>
