@@ -15,6 +15,10 @@ class MockStaticInstantiator extends \lithium\core\StaticObject {
 	public static function instance($name, array $config = array()) {
 		return static::_instance($name, $config);
 	}
+
+	protected static function _foo() {
+		return false;
+	}
 }
 
 ?>

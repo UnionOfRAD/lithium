@@ -289,6 +289,13 @@ class ServiceTest extends \lithium\test\Unit {
 		$response = $http->get('/http_auth/', array(), array('return' => 'response'));
 		$this->assertEqual('success', $response->body());
 	}
+
+	public function testRespondsTo() {
+		$query = new Service();
+		$this->assertTrue($query->respondsTo('foobarbaz'));
+		$this->assertFalse($query->respondsTo(0));
+	}
+
 }
 
 ?>

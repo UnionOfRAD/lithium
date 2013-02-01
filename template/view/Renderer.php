@@ -298,6 +298,17 @@ abstract class Renderer extends \lithium\core\Object {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public function respondsTo($method, $internal = false) {
+		return is_callable(array($this, $method), true);
+	}
+
+	/**
 	 * Brokers access to helpers attached to this rendering context, and loads helpers on-demand if
 	 * they are not available.
 	 *

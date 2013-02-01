@@ -267,6 +267,12 @@ class RendererTest extends \lithium\test\Unit {
 		$this->assertEqual("foo\n\tbar", trim($this->subject->head('bar')));
 		$this->assertEqual("foo\n\tbar", trim($this->subject->head()));
 	}
+
+	public function testRespondsTo() {
+		$this->assertTrue($this->subject->respondsTo('foobarbaz'));
+		$this->assertFalse($this->subject->respondsTo(0));
+	}
+
 }
 
 ?>

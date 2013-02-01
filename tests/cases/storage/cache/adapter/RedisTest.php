@@ -402,6 +402,18 @@ class RedisTest extends \lithium\test\Unit {
 		$result = $this->redis->info();
 		$this->assertTrue(is_array($result), 'redis method dispatch failed');
 	}
+
+	public function testRespondsTo() {
+		$this->assertTrue($this->redis->respondsTo('bgsave'));
+		$this->assertTrue($this->redis->respondsTo('dbSize'));
+		$this->assertFalse($this->redis->respondsTo('foobarbaz'));
+	}
+
+	public function testRespondsToParentCall() {
+		$this->assertTrue($this->redis->respondsTo('applyFilter'));
+		$this->assertFalse($this->redis->respondsTo('fooBarBaz'));
+	}
+
 }
 
 ?>

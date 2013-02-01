@@ -19,6 +19,11 @@ class MockPost extends \lithium\tests\mocks\data\MockBase {
 	public static function instances() {
 		return array_keys(static::$_instances);
 	}
+
+	public function foobar() {
+		return;
+	}
+
 }
 
 ?>

@@ -388,6 +388,19 @@ class Validator extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public static function respondsTo($method, $internal = false) {
+		$rule = preg_replace("/^is([A-Z][A-Za-z0-9]+)$/", '$1', $method);
+		$rule[0] = strtolower($rule[0]);
+		return isset(static::$_rules[$rule]) || parent::respondsTo($method, $internal);
+	}
+
+	/**
 	 * Checks a set of values against a specified rules list. This method may be used to validate
 	 * any arbitrary array of data against a set of validation rules.
 	 *

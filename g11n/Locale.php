@@ -82,6 +82,17 @@ class Locale extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Custom check to determine if our given magic methods can be responded to.
+	 *
+	 * @param  string  $method     Method name.
+	 * @param  bool    $internal   Interal call or not.
+	 * @return bool
+	 */
+	public static function respondsTo($method, $internal = false) {
+		return isset(static::$_tags[$method]) || parent::respondsTo($method, $internal);
+	}
+
+	/**
 	 * Composes a locale from locale tags.  This is the pendant to `Locale::decompose()`.
 	 *
 	 * @param array $tags An array as obtained from `Locale::decompose()`.
