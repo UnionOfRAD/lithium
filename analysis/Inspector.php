@@ -16,6 +16,19 @@ use SplFileObject;
 use lithium\core\Libraries;
 
 /**
+ * Performing a `is_callable` with no context
+ *
+ * @param  mixed   $callable      The callback function to check.
+ * @param  boolean $syntax_only   If set to `true` the function only verifies that name might be a
+ *                                function or method.
+ * @param  string  $callable_name Receives the "callable name".
+ * @return boolean
+ */
+function is_callable($callable, $syntax_only = false, &$callable_name = null) {
+	return \is_callable($callable, $syntax_only, $callable_name);
+};
+
+/**
  * General source code inspector.
  *
  * This inspector provides a simple interface to the PHP Reflection API that
@@ -58,10 +71,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 */
 	public static function isCallable($object, $method, $internal = false) {
 		$methodExists = method_exists($object, $method);
-		$callable = function($object, $method) {
-			return is_callable(array($object, $method));
-		};
-		return $internal ? $methodExists : $methodExists && $callable($object, $method);
+		return $internal ? $methodExists : $methodExists && is_callable(array($object, $method));
 	}
 
 	/**

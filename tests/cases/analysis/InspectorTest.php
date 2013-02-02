@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\analysis;
 
+use stdClass;
 use ReflectionMethod;
 use lithium\analysis\Inspector;
 use lithium\core\Libraries;
@@ -110,8 +111,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = array(__LINE__ - 2 => "\tpublic function testLineIntrospection() {");
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::lines(__CLASS__, array(17));
-		$expected = array(17 => 'class InspectorTest extends \lithium\test\Unit {');
+		$result = Inspector::lines(__CLASS__, array(18));
+		$expected = array(18 => 'class InspectorTest extends \lithium\test\Unit {');
 		$this->assertEqual($expected, $result);
 
 		$lines = 'This is the first line.' . PHP_EOL . 'And this the second.';
@@ -318,38 +319,54 @@ class InspectorTest extends \lithium\test\Unit {
 
 	public function testCallableObjectWithBadMethods() {
 		$stdObj = new MockEmptyClass;
-		$this->assertFalse(Inspector::isCallable($stdObj, 'foo', 0));
-		$this->assertFalse(Inspector::isCallable($stdObj, 'bar', 0));
-		$this->assertFalse(Inspector::isCallable($stdObj, 'baz', 0));
+		$this->assertFalse(Inspector::isCallable($stdObj, 'foo'));
+		$this->assertFalse(Inspector::isCallable($stdObj, 'bar'));
+		$this->assertFalse(Inspector::isCallable($stdObj, 'baz'));
 	}
 
-	public function testCallableClassWithBadMethods() {
-		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', 'foo', 0));
-		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', 'bar', 0));
-		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', 'baz', 0));
+	public function testIsCallableClassWithBadMethods() {
+		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', 'foo'));
+		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', 'bar'));
+		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', 'baz'));
 	}
 
-	public function testCallableObjectWithRealMethods() {
+	public function testISCallableObjectWithRealMethods() {
 		$obj = new MockMethodFiltering();
-		$this->assertTrue(Inspector::isCallable($obj, 'method', 0));
-		$this->assertTrue(Inspector::isCallable($obj, 'method2', 0));
-		$this->assertTrue(Inspector::isCallable($obj, 'manual', 0));
+		$this->assertTrue(Inspector::isCallable($obj, 'method'));
+		$this->assertTrue(Inspector::isCallable($obj, 'method2'));
+		$this->assertTrue(Inspector::isCallable($obj, 'manual'));
 	}
 
-	public function testCallableClassWithRealMethods() {
-		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', 'config', 0));
-		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', 'run', 0));
-		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', 'applyRules', 0));
+	public function testIsCallableClassWithRealMethods() {
+		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', 'config'));
+		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', 'run'));
+		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', 'applyRules'));
 	}
 
-	public function testCallableVisibility() {
+	public function testIsCallableVisibility() {
 		$obj = new MockMethodFiltering();
-		$this->assertTrue(Inspector::isCallable($obj, 'method', 0));
-		$this->assertTrue(Inspector::isCallable($obj, 'method', 1));
-		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', '_callable', 0));
-		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', '_callable', 1));
+		$this->assertTrue(Inspector::isCallable($obj, 'method'));
+		$this->assertTrue(Inspector::isCallable($obj, 'method', true));
+		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', '_callable'));
+		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', '_callable', true));
 	}
 
+	public function testIsCallableContext() {
+		$this->assertFalse(Inspector::isCallable('stdClass', 'invokeMethod'));
+		$this->assertFalse(Inspector::isCallable('stdClass', 'invokeMethod', true));
+		$this->assertFalse(Inspector::isCallable('stdClass', '_instance'));
+		$this->assertFalse(Inspector::isCallable('stdClass', '_instance', true));
+		$this->assertTrue(Inspector::isCallable('lithium\analysis\Inspector', 'invokeMethod'));
+		$this->assertTrue(Inspector::isCallable('lithium\analysis\Inspector', 'invokeMethod', true));
+		$this->assertFalse(Inspector::isCallable('lithium\analysis\Inspector', '_instance'));
+		$this->assertTrue(Inspector::isCallable('lithium\analysis\Inspector', '_instance', true));
+
+		$instance = new stdClass();
+		$this->assertFalse(Inspector::isCallable($instance, 'invokeMethod'));
+		$this->assertFalse(Inspector::isCallable($instance, 'invokeMethod', true));
+		$this->assertFalse(Inspector::isCallable($instance, '_instance'));
+		$this->assertFalse(Inspector::isCallable($instance, '_instance', true));
+	}
 }
 
 ?>
