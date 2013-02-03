@@ -100,15 +100,15 @@ class MockerTest extends \lithium\test\Unit {
 	}
 
 	public function testFilteringStaticClassCanReturnOriginal() {
-		$mockee = 'lithium\analysis\inspector\Mock';
+		$mockee = 'lithium\analysis\debugger\Mock';
 
-		$originalResult = $mockee::methods('lithium\analysis\Inspector');
+		$originalResult = $mockee::export(array('foo', 'bar', 'baz'));
 
-		$mockee::applyFilter('tokenize', function($self, $params, $chain) {
+		$mockee::applyFilter('export', function($self, $params, $chain) {
 			return $chain->next($self, $params, $chain);
 		});
 
-		$filteredResult = $mockee::methods('lithium\analysis\Inspector');
+		$filteredResult = $mockee::export(array('foo', 'bar', 'baz'));
 
 		$this->assertEqual($filteredResult, $originalResult);
 	}
