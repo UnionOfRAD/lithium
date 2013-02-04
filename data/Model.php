@@ -280,7 +280,7 @@ class Model extends \lithium\core\StaticObject {
 	protected $_schema = array();
 
 	/**
-	 * Default query parameters.
+	 * Default query parameters for the model finders.
 	 *
 	 * - `'conditions'`: The conditional query elements, e.g.
 	 *                 `'conditions' => array('published' => true)`
