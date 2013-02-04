@@ -23,6 +23,23 @@ class MockerChainTest extends \lithium\test\Unit {
 		$this->assertTrue($chain->success());
 	}
 
+	public function testStaticSuccessful() {
+		$class = '\lithium\tests\mocks\test\mockStdStaticClass\Mock';
+		$class::applyFilter(false);
+		$chain = Mocker::chain($class);
+
+		$this->assertTrue($chain->success());
+	}
+
+	public function testBasicStaticCalled() {
+		$class = '\lithium\tests\mocks\test\mockStdStaticClass\Mock';
+		$class::applyFilter(false);
+		$class::method1();
+		$chain = Mocker::chain($class);
+
+		$this->assertTrue($chain->called('method1')->success());
+	}
+
 	public function testBasicNotCalled() {
 		$mock = new \lithium\tests\mocks\test\mockStdClass\Mock();
 		$chain = Mocker::chain($mock);

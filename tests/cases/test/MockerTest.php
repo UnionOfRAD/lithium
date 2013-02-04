@@ -41,10 +41,35 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertTrue(is_a($mockeeObj, $mocker));
 	}
 
-	public function testCannotMockNonLithiumClasses() {
+	public function testCanMockNonLithiumClasses() {
 		$mockee = 'stdClass\Mock';
 		Mocker::create($mockee);
-		$this->assertTrue(!class_exists($mockee));
+		$this->assertTrue(class_exists($mockee));
+	}
+
+	public function testNonLithiumInstanceClass() {
+		$std = new \lithium\tests\mocks\test\mockNonLi3StdClass\Mock;
+
+		$this->assertInternalType('bool', $std->method1());
+
+		$std->applyFilter('method1', function($self, $params, $chain) {
+			return array();
+		});
+
+		$this->assertInternalType('array', $std->method1());
+	}
+
+	public function testNonLithiumStaticClass() {
+		$class = 'lithium\analysis\debugger\Mock';
+		$var = array('foo', 'bar', 'baz');
+
+		$this->assertInternalType('string', $class::export($var));
+
+		$class::applyFilter('export', function($self, $params, $chain) {
+			return array();
+		});
+
+		$this->assertInternalType('array', $class::export($var));
 	}
 
 	public function testCannotCreateNonStandardMockClass() {
@@ -144,19 +169,19 @@ class MockerTest extends \lithium\test\Unit {
 		$docblock::applyFilter(array('comment', 'tags'), function($self, $params, $chain) {
 			return false;
 		});
-		$docblock::comment('foo', 'foobar');
+		$docblock::comment('foobar');
 		$docblock::comment('bar');
-		$docblock::tags('baz');
+		$docblock::tags('baz', 'foo');
 
-		$this->assertIdentical(2, count($docblock::$results['comment']));
-		$this->assertIdentical(array('foo', 'foobar'), $docblock::$results['comment'][0]['args']);
-		$this->assertIdentical(false, $docblock::$results['comment'][0]['result']);
-		$this->assertIdentical(array('bar'), $docblock::$results['comment'][1]['args']);
-		$this->assertIdentical(false, $docblock::$results['comment'][1]['result']);
+		$this->assertIdentical(2, count($docblock::$staticResults['comment']));
+		$this->assertIdentical(array('foobar'), $docblock::$staticResults['comment'][0]['args']);
+		$this->assertIdentical(false, $docblock::$staticResults['comment'][0]['result']);
+		$this->assertIdentical(array('bar'), $docblock::$staticResults['comment'][1]['args']);
+		$this->assertIdentical(false, $docblock::$staticResults['comment'][1]['result']);
 
-		$this->assertIdentical(1, count($docblock::$results['tags']));
-		$this->assertIdentical(array('baz'), $docblock::$results['tags'][0]['args']);
-		$this->assertIdentical(false, $docblock::$results['tags'][0]['result']);
+		$this->assertIdentical(1, count($docblock::$staticResults['tags']));
+		$this->assertIdentical(array('baz', 'foo'), $docblock::$staticResults['tags'][0]['args']);
+		$this->assertIdentical(false, $docblock::$staticResults['tags'][0]['result']);
 	}
 
 	public function testInstanceResults() {
@@ -200,6 +225,119 @@ class MockerTest extends \lithium\test\Unit {
 
 	public function testChainReturnsMockerChain() {
 		$this->assertTrue(Mocker::chain(new \stdClass) instanceof \lithium\test\MockerChain);
+	}
+
+	public function testMergeWithEmptyArray() {
+		$results = array();
+		$staticResults = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+		);
+
+		$this->assertEqual($staticResults, Mocker::mergeResults($results, $staticResults));
+		$this->assertEqual($staticResults, Mocker::mergeResults($staticResults, $results));
+	}
+
+	public function testMultipleResultsSimple() {
+		$results = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+		);
+		$staticResults = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 0,
+				),
+			),
+		);
+		$expected = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 0,
+				),
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+		);
+		$this->assertEqual($expected, Mocker::mergeResults($results, $staticResults));
+	}
+
+	public function testMultipleResultsComplex() {
+		$results = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+			'method2' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+		);
+		$staticResults = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 0,
+				),
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 200,
+				),
+			),
+		);
+		$expected = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 0,
+				),
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 200,
+				),
+			),
+			'method2' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+		);
+
+		$this->assertEqual($expected, Mocker::mergeResults($results, $staticResults));
 	}
 
 }
