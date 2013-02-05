@@ -340,6 +340,58 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, Mocker::mergeResults($results, $staticResults));
 	}
 
+	public function testCreateFunction() {
+		$obj = new \lithium\tests\mocks\test\MockStdClass;
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function() {
+			return 'foo';
+		});
+		$this->assertIdentical('foo', $obj->getClass());
+	}
+
+	public function testCallFunctionUsesGlobalFallback() {
+		$result = Mocker::callFunction('foo\bar\baz\get_called_class');
+		$this->assertIdentical('lithium\test\Mocker', $result);
+	}
+
+	public function testMultipleCreateFunction() {
+		$obj = new \lithium\tests\mocks\test\MockStdClass;
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function() {
+			return 'foo';
+		});
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function() {
+			return 'bar';
+		});
+		$this->assertIdentical('bar', $obj->getClass());
+	}
+
+	public function testResetSpecificFunctions() {
+		$obj = new \lithium\tests\mocks\test\MockStdClass;
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function() {
+			return 'baz';
+		});
+		Mocker::overwriteFunction('lithium\tests\mocks\test\is_executable', function() {
+			return 'qux';
+		});
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', false);
+
+		$this->assertIdentical('lithium\tests\mocks\test\MockStdClass', $obj->getClass());
+		$this->assertIdentical('qux', $obj->isExecutable());
+	}
+
+	public function testResetAllFunctions() {
+		$obj = new \lithium\tests\mocks\test\MockStdClass;
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function() {
+			return 'baz';
+		});
+		Mocker::overwriteFunction('lithium\tests\mocks\test\is_executable', function() {
+			return 'qux';
+		});
+		Mocker::overwriteFunction(false);
+
+		$this->assertIdentical('lithium\tests\mocks\test\MockStdClass', $obj->getClass());
+		$this->assertInternalType('bool', $obj->isExecutable());
+	}
+
 }
 
 ?>
