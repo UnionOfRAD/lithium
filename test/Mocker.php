@@ -24,7 +24,7 @@ use Reflection;
  * use lithium\core\Environment;
  * use lithium\test\Mocker;
  * if (!Environment::is('production')) {
- * 	Mocker::register();
+ *   Mocker::register();
  * }
  * }}}
  *
@@ -33,9 +33,9 @@ use Reflection;
  * {{{
  * use lithium\test\Mocker;
  * class MockerTest extends \lithium\test\Unit {
- * 	public function setUp() {
- * 		Mocker::register();
- * 	}
+ *   public function setUp() {
+ *     Mocker::register();
+ *   }
  * }
  * }}}
  *
@@ -55,9 +55,66 @@ use Reflection;
  * use lithium\analysis\parser\Mock as ParserMock;
  * $code = 'echo "foobar";';
  * ParserMock::applyFilter('config', function($self, $params, $chain) {
- * 	return array();
+ *   return array();
  * });
  * $tokens = ParserMock::tokenize($code, array('wrap' => true));
+ * }}}
+ *
+ * Mocker also gives the ability, if used correctly, to stub build in php
+ * function calls. Consider the following example.
+ * {{{
+ * namespace app\extensions;
+ *
+ * class AwesomeFileEditor {
+ *
+ *   public static function updateJson($file) {
+ *     if (file_exists($file)) {
+ *       $time = microtime(true);
+ *       $packages = json_decode(file_get_contents($file), true);
+ *       foreach ($packages['users'] as &$package) {
+ *         $package['updated'] = $time;
+ *       }
+ *       return $packages;
+ *     }
+ *     return false;
+ *   }
+ *
+ * }
+ * }}}
+ * {{{
+ * namespace app\tests\cases\extensions;
+ *
+ * use lithium\test\Mocker;
+ * use app\extensions\AwesomeFileEditor;
+ *
+ * class AwesomeFileEditorTest extends \lithium\test\Unit {
+ *
+ *   public function setUp() {
+ *     Mocker::overwriteFunction(false);
+ *   }
+ *
+ *   public function testUpdateJson() {
+ *     Mocker::overwriteFunction('app\extensions\file_exists', function() {
+ *       return true;
+ *     });
+ *     Mocker::overwriteFunction('app\extensions\file_get_contents', function() {
+ *       return <<<EOD
+ * {
+ *   "users": [
+ *     {
+ *       "name": "BlaineSch",
+ *       "updated": 0
+ *     }
+ *   ]
+ * }
+ * EOD;
+ *     });
+ *
+ *     $results = AwesomeFileEditor::updateJson('idontexist.json');
+ *     $this->assertNotEqual(0, $results['users'][0]['updated']);
+ *   }
+ *
+ * }
  * }}}
  */
 class Mocker {
@@ -68,6 +125,15 @@ class Mocker {
 	 * @var array Method filters, indexed by class.
 	 */
 	protected static $_methodFilters = array();
+
+	/**
+	 * Functions to be called instead of the original.
+	 *
+	 * The key is the fully namespaced function name, and the value is the closure to be called.
+	 *
+	 * @var array
+	 */
+	protected static $_functionCallbacks = array();
 
 	/**
 	 * A list of code to be generated for the delegator.
@@ -118,6 +184,21 @@ class Mocker {
 			'}',
 		),
 		'endClass' => array(
+			'}',
+		),
+	);
+
+	/**
+	 * List of code to be generated for the function mock.
+	 *
+	 * @var array
+	 */
+	protected static $_mockFunctionIngredients = array(
+		'function' => array(
+			'namespace {:namespace};',
+			'use lithium\test\Mocker;',
+			'function {:function}() {',
+			'    return Mocker::callFunction(__FUNCTION__, func_get_args());',
 			'}',
 		),
 	);
@@ -548,6 +629,54 @@ class Mocker {
 	 */
 	public static function invokeMethod($method, $params = array()) {
 		return forward_static_call_array(array(get_called_class(), $method), $params);
+	}
+
+	/**
+	 * Will overwrite namespaced functions.
+	 *
+	 * @param  string|bool   $name     Fully namespaced function, or `false` to reset functions.
+	 * @param  closure|bool  $callback Callback to be called, or `false` to reset this function.
+	 * @return void
+	 */
+	public static function overwriteFunction($name, $callback = null) {
+		if ($name === false) {
+			return static::$_functionCallbacks = array();
+		}
+		if ($callback === false) {
+			return static::$_functionCallbacks[$name] = false;
+		}
+		static::$_functionCallbacks[$name] = $callback;
+		if (function_exists($name)) {
+			return;
+		}
+
+		$pos = strrpos($name, '\\');
+		eval(self::_dynamicCode('mockFunction', 'function', array(
+			'namespace' => substr($name, 0, $pos),
+			'function' => substr($name, $pos + 1),
+		)));
+		return;
+	}
+
+	/**
+	 * A method to call user defined functions.
+	 *
+	 * This method should only be accessed by functions created by `Mocker::overwriteFunction()`.
+	 *
+	 * If no matching stored function exists, the global function will be called instead.
+	 *
+	 * @param  string $name   Fully namespaced function name to call.
+	 * @param  array  $params Params to be passed to the function.
+	 * @return mixed
+	 */
+	public static function callFunction($name, array $params = array()) {
+		$function = substr($name, strrpos($name, '\\'));
+		$exists = isset(static::$_functionCallbacks[$name]);
+		if ($exists && is_callable(static::$_functionCallbacks[$name])) {
+			$function = static::$_functionCallbacks[$name];
+		}
+
+		return call_user_func_array($function, $params);
 	}
 
 }
