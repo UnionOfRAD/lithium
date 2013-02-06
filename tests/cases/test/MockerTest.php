@@ -392,6 +392,36 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertInternalType('bool', $obj->isExecutable());
 	}
 
+	public function testMagicCallGetStoredResultsWhenCalled() {
+		$obj = new \lithium\tests\mocks\test\mockStdClass\Mock;
+
+		$obj->__call('foo', array());
+		$results = Mocker::mergeResults($obj->results, $obj::$staticResults);
+
+		$this->assertArrayHasKey('__call', $results);
+		$this->assertArrayNotHasKey('__callStatic', $results);
+	}
+
+	public function testMagicCallStaticGetStoredResultsWhenCalled() {
+		$obj = new \lithium\tests\mocks\test\mockStdClass\Mock;
+
+		$obj->__callStatic('foo', array());
+		$results = Mocker::mergeResults($obj->results, $obj::$staticResults);
+
+		$this->assertArrayHasKey('__callStatic', $results);
+		$this->assertArrayNotHasKey('__call', $results);
+	}
+
+	public function testMagicCallGetStoredResultsWhenCalledIndirectly() {
+		$obj = new \lithium\tests\mocks\test\mockStdClass\Mock;
+
+		$obj->methodBar();
+		$results = Mocker::mergeResults($obj->results, $obj::$staticResults);
+
+		$this->assertArrayHasKey('__call', $results);
+		$this->assertCount(2, $results['__call']);
+	}
+
 }
 
 ?>
