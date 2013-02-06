@@ -36,6 +36,14 @@ class MockStdClass extends \lithium\core\Object {
 		return false;
 	}
 
+	public function getClass() {
+		return get_class($this);
+	}
+
+	public function isExecutable() {
+		return is_executable(__FILE__);
+	}
+
 }
 
 ?>
