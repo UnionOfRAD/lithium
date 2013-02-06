@@ -44,6 +44,23 @@ class MockStdClass extends \lithium\core\Object {
 		return is_executable(__FILE__);
 	}
 
+	public static function methodFoo() {
+		return true;
+	}
+
+	public function __call($method, $params) {
+		return $this->methodFoo();
+	}
+
+	public static function __callStatic($method, $params) {
+		return static::methodFoo();
+	}
+
+	public function methodBar() {
+		$this->methodBaz(1);
+		return $this->__call('methodBaz', array(2));
+	}
+
 }
 
 ?>
