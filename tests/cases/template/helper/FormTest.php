@@ -568,6 +568,24 @@ class FormTest extends \lithium\test\Unit {
 				'type' => 'radio', 'value' => '1', 'name' => 'foo', 'id' => 'MockFormPostFoo'
 			))
 		));
+
+		$document = new Document(array(
+			'model' => $this->_model,
+			'data' => array(
+				'subdocument' => array(
+					'foo' => true
+				)
+			)
+		));
+		$this->form->create($document);
+
+		$result = $this->form->radio('subdocument.foo');
+		$this->assertTags($result, array(
+			array('input' => array(
+				'type' => 'radio', 'value' => '1', 'name' => 'subdocument[foo]', 'id' => 'MockFormPostSubdocumentFoo',
+				'checked' => 'checked'
+			))
+		));
 	}
 
 	public function testCustomRadio() {
