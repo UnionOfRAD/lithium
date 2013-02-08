@@ -51,8 +51,9 @@ class PhpTest extends \lithium\test\Unit {
 
 	public function testEnabled() {
 		$php = $this->php;
-		$this->_destroySession(session_name());
-		$this->assertFalse($php::enabled());
+		//is php session support enabled?
+		$sessions_supported = in_array('session', get_loaded_extensions());
+		$this->assertEqual($sessions_supported, $php::enabled());
 	}
 
 	public function testInit() {

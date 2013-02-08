@@ -77,23 +77,26 @@ class Php extends \lithium\core\Object {
 	 *         false otherwise.
 	 */
 	protected static function _start() {
-		if (session_id()) {
+		if (static::isStarted()) {
 			return true;
 		}
-		if (!isset($_SESSION)) {
-			session_cache_limiter('nocache');
-		}
+		session_cache_limiter('nocache');
 		return session_start();
 	}
 
 	/**
 	 * Obtain the status of the session.
 	 *
-	 * @return boolean True if $_SESSION is accessible and if a '_timestamp' key
-	 *         has been set, false otherwise.
+	 * @return boolean True if a session is currently started, False otherwise. If PHP5.4
+	 *                 then we know, if PHP5.3 then we cannot tell for sure if a session
+	 *                 has been closed.
 	 */
 	public static function isStarted() {
-		return (boolean) session_id();
+		if (function_exists("session_status")) {
+			return session_status() === PHP_SESSION_ACTIVE;
+		} else {
+			return isset($_SESSION);
+		}
 	}
 
 	/**
@@ -103,7 +106,7 @@ class Php extends \lithium\core\Object {
 	 * @return mixed Session ID, or `null` if the session has not been started.
 	 */
 	public static function key($key = null) {
-		if ($key) {
+		if ($key !== null) {
 			return session_id($key);
 		}
 		return session_id() ?: null;
@@ -217,10 +220,14 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Determines if PHP sessions are enabled.
 	 *
-	 * @return boolean True if enabled (that is, if session_id() returns a value), false otherwise.
+	 * @return boolean True if enabled (php session functionality can be disabled completely), false otherwise
 	 */
 	public static function enabled() {
-		return (boolean) session_id();
+		if (function_exists("session_status")) {
+			return session_status() !== PHP_SESSION_DISABLED;
+		} else {
+			return in_array('session', get_loaded_extensions());
+		}
 	}
 
 	/**

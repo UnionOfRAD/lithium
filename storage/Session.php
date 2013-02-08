@@ -55,14 +55,15 @@ class Session extends \lithium\core\Adaptable {
 	protected static $_strategies = 'strategy.storage.session';
 
 	/**
-	 * Returns the key used to identify the session.
+	 * Returns (and Sets) the key used to identify the session.
 	 *
 	 * @param mixed $name Optional named session configuration.
+   * @param mixed $session_id Optional session id to use for this session.
 	 * @return string Returns the value of the session identifier key, or `null` if no named
-	 *         configuration exists, or no session has been started.
+	 *         configuration exists, no session id has been set or no session has been started.
 	 */
-	public static function key($name = null) {
-		return is_object($adapter = static::adapter($name)) ? $adapter->key() : null;
+	public static function key($name = null, $session_id = null) {
+		return is_object($adapter = static::adapter($name)) ? $adapter->key($session_id) : null;
 	}
 
 	/**
