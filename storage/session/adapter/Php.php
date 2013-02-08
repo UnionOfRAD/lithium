@@ -94,9 +94,8 @@ class Php extends \lithium\core\Object {
 	public static function isStarted() {
 		if (function_exists("session_status")) {
 			return session_status() === PHP_SESSION_ACTIVE;
-		} else {
-			return isset($_SESSION);
 		}
+		return isset($_SESSION) && session_id();
 	}
 
 	/**
@@ -225,9 +224,8 @@ class Php extends \lithium\core\Object {
 	public static function enabled() {
 		if (function_exists("session_status")) {
 			return session_status() !== PHP_SESSION_DISABLED;
-		} else {
-			return in_array('session', get_loaded_extensions());
 		}
+		return in_array('session', get_loaded_extensions());
 	}
 
 	/**
