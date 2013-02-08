@@ -62,8 +62,8 @@ class Session extends \lithium\core\Adaptable {
 	 * @return string Returns the value of the session identifier key, or `null` if no named
 	 *         configuration exists, no session id has been set or no session has been started.
 	 */
-	public static function key($name = null, $session_id = null) {
-		return is_object($adapter = static::adapter($name)) ? $adapter->key($session_id) : null;
+	public static function key($name = null, $sessionId = null) {
+		return is_object($adapter = static::adapter($name)) ? $adapter->key($sessionId) : null;
 	}
 
 	/**
