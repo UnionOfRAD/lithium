@@ -28,7 +28,7 @@ class InspectorTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testBasicMethodInspection() {
-		$class = 'lithium\analysis\Inspector';
+		$class = 'lithium\analysis\Debugger';
 		$parent = 'lithium\core\StaticObject';
 
 		$expected = array_diff(get_class_methods($class), get_class_methods($parent));
@@ -348,6 +348,43 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertTrue(Inspector::isCallable($obj, 'method', 1));
 		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', '_callable', 0));
 		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', '_callable', 1));
+	}
+
+	/**
+	 * Tests that the correct parameters are always passed in `Inspector::invokeMethod()`,
+	 * regardless of the number.
+	 *
+	 * @return void
+	 */
+	public function testMethodInvocationWithParameters() {
+		$class = 'lithium\tests\mocks\analysis\MockInspector';
+
+		$this->assertEqual($class::invokeMethod('foo'), array());
+		$this->assertEqual($class::invokeMethod('foo', array('bar')), array('bar'));
+
+		$params = array('one', 'two');
+		$this->assertEqual($class::invokeMethod('foo', $params), $params);
+
+		$params = array('short', 'parameter', 'list');
+		$this->assertEqual($class::invokeMethod('foo', $params), $params);
+
+		$params = array('a', 'longer', 'parameter', 'list');
+		$this->assertEqual($class::invokeMethod('foo', $params), $params);
+
+		$params = array('a', 'much', 'longer', 'parameter', 'list');
+		$this->assertEqual($class::invokeMethod('foo', $params), $params);
+
+		$params = array('an', 'extremely', 'long', 'list', 'of', 'parameters');
+		$this->assertEqual($class::invokeMethod('foo', $params), $params);
+
+		$params = array('an', 'extremely', 'long', 'list', 'of', 'parameters');
+		$this->assertEqual($class::invokeMethod('foo', $params), $params);
+
+		$params = array(
+			'if', 'you', 'have', 'a', 'parameter', 'list', 'this',
+			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
+		);
+		$this->assertEqual($class::invokeMethod('foo', $params), $params);
 	}
 
 }

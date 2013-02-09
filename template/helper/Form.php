@@ -681,12 +681,13 @@ class Form extends \lithium\template\Helper {
 		$defaults = array('value' => '1');
 		$options += $defaults;
 		$default = $options['value'];
+		$key = $name;
 
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
 		if (!isset($options['checked'])) {
-			$options['checked'] = ($this->binding($name)->data == $default);
+			$options['checked'] = ($this->binding($key)->data == $default);
 		}
 
 		$options['value'] = $scope['value'];
