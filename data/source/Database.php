@@ -308,12 +308,21 @@ abstract class Database extends \lithium\data\Source {
 	 * Field name handler to ensure proper escaping.
 	 *
 	 * @param string $name Field or identifier name.
+	 * @param array $options if the `escape` key is set to `false`, escaping a dot (`.`)
+	 *              is ignored since MySQL 5.1.6> allow this. Default is true.
 	 * @return string Returns `$name` quoted according to the rules and quote characters of the
 	 *         database adapter subclass.
 	 */
-	public function name($name) {
+	public function name($name, array $options = array()) {
+		$defaults = array('escape' => true);
+		$options += $defaults;
+
 		$open  = reset($this->_quotes);
 		$close = next($this->_quotes);
+
+		if ($options['escape'] === false) {
+			return "{$open}{$name}{$close}";
+		}
 
 		list($first, $second) = $this->_splitFieldname($name);
 		if ($first) {
