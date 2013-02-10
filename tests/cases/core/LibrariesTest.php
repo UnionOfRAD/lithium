@@ -122,6 +122,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function testLibraryConfigAccess() {
 		$config = Libraries::get('lithium'); // => ['path' => '/path/to/lithium', ...]
 		$expected = array(
+			'name' => 'lithium',
 			'path' => str_replace('\\', '/', realpath(realpath(LITHIUM_LIBRARY_PATH) . '/lithium')),
 			'prefix' => 'lithium\\',
 			'suffix' => '.php',
@@ -167,6 +168,17 @@ class LibrariesTest extends \lithium\test\Unit {
 		$library = Libraries::get('lithium\core\Libraries'); // 'lithium'
 		$this->assertEqual('lithium', $library);
 		$this->assertNull(Libraries::get('foo\bar\baz'));
+	}
+
+	public function testLibraryNameConfigAccess() {
+		$original = Libraries::get(true);
+		Libraries::remove($original['name']);
+
+		Libraries::add('myapp', array('default' => true));
+		$this->assertIdentical('myapp', Libraries::get(true, 'name'));
+
+		Libraries::remove('myapp');
+		Libraries::add($original['name'], $original);
 	}
 
 	/**
