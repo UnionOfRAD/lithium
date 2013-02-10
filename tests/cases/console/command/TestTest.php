@@ -198,7 +198,6 @@ class TestTest extends \lithium\test\Unit {
 		));
 		$expected = 'test_app\tests\cases\models';
 		$result = $command->invokeMethod('_path', array('tests\cases\models'));
-		print_r($command->error());
 		$this->assertIdentical($expected, $result);
 		Libraries::remove('test_app');
 		$this->_cleanUp();
