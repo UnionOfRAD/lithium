@@ -277,6 +277,7 @@ class Libraries {
 	 */
 	public static function add($name, array $config = array()) {
 		$defaults = array(
+			'name' => $name,
 			'path' => null,
 			'prefix' => $name . "\\",
 			'suffix' => '.php',
@@ -398,7 +399,6 @@ class Libraries {
 	 *
 	 * @param mixed $name A string or array of library names indicating the libraries you wish to
 	 *        remove, i.e. `'app'` or `'lithium'`. This can also be used to unload plugins by  name.
-	 * @return void
 	 */
 	public static function remove($name) {
 		foreach ((array) $name as $library) {
