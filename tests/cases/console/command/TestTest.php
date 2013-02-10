@@ -186,6 +186,23 @@ class TestTest extends \lithium\test\Unit {
 		$this->assertTrue(isset($result['count']));
 		$this->assertTrue(isset($result['stats']));
 	}
+
+	public function testPathWithCustomDirectoryName() {
+		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/custom_dir';
+		$testDir = $testApp . '/tests/cases/models';
+		mkdir($testDir, 0777, true);
+		Libraries::add('test_app', array('path' => $testApp));
+		$request = new Request(array('env' => array('working' => $testApp)));
+		$command = new Test(array(
+			'request' => $request, 'classes' => $this->classes
+		));
+		$expected = 'test_app\tests\cases\models';
+		$result = $command->invokeMethod('_path', array('tests\cases\models'));
+		print_r($command->error());
+		$this->assertIdentical($expected, $result);
+		Libraries::remove('test_app');
+		$this->_cleanUp();
+	}
 }
 
 ?>
