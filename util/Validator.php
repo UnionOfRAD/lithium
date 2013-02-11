@@ -234,10 +234,9 @@ class Validator extends \lithium\core\StaticObject {
 				              '((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468]' .
 				              '[048]|[3579][26])00)))))))\\,?\\ ((1[6-9]|[2-9]\\d)\\d{2}))$/',
 				'My'       => '%^(Jan(uary)?|Feb(ruary)?|Ma(r(ch)?|y)|Apr(il)?|Ju((ly?)|(ne?))|' .
-				              'Aug(ust)?|Oct(ober)?|(Sep(?=\\b|t)t?|Nov|Dec)(ember)?)[ /]((1[6-9]' .
+				              'Aug(ust)?|Oct(ober)?|(Sep(?=\\b|t)t?|Nov|Dec)(ember)?)\\ ((1[6-9]' .
 				              '|[2-9]\\d)\\d{2})$%',
-				'my'       => '%^(((0[123456789]|10|11|12)([- /.])(([1][9][0-9][0-9])|([2][0-9]' .
-				              '[0-9][0-9]))))$%'
+				'my'       => '%^(0?[1-9]|1[012])([- /.])((1[6-9])|([2-9]\\d)\\d{2})$%'
 			),
 			'ip' => function($value, $format = null, array $options = array()) {
 				$options += array('flags' => array());
