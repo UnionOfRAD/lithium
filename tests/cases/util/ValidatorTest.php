@@ -967,6 +967,36 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertFalse(Validator::isLuhn(true));
 	}
 
+    public function testDateValidation() {
+        $this->assertTrue(Validator::isDate('31-12-2012', 'dmy'));
+        $this->assertTrue(Validator::isDate('1 1 1999', 'dmy'));
+        $this->assertTrue(Validator::isDate('12/31/2012', 'mdy'));
+        $this->assertTrue(Validator::isDate('02.29.2000', 'mdy'));
+        $this->assertTrue(Validator::isDate('2012/12/31', 'ymd'));
+        $this->assertTrue(Validator::isDate('1999-1-01', 'ymd'));
+        $this->assertTrue(Validator::isDate('31 Dec 2012', 'dMy'));
+        $this->assertTrue(Validator::isDate('1 January 1999', 'dMy'));
+        $this->assertTrue(Validator::isDate('Dec 31 2012', 'Mdy'));
+        $this->assertTrue(Validator::isDate('January 1, 1999', 'Mdy'));
+        $this->assertTrue(Validator::isDate('December 2012', 'My'));
+        $this->assertTrue(Validator::isDate('Jan 1999', 'My'));
+        $this->assertTrue(Validator::isDate('12/2012', 'my'));
+        $this->assertTrue(Validator::isDate('1 2012', 'my'));
+        
+        $this->assertFalse(Validator::isDate('32-12-2012', 'dmy'));
+        $this->assertFalse(Validator::isDate('29 2 1999', 'dmy'));
+        $this->assertFalse(Validator::isDate('13/31/2012', 'mdy'));
+        $this->assertFalse(Validator::isDate('1.0.1999', 'mdy'));
+        $this->assertFalse(Validator::isDate('2012/11/31', 'ymd'));
+        $this->assertFalse(Validator::isDate('2012/11/0', 'ymd'));
+        $this->assertFalse(Validator::isDate('31 Dic 2012', 'dMy'));
+        $this->assertFalse(Validator::isDate('1.January.1999', 'dMy'));
+        $this->assertFalse(Validator::isDate('Dec-31-2012', 'Mdy'));
+        $this->assertFalse(Validator::isDate('December/2012', 'My'));
+        $this->assertFalse(Validator::isDate('Jan.1999', 'My'));
+        $this->assertFalse(Validator::isDate('13 2012', 'my'));
+    }
+    
 	public function testCheckHasErrors() {
 		$rules = array('title' => array('please enter a title'));
 		$result = Validator::check(array(), $rules);
