@@ -219,6 +219,64 @@ class ViewTest extends \lithium\test\Unit {
 		Libraries::remove('test_app');
 		$this->_cleanUp();
 	}
+
+	public function testContextWithElementRenderingOptions() {
+		$tmpDir = realpath(Libraries::get(true, 'resources') . '/tmp');
+		$this->skipIf(!is_writable($tmpDir), "Can't write to resources directory.");
+
+		$testApp = $tmpDir . '/tests/test_app';
+		$viewDir = $testApp . '/views';
+		mkdir($viewDir . '/elements', 0777, true);
+		Libraries::add('test_app', array('path' => $testApp));
+
+		$testApp2 = $tmpDir . '/tests/test_app2';
+		$viewDir2 = $testApp2 . '/views';
+		mkdir($viewDir2 . '/elements', 0777, true);
+		Libraries::add('test_app2', array('path' => $testApp2));
+
+		$body = "<?php ";
+		$body .= "echo \$this->_render('element', 'element2', array(), ";
+		$body .= "array('library' => 'test_app2'));";
+		$body .= "echo \$this->_render('element', 'element1');";
+		$body .= "?>";
+
+		file_put_contents($viewDir . '/template.html.php', $body);
+		file_put_contents($viewDir . '/elements/element1.html.php', 'element1');
+		file_put_contents($viewDir2 . '/elements/element2.html.php', 'element2');
+
+
+		$view = new View(array(
+			'compile' => false,
+			'paths' => array(
+				'template' => '{:library}/views/{:template}.html.php',
+				'element'  => '{:library}/views/elements/{:template}.html.php',
+				'layout'   => false
+			)
+		));
+
+		$options = array(
+			'template' => 'template',
+			'library' => 'test_app'
+		);
+
+		$result = $view->render('all', array(), $options);
+		$this->assertIdentical('element2element1', $result);
+
+		$body = "<?php ";
+		$body .= "echo \$this->_render('element', 'element1');";
+		$body .= "echo \$this->_render('element', 'element2', array(), ";
+		$body .= "array('library' => 'test_app2'));";
+		$body .= "?>";
+
+		file_put_contents($viewDir . '/template.html.php', $body);
+
+		$result = $view->render('all', array(), $options);
+		$this->assertIdentical('element1element2', $result);
+
+		Libraries::remove('test_app');
+		Libraries::remove('test_app2');
+		$this->_cleanUp();
+	}
 }
 
 ?>
