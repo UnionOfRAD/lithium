@@ -207,7 +207,7 @@ class DispatcherTest extends \lithium\test\Unit {
 		}
 
 		$params = array(
-			'' => array('controller' => 'some_non_existent_controller', 'action' => 'index'),
+			'/' => array('controller' => 'some_non_existent_controller', 'action' => 'index'),
 			'/plugin' => array(
 				'controller' => 'some_invalid_plugin.controller', 'action' => 'index'
 			),

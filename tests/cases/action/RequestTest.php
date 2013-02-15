@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\action;
 
+use lithium\core\Libraries;
 use lithium\action\Request;
 use lithium\tests\mocks\action\MockIisRequest;
 use lithium\tests\mocks\action\MockNginxRequest;
@@ -15,19 +16,39 @@ use lithium\tests\mocks\action\MockCgiRequest;
 
 class RequestTest extends \lithium\test\Unit {
 
-	public $request = null;
+	protected $_library = null;
 
-	protected $_get = array();
+	protected $_docroot = null;
+
+	protected $_superglobals = array('_GET', '_POST', '_SERVER', '_ENV');
+
+	protected $_env = array();
 
 	public function setUp() {
-		$this->request = new Request(array('init' => false));
-		$this->_get = $_GET;
-		unset($_GET);
+		$resources = Libraries::get(true, 'resources') . '/tmp/tests';
+		$this->skipIf(!is_writable($resources), "Can't write to resources directory.");
+		$app = $resources . '/www/lithium/app';
+		mkdir($app, 0777, true);
+
+		$this->_library = Libraries::get(true);
+		Libraries::remove($this->_library['name']);
+
+		Libraries::add('app', array('path' => $app, 'default' => true));
+		$this->_docroot = $resources . '/www';
+
+		foreach ($this->_superglobals as $varname) {
+			$this->_env[$varname] = $GLOBALS[$varname];
+			unset($GLOBALS[$varname]);
+		}
 	}
 
 	public function tearDown() {
-		unset($this->request);
-		$_GET = $this->_get;
+		foreach ($this->_superglobals as $varname) {
+			$GLOBALS[$varname] = $this->_env[$varname];
+		}
+		Libraries::remove('app');
+		Libraries::add($this->_library['name'], $this->_library);
+		$this->_cleanUp();
 	}
 
 	public function testInitData() {
@@ -89,7 +110,13 @@ class RequestTest extends \lithium\test\Unit {
 		$request = new MockIisRequest();
 		$this->assertEqual('\lithium\app\webroot\index.php', $request->env('SCRIPT_FILENAME'));
 
-		$request = new Request(array('env' => array('SCRIPT_FILENAME' => null)));
+		$request = new Request(array(
+			'env' => array(
+				'DOCUMENT_ROOT' => 'C:\htdocs',
+				'PHP_SELF' => '\lithium\index.php',
+				'SCRIPT_FILENAME' => null
+			)
+		));
 		$path = $request->env('DOCUMENT_ROOT') . $request->env('PHP_SELF');
 		$this->assertEqual($path, $request->env('SCRIPT_FILENAME'));
 	}
@@ -177,73 +204,57 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testBaseWithDirectory() {
 		$request = new Request(array('env' => array(
-			'PHP_SELF' => '/lithium.com/app/webroot/index.php'
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'PHP_SELF' => '/lithium/app/webroot/index.php',
+			'REQUEST_URI' => '/lithium/hello/world'
 		)));
-		$this->assertEqual('/lithium.com', $request->env('base'));
-	}
-
-	public function testRequestWithoutUrlQueryParam() {
-		$request = new Request(array(
-			'env' => array(
-				'PHP_SELF' => '/test_app/app/webroot/index.php',
-				'REQUEST_URI' => '/test_app/'
-			)
-		));
-		$this->assertEqual('/test_app', $request->env('base'));
-		$this->assertEqual('/', $request->url);
-
-		$request = new Request(array('env' => array(
-			'PHP_SELF' => '/test_app/app/webroot/index.php',
-			'REQUEST_URI' => '/test_app/pages/test_app'
-		)));
-		$this->assertEqual('/test_app', $request->env('base'));
-		$this->assertEqual('pages/test_app', $request->url);
+		$this->assertEqual('/lithium', $request->env('base'));
 	}
 
 	public function testRequestWithColon() {
 		$request = new Request(array('env' => array(
-			'PHP_SELF' => '/test_app/app/webroot/index.php',
-			'REQUEST_URI' => '/test_app/pages/test_app/test:a'
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'PHP_SELF' => '/lithium/app/webroot/index.php',
+			'REQUEST_URI' => '/lithium/pages/lithium/test:a'
 		)));
-		$this->assertEqual('/test_app', $request->env('base'));
-		$this->assertEqual('pages/test_app/test:a', $request->url);
+		$this->assertEqual('/lithium', $request->env('base'));
+		$this->assertEqual('/pages/lithium/test:a', $request->url);
 
 		$request = new Request(array('env' => array(
-			'PHP_SELF' => '/test_app/app/webroot/index.php',
-			'REQUEST_URI' => '/test_app/pages/test_app/test:1'
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'PHP_SELF' => '/lithium/app/webroot/index.php',
+			'REQUEST_URI' => '/lithium/pages/lithium/test:1'
 		)));
-		$this->assertEqual('/test_app', $request->env('base'));
-		$this->assertEqual('pages/test_app/test:1', $request->url);
+		$this->assertEqual('/lithium', $request->env('base'));
+		$this->assertEqual('/pages/lithium/test:1', $request->url);
 	}
 
 	public function testRequestWithoutUrlQueryParamAndNoApp() {
 		$request = new Request(array('env' => array(
-			'PHP_SELF' => '/test_app/webroot/index.php',
-			'REQUEST_URI' => '/test_app/'
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'PHP_SELF' => '/lithium/webroot/index.php',
+			'REQUEST_URI' => '/lithium/'
 		)));
-		$this->assertEqual('/test_app', $request->env('base'));
+		$this->assertEqual('/lithium', $request->env('base'));
 		$this->assertEqual('/', $request->url);
 	}
 
 	public function testRequestWithoutUrlQueryParamAndNoAppOrWebroot() {
 		$request = new Request(array('env' => array(
-			'PHP_SELF' => '/test_app/index.php',
-			'REQUEST_URI' => '/test_app/'
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'PHP_SELF' => '/lithium/index.php',
+			'REQUEST_URI' => '/lithium/'
 		)));
-		$this->assertEqual('/test_app', $request->env('base'));
+		$this->assertEqual('/lithium', $request->env('base'));
 		$this->assertEqual('/', $request->url);
 	}
 
 	public function testBaseWithAppAndOtherDirectory() {
 		$request = new Request(array('env' => array(
-			'PHP_SELF' => '/lithium.com/app/other/webroot/index.php'
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'PHP_SELF' => '/lithium/app/other/webroot/index.php'
 		)));
-		$this->assertEqual('/lithium.com/app/other', $request->env('base'));
-	}
-
-	public function testPhpSelfTranslatedForIIS() {
-		$request = new MockIisRequest();
-		$this->assertEqual('/index.php', $request->env('PHP_SELF'));
+		$this->assertEqual('/lithium', $request->env('base'));
 	}
 
 	public function testServerHttpBase() {
@@ -275,7 +286,8 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testGetMethod() {
 		$request = new Request(array('env' => array(
-			'PHP_SELF' => '/lithium.com/app/webroot/index.php',
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'PHP_SELF' => '/lithium/app/webroot/index.php',
 			'HTTP_ACCEPT' => 'text/html,application/xml,image/png,*/*',
 			'HTTP_ACCEPT_LANGUAGE' => 'da, en-gb;q=0.8, en;q=0.7'
 		)));
@@ -288,7 +300,7 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->get('not:Post');
 		$this->assertNull($result);
 
-		$expected = '/lithium.com';
+		$expected = '/lithium';
 		$result = $request->get('env:base');
 		$this->assertEqual($expected, $result);
 
@@ -458,13 +470,14 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testMagicParamsAccess() {
-		$this->assertNull($this->request->action);
-		$this->assertArrayNotHasKey('action', $this->request->params);
-		$this->assertFalse(isset($this->request->action));
+		$request = new Request(array('init' => false));
+		$this->assertNull($request->action);
+		$this->assertArrayNotHasKey('action', $request->params);
+		$this->assertFalse(isset($request->action));
 
-		$expected = $this->request->params['action'] = 'index';
-		$this->assertEqual($expected, $this->request->action);
-		$this->assertTrue(isset($this->request->action));
+		$expected = $request->params['action'] = 'index';
+		$this->assertEqual($expected, $request->action);
+		$this->assertTrue(isset($request->action));
 	}
 
 	public function testSingleFileNormalization() {
@@ -848,19 +861,10 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertTrue($request->is('mobile'));
 	}
 
-	public function testUrlFromGet() {
-		$_GET['url'] = 'posts/1';
-		$request = new Request();
-
-		$expected = 'posts/1';
-		$result = $request->url;
-		$this->assertEqual($expected, $result);
-	}
-
 	public function testUrlFromConstructor() {
 		$request = new Request(array('url' => 'posts/1'));
 
-		$expected = 'posts/1';
+		$expected = '/posts/1';
 		$result = $request->url;
 		$this->assertEqual($expected, $result);
 	}
@@ -1150,6 +1154,132 @@ class RequestTest extends \lithium\test\Unit {
 		$request = new Request(array('env' => array('REQUEST_METHOD' => 'PATCH')));
 		$this->assertEqual('PATCH', $request->method);
 	}
+
+	public function testRequestUriWithHtAccessRedirection() {
+		$request = new Request(array('env' => array(
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'REQUEST_URI' => '/lithium/hello/world?page=1',
+			'PHP_SELF' => '/lithium/app/webroot/index.php'
+		)));
+
+		$this->assertIdentical('/lithium', $request->env('base'));
+		$this->assertIdentical('/hello/world', $request->url);
+	}
+
+	public function testRequestUriWithNoHtAccessRedirection() {
+		$request = new Request(array('env' => array(
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'REQUEST_URI' => '/lithium/app/webroot/hello/world?page=1',
+			'PHP_SELF' => '/lithium/app/webroot/index.php'
+		)));
+
+		$this->assertIdentical('/lithium', $request->env('base'));
+		$this->assertIdentical('/hello/world', $request->url);
+	}
+
+	public function testRequestUriWithCustomLib() {
+		$resources = Libraries::get(true, 'resources') . '/tmp/tests';
+		$this->skipIf(!is_writable($resources), "Can't write to resources directory.");
+		$myApp = $resources . '/www2/li3/myapp';
+		mkdir($myApp, 0777, true);
+		Libraries::add('myapp', array('path' => $myApp));
+		$root = $resources . '/www2';
+
+		$request = new Request(array(
+			'env' => array(
+				'DOCUMENT_ROOT' => $root,
+				'REQUEST_URI' => '/li3/myapp/web/root/hello/world?page=1',
+				'PHP_SELF' => '/li3/myapp/web/root/index.php'
+			),
+			'globals' => false
+		));
+		$this->assertIdentical('/li3/myapp/web/root', $request->env('base'));
+		$request->params['library'] = 'myapp';
+		$this->assertIdentical('/li3', $request->env('base'));
+		$this->assertIdentical('/hello/world', $request->url);
+
+		Libraries::remove('myapp');
+	}
+
+	public function testRequestUriWithVirtualHost() {
+		$request = new Request(array('env' => array(
+			'DOCUMENT_ROOT' => $this->_docroot . '/lithium/app/webroot',
+			'REQUEST_URI' => '/hello/world?page=1',
+			'PHP_SELF' => '/index.php'
+		)));
+
+		$this->assertIdentical('', $request->env('base'));
+		$this->assertIdentical('/hello/world', $request->url);
+	}
+
+	public function testRequestWithNoGlobals() {
+		$_SERVER = array('env' => array(
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'HTTP_HOST' => 'foo.com',
+			'HTTPS' => 'on',
+			'SERVER_PROTOCOL' => 'HTTP/1.0',
+			'REQUEST_URI' => '/lithium/app/hello/world?page=1',
+			'PHP_SELF' => '/lithium/app/index.php'
+		));
+		$request = new Request(array('globals' => false));
+
+		$this->assertIdentical('localhost', $request->host);
+		$this->assertIdentical('http', $request->scheme);
+		$this->assertIdentical('HTTP/1.1', $request->protocol);
+		$this->assertIdentical('1.1', $request->version);
+		$this->assertIdentical('/', $request->url);
+		$this->assertIdentical('', $request->env('base'));
+	}
+
+	public function testRequestWithEnvVariables() {
+		$request = new Request(array('env' => array(
+			'DOCUMENT_ROOT' => $this->_docroot,
+			'HTTP_HOST' => 'foo.com',
+			'HTTPS' => 'on',
+			'SERVER_PROTOCOL' => 'HTTP/1.0',
+			'REQUEST_URI' => '/lithium/app/hello/world?page=1',
+			'PHP_SELF' => '/lithium/app/index.php'
+		)));
+
+		$this->assertIdentical('foo.com', $request->host);
+		$this->assertIdentical('https', $request->scheme);
+		$this->assertIdentical('HTTP/1.0', $request->protocol);
+		$this->assertIdentical('1.0', $request->version);
+		$this->assertIdentical('/hello/world', $request->url);
+		$this->assertIdentical('/lithium', $request->env('base'));
+	}
+
+	public function testEnvVariablesArePopulated() {
+		$request = new Request(array('env' => array(
+			'HTTP_HOST' => 'foo.com',
+			'HTTPS' => 'on',
+			'SERVER_PROTOCOL' => 'HTTP/1.0'
+		)));
+
+		$this->assertIdentical('foo.com', $request->host);
+		$this->assertIdentical('https', $request->scheme);
+		$this->assertIdentical('HTTP/1.0', $request->protocol);
+		$this->assertIdentical('1.0', $request->version);
+	}
+
+	public function testOverridingOfEnvVariables() {
+		$request = new Request(array(
+			'env' => array(
+				'HTTP_HOST' => 'foo.com',
+				'HTTPS' => 'on',
+				'SERVER_PROTOCOL' => 'HTTP/1.0'
+			),
+			'host' => 'bar.com',
+			'scheme' => 'http',
+			'protocol' => 'HTTP/1.1'
+		));
+
+		$this->assertIdentical('bar.com', $request->host);
+		$this->assertIdentical('http', $request->scheme);
+		$this->assertIdentical('HTTP/1.1', $request->protocol);
+		$this->assertIdentical('1.1', $request->version);
+	}
+
 }
 
 ?>
