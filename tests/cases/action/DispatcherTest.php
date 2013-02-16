@@ -26,9 +26,12 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Router::reset();
-
-		foreach ($this->_routes as $route) {
-			Router::connect($route);
+		foreach ($this->_routes as $scope => $routes) {
+			Router::scope($scope, function() use ($routes) {
+				foreach ($routes as $route) {
+					Router::connect($route);
+				}
+			});
 		}
 	}
 
@@ -199,6 +202,10 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testAutoHandler() {
 		$result = MockDispatcher::run(new Request(array('url' => '/auto')));
 		$this->assertEqual(array('Location: /redirect'), $result->headers());
+	}
+
+	public function methods() {
+		return array('testPluginControllerLookupFail');
 	}
 
 	public static function process($request) {

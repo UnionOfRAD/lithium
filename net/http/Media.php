@@ -33,6 +33,22 @@ use lithium\net\http\MediaException;
 class Media extends \lithium\core\StaticObject {
 
 	/**
+	 * Contain the configuration of scopes.
+	 *
+	 * @var array of scopes
+	 */
+	protected static $_scopes = null;
+
+	/**
+	 * Stores the name of the scope in use.
+	 * If set to `false`, no scope is used.
+	 *
+	 * @see lithium\net\http\Media::scope()
+	 * @var string
+	 */
+	protected static $_scope = false;
+
+	/**
 	 * Maps file extensions to content-types.  Used to set response types and determine request
 	 * types. Can be modified with `Media::type()`.
 	 *
@@ -66,7 +82,9 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * @var array
 	 */
-	protected static $_classes = array();
+	protected static $_classes = array(
+		'configuration' => 'lithium\core\Configuration'
+	);
 
 	/**
 	 * Returns the list of registered media types.  New types can be set with the `type()` method.
@@ -355,7 +373,7 @@ class Media extends \lithium\core\StaticObject {
 	 *          applicable.
 	 *        - `'filter'`: An array of key/value pairs representing simple string replacements to
 	 *          be done on a path once it is generated.
-	 *        - `'path'`: An array of key/value pairs where the keys are `String::insert()`
+	 *        - `'paths'`: An array of key/value pairs where the keys are `String::insert()`
 	 *          compatible paths, and the values are array lists of keys to be inserted into the
 	 *          path string.
 	 * @return array If `$type` is empty, an associative array of all registered types and all
@@ -364,7 +382,7 @@ class Media extends \lithium\core\StaticObject {
 	 *         are both non-empty, returns `null`.
 	 */
 	public static function assets($type = null, $options = array()) {
-		$defaults = array('suffix' => null, 'filter' => null, 'path' => array());
+		$defaults = array('suffix' => null, 'filter' => null, 'paths' => array());
 
 		if (!$type) {
 			return static::_assets();
@@ -401,7 +419,7 @@ class Media extends \lithium\core\StaticObject {
 	 *          `false`.
 	 *        - `'filter'`: An array of key/value pairs representing simple string replacements to
 	 *          be done on a path once it is generated.
-	 *        - `'path'`: An array of paths to search for the asset in. The paths should use
+	 *        - `'paths'`: An array of paths to search for the asset in. The paths should use
 	 *          `String::insert()` formatting. See `Media::$_assets` for more.
 	 *        - `suffix`: The suffix to attach to the path, generally a file extension.
 	 *        - `'timestamp'`: Appends the last modified time of the file to the path if `true`.
@@ -419,16 +437,38 @@ class Media extends \lithium\core\StaticObject {
 			'base' => null,
 			'timestamp' => false,
 			'filter' => null,
-			'path' => array(),
+			'paths' => array(),
 			'suffix' => null,
 			'check' => false,
 			'library' => true
 		);
-		if (!$base = static::_assets($type)) {
+		if (!$paths = static::_assets($type)) {
 			$type = 'generic';
-			$base = static::_assets('generic');
+			$paths = static::_assets('generic');
 		}
-		$options += ($base + $defaults);
+
+		$base = isset($options['base']) ? rtrim($options['base'], '/') : '';
+		$options += array('scope' => static::scope());
+		$name = $options['scope'];
+
+		if ($name && $config = static::attached($name)) {
+			$defaults = array_merge($defaults, $config);
+
+			if (preg_match('/^((?:[a-z0-9-]+:)?\/\/)([^\/]*)/i', $base, $match)) {
+				$options = array_merge($defaults, array(
+					'base' => rtrim($base . '/' . $defaults['prefix'], '/')
+				));
+			} else {
+				$host = '';
+				if ($defaults['absolute']) {
+					$host = $defaults['scheme'] . $defaults['host'];
+				}
+				$base = $host ? ($base ? '/' . ltrim($base, '/') : '') : $base;
+				$options['base'] = rtrim($host . $base . '/' . $defaults['prefix'], '/');
+			}
+		}
+
+		$options += ($paths + $defaults);
 		$params = compact('path', 'type', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
@@ -441,7 +481,7 @@ class Media extends \lithium\core\StaticObject {
 				return $path;
 			}
 			$config = Libraries::get($library);
-			$paths = $options['path'];
+			$paths = $options['paths'];
 			$config['default'] ? end($paths) : reset($paths);
 			$options['library'] = basename($config['path']);
 
@@ -511,11 +551,16 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * @param string|boolean $library The name of the library for which to find the path, or `true`
 	 *        for the default library.
-	 * @return string Returns the physical path to the web assets directory for a library. For
-	 *         example, the `/webroot` directory of the default library would be
-	 *         `Libraries::get(true, 'path') . '/webroot'`.
+	 * @param string|boolean $scope The name of the to use to find the path.
+	 * @return string Returns the physical path to the web assets directory.
 	 */
-	public static function webroot($library = true) {
+	public static function webroot($library = true, $scope = null) {
+		if ($scope) {
+			if ($config = static::attached($scope)) {
+				return $config['path'];
+			}
+			return null;
+		}
 		if (!$config = Libraries::get($library)) {
 			return null;
 		}
@@ -531,32 +576,35 @@ class Media extends \lithium\core\StaticObject {
 	 * Returns the physical path to an asset in the `/webroot` directory of an application or
 	 * plugin.
 	 *
-	 * @param string $path The path to a web asset, relative to the root path for its type. For
-	 *               example, for a JavaScript file in `/webroot/js/subpath/file.js`, the correct
-	 *               value for `$path` would be `'subpath/file.js'`.
+	 * @param string $paths The path to a web asset, relative to the root path for its type. For
+	 *        example, for a JavaScript file in `/webroot/js/subpath/file.js`, the correct
+	 *        value for `$path` would be `'subpath/file.js'`.
 	 * @param string $type A valid asset type, i.e. `'js'`, `'cs'`, `'image'`, or another type
-	 *               registered with `Media::assets()`, or `'generic'`.
+	 *        registered with `Media::assets()`, or `'generic'`.
 	 * @param array $options The options used to calculate the path to the file.
 	 * @return string Returns the physical filesystem path to an asset in the `/webroot` directory.
 	 */
 	public static function path($path, $type, array $options = array()) {
 		$defaults = array(
 			'base' => null,
-			'path' => array(),
+			'paths' => array(),
 			'suffix' => null,
-			'library' => true
+			'library' => true,
+			'scope' => false
 		);
 		if (!$base = static::_assets($type)) {
 			$type = 'generic';
 			$base = static::_assets('generic');
 		}
 		$options += ($base + $defaults);
-		$config = Libraries::get($options['library']);
-		$root = static::webroot($options['library']);
-		$paths = $options['path'];
+		$paths = $options['paths'];
 
-		$config['default'] ? end($paths) : reset($paths);
-		$options['library'] = basename($config['path']);
+		if ($options['scope']) {
+			$root = static::webroot(false, $options['scope']);
+		} else {
+			$root = static::webroot($options['library']);
+			Libraries::get(true, 'name') === $options['library'] ? end($paths) : reset($paths);
+		}
 
 		if ($qOffset = strpos($path, '?')) {
 			$path = substr($path, 0, $qOffset);
@@ -723,12 +771,13 @@ class Media extends \lithium\core\StaticObject {
 	/**
 	 * Resets the `Media` class to its default state. Mainly used for ensuring a consistent state
 	 * during testing.
-	 *
-	 * @return void
 	 */
 	public static function reset() {
-		foreach (get_class_vars(__CLASS__) as $name => $value) {
-			static::${$name} = array();
+		static::$_handlers = array();
+		static::$_types = array();
+		static::$_scope = false;
+		if (isset(static::$_scopes)) {
+			static::$_scopes->reset();
 		}
 	}
 
@@ -871,19 +920,19 @@ class Media extends \lithium\core\StaticObject {
 	 */
 	protected static function _assets($type = null) {
 		$assets = static::$_assets + array(
-			'js' => array('suffix' => '.js', 'filter' => null, 'path' => array(
+			'js' => array('suffix' => '.js', 'filter' => null, 'paths' => array(
 				'{:base}/{:library}/js/{:path}' => array('base', 'library', 'path'),
 				'{:base}/js/{:path}' => array('base', 'path')
 			)),
-			'css' => array('suffix' => '.css', 'filter' => null, 'path' => array(
+			'css' => array('suffix' => '.css', 'filter' => null, 'paths' => array(
 				'{:base}/{:library}/css/{:path}' => array('base', 'library', 'path'),
 				'{:base}/css/{:path}' => array('base', 'path')
 			)),
-			'image' => array('suffix' => null, 'filter' => null, 'path' => array(
+			'image' => array('suffix' => null, 'filter' => null, 'paths' => array(
 				'{:base}/{:library}/img/{:path}' => array('base', 'library', 'path'),
 				'{:base}/img/{:path}' => array('base', 'path')
 			)),
-			'generic' => array('suffix' => null, 'filter' => null, 'path' => array(
+			'generic' => array('suffix' => null, 'filter' => null, 'paths' => array(
 				'{:base}/{:library}/{:path}' => array('base', 'library', 'path'),
 				'{:base}/{:path}' => array('base', 'path')
 			))
@@ -892,6 +941,105 @@ class Media extends \lithium\core\StaticObject {
 			return isset($assets[$type]) ? $assets[$type] : null;
 		}
 		return $assets;
+	}
+
+	/**
+	 * Scope getter/setter.
+	 *
+	 * Special use case: If `$closure` is not null executing the closure inside
+	 * the specified scope.
+	 *
+	 * @param string $name Name of the scope to use.
+	 * @param array $closure A closure to execute inside the scope.
+	 * @return mixed Returns the previous scope if if `$name` is not null and `$closure` is null,
+	 *               returns the default used scope if `$name` is null, otherwise returns `null`.
+	 */
+	public static function scope($name = null, Closure $closure = null) {
+		if ($name === null) {
+			return static::$_scope;
+		}
+
+		if ($closure === null) {
+			$former = static::$_scope;
+			static::$_scope = $name;
+			return $former;
+		}
+
+		$former = static::$_scope;
+		static::$_scope = $name;
+		call_user_func($closure);
+		static::$_scope = $former;
+	}
+
+	/**
+	 * Attach a scope to a mount point.
+	 *
+	 * Example:
+	 * {{{
+	 * Media::attach('app', array(
+	 *     'path' => '/var/www/website/app/webroot/extradir',
+	 *     'prefix' => 'extradir'
+	 * ));
+	 * }}}
+	 *
+	 * {{{
+	 * Media::attach('cdn', array(
+	 *     'absolute' => true,
+	 *     'path' => null,
+	 *     'host' => 'http://my.cdn.com',
+	 *     'prefix' => 'project1/assets'
+	 * ));
+	 * }}}
+	 *
+	 */
+	public static function attach($name, $config = null) {
+		if (!isset(static::$_scopes)) {
+			static::_initScopes();
+		}
+		if ($name === false) {
+			$name = '__defaultScope__';
+		}
+		if (is_array($config) || $config === false) {
+			static::$_scopes->set($name, $config);
+		}
+	}
+
+	/**
+	 * Returns an attached mount point configuration.
+	 */
+	public static function attached($name = null) {
+		if (!isset(static::$_scopes)) {
+			static::_initScopes();
+		}
+		if ($name === false) {
+			$name = '__defaultScope__';
+		}
+		return static::$_scopes->get($name);
+	}
+
+	/**
+	 * Initialize `static::$_scopes` with a `lithium\core\Configuration` instance.
+	 */
+	protected static function _initScopes() {
+		$configuration = static::$_classes['configuration'];
+		static::$_scopes = new $configuration();
+		$self = get_called_class();
+		static::$_scopes->initConfig = function($name, $config) use ($self) {
+			$defaults = array(
+				'absolute' => false,
+				'host' => 'localhost',
+				'scheme' => 'http://',
+				'prefix' => '',
+				'path' => null,
+				'timestamp' => false,
+				'filter' => null,
+				'suffix' => null,
+				'check' => false
+			);
+			$config += $defaults;
+			$config['prefix'] = trim($config['prefix'], '/');
+			return $config;
+		};
 	}
 }
 

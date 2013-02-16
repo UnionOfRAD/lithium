@@ -181,6 +181,7 @@ class Route extends \lithium\core\Object {
 			'persist'  => array(),
 			'handler'  => null,
 			'continue' => false,
+			'modifiers' => array(),
 			'formatters' => array(),
 			'unicode'  => true
 		);
@@ -229,14 +230,17 @@ class Route extends \lithium\core\Object {
 				return false;
 			}
 		}
-		if (isset($match['args'])) {
-			$match['args'] = explode('/', $match['args']);
+		foreach ($this->_config['modifiers'] as $key => $modifier) {
+			if (isset($match[$key])) {
+				$match[$key] = $modifier($match[$key]);
+			}
 		}
-		$result = array_filter(array_intersect_key($match, $this->_keys), function($val) {
-			return !is_scalar($val) || strlen($val);
-		});
-		if (isset($this->_keys['args'])) {
-			$result += array('args' => array());
+
+		$result = array_intersect_key($match + array('args' => array()), $this->_keys);
+		foreach ($result as $key => $value) {
+			if ($value === '') {
+				unset($result[$key]);
+			}
 		}
 		$result += $this->_params + $this->_defaults;
 		$request->params = $result + (array) $request->params;
@@ -258,7 +262,7 @@ class Route extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function match(array $options = array(), $context = null) {
-		$defaults = array('action' => 'index');
+		$defaults = array('action' => 'index', 'http:method' => 'GET');
 		$query = null;
 
 		if (!$this->_config['continue']) {
@@ -270,6 +274,12 @@ class Route extends \lithium\core\Object {
 				unset($options['?']);
 			}
 		}
+		if (isset($this->_meta['http:method']) &&
+			$options['http:method'] !== $this->_meta['http:method']
+		) {
+			return false;
+		}
+		unset($options['http:method']);
 
 		if (!$options = $this->_matchKeys($options)) {
 			return false;
@@ -400,7 +410,6 @@ class Route extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function compile() {
-		$this->_match = $this->_params;
 
 		foreach ($this->_params as $key => $value) {
 			if (!strpos($key, ':')) {
@@ -409,6 +418,8 @@ class Route extends \lithium\core\Object {
 			unset($this->_params[$key]);
 			$this->_meta[$key] = $value;
 		}
+
+		$this->_match = $this->_params;
 
 		if ($this->_template === '/' || $this->_template === '') {
 			$this->_pattern = '@^/*$@';
