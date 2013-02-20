@@ -5,6 +5,7 @@ Thank you for your interest in contributing to Lithium! This project is built by
 Here's what you need to stick to in order to have the best chance of getting your code pushed to the core:
 
  * **Integration**: all pull requests should be submitted against the [`dev`](https://github.com/UnionOfRAD/lithium/tree/dev) branch for integration testing
+ * **Branching**: create a short and meaningful branch name that starts with either `bug/` or `feature/`. A good example would be `feature/newMediaEncode` or `bug/modelFindFix`
  * **Conceptual integrity**: code should conform to the goals of the framework
  * **Maintainability**: code should pass existing tests, have adequate test coverage and should conform to our coding standards & QA guidelines
  * **Comprehensibility**: code should be concise and expressive, and should be accompanied by new documentation as appropriate, or updates to existing docs
