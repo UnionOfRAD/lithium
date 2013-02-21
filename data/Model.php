@@ -432,6 +432,7 @@ class Model extends \lithium\core\StaticObject {
 			}
 		);
 
+		$source['schema'] = $source['schema'] + $schema;
 		if (is_object($self->_schema)) {
 			$self->_schema->append($source['schema']);
 		} elseif (is_array($self->_schema)) {
