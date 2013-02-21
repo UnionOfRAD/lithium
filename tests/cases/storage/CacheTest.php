@@ -11,11 +11,13 @@ namespace lithium\tests\cases\storage;
 use SplFileInfo;
 use lithium\core\Libraries;
 use lithium\storage\Cache;
+use lithium\test\Mocker;
 
 class CacheTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		Cache::reset();
+		Mocker::register();
 	}
 
 	public function tearDown() {
@@ -649,6 +651,32 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 		$this->assertFalse(file_exists("{$path}/key"));
 	}
+
+	public function testNotCreateCacheWhenTestingEnabled() {
+		$class = "lithium\storage\cache\Mock";
+		$class::config(array(
+			'default' => array(
+				'adapter' => 'Memory',
+			),
+		));
+
+		$class::enabled('default');
+		$chain = Mocker::chain($class);
+
+		$this->assertFalse($chain->called('adapter')->success());
+	}
+
+	public function testEnabledHasCorrectOutput() {
+		$class = "lithium\storage\cache\Mock";
+		$class::config(array(
+			'default' => array(
+				'adapter' => 'Memory',
+			),
+		));
+
+		$this->assertInternalType('bool', $class::enabled('default'));
+	}
+
 }
 
 ?>
