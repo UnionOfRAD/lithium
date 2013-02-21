@@ -21,6 +21,8 @@ use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\data\MockTagging;
 use lithium\tests\mocks\data\MockCreator;
 use lithium\tests\mocks\data\MockPostForValidates;
+use lithium\tests\mocks\data\MockProductForSchemas;
+use lithium\tests\mocks\data\MockAntiqueForSchemas;
 use lithium\tests\mocks\data\MockBadConnection;
 
 class ModelTest extends \lithium\test\Unit {
@@ -210,6 +212,11 @@ class ModelTest extends \lithium\test\Unit {
 
 		MockPost::config(array('schema' => $this->_altSchema));
 		$this->assertEqual($this->_altSchema->fields(), MockPost::schema()->fields());
+	}
+
+	public function testSchemaInheritance() {
+		$result = MockAntiqueForSchemas::schema();
+		$this->assertTrue(array_key_exists('price', $result->fields()));
 	}
 
 	public function testFieldIntrospection() {
