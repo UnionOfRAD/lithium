@@ -275,7 +275,8 @@ class AdaptableTest extends \lithium\test\Unit {
 		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue($adapter::enabled('default'));
+		$this->assertIdentical(true, $adapter::enabled('default'));
+		$this->expectException('/No adapter set for configuration/');
 		$this->assertNull($adapter::enabled('non-existent'));
 	}
 
