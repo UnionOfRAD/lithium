@@ -15,11 +15,13 @@ use lithium\tests\mocks\core\MockAdapter;
 use lithium\tests\mocks\core\MockStrategy;
 use lithium\tests\mocks\storage\cache\strategy\MockSerializer;
 use lithium\tests\mocks\storage\cache\strategy\MockConfigurizer;
+use lithium\test\Mocker;
 
 class AdaptableTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->adaptable = new Adaptable();
+		Mocker::register();
 	}
 
 	public function testConfig() {
@@ -273,7 +275,8 @@ class AdaptableTest extends \lithium\test\Unit {
 		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue($adapter::enabled('default'));
+		$this->assertIdentical(true, $adapter::enabled('default'));
+		$this->expectException('/No adapter set for configuration/');
 		$this->assertNull($adapter::enabled('non-existent'));
 	}
 
@@ -324,6 +327,21 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->expectException($message);
 		$result = $adapter::adapter('default');
 	}
+
+	public function testNotCreateCacheWhenTestingEnabled() {
+		$adapter = 'lithium\tests\mocks\core\mockAdapter\Mock';
+		$adapter::config(array(
+			'default' => array(
+				array('adapter' => 'Memory'),
+			),
+		));
+
+		$adapter::enabled('default');
+		$chain = Mocker::chain($adapter);
+
+		$this->assertFalse($chain->called('adapter')->success());
+	}
+
 }
 
 ?>

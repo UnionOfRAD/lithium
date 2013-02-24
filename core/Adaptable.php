@@ -199,11 +199,8 @@ class Adaptable extends \lithium\core\StaticObject {
 	 *         return null if no configuration under the given $name exists.
 	 */
 	public static function enabled($name) {
-		if (!static::_config($name)) {
-			return null;
-		}
-		$adapter = static::adapter($name);
-		return $adapter::enabled();
+		$class = static::_class(static::_config($name), static::$_adapters);
+		return $class::enabled();
 	}
 
 	/**
