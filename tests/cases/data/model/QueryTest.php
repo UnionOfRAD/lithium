@@ -421,7 +421,7 @@ class QueryTest extends \lithium\test\Unit {
 		));
 		$expected = 'SELECT * FROM {foo} AS {MockQueryPost} LEFT JOIN AS ';
 		$expected .= '{MockQueryComment} ON {MockQueryPost}.{id} = {MockQueryComment}';
-		$expected .= '.{mock_query_post_id} GROUP BY author_id ORDER BY author_id ASC ';
+		$expected .= '.{mock_query_post_id} GROUP BY {MockQueryPost}.{author_id} ORDER BY {MockQueryPost}.{author_id} ASC ';
 		$expected .= 'LIMIT 3;';
 		$this->assertEqual($expected, $this->db->renderCommand($query));
 	}

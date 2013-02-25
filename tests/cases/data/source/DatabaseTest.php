@@ -25,6 +25,7 @@ class DatabaseTest extends \lithium\test\Unit {
 	protected $_configs = array();
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDatabasePost';
+	protected $_comment = 'lithium\tests\mocks\data\model\MockDatabaseComment';
 	protected $_gallery = 'lithium\tests\mocks\data\model\MockGallery';
 	protected $_imageTag = 'lithium\tests\mocks\data\model\MockImageTag';
 
@@ -567,7 +568,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$query = new Query(array('model' => $this->_model));
 
 		$result = $this->db->order("foo_bar", $query);
-		$expected = 'ORDER BY foo_bar ASC';
+		$expected = 'ORDER BY {foo_bar} ASC';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->db->order("title", $query);
@@ -606,11 +607,11 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 
 		$result = $this->db->order('MockDatabaseComment.created DESC', $query);
-		$expected = 'ORDER BY MockDatabaseComment.created DESC';
+		$expected = 'ORDER BY {MockDatabaseComment}.{created} DESC';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->db->order(array('MockDatabaseComment.created' => 'DESC'), $query);
-		$expected = 'ORDER BY MockDatabaseComment.created DESC';
+		$expected = 'ORDER BY {MockDatabaseComment}.{created} DESC';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->db->order(
@@ -620,7 +621,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			),
 			$query
 		);
-		$expected = 'ORDER BY MockDatabasePost.title ASC, MockDatabaseComment.created DESC';
+		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, {MockDatabaseComment}.{created} DESC';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->db->order(
@@ -630,7 +631,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			),
 			$query
 		);
-		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, MockDatabaseComment.created DESC';
+		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, {MockDatabaseComment}.{created} DESC';
 		$this->assertEqual($expected, $result);
 	}
 
@@ -1008,9 +1009,36 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testGroup() {
-		$result = $this->db->group(array('id ASC'));
-		$expected = 'GROUP BY id ASC';
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model
+		));
+		$result = $this->db->group(array('id' => 'ASC'), $query);
+		$expected = 'GROUP BY {MockDatabasePost}.{id} ASC';
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testGroupWithAlias() {
+		$query = new Query(array(
+			'type' => 'read', 'model' => $this->_model, 'alias' => 'MyModel'
+		));
+		$result = $this->db->group('id', $query);
+		$expected = 'GROUP BY {MyModel}.{id}';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testGroupOnRelation() {
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_comment,
+			'with' => 'MockDatabasePost',
+			'group' => array('MockDatabaseComment.id')
+		));
+
+		$sql = 'SELECT * FROM {mock_database_comments} AS {MockDatabaseComment} LEFT JOIN ';
+		$sql .= '{mock_database_posts} AS {MockDatabasePost} ON {MockDatabaseComment}.';
+		$sql .= '{mock_database_post_id} = {MockDatabasePost}.{id} GROUP BY ';
+		$sql .= '{MockDatabaseComment}.{id};';
+		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
 	public function testLimit() {
@@ -1519,7 +1547,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->read($query);
 		$expected = 'SELECT count(Image.id) as count, {Gallery}.{id}, {Image}.* FROM ';
 		$expected .= '{mock_gallery} AS {Gallery} LEFT JOIN {mock_image} AS {Image} ON ';
-		$expected .= '{Gallery}.{id} = {Image}.{gallery_id} GROUP BY Gallery.id;';
+		$expected .= '{Gallery}.{id} = {Image}.{gallery_id} GROUP BY {Gallery}.{id};';
 
 		$this->assertEqual($expected, $this->db->sql);
 		$map = array(
