@@ -35,8 +35,8 @@ class SchemaTest extends \lithium\test\Unit {
 		));
 
 		$this->assertEqual(array('users'), array_keys($result->data()));
-		$this->assertEqual(1, count($result->users));
-		$this->assertTrue($result->users[0] instanceof MongoId);
+		$this->assertCount(1, $result->users);
+		$this->assertInstanceOf('MongoId', $result->users[0]);
 	}
 
 	public function testCastingEmptyValues() {

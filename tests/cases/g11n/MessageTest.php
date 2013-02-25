@@ -291,7 +291,7 @@ class MessageTest extends \lithium\test\Unit {
 		$data = array('catalog' => 'Katalog');
 		Catalog::write('runtime', 'message', 'de', $data, array('scope' => 'foo'));
 
-		$this->assertFalse(Message::cache());
+		$this->assertEmpty(Message::cache());
 
 		$result = Message::translate('catalog', array('locale' => 'de', 'scope' => 'foo'));
 		$this->assertEqual('Katalog', $result);
@@ -300,7 +300,7 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual('Katalog', $cache['foo']['de']['catalog']);
 
 		Message::cache(false);
-		$this->assertFalse(Message::cache());
+		$this->assertEmpty(Message::cache());
 
 		Message::cache(array('foo' => array('de' => array('catalog' => '<Katalog>'))));
 		$result = Message::translate('catalog', array('locale' => 'de', 'scope' => 'foo'));

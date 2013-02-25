@@ -62,14 +62,14 @@ class LoggerTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 
 		$result = Logger::config();
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$this->assertFalse(Logger::write('info', 'Test message.'));
 	}
 
 	public function testWrite() {
 		$result = Logger::write('info', 'value');
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 	}
 
 	public function testIntegrationWriteFile() {
@@ -82,14 +82,14 @@ class LoggerTest extends \lithium\test\Unit {
 		Logger::config($config);
 
 		$result = Logger::write('info', 'Message line 1');
-		$this->assertTrue(file_exists($base . '/info.log'));
+		$this->assertFileExists($base . '/info.log');
 
 		$expected = "Message line 1\n";
 		$result = file_get_contents($base . '/info.log');
 		$this->assertEqual($expected, $result);
 
 		$result = Logger::write('info', 'Message line 2');
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$expected = "Message line 1\nMessage line 2\n";
 		$result = file_get_contents($base . '/info.log');
@@ -114,12 +114,12 @@ class LoggerTest extends \lithium\test\Unit {
 			'format' => "{:message}\n"
 		)));
 
-		$this->assertFalse(file_exists($base . '/info.log'));
+		$this->assertFileNotExists($base . '/info.log');
 
-		$this->assertFalse(Logger::write('info', 'Message line 1'));
-		$this->assertFalse(file_exists($base . '/info.log'));
+		$this->assertEmpty(Logger::write('info', 'Message line 1'));
+		$this->assertFileNotExists($base . '/info.log');
 
-		$this->assertTrue(Logger::write(null, 'Message line 1', array('name' => 'default')));
+		$this->assertNotEmpty(Logger::write(null, 'Message line 1', array('name' => 'default')));
 
 		$expected = "Message line 1\n";
 		$result = file_get_contents($base . '/.log');
@@ -147,13 +147,13 @@ class LoggerTest extends \lithium\test\Unit {
 			),
 		));
 
-		$this->assertFalse(file_exists($base . '/info_default.log'));
+		$this->assertFileNotExists($base . '/info_default.log');
 
-		$this->assertTrue(Logger::write('info', 'Default Message line 1', array(
+		$this->assertNotEmpty(Logger::write('info', 'Default Message line 1', array(
 			'name' => 'default'
 		)));
 
-		$this->assertTrue(file_exists($base . '/info_default.log'));
+		$this->assertFileExists($base . '/info_default.log');
 
 		$expected = "Default Message line 1\n";
 		$result = file_get_contents($base . '/info_default.log');
@@ -182,13 +182,13 @@ class LoggerTest extends \lithium\test\Unit {
 			),
 		));
 
-		$this->assertFalse(file_exists($base . '/info_secondary.log'));
+		$this->assertFileNotExists($base . '/info_secondary.log');
 
-		$this->assertTrue(Logger::write('info', 'Secondary Message line 1', array(
+		$this->assertNotEmpty(Logger::write('info', 'Secondary Message line 1', array(
 			'name' => 'secondary'
 		)));
 
-		$this->assertTrue(file_exists($base . '/info_secondary.log'));
+		$this->assertFileExists($base . '/info_secondary.log');
 
 		$expected = "Secondary Message line 1\n";
 		$result = file_get_contents($base . '/info_secondary.log');

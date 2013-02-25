@@ -156,7 +156,7 @@ class DatabaseTest extends \lithium\test\Integration {
 		$images = $this->db->read($query)->data();
 		reset($this->images);
 
-		$this->assertEqual(3, count($images));
+		$this->assertCount(3, $images);
 		foreach ($images as $key => $image) {
 			$expect = current($this->images) + array(
 				'gallery_id' => 1,
@@ -192,7 +192,7 @@ class DatabaseTest extends \lithium\test\Integration {
 		$galleries = $this->db->read($query)->data();
 		$images = array(1 => $this->images[1], 2 => $this->images[2], 3 => $this->images[3]);
 
-		$this->assertEqual(1, count($galleries));
+		$this->assertCount(1, $galleries);
 		foreach ($galleries as $key => $gallery) {
 			$expect = $this->galleries[1] + array(
 				'images' => $images
@@ -244,7 +244,7 @@ class DatabaseTest extends \lithium\test\Integration {
 
 		$expected = array($this->images[3], $this->images[2], $this->images[1]);
 
-		$this->assertEqual(3, count($images));
+		$this->assertCount(3, $images);
 		foreach ($images as $image) {
 			$this->assertEqual(current($expected), $image);
 			next($expected);
@@ -261,7 +261,7 @@ class DatabaseTest extends \lithium\test\Integration {
 			'order' => array('Galleries.id' => 'ASC')
 		));
 
-		$this->assertEqual(2, count($galleries));
+		$this->assertCount(2, $galleries);
 		$expected = array(3, 2);
 
 		foreach ($galleries as $gallery) {

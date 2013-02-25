@@ -58,7 +58,7 @@ class CompilerTest extends \lithium\test\Unit {
 
 	public function testTemplateContentRewriting() {
 		$template = Compiler::template("{$this->_path}/{$this->_file}");
-		$this->assertTrue(file_exists($template));
+		$this->assertFileExists($template);
 
 		$expected = array(
 			"<?php echo 'this is unescaped content'; ?" . ">",

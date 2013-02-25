@@ -42,7 +42,7 @@ class MemoryTest extends \lithium\test\Unit {
 
 	public function testReadNonExistent() {
 		$result = $this->adapter->read('messageTemplate', 'root', null);
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 }
 

@@ -90,10 +90,10 @@ class CreateTest extends \lithium\test\Unit {
 			'class' => 'PostTest',
 			'methods' => "\tpublic function testCreate() {\n\n\t}\n"
 		));
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$result = $this->_testPath . '/create_test/tests/cases/models/PostTest.php';
-		$this->assertTrue(file_exists($result));
+		$this->assertFileExists($result);
 
 		$this->_cleanUp();
 	}
@@ -105,7 +105,7 @@ class CreateTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 
 		$result = $create->response->output;
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	public function testRunNotSaved() {
@@ -138,7 +138,7 @@ class CreateTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_testPath . '/create_test/models/Posts.php';
-		$this->assertTrue(file_exists($result));
+		$this->assertFileExists($result);
 	}
 
 	public function testRunWithTestModelCommand() {
@@ -156,7 +156,7 @@ class CreateTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_testPath . '/create_test/tests/cases/models/PostsTest.php';
-		$this->assertTrue(file_exists($result));
+		$this->assertFileExists($result);
 	}
 
 	public function testRunWithTestControllerCommand() {
@@ -174,7 +174,7 @@ class CreateTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_testPath . '/create_test/tests/cases/controllers/PostsControllerTest.php';
-		$this->assertTrue(file_exists($result));
+		$this->assertFileExists($result);
 	}
 
 	public function testRunWithTestOtherCommand() {
@@ -191,7 +191,7 @@ class CreateTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_testPath . '/create_test/tests/cases/something/PostsTest.php';
-		$this->assertTrue(file_exists($result));
+		$this->assertFileExists($result);
 	}
 
 	public function testRunAll() {
@@ -204,16 +204,16 @@ class CreateTest extends \lithium\test\Unit {
 		$create->run('Posts');
 
 		$result = $this->_testPath . '/create_test/models/Posts.php';
-		$this->assertTrue(file_exists($result));
+		$this->assertFileExists($result);
 
 		$result = $this->_testPath . '/create_test/controllers/PostsController.php';
-		$this->assertTrue(file_exists($result));
+		$this->assertFileExists($result);
 
 		$result = $this->_testPath . '/create_test/tests/cases/models/PostsTest.php';
-		$this->assertTrue(file_exists($result));
+		$this->assertFileExists($result);
 
 		$result = $this->_testPath . '/create_test/tests/cases/controllers/PostsControllerTest.php';
-		$this->assertTrue(file_exists($result));
+		$this->assertFileExists($result);
 	}
 }
 

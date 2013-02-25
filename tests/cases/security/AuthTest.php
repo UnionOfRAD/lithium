@@ -60,7 +60,7 @@ class AuthTest extends \lithium\test\Unit {
 		$this->assertFalse(Auth::check('test'));
 		$user = array('id' => 13, 'user' => 'bob');
 
-		$this->assertTrue(Auth::set('test', $user));
+		$this->assertNotEmpty(Auth::set('test', $user));
 
 		$result = Auth::check('test');
 		$this->assertEqual($user, $result);

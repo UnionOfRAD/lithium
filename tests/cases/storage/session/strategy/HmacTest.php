@@ -29,7 +29,7 @@ class HmacTest extends \lithium\test\Unit {
 	public function testConstruct() {
 		$secret = 'foo';
 		$hmac = new Hmac(compact('secret'));
-		$this->assertTrue($hmac instanceof Hmac);
+		$this->assertInstanceOf('lithium\storage\session\strategy\Hmac', $hmac);
 	}
 
 	public function testWrite() {

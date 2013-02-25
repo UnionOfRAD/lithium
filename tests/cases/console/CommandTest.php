@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\console;
 
 use lithium\console\Request;
-use lithium\console\Response;
 use lithium\tests\mocks\console\MockCommand;
 
 class CommandTest extends \lithium\test\Unit {
@@ -31,7 +30,7 @@ class CommandTest extends \lithium\test\Unit {
 			'case' => 'lithium.tests.cases.console.CommandTest'
 		);
 		$command = new MockCommand(array('request' => $this->request));
-		$this->assertTrue(!empty($command->case));
+		$this->assertNotEmpty($command->case);
 	}
 
 	public function testInvoke() {
@@ -39,7 +38,7 @@ class CommandTest extends \lithium\test\Unit {
 		$response = $command('testRun');
 
 		$result = $response;
-		$this->assertTrue($result instanceof Response);
+		$this->assertInstanceOf('lithium\console\Response', $result);
 
 		$expected = 'testRun';
 		$result = $response->testAction;
@@ -152,7 +151,7 @@ class CommandTest extends \lithium\test\Unit {
 		$command = new MockCommand(array('request' => $this->request));
 		$return = $command->__invoke('_help');
 
-		$this->assertTrue($return instanceOf \lithium\tests\mocks\console\MockResponse);
+		$this->assertInstanceOf('lithium\tests\mocks\console\MockResponse', $return);
 
 		$expected = "DESCRIPTION.*This is the Mock Command";
 		$result = $command->response->output;

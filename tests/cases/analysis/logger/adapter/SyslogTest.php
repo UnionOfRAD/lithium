@@ -54,7 +54,7 @@ class SyslogTest extends \lithium\test\Unit {
 
 	public function testWrite() {
 		$result = Logger::write('info', 'SyslogTest message...', array('name' => 'syslog'));
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 	}
 }
 

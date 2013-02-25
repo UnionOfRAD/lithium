@@ -33,7 +33,7 @@ class LoggerTest extends \lithium\test\Integration {
 		Logger::config($config);
 
 		$result = Logger::write('info', 'Original Message');
-		$this->assertTrue(file_exists($base . '/info.log'));
+		$this->assertFileExists($base . '/info.log');
 
 		$expected = "Filtered Message\n";
 		$result = file_get_contents($base . '/info.log');

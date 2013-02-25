@@ -47,14 +47,14 @@ class EntityTest extends \lithium\test\Unit {
 		$this->assertEqual('foo', $entity->test_field);
 		$this->assertEqual(array('test_me' => 'bar'), $entity->test_relationship);
 
-		$this->assertTrue(isset($entity->test_field));
+		$this->assertFalse(isset($entity->field));
 		$this->assertTrue(isset($entity->test_relationship));
 
-		$this->assertFalse(empty($entity->test_field));
-		$this->assertFalse(empty($entity->test_relationship));
+		$this->assertNotEmpty($entity->test_field);
+		$this->assertNotEmpty($entity->test_relationship);
 
-		$this->assertTrue(empty($entity->test_invisible_field));
-		$this->assertTrue(empty($entity->test_invisible_relationship));
+		$this->assertEmpty($entity->test_invisible_field);
+		$this->assertEmpty($entity->test_invisible_relationship);
 	}
 
 	public function testIncrement() {
@@ -152,7 +152,7 @@ class EntityTest extends \lithium\test\Unit {
 		$this->assertEqual(array('foo' => true, 'baz' => true, 'ble' => true), $entity->modified());
 
 		$this->assertTrue($entity->ble->modified('foo'));
-		$this->assertFalse($entity->ble->modified('iak'));
+		$this->assertEmpty($entity->ble->modified('iak'));
 		$this->assertEqual($entity->ble->modified(), array('foo' => true, 'baz' => true));
 
 		$data = array('foo' => 'bar', 'baz' => 'dib'); //it's the default data array in the test

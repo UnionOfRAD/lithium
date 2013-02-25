@@ -48,19 +48,19 @@ class ValidatorTest extends \lithium\test\Unit {
 			array('number' => 'one', 'name' => 'bob'),
 			$fieldValidationRules
 		);
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 
 		$result = Validator::check(
 			array('number' => 'four', 'name' => 'bob'),
 			$fieldValidationRules
 		);
-		$this->assertFalse(empty($result));
+		$this->assertNotEmpty($result);
 
 		$result = Validator::check(
 			array('number' => 'one', 'name' => 'rex'),
 			$fieldValidationRules
 		);
-		$this->assertFalse(empty($result));
+		$this->assertNotEmpty($result);
 	}
 
 	/**
@@ -967,40 +967,40 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertFalse(Validator::isLuhn(true));
 	}
 
-    public function testDateValidation() {
-        $this->assertTrue(Validator::isDate('31-12-2012', 'dmy'));
-        $this->assertTrue(Validator::isDate('1 1 1999', 'dmy'));
-        $this->assertTrue(Validator::isDate('12/31/2012', 'mdy'));
-        $this->assertTrue(Validator::isDate('02.29.2000', 'mdy'));
-        $this->assertTrue(Validator::isDate('2012/12/31', 'ymd'));
-        $this->assertTrue(Validator::isDate('1999-1-01', 'ymd'));
-        $this->assertTrue(Validator::isDate('31 Dec 2012', 'dMy'));
-        $this->assertTrue(Validator::isDate('1 January 1999', 'dMy'));
-        $this->assertTrue(Validator::isDate('Dec 31 2012', 'Mdy'));
-        $this->assertTrue(Validator::isDate('January 1, 1999', 'Mdy'));
-        $this->assertTrue(Validator::isDate('December 2012', 'My'));
-        $this->assertTrue(Validator::isDate('Jan 1999', 'My'));
-        $this->assertTrue(Validator::isDate('12/2012', 'my'));
-        $this->assertTrue(Validator::isDate('1 2012', 'my'));
-        
-        $this->assertFalse(Validator::isDate('32-12-2012', 'dmy'));
-        $this->assertFalse(Validator::isDate('29 2 1999', 'dmy'));
-        $this->assertFalse(Validator::isDate('13/31/2012', 'mdy'));
-        $this->assertFalse(Validator::isDate('1.0.1999', 'mdy'));
-        $this->assertFalse(Validator::isDate('2012/11/31', 'ymd'));
-        $this->assertFalse(Validator::isDate('2012/11/0', 'ymd'));
-        $this->assertFalse(Validator::isDate('31 Dic 2012', 'dMy'));
-        $this->assertFalse(Validator::isDate('1.January.1999', 'dMy'));
-        $this->assertFalse(Validator::isDate('Dec-31-2012', 'Mdy'));
-        $this->assertFalse(Validator::isDate('December/2012', 'My'));
-        $this->assertFalse(Validator::isDate('Jan.1999', 'My'));
-        $this->assertFalse(Validator::isDate('13 2012', 'my'));
-    }
-    
+	public function testDateValidation() {
+		$this->assertTrue(Validator::isDate('31-12-2012', 'dmy'));
+		$this->assertTrue(Validator::isDate('1 1 1999', 'dmy'));
+		$this->assertTrue(Validator::isDate('12/31/2012', 'mdy'));
+		$this->assertTrue(Validator::isDate('02.29.2000', 'mdy'));
+		$this->assertTrue(Validator::isDate('2012/12/31', 'ymd'));
+		$this->assertTrue(Validator::isDate('1999-1-01', 'ymd'));
+		$this->assertTrue(Validator::isDate('31 Dec 2012', 'dMy'));
+		$this->assertTrue(Validator::isDate('1 January 1999', 'dMy'));
+		$this->assertTrue(Validator::isDate('Dec 31 2012', 'Mdy'));
+		$this->assertTrue(Validator::isDate('January 1, 1999', 'Mdy'));
+		$this->assertTrue(Validator::isDate('December 2012', 'My'));
+		$this->assertTrue(Validator::isDate('Jan 1999', 'My'));
+		$this->assertTrue(Validator::isDate('12/2012', 'my'));
+		$this->assertTrue(Validator::isDate('1 2012', 'my'));
+
+		$this->assertFalse(Validator::isDate('32-12-2012', 'dmy'));
+		$this->assertFalse(Validator::isDate('29 2 1999', 'dmy'));
+		$this->assertFalse(Validator::isDate('13/31/2012', 'mdy'));
+		$this->assertFalse(Validator::isDate('1.0.1999', 'mdy'));
+		$this->assertFalse(Validator::isDate('2012/11/31', 'ymd'));
+		$this->assertFalse(Validator::isDate('2012/11/0', 'ymd'));
+		$this->assertFalse(Validator::isDate('31 Dic 2012', 'dMy'));
+		$this->assertFalse(Validator::isDate('1.January.1999', 'dMy'));
+		$this->assertFalse(Validator::isDate('Dec-31-2012', 'Mdy'));
+		$this->assertFalse(Validator::isDate('December/2012', 'My'));
+		$this->assertFalse(Validator::isDate('Jan.1999', 'My'));
+		$this->assertFalse(Validator::isDate('13 2012', 'my'));
+	}
+
 	public function testCheckHasErrors() {
 		$rules = array('title' => array('please enter a title'));
 		$result = Validator::check(array(), $rules);
-		$this->assertFalse(empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = array('title' => array('please enter a title'));
 		$this->assertEqual($expected, $result);
@@ -1010,7 +1010,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$rules = array('title' => 'please enter a title');
 		$data = array('title' => 'new title');
 		$result = Validator::check($data, $rules);
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 	}
 
 	public function testCheckSkipEmpty() {
@@ -1021,17 +1021,17 @@ class ValidatorTest extends \lithium\test\Unit {
 		// empty string should pass
 		$data = array('email' => '');
 		$result = Validator::check($data, $rules);
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 
 		// null value should pass
 		$data = array('email' => null);
 		$result = Validator::check($data, $rules);
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 
 		// string with spaces should NOT pass
 		$data = array('email' => ' ');
 		$result = Validator::check($data, $rules);
-		$this->assertFalse(empty($result));
+		$this->assertNotEmpty($result);
 	}
 
 	public function testCheckMultipleHasErrors() {
@@ -1043,7 +1043,7 @@ class ValidatorTest extends \lithium\test\Unit {
 			)
 		);
 		$result = Validator::check(array(), $rules);
-		$this->assertFalse(empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = array(
 			'title' => array('please enter a title'),
@@ -1061,7 +1061,7 @@ class ValidatorTest extends \lithium\test\Unit {
 			)
 		);
 		$result = Validator::check(array(), $rules);
-		$this->assertFalse(empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = array(
 			'title' => array('title is empty'),
@@ -1086,7 +1086,7 @@ class ValidatorTest extends \lithium\test\Unit {
 			'title' => array('please enter a title'),
 			'email' => array('email is not valid')
 		);
-		$this->assertFalse(empty($result));
+		$this->assertNotEmpty($result);
 		$this->assertEqual($errors, $result);
 	}
 
@@ -1100,7 +1100,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		);
 		$data = array('title' => 'new title', 'email' => 'something');
 		$result = Validator::check($data, $rules);
-		$this->assertFalse(empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = array('email' => array('email is not valid'));
 		$this->assertEqual($expected, $result);
@@ -1116,7 +1116,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		);
 		$data = array('title' => 'new title', 'email' => 'something@test.com');
 		$result = Validator::check($data, $rules);
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 
 		$expected = array();
 		$this->assertEqual($expected, $result);

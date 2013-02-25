@@ -56,7 +56,7 @@ class SessionTest extends \lithium\test\Unit {
 
 		Session::reset();
 		$this->assertNull(Session::read('key'));
-		$this->assertIdentical(false, Session::write('key', 'value'));
+		$this->assertFalse(Session::write('key', 'value'));
 	}
 
 	public function testNamedConfigurationReadWrite() {
@@ -78,7 +78,7 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertEqual($result, 'value');
 
 		$result = Session::read('key', array('name' => 'store2'));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	public function testSessionConfigReset() {
@@ -86,9 +86,9 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertEqual(Session::read('key'), 'value');
 
 		Session::reset();
-		$this->assertFalse(Session::config());
+		$this->assertEmpty(Session::config());
 
-		$this->assertFalse(Session::read('key'));
+		$this->assertEmpty(Session::read('key'));
 		$this->assertFalse(Session::write('key', 'value'));
 	}
 
@@ -182,7 +182,7 @@ class SessionTest extends \lithium\test\Unit {
 		));
 		$this->assertTrue(Session::write('key', 'value'));
 		$this->assertEqual(Session::read('key'), 'value');
-		$this->assertFalse(Session::read('key', array('fail' => true)));
+		$this->assertEmpty(Session::read('key', array('fail' => true)));
 	}
 
 	public function testSessionState() {
@@ -295,7 +295,7 @@ class SessionTest extends \lithium\test\Unit {
 		$encrypted = Session::read('test', array('strategies' => false));
 
 		$this->assertNotEqual($value, $encrypted);
-		$this->assertTrue(is_string($encrypted));
+		$this->assertInternalType('string', $encrypted);
 
 		$result = Session::read('test');
 		$this->assertEqual($value, $result);

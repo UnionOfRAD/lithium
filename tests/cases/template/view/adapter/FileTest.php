@@ -43,7 +43,7 @@ class FileTest extends \lithium\test\Unit {
 		$file = new File(array('extract' => false));
 		$this->expectException('Undefined variable: foo');
 		$content = $file->render("{$this->_path}/template1.html.php", array('foo' => 'bar'));
-		$this->assertFalse($content);
+		$this->assertEmpty($content);
 
 		$content = $file->render("{$this->_path}/template2.html.php", array('foo' => 'bar'));
 		$this->assertEqual('bar', $content);
