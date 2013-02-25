@@ -109,7 +109,7 @@ class DispatcherTest extends \lithium\test\Unit {
 				'sample-task-with-optional-args'
 			)
 		)));
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$result = Dispatcher::run(new Request(array(
 			'args' => array(
@@ -117,7 +117,7 @@ class DispatcherTest extends \lithium\test\Unit {
 				'sample_task_with_optional_args'
 			)
 		)));
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 	}
 
 	public function testEnvironmentIsSet() {

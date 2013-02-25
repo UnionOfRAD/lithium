@@ -49,8 +49,7 @@ class RecordTest extends \lithium\test\Unit {
 		$this->assertTrue(isset($this->record->body));
 
 		$this->assertNull($this->record->foo);
-		$this->assertFalse(isset($this->record->foo));
-	}
+		$this->assertFalse(isset($this->record->foo));	}
 
 	/**
 	 * Tests that a record can be exported to a given series of formats.
@@ -97,7 +96,7 @@ class RecordTest extends \lithium\test\Unit {
 	 * Test the ability to set multiple field's values, and that they can be read back.
 	 */
 	public function testSetData() {
-		$this->assertFalse($this->record->data());
+		$this->assertEmpty($this->record->data());
 		$expected = array('id' => 1, 'name' => 'Joe Bloggs', 'address' => 'The Park');
 		$this->record->set($expected);
 		$this->assertEqual($expected, $this->record->data());

@@ -220,6 +220,16 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $results[0]['result']);
 	}
 
+	public function testAssertNotIdentical() {
+		$expected = true;
+		$result = 1;
+		$this->test->assertNotIdentical($expected, $result);
+		$results = $this->test->results();
+
+		$expected = 'pass';
+		$this->assertEqual($expected, $results[0]['result']);
+	}
+
 	public function testAssertIdenticalArray() {
 		$expected = array('1', '2', '3');
 		$result = array('1', '3', '4');
@@ -233,6 +243,16 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $results[0]['message']);
 	}
 
+	public function testAssertNotIdenticalArray() {
+		$expected = array('1', '2', '3');
+		$result = array('1', '3', '4');
+		$this->test->assertNotIdentical($expected, $result);
+		$results = $this->test->results();
+
+		$expected = 'pass';
+		$this->assertEqual($expected, $results[0]['result']);
+	}
+
 	public function testAssertNull() {
 		$expected = null;
 		$result = null;
@@ -243,10 +263,10 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $results[0]['result']);
 	}
 
-	public function testAssertNoPattern() {
+	public function testAssertNotPattern() {
 		$expected = '/\s/';
 		$result = null;
-		$this->test->assertNoPattern($expected, $result);
+		$this->test->assertNotPattern($expected, $result);
 		$results = $this->test->results();
 
 		$expected = 'pass';
@@ -402,7 +422,7 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp();
-		$this->assertFalse(file_exists("{$base}/cleanup_test"));
+		$this->assertFileNotExists("{$base}/cleanup_test");
 	}
 
 	public function testCleanUpWithFullPath() {
@@ -414,9 +434,9 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp("{$base}/cleanup_test");
-		$this->assertTrue(file_exists("{$base}/cleanup_test"));
-		$this->assertFalse(file_exists("{$base}/cleanup_test/file"));
-		$this->assertFalse(file_exists("{$base}/cleanup_test/.hideme"));
+		$this->assertFileExists("{$base}/cleanup_test");
+		$this->assertFileNotExists("{$base}/cleanup_test/file");
+		$this->assertFileNotExists("{$base}/cleanup_test/.hideme");
 
 		$this->_cleanUp();
 	}
@@ -430,9 +450,9 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp("tests/cleanup_test");
-		$this->assertTrue(file_exists("{$base}/cleanup_test"));
-		$this->assertFalse(file_exists("{$base}/cleanup_test/file"));
-		$this->assertFalse(file_exists("{$base}/cleanup_test/.hideme"));
+		$this->assertFileExists("{$base}/cleanup_test");
+		$this->assertFileNotExists("{$base}/cleanup_test/file");
+		$this->assertFileNotExists("{$base}/cleanup_test/.hideme");
 
 		$this->_cleanUp();
 	}
@@ -468,7 +488,7 @@ class UnitTest extends \lithium\test\Unit {
 		$this->test->expectException('/test handle exception/');
 		$this->test->handleException(new Exception('test handle exception'));
 
-		$this->assertFalse($this->test->expected());
+		$this->assertEmpty($this->test->expected());
 	}
 
 	public function testExpectExceptionPostNotThrown() {
@@ -1470,50 +1490,6 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertException('InvalidArgumentException', function() use($self) {
 			$self->test->assertObjectNotHasAttribute('foo', 'new \stdClass');
 		});
-	}
-
-	public function testAssertRegExpTrue() {
-		$this->assertTrue($this->test->assertRegExp('/^foo/', 'foobar'));
-
-		$results = $this->test->results();
-		$result = array_pop($results);
-
-		$this->assertEqual('pass', $result['result']);
-	}
-
-	public function testAssertRegExpFalse() {
-		$this->assertFalse($this->test->assertRegExp('/^bar/', 'foobar'));
-
-		$results = $this->test->results();
-		$result = array_pop($results);
-
-		$this->assertEqual('fail', $result['result']);
-		$this->assertEqual(array(
-			'expected' => '/^bar/',
-			'result' => array()
-		), $result['data']);
-	}
-
-	public function testAssertNotRegExpTrue() {
-		$this->assertTrue($this->test->assertNotRegExp('/^bar/', 'foobar'));
-
-		$results = $this->test->results();
-		$result = array_pop($results);
-
-		$this->assertEqual('pass', $result['result']);
-	}
-
-	public function testAssertNotRegExpFalse() {
-		$this->assertFalse($this->test->assertNotRegExp('/^foo/', 'foobar'));
-
-		$results = $this->test->results();
-		$result = array_pop($results);
-
-		$this->assertEqual('fail', $result['result']);
-		$this->assertEqual(array(
-			'expected' => '/^foo/',
-			'result' => array('foo')
-		), $result['data']);
 	}
 
 	public function testAssertStringMatchesFormatTrue() {

@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\data;
 
-use lithium\data\Entity;
 use lithium\tests\mocks\data\MockSource;
 
 class SourceTest extends \lithium\test\Unit {
@@ -45,7 +44,7 @@ class SourceTest extends \lithium\test\Unit {
 	public function testItem() {
 		$source = new MockSource();
 		$entity = $source->item('Foo', array('foo' => 'bar'));
-		$this->assertTrue($entity instanceof Entity);
+		$this->assertInstanceOf('lithium\data\Entity', $entity);
 		$this->assertEqual('Foo', $entity->model());
 		$this->assertEqual(array('foo' => 'bar'), $entity->data());
 	}

@@ -357,25 +357,25 @@ class InflectorTest extends \lithium\test\Unit {
 		Inflector::reset();
 
 		$expected = array('TestField' => 'test_field');
-		$this->assertFalse($this->_getProtectedValue('$_underscored'));
+		$this->assertEmpty($this->_getProtectedValue('$_underscored'));
 		$this->assertEqual(Inflector::underscore('TestField'), 'test_field');
 		$this->assertEqual($expected, $this->_getProtectedValue('$_underscored'));
 		$this->assertEqual(Inflector::underscore('TestField'), 'test_field');
 
 		$expected = array('test_field' => 'TestField');
-		$this->assertFalse($this->_getProtectedValue('$_camelized'));
+		$this->assertEmpty($this->_getProtectedValue('$_camelized'));
 		$this->assertEqual(Inflector::camelize('test_field', true), 'TestField');
 		$this->assertEqual($expected, $this->_getProtectedValue('$_camelized'));
 		$this->assertEqual(Inflector::camelize('test_field', true), 'TestField');
 
 		$expected = array('test_field:_' => 'Test Field');
-		$this->assertFalse($this->_getProtectedValue('$_humanized'));
+		$this->assertEmpty($this->_getProtectedValue('$_humanized'));
 		$this->assertEqual(Inflector::humanize('test_field'), 'Test Field');
 		$this->assertEqual($expected, $this->_getProtectedValue('$_humanized'));
 		$this->assertEqual(Inflector::humanize('test_field'), 'Test Field');
 
 		$expected = array('field' => 'fields');
-		$this->assertFalse($this->_getProtectedValue('$_pluralized'));
+		$this->assertEmpty($this->_getProtectedValue('$_pluralized'));
 		$this->assertEqual(Inflector::pluralize('field'), 'fields');
 		$this->assertEqual($expected, $this->_getProtectedValue('$_pluralized'));
 		$this->assertEqual(Inflector::pluralize('field'), 'fields');

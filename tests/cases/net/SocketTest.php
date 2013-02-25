@@ -10,7 +10,6 @@ namespace lithium\tests\cases\net;
 
 use lithium\tests\mocks\net\http\MockSocket;
 use lithium\net\http\Request;
-use lithium\net\http\Response;
 
 class SocketTest extends \lithium\test\Unit {
 
@@ -25,8 +24,8 @@ class SocketTest extends \lithium\test\Unit {
 		$socket = new MockSocket();
 		$message = new Request();
 		$response = $socket->send($message, array('response' => 'lithium\net\http\Response'));
-		$this->assertTrue($response instanceof Response);
-		$this->assertTrue($socket->data instanceof Request);
+		$this->assertInstanceOf('lithium\net\http\Response', $response);
+		$this->assertInstanceOf('lithium\net\http\Request', $socket->data);
 	}
 }
 

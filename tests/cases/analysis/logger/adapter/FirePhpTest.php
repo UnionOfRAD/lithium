@@ -38,8 +38,7 @@ class FirePhpTest extends \lithium\test\Unit {
 	 */
 	public function testConfiguration() {
 		$loggers = Logger::config();
-		$result = isset($loggers['firephp']);
-		$this->assertTrue($result);
+		$this->assertArrayHasKey('firephp', $loggers);
 	}
 
 	/**
@@ -51,8 +50,8 @@ class FirePhpTest extends \lithium\test\Unit {
 	public function testWrite() {
 		$response = new Response();
 		$result = Logger::write('debug', 'FirePhp to the rescue!', array('name' => 'firephp'));
-		$this->assertTrue($result);
-		$this->assertFalse($response->headers());
+		$this->assertNotEmpty($result);
+		$this->assertEmpty($response->headers());
 
 		$host = 'meta.firephp.org';
 		$expected = array(
@@ -65,7 +64,7 @@ class FirePhpTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $response->headers());
 
 		$result = Logger::write('debug', 'Add this immediately.', array('name' => 'firephp'));
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 		$expected[] = 'X-Wf-1-1-1-2: 40|[{"Type":"LOG"},"Add this immediately."]|';
 		$this->assertEqual($expected, $response->headers());
 	}

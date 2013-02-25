@@ -1143,7 +1143,7 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$this->assertTrue(Set::check($set, 'My Index 1'));
-		$this->assertTrue(Set::check($set, array()));
+		$this->assertNotEmpty(Set::check($set, array()));
 
 		$set = array('My Index 1' => array('First' => array('Second' => array('Third' => array(
 			'Fourth' => 'Heavy. Nesting.'
@@ -1162,7 +1162,7 @@ class SetTest extends \lithium\test\Unit {
 		$set = Set::remove($set, 'Session Test');
 		$this->assertFalse(Set::check($set, 'Session Test'));
 
-		$this->assertTrue($set = Set::insert(array(), 'Session Test.Test Case', "test"));
+		$this->assertNotEmpty($set = Set::insert(array(), 'Session Test.Test Case', "test"));
 		$this->assertTrue(Set::check($set, 'Session Test.Test Case'));
 	}
 
@@ -1208,9 +1208,9 @@ class SetTest extends \lithium\test\Unit {
 
 	public function testCombine() {
 		$result = Set::combine(array(), '/User/id', '/User/Data');
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 		$result = Set::combine('', '/User/id', '/User/Data');
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$a = array(
 			array('User' => array('id' => 2, 'group_id' => 1,

@@ -67,21 +67,21 @@ class FileTest extends \lithium\test\Unit {
 		$time = time() + 60;
 
 		$closure = $this->File->write($key, $data, $expiry);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'data', 'expiry');
 		$result = $closure($this->File, $params, null);
 		$expected = 25;
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue(file_exists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
+		$this->assertFileExists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}");
 		$this->assertEqual(
 			file_get_contents(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"),
 			"{:expiry:$time}\ndata"
 		);
 
 		$this->assertTrue(unlink(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
-		$this->assertFalse(file_exists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
+		$this->assertFileNotExists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}");
 	}
 
 	public function testWriteDefaultCacheExpiry() {
@@ -91,21 +91,21 @@ class FileTest extends \lithium\test\Unit {
 		$time = time() + 60;
 
 		$closure = $file->write($key, $data);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'data');
 		$result = $closure($file, $params, null);
 		$expected = 25;
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue(file_exists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
+		$this->assertFileExists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}");
 		$this->assertEqual(
 			file_get_contents(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"),
 			"{:expiry:{$time}}\ndata"
 		);
 
 		$this->assertTrue(unlink(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
-		$this->assertFalse(file_exists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
+		$this->assertFileNotExists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}");
 	}
 
 	public function testRead() {
@@ -113,11 +113,11 @@ class FileTest extends \lithium\test\Unit {
 		$time = time() + 60;
 
 		$closure = $this->File->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
 		file_put_contents($path, "{:expiry:$time}\ndata");
-		$this->assertTrue(file_exists($path));
+		$this->assertFileExists($path);
 
 		$params = compact('key');
 		$result = $closure($this->File, $params, null);
@@ -128,7 +128,7 @@ class FileTest extends \lithium\test\Unit {
 		$key = 'non_existent';
 		$params = compact('key');
 		$closure = $this->File->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$result = $closure($this->File, $params, null);
 		$this->assertFalse($result);
@@ -139,11 +139,11 @@ class FileTest extends \lithium\test\Unit {
 		$time = time() + 1;
 
 		$closure = $this->File->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 		$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
 
 		file_put_contents($path, "{:expiry:$time}\ndata");
-		$this->assertTrue(file_exists($path));
+		$this->assertFileExists($path);
 
 		sleep(2);
 		$params = compact('key');
@@ -157,10 +157,10 @@ class FileTest extends \lithium\test\Unit {
 		$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
 
 		file_put_contents($path, "{:expiry:$time}\ndata");
-		$this->assertTrue(file_exists($path));
+		$this->assertFileExists($path);
 
 		$closure = $this->File->delete($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$this->assertTrue($closure($this->File, $params, null));
@@ -178,7 +178,7 @@ class FileTest extends \lithium\test\Unit {
 
 		$result = $this->File->clear();
 		$this->assertTrue($result);
-		$this->assertFalse(file_exists($path));
+		$this->assertFileNotExists($path);
 
 		$result = touch(Libraries::get(true, 'resources') . "/tmp/cache/empty");
 		$this->assertTrue($result);

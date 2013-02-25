@@ -65,6 +65,7 @@ class Unit extends \lithium\core\Object {
 	protected static $_internalTypes = array(
 		'array' => 'is_array',
 		'bool' => 'is_bool',
+		'boolean' => 'is_bool',
 		'callable' => 'is_callable',
 		'double' => 'is_double',
 		'float' => 'is_float',
@@ -292,7 +293,7 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $result
 	 * @param string|boolean $message
 	 */
-	public function assertEqual($expected, $result, $message = false) {
+	public function assertEqual($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$data = ($expected != $result) ? $this->_compare('equal', $expected, $result) : null;
 		return $this->assert($expected == $result, $message, $data);
@@ -305,7 +306,7 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $result
 	 * @param string|boolean $message
 	 */
-	public function assertNotEqual($expected, $result, $message = false) {
+	public function assertNotEqual($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		return $this->assert($result != $expected, $message, compact('expected', 'result'));
 	}
@@ -317,9 +318,20 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $result
 	 * @param string|boolean $message
 	 */
-	public function assertIdentical($expected, $result, $message = false) {
+	public function assertIdentical($expected, $result, $message = '{:message}') {
 		$data = ($expected !== $result) ? $this->_compare('identical', $expected, $result) : null;
 		return $this->assert($expected === $result, $message, $data);
+	}
+
+	/**
+	 * Checks that the actual result and the expected result are identical.
+	 *
+	 * @param mixed $expected
+	 * @param mixed $result
+	 * @param string|boolean $message
+	 */
+	public function assertNotIdentical($expected, $result, $message = '{:message}') {
+		return $this->assert($expected !== $result, $message, compact('expected', 'result'));
 	}
 
 	/**
@@ -339,10 +351,11 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param mixed $result
 	 * @param string $message
+	 * @return boolean
 	 */
 	public function assertTrue($result, $message = '{:message}') {
 		$expected = true;
-		return $this->assert(!empty($result), $message, compact('expected', 'result'));
+		return $this->assert($result === $expected, $message, compact('expected', 'result'));
 	}
 
 	/**
@@ -364,10 +377,11 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param mixed $result
 	 * @param string $message
+	 * @return boolean
 	 */
 	public function assertFalse($result, $message = '{:message}') {
 		$expected = false;
-		return $this->assert(empty($result), $message, compact('expected', 'result'));
+		return $this->assert($result === $expected, $message, compact('expected', 'result'));
 	}
 
 	/**
@@ -375,6 +389,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param mixed $result
 	 * @param string $message
+	 * @return boolean
 	 */
 	public function assertNull($result, $message = '{:message}') {
 		$expected = null;
@@ -387,8 +402,9 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $expected
 	 * @param mixed $result
 	 * @param string $message
+	 * @return boolean
 	 */
-	public function assertNoPattern($expected, $result, $message = '{:message}') {
+	public function assertNotPattern($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$params = compact('expected', 'result');
 		return $this->assert(!preg_match($expected, $result), $message, $params);
@@ -400,6 +416,7 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $expected
 	 * @param mixed $result
 	 * @param string $message
+	 * @return boolean
 	 */
 	public function assertPattern($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
@@ -1219,15 +1236,15 @@ class Unit extends \lithium\core\Object {
 	 * Will mark the test `true` if `$class` has an attribute `$attributeName`.
 	 *
 	 * {{{
-	 * $this->assertClassHasAttribute('name', '\ReflectionClass');
+	 * $this->assertClassHasAttribute('name', 'ReflectionClass');
 	 * }}}
 	 *
 	 * {{{
-	 * $this->assertClassHasAttribute('__construct', '\ReflectionClass');
+	 * $this->assertClassHasAttribute('__construct', 'ReflectionClass');
 	 * }}}
 	 *
 	 * @see    lithium\test\Unit::assertObjectHasAttribute()
-	 * @throws InvalidArgumentException When $object is not an object
+	 * @throws InvalidArgumentException When $class does not exist
 	 * @throws ReflectionException      If the given class does not exist
 	 * @param  string $attributeName    Attribute you wish to look for
 	 * @param  string $class            Class name
@@ -1249,15 +1266,15 @@ class Unit extends \lithium\core\Object {
 	 * Will mark the test `true` if `$class` has an attribute `$attributeName`.
 	 *
 	 * {{{
-	 * $this->assertClassNotHasAttribute('__construct', '\ReflectionClass');
+	 * $this->assertClassNotHasAttribute('__construct', 'ReflectionClass');
 	 * }}}
 	 *
 	 * {{{
-	 * $this->assertClassNotHasAttribute('name', '\ReflectionClass');
+	 * $this->assertClassNotHasAttribute('name', 'ReflectionClass');
 	 * }}}
 	 *
 	 * @see    lithium\test\Unit::assertObjectNotHasAttribute()
-	 * @throws InvalidArgumentException When $object is not an object
+	 * @throws InvalidArgumentException When $class does not exist
 	 * @throws ReflectionException      If the given class does not exist
 	 * @param  string $attributeName    Attribute you wish to look for
 	 * @param  string $class            Class name
@@ -1631,11 +1648,11 @@ class Unit extends \lithium\core\Object {
 	 * Will mark the test `true` if the file `$actual` does not exist.
 	 *
 	 * {{{
-	 * $this->assertFileExists(LITHIUM_APP_PATH . '/does/not/exist.txt');
+	 * $this->assertFileNotExists(LITHIUM_APP_PATH . '/does/not/exist.txt');
 	 * }}}
 	 *
 	 * {{{
-	 * $this->assertFileExists(LITHIUM_APP_PATH . '/readme.md');
+	 * $this->assertFileNotExists(LITHIUM_APP_PATH . '/readme.md');
 	 * }}}
 	 *
 	 * @param  string $actual   Path to the file you are asserting
@@ -1783,7 +1800,7 @@ class Unit extends \lithium\core\Object {
 	public function assertNotInstanceOf($expected, $actual, $message = '{:message}') {
 		return $this->assert(!is_a($actual, $expected), $message, array(
 			'expected' => $expected,
-			'result' => get_class($actual)
+			'result' => is_object($actual) ? get_class($actual) : gettype($actual),
 		));
 	}
 
@@ -1861,11 +1878,11 @@ class Unit extends \lithium\core\Object {
 	 * Will mark the test `true` if `$object` has an attribute `$attributeName`.
 	 *
 	 * {{{
-	 * $this->assertObjectHasAttribute('name', '\ReflectionClass');
+	 * $this->assertObjectHasAttribute('name', 'ReflectionClass');
 	 * }}}
 	 *
 	 * {{{
-	 * $this->assertObjectHasAttribute('__construct', '\ReflectionClass');
+	 * $this->assertObjectHasAttribute('__construct', 'ReflectionClass');
 	 * }}}
 	 *
 	 * @see    lithium\test\Unit::assertClassHasAttribute()
@@ -1890,11 +1907,11 @@ class Unit extends \lithium\core\Object {
 	 * Will mark the test `true` if `$object` has an attribute `$attributeName`.
 	 *
 	 * {{{
-	 * $this->assertObjectNotHasAttribute('__construct', '\ReflectionClass');
+	 * $this->assertObjectNotHasAttribute('__construct', 'ReflectionClass');
 	 * }}}
 	 *
 	 * {{{
-	 * $this->assertObjectNotHasAttribute('name', '\ReflectionClass');
+	 * $this->assertObjectNotHasAttribute('name', 'ReflectionClass');
 	 * }}}
 	 *
 	 * @see    lithium\test\Unit::assertClassHasNotAttribute()
@@ -1912,52 +1929,6 @@ class Unit extends \lithium\core\Object {
 		return $this->assert(!$object->hasProperty($attributeName), $message, array(
 			'expected' => $attributeName,
 			'result' => $object->getProperties()
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$actual` matches $expected using `preg_match`.
-	 *
-	 * {{{
-	 * $this->assertRegExp('/^foo/', 'foobar');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertRegExp('/^foobar/', 'bar');
-	 * }}}
-	 *
-	 * @param  string $expected Regex to match against $actual
-	 * @param  string $actual   String to be matched upon
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertRegExp($expected, $actual, $message = '{:message}') {
-		return $this->assert(preg_match($expected, $actual, $matches) === 1, $message, array(
-			'expected' => $expected,
-			'result' => $matches
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$actual` does not match $expected using `preg_match`.
-	 *
-	 * {{{
-	 * $this->assertNotRegExp('/^foobar/', 'bar');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertNotRegExp('/^foo/', 'foobar');
-	 * }}}
-	 *
-	 * @param  string $expected Regex to match against $actual
-	 * @param  string $actual   String to be matched upon
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertNotRegExp($expected, $actual, $message = '{:message}') {
-		return $this->assert(preg_match($expected, $actual, $matches) === 0, $message, array(
-			'expected' => $expected,
-			'result' => $matches
 		));
 	}
 

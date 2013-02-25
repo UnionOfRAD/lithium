@@ -58,8 +58,7 @@ class CacheTest extends \lithium\test\Unit {
 	 */
 	public function testConfiguration() {
 		$loggers = Logger::config();
-		$result = isset($loggers['cachelog']);
-		$this->assertTrue($result);
+		$this->assertArrayHasKey('cachelog', $loggers);
 	}
 
 	/**
@@ -69,7 +68,7 @@ class CacheTest extends \lithium\test\Unit {
 	public function testWrite() {
 		$message = "CacheLog test message...";
 		$result = Logger::write('info', $message, array('name' => 'cachelog'));
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 		$result = CacheStorage::read('cachelog', 'cachelog_testkey');
 		$this->assertEqual($message, $result);
 	}

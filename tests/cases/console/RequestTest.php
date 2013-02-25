@@ -45,7 +45,7 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $request->env();
-		$this->assertTrue(!empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = getcwd();
 		$result = $result['working'];
@@ -134,7 +134,7 @@ class RequestTest extends \lithium\test\Unit {
 
 		$stream = fopen($this->streams['input'], 'w+');
 		$request = new Request(array('input' => $stream));
-		$this->assertTrue(is_resource($request->input));
+		$this->assertInternalType('resource', $request->input);
 		$this->assertEqual($stream, $request->input);
 
 		$this->assertEqual(2, fwrite($request->input, 'ok'));
@@ -179,7 +179,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function testTemporaryFileStructureExists() {
 		$resources = Libraries::get(true, 'resources');
 		$template = $resources . '/tmp/cache/templates/';
-		$this->assert(is_dir($template));
+		$this->assertFileExists($template);
 	}
 }
 

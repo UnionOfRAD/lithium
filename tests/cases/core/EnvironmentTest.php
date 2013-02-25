@@ -229,7 +229,7 @@ class EnvironmentTest extends \lithium\test\Unit {
 		$this->assertEqual(Environment::get(true), Environment::get('development'));
 
 		Environment::set('production');
-		$this->assertFalse(Environment::get(true));
+		$this->assertEmpty(Environment::get(true));
 	}
 }
 

@@ -73,7 +73,7 @@ class ResultTest extends \lithium\test\Unit {
 
 		$resource = new PDOStatement;
 		$result = new Result(compact('resource'));
-		$this->assertTrue($result->resource() instanceof PDOStatement);
+		$this->assertInstanceOf('PDOStatement', $result->resource());
 	}
 
 	public function testNext() {

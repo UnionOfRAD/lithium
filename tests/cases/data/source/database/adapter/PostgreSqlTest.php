@@ -105,12 +105,12 @@ class PostgreSqlTest extends \lithium\test\Unit {
 	public function testValueByIntrospect() {
 		$expected = "'string'";
 		$result = $this->db->value("string");
-		$this->assertTrue(is_string($result));
+		$this->assertInternalType('string', $result);
 		$this->assertEqual($expected, $result);
 
 		$expected = "'''this string is escaped'''";
 		$result = $this->db->value("'this string is escaped'");
-		$this->assertTrue(is_string($result));
+		$this->assertInternalType('string', $result);
 		$this->assertEqual($expected, $result);
 
 		$this->assertIdentical("'t'", $this->db->value(true));
@@ -151,11 +151,11 @@ class PostgreSqlTest extends \lithium\test\Unit {
 			'name' => 'Test',
 			'return' => 'array'
 		));
-		$this->assertEqual(1, count($result));
+		$this->assertCount(1, $result);
 		$expected = array('id', 'name', 'active', 'created', 'modified');
 		$this->assertEqual($expected, array_keys($result[0]));
 
-		$this->assertTrue(is_numeric($result[0]['id']));
+		$this->assertInternalType('numeric', $result[0]['id']);
 		unset($result[0]['id']);
 
 		$expected = array(
@@ -193,8 +193,8 @@ class PostgreSqlTest extends \lithium\test\Unit {
 
 	public function testEntityQuerying() {
 		$sources = $this->db->sources();
-		$this->assertTrue(is_array($sources));
-		$this->assertFalse(empty($sources));
+		$this->assertInternalType('array', $sources);
+		$this->assertNotEmpty($sources);
 	}
 
 	public function testQueryOrdering() {
@@ -207,19 +207,19 @@ class PostgreSqlTest extends \lithium\test\Unit {
 				'created' => date('Y-m-d H:i:s')
 			)
 		));
-		$this->assertIdentical(true, $this->db->create($insert));
+		$this->assertTrue($this->db->create($insert));
 
 		$insert->data(array(
 			'name' => 'Bar',
 			'created' => date('Y-m-d H:i:s', strtotime('-5 minutes'))
 		));
-		$this->assertIdentical(true, $this->db->create($insert));
+		$this->asserTrue($this->db->create($insert));
 
 		$insert->data(array(
 			'name' => 'Baz',
 			'created' => date('Y-m-d H:i:s', strtotime('-10 minutes'))
 		));
-		$this->assertIdentical(true, $this->db->create($insert));
+		$this->assertTrue($this->db->create($insert));
 
 		$read = new Query(array(
 			'type' => 'read',

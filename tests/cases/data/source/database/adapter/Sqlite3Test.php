@@ -192,7 +192,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 			$this->assertEqual($cpt, $employee->id);
 		}
 		$this->assertEqual(8, $cpt);
-		$this->assertEqual(8, count($employees));
+		$this->assertCount(8, $employees);
 
 		Employees::reset();
 		Companies::reset();
@@ -227,7 +227,7 @@ class Sqlite3Test extends \lithium\test\Unit {
 			$this->assertEqual($cpt, $employee->id);
 		}
 		$this->assertEqual(8, $cpt);
-		$this->assertEqual(8, count($employees));
+		$this->assertCount(8, $employees);
 
 		$this->_cleanUp();
 		Connections::get('test')->read('DROP TABLE employees;');

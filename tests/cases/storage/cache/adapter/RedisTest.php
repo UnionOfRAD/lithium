@@ -70,7 +70,7 @@ class RedisTest extends \lithium\test\Unit {
 		$time = strtotime($expiry);
 
 		$closure = $this->redis->write($key, $data, $expiry);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'data', 'expiry');
 		$result = $closure($this->redis, $params, null);
@@ -92,7 +92,7 @@ class RedisTest extends \lithium\test\Unit {
 		$time = strtotime($expiry);
 
 		$closure = $this->redis->write($key, $data, $expiry);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'data', 'expiry');
 		$result = $closure($this->redis, $params, null);
@@ -116,7 +116,7 @@ class RedisTest extends \lithium\test\Unit {
 		$time = strtotime('+5 seconds');
 
 		$closure = $redis->write($key, $data);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'data');
 		$result = $closure($redis, $params, null);
@@ -150,7 +150,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$closure = $this->redis->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -171,7 +171,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$closure = $this->redis->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -188,7 +188,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$closure = $this->redis->read(array_keys($data));
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = array('key' => array_keys($data));
 		$result = $closure($this->redis, $params, null);
@@ -207,7 +207,7 @@ class RedisTest extends \lithium\test\Unit {
 		$time = strtotime($expiry);
 
 		$closure = $this->redis->write($key, $expiry);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = array('key' => $key, 'data' => $expiry, 'expiry' => null);
 		$result = $closure($this->redis, $params, null);
@@ -222,7 +222,7 @@ class RedisTest extends \lithium\test\Unit {
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
 		$closure = $this->redis->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -239,7 +239,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$closure = $this->redis->delete($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -251,7 +251,7 @@ class RedisTest extends \lithium\test\Unit {
 	public function testDeleteNonExistentKey() {
 		$key = 'delete_key';
 		$closure = $this->redis->delete($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -265,7 +265,7 @@ class RedisTest extends \lithium\test\Unit {
 		$time = strtotime($expiry);
 
 		$closure = $this->redis->write($key, $data, $expiry);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'data', 'expiry');
 		$result = $closure($this->redis, $params, null);
@@ -276,7 +276,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$closure = $this->redis->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -284,7 +284,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$closure = $this->redis->delete($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -315,7 +315,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$closure = $this->redis->decrement($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -336,7 +336,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$closure = $this->redis->decrement($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -357,7 +357,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$closure = $this->redis->increment($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -378,7 +378,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$closure = $this->redis->increment($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->redis, $params, null);
@@ -400,7 +400,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($result, array('some_key'), 'redis method dispatch failed');
 
 		$result = $this->redis->info();
-		$this->assertTrue(is_array($result), 'redis method dispatch failed');
+		$this->assertInternalType('array', $assertInternalType, 'redis method dispatch failed');
 	}
 
 	public function testRespondsTo() {

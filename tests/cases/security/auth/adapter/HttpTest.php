@@ -24,7 +24,7 @@ class HttpTest extends \lithium\test\Unit {
 	public function testCheckBasicIsFalse() {
 		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($this->request);
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$expected = array('WWW-Authenticate: Basic realm="' . basename(LITHIUM_APP_PATH) . '"');
 		$result = $http->headers;
@@ -37,7 +37,7 @@ class HttpTest extends \lithium\test\Unit {
 		));
 		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($request);
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$expected = array();
 		$result = $http->headers;
@@ -63,7 +63,7 @@ class HttpTest extends \lithium\test\Unit {
 		$request = new Request(array('env' => array('PHP_AUTH_DIGEST' => $digest)));
 		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($request);
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$expected = array();
 		$result = $http->headers;

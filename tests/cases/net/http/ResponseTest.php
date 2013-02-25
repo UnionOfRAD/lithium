@@ -409,7 +409,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$body = "\n<html>...</html>\n";
 		$message = "\r\n\r\n{$body}";
 		$response = new Response(compact('message'));
-		$this->assertFalse($response->headers());
+		$this->assertEmpty($response->headers());
 		$this->assertEqual(trim($body), $response->body());
 	}
 

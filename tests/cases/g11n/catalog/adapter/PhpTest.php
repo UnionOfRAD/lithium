@@ -128,7 +128,7 @@ EOD;
 		file_put_contents("{$this->_path}/fr/message/li3_docs.php", $data);
 
 		$result = $this->adapter->read('message', 'fr', null);
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = $this->adapter->read('message', 'fr', 'li3_docs');
 		$expected = array(
@@ -193,7 +193,7 @@ EOD;
 		);
 		$this->assertEqual($expected, $result['politics']);
 
-		$this->assertTrue(is_callable($result['plural']['translated']));
+		$this->assertInternalType('callable', $result['plural']['translated']);
 
 		$expected = 123;
 		$result = $result['plural']['translated']();

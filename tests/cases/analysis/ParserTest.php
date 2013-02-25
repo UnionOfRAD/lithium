@@ -54,7 +54,7 @@ class ParserTest extends \lithium\test\Unit {
 
 	public function testFullTokenization() {
 		$result = Parser::tokenize('$foo = function() {};');
-		$this->assertEqual(11, count($result));
+		$this->assertCount(11, $result);
 
 		$expected = array(
 			'id' => T_VARIABLE,
@@ -70,7 +70,7 @@ class ParserTest extends \lithium\test\Unit {
 		$code = '$defaults = array("id" => "foo", "name" => "bar", \'count\' => 5);';
 		$result = Parser::tokenize($code);
 
-		$this->assertEqual(27, count($result));
+		$this->assertCount(27, $result);
 		$this->assertEqual('T_VARIABLE', $result[0]['name']);
 		$this->assertEqual('$defaults', $result[0]['content']);
 	}

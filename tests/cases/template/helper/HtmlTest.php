@@ -346,10 +346,10 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function testNonInlineScriptsAndStyles() {
 		$result = trim($this->context->scripts());
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = $this->html->script('application', array('inline' => false));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = $this->context->scripts();
 		$this->assertTags($result, array('script' => array(
@@ -357,10 +357,10 @@ class HtmlTest extends \lithium\test\Unit {
 		)));
 
 		$result = trim($this->context->styles());
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = $this->html->style('base', array('inline' => false));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = $this->context->styles();
 		$this->assertTags($result, array('link' => array(

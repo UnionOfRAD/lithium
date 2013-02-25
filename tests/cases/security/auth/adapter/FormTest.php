@@ -395,7 +395,7 @@ class FormTest extends \lithium\test\Unit {
 		));
 
 		$request = (object) array('data' => array('name' => 'Foo', 'password' => 'bar'));
-		$this->assertTrue($subject->check($request));
+		$this->assertNotEmpty($subject->check($request));
 	}
 }
 

@@ -216,7 +216,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertPattern('%^foo/media_test/css/debug\.css\?type=test&\d+$%', $result);
 
 		$file = Media::path('css/debug.css', 'bar', array('library' => 'media_test'));
-		$this->assertTrue(file_exists($file));
+		$this->assertFileExists($file);
 
 		$result = Media::asset('this.file.should.not.exist', 'css', array('check' => true));
 		$this->assertFalse($result);
@@ -630,7 +630,7 @@ class MediaTest extends \lithium\test\Unit {
 		}
 
 		Libraries::add('media_test', array('path' => "{$resources}/media_test"));
-		$this->assertTrue(is_dir(Media::webroot('media_test')));
+		$this->assertFileExists(Media::webroot('media_test'));
 		Libraries::remove('media_test');
 		rmdir($webroot);
 	}
