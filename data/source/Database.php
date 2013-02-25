@@ -1104,56 +1104,71 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Return formatted clause for order.
+	 * Return formatted clause for `ORDER BY`.
 	 *
-	 * @param mixed $order The `order` clause to be formatted
+	 * @param mixed $order The clause to be formatted
 	 * @param object $context
-	 * @return mixed Formatted `order` clause.
+	 * @return string Formatted clause.
 	 */
 	public function order($order, $context) {
-		$direction = 'ASC';
+		return $this->_sort($order, $context);
+	}
+
+	/**
+	 * Return formatted clause for `GROUP BY`.
+	 *
+	 * @param mixed $group The clause to be formatted
+	 * @param object $context
+	 * @return string Formatted clause.
+	 */
+	public function group($group, $context) {
+		return $this->_sort($group, $context, 'GROUP BY', false);
+	}
+
+	/**
+	 * Helper method
+	 * 
+	 * @see lithium\data\source\Database::order()
+	 * @see lithium\data\source\Database::group()
+	 * @param mixed $field The field
+	 * @param object $context
+	 * @return string Formatted clause.
+	 */
+	protected function _sort($field, $context, $clause = 'ORDER BY', $direction = true) {
+		$direction = $direction ? ' ASC' : '';
 		$model = $context->model();
 
-		if (is_string($order)) {
-			if (!$model::schema($order)) {
-				$match = '/\s+(A|DE)SC/i';
-				return "ORDER BY {$order}" . (preg_match($match, $order) ? '' : " {$direction}");
+		if (is_string($field)) {
+			if (preg_match('/^(.*?)\s+((?:A|DE)SC)$/i', $field, $match)) {
+				$field = $match[1];
+				$direction = $match[2];
 			}
-			$order = array($order => $direction);
+			$field = array($field => $direction);
 		}
 
-		if (!is_array($order)) {
+		if (!is_array($field)) {
 			return;
 		}
 		$result = array();
 
-		foreach ($order as $column => $dir) {
+		foreach ($field as $column => $dir) {
 			if (is_int($column)) {
 				$column = $dir;
 				$dir = $direction;
 			}
-			$dir = in_array($dir, array('ASC', 'asc', 'DESC', 'desc')) ? $dir : $direction;
+			$dir = in_array($dir, array('ASC', 'asc', 'DESC', 'desc')) ? " {$dir}" : $direction;
 
-			if (!$model) {
-				$result[] = "{$column} {$dir}";
+			if ($model && $field = $model::schema($column)) {
+				$column = $this->name($column);
+				$name = $this->name($context->alias()) . '.' . $column;
+				$result[] = "{$name}{$dir}";
 				continue;
 			}
-			if ($field = $model::schema($column)) {
-				$name = $this->name($model::meta('name')) . '.' . $this->name($column);
-				$result[] = "{$name} {$dir}";
-				continue;
-			}
-			$result[] = "{$column} {$dir}";
+			$column = $this->name($column);
+			$result[] = "{$column}{$dir}";
 		}
-		$order = join(', ', $result);
-		return "ORDER BY {$order}";
-	}
-
-	public function group($group, $context = null) {
-		if (!$group) {
-			return null;
-		}
-		return 'GROUP BY ' . join(', ', (array) $group);
+		$fields = join(', ', $result);
+		return "$clause {$fields}";
 	}
 
 	/**
