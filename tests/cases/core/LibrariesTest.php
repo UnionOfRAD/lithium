@@ -77,7 +77,7 @@ class LibrariesTest extends \lithium\test\Unit {
 			'format' => false,
 		));
 
-		$this->assertCount(2, $analysis);
+		$this->assertIdentical(2, count($analysis));
 		$this->assertPattern('/Docblock\.php/', $docblock);
 		$this->assertPattern('/Debugger\.php/', $debugger);
 	}
