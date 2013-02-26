@@ -27,23 +27,47 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @var array
 	 */
 	protected $_columns = array(
-		'primary_key' => array('name' => 'SERIAL not null'),
-		'string' => array('name' => 'varchar', 'length' => 255),
-		'text' => array('name' => 'text'),
-		'integer' => array('name' => 'integer', 'formatter' => 'intval'),
-		'float' => array('name' => 'float', 'formatter' => 'floatval'),
+		'id' => array('use' => 'integer', 'increment' => true),
+		'string' => array('use' => 'varchar', 'length' => 255),
+		'text' => array('use' => 'text'),
+		'integer' => array('use' => 'integer', 'formatter' => 'intval'),
+		'float' => array('use' => 'real', 'formatter' => 'floatval'),
 		'datetime' => array(
-			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
+			'use' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
 		),
-		'timestamp' => array(
-			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
+		'time' => array('use' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
+		'date' => array('use' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
+		'binary' => array('use' => 'bytea'),
+		'boolean' => array('use' => 'boolean'),
+		'inet' => array('use' => 'inet')
+	);
+
+	/**
+	 * Column/table metas
+	 * By default `'escape'` is false and 'join' is `' '`
+	 *
+	 * @var array
+	 */
+	protected $_metas = array(
+		'table' => array(
+			'tablespace' => array('keyword' => 'TABLESPACE')
+		)
+	);
+
+	/**
+	 * Column contraints
+	 *
+	 * @var array
+	 */
+	protected $_constraints = array(
+		'primary' => array('template' => 'PRIMARY KEY ({:column})'),
+		'foreign_key' => array(
+			'template' => 'FOREIGN KEY ({:column}) REFERENCES {:to} ({:toColumn}) {:on}'
 		),
-		'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
-		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
-		'binary' => array('name' => 'bytea'),
-		'boolean' => array('name' => 'boolean'),
-		'number' => array('name' => 'numeric'),
-		'inet' => array('name' => 'inet')
+		'unique' => array(
+			'template' => 'UNIQUE {:index} ({:column})'
+		),
+		'check' => array('template' => 'CHECK ({:expr})')
 	);
 
 	/**
@@ -106,6 +130,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			'arrays' => false,
 			'transactions' => true,
 			'booleans' => true,
+			'schema' => true,
 			'relationships' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
@@ -433,6 +458,40 @@ class PostgreSql extends \lithium\data\source\Database {
 
 	protected function _toNativeBoolean($value) {
 		return $this->connection->quote($value ? 't' : 'f');
+	}
+
+	/**
+	 * Helper for `DatabaseSchema::_column()`
+	 *
+	 * @param array $field A field array
+	 * @return string SQL column string
+	 */
+	protected function _buildColumn($field) {
+		extract($field);
+		if ($type === 'float' && $precision) {
+			$use = 'numeric';
+		}
+
+		if ($precision) {
+			$precision = $use === 'numeric' ? ",{$precision}" : '';
+		}
+
+		$out = $this->name($name);
+
+		if (isset($increment) && $increment) {
+			$out .= ' serial NOT NULL';
+		} else {
+			$out .= ' ' . $use;
+
+			if ($length && preg_match('/char|numeric|interval|bit|time/',$use)) {
+				$out .= "({$length}{$precision})";
+			}
+
+			$out .= is_bool($null) ? ($null ? ' NULL' : ' NOT NULL') : '' ;
+			$out .= $default ? ' DEFAULT ' . $this->value($default, $field) : '';
+		}
+
+		return $out;
 	}
 }
 

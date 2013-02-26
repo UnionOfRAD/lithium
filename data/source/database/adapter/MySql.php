@@ -27,21 +27,54 @@ class MySql extends \lithium\data\source\Database {
 	 * @var array
 	 */
 	protected $_columns = array(
-		'primary_key' => array('name' => 'NOT NULL AUTO_INCREMENT'),
-		'string' => array('name' => 'varchar', 'length' => 255),
-		'text' => array('name' => 'text'),
-		'integer' => array('name' => 'int', 'length' => 11, 'formatter' => 'intval'),
-		'float' => array('name' => 'float', 'formatter' => 'floatval'),
-		'datetime' => array('name' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
-		'timestamp' => array(
-			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
-		),
-		'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
-		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
-		'binary' => array('name' => 'blob'),
-		'boolean' => array('name' => 'tinyint', 'length' => 1)
+		'id' => array('use' => 'int', 'length' => 11, 'increment' => true),
+		'string' => array('use' => 'varchar', 'length' => 255),
+		'text' => array('use' => 'text'),
+		'integer' => array('use' => 'int', 'length' => 11, 'formatter' => 'intval'),
+		'float' => array('use' => 'float', 'formatter' => 'floatval'),
+		'datetime' => array('use' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
+		'time' => array('use' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
+		'date' => array('use' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
+		'binary' => array('use' => 'blob'),
+		'boolean' => array('use' => 'tinyint', 'length' => 1)
 	);
-
+	/**
+	 * Meta atrribute syntax
+	 * By default `'escape'` is false and 'join' is `' '`
+	 *
+	 * @var array
+	 */
+	protected $_metas = array(
+		'column' => array(
+			'charset' => array('keyword' => 'CHARACTER SET'),
+			'collate' => array('keyword' => 'COLLATE'),
+			'comment' => array('keyword' => 'COMMENT', 'escape' => true)
+		),
+		'table' => array(
+			'charset' => array('keyword' => 'DEFAULT CHARSET'),
+			'collate' => array('keyword' => 'COLLATE'),
+			'engine' => array('keyword' => 'ENGINE'),
+			'tablespace' => array('keyword' => 'TABLESPACE')
+		)
+	);
+	/**
+	 * Column contraints
+	 *
+	 * @var array
+	 */
+	protected $_constraints = array(
+		'primary' => array('template' => 'PRIMARY KEY ({:column})'),
+		'foreign_key' => array(
+			'template' => 'FOREIGN KEY ({:column}) REFERENCES {:to} ({:toColumn}) {:on}'
+		),
+		'index' => array('template' => 'INDEX ({:column})'),
+		'unique' => array(
+			'template' => 'UNIQUE {:index} ({:column})',
+			'key' => 'KEY',
+			'index' => 'INDEX'
+		),
+		'check' => array('template' => 'CHECK ({:expr})')
+	);
 	/**
 	 * Pair of opening and closing quote characters used for quoting identifiers in queries.
 	 *
@@ -96,6 +129,7 @@ class MySql extends \lithium\data\source\Database {
 			'arrays' => false,
 			'transactions' => false,
 			'booleans' => true,
+			'schema' => true,
 			'relationships' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
@@ -357,6 +391,39 @@ class MySql extends \lithium\data\source\Database {
 			break;
 		}
 		return $column;
+	}
+
+	/**
+	 * Helper for `DatabaseSchema::_column()`
+	 *
+	 * @param array $field A field array
+	 * @return string The SQL column string
+	 */
+	protected function _buildColumn($field) {
+		extract($field);
+		if ($type === 'float' && $precision) {
+			$use = 'decimal';
+		}
+
+		$out = $this->name($name) . ' ' . $use;
+
+		$allowPrecision = preg_match('/^(decimal|float|double|real|numeric)$/',$use);
+		$precision = ($precision && $allowPrecision) ? ",{$precision}" : '';
+
+		if ($length && ($allowPrecision || preg_match('/(char|binary|int|year)/',$use))) {
+			$out .= "({$length}{$precision})";
+		}
+
+		$out .= $this->_buildMetas('column', $field, array('charset', 'collate'));
+
+		if (isset($increment) && $increment) {
+			$out .= ' NOT NULL AUTO_INCREMENT';
+		} else {
+			$out .= is_bool($null) ? ($null ? ' NULL' : ' NOT NULL') : '' ;
+			$out .= $default ? ' DEFAULT ' . $this->value($default, $field) : '';
+		}
+
+		return $out . $this->_buildMetas('column', $field, array('comment'));
 	}
 }
 
