@@ -1161,9 +1161,10 @@ class Model extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$self = static::_object();
 		$validator = $self->_classes['validator'];
+		$entity->errors(false);
 		$params = compact('entity', 'options');
 
-		$filter = function($parent, $params) use (&$self, $validator) {
+		$filter = function($parent, $params) use ($validator) {
 			$entity = $params['entity'];
 			$options = $params['options'];
 			$rules = $options['rules'];

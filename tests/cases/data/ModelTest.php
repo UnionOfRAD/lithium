@@ -634,6 +634,20 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual($errors, $antique->errors());
 	}
 
+	public function testErrorsIsClearedOnEachValidates() {
+		$post = MockPostForValidates::create(array('title' => 'new post'));
+		$result = $post->validates();
+		$this->assertFalse($result);
+		$result = $post->errors();
+		$this->assertNotEmpty($result);
+
+		$post->email = 'contact@lithify.me';
+		$result = $post->validates();
+		$this->assertTrue($result);
+		$result = $post->errors();
+		$this->assertEmpty($result);
+	}
+
 	public function testDefaultValuesFromSchema() {
 		$creator = MockCreator::create();
 

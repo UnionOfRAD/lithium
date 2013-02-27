@@ -118,6 +118,71 @@ class EntityTest extends \lithium\test\Unit {
 		$entity->errors($errors);
 		$this->assertEqual($errors, $entity->errors());
 		$this->assertEqual('Something bad happened.', $entity->errors('foo'));
+
+		$otherError = array('bar' => 'Something really bad happened.');
+		$errors += $otherError;
+		$entity->errors($otherError);
+		$this->assertEqual($errors, $entity->errors());
+
+		$this->assertCount(2, $entity->errors());
+		$this->assertEqual('Something bad happened.', $entity->errors('foo'));
+		$this->assertEqual('Something really bad happened.', $entity->errors('bar'));
+	}
+
+	public function testResetErrors() {
+		$entity = new Entity();
+		$errors = array(
+			'foo' => 'Something bad happened.',
+			'bar' => 'Something really bad happened.'
+		);
+
+		$entity->errors($errors);
+		$this->assertEqual($errors, $entity->errors());
+
+		$entity->errors(false);
+		$this->assertEmpty($entity->errors());
+	}
+
+	public function testAppendingErrors() {
+		$entity = new Entity();
+		$expected = array(
+			'Something bad happened.',
+			'Something really bad happened.'
+		);
+
+		$entity->errors('foo', $expected[0]);
+		$entity->errors('foo', $expected[1]);
+
+		$this->assertCount(1, $entity->errors());
+		$this->assertEqual($expected, $entity->errors('foo'));
+	}
+
+	public function testAppendingErrorsWithArraySyntax() {
+		$entity = new Entity();
+		$expected = array(
+			'Something bad happened.',
+			'Something really bad happened.'
+		);
+
+		$entity->errors(array('foo' => $expected[0]));
+		$entity->errors(array('foo' => $expected[1]));
+
+		$this->assertCount(1, $entity->errors());
+		$this->assertEqual($expected, $entity->errors('foo'));
+	}
+
+	public function testAppendingErrorsWithMixedSyntax() {
+		$entity = new Entity();
+		$expected = array(
+			'Something bad happened.',
+			'Something really bad happened.'
+		);
+
+		$entity->errors('foo', $expected[0]);
+		$entity->errors(array('foo' => $expected[1]));
+
+		$this->assertCount(1, $entity->errors());
+		$this->assertEqual($expected, $entity->errors('foo'));
 	}
 
 	public function testConversion() {
