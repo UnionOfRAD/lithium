@@ -216,6 +216,35 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue(array_key_exists('price', $result->fields()));
 	}
 
+	public function testInitializationInheritance() {
+		$meta = array (
+			'name' => 'MockAntiqueForSchemas',
+			'source' => 'mock_products',
+			'title' => 'name',
+			'class' => 'lithium\tests\mocks\data\MockAntiqueForSchemas',
+			'connection' => false
+		);
+		$this->assertEqual($meta, MockAntiqueForSchemas::meta());
+
+		$this->assertArrayHasKey('MockCreator', MockAntiqueForSchemas::relations());
+
+		$this->assertCount(3, MockAntiqueForSchemas::finders());
+
+		$this->assertCount(1, MockAntiqueForSchemas::initializers());
+
+		$config = array(
+			'query' => array(
+				'with' => array('MockCreator')
+			)
+		);
+		MockProductForSchemas::config(compact('config'));
+		$this->assertEqual(MockProductForSchemas::query(), MockAntiqueForSchemas::query());
+		
+		$expected = array('limit' => 50) + MockProductForSchemas::query();
+		MockAntiqueForSchemas::config(array('query' => $expected));
+		$this->assertEqual($expected, MockAntiqueForSchemas::query());
+	}
+
 	public function testFieldIntrospection() {
 		$this->assertNotEmpty(MockComment::hasField('comment_id'));
 		$this->assertEmpty(MockComment::hasField('foo'));
@@ -580,6 +609,29 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 		$result = $post->errors();
 		$this->assertEmpty($result);
+	}
+
+	public function testValidationInheritance() {
+		$product = MockProductForSchemas::create();
+		$antique = MockAntiqueForSchemas::create();
+
+		$errors = array(
+			'name' => array('Name cannot be empty.'),
+			'price' => array(
+				'Price cannot be empty.',
+				'Price must have a numeric value.'
+			)
+		);
+
+		$this->assertFalse($product->validates());
+		$this->assertEqual($errors, $product->errors());
+
+		$errors += array(
+			'refurb' => array('Must have a boolean value.')
+		);
+
+		$this->assertFalse($antique->validates());
+		$this->assertEqual($errors, $antique->errors());
 	}
 
 	public function testDefaultValuesFromSchema() {

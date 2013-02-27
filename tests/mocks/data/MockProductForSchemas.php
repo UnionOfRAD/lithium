@@ -8,15 +8,45 @@
 
 namespace lithium\tests\mocks\data;
 
-
 class MockProductForSchemas extends \lithium\data\Model {
 
 	protected $_meta = array('source' => false, 'connection' => false);
 
 	protected $_schema = array(
-    'name' => array('type' => 'string', 'null' => false),
-    'price' => array('type' => 'string', 'null' => false)
+		'name' => array('type' => 'string', 'null' => false),
+		'price' => array('type' => 'string', 'null' => false),
 	);
+
+	public $hasOne = array('MockCreator');
+
+	public $validates = array(
+		'name' => array(
+			array(
+				'notEmpty',
+				'message' => 'Name cannot be empty.'
+			)
+		),
+		'price' => array(
+			array(
+				'notEmpty',
+				'message' => 'Price cannot be empty.'
+			),
+			array(
+				'numeric',
+				'message' => 'Price must have a numeric value.'
+			)
+		)
+	);
+
+	public static function finders() {
+		$self = static::_object();
+		return $self->_finders;
+	}
+
+	public static function initializers() {
+		$self = static::_object();
+		return $self->_initializers;
+	}
 }
 
 ?>
