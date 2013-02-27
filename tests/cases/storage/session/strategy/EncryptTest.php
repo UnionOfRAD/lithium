@@ -38,7 +38,7 @@ class EncryptTest extends \lithium\test\Unit {
 
 	public function testConstruct() {
 		$encrypt = new Encrypt(array('secret' => $this->secret));
-		$this->assertTrue($encrypt instanceof Encrypt);
+		$this->assertInstanceOf('lithium\storage\session\strategy\Encrypt', $encrypt);
 	}
 
 	public function testWrite() {
@@ -50,9 +50,9 @@ class EncryptTest extends \lithium\test\Unit {
 		$result = $encrypt->write($value, array('class' => $this->mock, 'key' => $key));
 		$cookie = MockCookieSession::data();
 
-		$this->assertTrue($result);
-		$this->assertTrue($cookie['__encrypted']);
-		$this->assertTrue(is_string($cookie['__encrypted']));
+		$this->assertNotEmpty($result);
+		$this->assertNotEmpty($cookie['__encrypted']);
+		$this->assertInternalType('string', $cookie['__encrypted']);
 		$this->assertNotEqual($cookie['__encrypted'], $value);
 	}
 
@@ -63,7 +63,7 @@ class EncryptTest extends \lithium\test\Unit {
 		$value = 'barvalue';
 
 		$result = $encrypt->write($value, array('class' => $this->mock, 'key' => $key));
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$cookie = MockCookieSession::data();
 		$result = $encrypt->read($key, array('class' => $this->mock, 'key' => $key));
@@ -79,7 +79,7 @@ class EncryptTest extends \lithium\test\Unit {
 		$value = 'barvalue';
 
 		$result = $encrypt->write($value, array('class' => $this->mock, 'key' => $key));
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$cookie = MockCookieSession::data();
 		$result = $encrypt->read($key, array('class' => $this->mock, 'key' => $key));
@@ -89,10 +89,10 @@ class EncryptTest extends \lithium\test\Unit {
 		$result = $encrypt->delete($key, array('class' => $this->mock, 'key' => $key));
 
 		$cookie = MockCookieSession::data();
-		$this->assertTrue(empty($cookie['__encrypted']));
+		$this->assertEmpty($cookie['__encrypted']);
 
 		$result = $encrypt->read($key, array('class' => $this->mock));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 }
 

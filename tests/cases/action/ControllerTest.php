@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\action;
 
 use lithium\action\Request;
-use lithium\action\Response;
 use lithium\action\Controller;
 use lithium\tests\mocks\action\MockPostsController;
 use lithium\tests\mocks\action\MockControllerRequest;
@@ -39,7 +38,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$postsController = new MockPostsController();
 		$result = $postsController->__invoke(null, array('action' => 'index', 'args' => array()));
 
-		$this->assertTrue($result instanceof Response);
+		$this->assertInstanceOf('lithium\action\Response', $result);
 		$this->assertEqual('List of posts', $result->body());
 		$this->assertEqual(array('Content-Type' => 'text/plain; charset=UTF-8'), $result->headers);
 
@@ -50,7 +49,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->expectException('/Unhandled media type/');
 		$result = $postsController(null, array('action' => 'index', 'args' => array(true)));
 
-		$this->assertTrue($result instanceof Response);
+		$this->assertInstanceOf('lithium\action\Response', $result);
 		$this->assertEqual($result->body, '');
 
 		$headers = array('Content-Type' => 'text/html; charset=UTF-8');
@@ -62,7 +61,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$postsController = new MockPostsController();
 		$result = $postsController(null, array('action' => 'view', 'args' => array('2')));
 
-		$this->assertTrue($result instanceof Response);
+		$this->assertInstanceOf('lithium\action\Response', $result);
 		$this->assertEqual($result->body, "Array\n(\n    [0] => This is a post\n)\n");
 
 		$headers = array('status' => 200, 'Content-Type' => 'text/plain; charset=UTF-8');

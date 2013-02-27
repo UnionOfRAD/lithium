@@ -8,8 +8,6 @@
 
 namespace lithium\tests\cases\test;
 
-use lithium\test\Group;
-use lithium\test\Report;
 use lithium\test\Dispatcher;
 use lithium\util\Collection;
 use lithium\tests\mocks\test\cases\MockTest;
@@ -22,10 +20,10 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function testRunDefaults() {
 		$report = Dispatcher::run();
-		$this->assertTrue($report instanceof Report);
+		$this->assertInstanceOf('lithium\test\Report', $report);
 
 		$result = $report->group;
-		$this->assertTrue($result instanceof Group);
+		$this->assertInstanceOf('lithium\test\Group', $result);
 	}
 
 	public function testRunWithReporter() {
@@ -34,10 +32,10 @@ class DispatcherTest extends \lithium\test\Unit {
 				return $info;
 			}
 		));
-		$this->assertTrue($report instanceof Report);
+		$this->assertInstanceOf('lithium\test\Report', $report);
 
 		$result = $report->group;
-		$this->assertTrue($result instanceof Group);
+		$this->assertInstanceOf('lithium\test\Group', $result);
 	}
 
 	public function testRunCaseWithString() {

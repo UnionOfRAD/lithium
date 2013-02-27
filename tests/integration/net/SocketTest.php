@@ -9,7 +9,6 @@
 namespace lithium\tests\integration\net;
 
 use lithium\net\socket\Curl;
-use lithium\net\http\Response;
 use lithium\net\socket\Stream;
 use lithium\net\socket\Context;
 
@@ -36,7 +35,7 @@ class SocketTest extends \lithium\test\Integration {
 		$socket = new Context($this->_testConfig);
 		$this->assertTrue($socket->open());
 		$response = $socket->send();
-		$this->assertTrue($response instanceof Response);
+		$this->assertInstanceOf('lithium\net\http\Response', $response);
 
 		$expected = 'google.com';
 		$result = $response->host;
@@ -53,7 +52,7 @@ class SocketTest extends \lithium\test\Integration {
 		$socket = new Curl($this->_testConfig);
 		$this->assertTrue($socket->open());
 		$response = $socket->send();
-		$this->assertTrue($response instanceof Response);
+		$this->assertInstanceOf('lithium\net\http\Response', $response);
 
 		$expected = 'google.com';
 		$result = $response->host;
@@ -67,7 +66,7 @@ class SocketTest extends \lithium\test\Integration {
 		$socket = new Stream($this->_testConfig);
 		$this->assertTrue($socket->open());
 		$response = $socket->send();
-		$this->assertTrue($response instanceof Response);
+		$this->assertInstanceOf('lithium\net\http\Response', $response);
 
 		$expected = 'google.com';
 		$result = $response->host;

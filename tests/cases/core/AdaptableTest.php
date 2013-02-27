@@ -13,8 +13,6 @@ use lithium\core\Adaptable;
 use lithium\storage\cache\adapter\Memory;
 use lithium\tests\mocks\core\MockAdapter;
 use lithium\tests\mocks\core\MockStrategy;
-use lithium\tests\mocks\storage\cache\strategy\MockSerializer;
-use lithium\tests\mocks\storage\cache\strategy\MockConfigurizer;
 use lithium\test\Mocker;
 
 class AdaptableTest extends \lithium\test\Unit {
@@ -25,7 +23,7 @@ class AdaptableTest extends \lithium\test\Unit {
 	}
 
 	public function testConfig() {
-		$this->assertFalse($this->adaptable->config());
+		$this->assertEmpty($this->adaptable->config());
 
 		$items = array(array(
 			'adapter' => 'some\adapter',
@@ -60,7 +58,7 @@ class AdaptableTest extends \lithium\test\Unit {
 
 		$result = $this->adaptable->reset();
 		$this->assertNull($result);
-		$this->assertFalse($this->adaptable->config());
+		$this->assertEmpty($this->adaptable->config());
 	}
 
 	public function testNonExistentConfig() {
@@ -114,9 +112,10 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $strategy::strategies('default');
-		$this->assertTrue($result instanceof SplDoublyLinkedList);
-		$this->assertEqual(count($result), 1);
-		$this->assertTrue($result->top() instanceof MockSerializer);
+		$this->assertInstanceOf('SplDoublyLinkedList', $result);
+		$this->assertCount(1, $result);
+		$obj = $result->top();
+		$this->assertInstanceOf('lithium\tests\mocks\storage\cache\strategy\MockSerializer', $obj);
 	}
 
 	public function testInvalidStrategy() {
@@ -133,14 +132,15 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->expectException($message);
 
 		$result = $strategy::strategies('default');
-		$this->assertTrue($result instanceof SplDoublyLinkedList);
+		$this->assertInstanceOf('SplDoublyLinkedList', $result);
 	}
 
 	public function testStrategyConstructionSettings() {
+		$mockConfigurizer = 'lithium\tests\mocks\storage\cache\strategy\MockConfigurizer';
 		$strategy = new MockStrategy();
 		$items = array('default' => array(
 			'strategies' => array(
-				'lithium\tests\mocks\storage\cache\strategy\MockConfigurizer' => array(
+				$mockConfigurizer => array(
 					'key1' => 'value1', 'key2' => 'value2'
 				)
 			),
@@ -153,9 +153,9 @@ class AdaptableTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $strategy::strategies('default');
-		$this->assertTrue($result instanceof SplDoublyLinkedList);
+		$this->assertInstanceOf('SplDoublyLinkedList', $result);
 		$this->assertEqual(count($result), 1);
-		$this->assertTrue($result->top() instanceof MockConfigurizer);
+		$this->assertInstanceOf($mockConfigurizer, $result->top());
 	}
 
 	public function testNonExistentStrategyConfiguration() {

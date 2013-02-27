@@ -14,7 +14,6 @@ use lithium\util\Collection;
 use lithium\tests\cases\data\ModelTest;
 use lithium\tests\cases\core\ObjectTest;
 use lithium\tests\cases\g11n\CatalogTest;
-use lithium\tests\mocks\test\MockUnitTest;
 use lithium\tests\mocks\test\cases\MockTest;
 use lithium\tests\mocks\test\cases\MockTestErrorHandling;
 use lithium\tests\mocks\test\cases\MockSkipThrowsException;
@@ -52,7 +51,7 @@ class GroupTest extends \lithium\test\Unit {
 		$group->add('');
 		$group->add('\\');
 		$group->add('foobar');
-		$this->assertFalse($group->items());
+		$this->assertEmpty($group->items());
 	}
 
 	public function testAddByString() {
@@ -111,10 +110,10 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$results = $group->tests();
-		$this->assertTrue($results instanceof Collection);
+		$this->assertInstanceOf('lithium\util\Collection', $results);
 
 		$results = $group->tests();
-		$this->assertTrue($results->current() instanceof CatalogTest);
+		$this->assertInstanceOf('lithium\tests\cases\g11n\CatalogTest', $results->current());
 	}
 
 	public function testAddEmptyTestsRun() {
@@ -124,8 +123,8 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$results = $group->tests();
-		$this->assertTrue($results instanceof Collection);
-		$this->assertTrue($results->current() instanceof MockUnitTest);
+		$this->assertInstanceOf('lithium\util\Collection', $results);
+		$this->assertInstanceOf('lithium\tests\mocks\test\MockUnitTest', $results->current());
 
 		$results = $group->tests()->run();
 

@@ -100,16 +100,16 @@ class SourceTest extends \lithium\test\Integration {
 		$new = Companies::create(array($key => 12345, 'name' => 'Acme, Inc.'));
 
 		$result = $new->data();
-		$this->assertTrue($result !== null);
+		$this->assertNotNull($result);
 		$this->assertTrue($new->save());
 		$this->assertTrue($new->exists());
 
 		$result = Companies::all(12345);
-		$this->assertTrue($result !== null);
+		$this->assertNotNull($result);
 
 		$result = $result->rewind();
-		$this->assertTrue($result !== null);
-		$this->assertTrue(!is_string($result));
+		$this->assertNotNull($result);
+		$this->assertInternalType('string', $result);
 	}
 
 	public function testFindFirstWithFieldsOption() {
@@ -126,7 +126,7 @@ class SourceTest extends \lithium\test\Integration {
 		$this->assertTrue($new->exists());
 
 		$result = Companies::find('first', array('fields' => array('name')));
-		$this->assertFalse(is_null($result));
+		$this->assertNotInternalType('null', $result);
 
 		$this->skipIf(is_null($result), 'No result returned to test');
 		$result = $result->data();

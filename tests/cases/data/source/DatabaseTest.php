@@ -10,7 +10,6 @@ namespace lithium\tests\cases\data\source;
 
 use lithium\data\model\Query;
 use lithium\data\entity\Record;
-use lithium\data\collection\RecordSet;
 use lithium\tests\mocks\data\model\MockDatabase;
 use lithium\tests\mocks\data\model\MockDatabasePost;
 use lithium\tests\mocks\data\model\MockDatabaseComment;
@@ -447,7 +446,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->read('SELECT * from mock_database_posts AS MockDatabasePost;', array(
 			'return' => 'resource'
 		));
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$expected = "SELECT * from mock_database_posts AS MockDatabasePost;";
 		$this->assertEqual($expected, $this->db->sql);
@@ -474,7 +473,7 @@ class DatabaseTest extends \lithium\test\Unit {
 	public function testReadWithQueryObjectRecordSet() {
 		$query = new Query(array('type' => 'read', 'model' => $this->_model));
 		$result = $this->db->read($query);
-		$this->assertTrue($result instanceof RecordSet);
+		$this->assertInstanceOf('lithium\data\collection\RecordSet', $result);
 
 		$expected = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost};";
 		$result = $this->db->sql;
@@ -484,7 +483,7 @@ class DatabaseTest extends \lithium\test\Unit {
 	public function testReadWithQueryObjectArray() {
 		$query = new Query(array('type' => 'read', 'model' => $this->_model));
 		$result = $this->db->read($query, array('return' => 'array'));
-		$this->assertTrue(is_array($result));
+		$this->assertInternalType('array', $result);
 
 		$expected = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost};";
 		$result = $this->db->sql;
@@ -912,15 +911,15 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testRawConditions() {
 		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => null));
-		$this->assertFalse($this->db->conditions(5, $query));
-		$this->assertFalse($this->db->conditions(null, $query));
+		$this->assertEmpty($this->db->conditions(5, $query));
+		$this->assertEmpty($this->db->conditions(null, $query));
 		$this->assertEqual("WHERE CUSTOM", $this->db->conditions("CUSTOM", $query));
 	}
 
 	public function testRawHaving() {
 		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'having' => null));
-		$this->assertFalse($this->db->having(5, $query));
-		$this->assertFalse($this->db->having(null, $query));
+		$this->assertEmpty($this->db->having(5, $query));
+		$this->assertEmpty($this->db->having(null, $query));
 		$this->assertEqual("HAVING CUSTOM", $this->db->having("CUSTOM", $query));
 	}
 
@@ -1005,7 +1004,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'limit' => 1
 		);
 		$result = $this->db->read(new Query($options), $options);
-		$this->assertFalse($result instanceof RecordSet);
+		$this->assertNotInstanceOf('lithium\data\collection\RecordSet', $result);
 	}
 
 	public function testGroup() {

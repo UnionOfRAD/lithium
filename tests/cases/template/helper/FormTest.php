@@ -253,8 +253,8 @@ class FormTest extends \lithium\test\Unit {
 			)
 		);
 		$this->assertEqual($expected, $result);
-		$this->assertTrue(is_callable($result['attributes']['id']));
-		$this->assertTrue(is_callable($result['attributes']['name']));
+		$this->assertInternalType('callable', $result['attributes']['id']);
+		$this->assertInternalType('callable', $result['attributes']['name']);
 	}
 
 	public function testFormElementWithDefaultValue() {
@@ -1115,7 +1115,7 @@ class FormTest extends \lithium\test\Unit {
 	public function testFormErrorWithout() {
 		$this->form->create(null);
 		$result = $this->form->error('name');
-		$this->assertTrue(is_null($result));
+		$this->assertInternalType('null', $result);
 	}
 
 	public function testFormErrorWithRecordAndStringError() {
@@ -1451,7 +1451,7 @@ class FormTest extends \lithium\test\Unit {
 		));
 
 		$result = $this->form->error('body');
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 
 		$result = $this->form->error('record1.title');
 		$this->assertTags($result, array(

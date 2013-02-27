@@ -58,7 +58,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertEqual($result, array_fill(0, 10, 'testFoo'));
 
 		$result = $collection->invoke('testFoo', array(), array('collect' => true));
-		$this->assertTrue($result instanceof Collection);
+		$this->assertInstanceOf('lithium\util\Collection', $result);
 		$this->assertEqual($result->to('array'), array_fill(0, 10, 'testFoo'));
 	}
 
@@ -95,11 +95,11 @@ class CollectionTest extends \lithium\test\Unit {
 			array_fill(0, 10, 1),
 			array_fill(0, 10, 2)
 		)));
-		$this->assertEqual(20, count($collection->to('array')));
+		$this->assertCount(20, $collection->to('array'));
 
 		$filter = function($item) { return $item === 1; };
 		$result = $collection->find($filter);
-		$this->assertTrue($result instanceof Collection);
+		$this->assertInstanceOf('lithium\util\Collection', $result);
 		$this->assertEqual(array_fill(0, 10, 1), $result->to('array'));
 
 		$result = $collection->find($filter, array('collect' => false));
@@ -252,12 +252,12 @@ class CollectionTest extends \lithium\test\Unit {
 	public function testValueAppend() {
 		$collection = new Collection();
 		$this->assertFalse($collection->valid());
-		$this->assertEqual(0, count($collection));
+		$this->assertCount(0, $collection);
 
 		$collection->append(1);
-		$this->assertEqual(1, count($collection));
+		$this->assertCount(1, $collection);
 		$collection->append(new stdClass());
-		$this->assertEqual(2, count($collection));
+		$this->assertCount(2, $collection);
 
 		$this->assertEqual(1, $collection->current());
 		$this->assertEqual(new stdClass(), $collection->next());
@@ -447,10 +447,10 @@ class CollectionTest extends \lithium\test\Unit {
 			'data' => array($first, $second, $third)
 		));
 
-		$this->assertTrue(is_object($doc[0]));
-		$this->assertTrue(is_object($doc[1]));
-		$this->assertTrue(is_object($doc[2]));
-		$this->assertEqual(3, count($doc));
+		$this->assertInternalType('object', $doc[0]);
+		$this->assertInternalType('object', $doc[1]);
+		$this->assertInternalType('object', $doc[2]);
+		$this->assertCount(3, $doc);
 	}
 
 	public function testValid() {

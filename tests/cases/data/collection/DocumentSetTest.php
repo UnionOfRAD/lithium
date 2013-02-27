@@ -46,7 +46,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 		));
 
 		foreach ($array as $value) {
-			$this->assertTrue(is_int($value));
+			$this->assertInternalType('int', $value);
 		}
 	}
 
@@ -80,10 +80,10 @@ class DocumentSetTest extends \lithium\test\Unit {
 		)));
 
 		foreach ($array as $document) {
-			$this->assertTrue($document->_id instanceof MongoId);
-			$this->assertTrue(is_string($document->body));
-			$this->assertTrue(is_object($document->foo));
-			$this->assertTrue(is_string($document->foo->bar));
+			$this->assertInstanceOf('MongoId', $document->_id);
+			$this->assertInternalType('string', $document->body);
+			$this->assertInternalType('object', $document->foo);
+			$this->assertInternalType('string', $document->foo->bar);
 		}
 
 		$array = new DocumentSet(compact('model', 'schema') + array(
@@ -106,10 +106,10 @@ class DocumentSetTest extends \lithium\test\Unit {
 		)));
 
 		foreach ($array as $document) {
-			$this->assertTrue($document->_id instanceof MongoId);
-			$this->assertTrue(is_string($document->body));
-			$this->assertTrue(is_object($document->foo));
-			$this->assertTrue(is_int($document->foo->bar));
+			$this->assertInstanceOf('MongoId', $document->_id);
+			$this->assertInternalType('string', $document->body);
+			$this->assertInternalType('object', $document->foo);
+			$this->assertInternalType('int', $document->foo->bar);
 		}
 
 	}
@@ -170,10 +170,10 @@ class DocumentSetTest extends \lithium\test\Unit {
 			'data' => array($first, $second, $third)
 		));
 
-		$this->assertTrue(is_object($doc[0]));
-		$this->assertTrue(is_object($doc[1]));
-		$this->assertTrue(is_object($doc[2]));
-		$this->assertEqual(3, count($doc));
+		$this->assertInternalType('object', $doc[0]);
+		$this->assertInternalType('object', $doc[1]);
+		$this->assertInternalType('object', $doc[2]);
+		$this->assertCount(3, $doc);
 	}
 
 	public function testOffsetSet() {
@@ -192,8 +192,8 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$model = $this->_model;
 
 		$result = $doc->rewind();
-		$this->assertTrue($result instanceof Document);
-		$this->assertTrue(is_object($result['_id']));
+		$this->assertInstanceOf('lithium\data\entity\Document', $result);
+		$this->assertInternalType('object', $result['_id']);
 
 		$expected = array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar');
 		$this->assertEqual($expected, $result->data());

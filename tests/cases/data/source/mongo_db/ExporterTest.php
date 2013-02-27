@@ -133,13 +133,13 @@ class ExporterTest extends \lithium\test\Unit {
 			))),
 			'deeply' => new Document(array('exists' => true, 'data' => array('nested' => 'object')))
 		)));
-		$this->assertFalse(Exporter::get('update', $doc->export()));
+		$this->assertEmpty(Exporter::get('update', $doc->export()));
 	}
 
 	public function testUpdateFromResourceLoading() {
 		$resource = new MockResult();
 		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
-		$this->assertFalse(Exporter::get('update', $doc->export()));
+		$this->assertEmpty(Exporter::get('update', $doc->export()));
 		$this->assertEqual('dib', $doc['6c8f86167675abfabdbf0302']->title);
 
 		$doc['6c8f86167675abfabdbf0302']->title = 'bob';
@@ -151,8 +151,8 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual('bill', $doc['4c8f86167675abfabdbf0300']->title);
 
 		$expected = Exporter::get('update', $doc->export());
-		$this->assertTrue(Exporter::get('update', $doc->export()));
-		$this->assertEqual(2, count($expected['update']));
+		$this->assertNotEmpty(Exporter::get('update', $doc->export()));
+		$this->assertCount(2, $expected['update']);
 	}
 
 	public function testUpdateWithSubObjects() {
@@ -285,7 +285,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, Exporter::get('update', $doc->export()));
 		$doc->sync();
 
-		$this->assertFalse(Exporter::get('update', $doc->export()));
+		$this->assertEmpty(Exporter::get('update', $doc->export()));
 		$doc->append2->foo = 'baz';
 		$doc->append2->bar = 'dib';
 		$doc->deeply->nested = true;
@@ -334,15 +334,15 @@ class ExporterTest extends \lithium\test\Unit {
 		$schema = new Schema(array('fields' => $this->_schema));
 		$result = $schema->cast(null, null, $data, $options);
 		$this->assertEqual(array_keys($data), array_keys($result->data()));
-		$this->assertTrue($result->_id instanceof MongoId);
+		$this->assertInstanceOf('MongoId', $result->_id);
 		$this->assertEqual('4c8f86167675abfabd970300', (string) $result->_id);
 
-		$this->assertTrue($result->comments instanceof DocumentSet);
-		$this->assertEqual(3, count($result['comments']));
+		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $result->comments);
+		$this->assertCount(3, $result['comments']);
 
-		$this->assertTrue($result->comments[0] instanceof MongoId);
-		$this->assertTrue($result->comments[1] instanceof MongoId);
-		$this->assertTrue($result->comments[2] instanceof MongoId);
+		$this->assertInstanceOf('MongoId', $result->comments[0]);
+		$this->assertInstanceOf('MongoId', $result->comments[1]);
+		$this->assertInstanceOf('MongoId', $result->comments[2]);
 		$this->assertEqual('4c8f86167675abfabdbe0300', (string) $result->comments[0]);
 		$this->assertEqual('4c8f86167675abfabdbf0300', (string) $result->comments[1]);
 		$this->assertEqual('4c8f86167675abfabdc00300', (string) $result->comments[2]);
@@ -350,13 +350,13 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual($data['comments'], $result->comments->data());
 		$this->assertEqual(array('test'), $result->tags->data());
 		$this->assertEqual(array('4c8f86167675abfabdb00300'), $result->authors->data());
-		$this->assertTrue($result->authors[0] instanceof MongoId);
+		$this->assertInstanceOf('MongoId', $result->authors[0]);
 
-		$this->assertTrue($result->modified instanceof MongoDate);
-		$this->assertTrue($result->created instanceof MongoDate);
-		$this->assertTrue($result->created->sec > 0);
+		$this->assertInstanceOf('MongoDate', $result->modified);
+		$this->assertInstanceOf('MongoDate', $result->created);
+		$this->assertGreaterThan($result->created->sec, 0);
 
-		$this->assertTrue($result->empty_array instanceof DocumentSet);
+		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $result->empty_array);
 
 		$this->assertEqual($time, $result->modified->sec);
 		$this->assertEqual($time, $result->created->sec);
@@ -391,23 +391,23 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = $schema->cast(null, null, $data, $options);
 
 		$this->assertEqual(array_keys($data), array_keys($result->data()));
-		$this->assertTrue($result->_id instanceof MongoId);
+		$this->assertInstanceOf('MongoId', $result->_id);
 		$this->assertEqual('4c8f86167675abfabd970300', (string) $result->_id);
 
-		$this->assertTrue($result->accounts instanceof DocumentSet);
-		$this->assertEqual(2, count($result->accounts));
+		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $result->accounts);
+		$this->assertCount(2, $result->accounts);
 
 		$id1 = '4fb6e2dd3e91581fe6e75736';
 		$id2 = '4fb6e2df3e91581fe6e75737';
-		$this->assertTrue($result->accounts[$id1]['_id'] instanceof MongoId);
+		$this->assertInstanceOf('MongoId', $result->accounts[$id1]['_id']);
 		$this->assertEqual($id1, (string) $result->accounts[$id1]['_id']);
-		$this->assertTrue($result->accounts[$id2]['_id'] instanceof MongoId);
+		$this->assertInstanceOf('MongoId', $result->accounts[$id2]['_id']);
 		$this->assertEqual($id2, (string) $result->accounts[$id2]['_id']);
 
-		$this->assertTrue($result->accounts[$id1]['created'] instanceof MongoDate);
-		$this->assertTrue($result->accounts[$id1]['created']->sec > 0);
-		$this->assertTrue($result->accounts[$id2]['created'] instanceof MongoDate);
-		$this->assertTrue($result->accounts[$id2]['created']->sec > 0);
+		$this->assertInstanceOf('MongoDate', $result->accounts[$id1]['created']);
+		$this->assertGreaterThan($result->accounts[$id1]['created']->sec, 0);
+		$this->assertInstanceOf('MongoDate', $result->accounts[$id2]['created']);
+		$this->assertGreaterThan($result->accounts[$id2]['created']->sec, 0);
 	}
 
 	public function testWithArraySchema() {
@@ -580,11 +580,11 @@ class ExporterTest extends \lithium\test\Unit {
 			'similar_text.magazines' => array('type' => 'MongoId', 'array' => true)
 		)));
 		$result = $schema->cast(null, null, $data, $options);
-		$this->assertTrue($result['similar_text']['articles'][0] instanceof MongoId);
-		$this->assertTrue($result['similar_text']['books'][0] instanceof MongoId);
-		$this->assertTrue($result['similar_text']['books'][1] instanceof MongoId);
-		$this->assertTrue($result['similar_text']['magazines'][0] instanceof MongoId);
-		$this->assertTrue($result['similar_text']['magazines'][1] instanceof MongoId);
+		$this->assertInstanceOf('MongoId', $result['similar_text']['articles'][0]);
+		$this->assertInstanceOf('MongoId', $result['similar_text']['books'][0]);
+		$this->assertInstanceOf('MongoId', $result['similar_text']['books'][1]);
+		$this->assertInstanceOf('MongoId', $result['similar_text']['magazines'][0]);
+		$this->assertInstanceOf('MongoId', $result['similar_text']['magazines'][1]);
 	}
 
 	/**
@@ -604,12 +604,12 @@ class ExporterTest extends \lithium\test\Unit {
 		$doc->list[] = new MongoId();
 		$result = Exporter::get('update', $doc->export());
 
-		$this->assertEqual(1, count($result));
-		$this->assertEqual(1, count($result['update']));
-		$this->assertEqual(5, count($result['update']['list']));
+		$this->assertCount(1, $result);
+		$this->assertCount(1, $result['update']);
+		$this->assertCount(5, $result['update']['list']);
 
 		for ($i = 0; $i < 5; $i++) {
-			$this->assertTrue($result['update']['list'][$i] instanceof MongoId);
+			$this->assertInstanceOf('MongoId', $result['update']['list'][$i]);
 		}
 
 		$doc = new Document(array('exists' => true, 'data' => array(
@@ -618,12 +618,12 @@ class ExporterTest extends \lithium\test\Unit {
 		$doc->list = array(new MongoId(), new MongoId(), new MongoId());
 		$result = Exporter::get('update', $doc->export());
 
-		$this->assertEqual(1, count($result));
-		$this->assertEqual(1, count($result['update']));
-		$this->assertEqual(3, count($result['update']['list']));
+		$this->assertCount(1, $result);
+		$this->assertCount(1, $result['update']);
+		$this->assertCount(3, $result['update']['list']);
 
 		for ($i = 0; $i < 3; $i++) {
-			$this->assertTrue($result['update']['list'][$i] instanceof MongoId);
+			$this->assertInstanceOf('MongoId', $result['update']['list'][$i]);
 		}
 	}
 
@@ -720,8 +720,10 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 
 		$array = new DocumentSet(compact('model', 'schema', 'data'));
-		$this->assertTrue($array['4c8f86167675abfabd970300']->accounts instanceof DocumentSet);
-		$this->assertTrue($array['4c8f86167675abfabd970301']->accounts instanceof DocumentSet);
+		$obj = $array['4c8f86167675abfabd970300']->accounts;
+		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $obj);
+		$obj = $array['4c8f86167675abfabd970301']->accounts;
+		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $obj);
 
 		$result = Exporter::get('create', $array->export());
 		$this->assertTrue(isset($result['create'][0]));
@@ -766,8 +768,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 
 		$document = new Document(compact('model', 'schema', 'data'));
-		$this->assertTrue($document->accounts instanceof DocumentSet);
-		$this->assertTrue($document->accounts instanceof DocumentSet);
+		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $document->accounts);
 
 		$export = $document->export();
 		$result = Exporter::get('create', $document->export());
@@ -795,7 +796,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$model = $this->_model;
 
 		$document = new Document(compact('model', 'schema', 'data'));
-		$this->assertTrue($document->accounts[0] instanceof Document);
+		$this->assertInstanceOf('lithium\data\entity\Document', $document->accounts[0]);
 	}
 }
 

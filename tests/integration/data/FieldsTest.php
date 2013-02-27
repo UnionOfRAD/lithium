@@ -58,7 +58,7 @@ class FieldsTest extends \lithium\test\Integration {
 
 		$entity = MockCompanies::first($id);
 
-		$this->assertTrue($entity instanceof Entity);
+		$this->assertInstanceOf('lithium\data\Entity', $entity);
 		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
 
 		$expected = array(
@@ -73,7 +73,7 @@ class FieldsTest extends \lithium\test\Integration {
 			'fields' => array($key)
 		));
 
-		$this->assertTrue($entity instanceof Entity);
+		$this->assertInstanceOf('lithium\data\Entity', $entity);
 		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
 
 		$expected = array($key => $id);
@@ -84,7 +84,7 @@ class FieldsTest extends \lithium\test\Integration {
 			'conditions' => array($key => $id),
 			'fields' => array($key, 'name')
 		));
-		$this->assertTrue($entity instanceof Entity);
+		$this->assertInstanceOf('lithium\data\Entity', $entity);
 		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
 
 		$entity->name = 'Acme, Incorporated';

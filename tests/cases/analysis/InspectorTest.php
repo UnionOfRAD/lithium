@@ -48,7 +48,7 @@ class InspectorTest extends \lithium\test\Unit {
 
 	public function testMethodInspection() {
 		$result = Inspector::methods($this, null);
-		$this->assertTrue($result[0] instanceof ReflectionMethod);
+		$this->assertInstanceOf('ReflectionMethod', $result[0]);
 
 		$result = Inspector::info('lithium\core\Object::_init()');
 		$expected = '_init';
@@ -165,7 +165,7 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertEqual(array(__CLASS__ => __FILE__), $result);
 
 		$result = Inspector::classes(array('file' => __FILE__, 'group' => 'files'));
-		$this->assertEqual(1, count($result));
+		$this->assertCount(1, $result);
 		$this->assertEqual(__FILE__, key($result));
 
 		$result = Inspector::classes(array('file' => __FILE__, 'group' => 'foo'));
@@ -207,7 +207,7 @@ class InspectorTest extends \lithium\test\Unit {
 
 		$info = Inspector::info('\lithium\analysis\Inspector');
 		$result = str_replace('\\', '/', $info['file']);
-		$this->assertTrue(strpos($result, '/analysis/Inspector.php'));
+		$this->assertNotEmpty(strpos($result, '/analysis/Inspector.php'));
 		$this->assertEqual('lithium\analysis', $info['namespace']);
 		$this->assertEqual('Inspector', $info['shortName']);
 

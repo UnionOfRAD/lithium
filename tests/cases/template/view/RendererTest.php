@@ -11,7 +11,6 @@ namespace lithium\tests\cases\template\view;
 use stdClass;
 use lithium\action\Request;
 use lithium\action\Response;
-use lithium\template\Helper;
 use lithium\template\helper\Html;
 use lithium\template\view\adapter\Simple;
 use lithium\net\http\Router;
@@ -183,7 +182,7 @@ class RendererTest extends \lithium\test\Unit {
 
 	public function testHelperLoading() {
 		$helper = $this->subject->helper('html');
-		$this->assertTrue($helper instanceof Helper);
+		$this->assertInstanceOf('lithium\template\Helper', $helper);
 
 		$this->expectException('/invalidFoo/');
 		$this->assertNull($this->subject->helper('invalidFoo'));
@@ -191,13 +190,13 @@ class RendererTest extends \lithium\test\Unit {
 
 	public function testHelperQuerying() {
 		$helper = $this->subject->html;
-		$this->assertTrue($helper instanceof Helper);
+		$this->assertInstanceOf('lithium\template\Helper', $helper);
 	}
 
 	public function testTemplateStrings() {
 		$result = $this->subject->strings();
-		$this->assertTrue(is_array($result));
-		$this->assertFalse($result);
+		$this->assertInternalType('array', $result);
+		$this->assertEmpty($result);
 
 		$expected = array('data' => 'The data goes here: {:data}');
 		$result = $this->subject->strings($expected);
@@ -212,8 +211,8 @@ class RendererTest extends \lithium\test\Unit {
 	}
 
 	public function testGetters() {
-		$this->assertTrue($this->subject->request() instanceof Request);
-		$this->assertTrue($this->subject->response() instanceof Response);
+		$this->assertInstanceOf('lithium\action\Request', $this->subject->request());
+		$this->assertInstanceOf('lithium\action\Response', $this->subject->response());
 		$this->subject = new Simple();
 		$this->assertNull($this->subject->request());
 		$this->assertNull($this->subject->response());
@@ -243,26 +242,26 @@ class RendererTest extends \lithium\test\Unit {
 	}
 
 	public function testHandlers() {
-		$this->assertTrue($this->subject->url());
+		$this->assertNotEmpty($this->subject->url());
 		$this->assertPattern('/\/posts\/foo/', $this->subject->url('Posts::foo'));
 
 		$absolute = $this->subject->url('Posts::foo', array('absolute' => true));
 		$this->assertEqual('http://foo.local/posts/foo', $absolute);
 
-		$this->assertFalse(trim($this->subject->scripts()));
+		$this->assertEmpty(trim($this->subject->scripts()));
 		$this->assertEqual('foobar', trim($this->subject->scripts('foobar')));
 		$this->assertEqual('foobar', trim($this->subject->scripts()));
 
-		$this->assertFalse(trim($this->subject->styles()));
+		$this->assertEmpty(trim($this->subject->styles()));
 		$this->assertEqual('foobar', trim($this->subject->styles('foobar')));
 		$this->assertEqual('foobar', trim($this->subject->styles()));
 
-		$this->assertFalse($this->subject->title());
+		$this->assertEmpty($this->subject->title());
 		$this->assertEqual('Foo', $this->subject->title('Foo'));
 		$this->assertEqual('Bar', $this->subject->title('Bar'));
 		$this->assertEqual('Bar', $this->subject->title());
 
-		$this->assertFalse(trim($this->subject->head()));
+		$this->assertEmpty(trim($this->subject->head()));
 		$this->assertEqual('foo', trim($this->subject->head('foo')));
 		$this->assertEqual("foo\n\tbar", trim($this->subject->head('bar')));
 		$this->assertEqual("foo\n\tbar", trim($this->subject->head()));

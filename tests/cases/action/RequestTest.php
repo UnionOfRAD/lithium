@@ -156,7 +156,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testBase() {
 		$request = new Request(array('env' => array('PHP_SELF' => '/index.php')));
-		$this->assertFalse($request->env('base'));
+		$this->assertEmpty($request->env('base'));
 	}
 
 	public function testBaseWithDirectory() {
@@ -414,7 +414,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testMagicParamsAccess() {
 		$this->assertNull($this->request->action);
-		$this->assertFalse(isset($this->request->params['action']));
+		$this->assertArrayNotHasKey('action', $this->request->params);
 		$this->assertFalse(isset($this->request->action));
 
 		$expected = $this->request->params['action'] = 'index';
@@ -908,7 +908,7 @@ class RequestTest extends \lithium\test\Unit {
 				'CONTENT_TYPE' => 'application/json; charset=UTF-8',
 				'REQUEST_METHOD' => $method
 			)));
-			$this->assertFalse($request->data);
+			$this->assertEmpty($request->data);
 		}
 	}
 
@@ -1001,7 +1001,7 @@ class RequestTest extends \lithium\test\Unit {
 		);
 		$request = new Request(array('env' => array('HTTP_ACCEPT' => join(',', $chrome))));
 		$this->assertEqual('html', $request->accepts());
-		$this->assertTrue(array_search('text/plain', $request->accepts(true)), 4);
+		$this->assertNotEmpty(array_search('text/plain', $request->accepts(true)), 4);
 
 		$request = new Request(array('env' => array('HTTP_ACCEPT' => join(',', $safari))));
 		$this->assertEqual('html', $request->accepts());

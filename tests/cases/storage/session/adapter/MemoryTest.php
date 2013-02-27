@@ -31,7 +31,7 @@ class MemoryTest extends \lithium\test\Unit {
 	 */
 	public function testKey() {
 		$key1 = Memory::key();
-		$this->assertTrue($key1);
+		$this->assertNotEmpty($key1);
 
 		$key2 = Memory::key();
 		$this->assertNotEqual($key1, $key2);
@@ -67,7 +67,7 @@ class MemoryTest extends \lithium\test\Unit {
 		$this->Memory->_session[$key] = $value;
 
 		$closure = $this->Memory->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->Memory, $params, null);
@@ -76,14 +76,14 @@ class MemoryTest extends \lithium\test\Unit {
 
 		$key = 'non-existent';
 		$closure = $this->Memory->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->Memory, $params, null);
 		$this->assertNull($result);
 
 		$closure = $this->Memory->read();
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$result = $closure($this->Memory, array('key' => null), null);
 		$expected = array('read_test' => 'value to be read');
@@ -98,7 +98,7 @@ class MemoryTest extends \lithium\test\Unit {
 		$value = 'value to be written';
 
 		$closure = $this->Memory->write($key, $value);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'value');
 		$result = $closure($this->Memory, $params, null);
@@ -116,7 +116,7 @@ class MemoryTest extends \lithium\test\Unit {
 		$this->Memory->_session[$key] = $value;
 
 		$closure = $this->Memory->check($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->Memory, $params, null);
@@ -124,7 +124,7 @@ class MemoryTest extends \lithium\test\Unit {
 
 		$key = 'does_not_exist';
 		$closure = $this->Memory->check($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->Memory, $params, null);
@@ -143,7 +143,7 @@ class MemoryTest extends \lithium\test\Unit {
 		$this->Memory->_session[$key] = $value;
 
 		$closure = $this->Memory->delete($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->Memory, $params, null);
@@ -151,7 +151,7 @@ class MemoryTest extends \lithium\test\Unit {
 
 		$key = 'non-existent';
 		$closure = $this->Memory->delete($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->Memory, $params, null);
@@ -164,9 +164,9 @@ class MemoryTest extends \lithium\test\Unit {
 	public function testClear() {
 		$this->Memory->_session['foobar'] = 'foo';
 		$closure = $this->Memory->clear();
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 		$result = $closure($this->Memory, array(), null);
-		$this->assertTrue(empty($this->Memory->_session));
+		$this->assertEmpty($this->Memory->_session);
 	}
 }
 

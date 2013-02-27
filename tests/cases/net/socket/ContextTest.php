@@ -30,7 +30,7 @@ class ContextTest extends \lithium\test\Unit {
 
 	public function testConstruct() {
 		$subject = new Context(array('timeout' => 300) + $this->_testConfig);
-		$this->assertTrue(300, $subject->timeout());
+		$this->assertEqual(300, $subject->timeout());
 		unset($subject);
 	}
 
@@ -49,7 +49,7 @@ class ContextTest extends \lithium\test\Unit {
 
 	public function testOpen() {
 		$stream = new Context($this->_testConfig);
-		$this->assertTrue(is_resource($stream->open()));
+		$this->assertInternalType('resource', $stream->open());
 	}
 
 	public function testClose() {
@@ -69,48 +69,48 @@ class ContextTest extends \lithium\test\Unit {
 
 	public function testMessageInConfig() {
 		$socket = new Context(array('message' => new Request($this->_testConfig)));
-		$this->assertTrue(is_resource($socket->open()));
+		$this->assertInternalType('resource', $socket->open());
 	}
 
 	public function testWriteAndRead() {
 		$stream = new Context($this->_testConfig);
-		$this->assertTrue(is_resource($stream->open()));
-		$this->assertTrue(is_resource($stream->resource()));
+		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('resource', $stream->resource());
 		$this->assertEqual(1, $stream->write());
 		$this->assertPattern("/^HTTP/", (string) $stream->read());
 	}
 
 	public function testSendWithNull() {
 		$stream = new Context($this->_testConfig);
-		$this->assertTrue(is_resource($stream->open()));
+		$this->assertInternalType('resource', $stream->open());
 		$result = $stream->send(
 			new Request($this->_testConfig),
 			array('response' => 'lithium\net\http\Response')
 		);
-		$this->assertTrue($result instanceof Response);
+		$this->assertInstanceOf('lithium\net\http\Response', $result);
 		$this->assertPattern("/^HTTP/", (string) $result);
 		$this->assertTrue($stream->eof());
 	}
 
 	public function testSendWithArray() {
 		$stream = new Context($this->_testConfig);
-		$this->assertTrue(is_resource($stream->open()));
+		$this->assertInternalType('resource', $stream->open());
 		$result = $stream->send($this->_testConfig,
 			array('response' => 'lithium\net\http\Response')
 		);
-		$this->assertTrue($result instanceof Response);
+		$this->assertInstanceOf('lithium\net\http\Response', $result);
 		$this->assertPattern("/^HTTP/", (string) $result);
 		$this->assertTrue($stream->eof());
 	}
 
 	public function testSendWithObject() {
 		$stream = new Context($this->_testConfig);
-		$this->assertTrue(is_resource($stream->open()));
+		$this->assertInternalType('resource', $stream->open());
 		$result = $stream->send(
 			new Request($this->_testConfig),
 			array('response' => 'lithium\net\http\Response')
 		);
-		$this->assertTrue($result instanceof Response);
+		$this->assertInstanceOf('lithium\net\http\Response', $result);
 		$this->assertPattern("/^HTTP/", (string) $result);
 		$this->assertTrue($stream->eof());
 	}

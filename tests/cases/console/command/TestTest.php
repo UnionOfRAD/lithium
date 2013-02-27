@@ -183,8 +183,8 @@ class TestTest extends \lithium\test\Unit {
 		$result = $command->response->output;
 		$result = json_decode($result, true);
 
-		$this->assertTrue(isset($result['count']));
-		$this->assertTrue(isset($result['stats']));
+		$this->assertArrayHasKey('count', $result);
+		$this->assertArrayHasKey('stats', $result);
 	}
 
 	public function testPathWithCustomDirectoryName() {

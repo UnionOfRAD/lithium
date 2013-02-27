@@ -41,11 +41,11 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testAllMethodsNoConnection() {
 		$http = new Http(array('socket' => false));
-		$this->assertTrue($http->connect());
-		$this->assertTrue($http->disconnect());
-		$this->assertFalse($http->get());
-		$this->assertFalse($http->post());
-		$this->assertFalse($http->put());
+		$this->assertNotEmpty($http->connect());
+		$this->assertNotEmpty($http->disconnect());
+		$this->assertEmpty($http->get());
+		$this->assertEmpty($http->post());
+		$this->assertEmpty($http->put());
 	}
 
 	public function testConnect() {

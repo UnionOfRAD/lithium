@@ -12,7 +12,6 @@ use stdClass;
 use SplFileInfo;
 use lithium\util\Inflector;
 use lithium\core\Libraries;
-use lithium\template\view\adapter\Simple;
 
 class LibrariesTest extends \lithium\test\Unit {
 
@@ -35,13 +34,13 @@ class LibrariesTest extends \lithium\test\Unit {
 		$invalidDS = $ds == '/' ? '\\' : '/';
 
 		$result = Libraries::path('\lithium\core\Libraries');
-		$this->assertTrue(strpos($result, "${ds}lithium${ds}core${ds}Libraries.php"));
-		$this->assertTrue(file_exists($result));
+		$this->assertNotEmpty(strpos($result, "${ds}lithium${ds}core${ds}Libraries.php"));
+		$this->assertFileExists($result);
 		$this->assertFalse(strpos($result, $invalidDS));
 
 		$result = Libraries::path('lithium\core\Libraries');
-		$this->assertTrue(strpos($result, "${ds}lithium${ds}core${ds}Libraries.php"));
-		$this->assertTrue(file_exists($result));
+		$this->assertNotEmpty(strpos($result, "${ds}lithium${ds}core${ds}Libraries.php"));
+		$this->assertFileExists($result);
 		$this->assertFalse(strpos($result, $invalidDS));
 	}
 
@@ -143,11 +142,11 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertNull(Libraries::get('foo'));
 
 		$configs = Libraries::get(); // => ['lithium' => ['path' => ...], 'myapp' => [...], ...]
-		$this->assertTrue(isset($configs['lithium']));
+		$this->assertArrayHasKey('lithium', $configs);
 		$this->assertEqual($expected, $configs['lithium']);
 
 		if ($this->hasApp) {
-			$this->assertTrue(isset($configs['app']));
+			$this->assertArrayHasKey('app', $configs);
 		}
 
 		$configs = Libraries::get(array('lithium')); // => ['lithium' => ['path' => '...', ...]]
@@ -158,11 +157,11 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual(array('lithium' => 'lithium\\'), $prefixes);
 
 		$allPre = Libraries::get(null, 'prefix'); // => ['my' => 'my\\', 'lithium' => 'lithium\\']
-		$this->assertTrue($allPre);
+		$this->assertNotEmpty($allPre);
 		$this->assertEqual(array_keys(Libraries::get()), array_keys($allPre));
 
 		foreach ($allPre as $prefix) {
-			$this->assertTrue(is_string($prefix) || is_bool($prefix));
+			$this->assertInternalType('string', $prefix) || is_bool($prefix);
 		}
 
 		$library = Libraries::get('lithium\core\Libraries'); // 'lithium'
@@ -186,18 +185,18 @@ class LibrariesTest extends \lithium\test\Unit {
 	 */
 	public function testLibraryAddRemove() {
 		$lithium = Libraries::get('lithium');
-		$this->assertFalse(empty($lithium));
+		$this->assertNotEmpty($lithium);
 
 		$app = Libraries::get(true);
-		$this->assertFalse(empty($app));
+		$this->assertNotEmpty($app);
 
 		Libraries::remove(array('lithium', 'app'));
 
 		$result = Libraries::get('lithium');
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 
 		$result = Libraries::get('app');
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 
 		$result = Libraries::add('lithium', array('bootstrap' => false) + $lithium);
 		$this->assertEqual($lithium, $result);
@@ -255,7 +254,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	 */
 	public function testExcludeNonClassFiles() {
 		$result = Libraries::find('lithium');
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = Libraries::find('lithium', array('namespaces' => true));
 
@@ -266,15 +265,15 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertFalse(in_array('lithium\LICENSE.txt', $result));
 		$this->assertFalse(in_array('lithium\readme.wiki', $result));
 
-		$this->assertFalse(Libraries::find('lithium'));
+		$this->assertEmpty(Libraries::find('lithium'));
 		$result = Libraries::find('lithium', array('path' => '/test/filter/reporter/template'));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = Libraries::find('lithium', array(
 			'path' => '/test/filter/reporter/template',
 			'namespaces' => true
 		));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	/**
@@ -289,7 +288,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * Tests path caching by calling `path()` twice.
 	 */
 	public function testPathCaching() {
-		$this->assertFalse(Libraries::cache(false));
+		$this->assertEmpty(Libraries::cache(false));
 		$path = Libraries::path(__CLASS__);
 		$this->assertEqual(__FILE__, realpath($path));
 
@@ -357,7 +356,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertTrue(in_array('lithium\action\Dispatcher', $classes));
 
 		$this->assertFalse(in_array('lithium\tests\integration\data\SourceTest', $classes));
-		$this->assertFalse(preg_grep('/\w+Test$/', $classes));
+		$this->assertEmpty(preg_grep('/\w+Test$/', $classes));
 
 		$expected = Libraries::find('lithium', array(
 			'filter' => '/\w+Test$/', 'recursive' => true
@@ -387,7 +386,7 @@ class LibrariesTest extends \lithium\test\Unit {
 
 	public function testServiceLocateInstantiation() {
 		$result = Libraries::instance('adapter.template.view', 'Simple');
-		$this->assertTrue($result instanceof Simple);
+		$this->assertInstanceOf('lithium\template\view\adapter\Simple', $result);
 		$this->expectException("Class `Foo` of type `adapter.template.view` not found.");
 		$result = Libraries::instance('adapter.template.view', 'Foo');
 	}
@@ -496,7 +495,7 @@ class LibrariesTest extends \lithium\test\Unit {
 				}
 			}
 		));
-		$this->assertEqual(1, count($result));
+		$this->assertCount(1, $result);
 		$this->assertIdentical(__FILE__, $result[0]->getRealPath());
 	}
 
@@ -513,7 +512,7 @@ class LibrariesTest extends \lithium\test\Unit {
 				}
 			}
 		));
-		$this->assertEqual(1, count($result));
+		$this->assertCount(1, $result);
 		$this->assertIdentical(__FILE__, $result[0]->getRealPath());
 	}
 
@@ -529,9 +528,9 @@ class LibrariesTest extends \lithium\test\Unit {
 			}
 		));
 		$this->assertTrue(count($result) > 3);
-		$this->assertTrue(array_search('controller.txt.php', $result) !== false);
-		$this->assertTrue(array_search('model.txt.php', $result) !== false);
-		$this->assertTrue(array_search('plugin.phar.gz', $result) !== false);
+		$this->assertNotIdentical(array_search('controller.txt.php', $result), false);
+		$this->assertNotIdentical(array_search('model.txt.php', $result), false);
+		$this->assertNotIdentical(array_search('plugin.phar.gz', $result), false);
 	}
 
 	public function testLocateWithDotSyntax() {

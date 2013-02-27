@@ -58,7 +58,7 @@ class PhpTest extends \lithium\test\Unit {
 
 	public function testInit() {
 		$id = session_id();
-		$this->assertTrue(empty($id));
+		$this->assertEmpty($id);
 
 		$result = ini_get('session.name');
 		$this->assertEqual(basename(LITHIUM_APP_PATH), $result);
@@ -67,11 +67,11 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertEqual(0, (integer) $result);
 
 		$result = ini_get('session.cookie_httponly');
-		$this->assertTrue(1, (integer) $result);
+		$this->assertNotEmpty((integer) $result);
 
 		$name = 'this-is-a-custom-name';
 		$php = new Php(array('session.name' => $name));
-		$this->assertFalse(is_numeric($php->_config['session.name']));
+		$this->assertNotInternalType('numeric', $php->_config['session.name']);
 	}
 
 	public function testCustomConfiguration() {
@@ -94,10 +94,10 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertEqual($config['session.cookie_domain'], $result);
 
 		$result = ini_get('session.cookie_secure');
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = ini_get('session.cookie_httponly');
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$result = ini_get('session.save_path');
 		$this->assertEqual($config['session.save_path'], $result);
@@ -147,7 +147,7 @@ class PhpTest extends \lithium\test\Unit {
 		$value = 'value to be written';
 
 		$closure = $this->php->write($key, $value);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'value');
 		$result = $closure($this->php, $params, null);
@@ -164,7 +164,7 @@ class PhpTest extends \lithium\test\Unit {
 		$_SESSION[$key] = $value;
 
 		$closure = $this->php->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->php, $params, null);
@@ -173,14 +173,14 @@ class PhpTest extends \lithium\test\Unit {
 
 		$key = 'non-existent';
 		$closure = $this->php->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->php, $params, null);
 		$this->assertNull($result);
 
 		$closure = $this->php->read();
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$result = $closure($this->php, array('key' => null), null);
 		$expected = array('read_test' => 'value to be read');
@@ -195,7 +195,7 @@ class PhpTest extends \lithium\test\Unit {
 		$_SESSION[$key] = $value;
 
 		$closure = $this->php->check($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->php, $params, null);
@@ -203,7 +203,7 @@ class PhpTest extends \lithium\test\Unit {
 
 		$key = 'does_not_exist';
 		$closure = $this->php->check($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->php, $params, null);
@@ -219,7 +219,7 @@ class PhpTest extends \lithium\test\Unit {
 		$_SESSION[$key] = $value;
 
 		$closure = $this->php->delete($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->php, $params, null);
@@ -227,7 +227,7 @@ class PhpTest extends \lithium\test\Unit {
 
 		$key = 'non-existent';
 		$closure = $this->php->delete($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->php, $params, null);
@@ -239,11 +239,11 @@ class PhpTest extends \lithium\test\Unit {
 	 */
 	public function testClear() {
 		$_SESSION['foo'] = 'bar';
-		$this->assertFalse(empty($_SESSION));
+		$this->assertNotEmpty($_SESSION);
 		$closure = $this->php->clear();
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 		$result = $closure($this->php, array(), null);
-		$this->assertTrue(empty($_SESSION));
+		$this->assertEmpty($_SESSION);
 	}
 
 	public function testCheckThrowException() {
@@ -279,7 +279,7 @@ class PhpTest extends \lithium\test\Unit {
 		$_SESSION[$key] = $value;
 
 		$closure = $this->php->read($key);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
 		$result = $closure($this->php, $params, null);
@@ -297,7 +297,7 @@ class PhpTest extends \lithium\test\Unit {
 		$value = 'value to be written';
 
 		$closure = $this->php->write($key, $value);
-		$this->assertTrue(is_callable($closure));
+		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'value');
 		$result = $closure($this->php, $params, null);

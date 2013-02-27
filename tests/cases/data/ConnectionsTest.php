@@ -10,8 +10,6 @@ namespace lithium\tests\cases\data;
 
 use Exception;
 use lithium\data\Connections;
-use lithium\data\source\Http;
-use lithium\data\source\Mock;
 use lithium\data\source\database\adapter\MySql;
 use lithium\data\source\database\adapter\PostgreSql;
 
@@ -50,13 +48,13 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = Connections::get('conn-test');
-		$this->assertTrue($result instanceof Mock);
+		$this->assertInstanceOf('lithium\data\source\Mock', $result);
 
 		$result = Connections::add('conn-test-2', $this->config);
 		$this->assertEqual($expected, $result);
 
 		$result = Connections::get('conn-test-2');
-		$this->assertTrue($result instanceof Mock);
+		$this->assertInstanceOf('lithium\data\source\Mock', $result);
 	}
 
 	public function testConnectionGetAndReset() {
@@ -81,9 +79,9 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, Connections::get('conn-test', array('config' => true)));
 
 		$this->assertNull(Connections::reset());
-		$this->assertFalse(Connections::get());
+		$this->assertEmpty(Connections::get());
 
-		$this->assertTrue(is_array(Connections::get()));
+		$this->assertInternalType('array', Connections::get());
 	}
 
 	public function testConnectionAutoInstantiation() {
@@ -91,10 +89,10 @@ class ConnectionsTest extends \lithium\test\Unit {
 		Connections::add('conn-test-2', $this->config);
 
 		$result = Connections::get('conn-test');
-		$this->assertTrue($result instanceof Mock);
+		$this->assertInstanceOf('lithium\data\source\Mock', $result);
 
 		$result = Connections::get('conn-test');
-		$this->assertTrue($result instanceof Mock);
+		$this->assertInstanceOf('lithium\data\source\Mock', $result);
 
 		$this->assertNull(Connections::get('conn-test-2', array('autoCreate' => false)));
 	}
@@ -115,7 +113,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 		Connections::add('stream-test', $config);
 		$result = Connections::get('stream-test');
-		$this->assertTrue($result instanceof Http);
+		$this->assertInstanceOf('lithium\data\source\Http', $result);
 		Connections::config(array('stream-test' => false));
 	}
 
@@ -137,7 +135,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 
 	public function testGetNullAdapter() {
 		Connections::reset();
-		$this->assertTrue(Connections::get(false) instanceof Mock);
+		$this->assertInstanceOf('lithium\data\source\Mock', Connections::get(false));
 	}
 
 	protected function _canConnect($host, $port) {
