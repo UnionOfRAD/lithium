@@ -10,12 +10,21 @@ namespace lithium\tests\mocks\data;
 
 use lithium\util\Validator;
 
-class MockAntiqueForSchemas extends MockProductForSchemas {
+class MockAntiqueForSchemas extends \lithium\tests\mocks\data\MockProductForSchemas {
 
 	protected $_meta = array('source' => 'mock_products', 'connection' => false);
 
 	protected $_schema = array(
-    'refurb' => array('type' => 'boolean', 'default' => false)
+		'refurb' => array('type' => 'boolean')
+	);
+
+	public $validates = array(
+		'refurb' => array(
+			array(
+				'boolean',
+				'message' => 'Must have a boolean value.'
+			)
+		)
 	);
 }
 
