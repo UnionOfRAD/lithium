@@ -9,11 +9,16 @@
 namespace lithium\tests\cases\util;
 
 use lithium\util\Validator;
+use lithium\test\Mocker;
 
 class ValidatorTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		Validator::__init();
+	}
+
+	public function tearDown() {
+		Mocker::overwriteFunction(false);
 	}
 
 	/**
@@ -398,15 +403,23 @@ class ValidatorTest extends \lithium\test\Unit {
 	/**
 	 * Tests email address validation, with additional hostname lookup
 	 */
-	public function testEmailDomainCheck() {
-		$message = "No internet connection established.";
-		$this->skipIf(!$this->_hasNetwork(), $message);
-
-		$this->assertTrue(Validator::isEmail('abc.efg@rad-dev.org', null, array('deep' => true)));
-		$this->assertFalse(Validator::isEmail('abc.efg@invalidfoo.com', null, array(
-			'deep' => true
+	public function testEmailDomainCheckGoodMxrr() {
+		Mocker::overwriteFunction('lithium\util\getmxrr', function($host, &$mxhosts) {
+			return false;
+		});
+		$this->assertFalse(Validator::isEmail('abc.efg@rad-dev.org', null, array(
+			'deep' => true,
 		)));
-		$this->assertFalse(Validator::isEmail('abc@example.abcd', null, array('deep' => true)));
+	}
+
+	public function testEmailDomainCheckBadMxrr() {
+		Mocker::overwriteFunction('lithium\util\getmxrr', function($host, &$mxhosts) {
+			$mxhosts = array();
+			return true;
+		});
+		$this->assertTrue(Validator::isEmail('abc.efg@invalidfoo.com', null, array(
+			'deep' => true,
+		)));
 	}
 
 	/**

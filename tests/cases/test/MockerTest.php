@@ -341,10 +341,20 @@ class MockerTest extends \lithium\test\Unit {
 
 	public function testCreateFunction() {
 		$obj = new \lithium\tests\mocks\test\MockStdClass;
-		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function() {
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function($obj) {
 			return 'foo';
 		});
 		$this->assertIdentical('foo', $obj->getClass());
+	}
+
+	public function testCreateFunctionWithByReferenceParam() {
+		Mocker::overwriteFunction('lithium\tests\mocks\test\getmxrr', function($host, &$mxhosts) {
+			$mxhosts = 'foo_bar';
+			return;
+		});
+		$foo = 'baz';
+		\lithium\tests\mocks\test\getmxrr('foo', $foo);
+		$this->assertIdentical('foo_bar', $foo);
 	}
 
 	public function testCallFunctionUsesGlobalFallback() {
@@ -354,10 +364,10 @@ class MockerTest extends \lithium\test\Unit {
 
 	public function testMultipleCreateFunction() {
 		$obj = new \lithium\tests\mocks\test\MockStdClass;
-		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function() {
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function($obj) {
 			return 'foo';
 		});
-		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function() {
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function($obj) {
 			return 'bar';
 		});
 		$this->assertIdentical('bar', $obj->getClass());
@@ -365,10 +375,10 @@ class MockerTest extends \lithium\test\Unit {
 
 	public function testResetSpecificFunctions() {
 		$obj = new \lithium\tests\mocks\test\MockStdClass;
-		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function() {
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function($obj) {
 			return 'baz';
 		});
-		Mocker::overwriteFunction('lithium\tests\mocks\test\is_executable', function() {
+		Mocker::overwriteFunction('lithium\tests\mocks\test\is_executable', function($foo) {
 			return 'qux';
 		});
 		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', false);
@@ -379,10 +389,10 @@ class MockerTest extends \lithium\test\Unit {
 
 	public function testResetAllFunctions() {
 		$obj = new \lithium\tests\mocks\test\MockStdClass;
-		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function() {
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function($obj) {
 			return 'baz';
 		});
-		Mocker::overwriteFunction('lithium\tests\mocks\test\is_executable', function() {
+		Mocker::overwriteFunction('lithium\tests\mocks\test\is_executable', function($foo) {
 			return 'qux';
 		});
 		Mocker::overwriteFunction(false);
