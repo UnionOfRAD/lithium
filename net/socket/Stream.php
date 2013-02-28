@@ -44,6 +44,7 @@ class Stream extends \lithium\net\Socket {
 		if ($config['persistent']) {
 			$flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT;
 		}
+		$errorCode = $errorMessage = null;
 		$this->_resource = stream_socket_client(
 			$host, $errorCode, $errorMessage, $config['timeout'], $flags
 		);

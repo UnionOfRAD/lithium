@@ -10,6 +10,7 @@ namespace lithium\tests\cases\net\socket;
 
 use lithium\net\http\Request;
 use lithium\net\socket\Curl;
+use lithium\test\Mocker;
 
 class CurlTest extends \lithium\test\Unit {
 
@@ -22,22 +23,47 @@ class CurlTest extends \lithium\test\Unit {
 		'classes' => array('request' => 'lithium\net\http\Request')
 	);
 
-	/**
-	 * Skip the test if curl is not available in your PHP installation.
-	 *
-	 * @return void
-	 */
-	public function skip() {
-		$message = 'Your PHP installation was not compiled with curl support.';
-		$this->skipIf(!function_exists('curl_init'), $message);
+	public function setUp() {
+		$base = 'lithium\net\socket';
+		Mocker::overwriteFunction("{$base}\curl_init", function($url) {
+			return fopen("php://memory", "rw");
+		});
+		Mocker::overwriteFunction("{$base}\curl_setopt_array", function($resource, $options) {
+			return count($options);
+		});
+		Mocker::overwriteFunction("{$base}\curl_setopt", function($resource, $key, $value) {
+			return;
+		});
+		Mocker::overwriteFunction("{$base}\curl_close", function(&$resource) {
+			$resource = null;
+			return;
+		});
+		Mocker::overwriteFunction("{$base}\curl_exec", function($resource) {
+			return <<<EOD
+HTTP/1.1 301 Moved Permanently
+Location: http://www.google.com/
+Content-Type: text/html; charset=UTF-8
+Date: Thu, 28 Feb 2013 07:05:10 GMT
+Expires: Sat, 30 Mar 2013 07:05:10 GMT
+Cache-Control: public, max-age=2592000
+Server: gws
+Content-Length: 219
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Connection: close
 
-		$config = $this->_testConfig;
-		$url = "{$config['scheme']}://{$config['host']}";
-		$message = "Could not open {$url} - skipping " . __CLASS__;
-		$this->skipIf(!curl_init($url), $message);
+<HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">
+<TITLE>301 Moved</TITLE></HEAD><BODY>
+<H1>301 Moved</H1>
+The document has moved
+<A HREF="http://www.google.com/">here</A>.
+</BODY></HTML>
+EOD;
+		});
+	}
 
-		$message = "No internet connection established.";
-		$this->skipIf(!$this->_hasNetwork($this->_testConfig), $message);
+	public function tearDown() {
+		Mocker::overwriteFunction(false);
 	}
 
 	public function testAllMethodsNoConnection() {

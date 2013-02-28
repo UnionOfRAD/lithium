@@ -1108,39 +1108,6 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Checks for a working internet connection.
-	 *
-	 * This method is used to check for a working connection to google.com, both
-	 * testing for proper DNS resolution and reading the actual URL.
-	 *
-	 * @param array $config Override the default URL to check.
-	 * @return boolean True if a network connection is established, false otherwise.
-	 */
-	protected function _hasNetwork($config = array()) {
-		$defaults = array(
-			'scheme' => 'http',
-			'host' => 'google.com'
-		);
-		$config += $defaults;
-
-		$url = "{$config['scheme']}://{$config['host']}";
-		$failed = false;
-
-		set_error_handler(function($errno, $errstr) use (&$failed) {
-			$failed = true;
-		});
-
-		dns_check_record($config['host'], 'A');
-
-		if ($handle = fopen($url, 'r')) {
-			fclose($handle);
-		}
-
-		restore_error_handler();
-		return !$failed;
-	}
-
-	/**
 	 * Will mark the test `true` if `$count` and `count($arr)` are equal.
 	 *
 	 * {{{

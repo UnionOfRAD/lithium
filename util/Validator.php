@@ -360,6 +360,7 @@ class Validator extends \lithium\core\StaticObject {
 			}
 			list($prefix, $host) = explode('@', $params['value']);
 
+			$mxhosts = array();
 			if (getmxrr($host, $mxhosts)) {
 				return is_array($mxhosts);
 			}

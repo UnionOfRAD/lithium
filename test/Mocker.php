@@ -658,9 +658,11 @@ class Mocker {
 	 */
 	public static function overwriteFunction($name, $callback = null) {
 		if ($name === false) {
+			static::$_functionResults = array();
 			return static::$_functionCallbacks = array();
 		}
 		if ($callback === false) {
+			static::$_functionResults[$name] = array();
 			return static::$_functionCallbacks[$name] = false;
 		}
 		static::$_functionCallbacks[$name] = $callback;
