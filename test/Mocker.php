@@ -12,7 +12,10 @@ use lithium\util\String;
 use lithium\util\collection\Filters;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionFunction;
+use ReflectionFunctionAbstract;
 use Reflection;
+use stdClass;
 
 /**
  * The Mocker class aids in the creation of Mocks on the fly, allowing you to
@@ -136,6 +139,13 @@ class Mocker {
 	protected static $_functionCallbacks = array();
 
 	/**
+	 * Results of function calls for later assertion in `MockerChain`.
+	 *
+	 * @var array
+	 */
+	protected static $_functionResults = array();
+
+	/**
 	 * A list of code to be generated for the delegator.
 	 *
 	 * The MockDelgate directly extends the mocker and makes all methods
@@ -196,8 +206,14 @@ class Mocker {
 		'function' => array(
 			'namespace {:namespace};',
 			'use lithium\test\Mocker;',
-			'function {:function}() {',
-			'    return Mocker::callFunction(__FUNCTION__, func_get_args());',
+			'function {:function}({:args}) {',
+			'    $params = array();',
+			'    foreach (array({:stringArgs}) as $value) {',
+			'        if (!empty($value)) {',
+			'            $params[] =& ${$value};',
+			'        }',
+			'    }',
+			'    return Mocker::callFunction(__FUNCTION__, $params);',
 			'}',
 		),
 	);
@@ -440,12 +456,12 @@ class Mocker {
 	/**
 	 * Will determine what parameter prototype of a method.
 	 *
-	 * For instance: 'ReflectionMethod $method' or '$name, array $foo = null'
+	 * For instance: 'ReflectionFunctionAbstract $method' or '$name, array $foo = null'
 	 *
-	 * @param  ReflectionMethod $method
+	 * @param  ReflectionFunctionAbstract $method
 	 * @return string
 	 */
-	protected static function _methodParams(ReflectionMethod $method) {
+	protected static function _methodParams(ReflectionFunctionAbstract $method) {
 		$pattern = '/Parameter #[0-9]+ \[ [^\>]+>([^\]]+) \]/';
 		$replace = array(
 			'from' => array('Array', 'or NULL'),
@@ -459,10 +475,10 @@ class Mocker {
 	/**
 	 * Will return the params in a way that can be placed into `compact()`
 	 *
-	 * @param  ReflectionMethod $method
+	 * @param  ReflectionFunctionAbstract $method
 	 * @return string
 	 */
-	protected static function _stringMethodParams(ReflectionMethod $method) {
+	protected static function _stringMethodParams(ReflectionFunctionAbstract $method) {
 		$pattern = '/Parameter [^$]+\$([^ ]+)/';
 		preg_match_all($pattern, $method, $matches);
 		$params = implode("', '", $matches[1]);
@@ -530,15 +546,18 @@ class Mocker {
 	/**
 	 * Generate a chain class with the current rules of the mock.
 	 *
-	 * @param  object $mock Mock to chain
+	 * @param  mixed  $mock Mock object, namespaced static mock, namespaced function name.
 	 * @return object       MockerChain instance
 	 */
 	public static function chain($mock) {
 		$results = array();
+		$string = is_string($mock);
 		if (is_object($mock) && isset($mock->results)) {
 			$results = static::mergeResults($mock->results, $mock::$staticResults);
-		} elseif (is_string($mock) && class_exists($mock) && isset($mock::$staticResults)) {
+		} elseif ($string && class_exists($mock) && isset($mock::$staticResults)) {
 			$results = $mock::$staticResults;
+		} elseif ($string && function_exists($mock) && isset(static::$_functionResults[$mock])) {
+			$results = array($mock => static::$_functionResults[$mock]);
 		}
 		return new MockerChain($results);
 	}
@@ -649,10 +668,13 @@ class Mocker {
 			return;
 		}
 
+		$function = new ReflectionFunction($callback);
 		$pos = strrpos($name, '\\');
 		eval(self::_dynamicCode('mockFunction', 'function', array(
 			'namespace' => substr($name, 0, $pos),
 			'function' => substr($name, $pos + 1),
+			'args' => static::_methodParams($function),
+			'stringArgs' => static::_stringMethodParams($function),
 		)));
 		return;
 	}
@@ -668,14 +690,22 @@ class Mocker {
 	 * @param  array  $params Params to be passed to the function.
 	 * @return mixed
 	 */
-	public static function callFunction($name, array $params = array()) {
+	public static function callFunction($name, array &$params = array()) {
 		$function = substr($name, strrpos($name, '\\'));
 		$exists = isset(static::$_functionCallbacks[$name]);
 		if ($exists && is_callable(static::$_functionCallbacks[$name])) {
 			$function = static::$_functionCallbacks[$name];
 		}
-
-		return call_user_func_array($function, $params);
+		$result = call_user_func_array($function, $params);
+		if (!isset(static::$_functionResults[$name])) {
+			static::$_functionResults[$name] = array();
+		}
+		static::$_functionResults[$name][] = array(
+			'args' => $params,
+			'result' => $result,
+			'time' => microtime(true),
+		);
+		return $result;
 	}
 
 }
