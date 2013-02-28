@@ -40,6 +40,16 @@ class MockerChainTest extends \lithium\test\Unit {
 		$this->assertTrue($chain->called('method1')->success());
 	}
 
+	public function testFunctionSuccessful() {
+		Mocker::overwriteFunction('app\extensions\file_get_contents', function() {
+			return 'foo';
+		});
+		\app\extensions\file_get_contents();
+
+		$chain = Mocker::chain('app\extensions\file_get_contents');
+		$this->assertTrue($chain->called('app\extensions\file_get_contents')->with()->success());
+	}
+
 	public function testBasicNotCalled() {
 		$mock = new \lithium\tests\mocks\test\mockStdClass\Mock();
 		$chain = Mocker::chain($mock);

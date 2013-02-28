@@ -12,6 +12,7 @@ use Phar;
 use lithium\console\command\Library;
 use lithium\core\Libraries;
 use lithium\console\Request;
+use lithium\test\Mocker;
 
 class LibraryTest extends \lithium\test\Unit {
 
@@ -27,6 +28,7 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
+		Mocker::register();
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
@@ -53,6 +55,7 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
+		Mocker::overwriteFunction(false);
 		$_SERVER = $this->_backup['_SERVER'];
 		chdir($this->_backup['cwd']);
 		Libraries::remove('library_test');
@@ -439,18 +442,22 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->_cleanUp();
 	}
 
-	public function testInstallDocs() {
-		$hasGit = strpos(shell_exec('git --version'), 'git version');
-		$this->skipIf($hasGit === false, 'Git is not installed.');
-
-		$message = "No internet connection established.";
-		$this->skipIf(!$this->_hasNetwork(), $message);
+	public function testInstallDocsWithGit() {
+		$base = 'lithium\console\command\\';
+		Mocker::overwriteFunction("{$base}shell_exec", function($cmd) {
+			if ($cmd === 'git --version') {
+				return 'git version 1.7.9.5';
+			}
+			return true;
+		});
+		Mocker::overwriteFunction("{$base}is_dir", function($dir) {
+			return true;
+		});
 
 		$this->library->path = $this->_testPath;
 		$result = $this->library->install('li3_docs');
 		$this->assertTrue($result);
 
-		$this->assertFileExists($this->_testPath . '/li3_docs');
 		$this->_cleanUp();
 	}
 
