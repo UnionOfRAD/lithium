@@ -1005,21 +1005,21 @@ class Unit extends \lithium\core\Object {
 			return $message;
 		}
 		$defaults = array('trace' => null, 'expected' => null, 'result' => null);
-		$result = (array) $data + $defaults;
+		$data = (array) $data + $defaults;
 
 		$message = null;
-		if (!empty($result['trace'])) {
-			$message = sprintf("trace: %s\n", $result['trace']);
+		if (!empty($data['trace'])) {
+			$message = sprintf("trace: %s\n", $data['trace']);
 		}
-		if (is_object($result['expected'])) {
-			$result['expected'] = get_object_vars($result['expected']);
+		if (is_object($data['expected'])) {
+			$data['expected'] = get_object_vars($data['expected']);
 		}
-		if (is_object($result['result'])) {
-			$result['result'] = get_object_vars($result['result']);
+		if (is_object($data['result'])) {
+			$data['result'] = get_object_vars($data['result']);
 		}
 		return $message . sprintf("expected: %s\nresult: %s\n",
-			var_export($result['expected'], true),
-			var_export($result['result'], true)
+			var_export($data['expected'], true),
+			var_export($data['result'], true)
 		);
 	}
 
