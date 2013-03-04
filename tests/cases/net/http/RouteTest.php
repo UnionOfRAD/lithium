@@ -171,6 +171,11 @@ class RouteTest extends \lithium\test\Unit {
 		$result = $route->parse($request);
 		$this->assertEqual($expected, $result->params);
 
+		$request->url = '/posts/view/0';
+		$result = $route->parse($request);
+		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '0');
+		$this->assertEqual($expected, $result->params);
+
 		$request->url = '/posts/view/5';
 		$result = $route->parse($request);
 		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '5');
