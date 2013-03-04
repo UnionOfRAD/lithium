@@ -232,7 +232,9 @@ class Route extends \lithium\core\Object {
 		if (isset($match['args'])) {
 			$match['args'] = explode('/', $match['args']);
 		}
-		$result = array_filter(array_intersect_key($match, $this->_keys));
+		$result = array_filter(array_intersect_key($match, $this->_keys), function($val) {
+			return !is_scalar($val) || strlen($val);
+		});
 		if (isset($this->_keys['args'])) {
 			$result += array('args' => array());
 		}
