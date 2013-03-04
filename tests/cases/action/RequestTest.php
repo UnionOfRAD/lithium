@@ -387,6 +387,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRefererNotLocal() {
 		$_SERVER['HTTP_REFERER'] = 'http://lithium.com/posts/index';
+		$_SERVER['HTTP_HOST'] = 'foo.com';
 		$request = new Request();
 
 		$expected = 'http://lithium.com/posts/index';
@@ -403,8 +404,19 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testRefererLocalWithHost() {
+		$_SERVER['HTTP_REFERER'] = 'http://lithium.com/posts/index';
+		$_SERVER['HTTP_HOST'] = 'lithium.com';
+		$request = new Request();
+
+		$expected = '/posts/index';
+		$result = $request->referer('/', true);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testRefererLocalFromNotLocal() {
 		$_SERVER['HTTP_REFERER'] = 'http://lithium.com/posts/index';
+		$_SERVER['HTTP_HOST'] = 'foo.com';
 		$request = new Request();
 
 		$expected = '/';
