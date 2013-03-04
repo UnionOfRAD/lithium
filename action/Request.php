@@ -514,7 +514,15 @@ class Request extends \lithium\net\http\Request {
 			if (!$local) {
 				return $ref;
 			}
-			if (strpos($ref, '://') === false) {
+			$url = parse_url($ref) + array('path' => '');
+			if (empty($url['host']) || $url['host'] == $this->env('HTTP_HOST')) {
+				$ref = $url['path'];
+				if (!empty($url['query'])) {
+					$ref .= '?' . $url['query'];
+				}
+				if (!empty($url['fragment'])) {
+					$ref .= '#' . $url['fragment'];
+				}
 				return $ref;
 			}
 		}
