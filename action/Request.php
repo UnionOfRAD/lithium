@@ -248,7 +248,7 @@ class Request extends \lithium\net\http\Request {
 			$https = array('HTTP_X_FORWARDED_FOR', 'HTTP_PC_REMOTE_ADDR', 'HTTP_X_REAL_IP');
 			foreach ($https as $altKey) {
 				if ($addr = $this->env($altKey)) {
-					$val = $addr;
+					list($val) = explode(', ', $addr);
 					break;
 				}
 			}
