@@ -156,7 +156,7 @@ class MySqlTest extends \lithium\test\Unit {
 			'name' => 'Test',
 			'return' => 'array'
 		));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	public function testAbstractColumnResolution() {

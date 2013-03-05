@@ -169,7 +169,7 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		$subject = new ErrorHandlerTest();
 		ErrorHandler::apply(array($subject, 'throwException'), array(), function($details) {});
 		$subject->throwException();
-		$this->assertFalse(ob_get_length());
+		$this->assertTrue(ob_get_length() === 0);
 	}
 }
 

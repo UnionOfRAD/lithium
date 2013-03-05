@@ -161,7 +161,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual(array_keys(Libraries::get()), array_keys($allPre));
 
 		foreach ($allPre as $prefix) {
-			$this->assertInternalType('string', $prefix) || is_bool($prefix);
+			$this->assertTrue(is_string($prefix) || is_bool($prefix));
 		}
 
 		$library = Libraries::get('lithium\core\Libraries'); // 'lithium'
