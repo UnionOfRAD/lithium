@@ -757,6 +757,15 @@ class UnitTest extends \lithium\test\Unit {
 		), $result['data']);
 	}
 
+	public function testArrayHasKeyValueNull() {
+		$this->assertTrue($this->test->assertArrayHasKey('bar', array('bar' => null)));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('pass', $result['result']);
+	}
+
 	public function testArrayNotHasKeyTrue() {
 		$this->assertTrue($this->test->assertArrayNotHasKey('foo', array('bar' => 'baz')));
 
