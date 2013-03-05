@@ -1203,7 +1203,13 @@ class Unit extends \lithium\core\Object {
 	 * @return bool
 	 */
 	public function assertArrayHasKey($key, $array, $message = '{:message}') {
-		return $this->assert(isset($array[$key]), $message, array(
+		if (is_object($array) && $array instanceof \ArrayAccess) {
+		    $result = isset($array[$key]);
+		} else {
+			$result = array_key_exists($key, $array);
+		}
+
+		return $this->assert($result, $message, array(
 			'expected' => $key,
 			'result' => $array
 		));
@@ -1226,7 +1232,13 @@ class Unit extends \lithium\core\Object {
 	 * @return bool
 	 */
 	public function assertArrayNotHasKey($key, $array, $message = '{:message}') {
-		return $this->assert(!isset($array[$key]), $message, array(
+		if (is_object($array) && $array instanceof \ArrayAccess) {
+			$result = isset($array[$key]);
+		} else {
+			$result = array_key_exists($key, $array);
+		}
+
+		return $this->assert(!$result, $message, array(
 			'expected' => $key,
 			'result' => $array
 		));
