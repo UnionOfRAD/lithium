@@ -86,7 +86,7 @@ class MongoDb extends \lithium\data\Source {
 		'!'   => '$not',
 		'and' => '$and',
 		'&&'  => '$and',
-		'nor' => 'nor'
+		'nor' => '$nor'
 	);
 
 	/**
