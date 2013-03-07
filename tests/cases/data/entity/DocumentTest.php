@@ -712,7 +712,10 @@ class DocumentTest extends \lithium\test\Unit {
 	 */
 	public function testNestedObjectExistence() {
 		$model = $this->_model;
-		$data = array('foo' => array('bar' => 'bar', 'baz' => 'dib'));
+		$data = array(
+			'foo' => array('bar' => 'bar', 'baz' => 'dib'),
+			'deeply' => array('nested' => array('object' => array('should' => 'exist')))
+		);
 		$doc = new Document(compact('model', 'data') + array('exists' => false));
 
 		$this->assertFalse($doc->exists());
@@ -721,6 +724,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc = new Document(compact('model', 'data') + array('exists' => true));
 		$this->assertTrue($doc->exists());
 		$this->assertTrue($doc->foo->exists());
+		$this->assertTrue($doc->deeply->nested->object->exists());
 
 		$doc = new Document(compact('model', 'data') + array('exists' => true));
 		$subDoc = new Document(array('data' => array('bar' => 'stuff')));
