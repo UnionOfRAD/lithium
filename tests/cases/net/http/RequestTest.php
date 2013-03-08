@@ -111,6 +111,17 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testQueryStringMerge() {
+		$expected = "?param=foo";
+		$this->request->query = array('param' => 'value');
+		$result = $this->request->queryString(array('param' => 'foo'));
+		$this->assertEqual($expected, $result);
+
+		$expected = "?param=foo&param2=bar";
+		$result = $this->request->queryString(array('param' => 'foo', 'param2' => 'bar'));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testToString() {
 		$expected = join("\r\n", array(
 			'GET / HTTP/1.1',

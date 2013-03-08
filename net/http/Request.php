@@ -121,21 +121,20 @@ class Request extends \lithium\net\http\Message {
 	 */
 	public function queryString($params = array(), $format = null) {
 		$result = array();
+		$query = array();
 
-		foreach (array_filter(array($this->query, $params)) as $query) {
-			if (is_string($query)) {
-				$result[] = $query;
+		foreach (array_filter(array($this->query, $params)) as $querySet) {
+			if (is_string($querySet)) {
+				$result[] = $querySet;
 				continue;
 			}
-			$query = array_filter($query);
-
-			if (!$format) {
-				$result[] = http_build_query($query);
-				continue;
-			}
+			$query = array_merge($query, $querySet);
+		}
+		$query = array_filter($query);
+		
+		if ($format) {
 			$q = null;
-
-			foreach ($params as $key => $value) {
+			foreach ($query as $key => $value) {
 				if (!is_array($value)) {
 					$q .= String::insert($format, array(
 						'key' => urlencode($key),
@@ -151,7 +150,10 @@ class Request extends \lithium\net\http\Message {
 				}
 			}
 			$result[] = substr($q, 0, -1);
+		} else {
+			$result[] = http_build_query($query);
 		}
+		
 		$result = array_filter($result);
 		return $result ? "?" . join("&", $result) : null;
 	}
