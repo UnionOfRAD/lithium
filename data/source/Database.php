@@ -1199,12 +1199,19 @@ abstract class Database extends \lithium\data\Source {
 
 		$column = $this->_columns[$type];
 
+        // If there's a "_format" method on the Adapter, use it...
+        $method = '_format' . ucfirst($column['formatter']); // { $method = '_formatDate' }
+
+        if ( method_exists($this, $method) ) {
+            return $this->$method($value, $column);
+        }
+
 		switch ($column['formatter']) {
 			case 'date':
 				return $column['formatter']($column['format'], strtotime($value));
-			default:
-				return $column['formatter']($value);
 		}
+
+        return $column['formatter']($value);
 	}
 
 	protected function _createFields($data, $schema, $context) {
