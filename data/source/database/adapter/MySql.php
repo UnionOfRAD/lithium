@@ -230,6 +230,17 @@ class MySql extends \lithium\data\source\Database {
 		return $this->connection->quote((string) $value);
 	}
 
+    protected function _formatDate ( $value, $column ) {
+        $format = ( isset($column['format']) ? $column['format'] : 'Y-m-d H:i:s' );
+
+        if ( false === $time = strtotime($value) ) {
+            return $value;
+        }
+
+        return date($format, $time);
+    }
+
+
 	/**
 	 * Retrieves database error message and error code.
 	 *
