@@ -237,6 +237,25 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testToUrlOverride() {
+		$request = new Request(array(
+			'scheme' => 'http',
+			'host' => 'localhost',
+			'port' => 80,
+			'query' => array('foo' => 'bar', 'bin' => 'baz')
+		));
+		
+		$result = $request->to('url', array(
+			'scheme' => 'https',
+			'host' => 'lithium.com',
+			'port' => 443,
+			'query' => array('foo' => 'you')
+		));
+		$expected = 'https://lithium.com:443/?foo=you';
+		
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testToContext() {
 		$expected = array('http' => array(
 			'method' => 'GET',
@@ -300,6 +319,14 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testParseUrlToConfig() {
 		$url = "http://localhost/path/one.php?param=1&param=2";
+		$config = parse_url($url);
+		$request = new Request($config);
+
+		$expected = $url;
+		$result = $request->to('url');
+		$this->assertEqual($expected, $result);
+		
+		$url = "http://localhost:80/path/one.php?param=1&param=2";
 		$config = parse_url($url);
 		$request = new Request($config);
 

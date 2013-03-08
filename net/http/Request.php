@@ -172,11 +172,9 @@ class Request extends \lithium\net\http\Message {
 	 *              - `'method'` _string_: If applicable, the HTTP method to use in the request.
 	 *                Mainly applies to the `'context'` format.
 	 *              - `'host'` _string_: The host name the request is pointing at.
-	 *              - `'port'` _string_: The host port, if any. If specified, should be prefixed
-	 *                with `':'`.
+	 *              - `'port'` _string_: The host port, if any.
 	 *              - `'path'` _string_: The URL path.
-	 *              - `'query'` _mixed_: The query string of the URL as a string or array. If passed
-	 *                as a string, should be prefixed with `'?'`.
+	 *              - `'query'` _mixed_: The query string of the URL as a string or array.
 	 *              - `'auth'` _string_: Authentication information. See the constructor for
 	 *                details.
 	 *              - `'content'` _string_: The body of the request.
@@ -189,7 +187,7 @@ class Request extends \lithium\net\http\Message {
 			'method' => $this->method,
 			'scheme' => $this->scheme,
 			'host' => $this->host,
-			'port' => $this->port ? ":{$this->port}" : '',
+			'port' => $this->port,
 			'path' => $this->path,
 			'query' => null,
 			'auth' => $this->auth,
@@ -204,6 +202,14 @@ class Request extends \lithium\net\http\Message {
 			'request_fulluri' => (boolean) $this->_config['proxy']
 		);
 		$options += $defaults;
+
+		if (is_string($options['query'])) {
+			$options['query'] = "?" . $options['query'];
+		} else if ($options['query']) {
+			$options['query'] = "?" . http_build_query($options['query']);
+		} else if ($options['query'] === null) {
+			$options['query'] = $this->queryString();
+		}
 
 		if ($options['auth']) {
 			$data = array();
@@ -221,7 +227,7 @@ class Request extends \lithium\net\http\Message {
 
 		switch ($format) {
 			case 'url':
-				$options['query'] = $this->queryString($options['query']);
+				$options['port'] = $options['port'] ? ":{$options['port']}" : '';
 				$options['path'] = str_replace('//', '/', $options['path']);
 				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
 			case 'context':
@@ -237,7 +243,7 @@ class Request extends \lithium\net\http\Message {
 				);
 				return array('http' => array_diff_key($options, $defaults) + $base);
 			case 'string':
-				$path = str_replace('//', '/', $this->path) . $this->queryString($options['query']);
+				$path = str_replace('//', '/', $this->path) . $options['query'];
 				$status = "{$this->method} {$path} {$this->protocol}";
 				return join("\r\n", array($status, join("\r\n", $this->headers()), "", $body));
 			default:
