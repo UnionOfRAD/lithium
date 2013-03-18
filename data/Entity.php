@@ -277,23 +277,32 @@ class Entity extends \lithium\core\Object {
 	 * Access the errors of the record.
 	 *
 	 * @see lithium\data\Entity::$_errors
-	 * @param array|string $field If an array, overwrites `$this->_errors`. If a string, and
-	 *        `$value` is not `null`, sets the corresponding key in `$this->_errors` to `$value`.
+	 * @param array|string $field If an array, overwrites `$this->_errors` if it is empty, if not,
+	 *		  merges the errors with the current values. If a string, and `$value` is not `null`,
+	 *		  sets the corresponding key in `$this->_errors` to `$value`. Setting `$field` to
+	 *		  `false` will reset the current state.
 	 * @param string $value Value to set.
 	 * @return mixed Either the `$this->_errors` array, or single value from it.
 	 */
 	public function errors($field = null, $value = null) {
+		if ($field === false) {
+			return ($this->_errors = array());
+		}
 		if ($field === null) {
 			return $this->_errors;
 		}
 		if (is_array($field)) {
-			return ($this->_errors = $field);
+			return ($this->_errors = array_merge_recursive($this->_errors, $field));
 		}
 		if ($value === null && isset($this->_errors[$field])) {
 			return $this->_errors[$field];
 		}
 		if ($value !== null) {
-			return $this->_errors[$field] = $value;
+			if (array_key_exists($field, $this->_errors)) {
+				$current = $this->_errors[$field];
+				return ($this->_errors[$field] = array_merge((array) $current, (array) $value));
+			}
+			return ($this->_errors[$field] = $value);
 		}
 		return $value;
 	}
