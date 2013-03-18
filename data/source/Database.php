@@ -442,10 +442,6 @@ abstract class Database extends \lithium\data\Source {
 			return $value;
 		}
 
-		if ($type === 'boolean') {
-			return $this->_toNativeBoolean($value);
-		}
-
 		return $this->connection->quote($value);
 	}
 
@@ -472,7 +468,11 @@ abstract class Database extends \lithium\data\Source {
 			return $value;
 		};
 
-		return compact('datetime', 'timestamp', 'date', 'time');
+		return (compact('datetime', 'timestamp', 'date', 'time') + array(
+			'boolean' => function($value){
+				return $value ? 1 : 0;
+			}
+		));
 	}
 
 	/**
@@ -1435,6 +1435,12 @@ abstract class Database extends \lithium\data\Source {
 		return (boolean) $value;
 	}
 
+	/**
+	 * Please remove this method and use the `_formatters()` method instead.
+	 *
+	 * @deprecated in favor of `_formatters()`
+	 * @see \lithium\data\source\Database::_formatters()
+	 */
 	protected function _toNativeBoolean($value) {
 		return $value ? 1 : 0;
 	}
