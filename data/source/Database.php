@@ -289,13 +289,13 @@ abstract class Database extends \lithium\data\Source {
 			preg_match('/SQLSTATE\[(.+?)\]/', $e->getMessage(), $code);
 			$code = $code[1] ?: 0;
 			switch (true) {
-				case $code === 'HY000' || substr($code, 0, 2) === '08':
-					$msg = "Unable to connect to host `{$config['host']}`.";
-					throw new NetworkException($msg, null, $e);
+			case $code === 'HY000' || substr($code, 0, 2) === '08':
+				$msg = "Unable to connect to host `{$config['host']}`.";
+				throw new NetworkException($msg, null, $e);
 				break;
-				case in_array($code, array('28000', '42000')):
-					$msg = "Host connected, but could not access database `{$config['database']}`.";
-					throw new ConfigException($msg, null, $e);
+			case in_array($code, array('28000', '42000')):
+				$msg = "Host connected, but could not access database `{$config['database']}`.";
+				throw new ConfigException($msg, null, $e);
 				break;
 			}
 			throw new ConfigException("An unknown configuration error has occured.", null, $e);
@@ -406,6 +406,38 @@ abstract class Database extends \lithium\data\Source {
 				return $this->_cast($type, $value);
 			default:
 				return $this->connection->quote($this->_cast($type, $value));
+		}
+	}
+
+	/**
+	 * Cast a value according to a column type, used by `Database::value()`
+	 *
+	 * @see \lithium\data\source\Database::value()
+	 *
+	 * @param string $type Name of the column type
+	 * @param string $value Value to cast
+	 *
+	 * @return mixed Casted value
+	 *
+	 */
+	protected function _cast($type, $value) {
+		if (is_object($value) || $value === null) {
+			return $value;
+		}
+		if ($type === 'boolean') {
+			return $this->_toNativeBoolean($value);
+		}
+		if (!isset($this->_columns[$type]) || !isset($this->_columns[$type]['formatter'])) {
+			return $value;
+		}
+
+		$column = $this->_columns[$type];
+
+		switch ($column['formatter']) {
+			case 'date':
+				return $column['formatter']($column['format'], strtotime($value));
+			default:
+				return $column['formatter']($value);
 		}
 	}
 
@@ -1078,7 +1110,7 @@ abstract class Database extends \lithium\data\Source {
 		return $result;
 	}
 
-	/**
+		/**
 	 * Returns a string of formatted constraints to be inserted into the query statement. If the
 	 * query constraints are defined as an array, key pairs are converted to SQL strings.
 	 *
@@ -1203,6 +1235,10 @@ abstract class Database extends \lithium\data\Source {
 			$alias = $model::meta('name');
 		}
 		return $alias ? "AS " . $this->name($alias) : null;
+	}
+
+	public function cast($entity, array $data, array $options = array()) {
+		return $data;
 	}
 
 	/**
@@ -1517,7 +1553,7 @@ abstract class Database extends \lithium\data\Source {
 		$meta = isset($this->_metas[$type][$name]) ? $this->_metas[$type][$name] : null;
 		if (!$meta || (isset($meta['options']) && !in_array($value, $meta['options']))) {
 			return;
-		}
+}
 		$meta += array('keyword' => '', 'escape' => false, 'join' => ' ');
 		extract($meta);
 		if ($escape === true) {
