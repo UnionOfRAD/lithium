@@ -188,6 +188,12 @@ abstract class Database extends \lithium\data\Source {
 	protected function _init() {
 		parent::_init();
 
+		array_walk($this->_columns, function(&$spec, $type, $formatters){
+			if ( array_key_exists($type, $formatters) ) {
+				$spec['formatter'] = $formatters[$type];
+			}
+		}, $this->_formatters());
+
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
 					  '{:having} {:order} {:limit};{:comment}'
@@ -399,14 +405,11 @@ abstract class Database extends \lithium\data\Source {
 			return 'NULL';
 		}
 
-		switch ($type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value)) {
-			case 'boolean':
-			case 'float':
-			case 'integer':
-				return $this->_cast($type, $value);
-			default:
-				return $this->connection->quote($this->_cast($type, $value));
-		}
+		$type = ( isset($schema['type']) ? $schema['type'] : $this->_introspectType($value) );
+
+		$spec = ( isset($this->_columns[$type]) ? $this->_columns[$type] : null );
+
+		return $this->_cast($type, $value, $spec);
 	}
 
 	/**
@@ -420,25 +423,56 @@ abstract class Database extends \lithium\data\Source {
 	 * @return mixed Casted value
 	 *
 	 */
-	protected function _cast($type, $value) {
-		if (is_object($value) || $value === null) {
+	protected function _cast($type, $value, $spec = null) {
+		extract($spec + array(
+			'name' => null,
+			'formatter' => null,
+			'format' => null,
+		));
+
+		if ( $formatter ) {
+			if ( $format ) {
+				return $formatter($value, $format);
+			}
+
+			return $formatter($value);
+		}
+
+		if (is_object($value) ) {
 			return $value;
 		}
+
 		if ($type === 'boolean') {
 			return $this->_toNativeBoolean($value);
 		}
-		if (!isset($this->_columns[$type]) || !isset($this->_columns[$type]['formatter'])) {
+
+		return $this->connection->quote($value);
+	}
+
+	/**
+	 * Provide an associative array of Closures to be used as the "formatter" key inside of the
+	 * `Database::$_columns` specification. Each formatter should return the appropriately quoted
+	 * or unquoted value and accept one or two parameters:
+	 *  - @param mixed $value to be formatted
+	 *  - @param mixed $format to apply to $value
+	 *
+	 * @see \lithium\data\source\Database::$_columns
+	 * @see \lithium\data\source\Database::_init()
+	 *
+	 * @return array of column types to \Closure formatter
+	 */
+	protected function _formatters() {
+		$self = $this;
+
+		$datetime = $timestamp = $date = $time = function($value, $format) use ($self){
+			if ( $time = strtotime($value) ) {
+				return $self->connection->quote(date($format, $time));
+			}
+
 			return $value;
-		}
+		};
 
-		$column = $this->_columns[$type];
-
-		switch ($column['formatter']) {
-			case 'date':
-				return $column['formatter']($column['format'], strtotime($value));
-			default:
-				return $column['formatter']($value);
-		}
+		return compact('datetime', 'timestamp', 'date', 'time');
 	}
 
 	/**

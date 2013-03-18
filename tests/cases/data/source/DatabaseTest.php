@@ -108,17 +108,19 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->value('1', array('type' => 'string'));
 		$this->assertIdentical("'1'", $result);
 
-		$result = $this->db->value((object) 'CURRENT_TIMESTAMP', array('type' => 'timestamp'));
-		$this->assertIdentical('CURRENT_TIMESTAMP', $result);
-
 		$result = $this->db->value((object) 'REGEXP "^fo$"');
 		$this->assertIdentical('REGEXP "^fo$"', $result);
 
-		$date = date_default_timezone_get();
-		date_default_timezone_set('UTC');
+		$result = $this->db->value((object) 'CURRENT_TIMESTAMP', array('type' => 'timestamp'));
+		$this->assertIdentical('CURRENT_TIMESTAMP', $result);
+
+		$result = $this->db->value('CURRENT_TIMESTAMP', array('type' => 'timestamp'));
+		$this->assertIdentical('CURRENT_TIMESTAMP', $result,
+			'Anything that `strtotime()` does not recognize should be passed through untouched');
+
 		$result = $this->db->value('Hello World', array('type' => 'timestamp'));
-		$this->assertIdentical("'1970-01-01 00:00:00'", $result);
-		date_default_timezone_set($date);
+		$this->assertIdentical("Hello World", $result,
+			'Even nonsensical values are passed through for the actual RDBMS to handle');
 
 		$result = $this->db->value('2012-05-25 22:44:00', array('type' => 'timestamp'));
 		$this->assertIdentical("'2012-05-25 22:44:00'", $result);
