@@ -443,6 +443,37 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = Exporter::get('update', $doc->export());
 		$this->assertEqual($result['update'], $data);
 	}
+	/**
+	 * Allow basic type field to be replaced by a `Document` / `DocumentSet` type.
+	 */
+	public function testArrayFieldChange() {
+		$doc = new Document();
+		$doc->someOtherField = "someValue";
+		$doc->list = "test";
+		$doc->sync();
+		$doc->list = new DocumentSet();
+		$doc->list["id"] = array('foo' => '!!', 'bar' => '??');
+		$data = array('list' => array("id"=>array('foo' => '!!', 'bar' => '??')));
+
+
+		$result = Exporter::get('update', $doc->export());
+		$this->assertEqual($data, $result['update']);
+
+
+		$doc = new Document();
+		$doc->someOtherField = "someValue";
+		$doc->list = new Document(array('data'=>array('foo'=>'!!')));
+		$doc->sync();
+		$doc->list = new DocumentSet();
+		$doc->list["id"] = array('foo' => '!!', 'bar' => '??');
+
+
+		$result = Exporter::get('update', $doc->export());
+		$this->assertEqual($data, $result['update']);
+
+
+
+	}
 
 	/**
 	 * Test that sub-objects are properly casted on creating a new `Document`.
