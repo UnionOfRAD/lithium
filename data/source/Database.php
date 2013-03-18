@@ -176,10 +176,23 @@ abstract class Database extends \lithium\data\Source {
 			'dsn'        => null,
 			'options'    => array()
 		);
+		parent::__construct($config + $defaults);
+	}
+
+	/**
+	 * Initialize `Database::$_strategies` because Closures cannot be created within the class
+	 * definition.
+	 *
+	 * @see \lithium\data\source\Database::$_strategies
+	 */
+	protected function _init() {
+		parent::_init();
+
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
-			          '{:having} {:order} {:limit};{:comment}'
+					  '{:having} {:order} {:limit};{:comment}'
 		);
+
 		$this->_strategies += array(
 			'joined' => function($self, $model, $context) {
 
@@ -251,7 +264,6 @@ abstract class Database extends \lithium\data\Source {
 				throw new QueryException("This strategy is not yet implemented.");
 			}
 		);
-		parent::__construct($config + $defaults);
 	}
 
 	public function connect() {
