@@ -84,6 +84,16 @@ class Request extends \lithium\net\http\Message {
 			'followLocation' => true
 		);
 		parent::__construct($config + $defaults);
+	}
+
+	/**
+	 * Initialize request object method, content type, and headers
+	 *
+	 * @return void
+	 */
+	protected function _init() {
+		parent::_init();
+
 		$this->method = $this->method ?: $this->_config['method'];
 
 		$this->headers = array(
