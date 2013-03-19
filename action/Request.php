@@ -175,6 +175,12 @@ class Request extends \lithium\net\http\Request {
 		if (isset($_POST)) {
 			$this->data += $_POST;
 		}
+		if (!empty($this->_config['cookies'])) {
+			$this->cookies = $this->_config['cookies'];
+		}
+		if (isset($_COOKIE)) {
+			$this->cookies += $_COOKIE;
+		}
 		if (isset($this->data['_method'])) {
 			$this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'] = strtoupper($this->data['_method']);
 			unset($this->data['_method']);
