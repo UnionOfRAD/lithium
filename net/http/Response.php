@@ -127,27 +127,29 @@ class Response extends \lithium\net\http\Message {
 		$defaults = array('decode' => true);
 		return parent::body($data, $options + $defaults);
 	}
+
 	/**
 	 * Set and get the status for the response.
 	 *
-	 * @param string $key
-	 * @param string $data
+	 * @param string $key Optional. Set to 'code' or 'message' to return just the code or message
+	 *        of the status, otherwise returns the full status header.
+	 * @param string $status The code or message of the status you wish to set.
 	 * @return string Returns the full HTTP status, with version, code and message.
 	 */
-	public function status($key = null, $data = null) {
-		if ($data === null) {
-			$data = $key;
+	public function status($key = null, $status = null) {
+		if ($status === null) {
+			$status = $key;
 		}
-		if ($data) {
+		if ($status) {
 			$this->status = array('code' => null, 'message' => null);
 
-			if (is_numeric($data) && isset($this->_statuses[$data])) {
-				$this->status = array('code' => $data, 'message' => $this->_statuses[$data]);
+			if (is_numeric($status) && isset($this->_statuses[$status])) {
+				$this->status = array('code' => $status, 'message' => $this->_statuses[$status]);
 			} else {
 				$statuses = array_flip($this->_statuses);
 
-				if (isset($statuses[$data])) {
-					$this->status = array('code' => $statuses[$data], 'message' => $data);
+				if (isset($statuses[$status])) {
+					$this->status = array('code' => $statuses[$status], 'message' => $status);
 				}
 			}
 		}
