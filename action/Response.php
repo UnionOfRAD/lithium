@@ -132,7 +132,7 @@ class Response extends \lithium\net\http\Response {
 				$this->_writeHeader("{$name}: {$value}");
 			}
 		}
-		if ($code == 302 || $code == 204) {
+		if ($this->status['code'] == 302 || $this->status['code'] == 204) {
 			return;
 		}
 		$chunked = $this->body(null, $this->_config);
