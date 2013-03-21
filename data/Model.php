@@ -98,7 +98,6 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Model hasOne relations.
-	 * Not yet implemented.
 	 *
 	 * @var array
 	 */
@@ -106,7 +105,6 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Model hasMany relations.
-	 * Not yet implemented.
 	 *
 	 * @var array
 	 */
@@ -114,7 +112,6 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Model belongsTo relations.
-	 * Not yet implemented.
 	 *
 	 * @var array
 	 */
