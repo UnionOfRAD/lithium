@@ -42,7 +42,7 @@ class CrudTest extends \lithium\test\Integration {
 	 * Skip the test if no test database connection available.
 	 */
 	public function skip() {
-		$connection = 'lithium_couch_test';
+		$connection = 'test';
 		$config = Connections::get($connection, array('config' => true));
 
 		$isConnected = $config && Connections::get($connection)->isConnected(array(

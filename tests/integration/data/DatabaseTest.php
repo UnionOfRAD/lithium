@@ -81,7 +81,7 @@ class DatabaseTest extends \lithium\test\Integration {
 	}
 
 	public function skip() {
-		$connection = 'lithium_mysql_test';
+		$connection = 'test';
 		$this->_dbConfig = Connections::get($connection, array(
 			'config' => true
 		));
