@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\data\source\database\adapter\pdo;
 
 use PDOStatement;
+use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\source\database\adapter\MySql;
 use lithium\data\source\database\adapter\PostgreSql;
@@ -51,7 +52,7 @@ class ResultTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
-		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
+		$lithium = Libraries::get('lithium', 'path');
 		$prefix = $this->mockPrefix;
 		$sqlFile = $lithium . "/tests/mocks/data/source/database/adapter/{$prefix}_companies.sql";
 		$sql = file_get_contents($sqlFile);

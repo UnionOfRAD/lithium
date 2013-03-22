@@ -31,7 +31,7 @@ class GroupTest extends \lithium\test\Unit {
 	}
 
 	public function testAddCaseThroughConstructor() {
-		$data = (array) "\lithium\\tests\mocks\\test";
+		$data = (array) 'lithium\tests\mocks\test';
 		$group = new Group(compact('data'));
 
 		$expected = new Collection(array('data' => array(
@@ -196,7 +196,7 @@ class GroupTest extends \lithium\test\Unit {
 		);
 		Libraries::cache(false);
 
-		$expected = array('test_app\\tests\\cases\\models\\UserTest');
+		$expected = array('test_app\tests\cases\models\UserTest');
 		$result = Group::all(array('library' => 'test_app'));
 	    $this->assertEqual($expected, $result);
 
@@ -218,9 +218,9 @@ class GroupTest extends \lithium\test\Unit {
 		);
 		Libraries::cache(false);
 
-		$group = new Group(array('data' => array('\\test_app\\tests\\cases')));
+		$group = new Group(array('data' => array('test_app\tests\cases')));
 
-		$expected = array('test_app\\tests\\cases\\models\\UserTest');
+		$expected = array('test_app\tests\cases\models\UserTest');
 		$result = $group->to('array');
 	    $this->assertEqual($expected, $result);
 

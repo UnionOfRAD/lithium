@@ -46,7 +46,7 @@ class File extends \lithium\core\Object {
 	 * @param array $config Configuration parameters for this cache adapter. These settings are
 	 *        indexed by name and queryable through `Cache::config('name')`.
 	 *        The defaults are:
-	 *        - 'path' : Path where cached entries live `LITHIUM_APP_PATH . '/resources/tmp/cache'`.
+	 *        - 'path' : Path where cached entries live `Libraries::get(true, 'resources') . '/tmp/cache'`.
 	 *        - 'expiry' : Default expiry time used if none is explicitly set when calling
 	 *          `Cache::write()`.
 	 */

@@ -8,6 +8,7 @@
 
 namespace lithium\tests\integration\data;
 
+use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\source\Database;
@@ -61,7 +62,8 @@ class DatabaseTest extends \lithium\test\Integration {
 	);
 
 	public function setUp() {
-		$mockBase = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/data/source/database/adapter/';
+		$lithium = Libraries::get('lithium', 'path');
+		$mockBase = $lithium . '/tests/mocks/data/source/database/adapter/';
 		$files = array('galleries' => '_galleries.sql', 'images' => '_images.sql');
 		$files = array_diff_key($files, array_flip($this->db->sources()));
 

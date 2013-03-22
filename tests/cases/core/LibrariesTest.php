@@ -122,7 +122,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$config = Libraries::get('lithium'); // => ['path' => '/path/to/lithium', ...]
 		$expected = array(
 			'name' => 'lithium',
-			'path' => str_replace('\\', '/', realpath(realpath(LITHIUM_LIBRARY_PATH) . '/lithium')),
+			'path' => str_replace('\\', '/', realpath(Libraries::get('lithium', 'path'))),
 			'prefix' => 'lithium\\',
 			'suffix' => '.php',
 			'loader' => 'lithium\\core\\Libraries::load',
