@@ -134,7 +134,7 @@ class DatabaseTest extends \lithium\test\Integration {
 	public function testCreateData() {
 		$gallery = Galleries::create($this->gallery);
 		$this->assertTrue($gallery->save());
-		$this->assertTrue($gallery->id);
+		$this->assertNotEmpty($gallery->id);
 
 		foreach ($this->images as $key => $image) {
 			unset($image['id'], $image['gallery_id']);
