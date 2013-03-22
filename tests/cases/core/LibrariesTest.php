@@ -20,7 +20,7 @@ class LibrariesTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_cache = Libraries::cache();
 		Libraries::cache(false);
-		$this->hasApp = preg_match('/app$/', LITHIUM_APP_PATH);
+		$this->hasApp = Libraries::get(true, 'name') !== 'lithium';
 	}
 
 	public function tearDown() {
@@ -109,8 +109,12 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertIdentical($tests, $result);
 
 		if ($this->hasApp) {
-			$tests = Libraries::find('app', array('recursive' => true, 'path' => '/tests/cases'));
-			$result = preg_grep('/^app\\\\tests\\\\cases\\\\/', $tests);
+			$config = Libraries::get(true);
+			$tests = Libraries::find($config['name'], array(
+				'recursive' => true, 'path' => '/tests/cases')
+			);
+			$prefix = preg_quote($config['prefix']);
+			$result = preg_grep('/^' . $prefix . 'tests\\\\cases\\\\/', $tests);
 			$this->assertIdentical($tests, $result);
 		}
 	}
@@ -146,7 +150,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $configs['lithium']);
 
 		if ($this->hasApp) {
-			$this->assertArrayHasKey('app', $configs);
+			$this->assertArrayHasKey(Libraries::get(true, 'name'), $configs);
 		}
 
 		$configs = Libraries::get(array('lithium')); // => ['lithium' => ['path' => '...', ...]]
