@@ -50,6 +50,9 @@ class ParserTest extends \lithium\test\Unit {
 
 		$result = Parser::token('0');
 		$this->assertEqual('T_LNUMBER', $result);
+
+		$result = Parser::token('${$var}');
+		$this->assertEqual('T_VARIABLE', $result);
 	}
 
 	public function testFullTokenization() {
@@ -73,6 +76,38 @@ class ParserTest extends \lithium\test\Unit {
 		$this->assertCount(27, $result);
 		$this->assertEqual('T_VARIABLE', $result[0]['name']);
 		$this->assertEqual('$defaults', $result[0]['content']);
+	}
+
+	public function testCurlyBraceTokenization() {
+		$result = Parser::tokenize('static::${$var}');
+		$this->assertCount(3, $result);
+
+		$expected = array(
+			'id' => T_STATIC,
+			'name' => 'T_STATIC',
+			'content' => 'static',
+			'line' => 1
+		);
+
+		$this->assertEqual($expected, $result[0]);
+
+		$expected = array(
+			'id' => T_DOUBLE_COLON,
+			'name' => 'T_DOUBLE_COLON',
+			'content' => '::',
+			'line' => 1
+		);
+
+		$this->assertEqual($expected, $result[1]);
+
+		$expected = array(
+			'id' => T_VARIABLE,
+			'name' => 'T_VARIABLE',
+			'content' => '${$var}',
+			'line' => 1
+		);
+
+		$this->assertEqual($expected, $result[2]);
 	}
 
 	public function testTokenPatternMatching() {
