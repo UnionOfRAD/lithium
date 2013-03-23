@@ -2,6 +2,7 @@
 
 namespace lithium\tests\integration\data;
 
+use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\Entity;
 use lithium\data\source\Database;
@@ -15,7 +16,8 @@ class FieldsTest extends \lithium\test\Integration {
 	protected $_dbConfig = null;
 
 	public function setUp() {
-		$mockBase = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/data/source/database/adapter/';
+		$lithium = Libraries::get('lithium', 'path');
+		$mockBase = $lithium . '/tests/mocks/data/source/database/adapter/';
 		$files = array('companies' => '_companies.sql', 'employees' => '_employees.sql');
 		$files = array_diff_key($files, array_flip($this->db->sources()));
 
@@ -33,7 +35,7 @@ class FieldsTest extends \lithium\test\Integration {
 	}
 
 	public function skip() {
-		$connection = 'lithium_mysql_test';
+		$connection = 'test';
 		$this->_dbConfig = Connections::get($connection, array(
 			'config' => true
 		));

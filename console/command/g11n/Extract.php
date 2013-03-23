@@ -25,7 +25,7 @@ class Extract extends \lithium\console\Command {
 
 	protected function _init() {
 		parent::_init();
-		$this->source = $this->source ?: LITHIUM_APP_PATH;
+		$this->source = $this->source ?: Libraries::get(true, 'path');
 		$this->destination = $this->destination ?: Libraries::get(true, 'resources') . '/g11n';
 	}
 

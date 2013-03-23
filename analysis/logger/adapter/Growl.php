@@ -10,6 +10,7 @@ namespace lithium\analysis\logger\adapter;
 
 use lithium\util\Inflector;
 use lithium\core\NetworkException;
+use lithium\core\Libraries;
 
 /**
  * The `Growl` logger implements support for the [ Growl](http://growl.info/) notification system
@@ -99,7 +100,7 @@ class Growl extends \lithium\core\Object {
 	 *                Growl to be able to send. Defaults to `array('Errors', 'Messages')`.
 	 */
 	public function __construct(array $config = array()) {
-		$name = basename(LITHIUM_APP_PATH);
+		$name = basename(Libraries::get(true, 'path'));
 
 		$defaults = compact('name') + array(
 			'host'     => '127.0.0.1',

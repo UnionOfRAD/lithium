@@ -11,7 +11,7 @@ class MockCompanies extends \lithium\data\Model {
 	);
 	protected $_meta = array(
 		'source' => 'companies',
-		'connection' => 'lithium_mysql_test'
+		'connection' => 'test'
 	);
 }
 

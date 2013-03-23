@@ -10,6 +10,7 @@ namespace lithium\g11n\catalog\adapter;
 
 use RangeException;
 use lithium\core\ConfigException;
+use lithium\core\Libraries;
 
 /**
  * The `Gettext` class is an adapter for reading and writing PO and MO files without the
@@ -472,9 +473,10 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 		if (!isset($item['ids']['singular'])) {
 			$item['ids']['singular'] = $item['id'];
 		}
+		$path = Libraries::get(true, 'path');
 		if (isset($item['occurrences'])) {
 			foreach ($item['occurrences'] as &$occurrence) {
-				$occurrence['file'] = str_replace(LITHIUM_APP_PATH, '', $occurrence['file']);
+				$occurrence['file'] = str_replace($path, '', $occurrence['file']);
 			}
 		}
 		return parent::_prepareForWrite($item);

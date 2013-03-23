@@ -136,20 +136,20 @@ class ViewTest extends \lithium\test\Unit {
 		));
 		$options = array(
 			'template' => 'testFile',
-			'library' => LITHIUM_LIBRARY_PATH . '/lithium'
+			'library' => Libraries::get('lithium', 'path')
 		);
 		$result = $view->render('all', array(), $options);
 		$expected = 'This is a test.';
 		$this->assertEqual($expected, $result);
 
 		$templateData = TestRenderer::$templateData;
-		$expectedPath = LITHIUM_LIBRARY_PATH;
-		$expectedPath .= '/lithium/tests/mocks/template/view/adapters/testFile.html.php';
+		$expectedPath = Libraries::get('lithium', 'path');
+		$expectedPath .= '/tests/mocks/template/view/adapters/testFile.html.php';
 		$expected = array (array (
 				'type' => 'template',
 				'params' => array (
 					'template' => 'testFile',
-					'library' => LITHIUM_LIBRARY_PATH . '/lithium',
+					'library' => Libraries::get('lithium', 'path'),
 					'type' => 'html'
 				),
 				'return' => $expectedPath

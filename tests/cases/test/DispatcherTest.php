@@ -11,10 +11,10 @@ namespace lithium\tests\cases\test;
 use lithium\test\Dispatcher;
 use lithium\util\Collection;
 use lithium\tests\mocks\test\cases\MockTest;
-use lithium\tests\mocks\test\cases\MockTestErrorHandling;
-use lithium\tests\mocks\test\cases\MockSkipThrowsException;
-use lithium\tests\mocks\test\cases\MockSetUpThrowsException;
-use lithium\tests\mocks\test\cases\MockTearDownThrowsException;
+use lithium\tests\mocks\test\cases\MockErrorHandlingTest;
+use lithium\tests\mocks\test\cases\MockSkipThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockSetUpThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockTearDownThrowsExceptionTest;
 
 class DispatcherTest extends \lithium\test\Unit {
 
@@ -62,11 +62,11 @@ class DispatcherTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = new Collection(array('data' => array(
-			new MockSetUpThrowsException(),
-			new MockSkipThrowsException(),
-			new MockTearDownThrowsException(),
-			new MockTest(),
-			new MockTestErrorHandling()
+			new MockErrorHandlingTest(),
+			new MockSetUpThrowsExceptionTest(),
+			new MockSkipThrowsExceptionTest(),
+			new MockTearDownThrowsExceptionTest(),
+			new MockTest()
 		)));
 		$result = $report->group->tests();
 		$this->assertEqual($expected, $result);

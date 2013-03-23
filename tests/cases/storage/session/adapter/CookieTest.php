@@ -10,6 +10,7 @@ namespace lithium\tests\cases\storage\session\adapter;
 
 use lithium\util\Inflector;
 use lithium\storage\session\adapter\Cookie;
+use lithium\core\Libraries;
 
 class CookieTest extends \lithium\test\Unit {
 
@@ -26,7 +27,7 @@ class CookieTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->cookie = new Cookie();
-		$this->name = basename(LITHIUM_APP_PATH) . 'cookie';
+		$this->name = basename(Libraries::get(true, 'path')) . 'cookie';
 	}
 
 	public function tearDown() {
@@ -253,7 +254,7 @@ class CookieTest extends \lithium\test\Unit {
 
 	public function testDefaultCookieName() {
 		$cookie = new Cookie();
-		$expected = Inflector::slug(basename(LITHIUM_APP_PATH)) . 'cookie';
+		$expected = Inflector::slug(basename(Libraries::get(true, 'path'))) . 'cookie';
 		$this->assertEqual($expected, $cookie->key());
 	}
 

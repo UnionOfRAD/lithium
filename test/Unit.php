@@ -1067,7 +1067,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param string $path Path to directory with contents to remove. If first
 	 *        character is NOT a slash (`/`) or a Windows drive letter (`C:`)
-	 *        prepends `LITHIUM_APP_PATH/resources/tmp/`.
+	 *        prepends `Libraries::get(true, 'resources')/tmp/`.
 	 * @return void
 	 */
 	protected function _cleanUp($path = null) {
@@ -1552,14 +1552,14 @@ class Unit extends \lithium\core\Object {
 	 * contents of `$actual`.
 	 *
 	 * {{{
-	 * $file1 = LITHIUM_APP_PATH . '/tests/mocks/md/file_1.md';
-	 * $file2 = LITHIUM_APP_PATH . '/tests/mocks/md/file_1.md.copy';
+	 * $file1 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md';
+	 * $file2 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md.copy';
 	 * $this->assertFileEquals($file1, $file2);
 	 * }}}
 	 *
 	 * {{{
-	 * $file1 = LITHIUM_APP_PATH . '/tests/mocks/md/file_1.md';
-	 * $file2 = LITHIUM_APP_PATH . '/tests/mocks/md/file_2.md';
+	 * $file1 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md';
+	 * $file2 = Libraries::get(true, 'path') . '/tests/mocks/md/file_2.md';
 	 * $this->assertFileEquals($file1, $file2);
 	 * }}}
 	 *
@@ -1579,14 +1579,14 @@ class Unit extends \lithium\core\Object {
 	 * the contents of `$actual`.
 	 *
 	 * {{{
-	 * $file1 = LITHIUM_APP_PATH . '/tests/mocks/md/file_1.md';
-	 * $file2 = LITHIUM_APP_PATH . '/tests/mocks/md/file_2.md';
+	 * $file1 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md';
+	 * $file2 = Libraries::get(true, 'path') . '/tests/mocks/md/file_2.md';
 	 * $this->assertFileNotEquals($file1, $file2);
 	 * }}}
 	 *
 	 * {{{
-	 * $file1 = LITHIUM_APP_PATH . '/tests/mocks/md/file_1.md';
-	 * $file2 = LITHIUM_APP_PATH . '/tests/mocks/md/file_1.md.copy';
+	 * $file1 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md';
+	 * $file2 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md.copy';
 	 * $this->assertFileNotEquals($file1, $file2);
 	 * }}}
 	 *
@@ -1605,11 +1605,11 @@ class Unit extends \lithium\core\Object {
 	 * Will mark the test `true` if the file `$actual` exists.
 	 *
 	 * {{{
-	 * $this->assertFileExists(LITHIUM_APP_PATH . '/readme.md');
+	 * $this->assertFileExists(Libraries::get(true, 'path') . '/readme.md');
 	 * }}}
 	 *
 	 * {{{
-	 * $this->assertFileExists(LITHIUM_APP_PATH . '/does/not/exist.txt');
+	 * $this->assertFileExists(Libraries::get(true, 'path') . '/does/not/exist.txt');
 	 * }}}
 	 *
 	 * @param  string $actual   Path to the file you are asserting
@@ -1627,11 +1627,11 @@ class Unit extends \lithium\core\Object {
 	 * Will mark the test `true` if the file `$actual` does not exist.
 	 *
 	 * {{{
-	 * $this->assertFileNotExists(LITHIUM_APP_PATH . '/does/not/exist.txt');
+	 * $this->assertFileNotExists(Libraries::get(true, 'path') . '/does/not/exist.txt');
 	 * }}}
 	 *
 	 * {{{
-	 * $this->assertFileNotExists(LITHIUM_APP_PATH . '/readme.md');
+	 * $this->assertFileNotExists(Libraries::get(true, 'path') . '/readme.md');
 	 * }}}
 	 *
 	 * @param  string $actual   Path to the file you are asserting

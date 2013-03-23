@@ -8,11 +8,18 @@
 
 namespace lithium\tests\mocks\test\cases;
 
-class MockTestErrorHandling extends \lithium\test\Unit {
+use Exception;
 
-	public function testNotEnoughParams() {
-		$this->_arrayPermute();
+class MockSetUpThrowsExceptionTest extends \lithium\test\Unit {
+
+	public function setUp() {
+		throw new Exception('setUp throws exception');
 	}
+
+	public function testNothing() {
+		$this->assert(true);
+	}
+
 }
 
 ?>

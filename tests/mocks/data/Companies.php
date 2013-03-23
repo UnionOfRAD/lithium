@@ -12,7 +12,7 @@ class Companies extends \lithium\data\Model {
 
 	public $hasMany = array('Employees');
 
-	protected $_meta = array('connection' => 'lithium_couch_test');
+	protected $_meta = array('connection' => 'test');
 }
 
 ?>

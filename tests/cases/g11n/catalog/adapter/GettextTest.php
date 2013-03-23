@@ -622,7 +622,7 @@ EOD;
 				'flags' => array(),
 				'translated' => array('translated 1-0', 'translated 1-1'),
 				'occurrences' => array(
-					array('file' => LITHIUM_APP_PATH . '/testa.php', 'line' => 22),
+					array('file' => Libraries::get(true, 'path') . '/testa.php', 'line' => 22),
 					array('file' => '/testb.php', 'line' => 23)
 				),
 				'comments' => array()

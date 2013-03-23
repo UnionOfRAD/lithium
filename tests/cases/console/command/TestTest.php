@@ -30,7 +30,7 @@ class TestTest extends \lithium\test\Unit {
 		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
 
-		chdir(LITHIUM_LIBRARY_PATH . '/lithium');
+		chdir(Libraries::get('lithium', 'path'));
 
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
 		$this->request->params = array('library' => 'build_test');
@@ -85,7 +85,8 @@ class TestTest extends \lithium\test\Unit {
 			'classes' => $this->classes
 		));
 		$command->format = 'foobar';
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
 		$expected = "No handler for format `foobar`... \n";
 		$result = $command->response->error;
@@ -96,7 +97,8 @@ class TestTest extends \lithium\test\Unit {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
 
 		$expected = "1 pass\n0 fails and 0 exceptions\n";
@@ -145,7 +147,8 @@ class TestTest extends \lithium\test\Unit {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases';
 		$command->run($path);
 
 		$expected = "4 exceptions";
@@ -158,7 +161,8 @@ class TestTest extends \lithium\test\Unit {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$result = $command->run($path);
 		$this->assertTrue($result);
 	}
@@ -167,7 +171,8 @@ class TestTest extends \lithium\test\Unit {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTestErrorHandling.php';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTestErrorHandling.php';
 		$result = $command->run($path);
 		$this->assertFalse($result);
 	}
@@ -176,7 +181,8 @@ class TestTest extends \lithium\test\Unit {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$command->format = 'json';
 		$command->run($path);
 
