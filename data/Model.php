@@ -98,7 +98,6 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Model hasOne relations.
-	 * Not yet implemented.
 	 *
 	 * @var array
 	 */
@@ -106,7 +105,6 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Model hasMany relations.
-	 * Not yet implemented.
 	 *
 	 * @var array
 	 */
@@ -114,7 +112,6 @@ class Model extends \lithium\core\StaticObject {
 
 	/**
 	 * Model belongsTo relations.
-	 * Not yet implemented.
 	 *
 	 * @var array
 	 */
@@ -572,7 +569,7 @@ class Model extends \lithium\core\StaticObject {
 	 * Posts::find('all'); // returns all records
 	 * Posts::find('count'); // returns a count of all records
 	 *
-	 * // The first ten records that have 'author' set to 'Lithium'
+	 * // The first ten records that have 'author' set to 'Bob'
 	 * Posts::find('all', array(
 	 *     'conditions' => array('author' => "Bob"), 'limit' => 10
 	 * ));
