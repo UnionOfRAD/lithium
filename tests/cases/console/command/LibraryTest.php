@@ -90,9 +90,10 @@ class LibraryTest extends \lithium\test\Unit {
 		$result = $this->library->extract($this->_testPath . '/library_test');
 		$this->assertTrue($result);
 
-		$path = '/lithium/console/command/create/template/app.phar.gz';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = '/console/command/create/template/app.phar.gz';
 		$expected = "library_test created in {$this->_testPath} from ";
-		$expected .= realpath(LITHIUM_LIBRARY_PATH . $path) . "\n";
+		$expected .= realpath($lithium . $path) . "\n";
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
 	}
@@ -129,9 +130,10 @@ class LibraryTest extends \lithium\test\Unit {
 		);
 		$this->assertTrue($result);
 
-		$path = '/lithium/console/command/create/template/test-app-replacements.phar.gz';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = '/console/command/create/template/test-app-replacements.phar.gz';
 		$expected = "replace_test created in {$this->_testPath} from ";
-		$expected .= realpath(LITHIUM_LIBRARY_PATH . $path) . "\n";
+		$expected .= realpath($lithium . $path) . "\n";
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
 
@@ -236,7 +238,8 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->assertFileExists($this->_testPath . '/new');
 
 		$path = realpath($this->_testPath);
-		$tplPath = realpath(LITHIUM_LIBRARY_PATH . '/lithium/console/command/create/template');
+		$lithium = Libraries::get('lithium', 'path');
+		$tplPath = realpath($lithium . '/console/command/create/template');
 		$filePath = $tplPath . DIRECTORY_SEPARATOR . "app.phar.gz";
 		$expected = "new created in {$path} from {$filePath}\n";
 		$result = $app->response->output;
@@ -254,8 +257,9 @@ class LibraryTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$expected = "library_test_plugin created in {$path} from ";
-		$target = '/lithium/console/command/create/template/plugin.phar.gz';
-		$expected .= realpath(LITHIUM_LIBRARY_PATH . $target) . "\n";
+		$lithium = Libraries::get('lithium', 'path');
+		$target = '/console/command/create/template/plugin.phar.gz';
+		$expected .= realpath($lithium . $target) . "\n";
 		$result = $this->library->response->output;
 		$this->assertEqual($expected, $result);
 

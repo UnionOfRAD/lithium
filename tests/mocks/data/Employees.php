@@ -12,7 +12,7 @@ class Employees extends \lithium\data\Model {
 
 	public $belongsTo = array('Companies');
 
-	protected $_meta = array('connection' => 'lithium_couch_test');
+	protected $_meta = array('connection' => 'test');
 
 	public function lastName($entity) {
 		$name = explode(' ', $entity->name);

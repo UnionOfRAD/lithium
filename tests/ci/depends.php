@@ -7,7 +7,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-if (isset($argv[1]) && 'APC' === strtoupper($argv[1])) {
+if (isset($argv[1]) && 'APC' === strtoupper($argv[1]) && PHP_VERSION_ID < 50500) {
 	PhpExtensions::install('apc');
 } else {
 	PhpExtensions::install('xcache');

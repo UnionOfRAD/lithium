@@ -10,6 +10,7 @@ namespace lithium\tests\cases\g11n;
 
 use lithium\g11n\Multibyte;
 use lithium\tests\mocks\g11n\multibyte\adapter\MockAdapter;
+use lithium\core\Libraries;
 
 class MultibyteTest extends \lithium\test\Unit {
 

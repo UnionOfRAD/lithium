@@ -37,13 +37,17 @@ class DocumentTest extends \lithium\test\Integration {
 	 * Skip the test if no test database connection available.
 	 */
 	public function skip() {
-		$connection = 'lithium_couch_test';
+		$connection = 'test';
 		$config = Connections::get($connection, array('config' => true));
 		$isConnected = $config && Connections::get($connection)->isConnected(array(
 			'autoConnect' => true
 		));
 		$isAvailable = $config && $isConnected;
 		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
+
+		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] === 'CouchDb');
+		$message = 'Test database is either unavailable, or not using a CouchDb adapter';
+		$this->skipIf(!$hasDb, $message);
 
 		$this->_key = Companies::key();
 		$this->_database = $config['database'];

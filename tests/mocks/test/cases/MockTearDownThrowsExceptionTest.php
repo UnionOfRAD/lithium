@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\test\cases;
 
 use Exception;
 
-class MockTearDownThrowsException extends \lithium\test\Unit {
+class MockTearDownThrowsExceptionTest extends \lithium\test\Unit {
 
 	public function testNothing() {
 		$this->assert(true);

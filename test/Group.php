@@ -58,7 +58,7 @@ class Group extends \lithium\util\Collection {
 	public static function all(array $options = array()) {
 		$defaults = array(
 			'filter' => '/cases/',
-			'exclude' => '/mock/',
+			'exclude' => '/mocks/',
 			'recursive' => true
 		);
 		return Libraries::locate('tests', null, $options + $defaults);
@@ -123,11 +123,10 @@ class Group extends \lithium\util\Collection {
 	protected function _resolve($test) {
 		if (strpos($test, '\\') === false && Libraries::get($test)) {
 			return (array) Libraries::find($test, array(
-				'recursive' => true, 'filter' => '/cases|integration|functional/'
+				'recursive' => true,
+				'filter' => '/(cases|integration|functional)\\\.*Test$/',
+				'exclude' => '/tests\\\mocks/'
 			));
-		}
-		if (preg_match("/Test/", $test)) {
-			return array($test);
 		}
 		if (!$test = trim($test, '\\')) {
 			return array();
@@ -137,7 +136,8 @@ class Group extends \lithium\util\Collection {
 		return (array) Libraries::find($library, array(
 			'recursive' => true,
 			'path' => '/' . str_replace('\\', '/', $path),
-			'filter' => '/cases|integration|functional/'
+			'filter' => '/(cases|integration|functional)\\\.*Test$/',
+			'exclude' => strstr($test, 'tests\mocks') ? '' : '/tests\\\mocks/'
 		));
 	}
 }

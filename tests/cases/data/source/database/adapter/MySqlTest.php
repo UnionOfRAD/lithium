@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\source\database\adapter;
 
+use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\source\database\adapter\MySql;
@@ -33,7 +34,7 @@ class MySqlTest extends \lithium\test\Unit {
 
 		$this->db = new MySql($this->_dbConfig);
 
-		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
+		$lithium = Libraries::get('lithium', 'path');
 		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/mysql_companies.sql';
 		$sql = file_get_contents($sqlFile);
 		$this->db->read($sql, array('return' => 'resource'));

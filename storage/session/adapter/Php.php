@@ -11,6 +11,7 @@ namespace lithium\storage\session\adapter;
 use lithium\util\Set;
 use RuntimeException;
 use lithium\core\ConfigException;
+use lithium\core\Libraries;
 
 /**
  * A minimal adapter to interface with native PHP sessions.
@@ -42,7 +43,7 @@ class Php extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		if (empty($config['session.name'])) {
-			$config['session.name'] = basename(LITHIUM_APP_PATH);
+			$config['session.name'] = basename(Libraries::get(true, 'path'));
 		}
 		parent::__construct($config + $this->_defaults);
 	}

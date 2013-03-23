@@ -11,10 +11,10 @@ namespace lithium\tests\cases\test;
 use Exception;
 use lithium\core\Libraries;
 use lithium\tests\mocks\test\MockUnitTest;
-use lithium\tests\mocks\test\cases\MockSkipThrowsException;
-use lithium\tests\mocks\test\cases\MockTestErrorHandling;
-use lithium\tests\mocks\test\cases\MockSetUpThrowsException;
-use lithium\tests\mocks\test\cases\MockTearDownThrowsException;
+use lithium\tests\mocks\test\cases\MockSkipThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockErrorHandlingTest;
+use lithium\tests\mocks\test\cases\MockSetUpThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockTearDownThrowsExceptionTest;
 
 class UnitTest extends \lithium\test\Unit {
 
@@ -93,7 +93,7 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = 'assert';
 		$this->assertEqual($expected, $results[0]['assertion']);
 
-		$expected = 'lithium\\tests\\mocks\\test\\MockUnitTest';
+		$expected = 'lithium\tests\mocks\test\MockUnitTest';
 		$this->assertEqual($expected, $results[0]['class']);
 
 		$expected = 'testSomething';
@@ -168,7 +168,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testSubject() {
-		$expected = 'lithium\\tests\\mocks\\test\\MockUnit';
+		$expected = 'lithium\tests\mocks\test\MockUnit';
 		$result = $this->test->subject();
 		$this->assertEqual($expected, $result);
 	}
@@ -177,7 +177,7 @@ class UnitTest extends \lithium\test\Unit {
 		$file = realpath(LITHIUM_LIBRARY_PATH) . '/lithium/tests/mocks/test/MockUnitTest.php';
 		$expected = array(
 			'result' => 'pass',
-			'class' => 'lithium\\tests\\mocks\\test\\MockUnitTest',
+			'class' => 'lithium\tests\mocks\test\MockUnitTest',
 			'method' => 'testNothing',
 			'message' => "expected: true\nresult: true\n",
 			'data' => array('expected' => true, 'result' => true),
@@ -570,19 +570,19 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testExceptionCatching() {
-		$test = new MockSkipThrowsException();
+		$test = new MockSkipThrowsExceptionTest();
 		$test->run();
 		$expected = 'skip throws exception';
 		$results = $test->results();
 		$this->assertEqual($expected, $results[0]['message']);
 
-		$test = new MockSetUpThrowsException();
+		$test = new MockSetUpThrowsExceptionTest();
 		$test->run();
 		$expected = 'setUp throws exception';
 		$results = $test->results();
 		$this->assertEqual($expected, $results[0]['message']);
 
-		$test = new MockTearDownThrowsException();
+		$test = new MockTearDownThrowsExceptionTest();
 		$test->run();
 		$expected = 'tearDown throws exception';
 		$results = $test->results();
@@ -590,7 +590,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testErrorHandling() {
-		$test = new MockTestErrorHandling();
+		$test = new MockErrorHandlingTest();
 
 		$test->run();
 
@@ -885,8 +885,8 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual(array(
 			'expected' => 'foobar',
 			'result' => array(
-				new \ReflectionProperty('lithium\\core\\StaticObject', '_methodFilters'),
-				new \ReflectionProperty('lithium\\core\\StaticObject', '_parents')
+				new \ReflectionProperty('lithium\core\StaticObject', '_methodFilters'),
+				new \ReflectionProperty('lithium\core\StaticObject', '_parents')
 			)
 		), $result['data']);
 	}
@@ -919,8 +919,8 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual(array(
 			'expected' => '_methodFilters',
 			'result' => array(
-				new \ReflectionProperty('lithium\\core\\StaticObject', '_methodFilters'),
-				new \ReflectionProperty('lithium\\core\\StaticObject', '_parents')
+				new \ReflectionProperty('lithium\core\StaticObject', '_methodFilters'),
+				new \ReflectionProperty('lithium\core\StaticObject', '_parents')
 			)
 		), $result['data']);
 	}

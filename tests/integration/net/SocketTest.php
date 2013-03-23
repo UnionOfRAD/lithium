@@ -33,7 +33,7 @@ class SocketTest extends \lithium\test\Integration {
 
 	public function testContextAdapter() {
 		$socket = new Context($this->_testConfig);
-		$this->assertTrue($socket->open());
+		$this->assertNotEmpty($socket->open());
 		$response = $socket->send();
 		$this->assertInstanceOf('lithium\net\http\Response', $response);
 
@@ -50,7 +50,7 @@ class SocketTest extends \lithium\test\Integration {
 		$this->skipIf(!function_exists('curl_init'), $message);
 
 		$socket = new Curl($this->_testConfig);
-		$this->assertTrue($socket->open());
+		$this->assertNotEmpty($socket->open());
 		$response = $socket->send();
 		$this->assertInstanceOf('lithium\net\http\Response', $response);
 
@@ -64,7 +64,7 @@ class SocketTest extends \lithium\test\Integration {
 
 	public function testStreamAdapter() {
 		$socket = new Stream($this->_testConfig);
-		$this->assertTrue($socket->open());
+		$this->assertNotEmpty($socket->open());
 		$response = $socket->send();
 		$this->assertInstanceOf('lithium\net\http\Response', $response);
 

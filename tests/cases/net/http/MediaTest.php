@@ -258,7 +258,7 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		Libraries::add('li3_foo_blog', array(
-			'path' => LITHIUM_APP_PATH . '/libraries/plugins/blog',
+			'path' => Libraries::get(true, 'path') . '/libraries/plugins/blog',
 			'bootstrap' => false,
 			'route' => false
 		));
@@ -539,18 +539,21 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testCustomWebroot() {
-		Libraries::add('defaultStyleApp', array('path' => LITHIUM_APP_PATH, 'bootstrap' => false));
+		Libraries::add('defaultStyleApp', array(
+			'path' => Libraries::get(true, 'path'),
+			'bootstrap' => false)
+		);
 		$this->assertEqual(
-			realpath(LITHIUM_APP_PATH . '/webroot'),
+			realpath(Libraries::get(true, 'path') . '/webroot'),
 			realpath(Media::webroot('defaultStyleApp'))
 		);
 
 		Libraries::add('customWebRootApp', array(
-			'path' => LITHIUM_APP_PATH,
-			'webroot' => LITHIUM_APP_PATH,
+			'path' => Libraries::get(true, 'path'),
+			'webroot' => Libraries::get(true, 'path'),
 			'bootstrap' => false
 		));
-		$this->assertEqual(LITHIUM_APP_PATH, Media::webroot('customWebRootApp'));
+		$this->assertEqual(Libraries::get(true, 'path'), Media::webroot('customWebRootApp'));
 
 		Libraries::remove('defaultStyleApp');
 		Libraries::remove('customWebRootApp');

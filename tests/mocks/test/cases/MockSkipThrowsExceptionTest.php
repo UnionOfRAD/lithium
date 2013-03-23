@@ -10,16 +10,11 @@ namespace lithium\tests\mocks\test\cases;
 
 use Exception;
 
-class MockSetUpThrowsException extends \lithium\test\Unit {
+class MockSkipThrowsExceptionTest extends \lithium\test\Unit {
 
-	public function setUp() {
-		throw new Exception('setUp throws exception');
+	public function skip() {
+		throw new Exception('skip throws exception');
 	}
-
-	public function testNothing() {
-		$this->assert(true);
-	}
-
 }
 
 ?>

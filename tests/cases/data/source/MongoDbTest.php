@@ -29,7 +29,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	protected $_testConfig = array(
 		'adapter' => false,
-		'database' => 'lithium_test',
+		'database' => 'test',
 		'host' => 'localhost',
 		'port' => '27017',
 		'persistent' => null,

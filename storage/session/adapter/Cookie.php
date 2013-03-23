@@ -10,6 +10,7 @@ namespace lithium\storage\session\adapter;
 
 use RuntimeException;
 use lithium\util\Set;
+use lithium\core\Libraries;
 
 /**
  * A minimal adapter to interface with HTTP cookies.
@@ -42,7 +43,7 @@ class Cookie extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		if (empty($config['name'])) {
-			$config['name'] = basename(LITHIUM_APP_PATH) . 'cookie';
+			$config['name'] = basename(Libraries::get(true, 'path')) . 'cookie';
 		}
 		parent::__construct($config + $this->_defaults);
 	}

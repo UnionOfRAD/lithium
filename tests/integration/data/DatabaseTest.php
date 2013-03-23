@@ -8,6 +8,7 @@
 
 namespace lithium\tests\integration\data;
 
+use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\source\Database;
@@ -61,7 +62,8 @@ class DatabaseTest extends \lithium\test\Integration {
 	);
 
 	public function setUp() {
-		$mockBase = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/data/source/database/adapter/';
+		$lithium = Libraries::get('lithium', 'path');
+		$mockBase = $lithium . '/tests/mocks/data/source/database/adapter/';
 		$files = array('galleries' => '_galleries.sql', 'images' => '_images.sql');
 		$files = array_diff_key($files, array_flip($this->db->sources()));
 
@@ -79,10 +81,11 @@ class DatabaseTest extends \lithium\test\Integration {
 	}
 
 	public function skip() {
-		$connection = 'lithium_mysql_test';
+		$connection = 'test';
 		$this->_dbConfig = Connections::get($connection, array(
 			'config' => true
 		));
+		unset($this->_dbConfig['object']);
 		$isConnected = $this->_dbConfig && Connections::get($connection)->isConnected(array(
 			'autoConnect' => true
 		));
@@ -107,32 +110,36 @@ class DatabaseTest extends \lithium\test\Integration {
 
 	public function testConnectWithWrongHost() {
 		$config = $this->_dbConfig;
+		$skip = $config['adapter'] === 'Sqlite3' || $config['adapter'] === 'MySql';
+		$this->skipIf($skip, 'Not supported by Sqlite3 & Uncatchable exception bug with MySql');
 		$config['host'] = 'unknown.host.nowhere';
 		$connection = 'wrong_host';
 		Connections::add($connection, $config);
-		$this->expectException('/Unable to connect to host `unknown.host.nowhere`/');
+		$this->expectException();
 		Connections::get($connection)->connect();
 	}
 
 	public function testConnectWithWrongPassword() {
 		$config = $this->_dbConfig;
+		$skip = $config['adapter'] === 'Sqlite3' || $config['adapter'] === 'MySql';
+		$this->skipIf($skip, 'Not supported by Sqlite3 & Uncatchable exception bug with MySql');
 		$config['login'] = 'wrong_login';
 		$config['password'] = 'wrong_pass';
 		$connection = 'wrong_passord';
 		Connections::add($connection, $config);
-		$this->expectException('/Host connected, but could not access database/');
+		$this->expectException();
 		Connections::get($connection)->connect();
 	}
 
 	public function testExecuteException() {
-		$this->expectException("/You have an error(.*?)near '\* FROM table'/");
+		$this->expectException("/error/");
 		$this->db->read('SELECT * FROM * FROM table');
 	}
 
 	public function testCreateData() {
 		$gallery = Galleries::create($this->gallery);
 		$this->assertTrue($gallery->save());
-		$this->assertTrue($gallery->id);
+		$this->assertNotEmpty($gallery->id);
 
 		foreach ($this->images as $key => $image) {
 			unset($image['id'], $image['gallery_id']);

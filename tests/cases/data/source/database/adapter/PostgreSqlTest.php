@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\source\database\adapter;
 
+use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\source\database\adapter\PostgreSql;
@@ -36,7 +37,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 
 		$this->db = new PostgreSql($this->_dbConfig);
 
-		$lithium = LITHIUM_LIBRARY_PATH . '/lithium';
+		$lithium = Libraries::get('lithium', 'path');
 		$sqlFile = $lithium . '/tests/mocks/data/source/database/adapter/postgresql_companies.sql';
 		$sql = file_get_contents($sqlFile);
 		$this->db->read($sql, array('return' => 'resource'));
@@ -174,7 +175,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 			'name' => 'Test',
 			'return' => 'array'
 		));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	public function testAbstractColumnResolution() {
@@ -213,7 +214,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 			'name' => 'Bar',
 			'created' => date('Y-m-d H:i:s', strtotime('-5 minutes'))
 		));
-		$this->asserTrue($this->db->create($insert));
+		$this->assertTrue($this->db->create($insert));
 
 		$insert->data(array(
 			'name' => 'Baz',
@@ -265,14 +266,14 @@ class PostgreSqlTest extends \lithium\test\Unit {
 		$expected = array(
 			'id' => array(
 				'type' => 'integer', 'null' => false,
-				'default' => 'nextval(\'companies_id_seq\'::regclass)'
+				'default' => null
 			),
 			'name' => array('type' => 'string', 'length' => 255, 'null' => true, 'default' => null),
 			'active' => array('type' => 'boolean', 'null' => true, 'default' => null),
 			'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 			'modified' => array('type' => 'datetime', 'null' => true, 'default' => null)
 		);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->fields());
 
 		unset($expected['name']);
 		unset($expected['modified']);
