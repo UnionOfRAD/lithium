@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\source\database\adapter;
 
+use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\source\database\adapter\Sqlite3;
 use lithium\tests\mocks\data\source\database\adapter\MockSqlite3;

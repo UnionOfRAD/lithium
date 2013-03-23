@@ -175,7 +175,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 			'name' => 'Test',
 			'return' => 'array'
 		));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	public function testAbstractColumnResolution() {
@@ -214,7 +214,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 			'name' => 'Bar',
 			'created' => date('Y-m-d H:i:s', strtotime('-5 minutes'))
 		));
-		$this->asserTrue($this->db->create($insert));
+		$this->assertTrue($this->db->create($insert));
 
 		$insert->data(array(
 			'name' => 'Baz',
@@ -266,14 +266,14 @@ class PostgreSqlTest extends \lithium\test\Unit {
 		$expected = array(
 			'id' => array(
 				'type' => 'integer', 'null' => false,
-				'default' => 'nextval(\'companies_id_seq\'::regclass)'
+				'default' => null
 			),
 			'name' => array('type' => 'string', 'length' => 255, 'null' => true, 'default' => null),
 			'active' => array('type' => 'boolean', 'null' => true, 'default' => null),
 			'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 			'modified' => array('type' => 'datetime', 'null' => true, 'default' => null)
 		);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result->fields());
 
 		unset($expected['name']);
 		unset($expected['modified']);

@@ -54,6 +54,10 @@ class SourceTest extends \lithium\test\Integration {
 		$isAvailable = $config && $isConnected;
 		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
 
+		$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] === 'CouchDb');
+		$message = 'Test database is either unavailable, or not using a CouchDb adapter';
+		$this->skipIf(!$hasDb, $message);
+
 		$this->_key = Companies::key();
 		$this->_database = $config['database'];
 		$this->_connection = Connections::get($connection);

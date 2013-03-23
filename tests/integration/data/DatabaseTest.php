@@ -85,6 +85,7 @@ class DatabaseTest extends \lithium\test\Integration {
 		$this->_dbConfig = Connections::get($connection, array(
 			'config' => true
 		));
+		unset($this->_dbConfig['object']);
 		$isConnected = $this->_dbConfig && Connections::get($connection)->isConnected(array(
 			'autoConnect' => true
 		));
@@ -109,25 +110,29 @@ class DatabaseTest extends \lithium\test\Integration {
 
 	public function testConnectWithWrongHost() {
 		$config = $this->_dbConfig;
+		$skip = $config['adapter'] === 'Sqlite3' || $config['adapter'] === 'MySql';
+		$this->skipIf($skip, 'Not supported by Sqlite3 & Uncatchable exception bug with MySql');
 		$config['host'] = 'unknown.host.nowhere';
 		$connection = 'wrong_host';
 		Connections::add($connection, $config);
-		$this->expectException('/Unable to connect to host `unknown.host.nowhere`/');
+		$this->expectException();
 		Connections::get($connection)->connect();
 	}
 
 	public function testConnectWithWrongPassword() {
 		$config = $this->_dbConfig;
+		$skip = $config['adapter'] === 'Sqlite3' || $config['adapter'] === 'MySql';
+		$this->skipIf($skip, 'Not supported by Sqlite3 & Uncatchable exception bug with MySql');
 		$config['login'] = 'wrong_login';
 		$config['password'] = 'wrong_pass';
 		$connection = 'wrong_passord';
 		Connections::add($connection, $config);
-		$this->expectException('/Host connected, but could not access database/');
+		$this->expectException();
 		Connections::get($connection)->connect();
 	}
 
 	public function testExecuteException() {
-		$this->expectException("/You have an error(.*?)near '\* FROM table'/");
+		$this->expectException("/error/");
 		$this->db->read('SELECT * FROM * FROM table');
 	}
 
