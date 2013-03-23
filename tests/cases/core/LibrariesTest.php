@@ -27,6 +27,7 @@ class LibrariesTest extends \lithium\test\Unit {
 		Libraries::cache(false);
 		Libraries::cache($this->_cache);
 		unset($this->hasApp);
+		$this->_cleanUp();
 	}
 
 	public function testNamespaceToFileTranslation() {
@@ -329,6 +330,25 @@ class LibrariesTest extends \lithium\test\Unit {
 		));
 		$this->assertIdentical(array(__CLASS__), $result);
 
+
+		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
+		mkdir($testApp . '/tests/cases/models', 0777, true);
+		Libraries::add('test_app', array('path' => $testApp));
+
+		$body = <<<EOD
+<?php 
+namespace test_app\\tests\\cases\\models;
+class UserTest extends \\lithium\\test\\Unit {
+	public function testMe() {
+		\$this->assertTrue(true);
+	}
+}
+?>
+EOD;
+
+		$filepath = $testApp . '/tests/cases/models/UserTest.php';
+		file_put_contents($filepath, $body);
+
 		$count = Libraries::find('lithium', array('recursive' => true));
 		$count2 = Libraries::find(true, array('recursive' => true));
 		$this->assertTrue($count < $count2);
@@ -438,12 +458,27 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testServiceLocateApp() {
-		$this->skipIf(!$this->hasApp, 'Running in standalone mode.');
+		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
+		mkdir($testApp, 0777, true);
+		Libraries::add('test_app', array('path' => $testApp));
+
+		mkdir($testApp . '/controllers', 0777, true);
+		$body = <<<EOD
+<?php
+namespace test_app\\controllers;
+class HelloWorldController extends \\lithium\\action\\Controller {
+	public function index() {}
+}
+?>
+EOD;
+		$filepath = $testApp . '/controllers/HelloWorldController.php';
+		file_put_contents($filepath, $body);
+		Libraries::cache(false);
+
 		$result = Libraries::locate('controllers', 'HelloWorld');
-		$expected = 'app\controllers\HelloWorldController';
+		$expected = 'test_app\controllers\HelloWorldController';
 		$this->assertEqual($expected, $result);
 
-		// Tests caching of paths
 		$result = Libraries::locate('controllers', 'HelloWorld');
 		$this->assertEqual($expected, $result);
 	}
@@ -580,20 +615,20 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testLocateWithLibrary() {
-	    $expected = array();
-	    $result = (array) Libraries::locate("tests", null, array('library' => 'doesntExist'));
-	    $this->assertIdentical($expected, $result);
+		$expected = array();
+		$result = (array) Libraries::locate("tests", null, array('library' => 'doesntExist'));
+		$this->assertIdentical($expected, $result);
 	}
 
 	public function testLocateWithLithiumLibrary() {
-	    $expected = (array) Libraries::find('lithium', array(
-		    'path' => '/tests',
+		$expected = (array) Libraries::find('lithium', array(
+			'path' => '/tests',
 			'preFilter' => '/[A-Z][A-Za-z0-9]+\Test\./',
-	        'recursive' => true,
-	        'filter' => '/cases|integration|functional|mocks/'
-	    ));
-	    $result = (array) Libraries::locate("tests", null, array('library' => 'lithium'));
-	    $this->assertEqual($expected, $result);
+			'recursive' => true,
+			'filter' => '/cases|integration|functional|mocks/'
+		));
+		$result = (array) Libraries::locate("tests", null, array('library' => 'lithium'));
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testLocateWithTestAppLibrary() {
@@ -602,19 +637,23 @@ class LibrariesTest extends \lithium\test\Unit {
 		Libraries::add('test_app', array('path' => $testApp));
 
 		mkdir($testApp . '/tests/cases/models', 0777, true);
-		file_put_contents($testApp . '/tests/cases/models/UserTest.php',
-		"<?php namespace test_app\\tests\\cases\\models;\n
-			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
-				\$this->assertTrue(true);
-			}}"
-		);
+		$body = <<<EOD
+<?php 
+namespace test_app\\tests\\cases\\models;
+class UserTest extends \\lithium\\test\\Unit {
+	public function testMe() {
+		\$this->assertTrue(true);
+	}
+}
+?>
+EOD;
+		$filepath = $testApp . '/tests/cases/models/UserTest.php';
+		file_put_contents($filepath, $body);
 		Libraries::cache(false);
 
-		$expected = array('test_app\\tests\\cases\\models\\UserTest');
-	    $result = (array) Libraries::locate("tests", null, array('library' => 'test_app'));
-	    $this->assertEqual($expected, $result);
-
-		$this->_cleanUp();
+		$expected = array('test_app\tests\cases\models\UserTest');
+		$result = (array) Libraries::locate("tests", null, array('library' => 'test_app'));
+		$this->assertEqual($expected, $result);
 	}
 
 	/**
@@ -641,23 +680,26 @@ class LibrariesTest extends \lithium\test\Unit {
 
 			Libraries::add('test_app', array('path' => $testApp));
 
+			$body = <<<EOD
+<?php
+namespace test_app{$namespace};
+class {$class}Controller extends \\lithium\\action\\Controller {
+	public function index() {
+		return true;
+	}
+}
+?>
+EOD;
 			mkdir($testApp . $path, 0777, true);
-			file_put_contents($testApp . $path . "/{$class}Controller.php",
-			"<?php namespace test_app{$namespace};\n
-				class {$class}Controller extends \\lithium\\action\\Controller {
-				public function index() {
-					return true;
-				}}"
-			);
+			$filepath = $testApp . $path . "/{$class}Controller.php";
+			file_put_contents($filepath, $body);
 			Libraries::cache(false);
 
 			$expected = "test_app{$namespace}\\{$class}Controller";
 			$instance = Libraries::instance($dotsyntax, "Posts", array('library' => 'test_app'));
-		    $result = get_class($instance);
-		    $this->assertEqual($expected, $result, "{$path} did not work");
+			$result = get_class($instance);
+			$this->assertEqual($expected, $result, "{$path} did not work");
 		}
-
-		$this->_cleanUp();
 	}
 
 	/**
@@ -672,57 +714,65 @@ class LibrariesTest extends \lithium\test\Unit {
 		mkdir($testApp. '/lib', 0777);
 		mkdir($testApp. '/_patch', 0777);
 
-		file_put_contents($testApp . '/lib/LibTest.php',
-		"<?php namespace test_app\\lib;\n
-			class LibTest{ public function testMe() {
-				return 'core class';
-			}}"
-		);
+		$lib = <<<EOD
+<?php
+namespace test_app\\lib;
+class LibTest {
+	public function testMe() {
+		return 'core class';
+	}
+}
+?>
+EOD;
+		file_put_contents($testApp . '/lib/LibTest.php', $lib);
 
-		file_put_contents($testApp . '/_patch/PatchedLibTest.php',
-		"<?php namespace test_app\\lib;\n
-			class LibTest{ public function testMe() {
-				return 'patched class';
-			}}"
-		);
+		$patch = <<<EOD
+<?php
+namespace test_app\\lib;
+class LibTest {
+	public function testMe() {
+		return 'patched class';
+	}
+}
+?>
+EOD;
+		file_put_contents($testApp . '/_patch/PatchedLibTest.php', $patch);
 
 		$expected = $result = Libraries::realPath($testApp . '/lib/LibTest.php');
-		$result = Libraries::path('test_app\\lib\\LibTest');
+		$result = Libraries::path('test_app\lib\LibTest');
 
 		$this->assertEqual($expected, $result);
 
 		Libraries::map(array(
-			'test_app\\lib\\LibTest' => $testApp . '/_patch/PatchedLibTest.php'
+			'test_app\lib\LibTest' => $testApp . '/_patch/PatchedLibTest.php'
 		));
 
 		$expected = $result = Libraries::realPath($testApp . '/_patch/PatchedLibTest.php');
-		$result = Libraries::path('test_app\\lib\\LibTest');
+		$result = Libraries::path('test_app\lib\LibTest');
 
-		Libraries::unmap(array('test_app\\lib\\LibTest'));
+		Libraries::unmap(array('test_app\lib\LibTest'));
 
 		$expected = $result = Libraries::realPath($testApp . '/lib/LibTest.php');
-		$result = Libraries::path('test_app\\lib\\LibTest');
+		$result = Libraries::path('test_app\lib\LibTest');
 
 		$this->assertEqual($expected, $result);
 
 		Libraries::map(array(
-			'test_app\\lib\\LibTest' => $testApp . '/_patch/PatchedLibTest.php'
+			'test_app\lib\LibTest' => $testApp . '/_patch/PatchedLibTest.php'
 		));
-		Libraries::unmap('test_app\\lib\\LibTest');
+		Libraries::unmap('test_app\lib\LibTest');
 
 		$expected = $result = Libraries::realPath($testApp . '/lib/LibTest.php');
-		$result = Libraries::path('test_app\\lib\\LibTest');
+		$result = Libraries::path('test_app\lib\LibTest');
 
 		Libraries::map(array(
-			'test_app\\lib\\LibTest' => $testApp . '/_patch/PatchedLibTest.php'
+			'test_app\lib\LibTest' => $testApp . '/_patch/PatchedLibTest.php'
 		));
 
 		$object = new \test_app\lib\LibTest();
 
 		$result = $object->testMe();
 		$this->assertEqual('patched class', $result);
-
-		$this->_cleanUp();
 	}
 }
 

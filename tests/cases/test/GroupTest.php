@@ -15,10 +15,10 @@ use lithium\tests\cases\data\ModelTest;
 use lithium\tests\cases\core\ObjectTest;
 use lithium\tests\cases\g11n\CatalogTest;
 use lithium\tests\mocks\test\cases\MockTest;
-use lithium\tests\mocks\test\cases\MockTestErrorHandling;
-use lithium\tests\mocks\test\cases\MockSkipThrowsException;
-use lithium\tests\mocks\test\cases\MockSetUpThrowsException;
-use lithium\tests\mocks\test\cases\MockTearDownThrowsException;
+use lithium\tests\mocks\test\cases\MockErrorHandlingTest;
+use lithium\tests\mocks\test\cases\MockSkipThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockSetUpThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockTearDownThrowsExceptionTest;
 
 class GroupTest extends \lithium\test\Unit {
 
@@ -35,11 +35,11 @@ class GroupTest extends \lithium\test\Unit {
 		$group = new Group(compact('data'));
 
 		$expected = new Collection(array('data' => array(
-			new MockSetUpThrowsException(),
-			new MockSkipThrowsException(),
-			new MockTearDownThrowsException(),
-			new MockTest(),
-			new MockTestErrorHandling()
+			new MockErrorHandlingTest(),
+			new MockSetUpThrowsExceptionTest(),
+			new MockSkipThrowsExceptionTest(),
+			new MockTearDownThrowsExceptionTest(),
+			new MockTest()
 		)));
 		$result = $group->tests();
 

@@ -8,12 +8,10 @@
 
 namespace lithium\tests\mocks\test\cases;
 
-use Exception;
+class MockErrorHandlingTest extends \lithium\test\Unit {
 
-class MockSkipThrowsException extends \lithium\test\Unit {
-
-	public function skip() {
-		throw new Exception('skip throws exception');
+	public function testNotEnoughParams() {
+		$this->_arrayPermute();
 	}
 }
 

@@ -11,10 +11,10 @@ namespace lithium\tests\cases\test;
 use Exception;
 use lithium\core\Libraries;
 use lithium\tests\mocks\test\MockUnitTest;
-use lithium\tests\mocks\test\cases\MockSkipThrowsException;
-use lithium\tests\mocks\test\cases\MockTestErrorHandling;
-use lithium\tests\mocks\test\cases\MockSetUpThrowsException;
-use lithium\tests\mocks\test\cases\MockTearDownThrowsException;
+use lithium\tests\mocks\test\cases\MockSkipThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockErrorHandlingTest;
+use lithium\tests\mocks\test\cases\MockSetUpThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockTearDownThrowsExceptionTest;
 
 class UnitTest extends \lithium\test\Unit {
 
@@ -570,19 +570,19 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testExceptionCatching() {
-		$test = new MockSkipThrowsException();
+		$test = new MockSkipThrowsExceptionTest();
 		$test->run();
 		$expected = 'skip throws exception';
 		$results = $test->results();
 		$this->assertEqual($expected, $results[0]['message']);
 
-		$test = new MockSetUpThrowsException();
+		$test = new MockSetUpThrowsExceptionTest();
 		$test->run();
 		$expected = 'setUp throws exception';
 		$results = $test->results();
 		$this->assertEqual($expected, $results[0]['message']);
 
-		$test = new MockTearDownThrowsException();
+		$test = new MockTearDownThrowsExceptionTest();
 		$test->run();
 		$expected = 'tearDown throws exception';
 		$results = $test->results();
@@ -590,7 +590,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testErrorHandling() {
-		$test = new MockTestErrorHandling();
+		$test = new MockErrorHandlingTest();
 
 		$test->run();
 

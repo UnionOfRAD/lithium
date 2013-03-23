@@ -27,7 +27,7 @@ class ContextTest extends \lithium\test\Unit {
 	public function setUp() {
 		$base = 'lithium\net\socket';
 		$namespace = __NAMESPACE__;
-		Mocker::overwriteFunction("{$namespace}\stream_context_get_options", function($resource) {
+		Mocker::overwriteFunction("{$namespace}\\stream_context_get_options", function($resource) {
 			rewind($resource);
 			return unserialize(stream_get_contents($resource));
 		});
@@ -39,7 +39,7 @@ class ContextTest extends \lithium\test\Unit {
 			fputs($handle, serialize($context));
 			return $handle;
 		});
-		Mocker::overwriteFunction("{$base}\stream_get_meta_data", function($resource) {
+		Mocker::overwriteFunction("{$base}\\stream_get_meta_data", function($resource) {
 			return array(
 				'wrapper_data' => array(
 					'HTTP/1.1 301 Moved Permanently',
@@ -56,7 +56,7 @@ class ContextTest extends \lithium\test\Unit {
 				),
 			);
 		});
-		Mocker::overwriteFunction("{$base}\stream_get_contents", function($resource) {
+		Mocker::overwriteFunction("{$base}\\stream_get_contents", function($resource) {
 			return <<<EOD
 <HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">
 <TITLE>301 Moved</TITLE></HEAD><BODY>
