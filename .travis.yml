@@ -17,10 +17,6 @@ php:
   - 5.4
   - 5.5
 
-matrix:
-  allow_failures:
-    - php: 5.5
-
 before_script:
   - php tests/ci/depends.php $OPCODE_CACHE
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database lithium_test;'; fi"
@@ -35,3 +31,6 @@ before_script:
 
 script:
   - ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases && ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration
+
+notifications:
+    irc: "irc.freenode.org#li3-core"
