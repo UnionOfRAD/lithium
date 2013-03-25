@@ -577,10 +577,11 @@ class CacheTest extends \lithium\test\Unit {
 		));
 		Cache::config($config);
 
-		$result = Cache::write('default', 'key', 'value', '+1 minute');
+		$time = time();
+		$result = Cache::write('default', 'key', 'value', "@{$time} +1 minute");
 		$this->assertNotEmpty($result);
 
-		$time = time() + 60;
+		$time = $time + 60;
 		$result = file_get_contents("{$path}/key");
 		$expected = "{:expiry:$time}\nvalue";
 		$this->assertEqual($result, $expected);
@@ -603,10 +604,11 @@ class CacheTest extends \lithium\test\Unit {
 		Cache::config($config);
 
 		$data = array('some' => 'data');
-		$result = Cache::write('default', 'key', $data, '+1 minute');
+		$time = time();
+		$result = Cache::write('default', 'key', $data, "@{$time} +1 minute");
 		$this->assertNotEmpty($result);
 
-		$time = time() + 60;
+		$time = $time + 60;
 		$result = file_get_contents("{$path}/key");
 
 		$expected = "{:expiry:$time}\na:1:{s:4:\"some\";s:4:\"data\";}";
@@ -633,10 +635,11 @@ class CacheTest extends \lithium\test\Unit {
 		Cache::config($config);
 
 		$data = array('some' => 'data');
-		$result = Cache::write('default', 'key', $data, '+1 minute');
+		$time = time();
+		$result = Cache::write('default', 'key', $data, "@{$time} +1 minute");
 		$this->assertNotEmpty($result);
 
-		$time = time() + 60;
+		$time = $time + 60;
 		$result = file_get_contents("{$path}/key");
 
 		$expected = "{:expiry:$time}\nYToxOntzOjQ6InNvbWUiO3M6NDoiZGF0YSI7fQ==";

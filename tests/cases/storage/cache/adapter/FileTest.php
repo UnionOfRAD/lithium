@@ -63,8 +63,9 @@ class FileTest extends \lithium\test\Unit {
 	public function testWrite() {
 		$key = 'key';
 		$data = 'data';
-		$expiry = '+1 minute';
-		$time = time() + 60;
+		$time = time();
+		$expiry = "@{$time} +1 minute";
+		$time = $time + 60;
 
 		$closure = $this->File->write($key, $data, $expiry);
 		$this->assertInternalType('callable', $closure);
@@ -85,10 +86,11 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteDefaultCacheExpiry() {
-		$file = new File(array('expiry' => '+1 minute'));
+		$time = time();
+		$file = new File(array('expiry' => "@{$time} +1 minute"));
 		$key = 'default_keykey';
 		$data = 'data';
-		$time = time() + 60;
+		$time = $time + 60;
 
 		$closure = $file->write($key, $data);
 		$this->assertInternalType('callable', $closure);
