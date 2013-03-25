@@ -1188,10 +1188,6 @@ abstract class Database extends \lithium\data\Source {
 		return $alias ? "AS " . $this->name($alias) : null;
 	}
 
-	public function cast($entity, array $data, array $options = array()) {
-		return $data;
-	}
-
 	/**
 	 * Cast a value according to a column type.
 	 *
