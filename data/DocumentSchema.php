@@ -74,13 +74,18 @@ class DocumentSchema extends \lithium\data\Schema {
 
 		if ($options['wrap']) {
 			$config = array(
-				'data' => $val,
 				'parent' => $options['parent'],
-				'model' => $options['model'],
 				'schema' => $this
 			);
 			$config += compact('pathKey') + array_diff_key($options, $defaults);
-			$val = $this->_instance($class, $config);
+
+			if ($model = $options['model']) {
+				$connection = $model::connection();
+				$val = $connection->item($model, $val, $config + array('class' => $class));
+			} else {
+				$config['data'] = $val;
+				$val = $this->_instance($class, $config);
+			}
 		} elseif ($class === 'set') {
 			$val = $val ?: array();
 			foreach ($val as &$value) {
