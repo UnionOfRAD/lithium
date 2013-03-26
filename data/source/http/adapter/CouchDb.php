@@ -207,8 +207,13 @@ class CouchDb extends \lithium\data\source\Http {
 			if (isset($data['id'])) {
 				return $self->update($query, $options);
 			}
-			$result = $conn->post($config['database'], $data, $request);
-			$result = is_string($result) ? json_decode($result, true) : $result;
+
+			$retry = false;
+			do {
+				$result = $conn->post($config['database'], $data, $request);
+				$result = is_string($result) ? json_decode($result, true) : $result;
+				$retry = $retry ? !$retry : $self->invokeMethod('_autoBuild', array($result));
+			} while ($retry);
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
 				$result = $self->invokeMethod('_format', array($result, $options));
@@ -294,8 +299,15 @@ class CouchDb extends \lithium\data\source\Http {
 				unset($data[$key]);
 			}
 			$data = (array) $conditions + array_filter((array) $data);
-			$result = $conn->put("{$config['database']}/{$_path}", $data, array('type' => 'json'));
-			$result = is_string($result) ? json_decode($result, true) : $result;
+
+			$retry = false;
+			do {
+				$result = $conn->put("{$config['database']}/{$_path}", $data, array(
+					'type' => 'json'
+				));
+				$result = is_string($result) ? json_decode($result, true) : $result;
+				$retry = $retry ? !$retry : $self->invokeMethod('_autoBuild', array($result));
+			} while ($retry);
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
 				$result = $self->invokeMethod('_format', array($result, $options));
@@ -307,6 +319,24 @@ class CouchDb extends \lithium\data\source\Http {
 			}
 			return false;
 		});
+	}
+
+	/**
+	 * Helper used for auto building a CouchDB database.
+	 *
+	 * @param string $result A query result.
+	 */
+	protected function _autoBuild($result) {
+		$hasError = (
+			isset($result['error']) &&
+			isset($result['reason']) &&
+			$result['reason'] === "no_db_file"
+		);
+		if ($hasError) {
+			$this->connection->put($this->_config['database']);
+			return true;
+		}
+		return false;
 	}
 
 	/**
