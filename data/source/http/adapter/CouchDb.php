@@ -264,9 +264,6 @@ class CouchDb extends \lithium\data\source\Http {
 				unset($result['rows']);
 				$stats = $result;
 			}
-			foreach ($data as $key => $val) {
-				$data[$key] = $self->item($model, $val, array('exists' => true));
-			}
 			$stats += array('total_rows' => null, 'offset' => null);
 			$opts = compact('stats') + array('class' => 'set', 'exists' => true);
 			return $self->item($query->model(), $data, $opts);
