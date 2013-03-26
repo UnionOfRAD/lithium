@@ -383,7 +383,7 @@ class CouchDb extends \lithium\data\source\Http {
 	public function calculation($type, $query, array $options = array()) {
 		switch ($type) {
 			case 'count':
-				return $this->read($query, $options)->stats('total_rows');
+				return (integer) $this->read($query, $options)->stats('total_rows');
 			default:
 				return null;
 		}
