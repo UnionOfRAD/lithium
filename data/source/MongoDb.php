@@ -206,7 +206,9 @@ class MongoDb extends \lithium\data\Source {
 			'arrays' => true,
 			'transactions' => false,
 			'booleans' => true,
-			'relationships' => true
+			'relationships' => true,
+			'schema' => false,
+			'sources' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}

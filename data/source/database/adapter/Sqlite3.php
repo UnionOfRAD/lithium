@@ -124,7 +124,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 			'transactions' => false,
 			'booleans' => true,
 			'schema' => true,
-			'relationships' => true
+			'relationships' => true,
+			'sources' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}

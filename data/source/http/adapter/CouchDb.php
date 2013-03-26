@@ -459,7 +459,9 @@ class CouchDb extends \lithium\data\source\Http {
 			'arrays' => true,
 			'transactions' => false,
 			'booleans' => true,
-			'relationships' => false
+			'relationships' => false,
+			'schema' => false,
+			'sources' => false
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}

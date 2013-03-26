@@ -131,7 +131,8 @@ class PostgreSql extends \lithium\data\source\Database {
 			'transactions' => true,
 			'booleans' => true,
 			'schema' => true,
-			'relationships' => true
+			'relationships' => true,
+			'sources' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
