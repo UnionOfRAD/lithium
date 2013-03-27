@@ -305,7 +305,6 @@ class CouchDb extends \lithium\data\source\Http {
 				$result = is_string($result) ? json_decode($result, true) : $result;
 				$retry = $retry ? !$retry : $self->invokeMethod('_autoBuild', array($result));
 			} while ($retry);
-
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
 				$result = $self->invokeMethod('_format', array($result, $options));
 				$query->entity()->sync($result['id'], array('rev' => $result['rev']));
@@ -398,13 +397,19 @@ class CouchDb extends \lithium\data\source\Http {
 	 *         in `$model`.
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
+		$defaults = array('class' => 'entity');
+		$options += $defaults;
+
 		if (isset($data['doc'])) {
 			return parent::item($model, $this->_format($data['doc']), $options);
 		}
 		if (isset($data['value'])) {
 			$data = $data['value'];
 		}
-		return parent::item($model, $this->_format($data), $options);
+		if (isset($options['class']) && $options['class'] === 'entity') {
+			$data = $this->_format($data);
+		}
+		return parent::item($model, $data, $options);
 	}
 
 	/**
@@ -500,9 +505,11 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	protected function _format(array $data) {
-		foreach (array("id", "rev") as $key) {
-			$data[$key] = isset($data["_{$key}"]) ? $data["_{$key}"] : null;
-			unset($data["_{$key}"]);
+		foreach (array('id', 'rev') as $key) {
+			if (isset($data["_{$key}"])) {
+				$data[$key] = $data["_{$key}"];
+				unset($data["_{$key}"]);
+			}
 		}
 		return $data;
 	}
