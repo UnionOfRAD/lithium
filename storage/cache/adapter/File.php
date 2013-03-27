@@ -12,6 +12,7 @@ use SplFileInfo;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use lithium\core\Libraries;
+use Closure;
 
 /**
  * A minimal file-based cache.
@@ -66,7 +67,7 @@ class File extends \lithium\core\Object {
 	 * @param mixed $data The value to be cached.
 	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
 	 *        then the default cache expiration time set with the cache configuration will be used.
-	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($key, $data, $expiry = null) {
 		$path = $this->_config['path'];
@@ -84,7 +85,7 @@ class File extends \lithium\core\Object {
 	 * Read value(s) from the cache.
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
-	 * @return closure Function returning cached value if successful, `false` otherwise.
+	 * @return Closure Function returning cached value if successful, `false` otherwise.
 	 */
 	public function read($key) {
 		$path = $this->_config['path'];
@@ -114,7 +115,7 @@ class File extends \lithium\core\Object {
 	 * Delete an entry from the cache.
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
-	 * @return closure Function returning boolean `true` on successful delete, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete($key) {
 		$path = $this->_config['path'];

@@ -8,6 +8,8 @@
 
 namespace lithium\storage\cache\adapter;
 
+use Closure;
+
 /**
  * A minimal in-memory cache.
  *
@@ -50,7 +52,7 @@ class Memory extends \lithium\core\Object {
 	 * note that this is not an atomic operation.
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
-	 * @return closure Function returning cached value if successful, `false` otherwise.
+	 * @return Closure Function returning cached value if successful, `false` otherwise.
 	 */
 	public function read($key) {
 		$cache =& $this->_cache;
@@ -81,7 +83,7 @@ class Memory extends \lithium\core\Object {
 	 * @param string $key The key to uniquely identify the cached item.
 	 * @param mixed $data The value to be cached.
 	 * @param string $expiry A strtotime() compatible cache time.
-	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($key, $data, $expiry) {
 		$cache =& $this->_cache;
@@ -103,7 +105,7 @@ class Memory extends \lithium\core\Object {
 	 * Delete value from the cache
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
-	 * @return closure Function returning boolean `true` on successful delete, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete($key) {
 		$cache =& $this->_cache;
@@ -124,7 +126,7 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to decrement.
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return closure Function returning item's new value on successful decrement,
+	 * @return Closure Function returning item's new value on successful decrement,
 	 *         `false` otherwise.
 	 */
 	public function decrement($key, $offset = 1) {
@@ -141,7 +143,7 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to increment.
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return closure Function returning item's new value on successful increment,
+	 * @return Closure Function returning item's new value on successful increment,
 	 *         `false` otherwise.
 	 */
 	public function increment($key, $offset = 1) {
