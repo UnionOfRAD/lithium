@@ -6,67 +6,59 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\data\source\database\adapter\pdo;
+namespace lithium\tests\integration\data\source\database\adapter\pdo;
 
 use PDOStatement;
-use lithium\core\Libraries;
+use lithium\data\Schema;
 use lithium\data\Connections;
-use lithium\data\source\database\adapter\MySql;
-use lithium\data\source\database\adapter\PostgreSql;
 use lithium\data\source\database\adapter\pdo\Result;
 
-class ResultTest extends \lithium\test\Unit {
+class ResultTest extends \lithium\tests\integration\data\Base {
 
-	public $db = null;
-	public $mockPrefix = '';
+	protected $_schema = array(
+		'fields' => array(
+			'id' => array('type' => 'id'),
+			'name' => array('type' => 'string', 'length' => 255),
+			'active' =>  array('type' => 'boolean'),
+			'created' => array('type' => 'datetime', 'null' => true),
+			'modified' => array('type' => 'datetime', 'null' => true)
+		)
+	);
 
 	protected $_mockData = array(
-		1 => array(1, 'Foo Company'),
-		2 => array(2, 'Bar Company')
+		1 => array(1, 'Foo Gallery'),
+		2 => array(2, 'Bar Gallery')
 	);
 
 	/**
-	 * Skip the test if a MySQL or PostgreSQL adapter configuration is unavailable and
-	 * preload test data.
+	 * Skip the test if a MySQL adapter configuration is unavailable.
+	 * @todo Tie into the Environment class to ensure that the test database is being used.
 	 */
 	public function skip() {
-		$enabled = (MySql::enabled() || PostgreSql::enabled());
-		$this->skipIf(!$enabled, 'MySQL or PostgreSQL Extension is not loaded');
-
-		$dbConfig = Connections::get('test', array('config' => true));
-		$validAdapter = in_array($dbConfig['adapter'], array('MySql', 'PostgreSql'));
-		$hasDb = (isset($dbConfig['adapter']) && $validAdapter);
-		$message = 'Test database is either unavailable, or not using a MySQL/PostgreSQL adapter';
-		$this->skipIf(!$hasDb, $message);
-
-		switch ($dbConfig['adapter']) {
-			case "MySql":
-				$this->db = new MySql($dbConfig);
-				$this->mockPrefix = 'mysql';
-			break;
-			case "PostgreSql":
-				$this->db = new PostgreSql($dbConfig);
-				$this->mockPrefix = 'postgresql';
-			break;
-		}
+		parent::connect($this->_connection);
+		$this->skipIf(!$this->with(array('MySql', 'PostgreSql', 'Sqlite3')));
 	}
 
+	/**
+	 * Creating the test database
+	 */
 	public function setUp() {
-		$lithium = Libraries::get('lithium', 'path');
-		$prefix = $this->mockPrefix;
-		$sqlFile = $lithium . "/tests/mocks/data/source/database/adapter/{$prefix}_companies.sql";
-		$sql = file_get_contents($sqlFile);
-		$this->db->read($sql, array('return' => 'resource'));
-
+		$this->_db->dropSchema('galleries');
+		$schema = new Schema($this->_schema);
+		$this->_db->createSchema('galleries', $schema);
 		foreach ($this->_mockData as $entry) {
-			$sql = "INSERT INTO companies (name) VALUES ('" . $entry[1] . "')";
-			$this->db->read($sql, array('return' => 'resource'));
+			$sql = "INSERT INTO galleries (name) VALUES ('" . $entry[1] . "')";
+			$this->_db->read($sql, array('return' => 'resource'));
 		}
 	}
 
+	/**
+	 * Dropping the test database
+	 */
 	public function tearDown() {
-		$this->db->read('DROP TABLE companies', array('return' => 'resource'));
+		$this->_db->dropSchema('galleries');
 	}
+
 
 	public function testConstruct() {
 		$result = new Result();
@@ -78,7 +70,7 @@ class ResultTest extends \lithium\test\Unit {
 	}
 
 	public function testNext() {
-		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
+		$resource = $this->_db->connection->query("SELECT id, name FROM galleries;");
 		$result = new Result(compact('resource'));
 
 		$this->assertEqual($this->_mockData[1], $result->next());
@@ -87,7 +79,7 @@ class ResultTest extends \lithium\test\Unit {
 	}
 
 	public function testPrev() {
-		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
+		$resource = $this->_db->connection->query("SELECT id, name FROM galleries;");
 		$result = new Result(compact('resource'));
 
 		$this->assertNull($result->prev());
@@ -103,13 +95,13 @@ class ResultTest extends \lithium\test\Unit {
 		$result = new Result();
 		$this->assertFalse($result->valid());
 
-		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
+		$resource = $this->_db->connection->query("SELECT id, name FROM galleries;");
 		$result = new Result(compact('resource'));
 		$this->assertTrue($result->valid());
 	}
 
 	public function testRewind() {
-		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
+		$resource = $this->_db->connection->query("SELECT id, name FROM galleries;");
 		$result = new Result(compact('resource'));
 
 		$this->assertEqual($this->_mockData[1], $result->next());
@@ -119,7 +111,7 @@ class ResultTest extends \lithium\test\Unit {
 	}
 
 	public function testCurrent() {
-		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
+		$resource = $this->_db->connection->query("SELECT id, name FROM galleries;");
 		$result = new Result(compact('resource'));
 
 		$this->assertEqual($this->_mockData[1], $result->next());
@@ -131,7 +123,7 @@ class ResultTest extends \lithium\test\Unit {
 	}
 
 	public function testKey() {
-		$resource = $this->db->connection->query("SELECT id, name FROM companies;");
+		$resource = $this->_db->connection->query("SELECT id, name FROM galleries;");
 		$result = new Result(compact('resource'));
 
 		$this->assertIdentical(0, $result->key());
@@ -152,7 +144,7 @@ class ResultTest extends \lithium\test\Unit {
 	 */
 	public function testResultForeach() {
 
-		$result = $this->db->read('SELECT name, active FROM companies', array(
+		$result = $this->_db->read('SELECT name, active FROM galleries', array(
 			'return' => 'resource'
 		));
 
@@ -162,8 +154,8 @@ class ResultTest extends \lithium\test\Unit {
 		}
 
 		$expected = array(
-			array('Foo Company', null),
-			array('Bar Company', null)
+			array('Foo Gallery', null),
+			array('Bar Gallery', null)
 		);
 
 		$this->assertEqual($expected, $rows);
@@ -174,9 +166,9 @@ class ResultTest extends \lithium\test\Unit {
 	 */
 	public function testEmptyResultForeach() {
 
-		$this->db->delete('DELETE FROM companies');
+		$this->_db->delete('DELETE FROM galleries');
 
-		$result = $this->db->read('SELECT name, active FROM companies', array(
+		$result = $this->_db->read('SELECT name, active FROM galleries', array(
 			'return' => 'resource'
 		));
 
