@@ -18,6 +18,7 @@ use lithium\analysis\Debugger;
 use lithium\analysis\Inspector;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Closure;
 
 /**
  * This is the base class for all test cases. Test are performed using an assertion method. If the
@@ -592,7 +593,7 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $expected A string indicating what the error text is expected to be.  This can
 	 *              be an exact string, a /-delimited regular expression, or true, indicating that
 	 *              any error text is acceptable.
-	 * @param closure $closure A closure containing the code that should throw the exception.
+	 * @param Closure $closure A closure containing the code that should throw the exception.
 	 * @param string $message
 	 * @return boolean
 	 */

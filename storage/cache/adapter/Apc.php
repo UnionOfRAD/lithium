@@ -8,6 +8,8 @@
 
 namespace lithium\storage\cache\adapter;
 
+use Closure;
+
 /**
  * An Alternative PHP Cache (APC) cache adapter implementation.
  *
@@ -63,7 +65,7 @@ class Apc extends \lithium\core\Object {
 	 * @param mixed $data The value to be cached.
 	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
 	 *        then the default cache expiration time set with the cache configuration will be used.
-	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($key, $data, $expiry = null) {
 		$expiry = ($expiry) ?: $this->_config['expiry'];
@@ -87,7 +89,7 @@ class Apc extends \lithium\core\Object {
 	 * containing key/value pairs of the requested data.
 	 *
 	 * @param string|array $key The key to uniquely identify the cached item.
-	 * @return closure Function returning cached value on successful read, `false` otherwise.
+	 * @return Closure Function returning cached value on successful read, `false` otherwise.
 	 */
 	public function read($key) {
 		return function($self, $params) {
@@ -103,7 +105,7 @@ class Apc extends \lithium\core\Object {
 	 * from the user space cache.
 	 *
 	 * @param string|array $key The key to uniquely identify the cached item.
-	 * @return closure Function returning `true` on successful delete, `false` otherwise.
+	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
 	 */
 	public function delete($key) {
 		return function($self, $params) {
@@ -120,7 +122,7 @@ class Apc extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return closure Function returning item's new value on successful decrement, else `false`
+	 * @return Closure Function returning item's new value on successful decrement, else `false`
 	 */
 	public function decrement($key, $offset = 1) {
 		return function($self, $params) use ($offset) {
@@ -137,7 +139,7 @@ class Apc extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return closure Function returning item's new value on successful increment, else `false`
+	 * @return Closure Function returning item's new value on successful increment, else `false`
 	 */
 	public function increment($key, $offset = 1) {
 		return function($self, $params) use ($offset) {

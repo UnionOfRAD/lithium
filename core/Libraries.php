@@ -13,6 +13,7 @@ use lithium\util\String;
 use lithium\util\collection\Filters;
 use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
+use Closure;
 
 /**
  * Manages all aspects of class and file location, naming and mapping. Implements auto-loading for
@@ -714,7 +715,7 @@ class Libraries {
 	 *
 	 * @see lithium\util\collection\Filters
 	 * @param string $method The name of the method to apply the closure to.
-	 * @param closure $filter The closure that is used to filter the method.
+	 * @param Closure $filter The closure that is used to filter the method.
 	 * @return void
 	 */
 	public static function applyFilter($method, $filter = null) {

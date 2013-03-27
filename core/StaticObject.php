@@ -11,6 +11,7 @@ namespace lithium\core;
 use lithium\core\Libraries;
 use lithium\util\collection\Filters;
 use lithium\analysis\Inspector;
+use Closure;
 
 /**
  * Provides a base class for all static classes in the Lithium framework. Similar to its
@@ -43,7 +44,7 @@ class StaticObject {
 	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
 	 *        method name as a string, or an array of method names. Can also be false to remove
 	 *        all filters on the current object.
-	 * @param closure $filter The closure that is used to filter the method(s), can also be false
+	 * @param Closure $filter The closure that is used to filter the method(s), can also be false
 	 *        to remove all the current filters for the given method.
 	 * @return void
 	 */

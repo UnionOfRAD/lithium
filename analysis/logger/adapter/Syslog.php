@@ -8,6 +8,8 @@
 
 namespace lithium\analysis\logger\adapter;
 
+use Closure;
+
 /**
  * The Syslog adapter facilitates logging messages to a `syslogd` backend. See the constructor for
  * information on configuring this adapter.
@@ -64,7 +66,7 @@ class Syslog extends \lithium\core\Object {
 	 *
 	 * @param string $priority The message priority string. Maps to a `syslogd` priority constant.
 	 * @param string $message The message to write.
-	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($priority, $message) {
 		$config = $this->_config;

@@ -16,6 +16,7 @@ use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use Reflection;
 use stdClass;
+use Closure;
 
 /**
  * The Mocker class aids in the creation of Mocks on the fly, allowing you to
@@ -591,7 +592,7 @@ class Mocker {
 	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
 	 *        method name as a string, or an array of method names. Can also be false to remove
 	 *        all filters on the current object.
-	 * @param closure $filter The closure that is used to filter the method(s), can also be false
+	 * @param Closure $filter The closure that is used to filter the method(s), can also be false
 	 *        to remove all the current filters for the given method.
 	 * @return void
 	 */

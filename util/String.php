@@ -118,7 +118,7 @@ class String {
 	 * speaking, this fallback is inadequate, but good enough.)
 	 *
 	 * @see lithium\util\String::$_source
-	 * @return closure Returns a closure containing a random number generator.
+	 * @return Closure Returns a closure containing a random number generator.
 	 */
 	protected static function _source() {
 		switch (true) {

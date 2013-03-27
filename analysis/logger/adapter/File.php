@@ -10,6 +10,7 @@ namespace lithium\analysis\logger\adapter;
 
 use lithium\util\String;
 use lithium\core\Libraries;
+use Closure;
 
 /**
  * A simple log adapter that writes messages to files. By default, messages are written to
@@ -66,7 +67,7 @@ class File extends \lithium\core\Object {
 	 * @see lithium\analysis\Logger::$_priorities
 	 * @param string $priority The message priority. See `Logger::$_priorities`.
 	 * @param string $message The message to write to the log.
-	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($priority, $message) {
 		$config = $this->_config;
