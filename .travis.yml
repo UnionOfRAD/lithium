@@ -24,6 +24,7 @@ before_script:
   - cd ..
   - mkdir libraries
   - mv lithium libraries
+  - git clone --branch=master --depth=100 --quiet git://github.com/UnionOfRAD/li3_fixtures.git libraries/li3_fixtures
   - mkdir -p ci/config
   - cd ci
   - cp ../libraries/lithium/tests/ci/config/libraries.php config/libraries.php

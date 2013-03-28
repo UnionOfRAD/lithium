@@ -17,6 +17,7 @@ use lithium\core\Libraries;
  * generally should not need to override any settings.
  */
 Libraries::add('lithium');
+Libraries::add('li3_fixtures');
 Libraries::add('ci', array(
 	'default' => true,
 	'resources' => call_user_func(function() {

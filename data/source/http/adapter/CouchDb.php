@@ -207,8 +207,13 @@ class CouchDb extends \lithium\data\source\Http {
 			if (isset($data['id'])) {
 				return $self->update($query, $options);
 			}
-			$result = $conn->post($config['database'], $data, $request);
-			$result = is_string($result) ? json_decode($result, true) : $result;
+
+			$retry = false;
+			do {
+				$result = $conn->post($config['database'], $data, $request);
+				$result = is_string($result) ? json_decode($result, true) : $result;
+				$retry = $retry ? !$retry : $self->invokeMethod('_autoBuild', array($result));
+			} while ($retry);
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
 				$result = $self->invokeMethod('_format', array($result, $options));
@@ -259,9 +264,6 @@ class CouchDb extends \lithium\data\source\Http {
 				unset($result['rows']);
 				$stats = $result;
 			}
-			foreach ($data as $key => $val) {
-				$data[$key] = $self->item($model, $val, array('exists' => true));
-			}
 			$stats += array('total_rows' => null, 'offset' => null);
 			$opts = compact('stats') + array('class' => 'set', 'exists' => true);
 			return $self->item($query->model(), $data, $opts);
@@ -294,9 +296,15 @@ class CouchDb extends \lithium\data\source\Http {
 				unset($data[$key]);
 			}
 			$data = (array) $conditions + array_filter((array) $data);
-			$result = $conn->put("{$config['database']}/{$_path}", $data, array('type' => 'json'));
-			$result = is_string($result) ? json_decode($result, true) : $result;
 
+			$retry = false;
+			do {
+				$result = $conn->put("{$config['database']}/{$_path}", $data, array(
+					'type' => 'json'
+				));
+				$result = is_string($result) ? json_decode($result, true) : $result;
+				$retry = $retry ? !$retry : $self->invokeMethod('_autoBuild', array($result));
+			} while ($retry);
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
 				$result = $self->invokeMethod('_format', array($result, $options));
 				$query->entity()->sync($result['id'], array('rev' => $result['rev']));
@@ -307,6 +315,24 @@ class CouchDb extends \lithium\data\source\Http {
 			}
 			return false;
 		});
+	}
+
+	/**
+	 * Helper used for auto building a CouchDB database.
+	 *
+	 * @param string $result A query result.
+	 */
+	protected function _autoBuild($result) {
+		$hasError = (
+			isset($result['error']) &&
+			isset($result['reason']) &&
+			$result['reason'] === "no_db_file"
+		);
+		if ($hasError) {
+			$this->connection->put($this->_config['database']);
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -353,7 +379,7 @@ class CouchDb extends \lithium\data\source\Http {
 	public function calculation($type, $query, array $options = array()) {
 		switch ($type) {
 			case 'count':
-				return $this->read($query, $options)->stats('total_rows');
+				return (integer) $this->read($query, $options)->stats('total_rows');
 			default:
 				return null;
 		}
@@ -371,13 +397,19 @@ class CouchDb extends \lithium\data\source\Http {
 	 *         in `$model`.
 	 */
 	public function item($model, array $data = array(), array $options = array()) {
+		$defaults = array('class' => 'entity');
+		$options += $defaults;
+
 		if (isset($data['doc'])) {
 			return parent::item($model, $this->_format($data['doc']), $options);
 		}
 		if (isset($data['value'])) {
 			$data = $data['value'];
 		}
-		return parent::item($model, $this->_format($data), $options);
+		if (isset($options['class']) && $options['class'] === 'entity') {
+			$data = $this->_format($data);
+		}
+		return parent::item($model, $data, $options);
 	}
 
 	/**
@@ -459,7 +491,9 @@ class CouchDb extends \lithium\data\source\Http {
 			'arrays' => true,
 			'transactions' => false,
 			'booleans' => true,
-			'relationships' => false
+			'relationships' => false,
+			'schema' => false,
+			'sources' => false
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
@@ -471,9 +505,11 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @return array
 	 */
 	protected function _format(array $data) {
-		foreach (array("id", "rev") as $key) {
-			$data[$key] = isset($data["_{$key}"]) ? $data["_{$key}"] : null;
-			unset($data["_{$key}"]);
+		foreach (array('id', 'rev') as $key) {
+			if (isset($data["_{$key}"])) {
+				$data[$key] = $data["_{$key}"];
+				unset($data["_{$key}"]);
+			}
 		}
 		return $data;
 	}

@@ -76,13 +76,38 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertInternalType('object', $couchdb->describe('companies'));
 	}
 
-	public function testItem() {
+	public function testEntityItem() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$data = array('_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1');
-		$expected = array('id' => 'a1', 'rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1');
+		$expected = array(
+			'id' => 'a1', 'rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
+		);
 
 		$item = $couchdb->item($this->query->model(), $data);
 		$result = $item->data();
+		$this->assertEqual($expected, $result);
+
+		$data = array('author' => 'author 1', 'body' => 'body 1');
+		$expected = array(
+			'author' => 'author 1', 'body' => 'body 1'
+		);
+
+		$item = $couchdb->item($this->query->model(), $data);
+		$result = $item->data();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSetItem() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$expected = array(
+			'id' => 'a1', 'rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
+		);
+		$data = array(array(
+			'_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1')
+		);
+		$item = $couchdb->item($this->query->model(), $data, array('class' => 'set'));
+		$this->assertCount(1, $item);
+		$result = $item->first()->data();
 		$this->assertEqual($expected, $result);
 	}
 

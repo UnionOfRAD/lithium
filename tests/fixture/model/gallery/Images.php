@@ -6,13 +6,14 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\mocks\data\source;
+namespace lithium\tests\fixture\model\gallery;
 
 class Images extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => 'test');
-
 	public $belongsTo = array('Galleries');
+
+	public $hasMany = array('ImagesTags', 'Comments');
+
 }
 
 ?>
