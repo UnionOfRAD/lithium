@@ -28,24 +28,50 @@ class Sqlite3 extends \lithium\data\source\Database {
 	protected $_quotes = array('"', '"');
 
 	/**
-	 * Sqlite column type definitions.
+	 * Sqlite3 column type definitions.
 	 *
 	 * @var array
 	 */
 	protected $_columns = array(
-		'primary_key' => array('name' => 'primary key autoincrement'),
-		'string' => array('name' => 'varchar', 'length' => 255),
-		'text' => array('name' => 'text'),
-		'integer' => array('name' => 'integer', 'formatter' => 'intval'),
-		'float' => array('name' => 'float', 'formatter' => 'floatval'),
-		'datetime' => array('name' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
-		'timestamp' => array(
-			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
+		'id' => array('use' => 'integer'),
+		'string' => array('use' => 'varchar', 'length' => 255),
+		'text' => array('use' => 'text'),
+		'integer' => array('use' => 'integer', 'formatter' => 'intval'),
+		'float' => array('use' => 'real', 'formatter' => 'floatval'),
+		'datetime' => array(
+			'use' => 'text', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
 		),
-		'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
-		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
-		'binary' => array('name' => 'blob'),
-		'boolean' => array('name' => 'boolean')
+		'time' => array('use' => 'text', 'format' => 'H:i:s', 'formatter' => 'date'),
+		'date' => array('use' => 'text', 'format' => 'Y-m-d', 'formatter' => 'date'),
+		'binary' => array('use' => 'blob'),
+		'boolean' => array('use' => 'boolean', 'length' => 1)
+	);
+
+	/**
+	 * Column specific metas used on table creating
+	 * By default `'quote'` is false and 'join' is `' '`
+	 *
+	 * @var array
+	 */
+	protected $_metas = array(
+		'column' => array(
+			'collate' => array('keyword' => 'COLLATE', 'escape' => true)
+		)
+	);
+	/**
+	 * Column contraints
+	 *
+	 * @var array
+	 */
+	protected $_constraints = array(
+		'primary' => array('template' => 'PRIMARY KEY ({:column})'),
+		'foreign_key' => array(
+			'template' => 'FOREIGN KEY ({:column}) REFERENCES {:to} ({:toColumn}) {:on}'
+		),
+		'unique' => array(
+			'template' => 'UNIQUE {:index} ({:column})'
+		),
+		'check' => array('template' => 'CHECK ({:expr})')
 	);
 
 	/**
@@ -97,7 +123,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 			'arrays' => false,
 			'transactions' => false,
 			'booleans' => true,
-			'relationships' => true
+			'schema' => true,
+			'relationships' => true,
+			'sources' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
@@ -187,11 +215,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$columns = $self->read("PRAGMA table_info({$name})", array('return' => 'array'));
 			$fields = array();
 			foreach ($columns as $column) {
-				preg_match("/{$regex['column']}/", $column['type'], $matches);
-
-				$fields[$column['name']] = array(
-					'type' => isset($matches['type']) ? $matches['type'] : null,
-					'length' => isset($matches['length']) ? $matches['length'] : null,
+				$fields[$column['name']] = $self->invokeMethod('_column', array($column['type']));
+				$fields[$column['name']] += array(
 					'null' => $column['notnull'] == 1,
 					'default' => $column['dflt_value']
 				);
@@ -286,8 +311,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 		if (!preg_match("/{$this->_regex['column']}/", $real, $column)) {
 			return $real;
 		}
-		$column = array_intersect_key($column, array('type' => null, 'length' => null));
 
+		$column = array_intersect_key($column, array('type' => null, 'length' => null));
 		if (isset($column['length']) && $column['length']) {
 			$length = explode(',', $column['length']) + array(null, null);
 			$column['length'] = $length[0] ? intval($length[0]) : null;
@@ -304,8 +329,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 			case (strpos($column['type'], 'int') !== false):
 				$column['type'] = 'integer';
 			break;
-			case (strpos($column['type'], 'char') !== false || $column['type'] === 'tinytext'):
+			case (strpos($column['type'], 'char') !== false ):
 				$column['type'] = 'string';
+				$column['length'] = 255;
 			break;
 			case (strpos($column['type'], 'text') !== false):
 				$column['type'] = 'text';
@@ -313,7 +339,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			case (strpos($column['type'], 'blob') !== false || $column['type'] === 'binary'):
 				$column['type'] = 'binary';
 			break;
-			case preg_match('/float|double|decimal/', $column['type']):
+			case preg_match('/real|float|double|decimal/', $column['type']):
 				$column['type'] = 'float';
 			break;
 			default:
@@ -321,6 +347,37 @@ class Sqlite3 extends \lithium\data\source\Database {
 			break;
 		}
 		return $column;
+	}
+
+	/**
+	 * Helper for `DatabaseSchema::_column()`
+	 *
+	 * @param array $field A field array
+	 * @return string SQL column string
+	 */
+	protected function _buildColumn($field) {
+		extract($field);
+		if ($type === 'float' && $precision) {
+			$use = 'numeric';
+		}
+
+		$out = $this->name($name) . ' ' . $use;
+
+		$allowPrecision = preg_match('/^(integer|real|numeric)$/',$use);
+		$precision = ($precision && $allowPrecision) ? ",{$precision}" : '';
+
+		if ($length && ($allowPrecision || $use === 'text')) {
+			$out .= "({$length}{$precision})";
+		}
+
+		$out .= $this->_buildMetas('column', $field, array('collate'));
+
+		if ($type !== 'id') {
+			$out .= is_bool($null) ? ($null ? ' NULL' : ' NOT NULL') : '' ;
+			$out .= $default ? ' DEFAULT ' . $this->value($default, $field) : '';
+		}
+
+		return $out;
 	}
 }
 
