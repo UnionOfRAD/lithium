@@ -244,7 +244,7 @@ class Request extends \lithium\net\http\Request {
 		$val = array_key_exists($key, $this->_env) ? $this->_env[$key] : getenv($key);
 		$this->_env[$key] = $val;
 
-		if ($key == 'REMOTE_ADDR') {
+		if ($key === 'REMOTE_ADDR') {
 			$https = array('HTTP_X_FORWARDED_FOR', 'HTTP_PC_REMOTE_ADDR', 'HTTP_X_REAL_IP');
 			foreach ($https as $altKey) {
 				if ($addr = $this->env($altKey)) {
@@ -273,7 +273,7 @@ class Request extends \lithium\net\http\Request {
 				}
 				return $this->_env['SERVER_ADDR'];
 			case 'SCRIPT_FILENAME':
-				if ($this->_env['PLATFORM'] == 'IIS') {
+				if ($this->_env['PLATFORM'] === 'IIS') {
 					return str_replace('\\\\', '\\', $this->env('PATH_TRANSLATED'));
 				}
 				return $this->env('DOCUMENT_ROOT') . $this->env('PHP_SELF');
@@ -364,12 +364,13 @@ class Request extends \lithium\net\http\Request {
 	 * ability to act conditionally on different aspects of the request. See `Media::type()` (the
 	 * section on content negotiation) and the routing system for more information.
 	 *
-	 *  _Note_: All keys should be _lower-cased_, even when getting HTTP headers.
+	 * _Note_: All keys should be _lower-cased_, even when getting HTTP headers.
+	 *
 	 * @see lithium\action\Request::env()
 	 * @see lithium\net\http\Media::type()
 	 * @see lithium\net\http\Router
 	 * @param string $key A prefixed key indicating what part of the request data the requested
-	 *               value should come from, and the name of the value to retrieve, in lower case.
+	 *        value should come from, and the name of the value to retrieve, in lower case.
 	 * @return string Returns the value of a GET, POST, routing or environment variable, or an
 	 *         HTTP header or method name.
 	 */
@@ -431,7 +432,7 @@ class Request extends \lithium\net\http\Request {
 			if (!in_array($flag, $media::types())) {
 				return false;
 			}
-			return $this->type() == $flag;
+			return $this->type() === $flag;
 		}
 		$detector = $this->_detectors[$flag];
 
@@ -449,7 +450,7 @@ class Request extends \lithium\net\http\Request {
 		if (Validator::isRegex($check)) {
 			return (boolean) preg_match($check, $this->env($key));
 		}
-		return ($this->env($key) == $check);
+		return ($this->env($key) === $check);
 	}
 
 	/**
@@ -515,7 +516,7 @@ class Request extends \lithium\net\http\Request {
 				return $ref;
 			}
 			$url = parse_url($ref) + array('path' => '');
-			if (empty($url['host']) || $url['host'] == $this->env('HTTP_HOST')) {
+			if (empty($url['host']) || $url['host'] === $this->env('HTTP_HOST')) {
 				$ref = $url['path'];
 				if (!empty($url['query'])) {
 					$ref .= '?' . $url['query'];
@@ -526,7 +527,7 @@ class Request extends \lithium\net\http\Request {
 				return $ref;
 			}
 		}
-		return ($default != null) ? $default : '/';
+		return ($default !== null) ? $default : '/';
 	}
 
 	/**

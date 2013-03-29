@@ -108,19 +108,23 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		$this->assertTrue($this->_objectRecordSet->offsetExists(4));
 		$this->assertArrayHasKey(3, $this->_objectRecordSet);
 
-		$data = array(array(
+		$data = array(
+			array(
 				'client_id' => 1,
 				'invoice_id' => 4,
 				'title' => 'Payment1'
-			), array(
+			),
+			array(
 				'client_id' => 2,
 				'invoice_id' => 5,
 				'title' => 'Payment2'
-			), array(
+			),
+			array(
 				'client_id' => 3,
 				'invoice_id' => 6,
 				'title' => 'Payment3'
-		));
+			)
+		);
 
 		$payments = new MockMultiKeyRecordSet(array('data' => $data, 'model' => $this->_model2));
 		$this->assertArrayHasKey(array('client_id' => 1,'invoice_id' => 4), $payments);
@@ -323,31 +327,38 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual(4, $result->id);
 		$this->assertEqual('data4', $result->data);
 
-		$data = array(array(
+		$data = array(
+			array(
 				'client_id' => 1,
 				'invoice_id' => 4,
 				'title' => 'Payment1'
-			), array(
+			),
+			array(
 				'client_id' => 2,
 				'invoice_id' => 5,
 				'title' => 'Payment2'
-			), array(
+			),
+			array(
 				'client_id' => 3,
 				'invoice_id' => 6,
 				'title' => 'Payment3'
-		));
+			)
+		);
 
 		$payments = new MockMultiKeyRecordSet(array('data' => $data, 'model' => $this->_model2));
 
-		$expected = array(array(
+		$expected = array(
+			array(
 				'client_id' => 2,
 				'invoice_id' => 5,
 				'title' => 'Payment2'
-			), array(
+			),
+			array(
 				'client_id' => 3,
 				'invoice_id' => 6,
 				'title' => 'Payment3'
-		));
+			)
+		);
 
 		unset($payments[array('client_id' => 1,'invoice_id' => 4)]);
 		$this->assertEqual($expected, array_values($payments->data()));
@@ -387,7 +398,6 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual($this->_records[1], $this->_recordSet->next()->to('array'));
 		$this->assertEqual($this->_records[1], $this->_recordSet->current()->to('array'));
 
-
 		$this->assertEqual($this->_records[0], $this->_recordSet->rewind()->to('array'));
 		$this->assertEqual($this->_records[1], $this->_recordSet->next()->to('array'));
 		$this->assertEqual($this->_records[1], $this->_recordSet->current()->to('array'));
@@ -407,7 +417,6 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		$result = $this->_objectRecordSet->current();
 		$this->assertEqual($this->_objectRecordSet[2]->id, $result->id);
 		$this->assertEqual($this->_objectRecordSet[2]->data, $result->data);
-
 
 		$result = $this->_objectRecordSet->rewind();
 		$this->assertEqual($this->_objectRecordSet[1]->id, $result->id);
@@ -701,7 +710,6 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		}
 		$this->assertEqual(4, $i);
 
-
 		$records = array(
 			array(false),
 			array('id' => 1, 'data' => 'data1'),
@@ -798,19 +806,23 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 	}
 
 	public function testRecordWithCombinedPk() {
-		$data = array(array(
+		$data = array(
+			array(
 				'client_id' => 1,
 				'invoice_id' => 4,
 				'title' => 'Payment1'
-			), array(
+			),
+			array(
 				'client_id' => 2,
 				'invoice_id' => 5,
 				'title' => 'Payment2'
-			), array(
+			),
+			array(
 				'client_id' => 3,
 				'invoice_id' => 6,
 				'title' => 'Payment3'
-		));
+			)
+		);
 
 		$payments = new MockMultiKeyRecordSet(array('data' => $data, 'model' => $this->_model2));
 		$this->assertCount(3, $payments->get('_data'));
@@ -893,42 +905,50 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 
 		$this->assertEqual($records, $payments->to('array'));
 
-		$expected = '[{"client_id":1,"invoice_id":4,"title":"Payment1"},' .
-					'{"client_id":2,"invoice_id":5,"title":"Payment2"},' .
-					'{"client_id":2,"invoice_id":6,"title":"Payment3"},' .
-					'{"client_id":4,"invoice_id":7,"title":"Payment3"}]';
+		$expected = '[{"client_id":1,"invoice_id":4,"title":"Payment1"},';
+		$expected .= '{"client_id":2,"invoice_id":5,"title":"Payment2"},';
+		$expected .= '{"client_id":2,"invoice_id":6,"title":"Payment3"},';
+		$expected .= '{"client_id":4,"invoice_id":7,"title":"Payment3"}]';
 
 		Collection::formats('lithium\net\http\Media');
 		$this->assertEqual($expected, $payments->to('json'));
 	}
 
 	public function testInternalWithCombinedPkKeys() {
-		$data = array(array(
+		$data = array(
+			array(
 				'client_id' => 1,
 				'invoice_id' => 4,
 				'title' => 'Payment1'
-			), array(
+			),
+			array(
 				'client_id' => 2,
 				'invoice_id' => 5,
 				'title' => 'Payment2'
-			), array(
+			),
+			array(
 				'client_id' => 3,
 				'invoice_id' => 6,
 				'title' => 'Payment3'
-		));
+			)
+		);
 
 		$payments = new MockMultiKeyRecordSet(array('data' => $data, 'model' => $this->_model2));
 
-		$expected = array( array(
+		$expected = array(
+			array(
 				'client_id' => 1,
 				'invoice_id' => 4
-			), array(
+			),
+			array(
 				'client_id' => 2,
 				'invoice_id' => 5
-			), array(
+			),
+			array(
 				'client_id' => 3,
 				'invoice_id' => 6
-		));
+			)
+		);
 		$this->assertEqual($expected, $payments->keys());
 	}
 

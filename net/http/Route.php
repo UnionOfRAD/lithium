@@ -30,13 +30,13 @@ namespace lithium\net\http;
  * incoming URLs than it generates.
  *
  * {{{$route = new Route(array(
- *		'template' => '/users/{:user}',
- *		'pattern' => '@^/u(?:sers)?(?:/(?P<user>[^\/]+))$@',
- *		'params' => array('controller' => 'users', 'action' => 'index'),
- *		'match' => array('controller' => 'users', 'action' => 'index'),
- *		'defaults' => array('controller' => 'users'),
- *		'keys' => array('user' => 'user'),
- *		'options' => array('compile' => false, 'wrap' => false)
+ *        'template' => '/users/{:user}',
+ *        'pattern' => '@^/u(?:sers)?(?:/(?P<user>[^\/]+))$@',
+ *        'params' => array('controller' => 'users', 'action' => 'index'),
+ *        'match' => array('controller' => 'users', 'action' => 'index'),
+ *        'defaults' => array('controller' => 'users'),
+ *        'keys' => array('user' => 'user'),
+ *        'options' => array('compile' => false, 'wrap' => false)
  * ));
  * Router::connect($route); // this will match '/users/<username>' or '/u/<username>'.
  * }}}

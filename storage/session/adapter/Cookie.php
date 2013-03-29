@@ -28,7 +28,7 @@ class Cookie extends \lithium\core\Object {
 	 *
 	 * @var array Keys are in direct correspondence with the parameters in the PHP-native
 	 *      `setcookie()` method. The only difference is that the `expire` value is a
-	 *		strtotime-compatible string instead of an epochal timestamp.
+	 *      strtotime-compatible string instead of an epochal timestamp.
 	 */
 	protected $_defaults = array(
 		'expire' => '+2 days', 'path' => '/',

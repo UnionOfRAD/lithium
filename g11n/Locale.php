@@ -304,7 +304,7 @@ class Locale extends \lithium\core\StaticObject {
 		if ($value = $request->env('LANGUAGE')) {
 			return explode(':', $value);
 		}
-		foreach (array('LC_ALL', 'LANG') as $variable)  {
+		foreach (array('LC_ALL', 'LANG') as $variable) {
 			$value = $request->env($variable);
 
 			if (!$value || $value === 'C' || $value === 'POSIX') {

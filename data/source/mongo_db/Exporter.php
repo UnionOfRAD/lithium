@@ -123,8 +123,8 @@ class Exporter extends \lithium\core\StaticObject {
 				$newValue = $value->to('array', $options);
 				$originalValue = null;
 				$shouldConvert = (isset($original[$key]) && (
-				    $original[$key] instanceof static::$_classes['set'] ||
-				    $original[$key] instanceof static::$_classes['entity']
+					$original[$key] instanceof static::$_classes['set'] ||
+					$original[$key] instanceof static::$_classes['entity']
 				));
 				if ($shouldConvert) {
 					$originalValue = $original[$key]->to('array', $options);

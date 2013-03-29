@@ -127,11 +127,11 @@ class RouteTest extends \lithium\test\Unit {
 
 		$command->all();
 
-		$expected = 'TemplateParams--------------
-			/{"controller":"Pages","action":"view"}
-			/pages/{:args}{"controller":"Pages","action":"view"}
-			/test/{:args}{"controller":"lithium\\test\\\\Controller","action":"index"}
-			/test{"controller":"lithium\\test\\\\Controller","action":"index"}';
+		$expected = 'TemplateParams--------------';
+		$expected .= '/{"controller":"Pages","action":"view"}';
+		$expected .= '/pages/{:args}{"controller":"Pages","action":"view"}';
+		$expected .= '/test/{:args}{"controller":"lithium\\test\\\\Controller","action":"index"}';
+		$expected .= '/test{"controller":"lithium\\test\\\\Controller","action":"index"}';
 		$this->assertEqual($this->_strip($expected),$this->_strip($command->response->output));
 	}
 
@@ -154,9 +154,9 @@ class RouteTest extends \lithium\test\Unit {
 
 		$command->all();
 
-		$expected = 'TemplateParams--------------
-			/{"controller":"Pages","action":"view"}
-			/pages/{:args}{"controller":"Pages","action":"view"}';
+		$expected = 'TemplateParams--------------';
+		$expected .= '/{"controller":"Pages","action":"view"}';
+		$expected .= '/pages/{:args}{"controller":"Pages","action":"view"}';
 		$this->assertEqual($this->_strip($expected),$this->_strip($command->response->output));
 	}
 
@@ -172,11 +172,11 @@ class RouteTest extends \lithium\test\Unit {
 
 		$command->run();
 
-		$expected = 'TemplateParams--------------
-			/{"controller":"Pages","action":"view"}
-			/pages/{:args}{"controller":"Pages","action":"view"}
-			/test/{:args}{"controller":"lithium\\test\\\\Controller","action":"index"}
-			/test{"controller":"lithium\\test\\\\Controller","action":"index"}';
+		$expected = 'TemplateParams--------------';
+		$expected .= '/{"controller":"Pages","action":"view"}';
+		$expected .= '/pages/{:args}{"controller":"Pages","action":"view"}';
+		$expected .= '/test/{:args}{"controller":"lithium\\test\\\\Controller","action":"index"}';
+		$expected .= '/test{"controller":"lithium\\test\\\\Controller","action":"index"}';
 		$this->assertEqual($this->_strip($expected),$this->_strip($command->response->output));
 	}
 

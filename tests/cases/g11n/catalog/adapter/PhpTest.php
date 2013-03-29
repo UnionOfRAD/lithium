@@ -79,7 +79,8 @@ EOD;
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -111,7 +112,8 @@ EOD;
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -139,7 +141,8 @@ EOD;
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -164,7 +167,8 @@ EOD;
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$this->assertEqual($expected, $result);
 
 	}

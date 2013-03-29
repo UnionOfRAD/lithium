@@ -66,7 +66,6 @@ class ResponseTest extends \lithium\test\Unit {
 		$response = new Response(array('output' => fopen($this->streams['output'], 'w+')));
 		$this->assertInternalType('resource', $response->output);
 
-
 		$this->assertEqual(2, $response->output('ok'));
 		$this->assertEqual('ok', file_get_contents($this->streams['output']));
 	}

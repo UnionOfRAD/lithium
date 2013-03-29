@@ -403,7 +403,6 @@ class StringTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests hash generation using `String::hash()`.
-	 * @return string
 	 */
 	public function testHash() {
 		$salt = 'Salt and pepper';

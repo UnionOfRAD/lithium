@@ -57,14 +57,14 @@ class TestTest extends \lithium\test\Unit {
 		$result = $test->response->output;
 		$this->assertEqual($expected, $result);
 
-		$expected = <<<'test'
+		$expected = <<<EOD
 
 
-namespace create_test\tests\cases\models;
+namespace create_test\\tests\\cases\\models;
 
-use create_test\models\Posts;
+use create_test\\models\\Posts;
 
-class PostsTest extends \lithium\test\Unit {
+class PostsTest extends \\lithium\\test\\Unit {
 
 	public function setUp() {}
 
@@ -74,7 +74,7 @@ class PostsTest extends \lithium\test\Unit {
 }
 
 
-test;
+EOD;
 		$replace = array("<?php", "?>");
 		$result = str_replace($replace, '',
 			file_get_contents($this->_testPath . '/create_test/tests/cases/models/PostsTest.php')
@@ -106,7 +106,7 @@ class Post{$id}s {
 		$result = $test->response->output;
 		$this->assertEqual($expected, $result);
 
-		$expected = <<<test
+		$expected = <<<EOD
 
 
 namespace create_test\\tests\\cases\\models;
@@ -123,7 +123,7 @@ class Post{$id}sTest extends \\lithium\\test\\Unit {
 }
 
 
-test;
+EOD;
 		$replace = array("<?php", "?>");
 		$path = "create_test/tests/cases/models/Post{$id}sTest.php";
 		$result = str_replace($replace, '', file_get_contents("{$this->_testPath}/{$path}"));

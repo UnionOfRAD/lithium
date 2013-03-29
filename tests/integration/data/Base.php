@@ -9,7 +9,6 @@
 namespace lithium\tests\integration\data;
 
 use lithium\data\Connections;
-use Closure;
 
 class Base extends \lithium\test\Integration {
 
@@ -55,3 +54,5 @@ class Base extends \lithium\test\Integration {
 		return parent::skipIf($condition, $message);
 	}
 }
+
+?>

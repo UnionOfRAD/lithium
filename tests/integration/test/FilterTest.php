@@ -91,7 +91,6 @@ class FilterTest extends \lithium\test\Integration {
 	 *
 	 * @todo This needs further refactoring.
 	 */
-
 	protected function _powerPerms($arr) {
 		$powerSet = $this->_powerSet($arr);
 		$result = array();

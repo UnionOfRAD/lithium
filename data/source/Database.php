@@ -19,6 +19,7 @@ use lithium\data\model\QueryException;
 use lithium\data\model\Query;
 use InvalidArgumentException;
 use UnexpectedValueException;
+
 /**
  * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.
  * It handles all aspects of abstraction, including formatting for basic query types and SQL
@@ -276,12 +277,14 @@ abstract class Database extends \lithium\data\Source {
 			preg_match('/SQLSTATE\[(.+?)\]/', $e->getMessage(), $code);
 			$code = $code[1] ?: 0;
 			switch (true) {
-			case $code === 'HY000' || substr($code, 0, 2) === '08':
-				$msg = "Unable to connect to host `{$config['host']}`.";
-				throw new NetworkException($msg, null, $e);
-			case in_array($code, array('28000', '42000')):
-				$msg = "Host connected, but could not access database `{$config['database']}`.";
-				throw new ConfigException($msg, null, $e);
+				case $code === 'HY000' || substr($code, 0, 2) === '08':
+					$msg = "Unable to connect to host `{$config['host']}`.";
+					throw new NetworkException($msg, null, $e);
+				break;
+				case in_array($code, array('28000', '42000')):
+					$msg = "Host connected, but could not access database `{$config['database']}`.";
+					throw new ConfigException($msg, null, $e);
+				break;
 			}
 			throw new ConfigException("An unknown configuration error has occured.", null, $e);
 		}
@@ -1063,7 +1066,7 @@ abstract class Database extends \lithium\data\Source {
 		return $result;
 	}
 
-		/**
+	/**
 	 * Returns a string of formatted constraints to be inserted into the query statement. If the
 	 * query constraints are defined as an array, key pairs are converted to SQL strings.
 	 *
@@ -1129,7 +1132,7 @@ abstract class Database extends \lithium\data\Source {
 
 	/**
 	 * Helper method
-	 * 
+	 *
 	 * @see lithium\data\source\Database::order()
 	 * @see lithium\data\source\Database::group()
 	 * @param mixed $field The field
@@ -1195,9 +1198,7 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * @param string $type Name of the column type
 	 * @param string $value Value to cast
-	 *
 	 * @return mixed Casted value
-	 *
 	 */
 	protected function _cast($type, $value) {
 		if (is_object($value) || $value === null) {
@@ -1451,7 +1452,6 @@ abstract class Database extends \lithium\data\Source {
 	 * @param array $constraints Array of additionnal $constraints.
 	 * @return array A constraints array.
 	 */
-
 	public function on($rel, $aliasFrom = null, $aliasTo = null, $constraints = array()) {
 		$model = $rel->from();
 
@@ -1531,20 +1531,20 @@ abstract class Database extends \lithium\data\Source {
 		}
 
 		$data = array();
-		foreach($value as $name => $value) {
-			switch($name){
+		foreach ($value as $name => $value) {
+			switch ($name) {
 				case 'key':
 				case 'index':
 					if (isset($meta[$name])) {
 						$data['index'] = $meta[$name];
 					}
-					break;
+				break;
 				case 'to':
 					$data[$name] = $this->name($value);
-					break;
+				break;
 				case 'on':
 					$data[$name] = "ON {$value}";
-					break;
+				break;
 				case 'expr':
 					if (is_array($value)) {
 						$result = array();
@@ -1559,11 +1559,11 @@ abstract class Database extends \lithium\data\Source {
 					} else {
 						$data[$name] = $value;
 					}
-					break;
+				break;
 				case 'toColumn':
-				case 'column';
+				case 'column':
 					$data[$name] = join(', ', array_map(array($this, 'name'), (array) $value));
-					break;
+				break;
 			}
 		}
 
@@ -1611,7 +1611,6 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * @see DatabaseSchema::createSchema()
 	 * @see DatabaseSchema::_column()
-	 *
 	 * @param array $metas The array of column metas.
 	 * @param array $names If `$names` is not `null` only build meta present in `$names`
 	 * @param type $joiner The join character
@@ -1633,7 +1632,6 @@ abstract class Database extends \lithium\data\Source {
 	 * Helper for building columns constraints
 	 *
 	 * @see DatabaseSchema::createSchema()
-	 *
 	 * @param array $constraints The array of constraints
 	 * @param type $schema The schema of the table
 	 * @param type $joiner The join character
@@ -1641,7 +1639,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function _buildconstraints(array $constraints, $schema = null, $joiner = ' ', $primary = false) {
 		$result = '';
-		foreach($constraints as $constraint) {
+		foreach ($constraints as $constraint) {
 			if (isset($constraint['type'])) {
 				$name = $constraint['type'];
 				if ($meta = $this->_constraint($name, $constraint, $schema)) {

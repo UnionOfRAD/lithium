@@ -21,7 +21,6 @@ class PhpTest extends \lithium\test\Unit {
 		$this->php = new Php();
 		$this->_destroySession();
 
-		/* Garbage collection */
 		$this->_gc_divisor = ini_get('session.gc_divisor');
 		ini_set('session.gc_divisor', '1');
 	}
@@ -29,7 +28,6 @@ class PhpTest extends \lithium\test\Unit {
 	public function tearDown() {
 		$this->_destroySession();
 
-		/* Revert to original garbage collection probability */
 		ini_set('session.gc_divisor', $this->_gc_divisor);
 		$_SESSION = $this->_session;
 	}

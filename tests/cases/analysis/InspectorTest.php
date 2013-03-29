@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\analysis;
 
-use ReflectionMethod;
 use lithium\analysis\Inspector;
 use lithium\core\Libraries;
 use lithium\tests\mocks\analysis\MockEmptyClass;
@@ -24,8 +23,6 @@ class InspectorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that basic method lists and information are queried properly.
-	 *
-	 * @return void
 	 */
 	public function testBasicMethodInspection() {
 		$class = 'lithium\analysis\Debugger';
@@ -61,8 +58,6 @@ class InspectorTest extends \lithium\test\Unit {
 	/**
 	 * Tests that the range of executable lines of this test method is properly calculated.
 	 * Recursively meta.
-	 *
-	 * @return void
 	 */
 	public function testMethodRange() {
 		$result = Inspector::methods(__CLASS__, 'ranges', array('methods' => __FUNCTION__));
@@ -73,8 +68,6 @@ class InspectorTest extends \lithium\test\Unit {
 	/**
 	 * Gets the executable line numbers of this file based on a manual entry of line ranges. Will
 	 * need to be updated manually if this method changes.
-	 *
-	 * @return void
 	 */
 	public function testExecutableLines() {
 		do {
@@ -110,8 +103,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = array(__LINE__ - 2 => "\tpublic function testLineIntrospection() {");
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::lines(__CLASS__, array(17));
-		$expected = array(17 => 'class InspectorTest extends \lithium\test\Unit {');
+		$result = Inspector::lines(__CLASS__, array(16));
+		$expected = array(16 => 'class InspectorTest extends \lithium\test\Unit {');
 		$this->assertEqual($expected, $result);
 
 		$lines = 'This is the first line.' . PHP_EOL . 'And this the second.';

@@ -21,7 +21,7 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 	public function testColumnMeta() {
 		$data = array('collate' => 'NOCASE');
 		$result = array();
-		foreach ($data as $key => $value){
+		foreach ($data as $key => $value) {
 			$result[] = $this->_db->invokeMethod('_meta', array('column', $key, $value));
 		}
 		$expected = array('COLLATE \'NOCASE\'');
@@ -104,7 +104,6 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 		$this->assertEqual($expected, $result);
 	}
 
-
 	public function testBuildStringColumn() {
 		$data = array(
 			'name' => 'fieldname',
@@ -180,7 +179,7 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 			'type' => 'datetime',
 			'default' => (object) 'CURRENT_TIMESTAMP',
 			'null' => false
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '"created" text NOT NULL DEFAULT CURRENT_TIMESTAMP';
@@ -209,7 +208,7 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'created',
 			'type' => 'date'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '"created" text';
@@ -220,7 +219,7 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'created',
 			'type' => 'time'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '"created" text';
@@ -231,7 +230,7 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'bool',
 			'type' => 'boolean'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '"bool" boolean';
@@ -242,7 +241,7 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'raw',
 			'type' => 'binary'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '"raw" blob';
@@ -373,13 +372,14 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 		$expected .= '"id" integer,' . "\n";
 		$expected .= '"table_id" integer,' . "\n";
 		$expected .= '"published" text NOT NULL DEFAULT CURRENT_TIMESTAMP,' . "\n";
-		$expected .= '"decimal" numeric(10,2),'."\n";
+		$expected .= '"decimal" numeric(10,2),' . "\n";
 		$expected .= '"integer" numeric(10,2),' . "\n";
 		$expected .= '"date" text NOT NULL,' . "\n";
 		$expected .= '"text" text NOT NULL,' . "\n";
 		$expected .= 'PRIMARY KEY ("id"),' . "\n";
 		$expected .= 'CHECK (("integer" < 10)),' . "\n";
-		$expected .= 'FOREIGN KEY ("table_id") REFERENCES "other_table" ("id") ON DELETE NO ACTION);';
+		$expected .= 'FOREIGN KEY ("table_id") REFERENCES "other_table" ("id") ';
+		$expected .= 'ON DELETE NO ACTION);';
 
 		$result = $this->_db->createSchema('test_table', $schema);
 		$this->assertEqual($expected, $result);

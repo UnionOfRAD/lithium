@@ -11,7 +11,6 @@ namespace lithium\tests\cases\storage\session\strategy;
 use lithium\storage\session\strategy\Hmac;
 use lithium\tests\mocks\storage\session\strategy\MockCookieSession;
 
-
 class HmacTest extends \lithium\test\Unit {
 
 	public function setUp() {

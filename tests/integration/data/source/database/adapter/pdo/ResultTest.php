@@ -10,7 +10,6 @@ namespace lithium\tests\integration\data\source\database\adapter\pdo;
 
 use PDOStatement;
 use lithium\data\Schema;
-use lithium\data\Connections;
 use lithium\data\source\database\adapter\pdo\Result;
 
 class ResultTest extends \lithium\tests\integration\data\Base {
@@ -19,7 +18,7 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 		'fields' => array(
 			'id' => array('type' => 'id'),
 			'name' => array('type' => 'string', 'length' => 255),
-			'active' =>  array('type' => 'boolean'),
+			'active' => array('type' => 'boolean'),
 			'created' => array('type' => 'datetime', 'null' => true),
 			'modified' => array('type' => 'datetime', 'null' => true)
 		)
@@ -32,6 +31,7 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 
 	/**
 	 * Skip the test if a MySQL adapter configuration is unavailable.
+	 *
 	 * @todo Tie into the Environment class to ensure that the test database is being used.
 	 */
 	public function skip() {
@@ -58,7 +58,6 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 	public function tearDown() {
 		$this->_db->dropSchema('galleries');
 	}
-
 
 	public function testConstruct() {
 		$result = new Result();

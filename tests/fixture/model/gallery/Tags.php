@@ -8,7 +8,7 @@
 
 namespace lithium\tests\fixture\model\gallery;
 
-class Tag extends \lithium\data\Model {
+class Tags extends \lithium\data\Model {
 
 	public $hasMany = array('ImagesTags');
 

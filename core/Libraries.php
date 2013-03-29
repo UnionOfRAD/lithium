@@ -419,7 +419,6 @@ class Libraries {
 	 * @param mixed $library The name of a library added to the application with `Libraries::add()`,
 	 *              or `true` to search all libraries.
 	 * @param array $options The options this method accepts:
-	 *
 	 *              - `'path'` _string_: A physical filesystem path relative to the directory of the
 	 *                library being searched. If provided, only the classes or namespaces within
 	 *                this path will be returned.

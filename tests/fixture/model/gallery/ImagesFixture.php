@@ -16,7 +16,7 @@ class ImagesFixture extends \li3_fixtures\test\Fixture {
 		'id' => array('type' => 'id'),
 		'gallery_id' => array('type' => 'integer', 'length' => 11),
 		'image' => array('type' => 'string', 'length' => 255),
-		'title' =>  array('type' => 'string', 'length' => 50),
+		'title' => array('type' => 'string', 'length' => 50),
 		'created' => array('type' => 'datetime'),
 		'modified' => array('type' => 'datetime')
 	);
