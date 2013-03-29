@@ -19,8 +19,8 @@ class TestRenderer extends \lithium\template\view\adapter\File implements \Array
 			return $path;
 		}
 		self::$templateData[] = compact('type', 'params') + array(
-				'return' => false
-			);
+			'return' => false
+		);
 		return false;
 	}
 

@@ -656,9 +656,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->errors('title');
 		$this->assertEqual($expected, $result);
 
-		/**
-		 * Errors are appended so, both errors are expected to be in an array
-		 */
+		/* Errors are appended so, both errors are expected to be in an array */
 		$doc->errors('title', 'Too generic');
 		$expected = array('Too short', 'Too generic');
 		$result = $doc->errors('title');
@@ -901,7 +899,6 @@ class DocumentTest extends \lithium\test\Unit {
 	 * Ensures that the data returned from the `data()` method matches the
 	 * internal state of the object.
 	 */
-
 	public function testEnsureArrayExportFidelity() {
 		$data = array(
 			'department_3' => 0,

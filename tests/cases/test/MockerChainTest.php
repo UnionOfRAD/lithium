@@ -86,11 +86,13 @@ class MockerChainTest extends \lithium\test\Unit {
 		$this->assertTrue($chain->called('method1')
 			->called('method2')
 			->called('method1')
-			->success());
+			->success()
+		);
 		$this->assertFalse($chain->called('method2')
 			->called('method1')
 			->called('method1')
-			->success());
+			->success()
+		);
 	}
 
 	public function testMethodWithParamsCalledBefore() {
@@ -103,15 +105,18 @@ class MockerChainTest extends \lithium\test\Unit {
 		$this->assertTrue($chain->called('method1')
 			->called('method2')->with('bar')
 			->called('method1')
-			->success());
+			->success()
+		);
 		$this->assertFalse($chain->called('method1')->with('bar')
 			->called('method2')->with('bar')
 			->called('method1')
-			->success());
+			->success()
+		);
 		$this->assertFalse($chain->called('method1')
 			->called('method2')->with('bar')
 			->called('method1')->with('bar')
-			->success());
+			->success()
+		);
 	}
 
 	public function testMethodCalledSpecificTimes() {
@@ -146,7 +151,8 @@ class MockerChainTest extends \lithium\test\Unit {
 
 		$this->assertTrue($chain->called('method1')->with('foo', 'bar')->eq(3)
 			->called('method2')->with('baz')->eq(2)
-			->called('method1')->with()->eq(1)->success());
+			->called('method1')->with()->eq(1)->success()
+		);
 	}
 
 	public function testRespondsToParentCall() {

@@ -105,8 +105,8 @@ class MySql extends \lithium\data\source\Database {
 	 *        - `'persistent'`: If a persistent connection (if available) should be made.
 	 *          Defaults to true.
 	 *
-	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
-	 * list of active connections.
+	 *        Typically, these parameters are set in `Connections::add()`, when adding the
+	 *        adapter to the list of active connections.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('host' => 'localhost:3306', 'encoding' => null);

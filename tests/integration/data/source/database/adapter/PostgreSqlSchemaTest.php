@@ -23,7 +23,7 @@ class PostgreSqlSchemaTest extends \lithium\tests\integration\data\Base {
 			'tablespace' => 'hello'
 		);
 		$result = array();
-		foreach ($data as $key => $value){
+		foreach ($data as $key => $value) {
 			$result[] = $this->_db->invokeMethod('_meta', array('table', $key, $value));
 		}
 		$expected = array(
@@ -108,7 +108,6 @@ class PostgreSqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$this->assertEqual($expected, $result);
 	}
 
-
 	public function testBuildStringColumn() {
 		$data = array(
 			'name' => 'fieldname',
@@ -184,7 +183,7 @@ class PostgreSqlSchemaTest extends \lithium\tests\integration\data\Base {
 			'type' => 'datetime',
 			'default' => (object) 'CURRENT_TIMESTAMP',
 			'null' => false
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '"created" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP';
@@ -213,7 +212,7 @@ class PostgreSqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'created',
 			'type' => 'date'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '"created" date';
@@ -224,7 +223,7 @@ class PostgreSqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'created',
 			'type' => 'time'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '"created" time';
@@ -235,7 +234,7 @@ class PostgreSqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'bool',
 			'type' => 'boolean'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '"bool" boolean';
@@ -246,7 +245,7 @@ class PostgreSqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'raw',
 			'type' => 'binary'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '"raw" bytea';
@@ -377,13 +376,14 @@ class PostgreSqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$expected .= '"id" serial NOT NULL,' . "\n";
 		$expected .= '"table_id" integer,' . "\n";
 		$expected .= '"published" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,' . "\n";
-		$expected .= '"decimal" numeric(10,2),'."\n";
+		$expected .= '"decimal" numeric(10,2),' . "\n";
 		$expected .= '"integer" numeric(10,2),' . "\n";
 		$expected .= '"date" date NOT NULL,' . "\n";
 		$expected .= '"text" text NOT NULL,' . "\n";
 		$expected .= 'PRIMARY KEY ("id"),' . "\n";
 		$expected .= 'CHECK (("integer" < 10)),' . "\n";
-		$expected .= 'FOREIGN KEY ("table_id") REFERENCES "other_table" ("id") ON DELETE NO ACTION);';
+		$expected .= 'FOREIGN KEY ("table_id") REFERENCES "other_table" ("id") ';
+		$expected .= 'ON DELETE NO ACTION);';
 
 		$result = $this->_db->createSchema('test_table', $schema);
 		$this->assertEqual($expected, $result);

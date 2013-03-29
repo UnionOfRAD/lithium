@@ -468,7 +468,7 @@ class LibraryTest extends \lithium\test\Unit {
 	public function testFind() {
 		$this->library->find();
 
-$expected = <<<'test'
+		$expected = <<<EOD
 --------------------------------------------------------------------------------
 lab.lithify.me > li3_lab
 --------------------------------------------------------------------------------
@@ -482,7 +482,7 @@ an li3 plugin example
 Version: 1.0
 Created: 2009-11-30
 
-test;
+EOD;
 	}
 
 	public function testFindNotFound() {
@@ -529,7 +529,6 @@ test;
 		$expected = "library_test_plugin.phar already exists in {$this->_testPath}\n";
 		$result = $this->library->response->error;
 		$this->assertEqual($expected, $result);
-
 
 		$this->library->force = true;
 		$this->library->response->output = null;

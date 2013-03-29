@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\net\socket;
 
 use lithium\net\http\Request;
-use lithium\net\http\Response;
 use lithium\net\socket\Context;
 use lithium\test\Mocker;
 

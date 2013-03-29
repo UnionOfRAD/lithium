@@ -90,9 +90,6 @@ class Response extends \lithium\core\Object {
 
 	/**
 	 * Destructor to close streams
-	 *
-	 * @return void
-	 *
 	 */
 	public function __destruct() {
 		if ($this->output) {

@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\action;
 
 use lithium\action\Request;
-use lithium\action\Controller;
 use lithium\tests\mocks\action\MockPostsController;
 use lithium\tests\mocks\action\MockControllerRequest;
 
@@ -17,8 +16,6 @@ class ControllerTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that controllers can be instantiated with custom request objects.
-	 *
-	 * @return void
 	 */
 	public function testConstructionWithCustomRequest() {
 		$request = new MockControllerRequest();
@@ -31,8 +28,6 @@ class ControllerTest extends \lithium\test\Unit {
 	 * Tests the use of `Controller::__invoke()` for dispatching requests to action methods.  Also
 	 * tests that using PHP's callable syntax yields the same result as calling `__invoke()`
 	 * explicitly.
-	 *
-	 * @return void
 	 */
 	public function testMethodInvocation() {
 		$postsController = new MockPostsController();
@@ -74,8 +69,6 @@ class ControllerTest extends \lithium\test\Unit {
 	/**
 	 * Tests that calls to `Controller::redirect()` correctly write redirect headers to the
 	 * response object.
-	 *
-	 * @return void
 	 */
 	public function testRedirectResponse() {
 		$postsController = new MockPostsController();
@@ -113,8 +106,6 @@ class ControllerTest extends \lithium\test\Unit {
 	/**
 	 * Tests calling `Controller::render()` with parameters to render an alternate template from
 	 * the default.
-	 *
-	 * @return void
 	 */
 	public function testRenderWithAlternateTemplate() {
 		$postsController = new MockPostsController(array('classes' => array(
@@ -133,8 +124,6 @@ class ControllerTest extends \lithium\test\Unit {
 	/**
 	 * Tests that requests where the controller class is specified manually continue to route to
 	 * the correct template path.
-	 *
-	 * @return void
 	 */
 	public function testRenderWithNamespacedController() {
 		$request = new Request();
@@ -150,8 +139,6 @@ class ControllerTest extends \lithium\test\Unit {
 
 	/**
 	 * Verifies that data array is passed on to controller's response.
-	 *
-	 * @return void
 	 */
 	public function testRenderWithDataArray() {
 		$request = new Request();
@@ -174,8 +161,6 @@ class ControllerTest extends \lithium\test\Unit {
 	/**
 	 * Verifies that the Controller does not modify data when passed an array (or RecordSet)
 	 * with a single element.
-	 *
-	 * @return void
 	 */
 	public function testRenderWithDataSingleIndexedArray() {
 		$request = new Request();
@@ -194,8 +179,6 @@ class ControllerTest extends \lithium\test\Unit {
 	/**
 	 * Verifies that protected methods (i.e. prefixed with '_'), and methods declared in the
 	 * Controller base class cannot be accessed.
-	 *
-	 * @return void
 	 */
 	public function testProtectedMethodAccessAttempt() {
 		$postsController = new MockPostsController();
@@ -291,8 +274,6 @@ class ControllerTest extends \lithium\test\Unit {
 	/**
 	 * Tests that `$_render['template']` can be manually set in a controller action and will not be
 	 * overwritten.
-	 *
-	 * @return void
 	 */
 	public function testManuallySettingTemplate() {
 		$postsController = new MockPostsController(array('classes' => array(
@@ -352,8 +333,6 @@ class ControllerTest extends \lithium\test\Unit {
 	/**
 	 * Tests that requests which are dispotched with the controller route parameter specified as
 	 * a fully-qualified class name are able to locate their templates correctly.
-	 *
-	 * @return void
 	 */
 	public function testDispatchingWithExplicitControllerName() {
 		$request = new Request(array('url' => '/'));

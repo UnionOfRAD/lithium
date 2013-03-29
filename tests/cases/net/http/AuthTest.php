@@ -21,7 +21,6 @@ class AuthTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-
 	public function testDigestEncode() {
 		$username = 'gwoo';
 		$password = 'li3';

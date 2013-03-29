@@ -120,9 +120,9 @@ class Response extends \lithium\net\http\Response {
 		foreach ($this->headers as $name => $value) {
 			$key = strtolower($name);
 
-			if ($key == 'location') {
+			if ($key === 'location') {
 				$this->_writeHeader("Location: {$value}", $this->status['code']);
-			} elseif ($key == 'download') {
+			} elseif ($key === 'download') {
 				$this->_writeHeader('Content-Disposition: attachment; filename="' . $value . '"');
 			} elseif (is_array($value)) {
 				$this->_writeHeader(
@@ -132,7 +132,7 @@ class Response extends \lithium\net\http\Response {
 				$this->_writeHeader("{$name}: {$value}");
 			}
 		}
-		if ($this->status['code'] == 302 || $this->status['code'] == 204) {
+		if ($this->status['code'] === 302 || $this->status['code'] === 204) {
 			return;
 		}
 		$chunked = $this->body(null, $this->_config);

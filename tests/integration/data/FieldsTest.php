@@ -2,10 +2,6 @@
 
 namespace lithium\tests\integration\data;
 
-use lithium\core\Libraries;
-use lithium\data\Connections;
-use lithium\data\Entity;
-use lithium\data\source\Database;
 use lithium\tests\fixture\model\gallery\Images;
 use lithium\tests\fixture\model\gallery\Galleries;
 use li3_fixtures\test\Fixtures;
@@ -137,8 +133,8 @@ class FieldsTest extends \lithium\tests\integration\data\Base {
 		$expected = array(
 			'id' => $cId,
 			'name' => 'Celebrities',
-			'images' => array (
-				$eId => array (
+			'images' => array(
+				$eId => array(
 					'id' => $eId,
 					'title' => 'John Doe'
 				)

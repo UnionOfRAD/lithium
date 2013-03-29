@@ -212,14 +212,14 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
-	* Decodes content bodies transferred with HTTP chunked encoding.
-	*
-	* @link http://en.wikipedia.org/wiki/Chunked_transfer_encoding Wikipedia: Chunked encoding
-	* @param string $body A chunked HTTP message body.
-	* @return string Returns the value of `$body` with chunks decoded, but only if the value of the
-	*         `Transfer-Encoding` header is set to `'chunked'`. Otherwise, returns `$body`
-	*         unmodified.
-	*/
+	 * Decodes content bodies transferred with HTTP chunked encoding.
+	 *
+	 * @link http://en.wikipedia.org/wiki/Chunked_transfer_encoding Wikipedia: Chunked encoding
+	 * @param string $body A chunked HTTP message body.
+	 * @return string Returns the value of `$body` with chunks decoded, but only if the value of the
+	 *         `Transfer-Encoding` header is set to `'chunked'`. Otherwise, returns `$body`
+	 *         unmodified.
+	 */
 	protected function _httpChunkedDecode($body) {
 		if (stripos($this->headers['Transfer-Encoding'], 'chunked') === false) {
 			return $body;
@@ -230,10 +230,10 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
-	* Return the response as a string.
-	*
-	* @return string
-	*/
+	 * Return the response as a string.
+	 *
+	 * @return string
+	 */
 	public function __toString() {
 		$first = "{$this->protocol} {$this->status['code']} {$this->status['message']}";
 		if ($type = $this->headers('Content-Type')) {

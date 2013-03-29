@@ -222,9 +222,10 @@ class Command extends \lithium\core\Object {
 			$this->out("{$prompt} {$choices} \n {$default}> ", false);
 			$result = trim($this->request->input());
 		} while (
-			!empty($options['choices']) && !in_array($result, $options['choices'], true)
-			&& (empty($options['quit']) || $result !== $options['quit'])
-			&& (!$options['default'] || $result !== '')
+			!empty($options['choices']) &&
+			!in_array($result, $options['choices'], true) &&
+			(empty($options['quit']) || $result !== $options['quit']) &&
+			(!$options['default'] || $result !== '')
 		);
 
 		if ($result == $options['quit']) {

@@ -22,7 +22,7 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 		'fields' => array(
 			'id' => array('type' => 'id'),
 			'name' => array('type' => 'string', 'length' => 255),
-			'active' =>  array('type' => 'boolean'),
+			'active' => array('type' => 'boolean'),
 			'created' => array('type' => 'datetime', 'null' => true),
 			'modified' => array('type' => 'datetime', 'null' => true)
 		)
@@ -50,14 +50,14 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 		$supported = array('booleans', 'schema', 'relationships', 'sources');
 		$notSupported = array('arrays', 'transactions');
 
-		foreach($supported as $feature) {
+		foreach ($supported as $feature) {
 			$this->assertTrue(Sqlite3::enabled($feature));
 		}
 
-		foreach($notSupported as $feature) {
+		foreach ($notSupported as $feature) {
 			$this->assertFalse(Sqlite3::enabled($feature));
 		}
-		
+
 		$this->assertNull(Sqlite3::enabled('unexisting'));
 	}
 
@@ -70,16 +70,16 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 		$db = new MockSqlite3(array('autoConnect' => false));
 		$result = $db->get('_config');
 		$expected = array(
-		  'autoConnect' => false,
-		  'database' => ':memory:',
-		  'encoding' => null,
-		  'persistent' => true,
-		  'host' => 'localhost',
-		  'login' => 'root',
-		  'password' => '',
-		  'dsn' => null,
-		  'options' => array(),
-		  'init' => true
+			'autoConnect' => false,
+			'database' => ':memory:',
+			'encoding' => null,
+			'persistent' => true,
+			'host' => 'localhost',
+			'login' => 'root',
+			'password' => '',
+			'dsn' => null,
+			'options' => array(),
+			'init' => true
 		);
 		$this->assertEqual($expected, $result);
 	}
@@ -227,7 +227,7 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 		$this->_cleanUp();
 	}
 
-	public function _testResultSet($connection) {
+	protected function _testResultSet($connection) {
 		$db = Connections::get($connection);
 		$db->dropSchema('galleries');
 		$schema = new Schema($this->_schema);

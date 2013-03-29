@@ -145,31 +145,29 @@ class ViewTest extends \lithium\test\Unit {
 		$templateData = TestRenderer::$templateData;
 		$expectedPath = Libraries::get('lithium', 'path');
 		$expectedPath .= '/tests/mocks/template/view/adapters/testFile.html.php';
-		$expected = array (array (
-				'type' => 'template',
-				'params' => array (
-					'template' => 'testFile',
-					'library' => Libraries::get('lithium', 'path'),
-					'type' => 'html'
-				),
-				'return' => $expectedPath
-			));
+		$expected = array(array(
+			'type' => 'template',
+			'params' => array(
+				'template' => 'testFile',
+				'library' => Libraries::get('lithium', 'path'),
+				'type' => 'html'
+			),
+			'return' => $expectedPath
+		));
 		$this->assertEqual($expected, $templateData);
 
 		$renderData = TestRenderer::$renderData;
-		$expected = array (
-			  array (
-				'template' => $expectedPath,
-				'data' => array (),
-				'options' => array (
-					'template' => 'testFile',
-					'library' => $options['library'],
-					'type' => 'html',
-					'layout' => null,
-					'context' => array()
-				)
-			  )
-			);
+		$expected = array(array(
+			'template' => $expectedPath,
+			'data' => array(),
+			'options' => array(
+				'template' => 'testFile',
+				'library' => $options['library'],
+				'type' => 'html',
+				'layout' => null,
+				'context' => array()
+			)
+		));
 		$this->assertInstanceOf('Closure', $renderData[0]['data']['h']);
 		unset($renderData[0]['data']['h']);
 		$this->assertEqual($expected, $renderData);
@@ -242,7 +240,6 @@ class ViewTest extends \lithium\test\Unit {
 		file_put_contents($viewDir . '/template.html.php', $body);
 		file_put_contents($viewDir . '/elements/element1.html.php', 'element1');
 		file_put_contents($viewDir2 . '/elements/element2.html.php', 'element2');
-
 
 		$view = new View(array(
 			'compile' => false,

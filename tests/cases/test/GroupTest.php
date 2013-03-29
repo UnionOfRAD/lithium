@@ -13,7 +13,6 @@ use lithium\core\Libraries;
 use lithium\util\Collection;
 use lithium\tests\cases\data\ModelTest;
 use lithium\tests\cases\core\ObjectTest;
-use lithium\tests\cases\g11n\CatalogTest;
 use lithium\tests\mocks\test\cases\MockTest;
 use lithium\tests\mocks\test\cases\MockErrorHandlingTest;
 use lithium\tests\mocks\test\cases\MockSkipThrowsExceptionTest;

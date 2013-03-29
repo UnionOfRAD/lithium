@@ -12,7 +12,8 @@ class MockImageTag extends \lithium\tests\mocks\data\MockBase {
 
 	public $belongsTo = array(
 		'Image' => array('to' => 'lithium\tests\mocks\data\model\MockImage'),
-		'Tag' => array('to' => 'lithium\tests\mocks\data\model\MockTag'));
+		'Tag' => array('to' => 'lithium\tests\mocks\data\model\MockTag')
+	);
 
 	public static $connection = null;
 

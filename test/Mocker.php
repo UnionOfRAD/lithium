@@ -15,7 +15,6 @@ use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use Reflection;
-use stdClass;
 use Closure;
 
 /**

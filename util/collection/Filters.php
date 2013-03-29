@@ -157,10 +157,9 @@ class Filters extends \lithium\util\Collection {
 	 * @param array $options The configuration options with which to create the filter chain.
 	 *        Mainly, these options allow the `Filters` object to be queried for details such as
 	 *        which class / method initiated it. Available keys:
-	 *
-	 *        -'class': The name of the class that initiated the filter chain.
-	 *        -'method': The name of the method that initiated the filter chain.
-	 *        -`'data'` _array_: An array of callable objects (usually closures) to be iterated
+	 *        - `'class'`: The name of the class that initiated the filter chain.
+	 *        - `'method'`: The name of the method that initiated the filter chain.
+	 *        - `'data'` _array_: An array of callable objects (usually closures) to be iterated
 	 *          through. By default, execution will be nested such that the first item will be
 	 *          executed first, and will be the last to return.
 	 * @return Returns the value returned by the first closure in `$options['data`]`.

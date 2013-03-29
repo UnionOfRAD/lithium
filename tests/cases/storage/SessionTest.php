@@ -13,10 +13,6 @@ use lithium\storage\session\adapter\Memory;
 use lithium\tests\mocks\storage\session\adapter\SessionStorageConditional;
 use lithium\tests\mocks\storage\session\strategy\MockEncrypt;
 
-/**
- *
- * @todo Refactor this to get rid of the very integration-style tests.
- */
 class SessionTest extends \lithium\test\Unit {
 
 	public function setUp() {
@@ -166,10 +162,7 @@ class SessionTest extends \lithium\test\Unit {
 	/**
 	 * Tests querying session keys from the primary adapter.
 	 * The memory adapter returns a UUID.
-	 *
-	 * @return void
 	 */
-
 	public function testKey() {
 		$result = Session::key();
 		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";

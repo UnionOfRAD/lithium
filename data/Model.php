@@ -242,13 +242,13 @@ class Model extends \lithium\core\StaticObject {
 	 * {{{
 	 * // config/bootstrap/connections.php:
 	 * Connections::add('default', array(
-	 * 	'type' => 'MongoDb',
-	 * 	'host' => 'localhost',
-	 * 	'database' => 'app_name',
-	 * 	'schema' => function($db, $collection, $meta) {
-	 * 		$result = $db->connection->schemas->findOne(compact('collection'));
-	 * 		return $result ? $result['data'] : array();
-	 * 	}
+	 *  'type' => 'MongoDb',
+	 *  'host' => 'localhost',
+	 *  'database' => 'app_name',
+	 *  'schema' => function($db, $collection, $meta) {
+	 *      $result = $db->connection->schemas->findOne(compact('collection'));
+	 *      return $result ? $result['data'] : array();
+	 *  }
 	 * ));
 	 * }}}
 	 *
@@ -261,14 +261,14 @@ class Model extends \lithium\core\StaticObject {
 	 * types as follows:
 	 *
 	 * {{{
-	 *	id      => MongoId
-	 *	date    => MongoDate
-	 *	regex   => MongoRegex
-	 *	integer => integer
-	 *	float   => float
-	 *	boolean => boolean
-	 *	code    => MongoCode
-	 *	binary  => MongoBinData
+	 *  id      => MongoId
+	 *  date    => MongoDate
+	 *  regex   => MongoRegex
+	 *  integer => integer
+	 *  float   => float
+	 *  boolean => boolean
+	 *  code    => MongoCode
+	 *  binary  => MongoBinData
 	 * }}}
 	 *
 	 * @see lithium\data\source\MongoDb::$_schema
@@ -420,7 +420,7 @@ class Model extends \lithium\core\StaticObject {
 			}
 		}
 
-		foreach($inheritedAttrs as $key => $value) {
+		foreach ($inheritedAttrs as $key => $value) {
 			$self->{$key} += $value;
 		}
 
@@ -490,7 +490,6 @@ class Model extends \lithium\core\StaticObject {
 	 * @see lithium\data\Model::find()
 	 * @see lithium\data\Model::$_meta
 	 * @link http://php.net/manual/en/language.oop5.overloading.php PHP Manual: Overloading
-	 *
 	 * @throws BadMethodCallException On unhandled call, will throw an exception.
 	 * @param string $method Method name caught by `__callStatic()`.
 	 * @param array $params Arguments given to the above `$method` call.
@@ -651,7 +650,6 @@ class Model extends \lithium\core\StaticObject {
 	 *        - `'limit'`: The maximum number of records to return.
 	 *        - `'page'`: For pagination of data.
 	 *        - `'with'`: An array of relationship names to be included in the query.
-	 *
 	 * @return mixed Returns the query definition if querying, or `null` if setting.
 	 */
 	public static function query($query = null) {
@@ -786,7 +784,6 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @param string $type A type of model relation.
 	 * @return mixed An array of relation instances or an instance of relation.
-	 *
 	 */
 	public static function relations($type = null) {
 		$self = static::_object();
@@ -845,7 +842,6 @@ class Model extends \lithium\core\StaticObject {
 			return $i->data('type') === $type;
 		});
 	}
-
 
 	/**
 	 * Creates a relationship binding between this model and another.
@@ -1022,7 +1018,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * {{{
 	 * if (!$post->save($someData)) {
-	 * 	return array('errors' => $post->errors());
+	 *  return array('errors' => $post->errors());
 	 * }
 	 * }}}
 	 *
@@ -1038,10 +1034,10 @@ class Model extends \lithium\core\StaticObject {
 	 * @see lithium\data\Model::validates()
 	 * @see lithium\data\Entity::errors()
 	 * @param object $entity The record or document object to be saved in the database. This
-	 *               parameter is implicit and should not be passed under normal circumstances.
-	 *               In the above example, the call to `save()` on the `$post` object is
-	 *               transparently proxied through to the `Posts` model class, and `$post` is passed
-	 *               in as the `$entity` parameter.
+	 *        parameter is implicit and should not be passed under normal circumstances.
+	 *        In the above example, the call to `save()` on the `$post` object is
+	 *        transparently proxied through to the `Posts` model class, and `$post` is passed
+	 *        in as the `$entity` parameter.
 	 * @param array $data Any data that should be assigned to the record before it is saved.
 	 * @param array $options Options:
 	 *        - `'callbacks'` _boolean_: If `false`, all callbacks will be disabled before
@@ -1056,7 +1052,6 @@ class Model extends \lithium\core\StaticObject {
 	 *          method if `'validate'` is not `false`.
 	 *        - `'whitelist'` _array_: An array of fields that are allowed to be saved to this
 	 *          record.
-	 *
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 * @filter
 	 */

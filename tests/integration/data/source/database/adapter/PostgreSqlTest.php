@@ -9,7 +9,6 @@
 namespace lithium\tests\integration\data\source\database\adapter;
 
 use lithium\data\Schema;
-use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\data\source\database\adapter\PostgreSql;
 use lithium\tests\mocks\data\source\database\adapter\MockPostgreSql;
@@ -21,7 +20,7 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 		'fields' => array(
 			'id' => array('type' => 'id'),
 			'name' => array('type' => 'string', 'length' => 255),
-			'active' =>  array('type' => 'boolean'),
+			'active' => array('type' => 'boolean'),
 			'created' => array('type' => 'datetime', 'null' => true),
 			'modified' => array('type' => 'datetime', 'null' => true)
 		)
@@ -49,14 +48,14 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 		$supported = array('booleans', 'schema', 'relationships', 'sources', 'transactions');
 		$notSupported = array('arrays');
 
-		foreach($supported as $feature) {
+		foreach ($supported as $feature) {
 			$this->assertTrue(PostgreSql::enabled($feature));
 		}
 
-		foreach($notSupported as $feature) {
+		foreach ($notSupported as $feature) {
 			$this->assertFalse(PostgreSql::enabled($feature));
 		}
-		
+
 		$this->assertNull(PostgreSql::enabled('unexisting'));
 	}
 

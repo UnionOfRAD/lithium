@@ -189,7 +189,6 @@ class FormTest extends \lithium\test\Unit {
 			'value' => 'This is a saved post', 'id' => 'MockFormPostTitle'
 		)));
 
-
 		$result = $this->form->text('zeroInt');
 		$this->assertTags($result, array('input' => array(
 			'type' => 'text', 'name' => 'zeroInt',
@@ -580,12 +579,13 @@ class FormTest extends \lithium\test\Unit {
 		$this->form->create($document);
 
 		$result = $this->form->radio('subdocument.foo');
-		$this->assertTags($result, array(
-			array('input' => array(
-				'type' => 'radio', 'value' => '1', 'name' => 'subdocument[foo]', 'id' => 'MockFormPostSubdocumentFoo',
-				'checked' => 'checked'
-			))
-		));
+		$this->assertTags($result, array(array('input' => array(
+			'type' => 'radio',
+			'value' => '1',
+			'name' => 'subdocument[foo]',
+			'id' => 'MockFormPostSubdocumentFoo',
+			'checked' => 'checked'
+		))));
 	}
 
 	public function testCustomRadio() {
@@ -1045,26 +1045,24 @@ class FormTest extends \lithium\test\Unit {
 		));
 		$this->assertTags($result, array(
 			array('div' => array()),
-				array('label' => array('for' => 'Name')),
-					'Enter a name',
-				'/label',
-				array('input' => array('type' => 'text', 'name' => 'name', 'id' => 'Name')),
+			array('label' => array('for' => 'Name')),
+			'Enter a name',
+			'/label',
+			array('input' => array('type' => 'text', 'name' => 'name', 'id' => 'Name')),
 			'/div',
-
 			array('div' => array()),
-				array('label' => array('for' => 'PhoneNumber')),
-					'Phone Number',
-				'/label',
-				array('input' => array(
-					'type' => 'text', 'name' => 'phone_number', 'id' => 'PhoneNumber'
-				)),
+			array('label' => array('for' => 'PhoneNumber')),
+			'Phone Number',
+			'/label',
+			array('input' => array(
+				'type' => 'text', 'name' => 'phone_number', 'id' => 'PhoneNumber'
+			)),
 			'/div',
-
 			array('div' => array()),
-				array('label' => array('for' => 'Email')),
-					'Enter a valid email',
-				'/label',
-				array('input' => array('type' => 'text', 'name' => 'email', 'id' => 'Email')),
+			array('label' => array('for' => 'Email')),
+			'Enter a valid email',
+			'/label',
+			array('input' => array('type' => 'text', 'name' => 'email', 'id' => 'Email')),
 			'/div'
 		));
 	}
@@ -1223,20 +1221,20 @@ class FormTest extends \lithium\test\Unit {
 		));
 		$expected = array(
 			'<div',
-				array('label' => array('for' => 'Colors')),
-					'Colors',
-				'/label',
-				'select' => array('name' => 'colors', 'id' => 'Colors'),
-					array('option' => array('value' => 'r')),
-						'red',
-					'/option',
-					array('option' => array('value' => 'g')),
-						'green',
-					'/option',
-					array('option' => array('value' => 'b')),
-						'blue',
-					'/option',
-				'/select',
+			array('label' => array('for' => 'Colors')),
+			'Colors',
+			'/label',
+			'select' => array('name' => 'colors', 'id' => 'Colors'),
+			array('option' => array('value' => 'r')),
+			'red',
+			'/option',
+			array('option' => array('value' => 'g')),
+			'green',
+			'/option',
+			array('option' => array('value' => 'b')),
+			'blue',
+			'/option',
+			'/select',
 			'/div'
 		);
 		$this->assertTags($result, $expected);

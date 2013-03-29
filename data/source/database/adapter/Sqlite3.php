@@ -4,7 +4,6 @@
  *
  * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
- *
  */
 
 namespace lithium\data\source\database\adapter;
@@ -100,8 +99,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *        - `'key'` _string_: An optional encryption key used when encrypting and decrypting
 	 *          an SQLite database.
 	 *
-	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
-	 * list of active connections.
+	 *          Typically, these parameters are set in `Connections::add()`, when adding the
+	 *          adapter to the list of active connections.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('database' => ':memory:', 'encoding' => null);

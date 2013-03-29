@@ -206,9 +206,7 @@ class EntityTest extends \lithium\test\Unit {
 		$this->assertTrue($entity->modified('foo'));
 		$this->assertTrue($entity->modified('baz'));
 
-		/**
-		 * and last, checking a non-existing field
-		 */
+		/* and last, checking a non-existing field */
 		$this->assertNull($entity->modified('ole'));
 
 		$subentity = new Entity();
@@ -225,16 +223,12 @@ class EntityTest extends \lithium\test\Unit {
 		$entity->set($data);
 		$entity->sync();
 
-		/**
-		 * Checking empty values
-		 */
+		/* Checking empty values */
 		$entity->foo = '';
 		$this->assertTrue($entity->modified('foo'));
 		$this->assertEqual(array('foo' => true, 'baz' => false), $entity->modified());
 
-		/**
-		 * and checking null values
-		 */
+		/* and checking null values */
 		$entity->sync();
 		$entity->foo = null;
 		$this->assertTrue($entity->modified('foo'));

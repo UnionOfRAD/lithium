@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\data\collection;
 
-use MongoId;
 use lithium\data\source\MongoDb;
 use lithium\data\source\mongo_db\Schema;
 use lithium\data\entity\Document;
@@ -77,7 +76,8 @@ class DocumentSetTest extends \lithium\test\Unit {
 					'body' => 'body3',
 					'foo' => (object) array('bar' => '3')
 				)
-		)));
+			)
+		));
 
 		foreach ($array as $document) {
 			$this->assertInstanceOf('MongoId', $document->_id);
@@ -103,7 +103,8 @@ class DocumentSetTest extends \lithium\test\Unit {
 					'body' => 'body3',
 					'foo' => array('bar' => '3')
 				)
-		)));
+			)
+		));
 
 		foreach ($array as $document) {
 			$this->assertInstanceOf('MongoId', $document->_id);
@@ -256,12 +257,10 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$resource = new MockResult();
 		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
 		$this->assertEqual(array(
-				0 => '4c8f86167675abfabdbf0300',
-				1 => '5c8f86167675abfabdbf0301',
-				2 => '6c8f86167675abfabdbf0302'
-			),
-			$doc->keys()
-		);
+			0 => '4c8f86167675abfabdbf0300',
+			1 => '5c8f86167675abfabdbf0301',
+			2 => '6c8f86167675abfabdbf0302'
+		), $doc->keys());
 	}
 
 	public function testTo() {
