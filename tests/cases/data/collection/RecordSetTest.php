@@ -307,7 +307,6 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual($this->_records[1], $this->_recordSet->next()->to('array'));
 		$this->assertEqual($this->_records[1], $this->_recordSet->current()->to('array'));
 
-
 		$this->assertEqual($this->_records[0], $this->_recordSet->rewind()->to('array'));
 		$this->assertEqual($this->_records[1], $this->_recordSet->next()->to('array'));
 		$this->assertEqual($this->_records[1], $this->_recordSet->current()->to('array'));
@@ -327,7 +326,6 @@ class RecordSetTest extends \lithium\test\Unit {
 		$result = $this->_objectRecordSet->current();
 		$this->assertEqual($this->_objectRecordSet[2]->id, $result->id);
 		$this->assertEqual($this->_objectRecordSet[2]->data, $result->data);
-
 
 		$result = $this->_objectRecordSet->rewind();
 		$this->assertEqual($this->_objectRecordSet[1]->id, $result->id);
@@ -629,7 +627,6 @@ class RecordSetTest extends \lithium\test\Unit {
 			$i++;
 		}
 		$this->assertEqual(4, $i);
-
 
 		$records = array(
 			array(false),

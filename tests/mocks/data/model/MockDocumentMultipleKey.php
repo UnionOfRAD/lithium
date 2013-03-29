@@ -8,7 +8,6 @@
 
 namespace lithium\tests\mocks\data\model;
 
-use lithium\data\Schema;
 use lithium\data\entity\Document;
 
 class MockDocumentMultipleKey extends \lithium\data\Model {

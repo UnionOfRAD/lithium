@@ -21,8 +21,8 @@ use lithium\core\ConfigException;
  *
  * {{{
  * Session::config(array('default' => array(
- *	'adapter' => 'Cookie',
- *	'strategies' => array('Encrypt' => array('secret' => 'f00bar$l1thium'))
+ *    'adapter' => 'Cookie',
+ *    'strategies' => array('Encrypt' => array('secret' => 'f00bar$l1thium'))
  * )));
  * }}}
  *

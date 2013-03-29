@@ -137,8 +137,8 @@ class Inspector {
 			if (method_exists($inspector, static::$_methodMap[$key])) {
 				$setAccess = (
 					($type === 'method' || $type === 'property') &&
-					array_intersect($result['modifiers'], array('private', 'protected')) != array()
-					&& method_exists($inspector, 'setAccessible')
+					array_intersect($result['modifiers'], array('private', 'protected')) !== array() &&
+					method_exists($inspector, 'setAccessible')
 				);
 
 				if ($setAccess) {
@@ -283,7 +283,7 @@ class Inspector {
 			case null:
 				return $methods;
 			case 'extents':
-				if ($methods->getName() == array()) {
+				if ($methods->getName() === array()) {
 					return array();
 				}
 
@@ -339,7 +339,7 @@ class Inspector {
 			$class = __CLASS__;
 			$modifiers = array_values($class::invokeMethod('_modifiers', array($item)));
 			$setAccess = (
-				array_intersect($modifiers, array('private', 'protected')) != array()
+				array_intersect($modifiers, array('private', 'protected')) !== array()
 			);
 			if ($setAccess) {
 				$item->setAccessible(true);

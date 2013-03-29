@@ -48,10 +48,10 @@ class FormTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests a check for the model class prior to attempted use.
-	 **/
+	 */
 	public function testModel() {
 		$this->expectException("Model class 'ModelDoesNotExist' not found.");
-		
+
 		$subject = new Form(array(
 			'model' => 'ModelDoesNotExist',
 			'fields' => array('username'),
@@ -63,7 +63,7 @@ class FormTest extends \lithium\test\Unit {
 	 * Tests a simple user lookup. Note that we're not using the password validator; due to the
 	 * limitations of this classes first() mock method, password will not be in the dataset
 	 * returned by Form::check().
-	 **/
+	 */
 	public function testLogin() {
 		$subject = new Form(array(
 			'model' => __CLASS__,

@@ -400,7 +400,6 @@ class RouterTest extends \lithium\test\Unit {
 		$prefix .= $this->request->env('HTTP_HOST');
 		$this->assertEqual($prefix . '/my/web/path/some/where', $result);
 
-
 		$result = Router::match('mailto:foo@localhost');
 		$expected = 'mailto:foo@localhost';
 		$this->assertEqual($expected, $result);

@@ -225,8 +225,9 @@ class Controller extends \lithium\core\Object {
 	 *          the template path would be `views/posts/view.html.php`. Defaults to the name of the
 	 *          action being rendered.
 	 *
-	 * The options specified here are merged with the values in the `Controller::$_render`
-	 * property. You may refer to it for other options accepted by this method.
+	 *          The options specified here are merged with the values in the `Controller::$_render`
+	 *          property. You may refer to it for other options accepted by this method.
+	 *
 	 * @return object Returns the `Response` object associated with this `Controller` instance.
 	 */
 	public function render(array $options = array()) {

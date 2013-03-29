@@ -45,6 +45,7 @@ use lithium\util\Set;
  * 	// Handle a normal request...
  * }
  * }}}
+ *
  * @link http://shiflett.org/articles/cross-site-request-forgeries Cross-Site Request Forgeries
  * @see lithium\template\helper\Security::requestToken()
  */

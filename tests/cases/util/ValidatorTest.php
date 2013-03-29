@@ -333,9 +333,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isEmail('henrik@sbcglobal.net'));
 		$this->assertTrue(Validator::isEmail('sani@sbcglobal.net'));
 
-		/**
-		 * All ICANN TLDs
-		 */
+		/* All ICANN TLDs */
 		$this->assertTrue(Validator::isEmail('abc@example.aero'));
 		$this->assertTrue(Validator::isEmail('abc@example.asia'));
 		$this->assertTrue(Validator::isEmail('abc@example.biz'));
@@ -358,17 +356,13 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isEmail('abc@example.travel'));
 		$this->assertTrue(Validator::isEmail('someone@st.t-com.hr'));
 
-		/**
-		 * Strange, but valid addresses
-		 */
+		/* Strange, but valid addresses */
 		$this->assertTrue(Validator::isEmail('_somename@example.com'));
 		$this->assertTrue(Validator::isEmail('abc@example.c'));
 		$this->assertTrue(Validator::isEmail('abc@example.com.a'));
 		$this->assertTrue(Validator::isEmail('abc@example.toolong'));
 
-		/**
-		 * Addresses which are invalid, but not caught until PHP 5.3.3.
-		 */
+		/* Addresses which are invalid, but not caught until PHP 5.3.3.*/
 		$this->assertFalse(
 			Validator::isEmail('abc@example'),
 			'Invalid email address passed validation. Please update to PHP 5.3.3 ' .
@@ -380,9 +374,7 @@ class ValidatorTest extends \lithium\test\Unit {
 			'or higher to correct this.'
 		);
 
-		/**
-		 * Invalid addresses
-		 */
+		/* Invalid addresses */
 		$this->assertFalse(Validator::isEmail('abc@example.com.'));
 		$this->assertFalse(Validator::isEmail('abc@example..com'));
 		$this->assertFalse(Validator::isEmail('abc;@example.com'));
@@ -453,15 +445,12 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertFalse(Validator::isInList('2', null, array('list' => array('0', '1'))));
 	}
 
-
 	/**
 	 * Tests credit card validation for numbers in various vendors' formats.
 	 */
 	public function testCreditCardValidation() {
 
-		/**
-		 * American Express
-		 */
+		/* American Express */
 		$this->assertTrue(Validator::isCreditCard('370482756063980', 'amex'));
 		$this->assertTrue(Validator::isCreditCard('3491-0643-3773-483', 'amex'));
 		$this->assertTrue(Validator::isCreditCard('344671486204764', 'amex'));
@@ -476,9 +465,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		)));
 		$this->assertFalse(Validator::isCreditCard('5610376649499352', 'amex'));
 
-		/**
-		 * BankCard
-		 */
+		/* BankCard */
 		$this->assertTrue(Validator::isCreditCard('5610 7458 6741 3420', 'bankcard'));
 		$this->assertTrue(Validator::isCreditCard('5610376649499352', 'bankcard'));
 		$this->assertTrue(Validator::isCreditCard('5610091936000694', 'bankcard'));
@@ -491,9 +478,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5602223993735777', 'bankcard'));
 		$this->assertFalse(Validator::isCreditCard('30155483651028', 'bankcard'));
 
-		/**
-		 * Diners Club 14
-		 */
+		/* Diners Club 14 */
 		$this->assertTrue(Validator::isCreditCard('30155483651028', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('36371312803821', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('38801277489875', 'diners'));
@@ -525,18 +510,14 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('38053196067461', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('36520379984870', 'diners'));
 
-		/**
-		 * 2004 MasterCard/Diners Club Alliance International 14
-		 */
+		/* 2004 MasterCard/Diners Club Alliance International 14 */
 		$this->assertTrue(Validator::isCreditCard('36747701998969', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('36427861123159', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('36150537602386', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('36582388820610', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('36729045250216', 'diners'));
 
-		/**
-		 * 2004 MasterCard/Diners Club Alliance US & Canada 16
-		 */
+		/* 2004 MasterCard/Diners Club Alliance US & Canada 16 */
 		$this->assertTrue(Validator::isCreditCard('5597511346169950', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('5526443162217562', 'diners'));
 		$this->assertTrue(Validator::isCreditCard('5577265786122391', 'diners'));
@@ -544,9 +525,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5545313588374502', 'diners'));
 		$this->assertFalse(Validator::isCreditCard('6011802876467237', 'diners'));
 
-		/**
-		 * Discover
-		 */
+		/* Discover */
 		$this->assertTrue(Validator::isCreditCard('6011802876467237', 'disc'));
 		$this->assertTrue(Validator::isCreditCard('6506432777720955', 'disc'));
 		$this->assertTrue(Validator::isCreditCard('6011126265283942', 'disc'));
@@ -559,9 +538,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('6500976374623323', 'disc'));
 		$this->assertFalse(Validator::isCreditCard('201496944158937', 'disc'));
 
-		/**
-		 * enRoute
-		 */
+		/* enRoute */
 		$this->assertTrue(Validator::isCreditCard('201496944158937', 'enroute'));
 		$this->assertTrue(Validator::isCreditCard('214945833739665', 'enroute'));
 		$this->assertTrue(Validator::isCreditCard('214982692491187', 'enroute'));
@@ -574,9 +551,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('201447595859877', 'enroute'));
 		$this->assertFalse(Validator::isCreditCard('210034762247893', 'enroute'));
 
-		/**
-		 * JCB 15 digit
-		 */
+		/* JCB 15 digit */
 		$this->assertTrue(Validator::isCreditCard('210034762247893', 'jcb'));
 		$this->assertTrue(Validator::isCreditCard('180078671678892', 'jcb'));
 		$this->assertTrue(Validator::isCreditCard('180010559353736', 'jcb'));
@@ -588,9 +563,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('180031358949367', 'jcb'));
 		$this->assertTrue(Validator::isCreditCard('180033802147846', 'jcb'));
 
-		/**
-		 * JCB 16 digit
-		 */
+		/* JCB 16 digit */
 		$this->assertTrue(Validator::isCreditCard('3096806857839939', 'jcb'));
 		$this->assertTrue(Validator::isCreditCard('3158699503187091', 'jcb'));
 		$this->assertTrue(Validator::isCreditCard('3112549607186579', 'jcb'));
@@ -623,9 +596,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('3337198811307545', 'jcb'));
 		$this->assertFalse(Validator::isCreditCard('5020147409985219', 'jcb'));
 
-		/**
-		 * Maestro (debit card)
-		 */
+		/* Maestro (debit card) */
 		$this->assertTrue(Validator::isCreditCard('5020147409985219', 'maestro'));
 		$this->assertTrue(Validator::isCreditCard('5020931809905616', 'maestro'));
 		$this->assertTrue(Validator::isCreditCard('5020412965470224', 'maestro'));
@@ -638,9 +609,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('6465028615704406', 'maestro'));
 		$this->assertFalse(Validator::isCreditCard('5580424361774366', 'maestro'));
 
-		/**
-		 * MasterCard
-		 */
+		/* MasterCard */
 		$this->assertTrue(Validator::isCreditCard('5580424361774366', 'mc'));
 		$this->assertTrue(Validator::isCreditCard('5589563059318282', 'mc'));
 		$this->assertTrue(Validator::isCreditCard('5387558333690047', 'mc'));
@@ -668,9 +637,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5162739131368058', 'mc'));
 		$this->assertFalse(Validator::isCreditCard('6767432107064987', 'mc'));
 
-		/**
-		 * Solo 16
-		 */
+		/* Solo 16 */
 		$this->assertTrue(Validator::isCreditCard('6767432107064987', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('6334667758225411', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('6767037421954068', 'solo'));
@@ -682,9 +649,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('6767493947881311', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('6767194235798817', 'solo'));
 
-		/**
-		 * Solo 18
-		 */
+		/* Solo 18 */
 		$this->assertTrue(Validator::isCreditCard('676714834398858593', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('676751666435130857', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('676781908573924236', 'solo'));
@@ -696,9 +661,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('633453764680740694', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('676768613295414451', 'solo'));
 
-		/**
-		 * Solo 19
-		 */
+		/* Solo 19 */
 		$this->assertTrue(Validator::isCreditCard('6767838565218340113', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('6767760119829705181', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('6767265917091593668', 'solo'));
@@ -711,9 +674,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('6334527312384101382', 'solo'));
 		$this->assertFalse(Validator::isCreditCard('5641829171515733', 'solo'));
 
-		/**
-		 * Switch 16
-		 */
+		/* Switch 16 */
 		$this->assertTrue(Validator::isCreditCard('5641829171515733', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('5641824852820809', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('6759129648956909', 'switch'));
@@ -755,9 +716,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('6759841558826118', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('4936164540922452', 'switch'));
 
-		/**
-		 * Switch 18
-		 */
+		/* Switch 18 */
 		$this->assertTrue(Validator::isCreditCard('493622764224625174', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('564182823396913535', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('675917308304801234', 'switch'));
@@ -799,9 +758,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('564182971729706785', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('633303461188963496', 'switch'));
 
-		/**
-		 * Switch 19
-		 */
+		/* Switch 19 */
 		$this->assertTrue(Validator::isCreditCard('6759603460617628716', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('4936705825268647681', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('5641829846600479183', 'switch'));
@@ -844,9 +801,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5641827998830403137', 'switch'));
 		$this->assertFalse(Validator::isCreditCard('4024007174754', 'switch'));
 
-		/**
-		 * Visa 13 digit
-		 */
+		/* Visa 13 digit */
 		$this->assertTrue(Validator::isCreditCard('4024007174754', 'visa'));
 		$this->assertTrue(Validator::isCreditCard('4104816460717', 'visa'));
 		$this->assertTrue(Validator::isCreditCard('4716229700437', 'visa'));
@@ -893,9 +848,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('4539365115149', 'visa'));
 		$this->assertTrue(Validator::isCreditCard('4485146516702', 'visa'));
 
-		/**
-		 * Visa 16 digit
-		 */
+		/* Visa 16 digit */
 		$this->assertTrue(Validator::isCreditCard('4916375389940009', 'visa'));
 		$this->assertTrue(Validator::isCreditCard('4929167481032610', 'visa'));
 		$this->assertTrue(Validator::isCreditCard('4485029969061519', 'visa'));
@@ -943,9 +896,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('4485611378115042', 'visa'));
 		$this->assertFalse(Validator::isCreditCard('869940697287073', 'visa'));
 
-		/**
-		 * Visa Electron
-		 */
+		/* Visa Electron */
 		$this->assertTrue(Validator::isCreditCard('4175003346287100', 'electron'));
 		$this->assertTrue(Validator::isCreditCard('4913042516577228', 'electron'));
 		$this->assertTrue(Validator::isCreditCard('4917592325659381', 'electron'));
@@ -963,9 +914,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('4913940802385364', 'electron'));
 		$this->assertFalse(Validator::isCreditCard('869940697287073', 'electron'));
 
-		/**
-		 * Voyager
-		 */
+		/* Voyager */
 		$this->assertTrue(Validator::isCreditCard('869940697287073', 'voyager'));
 		$this->assertTrue(Validator::isCreditCard('869934523596112', 'voyager'));
 		$this->assertTrue(Validator::isCreditCard('869958670174621', 'voyager'));

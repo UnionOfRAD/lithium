@@ -374,15 +374,18 @@ class ExporterTest extends \lithium\test\Unit {
 		$time = time();
 		$data = array(
 			'_id' => '4c8f86167675abfabd970300',
-			'accounts' => array(array(
-				'_id' => "4fb6e2dd3e91581fe6e75736",
-				'name' => 'Foo',
-				'created' => $time
-			),array(
-				'_id' => "4fb6e2df3e91581fe6e75737",
-				'name' => 'Bar',
-				'created' => $time
-			))
+			'accounts' => array(
+				array(
+					'_id' => "4fb6e2dd3e91581fe6e75736",
+					'name' => 'Foo',
+					'created' => $time
+				),
+				array(
+					'_id' => "4fb6e2df3e91581fe6e75737",
+					'name' => 'Bar',
+					'created' => $time
+				)
+			)
 		);
 		$model = $this->_model;
 		$handlers = $this->_handlers;
@@ -448,31 +451,25 @@ class ExporterTest extends \lithium\test\Unit {
 	 */
 	public function testArrayFieldChange() {
 		$doc = new Document();
-		$doc->someOtherField = "someValue";
-		$doc->list = "test";
+		$doc->someOtherField = 'someValue';
+		$doc->list = 'test';
 		$doc->sync();
 		$doc->list = new DocumentSet();
-		$doc->list["id"] = array('foo' => '!!', 'bar' => '??');
-		$data = array('list' => array("id"=>array('foo' => '!!', 'bar' => '??')));
-
+		$doc->list['id'] = array('foo' => '!!', 'bar' => '??');
+		$data = array('list' => array('id' => array('foo' => '!!', 'bar' => '??')));
 
 		$result = Exporter::get('update', $doc->export());
 		$this->assertEqual($data, $result['update']);
-
 
 		$doc = new Document();
-		$doc->someOtherField = "someValue";
-		$doc->list = new Document(array('data'=>array('foo'=>'!!')));
+		$doc->someOtherField = 'someValue';
+		$doc->list = new Document(array('data' => array('foo' => '!!')));
 		$doc->sync();
 		$doc->list = new DocumentSet();
-		$doc->list["id"] = array('foo' => '!!', 'bar' => '??');
-
+		$doc->list['id'] = array('foo' => '!!', 'bar' => '??');
 
 		$result = Exporter::get('update', $doc->export());
 		$this->assertEqual($data, $result['update']);
-
-
-
 	}
 
 	/**
@@ -595,7 +592,8 @@ class ExporterTest extends \lithium\test\Unit {
 				'magazines' => array(
 					"4fdfb4327a959c4f76000006",
 					"4e95f6e098ef47722d000001"
-				))
+				)
+			)
 		);
 
 		$model = $this->_model;
@@ -661,23 +659,31 @@ class ExporterTest extends \lithium\test\Unit {
 	public function testToData() {
 		$data = array(
 			array(
-			'_id' => '4c8f86167675abfabd970300',
-			'accounts' => array(array(
-				'_id' => "4fb6e2dd3e91581fe6e75736",
-				'name' => 'Foo1'
-			),array(
-				'_id' => "4fb6e2df3e91581fe6e75737",
-				'name' => 'Bar1'
-			))),
+				'_id' => '4c8f86167675abfabd970300',
+				'accounts' => array(
+					array(
+						'_id' => "4fb6e2dd3e91581fe6e75736",
+						'name' => 'Foo1'
+					),
+					array(
+						'_id' => "4fb6e2df3e91581fe6e75737",
+						'name' => 'Bar1'
+					)
+				)
+			),
 			array(
-			'_id' => '4c8f86167675abfabd970301',
-			'accounts' => array(array(
-				'_id' => "4fb6e2dd3e91581fe6e75738",
-				'name' => 'Foo2'
-			),array(
-				'_id' => "4fb6e2df3e91581fe6e75739",
-				'name' => 'Bar2'
-			)))
+				'_id' => '4c8f86167675abfabd970301',
+				'accounts' => array(
+					array(
+						'_id' => "4fb6e2dd3e91581fe6e75738",
+						'name' => 'Foo2'
+					),
+					array(
+						'_id' => "4fb6e2df3e91581fe6e75739",
+						'name' => 'Bar2'
+					)
+				)
+			)
 		);
 
 		$model = $this->_model;
@@ -729,23 +735,31 @@ class ExporterTest extends \lithium\test\Unit {
 
 		$data = array(
 			array(
-			'_id' => '4c8f86167675abfabd970300',
-			'accounts' => array(array(
-				'_id' => "4fb6e2dd3e91581fe6e75736",
-				'name' => 'Foo1'
-			),array(
-				'_id' => "4fb6e2df3e91581fe6e75737",
-				'name' => 'Bar1'
-			))),
+				'_id' => '4c8f86167675abfabd970300',
+				'accounts' => array(
+					array(
+						'_id' => "4fb6e2dd3e91581fe6e75736",
+						'name' => 'Foo1'
+					),
+					array(
+						'_id' => "4fb6e2df3e91581fe6e75737",
+						'name' => 'Bar1'
+					)
+				)
+			),
 			array(
-			'_id' => '4c8f86167675abfabd970301',
-			'accounts' => array(array(
-				'_id' => "4fb6e2dd3e91581fe6e75738",
-				'name' => 'Foo2'
-			),array(
-				'_id' => "4fb6e2df3e91581fe6e75739",
-				'name' => 'Bar2'
-			)))
+				'_id' => '4c8f86167675abfabd970301',
+				'accounts' => array(
+					array(
+						'_id' => "4fb6e2dd3e91581fe6e75738",
+						'name' => 'Foo2'
+					),
+					array(
+						'_id' => "4fb6e2df3e91581fe6e75739",
+						'name' => 'Bar2'
+					)
+				)
+			)
 		);
 
 		$model = $this->_model;
@@ -787,13 +801,16 @@ class ExporterTest extends \lithium\test\Unit {
 
 		$data = array(
 			'_id' => '4c8f86167675abfabd970300',
-			'accounts' => array(array(
-				'_id' => "4fb6e2dd3e91581fe6e75736",
-				'name' => 'Foo1'
-			), array(
-				'_id' => "4fb6e2df3e91581fe6e75737",
-				'name' => 'Bar1'
-			))
+			'accounts' => array(
+				array(
+					'_id' => "4fb6e2dd3e91581fe6e75736",
+					'name' => 'Foo1'
+				),
+				array(
+					'_id' => "4fb6e2df3e91581fe6e75737",
+					'name' => 'Bar1'
+				)
+			)
 		);
 
 		$model = $this->_model;

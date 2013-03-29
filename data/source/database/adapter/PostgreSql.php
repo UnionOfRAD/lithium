@@ -101,8 +101,8 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *        Defaults to true.
 	 *        - `'schema'`: The name of the database schema to use. Defaults to 'public'
 	 *
-	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
-	 * list of active connections.
+	 *        Typically, these parameters are set in `Connections::add()`, when adding the
+	 *        adapter to the list of active connections.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

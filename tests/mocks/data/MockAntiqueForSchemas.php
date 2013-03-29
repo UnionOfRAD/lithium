@@ -8,8 +8,6 @@
 
 namespace lithium\tests\mocks\data;
 
-use lithium\util\Validator;
-
 class MockAntiqueForSchemas extends \lithium\tests\mocks\data\MockProductForSchemas {
 
 	protected $_meta = array('source' => 'mock_products', 'connection' => false);

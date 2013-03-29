@@ -132,7 +132,6 @@ class XCache extends \lithium\core\Object {
 		};
 	}
 
-
 	/**
 	 * Clears user-space cache.
 	 *

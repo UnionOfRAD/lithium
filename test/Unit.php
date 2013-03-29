@@ -125,8 +125,6 @@ class Unit extends \lithium\core\Object {
 	 *	$this->skipIf(!$hasDb, $message);
 	 * }
 	 * }}}
-	 *
-	 * @return void
 	 */
 	public function skip() {}
 
@@ -220,7 +218,6 @@ class Unit extends \lithium\core\Object {
 	 *        then it will be converted to '{:message}'. Use '{:message}' in the string and it
 	 *        will use the `$data` to format the message with `String::insert()`.
 	 * @param array $data
-	 * @return void
 	 */
 	public function assert($expression, $message = false, $data = array()) {
 		if (!is_string($message)) {
@@ -621,7 +618,8 @@ class Unit extends \lithium\core\Object {
 
 			$message = sprintf(
 				'Exception "%s" was expected. Exception "%s" with message "%s" was thrown instead.',
-				$expected, get_class($e), $eMessage);
+				$expected, get_class($e), $eMessage
+			);
 			return $this->assert(false, $message);
 		}
 	}
@@ -1172,7 +1170,7 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertArrayHasKey($key, $array, $message = '{:message}') {
 		if (is_object($array) && $array instanceof \ArrayAccess) {
-		    $result = isset($array[$key]);
+			$result = isset($array[$key]);
 		} else {
 			$result = array_key_exists($key, $array);
 		}

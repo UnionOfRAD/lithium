@@ -11,7 +11,6 @@ namespace lithium\tests\integration\data;
 use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\model\Query;
-use lithium\data\source\Database;
 use lithium\tests\fixture\model\gallery\Images;
 use lithium\tests\fixture\model\gallery\Galleries;
 use lithium\util\String;
@@ -54,7 +53,7 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 
 		if ($this->with('PostgreSql')) {
 			$options['db']['alters']['change']['id'] = array(
-				'value' =>  function ($id) {
+				'value' => function ($id) {
 					return (object) 'default';
 				}
 			);
@@ -137,7 +136,7 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 			'with' => array('Galleries')
 		));
 		$images = $this->_db->read($query)->data();
-		$expected = include($this->_export . '/testManyToOne.php');
+		$expected = include $this->_export . '/testManyToOne.php';
 		$this->assertEqual($expected, $images);
 
 		$images = Images::find('all', $opts + array('with' => 'Galleries'))->data();
@@ -155,7 +154,7 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 			'with' => array('Images')
 		));
 		$galleries = $this->_db->read($query)->data();
-		$expected = include($this->_export . '/testOneToMany.php');
+		$expected = include $this->_export . '/testOneToMany.php';
 
 		$gallery = Galleries::find('first', $opts + array('with' => 'Images'))->data();
 		$this->assertEqual(reset($expected), $gallery);

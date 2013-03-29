@@ -56,15 +56,15 @@ class Message extends \lithium\net\Message {
 	 * Adds config values to the public properties when a new object is created.
 	 *
 	 * @param array $config Configuration options : default value
-	 * - `scheme`: http
-	 * - `host`: localhost
-	 * - `port`: null
-	 * - `username`: null
-	 * - `password`: null
-	 * - `path`: null
-	 * - `version`: 1.1
-	 * - `headers`: array
-	 * - `body`: null
+	 *              - `scheme`: http
+	 *              - `host`: localhost
+	 *              - `port`: null
+	 *              - `username`: null
+	 *              - `password`: null
+	 *              - `path`: null
+	 *              - `version`: 1.1
+	 *              - `headers`: array
+	 *              - `body`: null
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

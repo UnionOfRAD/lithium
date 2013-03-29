@@ -53,7 +53,8 @@ class ModelTest extends \lithium\test\Unit {
 				'author_id' => array('type' => 'integer'),
 				'title' => array('type' => 'string'),
 				'body' => array('type' => 'text')
-		)));
+			)
+		));
 	}
 
 	public function tearDown() {
@@ -239,7 +240,7 @@ class ModelTest extends \lithium\test\Unit {
 		);
 		MockProductForSchemas::config(compact('config'));
 		$this->assertEqual(MockProductForSchemas::query(), MockAntiqueForSchemas::query());
-		
+
 		$expected = array('limit' => 50) + MockProductForSchemas::query();
 		MockAntiqueForSchemas::config(array('query' => $expected));
 		$this->assertEqual($expected, MockAntiqueForSchemas::query());
@@ -449,7 +450,8 @@ class ModelTest extends \lithium\test\Unit {
 		$result = $model::key(array(
 			'client_id' => 3,
 			'invoice_id' => 5,
-			'payment' => '100'));
+			'payment' => '100')
+		);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -908,13 +910,12 @@ class ModelTest extends \lithium\test\Unit {
 
 		$config = array(
 			'schema' => new Schema(array(
-					'fields' => array(
-						'id' => array('type' => 'integer'),
-						'name' => array('type' => 'string'),
-						'label' => array('type' => 'string')
-					)
+				'fields' => array(
+					'id' => array('type' => 'integer'),
+					'name' => array('type' => 'string'),
+					'label' => array('type' => 'string')
 				)
-			),
+			)),
 			'initializers' => array(
 				'source' => function($self) {
 					return Inflector::tableize($self::meta('name'));

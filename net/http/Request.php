@@ -49,20 +49,20 @@ class Request extends \lithium\net\http\Message {
 	 * Adds config values to the public properties when a new object is created.
 	 *
 	 * @param array $config Configuration options : default value
-	 * - `scheme`: http
-	 * - `host`: localhost
-	 * - `port`: null
-	 * - `username`: null
-	 * - `password`: null
-	 * - `path`: null
-	 * - `query`: array - after the question mark ?
-	 * - `fragment`: null - after the hashmark #
-	 * - `auth` - the Authorization method (Basic|Digest)
-	 * - `method` - GET
-	 * - `type`: null
-	 * - `version`: 1.1
-	 * - `headers`: array
-	 * - `body`: null
+	 *              - `scheme`: http
+	 *              - `host`: localhost
+	 *              - `port`: null
+	 *              - `username`: null
+	 *              - `password`: null
+	 *              - `path`: null
+	 *              - `query`: array - after the question mark ?
+	 *              - `fragment`: null - after the hashmark #
+	 *              - `auth` - the Authorization method (Basic|Digest)
+	 *              - `method` - GET
+	 *              - `type`: null
+	 *              - `version`: 1.1
+	 *              - `headers`: array
+	 *              - `body`: null
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -131,7 +131,7 @@ class Request extends \lithium\net\http\Message {
 			$query = array_merge($query, $querySet);
 		}
 		$query = array_filter($query);
-		
+
 		if ($format) {
 			$q = null;
 			foreach ($query as $key => $value) {
@@ -153,7 +153,7 @@ class Request extends \lithium\net\http\Message {
 		} else {
 			$result[] = http_build_query($query);
 		}
-		
+
 		$result = array_filter($result);
 		return $result ? "?" . join("&", $result) : null;
 	}

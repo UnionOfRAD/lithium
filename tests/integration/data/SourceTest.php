@@ -8,7 +8,6 @@
 
 namespace lithium\tests\integration\data;
 
-use lithium\data\Connections;
 use lithium\tests\fixture\model\gallery\Images;
 use lithium\tests\fixture\model\gallery\Galleries;
 use li3_fixtures\test\Fixtures;

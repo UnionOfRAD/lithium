@@ -15,7 +15,7 @@ class ImagesTagsFixture extends \li3_fixtures\test\Fixture {
 	protected $_fields = array(
 		'id' => array('type' => 'id'),
 		'image_id' => array('type' => 'integer', 'length' => 11),
-		'tag_id' =>  array('type' => 'integer', 'length' => 11)
+		'tag_id' => array('type' => 'integer', 'length' => 11)
 	);
 
 	protected $_records = array(

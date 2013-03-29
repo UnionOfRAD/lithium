@@ -26,7 +26,7 @@ class MySqlSchemaTest extends \lithium\tests\integration\data\Base {
 			'tablespace' => 'hello'
 		);
 		$result = array();
-		foreach ($data as $key => $value){
+		foreach ($data as $key => $value) {
 			$result[] = $this->_db->invokeMethod('_meta', array('table', $key, $value));
 		}
 		$expected = array(
@@ -42,15 +42,17 @@ class MySqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'charset' => 'utf8',
 			'collate' => 'utf8_unicode_ci',
-			'comment' => 'comment value');
+			'comment' => 'comment value'
+		);
 		$result = array();
-		foreach ($data as $key => $value){
+		foreach ($data as $key => $value) {
 			$result[] = $this->_db->invokeMethod('_meta', array('column', $key, $value));
 		}
 		$expected = array(
 			'CHARACTER SET utf8',
 			'COLLATE utf8_unicode_ci',
-			'COMMENT \'comment value\'');
+			'COMMENT \'comment value\''
+		);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -139,7 +141,6 @@ class MySqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$this->assertEqual($expected, $result);
 	}
 
-
 	public function testBuildStringColumn() {
 		$data = array(
 			'name' => 'fieldname',
@@ -227,7 +228,7 @@ class MySqlSchemaTest extends \lithium\tests\integration\data\Base {
 			'type' => 'datetime',
 			'default' => (object) 'CURRENT_TIMESTAMP',
 			'null' => false
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '`created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP';
@@ -256,7 +257,7 @@ class MySqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'created',
 			'type' => 'date'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '`created` date';
@@ -267,7 +268,7 @@ class MySqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'created',
 			'type' => 'time'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '`created` time';
@@ -278,7 +279,7 @@ class MySqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'bool',
 			'type' => 'boolean'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '`bool` tinyint(1)';
@@ -289,7 +290,7 @@ class MySqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$data = array(
 			'name' => 'raw',
 			'type' => 'binary'
- 		);
+		);
 
 		$result = $this->_db->column($data);
 		$expected = '`raw` blob';
@@ -425,13 +426,14 @@ class MySqlSchemaTest extends \lithium\tests\integration\data\Base {
 		$expected .= '`id` int(11) NOT NULL AUTO_INCREMENT,' . "\n";
 		$expected .= '`table_id` int(11),' . "\n";
 		$expected .= '`published` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,' . "\n";
-		$expected .= '`decimal` decimal(10,2),'."\n";
+		$expected .= '`decimal` decimal(10,2),' . "\n";
 		$expected .= '`integer` numeric(10,2),' . "\n";
 		$expected .= '`date` date NOT NULL,' . "\n";
 		$expected .= '`text` text NOT NULL,' . "\n";
 		$expected .= 'PRIMARY KEY (`id`),' . "\n";
 		$expected .= 'CHECK ((`integer` < 10)),' . "\n";
-		$expected .= 'FOREIGN KEY (`table_id`) REFERENCES `other_table` (`id`) ON DELETE NO ACTION) ';
+		$expected .= 'FOREIGN KEY (`table_id`) REFERENCES `other_table` (`id`) ';
+		$expected .= 'ON DELETE NO ACTION) ';
 		$expected .= 'DEFAULT CHARSET utf8 COLLATE utf8_unicode_ci ENGINE InnoDB;';
 
 		$result = $this->_db->createSchema('test_table', $schema);

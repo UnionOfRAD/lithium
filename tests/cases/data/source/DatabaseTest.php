@@ -804,8 +804,8 @@ class DatabaseTest extends \lithium\test\Unit {
 			'having' => array('title' => array('0900'))
 		));
 
-		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost}' .
-				' HAVING {title} IN (\'0900\');';
+		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost}';
+		$sql .= ' HAVING {title} IN (\'0900\');';
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
@@ -828,7 +828,10 @@ class DatabaseTest extends \lithium\test\Unit {
 							array('title' => null)
 						),
 						'id' => 5
-		)))));
+					)
+				)
+			)
+		));
 
 		$sql = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} LEFT JOIN ';
 		$sql .= '{mock_database_comments} AS {MockDatabaseComment} ON ';
@@ -1272,7 +1275,8 @@ class DatabaseTest extends \lithium\test\Unit {
 				'Image' => array(
 					'constraints' => array(
 						'Image.title' => (object) "'MyImage'"
-				)),
+					)
+				),
 				'Image.ImageTag.Tag' => array(
 					'constraints' => array(
 						'Tag.name' => (object) "'MyTag'"
@@ -1320,7 +1324,8 @@ class DatabaseTest extends \lithium\test\Unit {
 			'to' => $to,
 			'constraints' => array(
 				'Image.title' => (object) "'MyImage'"
-		)));
+			)
+		));
 		$result = $this->db->read(new Query(array(
 			'type' => 'read',
 			'model' => $model,

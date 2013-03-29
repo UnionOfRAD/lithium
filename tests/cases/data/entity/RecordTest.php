@@ -24,7 +24,8 @@ class RecordTest extends \lithium\test\Unit {
 		$schema = new Schema(array(
 			'fields' => array(
 				'id' => 'int', 'title' => 'string', 'body' => 'text'
-		)));
+			)
+		));
 		$model::config(array(
 			'meta' => array('connection' => false, 'key' => 'id', 'locked' => true),
 			'schema' => $schema
@@ -49,7 +50,8 @@ class RecordTest extends \lithium\test\Unit {
 		$this->assertTrue(isset($this->record->body));
 
 		$this->assertNull($this->record->foo);
-		$this->assertFalse(isset($this->record->foo));	}
+		$this->assertFalse(isset($this->record->foo));
+	}
 
 	/**
 	 * Tests that a record can be exported to a given series of formats.

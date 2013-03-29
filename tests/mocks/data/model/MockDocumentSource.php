@@ -51,7 +51,7 @@ class MockDocumentSource extends \lithium\data\Source {
 			case 'close':
 				unset($resource);
 				$result = null;
-				break;
+			break;
 		}
 		return $result;
 	}

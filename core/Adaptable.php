@@ -37,9 +37,9 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * Example:
 	 * {{{
 	 * array(
-	 *	'production' => array(),
-	 *	'development' => array(),
-	 *	'test' => array()
+	 *  'production' => array(),
+	 *  'development' => array(),
+	 *  'test' => array()
 	 * )
 	 * }}}
 	 *

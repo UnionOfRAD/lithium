@@ -255,7 +255,7 @@ class RequestTest extends \lithium\test\Unit {
 			'port' => 80,
 			'query' => array('foo' => 'bar', 'bin' => 'baz')
 		));
-		
+
 		$result = $request->to('url', array(
 			'scheme' => 'https',
 			'host' => 'lithium.com',
@@ -263,7 +263,7 @@ class RequestTest extends \lithium\test\Unit {
 			'query' => array('foo' => 'you')
 		));
 		$expected = 'https://lithium.com:443/?foo=you';
-		
+
 		$this->assertEqual($expected, $result);
 	}
 
@@ -336,7 +336,7 @@ class RequestTest extends \lithium\test\Unit {
 		$expected = $url;
 		$result = $request->to('url');
 		$this->assertEqual($expected, $result);
-		
+
 		$url = "http://localhost:80/path/one.php?param=1&param=2";
 		$config = parse_url($url);
 		$request = new Request($config);

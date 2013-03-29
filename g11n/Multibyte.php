@@ -6,7 +6,6 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 namespace lithium\g11n;
-use lithium\core\Libraries;
 
 /**
  * The `Multibyte` class helps operating with UTF-8 encoded strings. Here

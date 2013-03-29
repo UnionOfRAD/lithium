@@ -144,8 +144,8 @@ class MongoDb extends \lithium\data\Source {
 	 *          array(Mongo::RP_SECONDARY_PREFERRED, array('dc' => 'east) See the documentation for
 	 *          `Mongo::setReadPreference()`. Defaults to null.
 	 *
-	 * Typically, these parameters are set in `Connections::add()`, when adding the adapter to the
-	 * list of active connections.
+	 *          Typically, these parameters are set in `Connections::add()`, when adding the
+	 *          adapter to the list of active connections.
 	 */
 	public function __construct(array $config = array()) {
 		$host = 'localhost:27017';

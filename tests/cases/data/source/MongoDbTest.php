@@ -702,7 +702,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual(array('$or'), array_keys($result));
 		$this->assertCount(2, $result['$or']);
 
-
 		foreach (array('_id', 'guid') as $i => $key) {
 			$this->assertInstanceOf('MongoId', $result['$or'][$i][$key]);
 			$this->assertEqual($conditions['$or'][$i][$key], (string) $result['$or'][$i][$key]);

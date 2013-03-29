@@ -86,7 +86,6 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertEqual('test', $cookie->key());
 	}
 
-
 	public function testWriteArrayData() {
 		$key = 'user';
 		$value = array(

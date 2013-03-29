@@ -65,9 +65,9 @@ class DocblockTest extends \lithium\test\Unit {
 	 *
 	 * @important This is a tag that spans a single line.
 	 * @discuss This is a tag that
-	 *      spans
-	 * several
-	 * lines.
+	 *          spans
+	 *          several
+	 *          lines.
 	 * @discuss The second discussion item
 	 * @link http://example.com/
 	 * @see lithium\analysis\Docblock
@@ -85,7 +85,8 @@ class DocblockTest extends \lithium\test\Unit {
 		$expected = array('important', 'discuss', 'link', 'see', 'return');
 		$this->assertEqual($expected, array_keys($tags));
 
-		$this->assertEqual("This is a tag that\n     spans\nseveral\nlines.", $tags['discuss'][0]);
+		$result = "This is a tag that\n         spans\n         several\n         lines.";
+		$this->assertEqual($result, $tags['discuss'][0]);
 		$this->assertEqual("The second discussion item", $tags['discuss'][1]);
 
 		$this->assertEqual('void This tag contains a email@address.com.', $tags['return']);

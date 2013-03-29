@@ -45,7 +45,6 @@ use Closure;
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\Cache::adapter()
  * @link https://github.com/nicolasff/phpredis GitHub: PhpRedis Extension
- *
  */
 class Redis extends \lithium\core\Object {
 
