@@ -104,7 +104,6 @@ class MySql extends \lithium\data\source\Database {
 	 *          followed by a port number or socket. Defaults to `'localhost:3306'`.
 	 *        - `'persistent'`: If a persistent connection (if available) should be made.
 	 *          Defaults to true.
-	 *
 	 *        Typically, these parameters are set in `Connections::add()`, when adding the
 	 *        adapter to the list of active connections.
 	 */

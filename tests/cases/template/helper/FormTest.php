@@ -543,9 +543,9 @@ class FormTest extends \lithium\test\Unit {
 				'value' => '1',
 				'name' => 'foo',
 				'checked' => 'checked',
-				'id' => 'Foo')
+				'id' => 'Foo'
 			)
-		));
+		)));
 
 		$record = new Record(array('model' => $this->_model, 'data' => array('foo' => true)));
 		$this->form->create($record);

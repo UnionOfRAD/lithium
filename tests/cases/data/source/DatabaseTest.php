@@ -1114,8 +1114,8 @@ class DatabaseTest extends \lithium\test\Unit {
 						'>=' => 'Post.id'
 					)
 				)
-			)
-		)));
+			))
+		));
 
 		$expected = "SELECT * FROM {comments} AS {Comments} LEFT JOIN {posts} AS {Post} ON ";
 		$expected .= "({Comment}.{post_id} <= {Post}.{id} AND {Comment}.{post_id} >= {Post}.{id}) ";

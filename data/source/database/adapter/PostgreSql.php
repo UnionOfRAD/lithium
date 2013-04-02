@@ -100,7 +100,6 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *        - `'persistent'`: If a persistent connection (if available) should be made.
 	 *        Defaults to true.
 	 *        - `'schema'`: The name of the database schema to use. Defaults to 'public'
-	 *
 	 *        Typically, these parameters are set in `Connections::add()`, when adding the
 	 *        adapter to the list of active connections.
 	 */
@@ -156,7 +155,7 @@ class PostgreSql extends \lithium\data\source\Database {
 		}
 
 		if ($this->_config['schema']) {
-			$this->search_path($this->_config['schema']);
+			$this->searchPath($this->_config['schema']);
 		}
 
 		if ($this->_config['timezone']) {
@@ -239,7 +238,7 @@ class PostgreSql extends \lithium\data\source\Database {
 					$default = $column['default'];
 				}
 				$fields[$column['field']] = $match + array(
-					'null'	   => ($column['null'] == 'YES' ? true : false),
+					'null'     => ($column['null'] == 'YES' ? true : false),
 					'default'  => $default
 				);
 				if ($fields[$column['field']]['type'] == 'string') {
@@ -252,18 +251,19 @@ class PostgreSql extends \lithium\data\source\Database {
 
 	/**
 	 * Gets or sets the search path for the connection
-	 * @param $search_path
-	 * @return mixed If setting the search_path; returns ture on success, else false
-	 *         When getting, returns the search_path
+	 *
+	 * @param $searchPath
+	 * @return mixed If setting the searchPath; returns ture on success, else false
+	 *         When getting, returns the searchPath
 	 */
-	public function search_path($search_path) {
-		if (empty($search_path)) {
+	public function searchPath($searchPath) {
+		if (empty($searchPath)) {
 			$query = $this->connection->query('SHOW search_path');
-			$search_path = $query->fetchColumn(1);
-			return explode(",", $search_path);
+			$searchPath = $query->fetchColumn(1);
+			return explode(",", $searchPath);
 		}
 		try{
-			$this->connection->exec("SET search_path TO ${search_path}");
+			$this->connection->exec("SET search_path TO ${searchPath}");
 			return true;
 		} catch (PDOException $e) {
 			return false;
@@ -272,6 +272,7 @@ class PostgreSql extends \lithium\data\source\Database {
 
 	/**
 	 * Gets or sets the time zone for the connection
+	 *
 	 * @param $timezone
 	 * @return mixed If setting the time zone; returns true on success, else false
 	 *         When getting, returns the time zone

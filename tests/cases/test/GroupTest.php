@@ -158,7 +158,7 @@ class GroupTest extends \lithium\test\Unit {
 
 		mkdir($testApp . '/tests/cases/models', 0777, true);
 		file_put_contents($testApp . '/tests/cases/models/UserTest.php',
-		"<?php namespace test_app\\tests\\cases\\models;\n
+			"<?php namespace test_app\\tests\\cases\\models;\n
 			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
 				\$this->assertTrue(true);
 			}}"
@@ -188,7 +188,7 @@ class GroupTest extends \lithium\test\Unit {
 
 		mkdir($testApp . '/tests/cases/models', 0777, true);
 		file_put_contents($testApp . '/tests/cases/models/UserTest.php',
-		"<?php namespace test_app\\tests\\cases\\models;\n
+			"<?php namespace test_app\\tests\\cases\\models;\n
 			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
 				\$this->assertTrue(true);
 			}}"
@@ -197,7 +197,7 @@ class GroupTest extends \lithium\test\Unit {
 
 		$expected = array('test_app\tests\cases\models\UserTest');
 		$result = Group::all(array('library' => 'test_app'));
-	    $this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result);
 
 		Libraries::cache(false);
 		$this->_cleanUp();
@@ -210,7 +210,7 @@ class GroupTest extends \lithium\test\Unit {
 
 		mkdir($testApp . '/tests/cases/models', 0777, true);
 		file_put_contents($testApp . '/tests/cases/models/UserTest.php',
-		"<?php namespace test_app\\tests\\cases\\models;\n
+			"<?php namespace test_app\\tests\\cases\\models;\n
 			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
 				\$this->assertTrue(true);
 			}}"
@@ -221,11 +221,11 @@ class GroupTest extends \lithium\test\Unit {
 
 		$expected = array('test_app\tests\cases\models\UserTest');
 		$result = $group->to('array');
-	    $this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result);
 
 		$expected = 'pass';
 		$result = $group->tests()->run();
-	    $this->assertEqual($expected, $result[0][0]['result']);
+		$this->assertEqual($expected, $result[0][0]['result']);
 
 		Libraries::cache(false);
 		$this->_cleanUp();

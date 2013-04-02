@@ -806,7 +806,6 @@ class Query extends \lithium\core\Object {
 	 * @param string $query a query instance
 	 * @return mixed
 	 */
-
 	public function childs($relpath = null, $query = null) {
 		if (!$model = $this->model()) {
 			throw new ConfigException("No binded model.");

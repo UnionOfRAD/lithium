@@ -58,7 +58,7 @@ class MockSocket extends \lithium\net\Socket {
 					'body' => 'body 3'
 				))
 			));
-		} else if (strpos($url, 'lithium-test/_design/latest/_view/all')) {
+		} elseif (strpos($url, 'lithium-test/_design/latest/_view/all')) {
 			$data = array('total_rows' => 3, 'offset' => 0, 'rows' => array(
 				array('value' => array(
 					'_id' => 'a1', '_rev' => '1-1',
@@ -76,11 +76,11 @@ class MockSocket extends \lithium\net\Socket {
 					'body' => 'body 3'
 				))
 			));
-		} else if (strpos($url, 'lithium-test/12345?rev=1-1')) {
+		} elseif (strpos($url, 'lithium-test/12345?rev=1-1')) {
 			$data = array(
 				'ok' => true, '_id' => '12345', '_rev' => '1-1'
 			);
-		} else if (strpos($url, 'lithium-test/12345')) {
+		} elseif (strpos($url, 'lithium-test/12345')) {
 			$data = array(
 				'_id' => '12345', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
 			);
