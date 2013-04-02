@@ -394,7 +394,7 @@ class Command extends \lithium\core\Object {
 		if (!is_array($options)) {
 			if (!$options || is_int($options)) {
 				$options = array('nl' => $options);
-			} else if (is_string($options)) {
+			} elseif (is_string($options)) {
 				$options = array('style' => $options);
 			} else {
 				$options = array();

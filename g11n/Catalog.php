@@ -8,7 +8,6 @@
 
 namespace lithium\g11n;
 
-
 /**
  * Globalization data is not just translated messages, it is validation rules, formats and a lot
  * more. Generally speaking is the `Catalog` class allowing us to retrieve and store globalized

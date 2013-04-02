@@ -166,7 +166,7 @@ class Message extends \lithium\net\Message {
 		}
 		if (is_string($data)) {
 			$type = $data;
-		} else if (!empty($data['content'])) {
+		} elseif (!empty($data['content'])) {
 			$header = is_array($data['content']) ? reset($data['content']) : $data['content'];
 		}
 		$this->headers('Content-Type', $header);

@@ -143,7 +143,6 @@ class MongoDb extends \lithium\data\Source {
 	 *          or an array containing a read preference and a tag set such as:
 	 *          array(Mongo::RP_SECONDARY_PREFERRED, array('dc' => 'east) See the documentation for
 	 *          `Mongo::setReadPreference()`. Defaults to null.
-	 *
 	 *          Typically, these parameters are set in `Connections::add()`, when adding the
 	 *          adapter to the list of active connections.
 	 */
@@ -696,6 +695,7 @@ class MongoDb extends \lithium\data\Source {
 	/**
 	 * Protected helper method used to format conditions.
 	 *
+	 * @todo Catch Document/Array objects used in conditions and extract their values.
 	 * @param array $conditions The conditions array to be processed.
 	 * @param string $model The name of the model class used in the query.
 	 * @param object $schema The object containing the schema definition.
@@ -721,9 +721,6 @@ class MongoDb extends \lithium\data\Source {
 				$conditions[$operator] = $value;
 				continue;
 			}
-			/**
-			 * @todo Catch Document/Array objects used in conditions and extract their values.
-			 */
 			if (is_object($value)) {
 				continue;
 			}

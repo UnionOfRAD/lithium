@@ -178,8 +178,7 @@ class XCache extends \lithium\core\Object {
 	 * Determines if the XCache extension has been installed and
 	 * if the userspace cache is available.
 	 *
-	 * return boolean True if enabled, false otherwise
-	 * @return boolean
+	 * @return boolean True if enabled, false otherwise.
 	 */
 	public static function enabled() {
 		return extension_loaded('xcache');

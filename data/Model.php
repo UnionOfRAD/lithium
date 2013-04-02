@@ -1121,24 +1121,24 @@ class Model extends \lithium\core\StaticObject {
 	 * @see lithium\util\Validator::check()
 	 * @see lithium\data\Entity::errors()
 	 * @param string $entity Model entity to validate. Typically either a `Record` or `Document`
-	 *               object. In the following example:
-	 * {{{
-	 * $post = Posts::create($data);
-	 * $success = $post->validates();
-	 * }}}
-	 * The `$entity` parameter is equal to the `$post` object instance.
+	 *        object. In the following example:
+	 *        {{{
+	 *            $post = Posts::create($data);
+	 *            $success = $post->validates();
+	 *        }}}
+	 *        The `$entity` parameter is equal to the `$post` object instance.
 	 * @param array $options Available options:
-	 *              - `'rules'` _array_: If specified, this array will _replace_ the default
-	 *                validation rules defined in `$validates`.
-	 *              - `'events'` _mixed_: A string or array defining one or more validation
-	 *                 _events_. Events are different contexts in which data events can occur, and
-	 *                correspond to the optional `'on'` key in validation rules. For example, by
-	 *                default, `'events'` is set to either `'create'` or `'update'`, depending on
-	 *                whether `$entity` already exists. Then, individual rules can specify
-	 *                `'on' => 'create'` or `'on' => 'update'` to only be applied at certain times.
-	 *                Using this parameter, you can set up custom events in your rules as well, such
-	 *                as `'on' => 'login'`. Note that when defining validation rules, the `'on'` key
-	 *                can also be an array of multiple events.
+	 *        - `'rules'` _array_: If specified, this array will _replace_ the default
+	 *          validation rules defined in `$validates`.
+	 *        - `'events'` _mixed_: A string or array defining one or more validation
+	 *          _events_. Events are different contexts in which data events can occur, and
+	 *          correspond to the optional `'on'` key in validation rules. For example, by
+	 *          default, `'events'` is set to either `'create'` or `'update'`, depending on
+	 *          whether `$entity` already exists. Then, individual rules can specify
+	 *          `'on' => 'create'` or `'on' => 'update'` to only be applied at certain times.
+	 *          Using this parameter, you can set up custom events in your rules as well, such
+	 *          as `'on' => 'login'`. Note that when defining validation rules, the `'on'` key
+	 *          can also be an array of multiple events.
 	 * @return boolean Returns `true` if all validation rules on all fields succeed, otherwise
 	 *         `false`. After validation, the messages for any validation failures are assigned to
 	 *         the entity, and accessible through the `errors()` method of the entity object.

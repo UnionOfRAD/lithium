@@ -119,10 +119,10 @@ class Unit extends \lithium\core\Object {
 	 * For example:
 	 * {{{
 	 * public function skip() {
-	 *	$this->_dbConfig = Connections::get('default', array('config' => true));
-	 *	$hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'MySql');
-	 *	$message = 'Test database is either unavailable, or not using a MySQL adapter';
-	 *	$this->skipIf(!$hasDb, $message);
+	 *     $this->_dbConfig = Connections::get('default', array('config' => true));
+	 *     $hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'MySql');
+	 *     $message = 'Test database is either unavailable, or not using a MySQL adapter';
+	 *     $this->skipIf(!$hasDb, $message);
 	 * }
 	 * }}}
 	 */
@@ -429,28 +429,28 @@ class Unit extends \lithium\core\Object {
 	 * Checks for an input tag with a name attribute (contains any non-empty value) and an id
 	 * attribute that contains 'my-input':
 	 * {{{
-	 * 	array('input' => array('name', 'id' => 'my-input'))
+	 *     array('input' => array('name', 'id' => 'my-input'))
 	 * }}}
 	 *
 	 * Checks for two p elements with some text in them:
 	 * {{{
-	 * 	array(
-	 * 		array('p' => true),
-	 * 		'textA',
-	 * 		'/p',
-	 * 		array('p' => true),
-	 * 		'textB',
-	 * 		'/p'
-	 *	)
+	 * array(
+	 *     array('p' => true),
+	 *     'textA',
+	 *     '/p',
+	 *     array('p' => true),
+	 *     'textB',
+	 *     '/p'
+	 * )
 	 * }}}
 	 *
 	 * You can also specify a pattern expression as part of the attribute values, or the tag
 	 * being defined, if you prepend the value with preg: and enclose it with slashes, like so:
 	 * {{{
-	 *	array(
-	 *  	array('input' => array('name', 'id' => 'preg:/FieldName\d+/')),
-	 *  	'preg:/My\s+field/'
-	 *	)
+	 * array(
+	 *     array('input' => array('name', 'id' => 'preg:/FieldName\d+/')),
+	 *     'preg:/My\s+field/'
+	 * )
 	 * }}}
 	 *
 	 * Important: This function is very forgiving about whitespace and also accepts any
@@ -475,7 +475,7 @@ class Unit extends \lithium\core\Object {
 
 		foreach ($normalized as $tags) {
 			$i++;
-			if (is_string($tags) && $tags{0} === '<') {
+			if (is_string($tags) && $tags[0] === '<') {
 				$tags = array(substr($tags, 1) => array());
 			} elseif (is_string($tags)) {
 				$tagsTrimmed = preg_replace('/\s+/m', '', $tags);
@@ -823,7 +823,7 @@ class Unit extends \lithium\core\Object {
 			$ref = $exception->getTrace();
 			$ref = $ref[0] + array('class' => null);
 
-			if ($ref['class'] == __CLASS__ && $ref['function'] == 'skipIf') {
+			if ($ref['class'] === __CLASS__ && $ref['function'] === 'skipIf') {
 				return $this->_result('skip', $data);
 			}
 		}

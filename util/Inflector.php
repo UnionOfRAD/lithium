@@ -79,7 +79,7 @@ class Inflector {
 	 *      - `'rules'`: An array of regular expression rules in the form of
 	 *        `'match' => 'replace'`, which specify the matching and replacing rules for
 	 *        the pluralization of words.
-	 *      - `'uninflected'`: A indexed array containing regex word patterns which do not 
+	 *      - `'uninflected'`: A indexed array containing regex word patterns which do not
 	 *        get inflected (i.e. singular and plural are the same).
 	 *      - `'irregular'`: Contains key-value pairs of specific words which are
 	 *        not inflected according to the rules. This is populated from `Inflector::$_plural`

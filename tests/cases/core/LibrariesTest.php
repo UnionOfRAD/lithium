@@ -211,8 +211,8 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	/**
-	* Tests that an exception is thrown when a library is added which could not be found.
-	*/
+	 * Tests that an exception is thrown when a library is added which could not be found.
+	 */
 	public function testAddInvalidLibrary() {
 		$this->expectException("Library `invalid_foo` not found.");
 		Libraries::add('invalid_foo');
@@ -330,13 +330,12 @@ class LibrariesTest extends \lithium\test\Unit {
 		));
 		$this->assertIdentical(array(__CLASS__), $result);
 
-
 		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
 		mkdir($testApp . '/tests/cases/models', 0777, true);
 		Libraries::add('test_app', array('path' => $testApp));
 
 		$body = <<<EOD
-<?php 
+<?php
 namespace test_app\\tests\\cases\\models;
 class UserTest extends \\lithium\\test\\Unit {
 	public function testMe() {
@@ -545,8 +544,8 @@ EOD;
 				return new SplFileInfo($file);
 			},
 			'filter' => null,
-			'exclude' =>  function($file) {
-				if ($file->getFilename() == 'LibrariesTest.php') {
+			'exclude' => function($file) {
+				if ($file->getFilename() === 'LibrariesTest.php') {
 					return true;
 				}
 			}
@@ -638,7 +637,7 @@ EOD;
 
 		mkdir($testApp . '/tests/cases/models', 0777, true);
 		$body = <<<EOD
-<?php 
+<?php
 namespace test_app\\tests\\cases\\models;
 class UserTest extends \\lithium\\test\\Unit {
 	public function testMe() {
@@ -711,8 +710,8 @@ EOD;
 		mkdir($testApp, 0777, true);
 		Libraries::add('test_app', array('path' => $testApp));
 
-		mkdir($testApp. '/lib', 0777);
-		mkdir($testApp. '/_patch', 0777);
+		mkdir($testApp . '/lib', 0777);
+		mkdir($testApp . '/_patch', 0777);
 
 		$lib = <<<EOD
 <?php
