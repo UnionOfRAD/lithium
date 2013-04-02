@@ -87,14 +87,16 @@ EOD;
 		mkdir($this->_testPath . '/create_test/models/', 0755, true);
 		$id = rand();
 		$path = "create_test/models/Post{$id}s.php";
-		file_put_contents("{$this->_testPath}/{$path}",
-"<?php
+
+		$body = <<<EOD
+<?php
 namespace create_test\models;
 
 class Post{$id}s {
 	public function someMethod() {}
-}"
-);
+}
+EOD;
+		file_put_contents("{$this->_testPath}/{$path}", $body);
 
 		$this->request->params += array('command' => 'create', 'action' => 'test', 'args' => array(
 			'model', "Post{$id}s"

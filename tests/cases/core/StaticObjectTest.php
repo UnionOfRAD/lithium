@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\core;
 
-use lithium\core\StaticObject;
 use lithium\tests\mocks\core\MockRequest;
 use lithium\tests\mocks\core\MockStaticInstantiator;
 

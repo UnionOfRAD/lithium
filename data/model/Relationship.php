@@ -54,14 +54,13 @@ class Relationship extends \lithium\core\Object {
 	 *
 	 * @param array $config The relationship's configuration, which defines how the two models in
 	 *        question are bound. The available options are:
-	 *
 	 *        - `'name'` _string_: The name of the relationship in the context of the
 	 *          originating model. For example, a `Posts` model might define a relationship to
 	 *          a `Users` model like so:
-	 * {{{ public $hasMany = array('Author' => array('to' => 'Users')); }}}
-	 * In this case, the relationship is bound to the `Users` model, but `'Author'` would be the
-	 * relationship name. This is the name with which the relationship is referenced in the
-	 * originating model.
+	 *          {{{ public $hasMany = array('Author' => array('to' => 'Users')); }}}
+	 *          In this case, the relationship is bound to the `Users` model, but `'Author'` would
+	 *          be the relationship name. This is the name with which the relationship is
+	 *          referenced in the originating model.
 	 *        - `'key'` _mixed_: An array of fields that define the relationship, where the
 	 *          keys are fields in the originating model, and the values are fields in the
 	 *          target model. If the relationship is not deined by keys, this array should be

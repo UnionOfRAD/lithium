@@ -59,8 +59,8 @@ class RouteTest extends \lithium\test\Unit {
 			'Router::connect("/", "Pages::view");',
 			'Router::connect("/pages/{:args}", "Pages::view");',
 			'if (!Environment::is("production")) {',
-				'Router::connect("/test/{:args}", ' . $testParams . ');',
-				'Router::connect("/test", ' . $testParams . ');',
+			'	Router::connect("/test/{:args}", ' . $testParams . ');',
+			'	Router::connect("/test", ' . $testParams . ');',
 			'}',
 			'?>'
 		);

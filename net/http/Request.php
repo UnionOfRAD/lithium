@@ -207,9 +207,9 @@ class Request extends \lithium\net\http\Message {
 
 		if (is_string($options['query'])) {
 			$options['query'] = "?" . $options['query'];
-		} else if ($options['query']) {
+		} elseif ($options['query']) {
 			$options['query'] = "?" . http_build_query($options['query']);
-		} else if ($options['query'] === null) {
+		} elseif ($options['query'] === null) {
 			$options['query'] = $this->queryString();
 		}
 

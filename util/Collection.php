@@ -285,7 +285,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * @param callback $filter Callback to use for filtering.
 	 * @param array $options The available options are:
-	 *        - `'collect'`: If `true`, the results will be returned wrapped in a new 
+	 *        - `'collect'`: If `true`, the results will be returned wrapped in a new
 	 *          `Collection` object or subclass.
 	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
 	 *         `$options` argument, then an instance of this class will be returned.
@@ -382,7 +382,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	public function sort($sorter = 'sort', array $options = array()) {
 		if (is_string($sorter) && strpos($sorter, 'sort') !== false && is_callable($sorter)) {
 			call_user_func_array($sorter, array(&$this->_data));
-		} else if (is_callable($sorter)) {
+		} elseif (is_callable($sorter)) {
 			usort($this->_data, $sorter);
 		}
 		return $this;

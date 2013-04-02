@@ -483,7 +483,7 @@ abstract class Collection extends \lithium\util\Collection {
 
 				return strcmp($a->$field, $b->$field);
 			};
-		} else if (is_callable($field)) {
+		} elseif (is_callable($field)) {
 			$sorter = $field;
 		}
 
@@ -612,7 +612,6 @@ abstract class Collection extends \lithium\util\Collection {
 	 *
 	 * @see lithium\data\Collection::_populate()
 	 * @see lithium\data\Collection::_offsetSet()
-	 *
 	 * @param mixed $data An array or an `Entity` object to set.
 	 * @param mixed $offset The offset. If offset is `null` data is simply appended to the set.
 	 * @param array $options Any additional options to pass to the `Entity`'s constructor.
