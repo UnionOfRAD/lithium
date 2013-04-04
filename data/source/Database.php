@@ -189,14 +189,14 @@ abstract class Database extends \lithium\data\Source {
 		parent::_init();
 
 		array_walk($this->_columns, function(&$spec, $type, $formatters){
-			if ( array_key_exists($type, $formatters) ) {
+			if (array_key_exists($type, $formatters)) {
 				$spec['formatter'] = $formatters[$type];
 			}
 		}, $this->_formatters());
 
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
-					  '{:having} {:order} {:limit};{:comment}'
+				'{:having} {:order} {:limit};{:comment}'
 		);
 
 		$this->_strategies += array(
@@ -295,13 +295,13 @@ abstract class Database extends \lithium\data\Source {
 			preg_match('/SQLSTATE\[(.+?)\]/', $e->getMessage(), $code);
 			$code = $code[1] ?: 0;
 			switch (true) {
-			case $code === 'HY000' || substr($code, 0, 2) === '08':
-				$msg = "Unable to connect to host `{$config['host']}`.";
-				throw new NetworkException($msg, null, $e);
+				case $code === 'HY000' || substr($code, 0, 2) === '08':
+					$msg = "Unable to connect to host `{$config['host']}`.";
+					throw new NetworkException($msg, null, $e);
 				break;
-			case in_array($code, array('28000', '42000')):
-				$msg = "Host connected, but could not access database `{$config['database']}`.";
-				throw new ConfigException($msg, null, $e);
+				case in_array($code, array('28000', '42000')):
+					$msg = "Host connected, but could not access database `{$config['database']}`.";
+					throw new ConfigException($msg, null, $e);
 				break;
 			}
 			throw new ConfigException("An unknown configuration error has occured.", null, $e);
@@ -416,12 +416,9 @@ abstract class Database extends \lithium\data\Source {
 	 * Cast a value according to a column type, used by `Database::value()`
 	 *
 	 * @see \lithium\data\source\Database::value()
-	 *
 	 * @param string $type Name of the column type
 	 * @param string $value Value to cast
-	 *
 	 * @return mixed Casted value
-	 *
 	 */
 	protected function _cast($type, $value, $spec = null) {
 		extract($spec + array(
@@ -430,15 +427,15 @@ abstract class Database extends \lithium\data\Source {
 			'format' => null,
 		));
 
-		if ( $formatter ) {
-			if ( $format ) {
+		if ($formatter) {
+			if ($format) {
 				return $formatter($value, $format);
 			}
 
 			return $formatter($value);
 		}
 
-		if (is_object($value) ) {
+		if (is_object($value)) {
 			return $value;
 		}
 
@@ -454,14 +451,13 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * @see \lithium\data\source\Database::$_columns
 	 * @see \lithium\data\source\Database::_init()
-	 *
 	 * @return array of column types to \Closure formatter
 	 */
 	protected function _formatters() {
 		$self = $this;
 
 		$datetime = $timestamp = $date = $time = function($value, $format) use ($self){
-			if ( $time = strtotime($value) ) {
+			if ($time = strtotime($value)) {
 				return $self->connection->quote(date($format, $time));
 			}
 
@@ -618,7 +614,9 @@ abstract class Database extends \lithium\data\Source {
 					}
 					$data['fields'] = $fields;
 					$data['limit'] = '';
-					$data['conditions'] = $this->conditions(array("{$name}.{$key}" => $ids), $query);
+					$data['conditions'] = $this->conditions(array(
+						"{$name}.{$key}" => $ids
+					), $query);
 					return $data;
 				}
 			}
@@ -1144,7 +1142,7 @@ abstract class Database extends \lithium\data\Source {
 		return $result;
 	}
 
-		/**
+	/**
 	 * Returns a string of formatted constraints to be inserted into the query statement. If the
 	 * query constraints are defined as an array, key pairs are converted to SQL strings.
 	 *
