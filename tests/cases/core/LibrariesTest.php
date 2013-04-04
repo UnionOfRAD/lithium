@@ -465,20 +465,20 @@ EOD;
 		$body = <<<EOD
 <?php
 namespace test_app\\controllers;
-class HelloWorldController extends \\lithium\\action\\Controller {
+class HelloWorldCustomTestController extends \\lithium\\action\\Controller {
 	public function index() {}
 }
 ?>
 EOD;
-		$filepath = $testApp . '/controllers/HelloWorldController.php';
+		$filepath = $testApp . '/controllers/HelloWorldCustomTestController.php';
 		file_put_contents($filepath, $body);
 		Libraries::cache(false);
 
-		$result = Libraries::locate('controllers', 'HelloWorld');
-		$expected = 'test_app\controllers\HelloWorldController';
+		$result = Libraries::locate('controllers', 'HelloWorldCustomTest');
+		$expected = 'test_app\controllers\HelloWorldCustomTestController';
 		$this->assertEqual($expected, $result);
 
-		$result = Libraries::locate('controllers', 'HelloWorld');
+		$result = Libraries::locate('controllers', 'HelloWorldCustomTest');
 		$this->assertEqual($expected, $result);
 	}
 
