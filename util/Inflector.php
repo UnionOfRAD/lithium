@@ -288,8 +288,8 @@ class Inflector {
 		extract(static::$_plural);
 
 		if (!isset($regexUninflected) || !isset($regexIrregular)) {
-			$regexUninflected = static::_enclose(join( '|', $uninflected + static::$_uninflected));
-			$regexIrregular = static::_enclose(join( '|', array_keys($irregular)));
+			$regexUninflected = static::_enclose(join('|', $uninflected + static::$_uninflected));
+			$regexIrregular = static::_enclose(join('|', array_keys($irregular)));
 			static::$_plural += compact('regexUninflected', 'regexIrregular');
 		}
 		if (preg_match('/(' . $regexUninflected . ')$/i', $word, $regs)) {
