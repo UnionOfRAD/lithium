@@ -750,7 +750,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model,
-			'conditions' => array( (object) 'lower(title) = \'test\'')
+			'conditions' => array((object) 'lower(title) = \'test\'')
 		));
 
 		$this->assertEqual($sql, $this->db->renderCommand($query));
@@ -760,14 +760,14 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model,
-			'conditions' => array( (object) 'lower(title) = REGEXP \'^test$\'')
+			'conditions' => array((object) 'lower(title) = REGEXP \'^test$\'')
 		));
 
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model,
-			'conditions' => array( 'lower(title)' => (object) 'REGEXP \'^test$\'')
+			'conditions' => array('lower(title)' => (object) 'REGEXP \'^test$\'')
 		));
 
 		$this->assertEqual($sql, $this->db->renderCommand($query));

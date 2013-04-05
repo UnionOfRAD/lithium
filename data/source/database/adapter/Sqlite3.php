@@ -327,7 +327,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			case (strpos($column['type'], 'int') !== false):
 				$column['type'] = 'integer';
 			break;
-			case (strpos($column['type'], 'char') !== false ):
+			case (strpos($column['type'], 'char') !== false):
 				$column['type'] = 'string';
 				$column['length'] = 255;
 			break;
