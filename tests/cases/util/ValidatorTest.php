@@ -118,7 +118,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		};
 		Validator::add('test', $function);
 		$validations = array(
-			'inputName' => array( array( 'test', 'message' => 'foobar', 'format' => 'string' ) )
+			'inputName' => array(array('test', 'message' => 'foobar', 'format' => 'string'))
 		);
 		$values = array(
 			'inputName' => 'blah'

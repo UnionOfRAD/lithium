@@ -238,10 +238,10 @@ class PostgreSql extends \lithium\data\source\Database {
 					$default = $column['default'];
 				}
 				$fields[$column['field']] = $match + array(
-					'null'     => ($column['null'] == 'YES' ? true : false),
+					'null'     => ($column['null'] === 'YES' ? true : false),
 					'default'  => $default
 				);
-				if ($fields[$column['field']]['type'] == 'string') {
+				if ($fields[$column['field']]['type'] === 'string') {
 					$fields[$column['field']]['length'] = $column['char_length'];
 				}
 			}
@@ -342,7 +342,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	public function alias($alias, $context) {
-		if ($context->type() == 'update' || $context->type() == 'delete') {
+		if ($context->type() === 'update' || $context->type() === 'delete') {
 			return;
 		}
 		return parent::alias($alias, $context);
@@ -429,23 +429,23 @@ class PostgreSql extends \lithium\data\source\Database {
 		switch (true) {
 			case in_array($column['type'], array('date', 'time', 'datetime')):
 				return $column;
-			case ($column['type'] == 'timestamp'):
+			case ($column['type'] === 'timestamp'):
 				$column['type'] = 'datetime';
 			break;
-			case ($column['type'] == 'tinyint' && $column['length'] == '1'):
-			case ($column['type'] == 'boolean'):
+			case ($column['type'] === 'tinyint' && $column['length'] == '1'):
+			case ($column['type'] === 'boolean'):
 				return array('type' => 'boolean');
 			break;
 			case (strpos($column['type'], 'int') !== false):
 				$column['type'] = 'integer';
 			break;
-			case (strpos($column['type'], 'char') !== false || $column['type'] == 'tinytext'):
+			case (strpos($column['type'], 'char') !== false || $column['type'] === 'tinytext'):
 				$column['type'] = 'string';
 			break;
 			case (strpos($column['type'], 'text') !== false):
 				$column['type'] = 'text';
 			break;
-			case (strpos($column['type'], 'blob') !== false || $column['type'] == 'binary'):
+			case (strpos($column['type'], 'blob') !== false || $column['type'] === 'binary'):
 				$column['type'] = 'binary';
 			break;
 			case preg_match('/float|double|decimal/', $column['type']):

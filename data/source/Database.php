@@ -1474,11 +1474,12 @@ abstract class Database extends \lithium\data\Source {
 	protected function _on(array $constraints, $aliasFrom, $aliasTo, $mapAlias = array()) {
 		$result = array();
 		foreach ($constraints as $key => $value) {
-			if (
+			$isAliasable = (
 				!is_numeric($key) &&
 				!isset($this->_constraintTypes[$key]) &&
 				!isset($this->_operators[$key])
-			) {
+			);
+			if ($isAliasable) {
 				$key = $this->_aliasing($key, $aliasFrom, $mapAlias);
 			}
 			if (is_string($value)) {
@@ -1645,7 +1646,7 @@ abstract class Database extends \lithium\data\Source {
 				if ($meta = $this->_constraint($name, $constraint, $schema)) {
 					$result .= $joiner . $meta;
 				}
-				if ($name == 'primary') {
+				if ($name === 'primary') {
 					$primary = false;
 				}
 			}
