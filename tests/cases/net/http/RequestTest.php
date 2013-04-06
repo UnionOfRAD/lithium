@@ -15,7 +15,7 @@ class RequestTest extends \lithium\test\Unit {
 	public $request = null;
 
 	public function setUp() {
-		$this->request = new Request(array('init' => false));
+		$this->request = new Request();
 	}
 
 	public function testConstruct() {

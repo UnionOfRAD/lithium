@@ -83,7 +83,7 @@ class Message extends \lithium\net\Message {
 			'auth' => null
 		);
 		$config += $defaults;
-		parent::__construct($config);
+
 		foreach (array_intersect_key(array_filter($config), $defaults) as $key => $value) {
 			$this->{$key} = $value;
 		}
@@ -92,6 +92,8 @@ class Message extends \lithium\net\Message {
 		}
 		$this->path = str_replace('//', '/', "/{$this->path}");
 		$this->protocol = $this->protocol ?: "HTTP/{$this->version}";
+
+		parent::__construct($config);
 	}
 
 	/**

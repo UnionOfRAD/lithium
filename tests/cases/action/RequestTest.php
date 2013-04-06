@@ -19,15 +19,23 @@ class RequestTest extends \lithium\test\Unit {
 
 	protected $_get = array();
 
+	protected $_post = array();
+
+	protected $_cookie = array();
+
 	public function setUp() {
 		$this->request = new Request(array('init' => false));
 		$this->_get = $_GET;
-		unset($_GET);
+		$this->_post = $_POST;
+		$this->_cookie = $_COOKIE;
+		unset($_GET, $_POST, $_COOKIE);
 	}
 
 	public function tearDown() {
 		unset($this->request);
 		$_GET = $this->_get;
+		$_POST = $this->_post;
+		$_COOKIE = $this->_cookie;
 	}
 
 	public function testInitData() {
@@ -871,6 +879,13 @@ class RequestTest extends \lithium\test\Unit {
 		$expected = array('name' => 'bob');
 		$result = $request->data;
 		$this->assertEqual($expected, $result);
+
+		$_POST['organization'] = 'Union of Rad';
+		$request = new Request(array('data' => array('name' => 'bob')));
+
+		$expected = array('name' => 'bob', 'organization' => 'Union of Rad');
+		$result = $request->data;
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testQueryFromConstructor() {
@@ -878,6 +893,28 @@ class RequestTest extends \lithium\test\Unit {
 
 		$expected = array('page' => 1);
 		$result = $request->query;
+		$this->assertEqual($expected, $result);
+
+		$_GET = array('limit' => 10);
+		$request = new Request(array('query' => array('page' => 1)));
+
+		$expected = array('page' => 1, 'limit' => 10);
+		$result = $request->query;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testCookiesFromConstructor() {
+		$request = new Request(array('cookies' => array('sid' => 12345)));
+
+		$expected = array('sid' => 12345);
+		$result = $request->cookies;
+		$this->assertEqual($expected, $result);
+
+		$_COOKIE['token'] = 'foo';
+		$request = new Request(array('cookies' => array('sid' => 12345)));
+
+		$expected = array('sid' => 12345, 'token' => 'foo');
+		$result = $request->cookies;
 		$this->assertEqual($expected, $result);
 	}
 
