@@ -468,6 +468,17 @@ class Mocker {
 			'to' => array('array()', ''),
 		);
 		preg_match_all($pattern, $method, $matches);
+		foreach ($matches[1] as $key => &$param) {
+			$optional = preg_match('/\<optional\>/', $matches[0][$key]) === 1;
+			$defaultValue = preg_match('/=/', $matches[1][$key]) === 1;
+			if (preg_match('/\.\.\./', $matches[1][$key]) === 1) {
+				unset($matches[1][$key]);
+				continue;
+			}
+			if ($optional && !$defaultValue) {
+				$param .= ' = null';
+			}
+		}
 		$params = implode(', ', $matches[1]);
 		return str_replace($replace['from'], $replace['to'], $params);
 	}
@@ -481,6 +492,11 @@ class Mocker {
 	protected static function _stringMethodParams(ReflectionFunctionAbstract $method) {
 		$pattern = '/Parameter [^$]+\$([^ ]+)/';
 		preg_match_all($pattern, $method, $matches);
+		foreach ($matches[1] as $key => &$param) {
+			if (preg_match('/\.\.\./', $matches[1][$key]) === 1) {
+				return 'func_get_args()';
+			}
+		}
 		$params = implode("', '", $matches[1]);
 		return strlen($params) > 0 ? "'{$params}'" : 'array()';
 	}
@@ -666,19 +682,34 @@ class Mocker {
 			return static::$_functionCallbacks[$name] = false;
 		}
 		static::$_functionCallbacks[$name] = $callback;
-		if (function_exists($name)) {
-			return;
-		}
+		static::setupFunctions($name);
+	}
 
-		$function = new ReflectionFunction($callback);
-		$pos = strrpos($name, '\\');
-		eval(self::_dynamicCode('mockFunction', 'function', array(
-			'namespace' => substr($name, 0, $pos),
-			'function' => substr($name, $pos + 1),
-			'args' => static::_methodParams($function),
-			'stringArgs' => static::_stringMethodParams($function),
-		)));
-		return;
+	/**
+	 * Sets up up a function to route to `Mocker` which will default to its original method.
+	 *
+	 * @param  string $name     Required. Name of the function you wish to setup.
+	 * @param  string $name,... Unlimited function names you also wish to setup.
+	 * @return void
+	 */
+	public static function setupFunctions($name) {
+		foreach (func_get_args() as $functionName) {
+			if (function_exists($functionName)) {
+				continue;
+			}
+			$pos = strrpos($functionName, '\\');
+			$baseName = substr($functionName, $pos);
+			if (isset(static::$_functionCallbacks[$name])) {
+				$baseName = static::$_functionCallbacks[$name];
+			}
+			$function = new ReflectionFunction($baseName);
+			eval(static::_dynamicCode('mockFunction', 'function', array(
+				'namespace' => substr($functionName, 0, $pos),
+				'function' => substr($functionName, $pos + 1),
+				'args' => static::_methodParams($function),
+				'stringArgs' => static::_stringMethodParams($function),
+			)));
+		}
 	}
 
 	/**

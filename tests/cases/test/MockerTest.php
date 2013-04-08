@@ -431,6 +431,24 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertCount(2, $results['__call']);
 	}
 
+	public function testSetupSingleFunction() {
+		$this->assertFalse(function_exists('foo\baz\print_r'));
+
+		Mocker::setupFunctions('foo\baz\print_r');
+
+		$this->assertTrue(function_exists('foo\baz\print_r'));
+	}
+
+	public function testSetupMultipleFunction() {
+		$this->assertFalse(function_exists('foo\baz\var_dump'));
+		$this->assertFalse(function_exists('foo\baz\var_export'));
+
+		Mocker::setupFunctions('foo\baz\var_dump', 'foo\baz\var_export');
+
+		$this->assertTrue(function_exists('foo\baz\var_dump'));
+		$this->assertTrue(function_exists('foo\baz\var_export'));
+	}
+
 }
 
 ?>
