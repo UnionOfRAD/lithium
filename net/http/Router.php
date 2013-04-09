@@ -187,16 +187,16 @@ class Router extends \lithium\core\StaticObject {
 	 * use litthium\util\Inflector;
 	 *
 	 * Router::modifiers(array(
-	 * 	'controller' => function($value) {
-	 *      return Inflector::camelize($value);
-	 *  },
-	 * 	'action' => function($value) {
-	 *      return Inflector::camelize($value) . 'Action';
-	 *  }
+	 *     'controller' => function($value) {
+	 *         return Inflector::camelize($value);
+	 *     },
+	 *     'action' => function($value) {
+	 *         return Inflector::camelize($value) . 'Action';
+	 *     }
 	 * ));
 	 * }}}
 	 *
-	 *  _Note_: Because modifiers are copied to `Route` objects on an individual basis, make sure
+	 * _Note_: Because modifiers are copied to `Route` objects on an individual basis, make sure
 	 * you append your custom modifiers _before_ connecting new routes.
 	 *
 	 * @param array $modifiers An array of named formatter closures to append to (or overwrite) the
@@ -284,41 +284,26 @@ class Router extends \lithium\core\StaticObject {
 			$orig = $request->params;
 			$url = $request->url;
 			$name = is_int($name) ? false : $name;
-			$isBelongsToScope = (isset(static::$_configurations[$name]) && (
-				(!$config = static::attached($name)) ||
-				static::_matchScope($name, $request)
-			));
-			if ($isBelongsToScope) {
-				if ($config['prefix']) {
-					$url = preg_replace('@^/' . trim($config['prefix'], '/') . '@', '/', $url);
+
+			if (!$url = static::_parseScope($name, $request)) {
+				continue;
+			}
+
+			foreach (static::$_configurations[$name] as $route) {
+				if (!$match = $route->parse($request, compact('url'))) {
+					continue;
+				}
+				$request = $match;
+				if ($route->canContinue() && isset($request->params['args'])) {
+					$url = '/' . join('/', $request->params['args']);
+					unset($request->params['args']);
+					continue;
 				}
 
-				foreach (static::$_configurations[$name] as $route) {
-					if (!$match = $route->parse($request, compact('url'))) {
-						continue;
-					}
-					$request = $match;
-					if ($route->canContinue() && isset($request->params['args'])) {
-						$url = '/' . join('/', $request->params['args']);
-						unset($request->params['args']);
-						continue;
-					}
+				static::attach($name, null, isset($request->params) ? $request->params : array());
+				static::scope($name);
 
-					if (isset($request->params['controller'])) {
-						$controller = $request->params['controller'];
-						if (isset($config['namespace']) && strpos($controller, '\\') === false) {
-							$controller = $config['namespace'] . '\\' . $controller;
-							$request->params['controller'] = $controller . 'Controller';
-						}
-						if (isset($config['library'])) {
-							$request->params['library'] = $config['library'];
-						}
-					}
-
-					static::attach($name, null, isset($request->params) ? $request->params : array());
-					static::scope($name);
-					return $request;
-				}
+				return $request;
 			}
 			$request->params = $orig;
 		}
@@ -378,22 +363,71 @@ class Router extends \lithium\core\StaticObject {
 	 *          or overrides the one provided in `$context`.
 	 *        - `'scheme'` _string_: If `'absolute'` is `true`, sets the URL scheme to be
 	 *          used, or overrides the one provided in `$context`.
+	 *        - `'scope'` _string_: Optionnal scope name.
 	 * @return string Returns a generated URL, based on the URL template of the matched route, and
 	 *         prefixed with the base URL of the application.
 	 */
 	public static function match($url = array(), $context = null, array $options = array()) {
+		$options = static::_matchOptions($context, $options);
+
+		if (is_string($url = static::_prepareParams($url, $context, $options))) {
+			return $url;
+		}
+
+		$base = $options['base'];
+		$url += array('action' => 'index');
+		$stack = array();
+
+		$suffix = isset($url['#']) ? "#{$url['#']}" : null;
+		unset($url['#']);
+
+		$scope = $options['scope'];
+		if (!isset(static::$_configurations[$scope])) {
+			$url = static::_formatError($url);
+			throw new RoutingException("No configuration found for scope `{$scope}`.");
+		}
+		foreach (static::$_configurations[$scope] as $route) {
+			if (!$match = $route->match($url, $context)) {
+				continue;
+			}
+			if ($route->canContinue()) {
+				$stack[] = $match;
+				$export = $route->export();
+				$keys = $export['match'] + $export['keys'] + $export['defaults'];
+				unset($keys['args']);
+				$url = array_diff_key($url, $keys);
+				continue;
+			}
+			if ($stack) {
+				$stack[] = $match;
+				$match = static::_compileStack($stack);
+			}
+			$path = rtrim("{$base}{$match}{$suffix}", '/') ?: '/';
+			$path = ($options) ? static::_prefix($path, $context, $options) : $path;
+			return $path ?: '/';
+		}
+		$url = static::_formatError($url);
+		throw new RoutingException("No parameter match found for URL `{$url}`.");
+	}
+
+	/**
+	 * Initialize options for `Router::match()`.
+	 *
+	 * @param object $context An instance of `lithium\action\Request`.
+	 * @param array $options Options for the generation of the matched URL.
+	 * @return array The initialized options.
+	 */
+	protected static function _matchOptions($context, $options) {
 		$defaults = array(
 			'scheme' => null,
 			'host' => null,
 			'absolute' => false,
 			'base' => $context ? rtrim($context->env('base'), '/') : ''
 		);
-
 		if ($context) {
 			$defaults['host'] = $context->host;
 			$defaults['scheme'] = $context->scheme . ($context->scheme ? '://' : '//');
 		}
-
 		$options += array('scope' => static::scope());
 		$vars = array();
 		$scope = $options['scope'];
@@ -418,43 +452,7 @@ class Router extends \lithium\core\StaticObject {
 			$config['base'] = '/' . ltrim($defaults['base'] . $prefix, '/');
 			$defaults = $config + $defaults;
 		}
-
-		$options += $defaults;
-		if (is_string($url = static::_prepareParams($url, $context, $options))) {
-			return $url;
-		}
-
-		$base = $options['base'];
-		$url += array('action' => 'index');
-		$stack = array();
-
-		$suffix = isset($url['#']) ? "#{$url['#']}" : null;
-		unset($url['#']);
-
-		if (isset(static::$_configurations[$scope])) {
-			foreach (static::$_configurations[$scope] as $route) {
-				if (!$match = $route->match($url, $context)) {
-					continue;
-				}
-				if ($route->canContinue()) {
-					$stack[] = $match;
-					$export = $route->export();
-					$keys = $export['match'] + $export['keys'] + $export['defaults'];
-					unset($keys['args']);
-					$url = array_diff_key($url, $keys);
-					continue;
-				}
-				if ($stack) {
-					$stack[] = $match;
-					$match = static::_compileStack($stack);
-				}
-				$path = rtrim("{$base}{$match}{$suffix}", '/') ? : '/';
-				$path = ($options) ? static::_prefix($path, $context, $options) : $path;
-				return $path ? : '/';
-			}
-		}
-		$url = static::_formatError($url);
-		throw new RoutingException("No parameter match found for URL `{$url}`.");
+		return $options + $defaults;
 	}
 
 	protected static function _compileStack($stack) {
@@ -681,7 +679,7 @@ class Router extends \lithium\core\StaticObject {
 	 * ));
 	 * }}}
 	 *
-	 * Attach the variable to populate for the app scope.
+	 * Attach the variables to populate for the app scope.
 	 * {{{
 	 * Router::attach('app', null, array(
 	 *     'subdomain' => 'www',
@@ -789,8 +787,7 @@ class Router extends \lithium\core\StaticObject {
 	 * Initialize `static::$_scopes` with a `lithium\core\Configuration` instance.
 	 */
 	protected static function _initScopes() {
-		$configuration = static::$_classes['configuration'];
-		static::$_scopes = new $configuration();
+		static::$_scopes = static::_instance('configuration');
 		$self = get_called_class();
 		static::$_scopes->initConfig = function($name, $config) use ($self) {
 			$defaults = array(
@@ -864,18 +861,24 @@ class Router extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Check if a scope match a request
+	 * Return the unscoped url to route.
 	 *
-	 * @param string $name Name of an url scope
-	 * @param string $request A `lithium\action\Request` instance to match on
-	 * @return boolean
+	 * @param string $name Scope name.
+	 * @param string $request A `lithium\action\Request` instance .
+	 * @return mixed The url to route, or `false` if the request doesn't match the scope.
 	 */
-	protected static function _matchScope($name, $request) {
+	protected static function _parseScope($name, $request) {
+		$url = trim($request->url, '/');
+		$url = $url ? '/' . $url . '/' : '/';
+
+		if (!$config = static::attached($name)) {
+			return $url;
+		}
+
 		$scheme = $request->scheme . ($request->scheme ? '://' : '//');
 		$host = $request->host;
-		$url = '/' . trim($request->url, '/') . '/';
 
-		if (($config = static::attached($name)) && $config['absolute']) {
+		if ($config['absolute']) {
 			preg_match($config['pattern'], $scheme . $host . $url, $match);
 		} else {
 			preg_match($config['pattern'], $url, $match);
@@ -883,8 +886,12 @@ class Router extends \lithium\core\StaticObject {
 
 		if ($match) {
 			$result = array_intersect_key($match, array_flip($config['params']));
+			$request->params = array('library' => $config['library']);
 			$request->params += $result;
-			return $result ? : true;
+			if ($config['prefix']) {
+				$url = preg_replace('@^/' . trim($config['prefix'], '/') . '@', '', $url);
+			}
+			return $url;
 		}
 		return false;
 	}

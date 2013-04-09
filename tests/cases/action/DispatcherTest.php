@@ -56,8 +56,6 @@ class DispatcherTest extends \lithium\test\Unit {
 	 * URL don't work as expected, because they immediately get redirected to the same URL but
 	 * as GET requests (with no data attached to it). It veryfies that the Lithium dispatcher
 	 * works as expected and returns the correct controller/action combination.
-	 *
-	 * @return void
 	 */
 	public function testRunWithPostRoot() {
 		Router::connect('/', array('controller' => 'test', 'action' => 'test'));
@@ -202,10 +200,6 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testAutoHandler() {
 		$result = MockDispatcher::run(new Request(array('url' => '/auto')));
 		$this->assertEqual(array('Location: /redirect'), $result->headers());
-	}
-
-	public function methods() {
-		return array('testPluginControllerLookupFail');
 	}
 
 	public static function process($request) {

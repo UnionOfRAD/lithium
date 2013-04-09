@@ -274,13 +274,9 @@ class Route extends \lithium\core\Object {
 				unset($options['?']);
 			}
 		}
-		if (isset($this->_meta['http:method']) &&
-			$options['http:method'] !== $this->_meta['http:method']
-		) {
+		if (!$options = $this->_matchMethod($options)) {
 			return false;
 		}
-		unset($options['http:method']);
-
 		if (!$options = $this->_matchKeys($options)) {
 			return false;
 		}
@@ -306,6 +302,26 @@ class Route extends \lithium\core\Object {
 	 */
 	public function canContinue() {
 		return $this->_config['continue'];
+	}
+
+	/**
+	 * Helper used by `Route::match()` which check if the required http method is compatible
+	 * with the route.
+	 *
+	 * @see lithium\net\http\Route::match()
+	 * @param array $options An array of URL parameters.
+	 * @return mixed On success, returns an updated array of options, On failure, returns `false`.
+	 */
+	protected function _matchMethod($options) {
+		$isMatch = (
+			!isset($this->_meta['http:method']) ||
+			$options['http:method'] === $this->_meta['http:method']
+		);
+		if (!$isMatch) {
+			return false;
+		}
+		unset($options['http:method']);
+		return $options;
 	}
 
 	/**

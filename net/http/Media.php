@@ -1021,10 +1021,8 @@ class Media extends \lithium\core\StaticObject {
 	 * Initialize `static::$_scopes` with a `lithium\core\Configuration` instance.
 	 */
 	protected static function _initScopes() {
-		$configuration = static::$_classes['configuration'];
-		static::$_scopes = new $configuration();
-		$self = get_called_class();
-		static::$_scopes->initConfig = function($name, $config) use ($self) {
+		static::$_scopes = static::_instance('configuration');
+		static::$_scopes->initConfig = function($name, $config) {
 			$defaults = array(
 				'absolute' => false,
 				'host' => 'localhost',
