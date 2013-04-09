@@ -625,6 +625,42 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
+	 * Assert that the code passed in a closure does not throw an exception matching the passed
+	 * expected exception.
+	 *
+	 * The value passed to `exepected` is either an exception class name or the expected message.
+	 *
+	 * @param mixed $expected A string indicating what the error text is not expected to be. This
+	 *              can be an exact string, a /-delimited regular expression, or true, indicating
+	 *              that any error text is acceptable.
+	 * @param closure $closure A closure containing the code that should throw the exception.
+	 * @param string $message
+	 * @return boolean
+	 */
+	public function assertNotException($expected, $closure, $message = '{:message}') {
+		try {
+			$closure();
+		} catch (Exception $e) {
+			$class = get_class($e);
+			$eMessage = $e->getMessage();
+			if (is_a($e, $expected)) {
+				$result = $class;
+				return $this->assert(false, $message, compact('expected', 'result'));
+			}
+			if ($eMessage === $expected) {
+				$result = $eMessage;
+				return $this->assert(false, $message, compact('expected', 'result'));
+			}
+			if (Validator::isRegex($expected) && preg_match($expected, $eMessage)) {
+				$result = $eMessage;
+				return $this->assert(false, $message, compact('expected', 'result'));
+			}
+		}
+		$message = sprintf('Exception "%s" was not expected.', $expected);
+		return $this->assert(true, $message, compact('expected', 'result'));
+	}
+
+	/**
 	 * Assert Cookie data is properly set in headers.
 	 *
 	 * The value passed to `exepected` is an array of the cookie data, with at least the key and
