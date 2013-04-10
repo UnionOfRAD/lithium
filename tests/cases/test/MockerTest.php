@@ -20,6 +20,10 @@ class MockerTest extends \lithium\test\Unit {
 		Mocker::register();
 	}
 
+	public function tearDown() {
+		Mocker::applyFilter(false);
+	}
+
 	public function testAutoloadRegister() {
 		Mocker::register();
 		$registered = spl_autoload_functions();
@@ -429,6 +433,12 @@ class MockerTest extends \lithium\test\Unit {
 
 		$this->assertArrayHasKey('__call', $results);
 		$this->assertCount(2, $results['__call']);
+	}
+
+	public function testDoesNotThrowExceptionWhenMockingIterator() {
+		$this->assertNotException('Exception', function() {
+			return new \lithium\util\collection\Mock;
+		});
 	}
 
 }
