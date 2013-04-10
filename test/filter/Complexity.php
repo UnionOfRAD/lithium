@@ -17,7 +17,7 @@ class Complexity extends \lithium\test\Filter {
 	 * The list of tokens which represent the starting point of a code branch.
 	 */
 	protected static $_include = array(
-		'T_CASE', 'T_DEFAULT', 'T_CATCH', 'T_IF', 'T_FOR',
+		'T_CASE', 'T_CATCH', 'T_IF', 'T_FOR',
 		'T_FOREACH', 'T_WHILE', 'T_DO', 'T_ELSEIF'
 	);
 
