@@ -39,7 +39,7 @@ class Mock extends \lithium\console\command\Create {
 	 */
 	protected function _parent($request) {
 		$namespace = parent::_namespace($request);
-		$class = Inflector::pluralize($request->action);
+		$class = Inflector::camelize($request->action);
 		return "\\{$namespace}\\{$class}";
 	}
 
@@ -57,7 +57,7 @@ class Mock extends \lithium\console\command\Create {
 			$request->params['action'] = $name;
 			$name = $command->invokeMethod('_class', array($request));
 		}
-		return  Inflector::pluralize("Mock{$name}");
+		return "Mock{$name}";
 	}
 
 	/**
