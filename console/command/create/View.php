@@ -27,7 +27,7 @@ class View extends \lithium\console\command\Create {
 	 * @return string
 	 */
 	protected function _name($request) {
-		return Inflector::camelize(Inflector::pluralize($request->action));
+		return Inflector::camelize($request->action);
 	}
 
 	/**

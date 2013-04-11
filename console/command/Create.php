@@ -116,10 +116,10 @@ class Create extends \lithium\console\Command {
 	 */
 	protected function _default($name) {
 		$commands = array(
-			array('model', Inflector::pluralize($name)),
-			array('controller', Inflector::pluralize($name)),
-			array('test', 'model', Inflector::pluralize($name)),
-			array('test', 'controller', Inflector::pluralize($name))
+			array('model', $name),
+			array('controller', $name),
+			array('test', 'model', $name),
+			array('test', 'controller', $name)
 		);
 		foreach ($commands as $args) {
 			$command = $this->template = $this->request->params['command'] = array_shift($args);
