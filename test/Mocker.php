@@ -258,12 +258,22 @@ class Mocker {
 			'    return $this->mocker->$name = $value;',
 			'}',
 		),
+		'isset' => array(
+			'public function __isset($name) {',
+			'    return isset($this->mocker->$name);',
+			'}',
+		),
+		'unset' => array(
+			'public function __unset($name) {',
+			'    unset($this->mocker->$name);',
+			'}',
+		),
 		'constructor' => array(
 			'{:modifiers} function __construct({:args}) {',
 			'    $args = compact({:stringArgs});',
 			'    array_push($args, $this);',
-			'    foreach ($this as $key => $value) {',
-			'        if (!in_array($key, $this->_safeVars)) {',
+			'    foreach (get_class_vars(get_class($this)) as $key => $value) {',
+			'        if (isset($this->{$key}) && !in_array($key, $this->_safeVars)) {',
 			'            unset($this->$key);',
 			'        }',
 			'    }',
@@ -429,6 +439,8 @@ class Mocker {
 			'reference' => $getByReference ? '&' : '',
 		));
 		$mock .= self::_dynamicCode('mock', 'set');
+		$mock .= self::_dynamicCode('mock', 'isset');
+		$mock .= self::_dynamicCode('mock', 'unset');
 		$mock .= self::_dynamicCode('mock', 'applyFilter', array(
 			'static' => $staticApplyFilter ? 'static' : '',
 		));
@@ -595,10 +607,12 @@ class Mocker {
 	 *        to remove all the current filters for the given method.
 	 * @return void
 	 */
-	public static function applyFilter($class, $method, $filter = null) {
+	public static function applyFilter($class, $method = null, $filter = null) {
+		if ($class === false) {
+			return static::$_methodFilters = array();
+		}
 		if ($method === false) {
-			static::$_methodFilters[$class] = array();
-			return;
+			return static::$_methodFilters[$class] = array();
 		}
 		foreach ((array) $method as $m) {
 			if (!isset(static::$_methodFilters[$class][$m]) || $filter === false) {
