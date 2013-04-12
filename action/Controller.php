@@ -141,6 +141,18 @@ class Controller extends \lithium\core\Object {
 	 */
 	protected function _init() {
 		parent::_init();
+
+		foreach (static::_parents() as $parent) {
+			$inherit = get_class_vars($parent);
+
+			if (isset($inherit['_render'])) {
+				$this->_render += $inherit['_render'];
+			}
+			if ($parent === __CLASS__) {
+				break;
+			}
+		}
+
 		$this->request = $this->request ?: $this->_config['request'];
 		$this->response = $this->_instance('response', $this->_config['response']);
 
