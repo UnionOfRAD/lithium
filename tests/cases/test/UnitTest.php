@@ -1589,6 +1589,30 @@ class UnitTest extends \lithium\test\Unit {
 		), $result['data']);
 	}
 
+	public function testAssertNotExceptionPassesWithNoException() {
+		$this->assertTrue($this->test->assertNotException('Exception', function() {
+			return false;
+		}));
+	}
+
+	public function testAssertNotExceptionPassesWithWrongException() {
+		$this->assertTrue($this->test->assertNotException('FooException', function() {
+			throw new \Exception('Foo');
+		}));
+	}
+
+	public function testAssertNotExceptionFailsWithExactException() {
+		$this->assertFalse($this->test->assertNotException('lithium\action\DispatchException', function() {
+			throw new \lithium\action\DispatchException('Foo');
+		}));
+	}
+
+	public function testAssertNotExceptionFailsWithBaseException() {
+		$this->assertFalse($this->test->assertNotException('Exception', function() {
+			throw new \lithium\action\DispatchException('Foo');
+		}));
+	}
+
 }
 
 ?>

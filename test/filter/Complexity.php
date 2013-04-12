@@ -8,9 +8,6 @@
 
 namespace lithium\test\filter;
 
-use lithium\analysis\Parser;
-use lithium\analysis\Inspector;
-
 /**
  * Calculates the cyclomatic complexity of class methods, and shows worst-offenders and statistics.
  */
@@ -20,8 +17,13 @@ class Complexity extends \lithium\test\Filter {
 	 * The list of tokens which represent the starting point of a code branch.
 	 */
 	protected static $_include = array(
-		'T_CASE', 'T_DEFAULT', 'T_CATCH', 'T_IF', 'T_FOR',
+		'T_CASE', 'T_CATCH', 'T_IF', 'T_FOR',
 		'T_FOREACH', 'T_WHILE', 'T_DO', 'T_ELSEIF'
+	);
+
+	protected static $_classes = array(
+		'parser' => 'lithium\analysis\Parser',
+		'inspector' => 'lithium\analysis\Inspector',
 	);
 
 	/**
@@ -30,20 +32,28 @@ class Complexity extends \lithium\test\Filter {
 	 *
 	 * @param object $report Instance of Report which is calling apply.
 	 * @param array $tests The test to apply this filter on
-	 * @param array $options Not used.
+	 * @param array $options Additional options to overwrite dependencies.
+	 *                       - `'classes'` _array_: Overwrite default classes array.
 	 * @return object Returns the instance of `$tests`.
 	 */
 	public static function apply($report, $tests, array $options = array()) {
 		$results = array();
+		$options += array(
+			'classes' => array(),
+		);
+		$classes = $options['classes'] + static::$_classes;
+		$inspector = $classes['inspector'];
+		$parser = $classes['parser'];
+
 		foreach ($tests->invoke('subject') as $class) {
 			$results[$class] = array();
 
-			if (!$methods = Inspector::methods($class, 'ranges', array('public' => false))) {
+			if (!$methods = $inspector::methods($class, 'ranges', array('public' => false))) {
 				continue;
 			}
 			foreach ($methods as $method => $lines) {
-				$lines = Inspector::lines($class, $lines);
-				$branches = Parser::tokenize(join("\n", (array) $lines), array(
+				$lines = $inspector::lines($class, $lines);
+				$branches = $parser::tokenize(join("\n", (array) $lines), array(
 					'include' => static::$_include
 				));
 				$results[$class][$method] = count($branches) + 1;
