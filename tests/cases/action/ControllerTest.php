@@ -11,6 +11,7 @@ namespace lithium\tests\cases\action;
 use lithium\action\Request;
 use lithium\action\Controller;
 use lithium\tests\mocks\action\MockPostsController;
+use lithium\tests\mocks\action\MockRenderAltController;
 use lithium\tests\mocks\action\MockControllerRequest;
 
 class ControllerTest extends \lithium\test\Unit {
@@ -301,6 +302,17 @@ class ControllerTest extends \lithium\test\Unit {
 		$postsController(new Request(), array('action' => 'changeTemplate'));
 		$result = $postsController->access('_render');
 		$this->assertEqual('foo', $result['template']);
+	}
+
+	public function testRenderPropertyInheritance() {
+		$controller = new MockRenderAltController();
+
+		$expected = array(
+			'data' => array('foo' => 'bar'), 'layout' => 'alternate', 'type' => null, 'auto' => true,
+			'template' => null, 'hasRendered' => false, 'negotiate' => false
+		);
+		$result = $controller->access('_render');
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testSetData() {
