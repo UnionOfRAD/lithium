@@ -461,7 +461,19 @@ class Media extends \lithium\core\StaticObject {
 			} else {
 				$host = '';
 				if ($defaults['absolute']) {
-					$host = $defaults['scheme'] . $defaults['host'];
+					$host = $defaults['host'];
+					$index = 0;
+					if (is_array($host)) {
+						$hash = substr(hexdec(md5($path)), 0, 10);
+						$index = ((int) $hash) % count($host);
+						if (is_array($defaults['scheme'])) {
+							$host = $defaults['scheme'][$index] . $host[$index];
+						} else {
+							$host = $defaults['scheme'] . $host[$index];
+						}
+					} else {
+						$host = $defaults['scheme'] . $defaults['host'];
+					}
 				}
 				$base = $host ? ($base ? '/' . ltrim($base, '/') : '') : $base;
 				$options['base'] = rtrim($host . $base . '/' . $defaults['prefix'], '/');
@@ -991,6 +1003,35 @@ class Media extends \lithium\core\StaticObject {
 	 * ));
 	 * }}}
 	 *
+	 * {{{
+	 * Media::attach('cdn', array(
+	 *     'absolute' => true,
+	 *     'path' => null,
+	 *     'host' => array('my.cdn.com', 'secure.cdn.com'),
+	 *     'scheme' => array('http://', 'https://'),
+	 *     'prefix' => 'project1/assets',
+	 * ));
+	 * }}}
+	 *
+	 * {{{
+	 * Media::attach('cdn', array(
+	 *     'absolute' => true,
+	 *     'path' => null,
+	 *     'host' => array('my1.cdn.com', 'my2.cdn.com'),
+	 *     'scheme' => 'http://',
+	 *     'prefix' => 'project1/assets',
+	 * ));
+	 * }}}
+	 *
+	 * @param  string $name   Name of the media you wish to attach.
+	 * @param  array  $config
+	 *        - `'path'` _string_: Path of the media.
+	 *        - `'prefix'` _string_: Contains the uri prefix. Such as `css`.
+	 *        - `'absolute'` _boolean_: Defaults to `false`. If you want to generate
+	 *                                  absolute URL's.
+	 *        - `'host'` _mixed_: String host, or array of hosts, of the media, if absolute is `true`.
+	 *        - `'scheme'` _mixed_: String scheme, or array of sc, of the media, if absolute is `true`.
+	 * @return void
 	 */
 	public static function attach($name, $config = null) {
 		if (!isset(static::$_scopes)) {
