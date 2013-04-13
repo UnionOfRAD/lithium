@@ -1015,6 +1015,48 @@ class MediaTest extends \lithium\test\Unit {
 
 		$this->assertEqual($expected, Media::attached());
 	}
+
+	public function testMultipleHostsAndSchemeSelectSameIndex() {
+		Media::attach('cdn', array(
+			'absolute' => true,
+			'host' => array('cdn.com', 'cdn.org'),
+			'scheme' => array('http://', 'https://'),
+		));
+
+		$result = Media::asset('style.css', 'css', array('scope' => 'cdn'));
+		$expected = '%https://cdn.org/css/style.css|http://cdn.com/css/style.css%';
+
+		$this->assertPattern($expected, $result);
+	}
+
+	public function testMultipleHostsAndSingleSchemePicksOnlyScheme() {
+		Media::attach('cdn', array(
+			'absolute' => true,
+			'host' => array('cdn.com', 'cdn.org'),
+			'scheme' => 'http://',
+		));
+
+		$result = Media::asset('style.css', 'css', array('scope' => 'cdn'));
+		$expected = '%http://cdn.org/css/style.css|http://cdn.com/css/style.css%';
+
+		$this->assertPattern($expected, $result);
+	}
+
+	public function testMultipleHostsPickSameHostForIdenticalAsset() {
+		Media::attach('cdn', array(
+			'absolute' => true,
+			'host' => array('cdn.com', 'cdn.org'),
+			'scheme' => 'http://',
+		));
+
+		$first = Media::asset('style.css', 'css', array('scope' => 'cdn'));
+		$second = Media::asset('style.css', 'css', array('scope' => 'cdn'));
+		$third = Media::asset('style.css', 'css', array('scope' => 'cdn'));
+
+		$this->assertIdentical($first, $second);
+		$this->assertIdentical($third, $second);
+	}
+
 }
 
 ?>
