@@ -61,9 +61,12 @@ class FormTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Router::reset();
-
-		foreach ($this->_routes as $route) {
-			Router::connect($route);
+		foreach ($this->_routes as $scope => $routes) {
+			Router::scope($scope, function() use ($routes) {
+				foreach ($routes as $route) {
+					Router::connect($route);
+				}
+			});
 		}
 	}
 

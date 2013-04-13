@@ -84,8 +84,8 @@ class Route extends \lithium\console\Command {
 	 *
 	 * @return void
 	 */
-	public function all() {
-		$routes = Router::get();
+	public function all($scope = true) {
+		$routes = Router::get(null, true);
 		$columns = array(array('Template', 'Params'), array('--------', '------'));
 
 		foreach ($routes As $route) {

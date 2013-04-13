@@ -26,9 +26,12 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Router::reset();
-
-		foreach ($this->_routes as $route) {
-			Router::connect($route);
+		foreach ($this->_routes as $scope => $routes) {
+			Router::scope($scope, function() use ($routes) {
+				foreach ($routes as $route) {
+					Router::connect($route);
+				}
+			});
 		}
 	}
 
@@ -53,8 +56,6 @@ class DispatcherTest extends \lithium\test\Unit {
 	 * URL don't work as expected, because they immediately get redirected to the same URL but
 	 * as GET requests (with no data attached to it). It veryfies that the Lithium dispatcher
 	 * works as expected and returns the correct controller/action combination.
-	 *
-	 * @return void
 	 */
 	public function testRunWithPostRoot() {
 		Router::connect('/', array('controller' => 'test', 'action' => 'test'));
@@ -207,7 +208,7 @@ class DispatcherTest extends \lithium\test\Unit {
 		}
 
 		$params = array(
-			'' => array('controller' => 'some_non_existent_controller', 'action' => 'index'),
+			'/' => array('controller' => 'some_non_existent_controller', 'action' => 'index'),
 			'/plugin' => array(
 				'controller' => 'some_invalid_plugin.controller', 'action' => 'index'
 			),
