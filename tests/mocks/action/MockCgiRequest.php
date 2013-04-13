@@ -10,14 +10,17 @@ namespace lithium\tests\mocks\action;
 
 class MockCgiRequest extends \lithium\action\Request {
 
-	protected function _init() {
-		parent::_init();
-		$this->_env = array(
-			'PLATFORM' => 'CGI',
-			'SCRIPT_FILENAME' => false,
-			'DOCUMENT_ROOT' => false,
-			'SCRIPT_URL' => '/lithium/app/webroot/index.php'
+	public function __construct(array $config = array()) {
+		$config = array(
+			'env' => array(
+				'PLATFORM' => 'CGI',
+				'SCRIPT_FILENAME' => false,
+				'DOCUMENT_ROOT' => false,
+				'SCRIPT_URL' => '/lithium/app/webroot/index.php'
+			),
+			'globals' => false
 		);
+		parent::__construct($config);
 	}
 }
 

@@ -98,17 +98,16 @@ class RouteTest extends \lithium\test\Unit {
 	 * routes are connected to the router.
 	 */
 	public function testRouteLoading() {
-		$this->assertEmpty(Router::get());
-
+		$this->assertEmpty(Router::get(null, true));
 		$command = new Route(array('routes' => $this->_config['routes']));
-		$this->assertCount(4, Router::get());
+		$this->assertCount(4, Router::get(null, true));
 
 		Router::reset();
 
 		$request = new Request();
 		$request->params['env'] = 'production';
 		$command = new Route(compact('request') + array('routes' => $this->_config['routes']));
-		$this->assertCount(2, Router::get());
+		$this->assertCount(2, Router::get(null, true));
 	}
 
 	/**
