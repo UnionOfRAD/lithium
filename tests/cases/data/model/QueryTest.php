@@ -310,6 +310,7 @@ class QueryTest extends \lithium\test\Unit {
 			'joins',
 			'limit',
 			'map',
+			'mode',
 			'model',
 			'offset',
 			'order',
@@ -345,7 +346,7 @@ class QueryTest extends \lithium\test\Unit {
 		$query = new Query($options);
 
 		$result = $query->export($this->db, array(
-			'keys' => array('data', 'conditions')
+			'keys' => array('type', 'data', 'conditions')
 		));
 		$expected = array(
 			'type' => 'update',
@@ -689,6 +690,7 @@ class QueryTest extends \lithium\test\Unit {
 			'order' => null,
 			'limit' => null,
 			'joins' => $joins,
+			'mode' => null,
 			'model' => 'lithium\tests\mocks\data\model\MockGallery',
 			'calculate' => 'MyCalculate',
 			'with' => array(
