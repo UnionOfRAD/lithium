@@ -281,6 +281,127 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$this->assertTrue(Galleries::remove());
 		$this->assertTrue(Images::remove());
 	}
+
+	public function testSaveNested() {
+		Fixtures::drop('db');
+		Fixtures::create('db');
+		$data = array(
+			'name' => 'Foo Gallery',
+			'images' => array(
+				array(
+					'image' => 'someimage.png',
+					'title' => 'Image1 Title',
+					'tags' => array(
+						array('name' => 'tag1'),
+						array('name' => 'tag2'),
+						array('name' => 'tag3')
+					)
+				),
+				array(
+					'image' => 'anotherImage.jpg',
+					'title' => 'Our Vacation',
+					'tags' => array(
+						array('name' => 'tag4'),
+						array('name' => 'tag5')
+					)
+				),
+				array(
+					'image' => 'me.bmp',
+					'title' => 'Me.',
+					'tags' => array()
+				)
+			)
+		);
+
+		$gallery = Galleries::create($data);
+		$this->assertTrue($gallery->save(null, array('with' => true)));
+		$result = Galleries::find('all', array('with' => 'Images.Tags'))->data();
+		$expected = include($this->_export . '/testSaveNested.php');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSaveHabtmWithFormCompatibleData() {
+		Fixtures::drop('db', array('images', 'images_tags'));
+		Fixtures::create('db', array('images', 'images_tags'));
+
+		$image = Images::create(array(
+			'image' => 'someimage.png',
+			'title' => 'Image1 Title',
+			'tags' => array(1, 3, 6)
+		));
+		$image->save(null, array('with' => 'Tags'));
+
+		$result = Images::find('first', array('with' => 'Tags'))->data();
+		$expected = include($this->_export . '/testSaveHabtmWithFormCompatibleData.php');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSaveNestedWithHabtm() {
+		$galleries = Galleries::find('all', array('with' => 'Images.Tags'));
+
+		foreach ($galleries->save() as $result) {
+			$this->assertTrue($result);
+		}
+
+		$expected = $galleries->data();
+		$result = Galleries::find('all', array('with' => 'Images.Tags'))->data();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSaveNestedWithEmptyHabtm() {
+		Fixtures::drop('db');
+		Fixtures::create('db');
+
+		$data = array(
+			'name' => 'Foo Gallery',
+			'images' => array()
+		);
+
+		$gallery = Galleries::create($data);
+		$this->assertTrue($gallery->save());
+
+		$result = Galleries::find('all', array('with' => 'Images'))->data();
+		$expected = array(
+			1 => array (
+				'id' => '1',
+				'name' => 'Foo Gallery',
+				'active' => '1',
+				'images' => array(),
+				'created' => null,
+				'modified' => null,
+			)
+		);
+		$this->assertEqual($expected, $result);
+
+		Fixtures::drop('db');
+		Fixtures::create('db');
+		$data = array(
+			'name' => 'Foo Gallery',
+			'images' => ''
+		);
+
+		$gallery = Galleries::create($data);
+		$this->assertTrue($gallery->save());
+
+		$result = Galleries::find('all', array('with' => 'Images'))->data();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSaveNestedWithHabtmAndUnset() {
+		$galleries = Galleries::find('all', array('with' => 'Images.Tags'));
+		$this->assertCount(2, $galleries[1]->images[1]->tags);
+
+		$key = $galleries[1]->images[1]->tags->first()->key();
+		unset($galleries[1]->images[1]->tags[reset($key)]);
+
+		foreach ($galleries->save() as $result) {
+			$this->assertTrue($result);
+		}
+
+		$expected = $galleries->data();
+		$result = Galleries::find('all', array('with' => 'Images.Tags'))->data();
+		$this->assertCount(1, $galleries[1]->images[1]->tags);
+	}
 }
 
 ?>
