@@ -23,8 +23,11 @@ class EntityTest extends \lithium\test\Unit {
 	}
 
 	public function testPropertyAccess() {
-		$entity = new Entity(array('model' => 'Foo', 'exists' => false));
-		$this->assertEqual('Foo', $entity->model());
+		$entity = new Entity(array(
+			'model' => 'lithium\tests\mocks\data\MockPost',
+			'exists' => false
+		));
+		$this->assertEqual('lithium\tests\mocks\data\MockPost', $entity->model());
 		$this->assertFalse($entity->exists());
 
 		$entity = new Entity(array('exists' => true));
@@ -38,7 +41,7 @@ class EntityTest extends \lithium\test\Unit {
 
 	public function testPropertyIssetEmpty() {
 		$entity = new Entity(array(
-			'model' => 'Foo',
+			'model' => 'lithium\tests\mocks\data\MockPost',
 			'exists' => true,
 			'data' => array('test_field' => 'foo'),
 			'relationships' => array('test_relationship' => array('test_me' => 'bar'))

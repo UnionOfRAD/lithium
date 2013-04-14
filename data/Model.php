@@ -164,6 +164,13 @@ class Model extends \lithium\core\StaticObject {
 	protected $_relations = array();
 
 	/**
+	 * Matching between relation's fieldnames and their corresponding relation name.
+	 *
+	 * @var array
+	 */
+	protected $_fieldNames = array();
+
+	/**
 	 * List of relation types.
 	 *
 	 * Valid relation types are:
@@ -792,6 +799,10 @@ class Model extends \lithium\core\StaticObject {
 			return static::_relations();
 		}
 
+		if (isset($self->_fieldNames[$type])) {
+			$type = $self->_fieldNames[$type];
+		}
+
 		if (isset($self->_relations[$type])) {
 			return $self->_relations[$type];
 		}
@@ -858,10 +869,14 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function bind($type, $name, array $config = array()) {
 		$self = static::_object();
+		if (!isset($config['fieldName'])) {
+			$config['fieldName'] = $self->_fieldName($type, $name);
+		}
 
 		if (!in_array($type, $self->_relationTypes)) {
 			throw new ConfigException("Invalid relationship type `{$type}` specified.");
 		}
+		$self->_fieldNames[$config['fieldName']] = $name;
 		$rel = static::connection()->relationship(get_called_class(), $type, $name, $config);
 		return $self->_relations[$name] = $rel;
 	}
@@ -1018,7 +1033,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * {{{
 	 * if (!$post->save($someData)) {
-	 *  return array('errors' => $post->errors());
+	 *     return array('errors' => $post->errors());
 	 * }
 	 * }}}
 	 *
@@ -1322,20 +1337,35 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	protected static function _relationsToLoad() {
 		try {
-			if (!static::connection()) {
+			if (!$connection = static::connection()) {
 				return;
 			}
 		} catch (ConfigExcepton $e) {
 			return;
 		}
+
+		if (!$connection::enabled('relationships')) {
+			return;
+		}
+
 		$self = static::_object();
 
 		foreach ($self->_relationTypes as $type) {
 			$self->$type = Set::normalize($self->$type);
 			foreach ($self->$type as $name => $config) {
 				$self->_relationsToLoad[$name] = $type;
+				$fieldName = $self->_fieldName($type, $name);
+				$self->_fieldNames[$fieldName] = $name;
 			}
 		}
+	}
+
+	protected function _fieldName($type, $name) {
+		if (!isset($this->{$type}[$name]['fieldName'])) {
+			$fieldName = static::connection()->fieldName($type, $name);
+			$this->{$type}[$name]['fieldName'] = $fieldName;
+		}
+		return $this->{$type}[$name]['fieldName'];
 	}
 
 	/**
