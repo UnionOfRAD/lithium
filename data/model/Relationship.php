@@ -115,8 +115,6 @@ class Relationship extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 		$config =& $this->_config;
-		$type = $config['type'];
-
 		if (!$config['to']) {
 			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $config['name'];
 			$config['to'] = Libraries::locate('models', $assoc);
