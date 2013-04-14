@@ -635,7 +635,8 @@ class MongoDb extends \lithium\data\Source {
 		$defaultLinks = array(
 			'hasOne' => $relationship::LINK_EMBEDDED,
 			'hasMany' => $relationship::LINK_EMBEDDED,
-			'belongsTo' => $relationship::LINK_CONTAINED
+			'belongsTo' => $relationship::LINK_CONTAINED,
+			'hasAndBelongsToMany' => $relationship::LINK_KEY,
 		);
 		$config += array('link' => $defaultLinks[$type]);
 		return new $relationship($config);

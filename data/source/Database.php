@@ -180,6 +180,7 @@ abstract class Database extends \lithium\data\Source {
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
 			          '{:having} {:order} {:limit};{:comment}'
 		);
+
 		$this->_strategies += array(
 			'joined' => function($self, $model, $context) {
 
@@ -206,19 +207,66 @@ abstract class Database extends \lithium\data\Source {
 							}
 							extract($with[$relPath]);
 						}
-						$to = $context->alias($alias, $relPath);
 
-						$deps[$to] = $deps[$from];
-						$deps[$to][] = $from;
+						if ($rel->type() !== 'hasAndBelongsToMany') {
+							$to = $context->alias($alias, $relPath);
 
-						if ($context->relationships($relPath) === null) {
-							$context->relationships($relPath, array(
-								'type' => $rel->type(),
-								'model' => $rel->to(),
-								'fieldName' => $rel->fieldName(),
-								'alias' => $to
-							));
-							$self->join($context, $rel, $from, $to, $constraints);
+							$deps[$to] = $deps[$from];
+							$deps[$to][] = $from;
+
+							if ($context->relationships($relPath) === null) {
+								$context->relationships($relPath, array(
+									'type' => $rel->type(),
+									'model' => $rel->to(),
+									'fieldName' => $rel->fieldName(),
+									'alias' => $to
+								));
+								$self->join($context, $rel, $from, $to, $constraints);
+							}
+						} else {
+							$nameVia = $rel->data('via');
+							$relnameVia = $path ? $path . '.' . $nameVia : $nameVia;
+
+							if (!$relVia = $model::relations($nameVia)) {
+								$message = "Model relationship `{$nameVia}` not found.";
+								throw new QueryException($message);
+							}
+
+							if (!$config = $context->relationships($relnameVia)) {
+								$aliasVia = $context->alias($nameVia, $relnameVia);
+								$context->relationships($relnameVia, array(
+									'type' => $relVia->type(),
+									'model' => $relVia->to(),
+									'fieldName' => $relVia->fieldName(),
+									'alias' => $aliasVia
+								));
+								$self->join($context, $relVia, $from, $aliasVia, $self->on($rel));
+							} else {
+								$aliasVia = $config['alias'];
+							}
+
+							$deps[$aliasVia] = $deps[$from];
+							$deps[$aliasVia][] = $from;
+
+							if (!$context->relationships($relPath)) {
+								$to = $context->alias($alias, $relPath);
+								$modelVia = $relVia->data('to');
+								if (!$relTo = $modelVia::relations($name)) {
+									$message = "Model relationship `{$name}` ";
+									$message .= "via `{$nameVia}` not found.";
+									throw new QueryException($message);
+								}
+								$context->relationships($relPath, array(
+									'type' => $rel->type(),
+									'model' => $relTo->to(),
+									'fieldName' => $rel->fieldName(),
+									'alias' => $to
+								));
+								$self->join($context, $relTo, $aliasVia, $to, $constraints);
+							}
+
+							$deps[$to] = $deps[$aliasVia];
+							$deps[$to][] = $aliasVia;
 						}
 
 						if (!empty($childs)) {
@@ -642,6 +690,13 @@ abstract class Database extends \lithium\data\Source {
 			} elseif ($type === 'hasOne' || $type === 'hasMany') {
 				$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
 				$key = array($primary => "{$secondary}_id");
+			} elseif ($type === 'hasAndBelongsToMany') {
+				$secondary = Inflector::underscore(Inflector::singularize($name));
+				$key = array($primary => "{$secondary}_id");
+				$viaRel = $from::relations($config['via']);
+				$via = $viaRel->to();
+				$toRel = $via::relations($name);
+				$config += array('to' => $toRel->to());
 			} else {
 				$key = Inflector::underscore(Inflector::singularize($name)) . '_id';
 			}
@@ -1454,6 +1509,9 @@ abstract class Database extends \lithium\data\Source {
 	 * @return array A constraints array.
 	 */
 	public function on($rel, $aliasFrom = null, $aliasTo = null, $constraints = array()) {
+		if ($rel->type() === 'hasAndBelongsToMany') {
+			return $constraints;
+		}
 		$model = $rel->from();
 
 		$aliasFrom = $aliasFrom ?: $model::meta('name');

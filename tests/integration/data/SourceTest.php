@@ -220,7 +220,7 @@ class SourceTest extends \lithium\tests\integration\data\Base {
 		$this->skipIf(!$db::enabled('relationships'));
 		$this->assertEqual(array('Images'), array_keys(Galleries::relations()));
 		$this->assertEqual(array(
-			'Galleries', 'ImagesTags', 'Comments'
+			'Galleries', 'ImagesTags', 'Tags', 'Comments'
 		), array_keys(Images::relations()));
 
 		$this->assertEqual(array('Images'), Galleries::relations('hasMany'));

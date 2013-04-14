@@ -118,6 +118,13 @@ class Model extends \lithium\core\StaticObject {
 	public $belongsTo = array();
 
 	/**
+	 * Model hasAndBelongsToMany relations.
+	 *
+	 * @var array
+	 */
+	public $hasAndBelongsToMany = array();
+
+	/**
 	 * Stores model instances for internal use.
 	 *
 	 * While the `Model` public API does not require instantiation thanks to late static binding
@@ -178,10 +185,11 @@ class Model extends \lithium\core\StaticObject {
 	 * - `belongsTo`
 	 * - `hasOne`
 	 * - `hasMany`
+	 * - `hasAndBelongsToMany`
 	 *
 	 * @var array
 	 */
-	protected $_relationTypes = array('belongsTo', 'hasOne', 'hasMany');
+	protected $_relationTypes = array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany');
 
 	/**
 	 * Store available relation names for this model which still unloaded.

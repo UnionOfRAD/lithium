@@ -14,6 +14,8 @@ class Images extends \lithium\data\Model {
 
 	public $hasMany = array('ImagesTags', 'Comments');
 
+	public $hasAndBelongsToMany = array('Tags' => array('via' => 'ImagesTags'));
+
 }
 
 ?>

@@ -551,7 +551,8 @@ class MongoDbTest extends \lithium\test\Unit {
 			'to'   => $to,
 			'fields' => true,
 			'fieldName' => 'mockPost',
-			'constraints' => null,
+			'constraints' => array(),
+			'via' => null,
 			'init' => true
 		);
 		$this->assertEqual($expected, $result->data());

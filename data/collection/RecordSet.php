@@ -157,7 +157,7 @@ class RecordSet extends \lithium\data\Collection {
 				$field = $relMap[$relName]['fieldName'];
 				$relModel = $relMap[$relName]['model'];
 
-				if ($relMap[$relName]['type'] === 'hasMany') {
+				if (preg_match('/Many$/', $relMap[$relName]['type'])) {
 					$rel = array();
 					$main = $relModel::key($record[$min][$relName]);
 					$i = $min;

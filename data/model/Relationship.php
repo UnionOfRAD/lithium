@@ -98,6 +98,8 @@ class Relationship extends \lithium\core\Object {
 	 *          other database-native value. If an array, maps fields from the related object
 	 *          either to fields elsewhere, or to arbitrary expressions. In either case, _the
 	 *          values specified here will be literally interpreted by the database_.
+	 *        - `via` _string_: HABTM specific option with indicate the relation name of the
+	 *          middle class
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -109,7 +111,8 @@ class Relationship extends \lithium\core\Object {
 			'link' => static::LINK_KEY,
 			'fields' => true,
 			'fieldName' => null,
-			'constraints' => array()
+			'constraints' => array(),
+			'via' => null
 		);
 		$config += $defaults;
 		if (!$config['type'] || !$config['fieldName']) {
