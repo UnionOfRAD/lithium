@@ -634,23 +634,20 @@ abstract class Database extends \lithium\data\Source {
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
-		$field = Inflector::underscore(Inflector::singularize($name));
-		$key = "{$field}_id";
-		$primary = $class::meta('key');
-
-		if (is_array($primary)) {
-			$key = array_combine($primary, $primary);
-		} elseif ($type === 'hasMany' || $type === 'hasOne') {
-			if ($type === 'hasMany') {
-				$field = Inflector::pluralize($field);
-			}
-			$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
-			$key = array($primary => "{$secondary}_id");
-		}
-
 		$from = $class;
-		$fieldName = $field;
-		$config += compact('type', 'name', 'key', 'from', 'fieldName');
+		$primary = $class::meta('key');
+		if (!isset($config['key'])) {
+			if (is_array($primary)) {
+				$key = array_combine($primary, $primary);
+			} elseif ($type === 'hasOne' || $type === 'hasMany') {
+				$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
+				$key = array($primary => "{$secondary}_id");
+			} else {
+				$key = Inflector::underscore(Inflector::singularize($name)) . '_id';
+			}
+			$config += compact('key');
+		}
+		$config += compact('type', 'name', 'from');
 		return $this->_instance('relationship', $config);
 	}
 

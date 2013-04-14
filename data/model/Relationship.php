@@ -19,6 +19,15 @@ use lithium\core\ClassNotFoundException;
 class Relationship extends \lithium\core\Object {
 
 	/**
+	 * Class dependencies.
+	 *
+	 * @var array
+	 */
+	protected $_classes = array(
+		'entity'      => 'lithium\data\Entity'
+	);
+
+	/**
 	 * A relationship linking type defined by one document or record (or multiple) being embedded
 	 * within another.
 	 */
@@ -147,12 +156,18 @@ class Relationship extends \lithium\core\Object {
 	}
 
 	protected function _keys($keys) {
-		$config = $this->_config;
-		$hasRel = ($related = ($config['type'] === 'belongsTo') ? $config['to'] : $config['from']);
-
-		if (!$hasRel || !$keys) {
+		if (!$keys) {
 			return array();
 		}
+		$config = $this->_config;
+
+		$hasRelation = ($config['type'] === 'hasOne' || $config['type'] === 'hasMany');
+		if ($hasRelation) {
+			$related = $config['from'];
+		} else {
+			$related = $config['to'];
+		}
+
 		if (!class_exists($related)) {
 			throw new ClassNotFoundException("Related model class '{$related}' not found.");
 		}
@@ -162,12 +177,35 @@ class Relationship extends \lithium\core\Object {
 		$keys = (array) $keys;
 		$related = (array) $related::key();
 
-		if (count($keys) !== count($related)) {
-			$msg  = "Unmatched keys in relationship `{$config['name']}` between models ";
+		if (count($keys) != count($related)) {
+			$msg = "Unmatched keys in relationship `{$config['name']}` between models ";
 			$msg .= "`{$config['from']}` and `{$config['to']}`.";
 			throw new ConfigException($msg);
 		}
-		return array_combine($keys, $related);
+		return $hasRelation ? array_combine($related, $keys) : array_combine($keys, $related);
+	}
+
+	/**
+	 * Build foreign keys from relation's primary keys
+	 *
+	 * @param $primaryKeys The relation primary keys.
+	 * @return array The corresponding foreign keys.
+	 */
+	public function foreignKey($primaryKeys) {
+		$result = array();
+		$entity = $this->_classes['entity'];
+		if ($primaryKeys instanceof $entity) {
+			$primaryKeys = $primaryKeys->to('array');
+		}
+		if ($this->_config['type'] === 'belongsTo') {
+			$keys = array_flip($this->_config['key']);
+		} else {
+			$keys = $this->_config['key'];
+		}
+		foreach ($keys as $key => $foreignKey) {
+			$result[$foreignKey] = $primaryKeys[$key];
+		}
+		return $result;
 	}
 }
 
