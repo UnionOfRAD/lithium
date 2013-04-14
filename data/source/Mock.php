@@ -32,6 +32,10 @@ class Mock extends \lithium\data\Source {
 		return true;
 	}
 
+	public static function enabled($feature = null) {
+		return false;
+	}
+
 	public function sources($class = null) {
 		return array();
 	}

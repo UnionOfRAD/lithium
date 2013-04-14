@@ -541,6 +541,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$to::config(array('meta' => array('key' => '_id')));
 
 		$result = $this->db->relationship($from, 'belongsTo', 'MockPost');
+
 		$expected = array(
 			'name' => 'MockPost',
 			'type' => 'belongsTo',
