@@ -1273,34 +1273,6 @@ abstract class Database extends \lithium\data\Source {
 		return $data;
 	}
 
-	/**
-	 * Cast a value according to a column type.
-	 *
-	 * @param string $type Name of the column type
-	 * @param string $value Value to cast
-	 * @return mixed Casted value
-	 */
-	protected function _cast($type, $value) {
-		if (is_object($value) || $value === null) {
-			return $value;
-		}
-		if ($type === 'boolean') {
-			return $this->_toNativeBoolean($value);
-		}
-		if (!isset($this->_columns[$type]) || !isset($this->_columns[$type]['formatter'])) {
-			return $value;
-		}
-
-		$column = $this->_columns[$type];
-
-		switch ($column['formatter']) {
-			case 'date':
-				return $column['formatter']($column['format'], strtotime($value));
-			default:
-				return $column['formatter']($value);
-		}
-	}
-
 	protected function _createFields($data, $schema, $context) {
 		$fields = $values = array();
 
