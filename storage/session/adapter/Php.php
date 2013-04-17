@@ -221,7 +221,8 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Determines if PHP sessions are enabled.
 	 *
-	 * @return boolean True if enabled (php session functionality can be disabled completely), false otherwise
+	 * @return boolean Returns `true` if enabled (PHP session functionality can be disabled
+	 *         completely), `false` otherwise.
 	 */
 	public static function enabled() {
 		if (function_exists("session_status")) {

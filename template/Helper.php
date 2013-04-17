@@ -203,7 +203,7 @@ abstract class Helper extends \lithium\core\Object {
 		$options += $defaults;
 
 		if (in_array($key, $this->_minimized)) {
-			$isMini = ($value == 1 || $value === true || $value == $key);
+			$isMini = ($value === 1 || $value === true || $value === $key);
 			if (!($value = $isMini ? $key : $value)) {
 				return null;
 			}

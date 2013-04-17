@@ -289,8 +289,8 @@ class ControllerTest extends \lithium\test\Unit {
 		$controller = new MockRenderAltController();
 
 		$expected = array(
-			'data' => array('foo' => 'bar'), 'layout' => 'alternate', 'type' => null, 'auto' => true,
-			'template' => null, 'hasRendered' => false, 'negotiate' => false
+			'data' => array('foo' => 'bar'), 'layout' => 'alternate', 'type' => null,
+			'auto' => true, 'template' => null, 'hasRendered' => false, 'negotiate' => false
 		);
 		$result = $controller->access('_render');
 		$this->assertEqual($expected, $result);

@@ -204,7 +204,7 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	public static function match($url) {
-		if ($url == array('controller' => 'foo_bar', 'action' => 'index')) {
+		if ($url === array('controller' => 'foo_bar', 'action' => 'index')) {
 			return '/foo_bar';
 		}
 	}

@@ -10,9 +10,6 @@ namespace lithium\tests\cases\action;
 
 use lithium\core\Libraries;
 use lithium\action\Request;
-use lithium\tests\mocks\action\MockIisRequest;
-use lithium\tests\mocks\action\MockNginxRequest;
-use lithium\tests\mocks\action\MockCgiRequest;
 
 class RequestTest extends \lithium\test\Unit {
 
@@ -23,6 +20,60 @@ class RequestTest extends \lithium\test\Unit {
 	protected $_superglobals = array('_GET', '_POST', '_SERVER', '_ENV');
 
 	protected $_env = array();
+
+	protected $_iisConfig = array(
+		'env' => array(
+			'PLATFORM' => 'IIS',
+			'SCRIPT_NAME' => '\index.php',
+			'SCRIPT_FILENAME' => false,
+			'DOCUMENT_ROOT' => false,
+			'PATH_TRANSLATED' => '\lithium\app\webroot\index.php',
+			'HTTP_PC_REMOTE_ADDR' => '123.456.789.000'
+		),
+		'globals' => false
+	);
+
+	protected $_cgiConfig = array(
+		'env' => array(
+			'PLATFORM' => 'CGI',
+			'SCRIPT_FILENAME' => false,
+			'DOCUMENT_ROOT' => false,
+			'SCRIPT_URL' => '/lithium/app/webroot/index.php'
+		),
+		'globals' => false
+	);
+
+	protected $_nginxConfig = array(
+		'env' => array(
+			'FCGI_ROLE' => 'RESPONDER',
+			'PATH_INFO' => '',
+			'PATH_TRANSLATED' => '/lithium/app/webroot/index.php',
+			'QUERY_STRING' => '',
+			'REQUEST_METHOD' => 'GET',
+			'CONTENT_TYPE' => '',
+			'CONTENT_LENGTH' => '',
+			'SCRIPT_NAME' => '/index.php',
+			'SCRIPT_FILENAME' => '/lithium/app/webroot/index.php',
+			'REQUEST_URI' => '/',
+			'DOCUMENT_URI' => '/index.php',
+			'DOCUMENT_ROOT' => '/lithium/app/webroot',
+			'SERVER_PROTOCOL' => 'HTTP/1.1',
+			'GATEWAY_INTERFACE' => 'CGI/1.1',
+			'REMOTE_ADDR' => '127.0.0.1',
+			'REMOTE_PORT' => '52987',
+			'SERVER_ADDR' => '127.0.0.1',
+			'SERVER_PORT' => '80',
+			'SERVER_NAME' => 'sandbox.local',
+			'HTTP_HOST' => 'sandbox.local',
+			'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7) AppleWebKit/...etc.',
+			'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+			'HTTP_ACCEPT_LANGUAGE' => 'en-us',
+			'HTTP_ACCEPT_ENCODING' => 'gzip, deflate',
+			'HTTP_CONNECTION' => 'keep-alive',
+			'PHP_SELF' => '/index.php'
+		),
+		'globals' => false
+	);
 
 	public function setUp() {
 		$resources = Libraries::get(true, 'resources') . '/tmp/tests';
@@ -101,13 +152,13 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testPlatform() {
-		$request = new MockIisRequest();
+		$request = new Request($this->_iisConfig);
 		$result = $request->env('PLATFORM');
 		$this->assertEqual('IIS', $result);
 	}
 
 	public function testScriptFilenameTranslatedForIIS() {
-		$request = new MockIisRequest();
+		$request = new Request($this->_iisConfig);
 		$this->assertEqual('\lithium\app\webroot\index.php', $request->env('SCRIPT_FILENAME'));
 
 		$request = new Request(array(
@@ -129,11 +180,9 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testDocumentRootTranslatedForIIS() {
-		$request = new MockIisRequest();
-
-		$expected = '\lithium\app\webroot';
+		$request = new Request($this->_iisConfig);
 		$result = $request->env('DOCUMENT_ROOT');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('\lithium\app\webroot', $result);
 	}
 
 	public function testScriptName() {
@@ -193,7 +242,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testRemoteAddrFromHttpPcRemoteAddr() {
-		$request = new MockIisRequest();
+		$request = new Request($this->_iisConfig);
 		$this->assertEqual('123.456.789.000', $request->env('REMOTE_ADDR'));
 	}
 
@@ -270,15 +319,12 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testCgiPlatform() {
-		$request = new MockCgiRequest();
-
-		$result = $request->env('CGI_MODE');
-		$this->assertTrue($result);
+		$request = new Request($this->_cgiConfig);
+		$this->assertTrue($request->env('CGI_MODE'));
 	}
 
 	public function testCgiScriptUrl() {
-		$request = new MockCgiRequest();
-
+		$request = new Request($this->_cgiConfig);
 		$expected = '/lithium/app/webroot/index.php';
 		$result = $request->env('SCRIPT_NAME');
 		$this->assertEqual($expected, $result);
@@ -400,42 +446,30 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testTypeforNginx() {
-		$request = new MockNginxRequest();
-
+		$request = new Request($this->_nginxConfig);
 		$this->assertEqual('html', $request->type());
 	}
 
 	public function testRefererDefault() {
 		$request = new Request(array(
-			'env' => array(
-				'HTTP_REFERER' => null
-			)
+			'env' => array('HTTP_REFERER' => null)
 		));
-
-		$expected = '/';
-		$result = $request->referer('/');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('/', $request->referer('/'));
 	}
 
 	public function testRefererNotLocal() {
-		$request = new Request(array(
-			'env' => array(
-				'HTTP_REFERER' => 'http://lithium.com/posts/index',
-				'HTTP_HOST' => 'foo.com'
-			)
-		));
+		$request = new Request(array('env' => array(
+			'HTTP_REFERER' => 'http://lithium.com/posts/index',
+			'HTTP_HOST' => 'foo.com'
+		)));
 
-		$expected = 'http://lithium.com/posts/index';
 		$result = $request->referer('/');
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('http://lithium.com/posts/index', $result);
 	}
 
 	public function testRefererLocal() {
-		$_SERVER['HTTP_REFERER'] = '/posts/index';
 		$request = new Request(array(
-			'env' => array(
-				'HTTP_REFERER' => '/posts/index'
-			)
+			'env' => array('HTTP_REFERER' => '/posts/index')
 		));
 
 		$expected = '/posts/index';
@@ -444,16 +478,13 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testRefererLocalWithHost() {
-		$request = new Request(array(
-			'env' => array(
-				'HTTP_REFERER' => 'http://lithium.com/posts/index',
-				'HTTP_HOST' => 'lithium.com'
-			)
-		));
+		$request = new Request(array('env' => array(
+			'HTTP_REFERER' => 'http://lithium.com/posts/index',
+			'HTTP_HOST' => 'lithium.com'
+		)));
 
-		$expected = '/posts/index';
 		$result = $request->referer('/', true);
-		$this->assertEqual($expected, $result);
+		$this->assertEqual('/posts/index', $result);
 	}
 
 	public function testRefererLocalFromNotLocal() {

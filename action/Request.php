@@ -465,7 +465,7 @@ class Request extends \lithium\net\http\Request {
 	 * ability to act conditionally on different aspects of the request. See `Media::type()` (the
 	 * section on content negotiation) and the routing system for more information.
 	 *
-	 * _Note_: All keys should be _lower-cased_, even when getting HTTP headers.
+	 *  _Note_: All keys should be _lower-cased_, even when getting HTTP headers.
 	 *
 	 * @see lithium\action\Request::env()
 	 * @see lithium\net\http\Media::type()

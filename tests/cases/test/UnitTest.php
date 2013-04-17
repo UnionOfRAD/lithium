@@ -1602,7 +1602,9 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testAssertNotExceptionFailsWithExactException() {
-		$this->assertFalse($this->test->assertNotException('lithium\action\DispatchException', function() {
+		$class = 'lithium\action\DispatchException';
+
+		$this->assertFalse($this->test->assertNotException($class, function() {
 			throw new \lithium\action\DispatchException('Foo');
 		}));
 	}

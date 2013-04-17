@@ -1023,14 +1023,16 @@ class Media extends \lithium\core\StaticObject {
 	 * ));
 	 * }}}
 	 *
-	 * @param  string $name   Name of the media you wish to attach.
-	 * @param  array  $config
+	 * @param  string $name The name of the media you wish to attach.
+	 * @param  array  $config Asset configuration options for the given scope.
 	 *        - `'path'` _string_: Path of the media.
 	 *        - `'prefix'` _string_: Contains the uri prefix. Such as `css`.
 	 *        - `'absolute'` _boolean_: Defaults to `false`. If you want to generate
 	 *                                  absolute URL's.
-	 *        - `'host'` _mixed_: String host, or array of hosts, of the media, if absolute is `true`.
-	 *        - `'scheme'` _mixed_: String scheme, or array of sc, of the media, if absolute is `true`.
+	 *        - `'host'` _mixed_: String host, or array of hosts, of the media, if absolute is
+	 *          `true`.
+	 *        - `'scheme'` _mixed_: String scheme, or array of sc, of the media, if absolute is
+	 *          `true`.
 	 * @return void
 	 */
 	public static function attach($name, $config = null) {
