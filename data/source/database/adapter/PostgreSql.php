@@ -464,9 +464,11 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @see \lithium\data\source\Database::_formatters()
 	 */
 	protected function _formatters() {
+        $self = $this;
+
 		return (array(
-			'boolean' => function($value){
-				return $value ? 't' : 'f';
+			'boolean' => function($value) use ($self){
+				return $self->connection->quote($value ? 't' : 'f');
 			}
 		) + parent::_formatters());
 	}
