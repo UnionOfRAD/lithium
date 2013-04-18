@@ -163,7 +163,8 @@ class MongoDb extends \lithium\data\Source {
 			'schema'     => null,
 			'gridPrefix' => 'fs',
 			'safe'       => false,
-			'readPreference' => null
+			'readPreference' => null,
+			'autoConnect' => false
 		);
 		parent::__construct($config + $defaults);
 	}

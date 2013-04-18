@@ -89,8 +89,10 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testGoodConnectionBadDatabase() {
-		$this->expectException('Could not connect to the database.');
 		$db = new MongoDb(array('database' => null, 'autoConnnect' => false));
+
+		$this->expectException('Could not connect to the database.');
+		$db->connect();
 	}
 
 	public function testSources() {
@@ -780,6 +782,7 @@ class MongoDbTest extends \lithium\test\Unit {
 			array('dc' => 'east', 'use' => 'reporting')
 		);
 		$db = new MongoDb(array(
+			'autoConnect' => true,
 			'readPreference' => $prefs,
 			'classes' => array(
 				'server' => 'lithium\tests\mocks\core\MockCallable'
