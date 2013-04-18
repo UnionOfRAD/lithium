@@ -20,7 +20,10 @@ class ContextTest extends \lithium\test\Unit {
 		'host' => 'google.com',
 		'port' => 80,
 		'timeout' => 4,
-		'classes' => array('request' => 'lithium\net\http\Request')
+		'classes' => array(
+			'request' => 'lithium\net\http\Request',
+			'response' => 'lithium\net\http\Response'
+		)
 	);
 
 	public function setUp() {
@@ -159,6 +162,20 @@ EOD;
 		$this->assertInstanceOf('lithium\net\http\Response', $result);
 		$this->assertPattern("/^HTTP/", (string) $result);
 		$this->assertTrue($stream->eof());
+	}
+
+	public function testContextAdapter() {
+		$socket = new Context($this->_testConfig);
+		$this->assertNotEmpty($socket->open());
+		$response = $socket->send();
+		$this->assertInstanceOf('lithium\net\http\Response', $response);
+
+		$expected = 'google.com';
+		$result = $response->host;
+		$this->assertEqual($expected, $result);
+
+		$result = $response->body();
+		$this->assertPattern("/<title[^>]*>301 Moved<\/title>/im", (string) $result);
 	}
 }
 
