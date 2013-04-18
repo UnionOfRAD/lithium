@@ -20,8 +20,16 @@ class CurlTest extends \lithium\test\Unit {
 		'host' => 'google.com',
 		'port' => 80,
 		'timeout' => 2,
-		'classes' => array('request' => 'lithium\net\http\Request')
+		'classes' => array(
+			'request' => 'lithium\net\http\Request',
+			'response' => 'lithium\net\http\Response'
+		)
 	);
+
+	public function skip() {
+		$message = 'Your PHP installation was not compiled with curl support.';
+		$this->skipIf(!function_exists('curl_init'), $message);
+	}
 
 	public function setUp() {
 		$base = 'lithium\net\socket';
@@ -207,6 +215,20 @@ EOD;
 		$this->assertTrue($stream->write(new Request($this->_testConfig)));
 		$this->assertFalse(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
 		$this->assertTrue($stream->close());
+	}
+
+	public function testCurlAdapter() {
+		$socket = new Curl($this->_testConfig);
+		$this->assertNotEmpty($socket->open());
+		$response = $socket->send();
+		$this->assertInstanceOf('lithium\net\http\Response', $response);
+
+		$expected = 'google.com';
+		$result = $response->host;
+		$this->assertEqual($expected, $result);
+
+		$result = $response->body();
+		$this->assertPattern("/<title[^>]*>301 Moved<\/title>/im", (string) $result);
 	}
 }
 
