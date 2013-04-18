@@ -760,6 +760,15 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = $tag['query']->export(MockTag::$connection);
 		$this->assertEqual($expected, $tag2['query']->export(MockTag::$connection));
 		$this->assertEqual($expected, $tag3['query']->export(MockTag::$connection));
+
+		$tag = MockTag::find('first', array(
+			'conditions' => array('id' => 2),
+			'return' => 'array'
+		));
+
+		$expected['return'] = 'array';
+		$this->assertTrue($tag instanceof Query);
+		$this->assertEqual($expected, $tag->export(MockTag::$connection));
 	}
 
 	/**
