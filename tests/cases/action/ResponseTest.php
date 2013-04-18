@@ -62,8 +62,9 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testResponseCaching() {
 		$this->response->body = 'Document body';
-
+		$time = time();
 		$expires = strtotime('+1 hour');
+
 		$this->response->cache($expires);
 		ob_start();
 		$this->response->render();
@@ -71,7 +72,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$headers = array (
 			'HTTP/1.1 200 OK',
 			'Expires: ' . gmdate('D, d M Y H:i:s', $expires) . ' GMT',
-			'Cache-Control: max-age=' . ($expires - time()),
+			'Cache-Control: max-age=' . ($expires - $time),
 			'Pragma: cache'
 		);
 		$this->assertIdentical($headers, $this->response->testHeaders);
@@ -84,7 +85,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$headers = array (
 			'HTTP/1.1 200 OK',
 			'Expires: ' . gmdate('D, d M Y H:i:s', strtotime($expires)) . ' GMT',
-			'Cache-Control: max-age=' . (strtotime($expires) - time()),
+			'Cache-Control: max-age=' . (strtotime($expires) - $time),
 			'Pragma: cache'
 		);
 		$this->assertIdentical($headers, $this->response->testHeaders);
