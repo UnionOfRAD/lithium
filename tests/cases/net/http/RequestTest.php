@@ -137,6 +137,44 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testToStringWithCookies() {
+		$request = new Request(array(
+			'cookies' => array('foo' => 'bar', 'bin' => 'baz')
+		));
+		$expected = join("\r\n", array(
+			'GET / HTTP/1.1',
+			'Host: localhost',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Cookie: foo=bar; bin=baz',
+			'', ''
+		));
+		$result = (string) $request;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testToContextWithCookies() {
+		$request = new Request(array(
+			'cookies' => array('sid' => '8f02d50ec2c4d47ab021d2a9a6aba4bb')
+		));
+		$expected = array('http' => array(
+			'method' => 'GET',
+			'header' => array(
+				'Host: localhost',
+				'Connection: Close',
+				'User-Agent: Mozilla/5.0',
+				'Cookie: sid=8f02d50ec2c4d47ab021d2a9a6aba4bb'
+			),
+			'content' => '',
+			'protocol_version' => '1.1',
+			'ignore_errors' => true,
+			'follow_location' => true,
+			'request_fulluri' => false,
+			'proxy' => null
+		));
+		$this->assertEqual($expected, $request->to('context'));
+	}
+
 	public function testToStringWithAuth() {
 		$request = new Request(array(
 			'auth' => 'Basic',
