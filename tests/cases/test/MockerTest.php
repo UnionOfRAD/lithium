@@ -9,6 +9,8 @@
 namespace lithium\tests\cases\test;
 
 use lithium\test\Mocker;
+use lithium\data\entity\document\Mock as Document;
+use lithium\tests\mocks\data\mockPost\Mock as MockPost;
 
 /**
  * WARNING:
@@ -439,6 +441,14 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertNotException('Exception', function() {
 			return new \lithium\util\collection\Mock;
 		});
+	}
+
+	public function testMockDocument() {
+		$document = new Document();
+	}
+
+	public function testMockModel() {
+		$entity = MockPost::create();
 	}
 
 }
