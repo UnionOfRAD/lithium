@@ -8,7 +8,6 @@
 
 namespace lithium\action;
 
-use lithium\core\Libraries;
 use lithium\util\Set;
 use lithium\util\Validator;
 
@@ -304,7 +303,7 @@ class Request extends \lithium\net\http\Request {
 		switch ($key) {
 			case 'BASE':
 			case 'base':
-				return $this->_base($this->_config['base']);
+				$val = $this->_base($this->_config['base']);
 			break;
 			case 'HTTP_HOST':
 				$val = 'localhost';
@@ -588,7 +587,7 @@ class Request extends \lithium\net\http\Request {
 			}
 		}
 		if (!$key) {
-			foreach($this->_env as $name => $value) {
+			foreach ($this->_env as $name => $value) {
 				if (substr($name, 0, 5) == 'HTTP_') {
 					$name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
 					$this->headers($name, $value);
@@ -698,7 +697,7 @@ class Request extends \lithium\net\http\Request {
 	}
 
 	/**
-	 * Extract the base url from the `SCRIPT_FILENAME` environment variables.
+	 * Find the base path of the current request.
 	 *
 	 * @param string $base The base path. If `null`, `'PHP_SELF'` will be used instead.
 	 * @return string
@@ -706,16 +705,8 @@ class Request extends \lithium\net\http\Request {
 	protected function _base($base = null) {
 		if ($base === null) {
 			$base = dirname($this->env('PHP_SELF'));
-			$path = dirname(Libraries::get($this->library ?: true, 'path'));
-			if (($root = $this->env('DOCUMENT_ROOT')) && strpos($path, $root) === 0) {
-				$root = str_replace($root, '', $path);
-				$i = 0;
-				$max = min(strlen($base), strlen($root));
-				while ($i < $max && ($base[$i] === $root[$i]) && ++$i) {}
-				$base = substr($root, 0, $i);
-			}
 		}
-		$base = trim(str_replace('\\', '/', $base), '/');
+		$base = trim(str_replace(array("/app/webroot", '/webroot'), '', $base), '/');
 		return $base ? '/' . $base : '';
 	}
 
@@ -730,11 +721,8 @@ class Request extends \lithium\net\http\Request {
 			return '/' . trim($url, '/');
 		} elseif ($uri = $this->env('REQUEST_URI')) {
 			list($uri) = explode('?', $uri, 2);
-			$base = str_replace('\\', '/', dirname($this->env('PHP_SELF')));
-			$i = 0;
-			$max = min(strlen($base), strlen($uri));
-			while ($i < $max && ($base[$i] === $uri[$i]) && ++$i) {}
-			return '/' . trim(substr($uri, $i), '/') ?: '/';
+			$base = '/^' . preg_quote($this->_base, '/') . '/';
+			return '/' . trim(preg_replace($base, '', $uri), '/') ?: '/';
 		}
 		return '/';
 	}

@@ -303,7 +303,7 @@ class RequestTest extends \lithium\test\Unit {
 			'DOCUMENT_ROOT' => $this->_docroot,
 			'PHP_SELF' => '/lithium/app/other/webroot/index.php'
 		)));
-		$this->assertEqual('/lithium', $request->env('base'));
+		$this->assertEqual('/lithium/app/other', $request->env('base'));
 	}
 
 	public function testServerHttpBase() {
@@ -1255,7 +1255,7 @@ class RequestTest extends \lithium\test\Unit {
 			'Content-Length: 36',
 			'', '{"some":"body","parameter":"values"}'
 		));
-		
+
 		$request = new Request(array(
 			'env' => array(
 				'HTTP_HOST' => 'lithify.me',
@@ -1266,7 +1266,7 @@ class RequestTest extends \lithium\test\Unit {
 			'body' => '{"some":"body","parameter":"values"}'
 		));
 		$this->assertEqual($expected, $request->to('string'));
-		
+
 		$request = new Request(array(
 			'env' => array(
 				'HTTP_HOST' => 'lithify.me',
@@ -1310,31 +1310,7 @@ class RequestTest extends \lithium\test\Unit {
 		)));
 
 		$this->assertIdentical('/lithium', $request->env('base'));
-		$this->assertIdentical('/hello/world', $request->url);
-	}
-
-	public function testRequestUriWithCustomLib() {
-		$resources = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($resources), "Can't write to resources directory.");
-		$myApp = $resources . '/www2/li3/myapp';
-		mkdir($myApp, 0777, true);
-		Libraries::add('myapp', array('path' => $myApp));
-		$root = $resources . '/www2';
-
-		$request = new Request(array(
-			'env' => array(
-				'DOCUMENT_ROOT' => $root,
-				'REQUEST_URI' => '/li3/myapp/web/root/hello/world?page=1',
-				'PHP_SELF' => '/li3/myapp/web/root/index.php'
-			),
-			'globals' => false
-		));
-		$this->assertIdentical('/li3/myapp/web/root', $request->env('base'));
-		$request->params['library'] = 'myapp';
-		$this->assertIdentical('/li3', $request->env('base'));
-		$this->assertIdentical('/hello/world', $request->url);
-
-		Libraries::remove('myapp');
+		$this->assertIdentical('/app/webroot/hello/world', $request->url);
 	}
 
 	public function testRequestUriWithVirtualHost() {
@@ -1346,6 +1322,17 @@ class RequestTest extends \lithium\test\Unit {
 
 		$this->assertIdentical('', $request->env('base'));
 		$this->assertIdentical('/hello/world', $request->url);
+	}
+
+	public function testRequestUriWithAdminRoute() {
+		$request = new Request(array('env' => array(
+			'DOCUMENT_ROOT' => $this->_docroot . '/lithium/app/webroot',
+			'REQUEST_URI' => '/lithium/admin/hello/world?page=1',
+			'PHP_SELF' => '/lithium/app/webroot/index.php'
+		)));
+
+		$this->assertIdentical('/lithium', $request->env('base'));
+		$this->assertIdentical('/admin/hello/world', $request->url);
 	}
 
 	public function testRequestWithNoGlobals() {
@@ -1382,7 +1369,7 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertIdentical('HTTP/1.0', $request->protocol);
 		$this->assertIdentical('1.0', $request->version);
 		$this->assertIdentical('/hello/world', $request->url);
-		$this->assertIdentical('/lithium', $request->env('base'));
+		$this->assertIdentical('/lithium/app', $request->env('base'));
 	}
 
 	public function testEnvVariablesArePopulated() {
@@ -1415,7 +1402,6 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertIdentical('HTTP/1.1', $request->protocol);
 		$this->assertIdentical('1.1', $request->version);
 	}
-
 }
 
 ?>
