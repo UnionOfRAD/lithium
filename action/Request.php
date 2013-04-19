@@ -50,16 +50,16 @@ class Request extends \lithium\net\http\Request {
 	public $persist = array();
 
 	/**
-	 * POST data.
+	 * Data found in the HTTP request body, most often populated by `$_POST` and `$_FILES`.
 	 *
-	 * @var data
+	 * @var array
 	 */
 	public $data = array();
 
 	/**
-	 * GET data.
+	 * Key/value pairs found encoded in the request URL after '?', populated by `$_GET`.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	public $query = array();
 
@@ -84,13 +84,6 @@ class Request extends \lithium\net\http\Request {
 	 * @var array
 	 */
 	protected $_env = array();
-
-	/**
-	 * Classes used by `Request`.
-	 *
-	 * @var array
-	 */
-	protected $_classes = array('media' => 'lithium\net\http\Media');
 
 	/**
 	 * If POST / PUT data is coming from an input stream (rather than `$_POST`), this specified
@@ -144,30 +137,32 @@ class Request extends \lithium\net\http\Request {
 	protected $_locale = null;
 
 	/**
-	 * Adds config values to the public properties when a new object is created.
-	 * Pulling request data from superglobals if `globals` is set to `true`.
+	 * Adds config values to the public properties when a new object is created, pulling
+	 * request data from superglobals if `globals` is set to `true`.
 	 *
 	 * @param array $config Configuration options : default values are:
-	 *        - `url`: ''
-	 *        - `base`: ''
-	 *        - `data`: array
-	 *        - `scheme`: http
-	 *        - `host`: localhost
-	 *        - `port`: null
-	 *        - `username`: null
-	 *        - `password`: null
-	 *        - `path`: null
-	 *        - `query`: array - after the question mark ?
-	 *        - `headers`: array
-	 *        - `body`: null
-	 *        - `auth` - the Authorization method (Basic|Digest)
-	 *        - `method` - GET
-	 *        - `protocol`: null
-	 *        - `version`: 1.1
-	 *        - `globals` : true. If true build the Request from superglobals.
+	 *        - `'base'` _string_: null
+	 *        - `'url'` _string_: null
+	 *        - `'protocol'` _string_: null
+	 *        - `'version'` _string_: '1.1'
+	 *        - `'method'` _string_: 'GET'
+	 *        - `'scheme'` _string_: 'http'
+	 *        - `'host'` _string_: 'localhost'
+	 *        - `'port'` _integer_: null
+	 *        - `'username'` _string_: null
+	 *        - `'password'` _string_: null
+	 *        - `'path'` _string_: null
+	 *        - `'query'` _array_: array()
+	 *        - `'headers'` _array_: array()
+	 *        - `'type'` _string_: null
+	 *        - `'auth'` _mixed_: null
+	 *        - `'body'` _mixed_: null
+	 *        - `'data'` _array_: array()
+	 *        - `'env'` _array_: array()
+	 *        - `'globals'` _boolean_: true
 	 */
 	public function __construct(array $config = array()) {
-		$config += array(
+		$defaults = array(
 			'base' => null,
 			'url' => null,
 			'env' => array(),
@@ -175,6 +170,7 @@ class Request extends \lithium\net\http\Request {
 			'data' => array(),
 			'globals' => true
 		);
+		$config += $defaults;
 
 		if ($config['globals'] === true) {
 			if (isset($_SERVER)) {
@@ -222,9 +218,8 @@ class Request extends \lithium\net\http\Request {
 	/**
 	 * Initialize request object
 	 *
-	 * Defines an artificial `'PLATFORM'` environment variable as either
-	 * `'IIS'`, `'CGI'` or `null` to allow checking for the SAPI in a
-	 * normalized way.
+	 * Defines an artificial `'PLATFORM'` environment variable as either `'IIS'`, `'CGI'` or `null`
+	 * to allow checking for the SAPI in a normalized way.
 	 */
 	protected function _init() {
 		parent::_init();
@@ -400,10 +395,10 @@ class Request extends \lithium\net\http\Request {
 	 *
 	 * @see lithium\net\http\Media::negotiate()
 	 * @param $type mixed If not specified, returns the media type name that the client prefers,
-	 *              using content negotiation. If a media type name (string) is passed, returns
-	 *              `true` or `false`, indicating whether or not that type is accepted by the client
-	 *              at all. If `true`, returns the raw content types from the `Accept` header,
-	 *              parsed into an array and sorted by client preference.
+	 *        using content negotiation. If a media type name (string) is passed, returns `true` or
+	 *        `false`, indicating whether or not that type is accepted by the client at all.
+	 *        If `true`, returns the raw content types from the `Accept` header, parsed into an array
+	 *        and sorted by client preference.
 	 * @return string Returns a simple type name if the type is registered (i.e. `'json'`), or
 	 *         a fully-qualified content-type if not (i.e. `'image/jpeg'`), or a boolean or array,
 	 *         depending on the value of `$type`.
@@ -522,7 +517,7 @@ class Request extends \lithium\net\http\Request {
 	 * @see lithium\action\Request::detect()
 	 * @see lithium\net\http\Media::type()
 	 * @param string $flag The name of the flag to check, which should be the name of a valid
-	 *               detector (that is either built-in or defined with `detect()`).
+	 *        detector (that is either built-in or defined with `detect()`).
 	 * @return boolean Returns `true` if the detector check succeeds (see the details for the
 	 *         built-in detectors above, or `detect()`), otherwise `false`.
 	 */
@@ -581,19 +576,18 @@ class Request extends \lithium\net\http\Request {
 	 * {{{ embed:lithium\tests\cases\action\RequestTest::testDetect(11-12) }}}
 	 *
 	 * @see lithium\action\Request::is()
-	 * @param string $flag The name of the detector check. Used in subsequent calls to
-	 *               `Request::is()`.
+	 * @param string $flag The name of the detector check. Used in subsequent calls to `Request::is()`.
 	 * @param mixed $detector Detectors can be specified in four different ways:
-	 *              - The name of an HTTP header or environment variable. If a string, calling the
-	 *                detector will check that the header or environment variable exists and is set
-	 *                to a non-empty value.
-	 *              - A two-element array containing a header/environment variable name, and a value
-	 *                to match against. The second element of the array must be an exact match to
-	 *                the header or variable value.
-	 *              - A two-element array containing a header/environment variable name, and a
-	 *                regular expression that matches against the value, as in the example above.
-	 *              - A closure which accepts an instance of the `Request` object and returns a
-	 *                boolean value.
+	 *        - The name of an HTTP header or environment variable. If a string, calling the detector
+	 *          will check that the header or environment variable exists and is set to a non-empty
+	 *          value.
+	 *        - A two-element array containing a header/environment variable name, and a value to match
+	 *          against. The second element of the array must be an exact match to the header or
+	 *          variable value.
+	 *        - A two-element array containing a header/environment variable name, and a regular
+	 *          expression that matches against the value, as in the example above.
+	 *        - A closure which accepts an instance of the `Request` object and returns a boolean
+	 *          value.
 	 * @return void
 	 */
 	public function detect($flag, $detector = null) {
@@ -652,7 +646,7 @@ class Request extends \lithium\net\http\Request {
 	 * "[Globalization](http://lithify.me/docs/manual/07_globalization)" in the manual.
 	 *
 	 * @param string $locale An optional locale string like `'en'`, `'en_US'` or `'de_DE'`. If
-	 *               specified, will overwrite the existing locale.
+	 *        specified, will overwrite the existing locale.
 	 * @return Returns the currently set locale string.
 	 */
 	public function locale($locale = null) {
@@ -714,7 +708,7 @@ class Request extends \lithium\net\http\Request {
 	 * @return array
 	 */
 	protected function _parseFiles() {
-		if (isset($_FILES) && $_FILES) {
+		if (!empty($_FILES)) {
 			$result = array();
 
 			$normalize = function($key, $value) use ($result, &$normalize){

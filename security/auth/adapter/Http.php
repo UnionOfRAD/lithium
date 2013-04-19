@@ -144,7 +144,7 @@ class Http extends \lithium\core\Object {
 			$this->_writeHeader($message);
 			return false;
 		}
-		return array('username' => $username, 'password' => $password);
+		return compact('username', 'password');
 	}
 
 	/**

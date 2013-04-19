@@ -85,10 +85,21 @@ class Response extends \lithium\net\http\Message {
 	/**
 	 * Adds config values to the public properties when a new object is created.
 	 *
-	 * @param array $config
+	 * @param array $config Configuration options : default value
+	 *        - `'protocol'` _string_: null
+	 *        - `'version'` _string_: '1.1'
+	 *        - `'headers'` _array_: array()
+	 *        - `'body'` _mixed_: null
+	 *        - `'message'` _string_: null
+	 *        - `'status'` _mixed_: null
+	 *        - `'type'` _string_: null
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('message' => null, 'type' => null);
+		$defaults = array(
+			'message' => null,
+			'status' => null,
+			'type' => null
+		);
 		parent::__construct($config + $defaults);
 
 		if ($this->_config['message']) {
@@ -96,6 +107,9 @@ class Response extends \lithium\net\http\Message {
 		}
 		if (isset($this->headers['Transfer-Encoding'])) {
 			$this->body = $this->_httpChunkedDecode($this->body);
+		}
+		if ($status = $this->_config['status']) {
+			$this->status($status);
 		}
 		if ($type = $this->_config['type']) {
 			$this->type($type);
@@ -115,12 +129,16 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
-	 * Return body parts and decode it into formatted type.
+	 * Add data to or compile and return the HTTP message body, optionally decoding its parts
+	 * according to content type.
 	 *
 	 * @see lithium\net\Message::body()
 	 * @see lithium\net\http\Message::_decode()
 	 * @param mixed $data
 	 * @param array $options
+	 *        - `'buffer'` _integer_: split the body string
+	 *        - `'encode'` _boolean_: encode the body based on the content type
+	 *        - `'decode'` _boolean_: decode the body based on the content type
 	 * @return array
 	 */
 	public function body($data = null, $options = array()) {
@@ -143,7 +161,10 @@ class Response extends \lithium\net\http\Message {
 		if ($status) {
 			$this->status = array('code' => null, 'message' => null);
 
-			if (is_numeric($status) && isset($this->_statuses[$status])) {
+			if (is_array($status)) {
+				$key = null;
+				$this->status = $status + $this->status;	
+			} elseif (is_numeric($status) && isset($this->_statuses[$status])) {
 				$this->status = array('code' => $status, 'message' => $this->_statuses[$status]);
 			} else {
 				$statuses = array_flip($this->_statuses);

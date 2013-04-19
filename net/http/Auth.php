@@ -9,8 +9,13 @@
 namespace lithium\net\http;
 
 /**
- * The `Auth` class handles HTTP Authentication encoding and decode. Typically, this class is not
- * used directly, but is a utility of `action\Request`  and `security\auth\adapter\Http`
+ * The `Auth` class handles HTTP Authentication encoding and decoding. Typically, this class is
+ * not used directly, but is a utility of `net\http\Request`, `net\http\Response`, and
+ * `security\auth\adapter\Http`
+ *
+ * @see lithium\net\http\Request::to()
+ * @see lithium\net\http\Response::digest()
+ * @see lithium\security\auth\adapter\Http
  */
 class Auth extends \lithium\core\StaticObject {
 
@@ -30,7 +35,7 @@ class Auth extends \lithium\core\StaticObject {
 		if (empty($data['response'])) {
 			return null;
 		}
-		if (!empty($data['opaque'])) {
+		if (isset($data['nonce'])) {
 			$defaults =  array(
 				'realm' => 'app', 'method' => 'GET', 'uri' => '/',
 				'username' => null, 'qop' => 'auth',
@@ -48,7 +53,7 @@ class Auth extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Encoded the data with username and password to create the proper response. Returns an array
+	 * Encodes the data with username and password to create the proper response. Returns an array
 	 * containing the username and encoded response.
 	 *
 	 * @param string $username Username to authenticate with
