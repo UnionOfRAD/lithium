@@ -28,31 +28,57 @@ class Response extends \lithium\net\http\Response {
 	 */
 	protected $_classes = array(
 		'router' => 'lithium\net\http\Router',
-		'media' => 'lithium\net\http\Media'
+		'media' => 'lithium\net\http\Media',
+		'auth' => 'lithium\net\http\Auth'
 	);
 
+	/**
+	 * Auto configuration properties.
+	 *
+	 * @var array
+	 */
 	protected $_autoConfig = array('classes' => 'merge');
 
+	/**
+	 * Adds config values to the public properties when a new object is created. Config options
+	 * also include default values for `Response::body()` when called from `Response::render()`.
+	 *
+	 * @see lithium\net\http\Message::body()
+	 * @param array $config Configuration options : default value
+	 *        - `'protocol'` _string_: null
+	 *        - `'version'` _string_: '1.1'
+	 *        - `'headers'` _array_: array()
+	 *        - `'body'` _mixed_: null
+	 *        - `'message'` _string_: null
+	 *        - `'status'` _mixed_: null
+	 *        - `'type'` _string_: null
+	 *        - `'buffer'` _integer_: null
+	 *        - `'decode'` _boolean_: null
+	 *        - `'location'` _mixed_: null
+	 *        - `'request'` _object_: null
+	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'buffer' => 8192,
 			'location' => null,
-			'status' => 0,
 			'request' => null,
 			'decode' => false
 		);
 		parent::__construct($config + $defaults);
 	}
 
+	/**
+	 * Sets the Location header using `$config['location']` and `$config['request']` passed in
+	 * through the constructor if provided.
+	 *
+	 * @return void
+	 */
 	protected function _init() {
 		parent::_init();
-		$config = $this->_config;
-		$this->status($config['status']);
-		unset($this->_config['status']);
 
-		if ($config['location']) {
-			$classes = $this->_classes;
-			$location = $classes['router']::match($config['location'], $config['request']);
+		if ($this->_config['location']) {
+			$router = $this->_classes['router'];
+			$location = $router::match($this->_config['location'], $this->_config['request']);
 			$this->headers('Location', $location);
 		}
 	}
@@ -61,9 +87,9 @@ class Response extends \lithium\net\http\Response {
 	 * Controls how or whether the client browser and web proxies should cache this response.
 	 *
 	 * @param mixed $expires This can be a Unix timestamp indicating when the page expires, or a
-	 *              string indicating the relative time offset that a page should expire, i.e.
-	 *              `"+5 hours". Finally, `$expires` can be set to `false` to completely disable
-	 *              browser or proxy caching.
+	 *        string indicating the relative time offset that a page should expire, i.e. `"+5 hours".
+	 *        Finally, `$expires` can be set to `false` to completely disable browser or proxy
+	 *        caching.
 	 * @return void
 	 */
 	public function cache($expires) {

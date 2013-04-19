@@ -29,7 +29,7 @@ class Message extends \lithium\net\Message {
 	public $version = '1.1';
 
 	/**
-	 * headers
+	 * HTTP headers
 	 *
 	 * @var array
 	 */
@@ -43,7 +43,7 @@ class Message extends \lithium\net\Message {
 	protected $_type = null;
 
 	/**
-	 * Classes used by `Request`.
+	 * Classes used by `Message` and its subclasses.
 	 *
 	 * @var array
 	 */
@@ -56,37 +56,32 @@ class Message extends \lithium\net\Message {
 	 * Adds config values to the public properties when a new object is created.
 	 *
 	 * @param array $config Configuration options : default value
-	 *              - `scheme`: http
-	 *              - `host`: localhost
-	 *              - `port`: null
-	 *              - `username`: null
-	 *              - `password`: null
-	 *              - `path`: null
-	 *              - `version`: 1.1
-	 *              - `headers`: array
-	 *              - `body`: null
+	 *        - `'protocol'` _string_: null
+	 *        - `'version'` _string_: '1.1'
+	 *        - `'scheme'` _string_: 'http'
+	 *        - `'host'` _string_: 'localhost'
+	 *        - `'port'` _integer_: null
+	 *        - `'username'` _string_: null
+	 *        - `'password'` _string_: null
+	 *        - `'path'` _string_: null
+	 *        - `'headers'` _array_: array()
+	 *        - `'body'` _mixed_: null
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'scheme' => 'http',
-			'host' => 'localhost',
-			'port' => null,
-			'username' => null,
-			'password' => null,
-			'path' => null,
-			'query' => array(),
-			'fragment' => null,
 			'protocol' => null,
 			'version' => '1.1',
-			'headers' => array(),
-			'body' => null,
-			'auth' => null
+			'scheme' => 'http',
+			'host' => 'localhost',
+			'headers' => array()
 		);
 		$config += $defaults;
-		parent::__construct($config);
+
 		foreach (array_intersect_key(array_filter($config), $defaults) as $key => $value) {
 			$this->{$key} = $value;
 		}
+		parent::__construct($config);
+
 		if (strpos($this->host, '/') !== false) {
 			list($this->host, $this->path) = explode('/', $this->host, 2);
 		}
@@ -174,11 +169,14 @@ class Message extends \lithium\net\Message {
 	}
 
 	/**
-	 * Add body parts.
+	 * Add data to and compile the HTTP message body, optionally encoding or decoding its parts
+	 * according to content type.
 	 *
 	 * @param mixed $data
 	 * @param array $options
-	 *        - `'buffer'`: split the body string
+	 *        - `'buffer'` _integer_: split the body string
+	 *        - `'encode'` _boolean_: encode the body based on the content type
+	 *        - `'decode'` _boolean_: decode the body based on the content type
 	 * @return array
 	 */
 	public function body($data = null, $options = array()) {
@@ -201,7 +199,7 @@ class Message extends \lithium\net\Message {
 	}
 
 	/**
-	 * Encodes the body based on the type
+	 * Encode the body based on the content type
 	 *
 	 * @see lithium\net\http\Message::type()
 	 * @param mixed $body
@@ -217,18 +215,19 @@ class Message extends \lithium\net\Message {
 	}
 
 	/**
-	 * Decodes the body based on the type
+	 * Decode the body based on the content type
 	 *
+	 * @see lithium\net\http\Message::type()
 	 * @param string $body
 	 * @return mixed
 	 */
 	protected function _decode($body) {
 		$media = $this->_classes['media'];
 
-		if (!$type = $media::type($this->_type)) {
-			return $body;
+		if ($type = $media::type($this->_type)) {
+			return $media::decode($this->_type, $body) ?: $body;
 		}
-		return $media::decode($this->_type, $body) ?: $body;
+		return $body;
 	}
 }
 
