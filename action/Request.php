@@ -715,7 +715,8 @@ class Request extends \lithium\net\http\Request {
 				$base = substr($root, 0, $i);
 			}
 		}
-		return rtrim(str_replace('\\', '/', $base), '/');
+		$base = trim(str_replace('\\', '/', $base), '/');
+		return $base ? '/' . $base : '';
 	}
 
 	/**

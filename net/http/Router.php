@@ -282,7 +282,6 @@ class Router extends \lithium\core\StaticObject {
 	public static function parse($request) {
 		foreach (static::$_configurations as $name => $value) {
 			$orig = $request->params;
-			$url = $request->url;
 			$name = is_int($name) ? false : $name;
 
 			if (!$url = static::_parseScope($name, $request)) {
@@ -422,12 +421,16 @@ class Router extends \lithium\core\StaticObject {
 			'scheme' => null,
 			'host' => null,
 			'absolute' => false,
-			'base' => $context ? rtrim($context->env('base'), '/') : ''
+			'base' => ''
 		);
 		if ($context) {
-			$defaults['host'] = $context->host;
-			$defaults['scheme'] = $context->scheme . ($context->scheme ? '://' : '//');
+			$defaults = array(
+				'base' => $context->env('base'),
+				'host' => $context->host,
+				'scheme' => $context->scheme . ($context->scheme ? '://' : '//')
+			) + $defaults;
 		}
+
 		$options += array('scope' => static::scope());
 		$vars = array();
 		$scope = $options['scope'];
@@ -440,7 +443,7 @@ class Router extends \lithium\core\StaticObject {
 				$scope = $tmp;
 			}
 		}
-		if ($scope && $config = static::attached($scope, $vars)) {
+		if ($config = static::attached($scope, $vars)) {
 			$config['host'] = $config['host'] ? : $defaults['host'];
 			if ($config['scheme'] === false) {
 				$config['scheme'] = '//';
@@ -448,8 +451,10 @@ class Router extends \lithium\core\StaticObject {
 				$config['scheme'] .= ($config['scheme'] ? '://' : $defaults['scheme']);
 			}
 			$config['scheme'] = $config['scheme'] ? : 'http://';
-			$prefix = $config['prefix'] ? '/' . $config['prefix'] : '';
-			$config['base'] = '/' . ltrim($defaults['base'] . $prefix, '/');
+
+			$base = isset($config['base']) ? '/' . $config['base'] : $defaults['base'];
+			$base = $base . ($config['prefix'] ? '/' . $config['prefix'] : '');
+			$config['base'] = $config['absolute'] ? '/' . trim($base, '/') : rtrim($base, '/');
 			$defaults = $config + $defaults;
 		}
 		return $options + $defaults;
@@ -794,9 +799,10 @@ class Router extends \lithium\core\StaticObject {
 				'absolute' => false,
 				'host' => null,
 				'scheme' => null,
+				'base' => null,
 				'prefix' => '',
 				'pattern' => '',
-				'library' => $name,
+				'library' => $name !== '__defaultScope__' ? $name : null,
 				'values' => array()
 			);
 
@@ -805,6 +811,7 @@ class Router extends \lithium\core\StaticObject {
 			if (!$config['pattern']) {
 				$config = $self::invokeMethod('_compileScope', array($config));
 			}
+			$config['base'] = $config['base'] ? trim($config['base'], '/') : $config['base'];
 			return $config;
 		};
 	}
@@ -820,6 +827,7 @@ class Router extends \lithium\core\StaticObject {
 			'absolute' => false,
 			'host' => null,
 			'scheme' => null,
+			'base' => null,
 			'prefix' => '',
 			'pattern' => '',
 			'params' => array()
