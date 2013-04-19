@@ -16,23 +16,12 @@ class RouterTest extends \lithium\test\Unit {
 
 	public $request = null;
 
-	protected $_routes = array();
-
 	public function setUp() {
 		$this->request = new Request();
-		$this->_routes = Router::get();
-		Router::reset();
 	}
 
 	public function tearDown() {
 		Router::reset();
-		foreach ($this->_routes as $scope => $routes) {
-			Router::scope($scope, function() use ($routes) {
-				foreach ($routes as $route) {
-					Router::connect($route);
-				}
-			});
-		}
 	}
 
 	public function testBasicRouteConnection() {

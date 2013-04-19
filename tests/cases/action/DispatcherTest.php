@@ -17,22 +17,8 @@ use lithium\util\Inflector;
 
 class DispatcherTest extends \lithium\test\Unit {
 
-	protected $_routes = array();
-
-	public function setUp() {
-		$this->_routes = Router::get();
-		Router::reset();
-	}
-
 	public function tearDown() {
 		Router::reset();
-		foreach ($this->_routes as $scope => $routes) {
-			Router::scope($scope, function() use ($routes) {
-				foreach ($routes as $route) {
-					Router::connect($route);
-				}
-			});
-		}
 	}
 
 	public function testRun() {

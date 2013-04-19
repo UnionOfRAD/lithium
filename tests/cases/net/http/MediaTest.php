@@ -21,7 +21,7 @@ class MediaTest extends \lithium\test\Unit {
 	/**
 	 * Reset the `Media` class to its default state.
 	 */
-	public function setUp() {
+	public function tearDown() {
 		Media::reset();
 	}
 
