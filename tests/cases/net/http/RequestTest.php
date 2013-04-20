@@ -137,6 +137,23 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testPostToString() {
+		$this->request->method = 'POST';
+		$expected = join("\r\n", array(
+			'POST / HTTP/1.1',
+			'Host: localhost',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Length: 0',
+			'', ''
+		));
+		$result = (string) $this->request;
+		$this->assertEqual($expected, $result);
+
+		$result = $this->request->to('string');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testToStringWithCookies() {
 		$request = new Request(array(
 			'cookies' => array('foo' => 'bar', 'bin' => 'baz')

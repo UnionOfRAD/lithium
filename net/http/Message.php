@@ -94,7 +94,7 @@ class Message extends \lithium\net\Message {
 	 *
 	 * @param string $key
 	 * @param string $value
-	 * @return array
+	 * @return mixed
 	 */
 	public function headers($key = null, $value = null) {
 		if (is_string($key) && strpos($key, ':') === false) {
@@ -106,7 +106,7 @@ class Message extends \lithium\net\Message {
 				return $this->headers;
 			}
 		}
-		foreach (($value ? array($key => $value) : (array) $key) as $header => $value) {
+		foreach (($value !== null ? array($key => $value) : (array) $key) as $header => $value) {
 			if (!is_string($header)) {
 				if (preg_match('/(.*?):(.+)/', $value, $match)) {
 					$this->headers[$match[1]] = trim($match[2]);

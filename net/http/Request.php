@@ -287,7 +287,9 @@ class Request extends \lithium\net\http\Message {
 			$this->headers('Cookie', $this->_cookies());
 		}
 		$body = $this->body($options['body']);
-		$this->headers('Content-Length', strlen($body));
+		if ($body || !in_array($options['method'], array('GET', 'HEAD', 'DELETE'))) {
+			$this->headers('Content-Length', strlen($body));
+		}
 
 		switch ($format) {
 			case 'url':
