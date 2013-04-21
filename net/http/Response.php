@@ -105,7 +105,7 @@ class Response extends \lithium\net\http\Message {
 		if ($this->_config['message']) {
 			$this->body = $this->_parseMessage($this->_config['message']);
 		}
-		if (isset($this->headers['Transfer-Encoding'])) {
+		if ($this->headers('Transfer-Encoding')) {
 			$this->body = $this->_httpChunkedDecode($this->body);
 		}
 		if ($status = $this->_config['status']) {
@@ -114,11 +114,11 @@ class Response extends \lithium\net\http\Message {
 		if ($type = $this->_config['type']) {
 			$this->type($type);
 		}
-		if (!isset($this->headers['Content-Type'])) {
+		if (!$header = $this->headers('Content-Type')) {
 			return;
 		}
-		$pattern = '/([-\w\/\.+]+)(;\s*?charset=(.+))?/i';
-		preg_match($pattern, $this->headers['Content-Type'], $match);
+		$header = is_array($header) ? end($header) : $header;
+		preg_match('/([-\w\/\.+]+)(;\s*?charset=(.+))?/i', $header, $match);
 
 		if (isset($match[1])) {
 			$this->type(trim($match[1]));
@@ -215,7 +215,7 @@ class Response extends \lithium\net\http\Message {
 			return trim($body);
 		}
 		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)(?:\s+(.*))?/i', array_shift($headers), $match);
-		$this->headers($headers);
+		$this->headers($headers, false);
 
 		if (!$match) {
 			return trim($body);

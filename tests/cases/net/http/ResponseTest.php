@@ -128,6 +128,23 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, (string) $response);
 	}
 
+	public function testParseMessageWithRepeatingHeaderKeys() {
+		$message = join("\r\n", array(
+			'HTTP/1.1 200 OK',
+			'Connection: close',
+			'Content-Type: text/plain;charset=UTF8',
+			'Header: value1',
+			'Header: value2',
+			'',
+			'Test!'
+		));
+		$header = array('value1', 'value2');
+
+		$response = new Response(compact('message'));
+		$this->assertEqual($header, $response->headers('Header'));
+		$this->assertEqual($message, (string) $response);
+	}
+
 	public function testParseMessageWithContentTypeHeaderSetsType() {
 		$response = new Response(array(
 			'message' => join("\r\n", array(

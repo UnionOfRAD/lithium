@@ -92,27 +92,40 @@ class Message extends \lithium\net\Message {
 	/**
 	 * Add a header to rendered output, or return a single header or full header list.
 	 *
-	 * @param string $key
-	 * @param string $value
-	 * @return mixed
+	 * @param string $key A header name, a full header line (`'Key: Value'`), or an array of headers
+	 *        to set in `key => value` form.
+	 * @param string $value A value to set if `$key` is a string. If `null`, returns the value of the
+	 *        header corresponding to `$key`. If `false`, it unsets the header corresponding to `$key`.
+	 * @param boolean $replace Whether to override or add alongside any existing header with the same
+	 *        name.
+	 * @return mixed The value of a single header, or an array of compiled headers in the form
+	 *         `'Key: Value'`.
 	 */
-	public function headers($key = null, $value = null) {
-		if (is_string($key) && strpos($key, ':') === false) {
+	public function headers($key = null, $value = null, $replace = true) {
+		if (!is_string($key) || strpos($key, ':') !== false) {
+			$replace = ($value === false) ? $value : $replace;
+
+			foreach ((array) $key as $header => $value) {
+				if (!is_string($header)) {
+					if (preg_match('/(.*?):(.+)/', $value, $match)) {
+						$this->headers($match[1], trim($match[2]), $replace);
+					}
+				} else {
+					$this->headers($header, $value, $replace);
+				}
+			}
+		} else {
 			if ($value === null) {
 				return isset($this->headers[$key]) ? $this->headers[$key] : null;
 			}
 			if ($value === false) {
 				unset($this->headers[$key]);
-				return $this->headers;
 			}
-		}
-		foreach (($value !== null ? array($key => $value) : (array) $key) as $header => $value) {
-			if (!is_string($header)) {
-				if (preg_match('/(.*?):(.+)/', $value, $match)) {
-					$this->headers[$match[1]] = trim($match[2]);
-				}
+			elseif (!$replace && isset($this->headers[$key])) {
+				$this->headers[$key] = (array) $this->headers[$key];
+				$this->headers[$key][] = $value;
 			} else {
-				$this->headers[$header] = $value;
+				$this->headers[$key] = $value;
 			}
 		}
 		$headers = array();
