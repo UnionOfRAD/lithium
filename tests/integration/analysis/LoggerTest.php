@@ -39,6 +39,7 @@ class LoggerTest extends \lithium\test\Integration {
 		$result = file_get_contents($base . '/info.log');
 		$this->assertEqual($expected, $result);
 
+		Filters::apply('lithium\analysis\Logger', 'write', false);
 		unlink($base . '/info.log');
 	}
 }
