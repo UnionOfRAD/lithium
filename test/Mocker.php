@@ -158,12 +158,18 @@ class Mocker {
 	protected static $_mockDelegateIngredients = array(
 		'startClass' => array(
 			'namespace {:namespace};',
-			'class MockDelegate extends \{:mocker} {'
+			'class MockDelegate extends \{:mocker} {',
+			'    public $parent = null;',
 		),
 		'constructor' => array(
 			'{:modifiers} function __construct({:args}) {',
 			'    $args = compact({:stringArgs});',
-			'    $this->parent = func_get_arg(func_num_args() - 1);',
+			'    $argCount = func_num_args();',
+			'    $this->parent = $argCount === 0 ? false : func_get_arg($argCount - 1);',
+			'    if (!is_a($this->parent, __NAMESPACE__ . "\Mock")) {',
+			'        $class = new \ReflectionClass(\'{:namespace}\Mock\');',
+			'        $this->parent = $class->newInstanceArgs($args);',
+			'    }',
 			'    $this->parent->mocker = $this;',
 			'    if (method_exists("{:mocker}", "__construct")) {',
 			'        call_user_func_array("parent::__construct", $args);',
