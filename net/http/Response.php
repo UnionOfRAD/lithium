@@ -28,6 +28,20 @@ class Response extends \lithium\net\http\Message {
 	public $encoding = 'UTF-8';
 
 	/**
+	 * Cookies to be set in this HTTP response, usually parsed from `Set-Cookie` headers.
+	 *
+	 * Cookies are stored as arrays of `$name => $value` where `$value` is an associative array
+	 * or an array of associative arrays which contain at minimum a `value` key and optionally,
+	 * `expire`, `path`, `domain`, `secure`, and/or `httponly` keys corresponding to the parameters
+	 * of PHP `setcookie()`.
+	 *
+	 * @see lithium\net\http\Response::cookies()
+	 * @see http://php.net/manual/en/function.setcookie.php
+	 * @var array
+	 */
+	public $cookies = array();
+
+	/**
 	 * Status codes.
 	 *
 	 * @var array
@@ -98,7 +112,8 @@ class Response extends \lithium\net\http\Message {
 		$defaults = array(
 			'message' => null,
 			'status' => null,
-			'type' => null
+			'type' => null,
+			'cookies' => null
 		);
 		parent::__construct($config + $defaults);
 
@@ -110,6 +125,12 @@ class Response extends \lithium\net\http\Message {
 		}
 		if ($status = $this->_config['status']) {
 			$this->status($status);
+		}
+		if ($cookies = $this->headers('Set-Cookie')) {
+			$this->_parseCookies($cookies);
+		}
+		if ($cookies = $this->_config['cookies']) {
+			$this->cookies($cookies);
 		}
 		if ($type = $this->_config['type']) {
 			$this->type($type);
@@ -184,6 +205,123 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
+	 * Add a cookie to header output, or return a single cookie or full cookie list.
+	 *
+	 * This function's parameters are designed to be analogous to setcookie(). Function parameters
+	 * `expire`, `path`, `domain`, `secure`, and `httponly` may be passed in as an associative array
+	 * alongside `value` inside `$value`.
+	 *
+	 * NOTE: Cookies values are expected to be scalar. This function will not serialize cookie values.
+	 * If you wish to store a non-scalar value, you must serialize the data first.
+	 *
+	 * NOTE: Cookie values are stored as an associative array containing at minimum a `value` key.
+	 * Cookies which have been set multiple times do not overwrite each other.  Rather they are stored
+	 * as an array of associative arrays.
+	 *
+	 * @see http://php.net/manual/en/function.setcookie.php
+	 * @param string $key
+	 * @param string $value
+	 * @return mixed
+	 */
+	public function cookies($key = null, $value = null) {
+		if (!$key) {
+			$key = $this->cookies;
+			$this->cookies = array();
+		}
+		if (is_array($key)) {
+			foreach ($key as $cookie => $value) {
+				$this->cookies($cookie, $value);
+			}
+		} elseif (is_string($key)) {
+			if ($value === null) {
+				return isset($this->cookies[$key]) ? $this->cookies[$key] : null;
+			}
+			if ($value === false) {
+				unset($this->cookies[$key]);
+			} else {
+				if (is_array($value)) {
+					if (array_values($value) === $value) {
+						foreach ($value as $i => $set) {
+							if (!is_array($set)) {
+								$value[$i] = array('value' => $set);
+							}
+						}
+					}
+				} else {
+					$value = array('value' => $value);
+				}
+				if (isset($this->cookies[$key])) {
+					$orig = $this->cookies[$key];
+					if (array_values($orig) !== $orig) {
+						$orig = array($orig);
+					}
+					if (array_values($value) !== $value) {
+						$value = array($value);
+					}
+					$this->cookies[$key] = array_merge($orig, $value);
+				} else {
+					$this->cookies[$key] = $value;
+				}
+			}
+		}
+		return $this->cookies;
+	}
+
+	/**
+	 * Render `Set-Cookie` headers, urlencoding invalid characters.
+	 *
+	 * NOTE: Technically '+' is a valid character, but many browsers erroneously convert these to
+	 * spaces, so we must escape this too.
+	 *
+	 * @return array Array of `Set-Cookie` headers or `null` if no cookies to set.
+	 */
+	protected function _cookies() {
+		$cookies = array();
+		foreach($this->cookies() as $name => $value) {
+			if (!isset($value['value'])) {
+				foreach($value as $set) {
+					$cookies[] = compact('name') + $set;
+				}
+			} else {
+				$cookies[] = compact('name') + $value;
+			}
+		}
+		$invalid = str_split(",; \+\t\r\n\013\014");
+		$replace = array_map('rawurlencode', $invalid);
+		$replace = array_combine($invalid, $replace);
+
+		foreach($cookies as &$cookie) {
+			if (!is_scalar($cookie['value'])) {
+				$message = "Non-scalar value cannot be rendered for cookie `{$cookie['name']}`";
+				throw new UnexpectedValueException($message);
+			}
+			$value = strtr($cookie['value'], $replace);
+			$header = $cookie['name'] . '=' . $value;
+
+			if (!empty($cookie['expires'])) {
+				if (is_string($cookie['expires'])) {
+					$cookie['expires'] = strtotime($cookie['expires']);
+				}
+				$header .= '; Expires=' . gmdate('D, d-M-Y H:i:s', $cookie['expires']) . ' GMT';
+			}
+			if (!empty($cookie['path'])) {
+				$header .= '; Path=' . strtr($cookie['path'], $replace);
+			}
+			if (!empty($cookie['domain'])) {
+				$header .= '; Domain=' . strtr($cookie['domain'], $replace);
+			}
+			if (!empty($cookie['secure'])) {
+				$header .= '; Secure';
+			}
+			if (!empty($cookie['httponly'])) {
+				$header .= '; HttpOnly';
+			}
+			$cookie = $header;
+		}
+		return $cookies ?: null;
+	}
+
+	/**
 	 * Looks at the WWW-Authenticate. Will return array of key/values if digest.
 	 *
 	 * @param string $header value of WWW-Authenticate
@@ -233,6 +371,29 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
+	 * Parse `Set-Cookie` headers.
+	 *
+	 * @param array $headers Array of `Set-Cookie` headers or `null` if no cookies to set.
+	 */
+	protected function _parseCookies($headers) {
+		foreach((array) $headers as $header) {
+			$parts = array_map('trim', array_filter(explode('; ', $header)));
+			$cookie = array_shift($parts);
+			list($name, $value) = array_map('urldecode', explode('=', $cookie, 2)) + array('','');
+
+			$options = array();
+			foreach($parts as $part) {
+				$part = array_map('urldecode', explode('=', $part, 2)) + array('','');
+				$options[strtolower($part[0])] = $part[1] ?: true;
+			}
+			if (isset($options['expires'])) {
+				$options['expires'] = strtotime($options['expires']);
+			}
+			$this->cookies($name, compact('value') + $options);
+		}
+	}
+
+	/**
 	 * Decodes content bodies transferred with HTTP chunked encoding.
 	 *
 	 * @link http://en.wikipedia.org/wiki/Chunked_transfer_encoding Wikipedia: Chunked encoding
@@ -259,6 +420,9 @@ class Response extends \lithium\net\http\Message {
 		$first = "{$this->protocol} {$this->status['code']} {$this->status['message']}";
 		if ($type = $this->headers('Content-Type')) {
 			$this->headers('Content-Type', "{$type};charset={$this->encoding}");
+		}
+		if ($setCookies = $this->_cookies()) {
+			$this->headers('Set-Cookie', $setCookies);
 		}
 		$body = join("\r\n", (array) $this->body);
 		$response = array($first, join("\r\n", $this->headers()), "", $body);

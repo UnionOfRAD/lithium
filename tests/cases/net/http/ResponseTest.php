@@ -145,6 +145,30 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($message, (string) $response);
 	}
 
+	public function testParseMessageWithCookies() {
+		$message = join("\r\n", array(
+			'HTTP/1.1 200 OK',
+			'Connection: close',
+			'Content-Type: text/plain;charset=UTF8',
+			'Set-Cookie: doctor=who; Path=/tardis; HttpOnly',
+			'Set-Cookie: test=foo%20bar; Expires=Tue, 15-Jan-2013 21:47:38 GMT; Secure',
+			'Set-Cookie: test=foo%2Bbin; Path=/test; Domain=lithify.me',
+			'',
+			'Test!'
+		));
+		$cookies = array(
+			'doctor' => array('value' => 'who', 'path' => '/tardis', 'httponly' => true),
+			'test' => array(
+				array('value' => 'foo bar', 'expires' => 1358286458, 'secure' => true),
+				array('value' => 'foo+bin', 'path' => '/test', 'domain' => 'lithify.me')
+			)
+		);
+
+		$response = new Response(compact('message'));
+		$this->assertEqual($cookies, $response->cookies());
+		$this->assertEqual($message, (string) $response);
+	}
+
 	public function testParseMessageWithContentTypeHeaderSetsType() {
 		$response = new Response(array(
 			'message' => join("\r\n", array(
@@ -218,6 +242,36 @@ class ResponseTest extends \lithium\test\Unit {
 			'type' => 'text/html',
 			'encoding' => 'UTF-8',
 			'body' => 'Test!'
+		);
+		$response = new Response($config);
+		$this->assertEqual($expected, (string) $response);
+	}
+
+	public function testToStringWithCookies() {
+		$expected = join("\r\n", array(
+			'HTTP/1.1 200 OK',
+			'Connection: close',
+			'Content-Type: text/html;charset=UTF-8',
+			'Set-Cookie: Name=Marty%20McFly; Domain=.hillvalley.us; Secure',
+			'Set-Cookie: Destination=The%20Future; Expires=Wed, 21-Oct-2015 23:29:00 GMT',
+			'',
+			'Great Scott!'
+		));
+		$config = array(
+			'protocol' => 'HTTP/1.1',
+			'version' => '1.1',
+			'status' => array('code' => '200', 'message' => 'OK'),
+			'headers' => array(
+				'Connection' => 'close',
+				'Content-Type' => 'text/html;charset=UTF-8'
+			),
+			'cookies' => array(
+				'Name' => array('value' => 'Marty McFly', 'domain' => '.hillvalley.us', 'secure' => true),
+				'Destination' => array('value' => 'The Future', 'expires' => 'Oct 21 2015 4:29 PM PDT')
+			),
+			'type' => 'text/html',
+			'encoding' => 'UTF-8',
+			'body' => 'Great Scott!'
 		);
 		$response = new Response($config);
 		$this->assertEqual($expected, (string) $response);
@@ -444,6 +498,78 @@ class ResponseTest extends \lithium\test\Unit {
 			'opaque' => 'dd7bcee161192cb8fba765eb595eba87'
 		);
 		$result = array_filter($response->digest());
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSetCookies() {
+		$expected = array(
+			'foo' => array('value' => 'bar'),
+			'bin' => array('value' => 'baz', 'path' => '/app', 'domain' => 'lithify.me', 'httponly' => true)
+		);
+		$response = new Response();
+		$response->cookies('foo', 'bar');
+		$response->cookies('bin', array(
+			'value' => 'baz', 'path' => '/app', 'domain' => 'lithify.me', 'httponly' => true
+		));
+
+		$result = $response->cookies;
+		$this->assertEqual($expected, $result);
+
+		$response = new Response();
+		$response->cookies('foo', 'bar');
+		$response->cookies(array(
+			'bin' => array('value' => 'baz', 'path' => '/app', 'domain' => 'lithify.me', 'httponly' => true)
+		));
+		$result = $response->cookies;
+		$this->assertEqual($expected, $result);
+
+		$response = new Response();
+		$response->cookies(array(
+			'foo' => 'bar',
+			'bin' => array('value' => 'baz', 'path' => '/app', 'domain' => 'lithify.me', 'httponly' => true)
+		));
+		$result = $response->cookies;
+		$this->assertEqual($expected, $result);
+
+		$result = $response->cookies();
+		$this->assertEqual($expected, $result);
+
+		$expected = array('value' => 'bar');
+		$result = $response->cookies('foo');
+		$this->assertEqual($expected, $result);
+
+		$expected = array('value' => 'baz', 'path' => '/app', 'domain' => 'lithify.me', 'httponly' => true);
+		$result = $response->cookies('bin');
+		$this->assertEqual($expected, $result);
+
+		$result = $response->cookies('bla');
+		$this->assertNull($result);
+	}
+
+	public function testSetCookiesMultipleValues() {
+		$response = new Response();
+		$response->cookies(array('foo' => 'bar', 'bin' => 'baz'));
+		$response->cookies('foo', array('value' => 'bin', 'path' => '/foo'));
+
+		$expected = array(
+			'foo' => array(
+				array('value' => 'bar'),
+				array('value' => 'bin', 'path' => '/foo')
+			),
+			'bin' => array('value' => 'baz')
+		);
+		$result = $response->cookies;
+		$this->assertEqual($expected, $result);
+
+		$response = new Response();
+		$response->cookies(array(
+			'foo' => array(
+				'bar',
+				array('value' => 'bin', 'path' => '/foo')
+			),
+			'bin' => 'baz'
+		));
+		$result = $response->cookies;
 		$this->assertEqual($expected, $result);
 	}
 
