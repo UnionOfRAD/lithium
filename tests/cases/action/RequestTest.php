@@ -450,6 +450,17 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual('html', $request->type());
 	}
 
+	public function testHeaders() {
+		$request = new Request(array('env' => array(
+			'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+			'HTTP_COOKIE' => 'name=value; name2=value2',
+			'HTTP_CUSTOM_HEADER' => 'foobar'
+		)));
+		$this->assertEqual('application/json; charset=UTF-8', $request->headers('Content-Type'));
+		$this->assertEqual('name=value; name2=value2', $request->headers('Cookie'));
+		$this->assertEqual('foobar', $request->headers('Custom-Header'));
+	}
+
 	public function testRefererDefault() {
 		$request = new Request(array(
 			'env' => array('HTTP_REFERER' => null)
@@ -1186,6 +1197,86 @@ class RequestTest extends \lithium\test\Unit {
 		));
 		$expected = 'https://foo.com/the/base/path/posts?some=query&parameter=values';
 		$this->assertEqual($expected, $request->to('url'));
+	}
+
+	public function testConvertToString() {
+		$request = new Request(array(
+			'env' => array(
+				'HTTP_HOST' => 'foo.com',
+				'HTTPS' => 'on',
+				'CONTENT_TYPE' => 'text/html',
+				'HTTP_CUSTOM_HEADER' => 'foobar'
+			),
+			'base' => '/the/base/path',
+			'url' => '/posts',
+			'query' => array('some' => 'query', 'parameter' => 'values')
+		));
+		$expected = join("\r\n", array(
+			'GET /the/base/path/posts?some=query&parameter=values HTTP/1.1',
+			'Host: foo.com',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Custom-Header: foobar',
+			'Content-Type: text/html',
+			'',''
+		));
+		$this->assertEqual($expected, $request->to('string'));
+	}
+
+	public function testConvertToStringWithPost() {
+		$request = new Request(array(
+			'env' => array(
+				'HTTP_HOST' => 'lithify.me',
+				'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
+				'HTTP_USER_AGENT' => 'Mozilla/5.0'
+			),
+			'url' => '/posts',
+			'data' => array('some' => 'body', 'parameter' => 'values')
+		));
+		$expected = join("\r\n", array(
+			'GET /posts HTTP/1.1',
+			'Host: lithify.me',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Length: 26',
+			'', 'some=body&parameter=values'
+		));
+		$this->assertEqual($expected, $request->to('string'));
+	}
+
+	public function testConvertToStringWithJson() {
+		$expected = join("\r\n", array(
+			'GET /posts HTTP/1.1',
+			'Host: lithify.me',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/json',
+			'Content-Length: 36',
+			'', '{"some":"body","parameter":"values"}'
+		));
+		
+		$request = new Request(array(
+			'env' => array(
+				'HTTP_HOST' => 'lithify.me',
+				'CONTENT_TYPE' => 'application/json',
+				'HTTP_USER_AGENT' => 'Mozilla/5.0'
+			),
+			'url' => '/posts',
+			'body' => '{"some":"body","parameter":"values"}'
+		));
+		$this->assertEqual($expected, $request->to('string'));
+		
+		$request = new Request(array(
+			'env' => array(
+				'HTTP_HOST' => 'lithify.me',
+				'CONTENT_TYPE' => 'application/json',
+				'HTTP_USER_AGENT' => 'Mozilla/5.0'
+			),
+			'url' => '/posts',
+			'data' => array('some' => 'body', 'parameter' => 'values')
+		));
+		$this->assertEqual($expected, $request->to('string'));
 	}
 
 	/**

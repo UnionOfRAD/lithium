@@ -309,8 +309,8 @@ class Request extends \lithium\net\http\Message {
 				);
 				return array('http' => array_diff_key($options, $defaults) + $base);
 			case 'string':
-				$path = str_replace('//', '/', $this->path) . $options['query'];
-				$status = "{$this->method} {$path} {$this->protocol}";
+				$path = str_replace('//', '/', $options['path']) . $options['query'];
+				$status = "{$options['method']} {$path} {$this->protocol}";
 				return join("\r\n", array($status, join("\r\n", $this->headers()), "", $body));
 			default:
 				return parent::to($format, $options);
