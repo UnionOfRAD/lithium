@@ -417,15 +417,15 @@ class Response extends \lithium\net\http\Message {
 	 * @return string
 	 */
 	public function __toString() {
-		$first = "{$this->protocol} {$this->status['code']} {$this->status['message']}";
 		if ($type = $this->headers('Content-Type')) {
 			$this->headers('Content-Type', "{$type};charset={$this->encoding}");
 		}
-		if ($setCookies = $this->_cookies()) {
-			$this->headers('Set-Cookie', $setCookies);
+		if ($cookies = $this->_cookies()) {
+			$this->headers('Set-Cookie', $cookies);
 		}
 		$body = join("\r\n", (array) $this->body);
-		$response = array($first, join("\r\n", $this->headers()), "", $body);
+		$headers = join("\r\n", $this->headers());
+		$response = array($this->status(), $headers, "", $body);
 		return join("\r\n", $response);
 	}
 }

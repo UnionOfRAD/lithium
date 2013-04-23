@@ -123,7 +123,11 @@ class Message extends \lithium\net\Message {
 			}
 			elseif (!$replace && isset($this->headers[$key])) {
 				$this->headers[$key] = (array) $this->headers[$key];
-				$this->headers[$key][] = $value;
+				if (is_array($value)) {
+					$this->headers[$key] = array_merge($this->headers[$key], $value);
+				} else {
+					$this->headers[$key][] = $value;
+				}
 			} else {
 				$this->headers[$key] = $value;
 			}
