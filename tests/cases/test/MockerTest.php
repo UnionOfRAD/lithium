@@ -451,6 +451,11 @@ class MockerTest extends \lithium\test\Unit {
 		$entity = MockPost::create();
 	}
 
+	public function testConstructParams() {
+		$expected = 'lithium\tests\mocks\data\MockPost';
+		$document = new Document(array('model' => $expected));
+		$this->assertIdentical($expected, $document->model());
+	}
 }
 
 ?>

@@ -171,7 +171,7 @@ class Mocker {
 			'        $this->parent = $class->newInstanceArgs($args);',
 			'    }',
 			'    $this->parent->mocker = $this;',
-			'    if (method_exists("{:mocker}", "__construct")) {',
+			'    if (method_exists(\'{:mocker}\', "__construct")) {',
 			'        call_user_func_array("parent::__construct", $args);',
 			'    }',
 			'}',
