@@ -84,6 +84,22 @@ class Response extends \lithium\net\http\Response {
 	}
 
 	/**
+	 * Expands on `\net\http\Message::headers()` with some magic conversions for shorthand headers.
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @param boolean $replace
+	 * @return mixed
+	 */
+	public function headers($key = null, $value = null, $replace = true) {
+		if (is_string($key) && strtolower($key) == 'download') {
+			$key = 'Content-Disposition';
+			$value = 'attachment; filename="' . $value . '"';
+		}
+		return parent::headers($key, $value, $replace);
+	}
+
+	/**
 	 * Controls how or whether the client browser and web proxies should cache this response.
 	 *
 	 * @param mixed $expires This can be a Unix timestamp indicating when the page expires, or a
@@ -136,28 +152,15 @@ class Response extends \lithium\net\http\Response {
 	 */
 	public function render() {
 		$code = null;
-		$hasLocation = (isset($this->headers['location']) || isset($this->headers['Location']));
-
-		if ($hasLocation && $this->status['code'] === 200) {
-			$code = 302;
-		}
-		$this->_writeHeader($this->status($code) ?: $this->status(500));
-
-		foreach ($this->headers as $name => $value) {
-			$key = strtolower($name);
-
-			if ($key === 'location') {
-				$this->_writeHeader("Location: {$value}", $this->status['code']);
-			} elseif ($key === 'download') {
-				$this->_writeHeader('Content-Disposition: attachment; filename="' . $value . '"');
-			} elseif (is_array($value)) {
-				$this->_writeHeader(
-					array_map(function($v) use ($name) { return "{$name}: {$v}"; }, $value)
-				);
-			} elseif (!is_numeric($name)) {
-				$this->_writeHeader("{$name}: {$value}");
+		if (isset($this->headers['location']) || isset($this->headers['Location'])) {
+			if ($this->status['code'] === 200) {
+				$this->status(302);
 			}
+			$code = $this->status['code'];
 		}
+		$this->_writeHeaders($this->status() ?: $this->status(500));
+		$this->_writeHeaders($this->headers(), $code);
+
 		if ($this->status['code'] === 302 || $this->status['code'] === 204) {
 			return;
 		}
@@ -189,12 +192,10 @@ class Response extends \lithium\net\http\Response {
 	 *        primarily in conjunction with the 'Location' header.
 	 * @return void
 	 */
-	protected function _writeHeader($header, $code = null) {
-		if (is_array($header)) {
-			array_map(function($h) { header($h, false); }, $header);
-			return;
+	protected function _writeHeaders($headers, $code = null) {
+		foreach ((array) $headers as $header) {
+			$code ? header($header, false, $code) : header($header, false);
 		}
-		$code ? header($header, true, $code) : header($header, true);
 	}
 }
 

@@ -111,11 +111,9 @@ class ResponseTest extends \lithium\test\Unit {
 		$headers = array (
 			'HTTP/1.1 201 Created',
 			'Expires: Mon, 26 Jul 1997 05:00:00 GMT',
-			array(
-				'Cache-Control: no-store, no-cache, must-revalidate',
-				'Cache-Control: post-check=0, pre-check=0',
-				'Cache-Control: max-age=0'
-			),
+			'Cache-Control: no-store, no-cache, must-revalidate',
+			'Cache-Control: post-check=0, pre-check=0',
+			'Cache-Control: max-age=0',
 			'Pragma: no-cache'
 		);
 		$this->assertIdentical($headers, $this->response->testHeaders);
@@ -165,7 +163,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual($headers, $this->response->testHeaders);
 
 		$this->response = new MockResponse();
-		$this->response->headers('location', '/');
+		$this->response->headers('Location', '/');
 		ob_start();
 		$this->response->render();
 		ob_get_clean();
@@ -177,7 +175,7 @@ class ResponseTest extends \lithium\test\Unit {
 	public function testLocationHeaderStatus() {
 		$this->response = new MockResponse();
 		$this->response->status(301);
-		$this->response->headers('location', '/');
+		$this->response->headers('Location', '/');
 		ob_start();
 		$this->response->render();
 		ob_get_clean();
