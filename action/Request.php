@@ -241,12 +241,15 @@ class Request extends \lithium\net\http\Request {
 		$type = $this->type($this->_config['type'] ?: $this->env('CONTENT_TYPE'));
 		$this->method = $method = strtoupper($this->env('REQUEST_METHOD'));
 		$hasBody = in_array($method, array('POST', 'PUT', 'PATCH'));
-		if (!$this->data && $hasBody && $type !== 'html') {
+		if (!$this->body && $hasBody && $type !== 'html') {
 			$this->_stream = $this->_stream ?: fopen('php://input', 'r');
-			$media = $this->_classes['media'];
-			$this->data = (array) $media::decode($type, stream_get_contents($this->_stream));
+			$this->body = stream_get_contents($this->_stream);
 			fclose($this->_stream);
 		}
+		if (!$this->data && $this->body) {
+			$this->data = $this->body(null, array('decode' => true, 'encode' => false));
+		}
+		$this->body = $this->data;
 		$this->data = Set::merge((array) $this->data, $this->_parseFiles());
 	}
 
@@ -562,6 +565,39 @@ class Request extends \lithium\net\http\Request {
 			$type = $this->params['type'];
 		}
 		return parent::type($type);
+	}
+
+	/**
+	 * Expands on `\net\http\Message::headers()` by translating field names and values to those
+	 * provided by the server environment.
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @param boolean $replace
+	 * @return mixed
+	 */
+	public function headers($key = null, $value = null, $replace = true) {
+		if (is_string($key) && !isset($this->headers[$key]) && $value === null) {
+			$env = strtoupper(str_replace('-', '_', $key));
+			if (!in_array($env, array('CONTENT_TYPE', 'CONTENT_LENGTH'))) {
+				$env = 'HTTP_' . $env;
+			}
+			if (!empty($this->_env[$env])) {
+				$this->headers($key, $this->_env[$env]);
+				return $this->_env[$env];
+			}
+		}
+		if (!$key) {
+			foreach($this->_env as $name => $value) {
+				if (substr($name, 0, 5) == 'HTTP_') {
+					$name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+					$this->headers($name, $value);
+				}
+			}
+			$this->headers('Content-Type');
+			$this->headers('Content-Length');
+		}
+		return parent::headers($key, $value, $replace);
 	}
 
 	/**
