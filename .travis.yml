@@ -1,20 +1,37 @@
 language: php
 
+services:
+  - mongodb
+  - memcache
+  - couchdb
+
 env:
-  - OPCODE_CACHE=apc
- #- OPCODE_CACHE=xcache
+  - OPCODE_CACHE=apc;DB=mysql
+  - OPCODE_CACHE=apc;DB=pgsql
+  - OPCODE_CACHE=apc;DB=sqlite
+  - OPCODE_CACHE=apc;DB=mongodb
+  - OPCODE_CACHE=apc;DB=couchdb
 
 php:
   - 5.3
   - 5.4
+  - 5.5
 
 before_script:
- - php tests/ci_depends.php $OPCODE_CACHE
-# - cd ../ && git clone git://github.com/UnionOfRAD/li3_quality.git && cd lithium
+  - php tests/ci/depends.php $OPCODE_CACHE
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database lithium_test;'; fi"
+  - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'create database lithium_test;' -U postgres; fi"
+  - cd ..
+  - mkdir libraries
+  - mv lithium libraries
+  - git clone --branch=master --depth=100 --quiet git://github.com/UnionOfRAD/li3_fixtures.git libraries/li3_fixtures
+  - mkdir -p ci/config
+  - cd ci
+  - cp ../libraries/lithium/tests/ci/config/libraries.php config/libraries.php
+  - cp ../libraries/lithium/tests/ci/config/bootstrap.$DB.php config/bootstrap.php
 
 script:
- - console/li3 test --filters=Profiler tests/cases
-# - console/li3 test --filters=Profiler tests/cases && cd ../li3_quality && for FILE in $(cd ../lithium/ && git diff-index --name-only --diff-filter=AM HEAD~1); do ../lithium/console/li3 quality syntax ../lithium/${FILE} --silent; done
+  - ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases && ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration
 
 notifications:
     irc: "irc.freenode.org#li3-core"

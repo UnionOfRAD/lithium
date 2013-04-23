@@ -24,7 +24,6 @@ class MockResult extends \lithium\data\source\Result {
 
 	public $query = array();
 
-
 	public function hasNext() {
 		return ($this->_iterator < count($this->_data));
 	}

@@ -8,162 +8,150 @@
 
 namespace lithium\tests\integration\data;
 
-use lithium\data\Connections;
-use lithium\tests\mocks\data\Companies;
+use lithium\tests\fixture\model\gallery\Galleries;
+use li3_fixtures\test\Fixtures;
 
-class CrudTest extends \lithium\test\Integration {
+class CrudTest extends \lithium\tests\integration\data\Base {
 
-	protected $_connection = null;
-
-	protected $_database = null;
-
-	protected $_key = null;
-
-	public $companyData = array(
-		array('name' => 'StuffMart', 'active' => true),
-		array('name' => 'Ma \'n Pa\'s Data Warehousing & Bait Shop', 'active' => false)
+	protected $_fixtures = array(
+		'images' => 'lithium\tests\fixture\model\gallery\ImagesFixture',
+		'galleries' => 'lithium\tests\fixture\model\gallery\GalleriesFixture',
 	);
+
+	/**
+	 * Skip the test if no test database connection available.
+	 */
+	public function skip() {
+		parent::connect($this->_connection);
+		if (!class_exists('li3_fixtures\test\Fixtures')) {
+			$this->skipIf(true, "These tests need `'li3_fixtures'` to be runned.");
+		}
+	}
 
 	/**
 	 * Creating the test database
 	 */
 	public function setUp() {
-		$this->_connection->connection->put($this->_database);
+		Fixtures::config(array(
+			'db' => array(
+				'adapter' => 'Connection',
+				'connection' => $this->_connection,
+				'fixtures' => $this->_fixtures
+			)
+		));
+		Fixtures::create('db', array('galleries'));
 	}
 
 	/**
 	 * Dropping the test database
 	 */
 	public function tearDown() {
-		$this->_connection->connection->delete($this->_database);
-	}
-
-	/**
-	 * Skip the test if no test database connection available.
-	 */
-	public function skip() {
-		$connection = 'lithium_couch_test';
-		$config = Connections::get($connection, array('config' => true));
-
-		$isConnected = $config && Connections::get($connection)->isConnected(array(
-			'autoConnect' => true
-		));
-		$isAvailable = $config && $isConnected;
-		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
-
-		$this->_key = Companies::key();
-		$this->_database = $config['database'];
-		$this->_connection = Connections::get($connection);
+		Fixtures::clear('db');
 	}
 
 	/**
 	 * Tests that a single record with a manually specified primary key can be created, persisted
 	 * to an arbitrary data store, re-read and updated.
-	 *
-	 * @return void
 	 */
 	public function testCreate() {
-		$this->assertIdentical(0, Companies::count());
-
-		$new = Companies::create(array('name' => 'Acme, Inc.', 'active' => true));
-		$expected = array('name' => 'Acme, Inc.', 'active' => true);
+		$this->assertIdentical(0, Galleries::count());
+		$new = Galleries::create(array('name' => 'Flowers', 'active' => true));
+		$expected = array('name' => 'Flowers', 'active' => true);
 		$result = $new->data();
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected['name'], $result['name']);
+		$this->assertEqual($expected['active'], $result['active']);
 
 		$this->assertEqual(
 			array(false, true, true),
 			array($new->exists(), $new->save(), $new->exists())
 		);
-		$this->assertIdentical(1, Companies::count());
+		$this->assertIdentical(1, Galleries::count());
 	}
 
 	public function testRead() {
-		static::_createCompany();
-		$existing = Companies::first();
-
-		foreach (Companies::key($existing) as $val) {
-			$this->assertTrue($val);
+		Galleries::create(array('name' => 'Flowers', 'active' => true))->save();
+		$existing = Galleries::first();
+		foreach (Galleries::key($existing) as $val) {
+			$this->assertNotEmpty($val);
 		}
-		$this->assertEqual('Acme, Inc.', $existing->name);
-		$this->assertTrue($existing->active);
+		$this->assertEqual('Flowers', $existing->name);
+		$this->assertNotEmpty($existing->active);
 		$this->assertTrue($existing->exists());
 	}
 
 	public function testUpdate() {
-		static::_createCompany();
-		$existing = Companies::first();
-		$this->assertEqual($existing->name, 'Acme, Inc.');
-		$existing->name = 'Big Brother and the Holding Company';
+		Galleries::create(array('name' => 'Flowers', 'active' => true))->save();
+		$existing = Galleries::first();
+		$this->assertEqual($existing->name, 'Flowers');
+		$existing->name = 'Flowers & Poneys';
 		$result = $existing->save();
 		$this->assertTrue($result);
 
-		$existing = Companies::first();
-		foreach (Companies::key($existing) as $val) {
-			$this->assertTrue($val);
+		$existing = Galleries::first();
+		foreach (Galleries::key($existing) as $val) {
+			$this->assertNotEmpty($val);
 		}
-		$this->assertTrue($existing->active);
-		$this->assertEqual('Big Brother and the Holding Company', $existing->name);
+		$this->assertNotEmpty($existing->active);
+		$this->assertEqual('Flowers & Poneys', $existing->name);
 	}
 
 	public function testDelete() {
-		static::_createCompany();
-		$existing = Companies::first();
+		Galleries::create(array('name' => 'Flowers', 'active' => true))->save();
+		$existing = Galleries::first();
 		$this->assertTrue($existing->exists());
 		$this->assertTrue($existing->delete());
-		$this->assertNull(Companies::first(array('conditions' => Companies::key($existing))));
-		$this->assertIdentical(0, Companies::count());
+		$this->assertNull(Galleries::first(array('conditions' => Galleries::key($existing))));
+		$this->assertIdentical(0, Galleries::count());
 	}
 
 	public function testCrudMulti() {
-		$large  = Companies::create(array('name' => 'BigBoxMart', 'active' => true));
-		$medium = Companies::create(array('name' => 'Acme, Inc.', 'active' => true));
-		$small  = Companies::create(array('name' => 'Ma & Pa\'s', 'active' => true));
+		$cities  = Galleries::create(array('name' => 'Cities', 'active' => true));
+		$flowers = Galleries::create(array('name' => 'Flowers', 'active' => true));
+		$poneys  = Galleries::create(array('name' => 'Poneys', 'active' => true));
 
-		foreach (array('large', 'medium', 'small') as $key) {
+		foreach (array('cities', 'flowers', 'poneys') as $key) {
 			$this->assertFalse(${$key}->exists());
 			$this->assertTrue(${$key}->save());
 			$this->assertTrue(${$key}->exists());
 		}
-		$this->assertEqual(3, Companies::count());
+		$this->assertEqual(3, Galleries::count());
 
-		$all = Companies::all();
+		$all = Galleries::all();
 		$this->assertEqual(3, $all->count());
 
-		$match = 'BigBoxMart';
+		$match = 'Cities';
 		$filter = function($entity) use (&$match) { return $entity->name === $match; };
 
-		foreach (array('BigBoxMart', 'Acme, Inc.', 'Ma & Pa\'s') as $match) {
+		foreach (array('Cities', 'Flowers', 'Poneys') as $match) {
 			$this->assertTrue($all->first($filter)->exists());
 		}
 		$this->assertEqual(array(true, true, true), array_values($all->delete()));
-		$this->assertEqual(0, Companies::count());
+		$this->assertEqual(0, Galleries::count());
 	}
 
 	public function testUpdateWithNewProperties() {
-		$new = Companies::create(array('name' => 'Acme, Inc.', 'active' => true));
+		$db = $this->_db;
+		$this->skipIf($db::enabled('schema'));
 
-		$expected = array('name' => 'Acme, Inc.', 'active' => true);
+		$new = Galleries::create(array('name' => 'Flowers', 'active' => true));
+
+		$expected = array('name' => 'Flowers', 'active' => true);
 		$result = $new->data();
 		$this->assertEqual($expected, $result);
 
 		$new->foo = 'bar';
-		$expected = array('name' => 'Acme, Inc.', 'active' => true, 'foo' => 'bar');
+		$expected = array('name' => 'Flowers', 'active' => true, 'foo' => 'bar');
 		$result = $new->data();
 		$this->assertEqual($expected, $result);
 
 		$this->assertTrue($new->save());
 
-		$updated = Companies::find((string) $new->_id);
+		$updated = Galleries::find('first', array(
+			'conditions' => Galleries::key($new)
+		));
 		$expected = 'bar';
 		$result = $updated->foo;
 		$this->assertEqual($expected, $result);
-	}
-
-	protected static function _createCompany() {
-		Companies::create(array(
-			'name' => 'Acme, Inc.',
-			'active' => true
-		))->save();
 	}
 }
 

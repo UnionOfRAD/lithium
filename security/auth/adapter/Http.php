@@ -8,6 +8,8 @@
 
 namespace lithium\security\auth\adapter;
 
+use lithium\core\Libraries;
+
 /**
  * The `Http` adapter provides basic and digest authentication based on the HTTP protocol.
  * By default, the adapter uses Http Digest based authentication.
@@ -46,8 +48,9 @@ class Http extends \lithium\core\Object {
 	 *        - `users`: the users to permit. key => value pair of username => password
 	 */
 	public function __construct(array $config = array()) {
+		$realm = basename(Libraries::get(true, 'path'));
 		$defaults = array(
-			'method' => 'digest', 'realm' => basename(LITHIUM_APP_PATH), 'users' => array()
+			'method' => 'digest', 'realm' => $realm, 'users' => array()
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -141,7 +144,7 @@ class Http extends \lithium\core\Object {
 			$this->_writeHeader($message);
 			return false;
 		}
-		return array('username' => $username, 'password' => $password);
+		return compact('username', 'password');
 	}
 
 	/**

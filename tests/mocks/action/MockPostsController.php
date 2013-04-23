@@ -63,7 +63,7 @@ class MockPostsController extends \lithium\action\Controller {
 		return $this->{$var};
 	}
 
-	protected function _stop($status = 0 ) {
+	protected function _stop($status = 0) {
 		$this->stopped = true;
 	}
 }

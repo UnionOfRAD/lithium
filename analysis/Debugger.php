@@ -16,7 +16,7 @@ use lithium\analysis\Inspector;
  * The `Debugger` class provides basic facilities for generating and rendering meta-data about the
  * state of an application in its current context.
  */
-class Debugger extends \lithium\core\StaticObject {
+class Debugger {
 
 	/**
 	 * Used for temporary closure caching.
@@ -89,7 +89,7 @@ class Debugger extends \lithium\core\StaticObject {
 
 			if ($options['format'] === 'points' && $trace['file'] !== '[internal]') {
 				$back[] = array('file' => $trace['file'], 'line' => $trace['line']);
-			} elseif (is_string($options['format']) && $options['format'] != 'array') {
+			} elseif (is_string($options['format']) && $options['format'] !== 'array') {
 				$back[] = String::insert($options['format'], array_map(
 					function($data) { return is_object($data) ? get_class($data) : $data; },
 					$trace

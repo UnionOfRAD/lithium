@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\core;
 
-use lithium\core\StaticObject;
 use lithium\tests\mocks\core\MockRequest;
 use lithium\tests\mocks\core\MockStaticInstantiator;
 
@@ -170,11 +169,11 @@ class StaticObjectTest extends \lithium\test\Unit {
 			return false;
 		});
 
-		$this->assertIdentical(false, $class::method2());
+		$this->assertFalse($class::method2());
 
 		$class::applyFilter('method2', false);
 
-		$this->assertTrue($class::method2() !== false);
+		$this->assertNotIdentical($class::method2(), false);
 	}
 
 	public function testResetMultipleFilters() {
@@ -184,13 +183,13 @@ class StaticObjectTest extends \lithium\test\Unit {
 			return false;
 		});
 
-		$this->assertIdentical(false, $class::method2());
-		$this->assertIdentical(false, $class::manual(array()));
+		$this->assertFalse($class::method2());
+		$this->assertFalse($class::manual(array()));
 
 		$class::applyFilter('method2', false);
 
-		$this->assertTrue($class::method2() !== false);
-		$this->assertIdentical(false, $class::manual(array()));
+		$this->assertNotIdentical($class::method2(), false);
+		$this->assertFalse($class::manual(array()));
 	}
 
 	public function testResetClass() {
@@ -200,13 +199,13 @@ class StaticObjectTest extends \lithium\test\Unit {
 			return false;
 		});
 
-		$this->assertIdentical(false, $class::method2());
-		$this->assertIdentical(false, $class::manual(array()));
+		$this->assertFalse($class::method2());
+		$this->assertFalse($class::manual(array()));
 
 		$class::applyFilter(false);
 
-		$this->assertTrue($class::method2() !== false);
-		$this->assertTrue($class::manual(array()) !== false);
+		$this->assertNotIdentical($class::method2(), false);
+		$this->assertNotIdentical($class::manual(array()), false);
 	}
 
 	public function testRespondsTo() {

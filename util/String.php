@@ -118,7 +118,7 @@ class String {
 	 * speaking, this fallback is inadequate, but good enough.)
 	 *
 	 * @see lithium\util\String::$_source
-	 * @return closure Returns a closure containing a random number generator.
+	 * @return Closure Returns a closure containing a random number generator.
 	 */
 	protected static function _source() {
 		switch (true) {
@@ -424,7 +424,7 @@ class String {
 			}
 			$buffer .= substr($data, $offset, ($tmpOffset - $offset));
 
-			if ($data{$tmpOffset} === $separator && $depth === 0) {
+			if ($data[$tmpOffset] === $separator && $depth === 0) {
 				$results[] = $buffer;
 				$buffer = '';
 			} else {
@@ -432,17 +432,17 @@ class String {
 			}
 
 			if ($leftBound !== $rightBound) {
-				if ($data{$tmpOffset} === $leftBound) {
+				if ($data[$tmpOffset] === $leftBound) {
 					$depth++;
 				}
-				if ($data{$tmpOffset} === $rightBound) {
+				if ($data[$tmpOffset] === $rightBound) {
 					$depth--;
 				}
 				$offset = ++$tmpOffset;
 				continue;
 			}
 
-			if ($data{$tmpOffset} === $leftBound) {
+			if ($data[$tmpOffset] === $leftBound) {
 				($open) ? $depth-- : $depth++;
 				$open = !$open;
 			}

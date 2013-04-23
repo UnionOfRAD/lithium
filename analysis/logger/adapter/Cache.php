@@ -9,6 +9,7 @@
 namespace lithium\analysis\logger\adapter;
 
 use lithium\util\String;
+use Closure;
 
 /**
  * The `Cache` logger allows log messages to be written to cache configurations set up in
@@ -52,7 +53,7 @@ class Cache extends \lithium\core\Object {
 		$defaults = array(
 			'config' => null,
 			'expiry' => '+999 days',
-			'key' => 'log_{:type}_{:timestamp}'
+			'key' => 'log_{:priority}_{:timestamp}'
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -60,11 +61,11 @@ class Cache extends \lithium\core\Object {
 	/**
 	 * Writes the message to the configured cache adapter.
 	 *
-	 * @param string $type
+	 * @param string $priority
 	 * @param string $message
-	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($type, $message) {
+	public function write($priority, $message) {
 		$config = $this->_config + $this->_classes;
 
 		return function($self, $params) use ($config) {

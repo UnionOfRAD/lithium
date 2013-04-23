@@ -11,10 +11,10 @@ namespace lithium\tests\cases\test;
 use Exception;
 use lithium\core\Libraries;
 use lithium\tests\mocks\test\MockUnitTest;
-use lithium\tests\mocks\test\cases\MockSkipThrowsException;
-use lithium\tests\mocks\test\cases\MockTestErrorHandling;
-use lithium\tests\mocks\test\cases\MockSetUpThrowsException;
-use lithium\tests\mocks\test\cases\MockTearDownThrowsException;
+use lithium\tests\mocks\test\cases\MockSkipThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockErrorHandlingTest;
+use lithium\tests\mocks\test\cases\MockSetUpThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockTearDownThrowsExceptionTest;
 
 class UnitTest extends \lithium\test\Unit {
 
@@ -93,7 +93,7 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = 'assert';
 		$this->assertEqual($expected, $results[0]['assertion']);
 
-		$expected = 'lithium\\tests\\mocks\\test\\MockUnitTest';
+		$expected = 'lithium\tests\mocks\test\MockUnitTest';
 		$this->assertEqual($expected, $results[0]['class']);
 
 		$expected = 'testSomething';
@@ -168,7 +168,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testSubject() {
-		$expected = 'lithium\\tests\\mocks\\test\\MockUnit';
+		$expected = 'lithium\tests\mocks\test\MockUnit';
 		$result = $this->test->subject();
 		$this->assertEqual($expected, $result);
 	}
@@ -177,7 +177,7 @@ class UnitTest extends \lithium\test\Unit {
 		$file = realpath(LITHIUM_LIBRARY_PATH) . '/lithium/tests/mocks/test/MockUnitTest.php';
 		$expected = array(
 			'result' => 'pass',
-			'class' => 'lithium\\tests\\mocks\\test\\MockUnitTest',
+			'class' => 'lithium\tests\mocks\test\MockUnitTest',
 			'method' => 'testNothing',
 			'message' => "expected: true\nresult: true\n",
 			'data' => array('expected' => true, 'result' => true),
@@ -220,6 +220,16 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $results[0]['result']);
 	}
 
+	public function testAssertNotIdentical() {
+		$expected = true;
+		$result = 1;
+		$this->test->assertNotIdentical($expected, $result);
+		$results = $this->test->results();
+
+		$expected = 'pass';
+		$this->assertEqual($expected, $results[0]['result']);
+	}
+
 	public function testAssertIdenticalArray() {
 		$expected = array('1', '2', '3');
 		$result = array('1', '3', '4');
@@ -233,6 +243,16 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $results[0]['message']);
 	}
 
+	public function testAssertNotIdenticalArray() {
+		$expected = array('1', '2', '3');
+		$result = array('1', '3', '4');
+		$this->test->assertNotIdentical($expected, $result);
+		$results = $this->test->results();
+
+		$expected = 'pass';
+		$this->assertEqual($expected, $results[0]['result']);
+	}
+
 	public function testAssertNull() {
 		$expected = null;
 		$result = null;
@@ -243,10 +263,10 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $results[0]['result']);
 	}
 
-	public function testAssertNoPattern() {
+	public function testAssertNotPattern() {
 		$expected = '/\s/';
 		$result = null;
-		$this->test->assertNoPattern($expected, $result);
+		$this->test->assertNotPattern($expected, $result);
 		$results = $this->test->results();
 
 		$expected = 'pass';
@@ -402,7 +422,7 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp();
-		$this->assertFalse(file_exists("{$base}/cleanup_test"));
+		$this->assertFileNotExists("{$base}/cleanup_test");
 	}
 
 	public function testCleanUpWithFullPath() {
@@ -414,9 +434,9 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp("{$base}/cleanup_test");
-		$this->assertTrue(file_exists("{$base}/cleanup_test"));
-		$this->assertFalse(file_exists("{$base}/cleanup_test/file"));
-		$this->assertFalse(file_exists("{$base}/cleanup_test/.hideme"));
+		$this->assertFileExists("{$base}/cleanup_test");
+		$this->assertFileNotExists("{$base}/cleanup_test/file");
+		$this->assertFileNotExists("{$base}/cleanup_test/.hideme");
 
 		$this->_cleanUp();
 	}
@@ -430,9 +450,9 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertTrue(touch("{$base}/cleanup_test/.hideme"));
 
 		$this->_cleanUp("tests/cleanup_test");
-		$this->assertTrue(file_exists("{$base}/cleanup_test"));
-		$this->assertFalse(file_exists("{$base}/cleanup_test/file"));
-		$this->assertFalse(file_exists("{$base}/cleanup_test/.hideme"));
+		$this->assertFileExists("{$base}/cleanup_test");
+		$this->assertFileNotExists("{$base}/cleanup_test/file");
+		$this->assertFileNotExists("{$base}/cleanup_test/.hideme");
 
 		$this->_cleanUp();
 	}
@@ -468,7 +488,7 @@ class UnitTest extends \lithium\test\Unit {
 		$this->test->expectException('/test handle exception/');
 		$this->test->handleException(new Exception('test handle exception'));
 
-		$this->assertFalse($this->test->expected());
+		$this->assertEmpty($this->test->expected());
 	}
 
 	public function testExpectExceptionPostNotThrown() {
@@ -550,19 +570,19 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testExceptionCatching() {
-		$test = new MockSkipThrowsException();
+		$test = new MockSkipThrowsExceptionTest();
 		$test->run();
 		$expected = 'skip throws exception';
 		$results = $test->results();
 		$this->assertEqual($expected, $results[0]['message']);
 
-		$test = new MockSetUpThrowsException();
+		$test = new MockSetUpThrowsExceptionTest();
 		$test->run();
 		$expected = 'setUp throws exception';
 		$results = $test->results();
 		$this->assertEqual($expected, $results[0]['message']);
 
-		$test = new MockTearDownThrowsException();
+		$test = new MockTearDownThrowsExceptionTest();
 		$test->run();
 		$expected = 'tearDown throws exception';
 		$results = $test->results();
@@ -570,7 +590,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testErrorHandling() {
-		$test = new MockTestErrorHandling();
+		$test = new MockErrorHandlingTest();
 
 		$test->run();
 
@@ -737,6 +757,15 @@ class UnitTest extends \lithium\test\Unit {
 		), $result['data']);
 	}
 
+	public function testArrayHasKeyValueNull() {
+		$this->assertTrue($this->test->assertArrayHasKey('bar', array('bar' => null)));
+
+		$results = $this->test->results();
+		$result = array_pop($results);
+
+		$this->assertEqual('pass', $result['result']);
+	}
+
 	public function testArrayNotHasKeyTrue() {
 		$this->assertTrue($this->test->assertArrayNotHasKey('foo', array('bar' => 'baz')));
 
@@ -856,8 +885,8 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual(array(
 			'expected' => 'foobar',
 			'result' => array(
-				new \ReflectionProperty('lithium\\core\\StaticObject', '_methodFilters'),
-				new \ReflectionProperty('lithium\\core\\StaticObject', '_parents')
+				new \ReflectionProperty('lithium\core\StaticObject', '_methodFilters'),
+				new \ReflectionProperty('lithium\core\StaticObject', '_parents')
 			)
 		), $result['data']);
 	}
@@ -890,8 +919,8 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual(array(
 			'expected' => '_methodFilters',
 			'result' => array(
-				new \ReflectionProperty('lithium\\core\\StaticObject', '_methodFilters'),
-				new \ReflectionProperty('lithium\\core\\StaticObject', '_parents')
+				new \ReflectionProperty('lithium\core\StaticObject', '_methodFilters'),
+				new \ReflectionProperty('lithium\core\StaticObject', '_parents')
 			)
 		), $result['data']);
 	}
@@ -1472,50 +1501,6 @@ class UnitTest extends \lithium\test\Unit {
 		});
 	}
 
-	public function testAssertRegExpTrue() {
-		$this->assertTrue($this->test->assertRegExp('/^foo/', 'foobar'));
-
-		$results = $this->test->results();
-		$result = array_pop($results);
-
-		$this->assertEqual('pass', $result['result']);
-	}
-
-	public function testAssertRegExpFalse() {
-		$this->assertFalse($this->test->assertRegExp('/^bar/', 'foobar'));
-
-		$results = $this->test->results();
-		$result = array_pop($results);
-
-		$this->assertEqual('fail', $result['result']);
-		$this->assertEqual(array(
-			'expected' => '/^bar/',
-			'result' => array()
-		), $result['data']);
-	}
-
-	public function testAssertNotRegExpTrue() {
-		$this->assertTrue($this->test->assertNotRegExp('/^bar/', 'foobar'));
-
-		$results = $this->test->results();
-		$result = array_pop($results);
-
-		$this->assertEqual('pass', $result['result']);
-	}
-
-	public function testAssertNotRegExpFalse() {
-		$this->assertFalse($this->test->assertNotRegExp('/^foo/', 'foobar'));
-
-		$results = $this->test->results();
-		$result = array_pop($results);
-
-		$this->assertEqual('fail', $result['result']);
-		$this->assertEqual(array(
-			'expected' => '/^foo/',
-			'result' => array('foo')
-		), $result['data']);
-	}
-
 	public function testAssertStringMatchesFormatTrue() {
 		$this->assertTrue($this->test->assertStringMatchesFormat('%d', '10'));
 
@@ -1602,6 +1587,32 @@ class UnitTest extends \lithium\test\Unit {
 			'expected' => 'bar',
 			'result' => 'foobar'
 		), $result['data']);
+	}
+
+	public function testAssertNotExceptionPassesWithNoException() {
+		$this->assertTrue($this->test->assertNotException('Exception', function() {
+			return false;
+		}));
+	}
+
+	public function testAssertNotExceptionPassesWithWrongException() {
+		$this->assertTrue($this->test->assertNotException('FooException', function() {
+			throw new \Exception('Foo');
+		}));
+	}
+
+	public function testAssertNotExceptionFailsWithExactException() {
+		$class = 'lithium\action\DispatchException';
+
+		$this->assertFalse($this->test->assertNotException($class, function() {
+			throw new \lithium\action\DispatchException('Foo');
+		}));
+	}
+
+	public function testAssertNotExceptionFailsWithBaseException() {
+		$this->assertFalse($this->test->assertNotException('Exception', function() {
+			throw new \lithium\action\DispatchException('Foo');
+		}));
 	}
 
 }

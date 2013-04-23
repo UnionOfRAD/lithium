@@ -146,6 +146,11 @@ abstract class Helper extends \lithium\core\Object {
 	protected function _render($method, $string, $params, array $options = array()) {
 		$strings = $this->_strings;
 
+		if (isset($params['options']['scope'])) {
+			$options['scope'] = $params['options']['scope'];
+			unset($params['options']['scope']);
+		}
+
 		if ($this->_context) {
 			foreach ($params as $key => $value) {
 				$handler = isset($options['handlers'][$key]) ? $options['handlers'][$key] : $key;
@@ -198,7 +203,7 @@ abstract class Helper extends \lithium\core\Object {
 		$options += $defaults;
 
 		if (in_array($key, $this->_minimized)) {
-			$isMini = ($value == 1 || $value === true || $value == $key);
+			$isMini = ($value === 1 || $value === true || $value === $key);
 			if (!($value = $isMini ? $key : $value)) {
 				return null;
 			}

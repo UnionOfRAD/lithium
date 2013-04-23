@@ -30,13 +30,13 @@ namespace lithium\net\http;
  * incoming URLs than it generates.
  *
  * {{{$route = new Route(array(
- *		'template' => '/users/{:user}',
- *		'pattern' => '@^/u(?:sers)?(?:/(?P<user>[^\/]+))$@',
- *		'params' => array('controller' => 'users', 'action' => 'index'),
- *		'match' => array('controller' => 'users', 'action' => 'index'),
- *		'defaults' => array('controller' => 'users'),
- *		'keys' => array('user' => 'user'),
- *		'options' => array('compile' => false, 'wrap' => false)
+ *        'template' => '/users/{:user}',
+ *        'pattern' => '@^/u(?:sers)?(?:/(?P<user>[^\/]+))$@',
+ *        'params' => array('controller' => 'users', 'action' => 'index'),
+ *        'match' => array('controller' => 'users', 'action' => 'index'),
+ *        'defaults' => array('controller' => 'users'),
+ *        'keys' => array('user' => 'user'),
+ *        'options' => array('compile' => false, 'wrap' => false)
  * ));
  * Router::connect($route); // this will match '/users/<username>' or '/u/<username>'.
  * }}}
@@ -181,6 +181,7 @@ class Route extends \lithium\core\Object {
 			'persist'  => array(),
 			'handler'  => null,
 			'continue' => false,
+			'modifiers' => array(),
 			'formatters' => array(),
 			'unicode'  => true
 		);
@@ -229,12 +230,17 @@ class Route extends \lithium\core\Object {
 				return false;
 			}
 		}
-		if (isset($match['args'])) {
-			$match['args'] = explode('/', $match['args']);
+		foreach ($this->_config['modifiers'] as $key => $modifier) {
+			if (isset($match[$key])) {
+				$match[$key] = $modifier($match[$key]);
+			}
 		}
-		$result = array_filter(array_intersect_key($match, $this->_keys));
-		if (isset($this->_keys['args'])) {
-			$result += array('args' => array());
+
+		$result = array_intersect_key($match + array('args' => array()), $this->_keys);
+		foreach ($result as $key => $value) {
+			if ($value === '') {
+				unset($result[$key]);
+			}
 		}
 		$result += $this->_params + $this->_defaults;
 		$request->params = $result + (array) $request->params;
@@ -256,7 +262,7 @@ class Route extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function match(array $options = array(), $context = null) {
-		$defaults = array('action' => 'index');
+		$defaults = array('action' => 'index', 'http:method' => 'GET');
 		$query = null;
 
 		if (!$this->_config['continue']) {
@@ -268,7 +274,9 @@ class Route extends \lithium\core\Object {
 				unset($options['?']);
 			}
 		}
-
+		if (!$options = $this->_matchMethod($options)) {
+			return false;
+		}
 		if (!$options = $this->_matchKeys($options)) {
 			return false;
 		}
@@ -294,6 +302,26 @@ class Route extends \lithium\core\Object {
 	 */
 	public function canContinue() {
 		return $this->_config['continue'];
+	}
+
+	/**
+	 * Helper used by `Route::match()` which check if the required http method is compatible
+	 * with the route.
+	 *
+	 * @see lithium\net\http\Route::match()
+	 * @param array $options An array of URL parameters.
+	 * @return mixed On success, returns an updated array of options, On failure, returns `false`.
+	 */
+	protected function _matchMethod($options) {
+		$isMatch = (
+			!isset($this->_meta['http:method']) ||
+			$options['http:method'] === $this->_meta['http:method']
+		);
+		if (!$isMatch) {
+			return false;
+		}
+		unset($options['http:method']);
+		return $options;
 	}
 
 	/**
@@ -398,7 +426,6 @@ class Route extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function compile() {
-		$this->_match = $this->_params;
 
 		foreach ($this->_params as $key => $value) {
 			if (!strpos($key, ':')) {
@@ -407,6 +434,8 @@ class Route extends \lithium\core\Object {
 			unset($this->_params[$key]);
 			$this->_meta[$key] = $value;
 		}
+
+		$this->_match = $this->_params;
 
 		if ($this->_template === '/' || $this->_template === '') {
 			$this->_pattern = '@^/*$@';

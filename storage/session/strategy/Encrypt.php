@@ -21,8 +21,8 @@ use lithium\core\ConfigException;
  *
  * {{{
  * Session::config(array('default' => array(
- *	'adapter' => 'Cookie',
- *	'strategies' => array('Encrypt' => array('secret' => 'f00bar$l1thium'))
+ *    'adapter' => 'Cookie',
+ *    'strategies' => array('Encrypt' => array('secret' => 'f00bar$l1thium'))
  * )));
  * }}}
  *
@@ -34,12 +34,12 @@ use lithium\core\ConfigException;
  *
  * {{{
  * Session::config(array('default' => array(
- *	'adapter' => 'Cookie',
- *	'strategies' => array('Encrypt' => array(
- *		'cipher' => MCRYPT_RIJNDAEL_256,
- *		'mode' 	 => MCRYPT_MODE_ECB, // Don't use ECB when you don't have to!
- *		'secret'	 => 'f00bar$l1thium'
- *	))
+ *     'adapter' => 'Cookie',
+ *     'strategies' => array('Encrypt' => array(
+ *         'cipher' => MCRYPT_RIJNDAEL_256,
+ *         'mode' => MCRYPT_MODE_ECB, // Don't use ECB when you don't have to!
+ *         'secret' => 'f00bar$l1thium'
+ *     ))
  * )));
  * }}}
  *

@@ -8,63 +8,42 @@
 
 namespace lithium\tests\integration\data;
 
-use lithium\data\Connections;
-use lithium\tests\mocks\data\Companies;
+use lithium\tests\fixture\model\gallery\Galleries;
 
-class DocumentTest extends \lithium\test\Integration {
-
-	protected $_database;
-
-	protected $_connection = null;
-
-	protected $_key = null;
+class DocumentTest extends \lithium\tests\integration\data\Base {
 
 	/**
-	 * Creating the test database
-	 */
-	public function setUp() {
-		$this->_connection->connection->put($this->_database);
-	}
-
-	/**
-	 * Dropping the test database
-	 */
-	public function tearDown() {
-		$this->_connection->connection->delete($this->_database);
-	}
-
-	/**
-	 * Skip the test if no test database connection available.
+	 * Skip the test if no allowed database connection available.
 	 */
 	public function skip() {
-		$connection = 'lithium_couch_test';
-		$config = Connections::get($connection, array('config' => true));
-		$isConnected = $config && Connections::get($connection)->isConnected(array(
-			'autoConnect' => true
-		));
-		$isAvailable = $config && $isConnected;
-		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
+		parent::connect($this->_connection);
+		$this->skipIf(!$this->with(array('MongoDb', 'CouchDb')));
+	}
 
-		$this->_key = Companies::key();
-		$this->_database = $config['database'];
-		$this->_connection = Connections::get($connection);
+	public function setUp() {
+		Galleries::config(array('meta' => array('connection' => 'test')));
+	}
+
+	public function tearDown() {
+		Galleries::remove();
+		Galleries::reset();
 	}
 
 	public function testUpdateWithNewArray() {
-		$new = Companies::create(array('name' => 'Acme, Inc.', 'active' => true));
+		$new = Galleries::create(array('name' => 'Poneys', 'active' => true));
 
-		$expected = array('name' => 'Acme, Inc.', 'active' => true);
+		$expected = array('name' => 'Poneys', 'active' => true);
 		$result = $new->data();
 		$this->assertEqual($expected, $result);
 
 		$new->foo = array('bar');
-		$expected = array('name' => 'Acme, Inc.', 'active' => true, 'foo' => array('bar'));
+		$expected = array('name' => 'Poneys', 'active' => true, 'foo' => array('bar'));
 		$result = $new->data();
 		$this->assertEqual($expected, $result);
 
 		$this->assertTrue($new->save());
 
-		$updated = Companies::find((string) $new->_id);
+		$updated = Galleries::find((string) $new->_id);
 		$expected = 'bar';
 		$result = $updated->foo[0];
 		$this->assertEqual($expected, $result);
@@ -73,7 +52,7 @@ class DocumentTest extends \lithium\test\Integration {
 
 		$this->assertTrue($updated->save());
 
-		$updated = Companies::find((string) $updated->_id);
+		$updated = Galleries::find((string) $updated->_id);
 		$expected = 'baz';
 		$result = $updated->foo[1];
 		$this->assertEqual($expected, $result);

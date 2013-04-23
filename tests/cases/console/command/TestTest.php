@@ -1,10 +1,10 @@
 <?php
 /**
-* Lithium: the most rad php framework
-*
-* @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
-* @license       http://opensource.org/licenses/bsd-license.php The BSD License
-*/
+ * Lithium: the most rad php framework
+ *
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
 
 namespace lithium\tests\cases\console\command;
 
@@ -30,7 +30,7 @@ class TestTest extends \lithium\test\Unit {
 		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
 
-		chdir(LITHIUM_LIBRARY_PATH . '/lithium');
+		chdir(Libraries::get('lithium', 'path'));
 
 		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
 		$this->request->params = array('library' => 'build_test');
@@ -85,7 +85,8 @@ class TestTest extends \lithium\test\Unit {
 			'classes' => $this->classes
 		));
 		$command->format = 'foobar';
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
 		$expected = "No handler for format `foobar`... \n";
 		$result = $command->response->error;
@@ -96,7 +97,8 @@ class TestTest extends \lithium\test\Unit {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
 
 		$expected = "1 pass\n0 fails and 0 exceptions\n";
@@ -145,7 +147,8 @@ class TestTest extends \lithium\test\Unit {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases';
 		$command->run($path);
 
 		$expected = "4 exceptions";
@@ -158,7 +161,8 @@ class TestTest extends \lithium\test\Unit {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$result = $command->run($path);
 		$this->assertTrue($result);
 	}
@@ -167,7 +171,8 @@ class TestTest extends \lithium\test\Unit {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTestErrorHandling.php';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTestErrorHandling.php';
 		$result = $command->run($path);
 		$this->assertFalse($result);
 	}
@@ -176,15 +181,32 @@ class TestTest extends \lithium\test\Unit {
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
-		$path = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/test/cases/MockTest.php';
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$command->format = 'json';
 		$command->run($path);
 
 		$result = $command->response->output;
 		$result = json_decode($result, true);
 
-		$this->assertTrue(isset($result['count']));
-		$this->assertTrue(isset($result['stats']));
+		$this->assertArrayHasKey('count', $result);
+		$this->assertArrayHasKey('stats', $result);
+	}
+
+	public function testPathWithCustomDirectoryName() {
+		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/custom_dir';
+		$testDir = $testApp . '/tests/cases/models';
+		mkdir($testDir, 0777, true);
+		Libraries::add('test_app', array('path' => $testApp));
+		$request = new Request(array('env' => array('working' => $testApp)));
+		$command = new Test(array(
+			'request' => $request, 'classes' => $this->classes
+		));
+		$expected = 'test_app\tests\cases\models';
+		$result = $command->invokeMethod('_path', array('tests\cases\models'));
+		$this->assertIdentical($expected, $result);
+		Libraries::remove('test_app');
+		$this->_cleanUp();
 	}
 }
 

@@ -277,23 +277,32 @@ class Entity extends \lithium\core\Object {
 	 * Access the errors of the record.
 	 *
 	 * @see lithium\data\Entity::$_errors
-	 * @param array|string $field If an array, overwrites `$this->_errors`. If a string, and
-	 *        `$value` is not `null`, sets the corresponding key in `$this->_errors` to `$value`.
+	 * @param array|string $field If an array, overwrites `$this->_errors` if it is empty,
+	 *        if not, merges the errors with the current values. If a string, and `$value`
+	 *        is not `null`, sets the corresponding key in `$this->_errors` to `$value`.
+	 *        Setting `$field` to `false` will reset the current state.
 	 * @param string $value Value to set.
 	 * @return mixed Either the `$this->_errors` array, or single value from it.
 	 */
 	public function errors($field = null, $value = null) {
+		if ($field === false) {
+			return ($this->_errors = array());
+		}
 		if ($field === null) {
 			return $this->_errors;
 		}
 		if (is_array($field)) {
-			return ($this->_errors = $field);
+			return ($this->_errors = array_merge_recursive($this->_errors, $field));
 		}
 		if ($value === null && isset($this->_errors[$field])) {
 			return $this->_errors[$field];
 		}
 		if ($value !== null) {
-			return $this->_errors[$field] = $value;
+			if (array_key_exists($field, $this->_errors)) {
+				$current = $this->_errors[$field];
+				return ($this->_errors[$field] = array_merge((array) $current, (array) $value));
+			}
+			return ($this->_errors[$field] = $value);
 		}
 		return $value;
 	}
@@ -318,11 +327,10 @@ class Entity extends \lithium\core\Object {
 	 * @param mixed $id The ID to assign, where applicable.
 	 * @param array $data Any additional generated data assigned to the object by the database.
 	 * @param array $options Method options:
-	 *              - `'materialize'` _boolean_: Determines whether or not the flag should be set
-	 *                that indicates that this entity exists in the data store. Defaults to `true`.
-	 *              - `'dematerialize'` _boolean_: If set to `true`, indicates that this entity has
-	 *                been deleted from the data store and no longer exists. Defaults to `false`.
-	 * @return void
+	 *        - `'materialize'` _boolean_: Determines whether or not the flag should be set
+	 *          that indicates that this entity exists in the data store. Defaults to `true`.
+	 *        - `'dematerialize'` _boolean_: If set to `true`, indicates that this entity has
+	 *          been deleted from the data store and no longer exists. Defaults to `false`.
 	 */
 	public function sync($id = null, array $data = array(), array $options = array()) {
 		$defaults = array('materialize' => true, 'dematerialize' => false);
@@ -350,7 +358,7 @@ class Entity extends \lithium\core\Object {
 	 *
 	 * @param string $field The name of the field to be incremented.
 	 * @param string $value The value to increment the field by. Defaults to `1` if this parameter
-	 *               is not specified.
+	 *        is not specified.
 	 * @return integer Returns the current value of `$field`, based on the value retrieved from the
 	 *         data source when the entity was loaded, plus any increments applied. Note that it may
 	 *         not reflect the most current value in the persistent backend data source.
@@ -386,8 +394,8 @@ class Entity extends \lithium\core\Object {
 	 *
 	 * @param string The field name to check its state.
 	 * @return mixed Returns `true` if a field is given and was updated, `false` otherwise and
-	 *		   `null` if the field was not set at all. If no field is given returns an arra
-	 *		   where the keys are entity field names, and the values are `true` for changed
+	 *         `null` if the field was not set at all. If no field is given returns an arra
+	 *         where the keys are entity field names, and the values are `true` for changed
 	 *         fields.
 	 */
 	public function modified($field = null) {
@@ -446,7 +454,6 @@ class Entity extends \lithium\core\Object {
 	 *
 	 * @param object $parent
 	 * @param array $config
-	 * @return void
 	 */
 	public function assignTo($parent, array $config = array()) {
 		foreach ($config as $key => $val) {

@@ -221,11 +221,11 @@ class ObjectTest extends \lithium\test\Unit {
 			return false;
 		});
 
-		$this->assertIdentical(false, $obj->method2());
+		$this->assertFalse($obj->method2());
 
 		$obj->applyFilter('method2', false);
 
-		$this->assertTrue($obj->method2() !== false);
+		$this->assertNotIdentical($obj->method2(), false);
 	}
 
 	public function testResetMultipleFilters() {
@@ -235,13 +235,13 @@ class ObjectTest extends \lithium\test\Unit {
 			return false;
 		});
 
-		$this->assertIdentical(false, $obj->method2());
-		$this->assertIdentical(false, $obj->manual(array()));
+		$this->assertFalse($obj->method2());
+		$this->assertFalse($obj->manual(array()));
 
 		$obj->applyFilter('method2', false);
 
-		$this->assertTrue($obj->method2() !== false);
-		$this->assertIdentical(false, $obj->manual(array()));
+		$this->assertNotIdentical($obj->method2(), false);
+		$this->assertFalse($obj->manual(array()));
 	}
 
 	public function testResetClass() {
@@ -251,13 +251,13 @@ class ObjectTest extends \lithium\test\Unit {
 			return false;
 		});
 
-		$this->assertIdentical(false, $obj->method2());
-		$this->assertIdentical(false, $obj->manual(array()));
+		$this->assertFalse($obj->method2());
+		$this->assertFalse($obj->manual(array()));
 
 		$obj->applyFilter(false);
 
-		$this->assertTrue($obj->method2() !== false);
-		$this->assertTrue($obj->manual(array()) !== false);
+		$this->assertNotIdentical($obj->method2(), false);
+		$this->assertNotIdentical($obj->manual(array()), false);
 	}
 
 	public function testRespondsTo() {

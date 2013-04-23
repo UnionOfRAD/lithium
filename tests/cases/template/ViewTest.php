@@ -8,7 +8,6 @@
 
 namespace lithium\tests\cases\template;
 
-use Closure;
 use lithium\core\Libraries;
 use lithium\template\View;
 use lithium\action\Response;
@@ -137,41 +136,39 @@ class ViewTest extends \lithium\test\Unit {
 		));
 		$options = array(
 			'template' => 'testFile',
-			'library' => LITHIUM_LIBRARY_PATH . '/lithium'
+			'library' => Libraries::get('lithium', 'path')
 		);
 		$result = $view->render('all', array(), $options);
 		$expected = 'This is a test.';
 		$this->assertEqual($expected, $result);
 
 		$templateData = TestRenderer::$templateData;
-		$expectedPath = LITHIUM_LIBRARY_PATH;
-		$expectedPath .= '/lithium/tests/mocks/template/view/adapters/testFile.html.php';
-		$expected = array (array (
-				'type' => 'template',
-				'params' => array (
-					'template' => 'testFile',
-					'library' => LITHIUM_LIBRARY_PATH . '/lithium',
-					'type' => 'html'
-				),
-				'return' => $expectedPath
-			));
+		$expectedPath = Libraries::get('lithium', 'path');
+		$expectedPath .= '/tests/mocks/template/view/adapters/testFile.html.php';
+		$expected = array(array(
+			'type' => 'template',
+			'params' => array(
+				'template' => 'testFile',
+				'library' => Libraries::get('lithium', 'path'),
+				'type' => 'html'
+			),
+			'return' => $expectedPath
+		));
 		$this->assertEqual($expected, $templateData);
 
 		$renderData = TestRenderer::$renderData;
-		$expected = array (
-			  array (
-				'template' => $expectedPath,
-				'data' => array (),
-				'options' => array (
-					'template' => 'testFile',
-					'library' => $options['library'],
-					'type' => 'html',
-					'layout' => null,
-					'context' => array()
-				)
-			  )
-			);
-		$this->assertTrue($renderData[0]['data']['h'] instanceof Closure);
+		$expected = array(array(
+			'template' => $expectedPath,
+			'data' => array(),
+			'options' => array(
+				'template' => 'testFile',
+				'library' => $options['library'],
+				'type' => 'html',
+				'layout' => null,
+				'context' => array()
+			)
+		));
+		$this->assertInstanceOf('Closure', $renderData[0]['data']['h']);
 		unset($renderData[0]['data']['h']);
 		$this->assertEqual($expected, $renderData);
 	}
@@ -217,6 +214,63 @@ class ViewTest extends \lithium\test\Unit {
 		$this->assertIdentical('test_app', $result);
 
 		Libraries::remove('test_app');
+		$this->_cleanUp();
+	}
+
+	public function testContextWithElementRenderingOptions() {
+		$tmpDir = realpath(Libraries::get(true, 'resources') . '/tmp');
+		$this->skipIf(!is_writable($tmpDir), "Can't write to resources directory.");
+
+		$testApp = $tmpDir . '/tests/test_app';
+		$viewDir = $testApp . '/views';
+		mkdir($viewDir . '/elements', 0777, true);
+		Libraries::add('test_app', array('path' => $testApp));
+
+		$testApp2 = $tmpDir . '/tests/test_app2';
+		$viewDir2 = $testApp2 . '/views';
+		mkdir($viewDir2 . '/elements', 0777, true);
+		Libraries::add('test_app2', array('path' => $testApp2));
+
+		$body = "<?php ";
+		$body .= "echo \$this->_render('element', 'element2', array(), ";
+		$body .= "array('library' => 'test_app2'));";
+		$body .= "echo \$this->_render('element', 'element1');";
+		$body .= "?>";
+
+		file_put_contents($viewDir . '/template.html.php', $body);
+		file_put_contents($viewDir . '/elements/element1.html.php', 'element1');
+		file_put_contents($viewDir2 . '/elements/element2.html.php', 'element2');
+
+		$view = new View(array(
+			'compile' => false,
+			'paths' => array(
+				'template' => '{:library}/views/{:template}.html.php',
+				'element'  => '{:library}/views/elements/{:template}.html.php',
+				'layout'   => false
+			)
+		));
+
+		$options = array(
+			'template' => 'template',
+			'library' => 'test_app'
+		);
+
+		$result = $view->render('all', array(), $options);
+		$this->assertIdentical('element2element1', $result);
+
+		$body = "<?php ";
+		$body .= "echo \$this->_render('element', 'element1');";
+		$body .= "echo \$this->_render('element', 'element2', array(), ";
+		$body .= "array('library' => 'test_app2'));";
+		$body .= "?>";
+
+		file_put_contents($viewDir . '/template.html.php', $body);
+
+		$result = $view->render('all', array(), $options);
+		$this->assertIdentical('element1element2', $result);
+
+		Libraries::remove('test_app');
+		Libraries::remove('test_app2');
 		$this->_cleanUp();
 	}
 }

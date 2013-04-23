@@ -24,7 +24,7 @@ Lithium integrates the latest storage technologies, including MongoDB, CouchDB a
 
 Lithium gives you full control over your application, from filters to dynamically modify framework internals, to dynamic dependencies to extend and replace core classes with application or plugin classes, to heavy use of adapter-oriented configurations, to make it seamless to move between different technologies and options.
 
-Every component of the Lithium framework stack is replaceable through the robust plugin architecture. Swap out the default ORM / ODM implementation for [Doctrine 2](https://github.com/mariano/li3_doctrine2/) or [PHP ActiveRecord](https://github.com/greut/li3_activerecord). Don't like the templating? Use [ Twig](https://github.com/nervetattoo/li3_twig), [ Mustache](https://github.com/bruensicke/li3_mustache), or roll your own.
+Every component of the Lithium framework stack is replaceable through the robust plugin architecture. Swap out the default ORM / ODM implementation for [Doctrine 2](https://github.com/mariano/li3_doctrine2/) or [PHP ActiveRecord](https://github.com/greut/li3_activerecord). Don't like the templating? Use [Twig](https://github.com/UnionOfRAD/li3_twig), [Mustache](https://github.com/bruensicke/li3_mustache), or roll your own.
 
 If you don't even need to write a full application, build a micro-app in a single file using the routing system, without giving up the maintainability of the framework's structure.
 

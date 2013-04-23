@@ -13,13 +13,11 @@ use lithium\core\Libraries;
 use lithium\util\Collection;
 use lithium\tests\cases\data\ModelTest;
 use lithium\tests\cases\core\ObjectTest;
-use lithium\tests\cases\g11n\CatalogTest;
-use lithium\tests\mocks\test\MockUnitTest;
 use lithium\tests\mocks\test\cases\MockTest;
-use lithium\tests\mocks\test\cases\MockTestErrorHandling;
-use lithium\tests\mocks\test\cases\MockSkipThrowsException;
-use lithium\tests\mocks\test\cases\MockSetUpThrowsException;
-use lithium\tests\mocks\test\cases\MockTearDownThrowsException;
+use lithium\tests\mocks\test\cases\MockErrorHandlingTest;
+use lithium\tests\mocks\test\cases\MockSkipThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockSetUpThrowsExceptionTest;
+use lithium\tests\mocks\test\cases\MockTearDownThrowsExceptionTest;
 
 class GroupTest extends \lithium\test\Unit {
 
@@ -32,15 +30,15 @@ class GroupTest extends \lithium\test\Unit {
 	}
 
 	public function testAddCaseThroughConstructor() {
-		$data = (array) "\lithium\\tests\mocks\\test";
+		$data = (array) 'lithium\tests\mocks\test';
 		$group = new Group(compact('data'));
 
 		$expected = new Collection(array('data' => array(
-			new MockSetUpThrowsException(),
-			new MockSkipThrowsException(),
-			new MockTearDownThrowsException(),
-			new MockTest(),
-			new MockTestErrorHandling()
+			new MockErrorHandlingTest(),
+			new MockSetUpThrowsExceptionTest(),
+			new MockSkipThrowsExceptionTest(),
+			new MockTearDownThrowsExceptionTest(),
+			new MockTest()
 		)));
 		$result = $group->tests();
 
@@ -52,7 +50,7 @@ class GroupTest extends \lithium\test\Unit {
 		$group->add('');
 		$group->add('\\');
 		$group->add('foobar');
-		$this->assertFalse($group->items());
+		$this->assertEmpty($group->items());
 	}
 
 	public function testAddByString() {
@@ -111,10 +109,10 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$results = $group->tests();
-		$this->assertTrue($results instanceof Collection);
+		$this->assertInstanceOf('lithium\util\Collection', $results);
 
 		$results = $group->tests();
-		$this->assertTrue($results->current() instanceof CatalogTest);
+		$this->assertInstanceOf('lithium\tests\cases\g11n\CatalogTest', $results->current());
 	}
 
 	public function testAddEmptyTestsRun() {
@@ -124,8 +122,8 @@ class GroupTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$results = $group->tests();
-		$this->assertTrue($results instanceof Collection);
-		$this->assertTrue($results->current() instanceof MockUnitTest);
+		$this->assertInstanceOf('lithium\util\Collection', $results);
+		$this->assertInstanceOf('lithium\tests\mocks\test\MockUnitTest', $results->current());
 
 		$results = $group->tests()->run();
 
@@ -160,7 +158,7 @@ class GroupTest extends \lithium\test\Unit {
 
 		mkdir($testApp . '/tests/cases/models', 0777, true);
 		file_put_contents($testApp . '/tests/cases/models/UserTest.php',
-		"<?php namespace test_app\\tests\\cases\\models;\n
+			"<?php namespace test_app\\tests\\cases\\models;\n
 			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
 				\$this->assertTrue(true);
 			}}"
@@ -190,16 +188,16 @@ class GroupTest extends \lithium\test\Unit {
 
 		mkdir($testApp . '/tests/cases/models', 0777, true);
 		file_put_contents($testApp . '/tests/cases/models/UserTest.php',
-		"<?php namespace test_app\\tests\\cases\\models;\n
+			"<?php namespace test_app\\tests\\cases\\models;\n
 			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
 				\$this->assertTrue(true);
 			}}"
 		);
 		Libraries::cache(false);
 
-		$expected = array('test_app\\tests\\cases\\models\\UserTest');
+		$expected = array('test_app\tests\cases\models\UserTest');
 		$result = Group::all(array('library' => 'test_app'));
-	    $this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result);
 
 		Libraries::cache(false);
 		$this->_cleanUp();
@@ -212,22 +210,22 @@ class GroupTest extends \lithium\test\Unit {
 
 		mkdir($testApp . '/tests/cases/models', 0777, true);
 		file_put_contents($testApp . '/tests/cases/models/UserTest.php',
-		"<?php namespace test_app\\tests\\cases\\models;\n
+			"<?php namespace test_app\\tests\\cases\\models;\n
 			class UserTest extends \\lithium\\test\\Unit { public function testMe() {
 				\$this->assertTrue(true);
 			}}"
 		);
 		Libraries::cache(false);
 
-		$group = new Group(array('data' => array('\\test_app\\tests\\cases')));
+		$group = new Group(array('data' => array('test_app\tests\cases')));
 
-		$expected = array('test_app\\tests\\cases\\models\\UserTest');
+		$expected = array('test_app\tests\cases\models\UserTest');
 		$result = $group->to('array');
-	    $this->assertEqual($expected, $result);
+		$this->assertEqual($expected, $result);
 
 		$expected = 'pass';
 		$result = $group->tests()->run();
-	    $this->assertEqual($expected, $result[0][0]['result']);
+		$this->assertEqual($expected, $result[0][0]['result']);
 
 		Libraries::cache(false);
 		$this->_cleanUp();

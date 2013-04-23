@@ -140,13 +140,12 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @see lithium\net\http\Media::formats()
 	 * @see lithium\util\Collection::to()
 	 * @param string $format A string representing the name of the format that a `Collection` can
-	 *               be converted to. This corresponds to the `$format` parameter in the `to()`
-	 *               method. Alternatively, the fully-namespaced class name of a format-handler
-	 *               class.
+	 *        be converted to. This corresponds to the `$format` parameter in the `to()` method.
+	 *        Alternatively, the fully-namespaced class name of a format-handler class.
 	 * @param mixed $handler If `$format` is the name of a format string, `$handler` should be the
-	 *              function that handles the conversion, either an anonymous function, or a
-	 *              reference to a method name in `"Class::method"` form. If `$format` is a class
-	 *              name, can be `null`.
+	 *        function that handles the conversion, either an anonymous function, or a
+	 *        reference to a method name in `"Class::method"` form. If `$format` is a class
+	 *        name, can be `null`.
 	 * @return mixed Returns the value of the format handler assigned.
 	 */
 	public static function formats($format, $handler = null) {
@@ -176,11 +175,11 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @param string $method The name of the method to call on each instance in the collection.
 	 * @param array $params The parameters to pass on each method call.
 	 * @param array $options Specifies options for how to run the given method against the object
-	 *              collection. The available options are:
-	 *              - `'collect'`: If `true`, the results of this method call will be returned
-	 *                wrapped in a new `Collection` object or subclass.
-	 *              - `'merge'`: Used primarily if the method being invoked returns an array.  If
-	 *                set to `true`, merges all results arrays into one.
+	 *        collection. The available options are:
+	 *        - `'collect'`: If `true`, the results of this method call will be returned
+	 *          wrapped in a new `Collection` object or subclass.
+	 *        - `'merge'`: Used primarily if the method being invoked returns an array.  If
+	 *          set to `true`, merges all results arrays into one.
 	 * @todo Implement filtering.
 	 * @return mixed Returns either an array of the return values of the methods, or the return
 	 *         values wrapped in a `Collection` instance.
@@ -239,7 +238,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @see lithium\util\Collection::formats()
 	 * @see lithium\util\Collection::$_formats
 	 * @param string $format By default the only supported value is `'array'`. However, additional
-	 *               format handlers can be registered using the `formats()` method.
+	 *        format handlers can be registered using the `formats()` method.
 	 * @param array $options Options for converting this collection:
 	 *        - `'internal'` _boolean_: Indicates whether the current internal representation of the
 	 *          collection should be exported. Defaults to `false`, which uses the standard iterator
@@ -286,10 +285,10 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * @param callback $filter Callback to use for filtering.
 	 * @param array $options The available options are:
-	 *              - `'collect'`: If `true`, the results will be returned wrapped
-	 *              in a new `Collection` object or subclass.
+	 *        - `'collect'`: If `true`, the results will be returned wrapped in a new
+	 *          `Collection` object or subclass.
 	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
-	 * `$options` argument, then an instance of this class will be returned.
+	 *         `$options` argument, then an instance of this class will be returned.
 	 */
 	public function find($filter, array $options = array()) {
 		$defaults = array('collect' => true);
@@ -308,10 +307,10 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * collection and returns the first value.
 	 *
 	 * @see lithium\util\Collection::rewind()
-	 * @param callback $filter A closure through which collection values will be
-	 *                 passed. If the return value of this function is non-empty,
-	 *                 it will be returned as the result of the method call. If `null`, the
-	 *                 collection is rewound (see `rewind()`) and the first item is returned.
+	 * @param callback $filter A closure through which collection values will be passed.
+	 *        If the return value of this function is non-empty, it will be returned as
+	 *        the result of the method call. If `null`, the collection is rewound
+	 *        (see `rewind()`) and the first item is returned.
 	 * @return mixed Returns the first non-empty collection value returned from `$filter`.
 	 */
 	public function first($filter = null) {
@@ -343,10 +342,10 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * @param callback $filter The filter to apply.
 	 * @param array $options The available options are:
-	 *              - `'collect'`: If `true`, the results will be returned wrapped
-	 *              in a new `Collection` object or subclass.
+	 *        - `'collect'`: If `true`, the results will be returned wrapped
+	 *        in a new `Collection` object or subclass.
 	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
-	 * `$options` argument, then an instance of this class will be returned.
+	 *         `$options` argument, then an instance of this class will be returned.
 	 */
 	public function map($filter, array $options = array()) {
 		$defaults = array('collect' => true);
@@ -375,15 +374,15 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Sorts the objects in the collection.
 	 *
 	 * @param callable $sorter The sorter for the data, can either be a sort function like
-	 * natsort or a compare function like strcmp.
+	 *        natsort or a compare function like strcmp.
 	 * @param array $options The available options are:
-	 *              - No options yet implemented
+	 *        - No options yet implemented
 	 * @return $this, useful for chaining this with other methods.
 	 */
 	public function sort($sorter = 'sort', array $options = array()) {
 		if (is_string($sorter) && strpos($sorter, 'sort') !== false && is_callable($sorter)) {
 			call_user_func_array($sorter, array(&$this->_data));
-		} else if (is_callable($sorter)) {
+		} elseif (is_callable($sorter)) {
 			usort($this->_data, $sorter);
 		}
 		return $this;
@@ -427,7 +426,6 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Unsets an offset.
 	 *
 	 * @param string $offset The offset to unset.
-	 * @return void
 	 */
 	public function offsetUnset($offset) {
 		prev($this->_data);
@@ -511,7 +509,6 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Appends an item.
 	 *
 	 * @param mixed $value The item to append.
-	 * @return void
 	 */
 	public function append($value) {
 		is_object($value) ? $this->_data[] =& $value : $this->_data[] = $value;
@@ -541,11 +538,11 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Exports a `Collection` instance to an array. Used by `Collection::to()`.
 	 *
 	 * @param mixed $data Either a `Collection` instance, or an array representing a `Collection`'s
-	 *              internal state.
+	 *        internal state.
 	 * @param array $options Options used when converting `$data` to an array:
-	 *              - `'handlers'` _array_: An array where the keys are fully-namespaced class
-	 *                names, and the values are closures that take an instance of the class as a
-	 *                parameter, and return an array or scalar value that the instance represents.
+	 *        - `'handlers'` _array_: An array where the keys are fully-namespaced class
+	 *        names, and the values are closures that take an instance of the class as a
+	 *        parameter, and return an array or scalar value that the instance represents.
 	 * @return array Returns the value of `$data` as a pure PHP array, recursively converting all
 	 *         sub-objects and other values to their closest array or scalar equivalents.
 	 */

@@ -14,6 +14,7 @@ class ServiceTest extends \lithium\test\Integration {
 
 	public function testStreamGet() {
 		$service = new Service(array(
+			'host' => 'www.google.com',
 			'classes' => array('socket' => 'lithium\net\socket\Stream')
 		));
 		$service->head();
@@ -25,6 +26,7 @@ class ServiceTest extends \lithium\test\Integration {
 
 	public function testContextGet() {
 		$service = new Service(array(
+			'host' => 'www.google.com',
 			'classes' => array('socket' => 'lithium\net\socket\Context')
 		));
 		$service->head();
@@ -36,6 +38,7 @@ class ServiceTest extends \lithium\test\Integration {
 
 	public function testCurlGet() {
 		$service = new Service(array(
+			'host' => 'www.google.com',
 			'classes' => array('socket' => 'lithium\net\socket\Curl')
 		));
 		$service->head();

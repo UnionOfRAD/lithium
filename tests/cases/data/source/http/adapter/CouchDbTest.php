@@ -44,11 +44,11 @@ class CouchDbTest extends \lithium\test\Unit {
 	}
 
 	public function testAllMethodsNoConnection() {
-		$this->assertTrue($this->db->connect());
-		$this->assertTrue($this->db->disconnect());
-		$this->assertFalse($this->db->get());
-		$this->assertFalse($this->db->post());
-		$this->assertFalse($this->db->put());
+		$this->assertNotEmpty($this->db->connect());
+		$this->assertNotEmpty($this->db->disconnect());
+		$this->assertEmpty($this->db->get());
+		$this->assertEmpty($this->db->post());
+		$this->assertEmpty($this->db->put());
 	}
 
 	public function testConnect() {
@@ -73,16 +73,41 @@ class CouchDbTest extends \lithium\test\Unit {
 
 	public function testDescribe() {
 		$couchdb = new CouchDb($this->_testConfig);
-		$this->assertTrue(is_object($couchdb->describe('companies')));
+		$this->assertInternalType('object', $couchdb->describe('companies'));
 	}
 
-	public function testItem() {
+	public function testEntityItem() {
 		$couchdb = new CouchDb($this->_testConfig);
 		$data = array('_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1');
-		$expected = array('id' => 'a1', 'rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1');
+		$expected = array(
+			'id' => 'a1', 'rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
+		);
 
 		$item = $couchdb->item($this->query->model(), $data);
 		$result = $item->data();
+		$this->assertEqual($expected, $result);
+
+		$data = array('author' => 'author 1', 'body' => 'body 1');
+		$expected = array(
+			'author' => 'author 1', 'body' => 'body 1'
+		);
+
+		$item = $couchdb->item($this->query->model(), $data);
+		$result = $item->data();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSetItem() {
+		$couchdb = new CouchDb($this->_testConfig);
+		$expected = array(
+			'id' => 'a1', 'rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1'
+		);
+		$data = array(array(
+			'_id' => 'a1', '_rev' => '1-2', 'author' => 'author 1', 'body' => 'body 1')
+		);
+		$item = $couchdb->item($this->query->model(), $data, array('class' => 'set'));
+		$this->assertCount(1, $item);
+		$result = $item->first()->data();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -122,7 +147,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		$couchdb = new CouchDb($this->_testConfig);
 
 		$result = $couchdb->read($this->query);
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 		$this->assertEqual(array('total_rows' => 3, 'offset' => 0), $result->stats());
 
 		$expected = '/lithium-test/_all_docs';
@@ -139,7 +164,7 @@ class CouchDbTest extends \lithium\test\Unit {
 
 		$this->query->conditions(array('id' => 12345));
 		$result = $couchdb->read($this->query);
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$expected = '/lithium-test/12345';
 		$result = $couchdb->last->request->path;
@@ -151,7 +176,7 @@ class CouchDbTest extends \lithium\test\Unit {
 
 		$this->query->conditions(array('id' => 12345, 'path' => '/lithium-test/12345'));
 		$result = $couchdb->read($this->query);
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 	}
 
 	public function testReadWithViewConditions() {

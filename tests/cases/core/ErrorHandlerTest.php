@@ -43,14 +43,14 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 
 		ErrorHandler::handle(new Exception('Test!'));
 
-		$this->assertEqual(1, count($this->errors));
+		$this->assertCount(1, $this->errors);
 		$result = end($this->errors);
 		$expected = 'Test!';
 		$this->assertEqual($expected, $result['message']);
 
 		$this->expectException('/Test/');
 		trigger_error('Test warning!', E_USER_WARNING);
-		$this->assertEqual(1, count($this->errors));
+		$this->assertCount(1, $this->errors);
 	}
 
 	public function testExceptionSubclassCatching() {
@@ -63,7 +63,7 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		)));
 		ErrorHandler::handle(new UnexpectedValueException('Test subclass'));
 
-		$this->assertEqual(1, count($this->errors));
+		$this->assertCount(1, $this->errors);
 		$result = end($this->errors);
 		$expected = 'Test subclass';
 		$this->assertEqual($expected, $result['message']);
@@ -81,19 +81,19 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		)));
 
 		file_get_contents(false);
-		$this->assertEqual(1, count($this->errors));
+		$this->assertCount(1, $this->errors);
 
 		$result = end($this->errors);
 		$this->assertPattern('/Filename cannot be empty/', $result['message']);
 
 		trigger_error('Test warning', E_USER_WARNING);
-		$this->assertEqual(2, count($this->errors));
+		$this->assertCount(2, $this->errors);
 
 		$result = end($this->errors);
 		$this->assertEqual('Test warning', $result['message']);
 
 		trigger_error('Test notice', E_USER_NOTICE);
-		$this->assertEqual(2, count($this->errors));
+		$this->assertCount(2, $this->errors);
 	}
 
 	public function testApply() {
@@ -135,17 +135,17 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 
 		$defaultChecks = 4;
 		$this->assertEqual($defaultChecks, count($checks));
-		$this->assertTrue($checks['type'] instanceof Closure);
+		$this->assertInstanceOf('Closure', $checks['type']);
 
 		$checks = MockErrorHandler::checks(array('foo' => 'bar'));
-		$this->assertEqual(1, count($checks));
+		$this->assertCount(1, $checks);
 		$this->assertFalse(isset($checks['type']));
 
 		MockErrorHandler::reset();
 
 		$checks = MockErrorHandler::checks();
 		$this->assertEqual($defaultChecks, count($checks));
-		$this->assertTrue($checks['type'] instanceof Closure);
+		$this->assertInstanceOf('Closure', $checks['type']);
 	}
 
 	public function testErrorTrapping() {
@@ -158,9 +158,9 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		));
 		ErrorHandler::run(array('trapErrors' => true));
 
-		$this->assertEqual(0, count($this->errors));
+		$this->assertCount(0, $this->errors);
 		list($foo, $bar) = array('baz');
-		$this->assertEqual(1, count($this->errors));
+		$this->assertCount(1, $this->errors);
 	}
 
 	public function testRenderedOutput() {
@@ -169,7 +169,7 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		$subject = new ErrorHandlerTest();
 		ErrorHandler::apply(array($subject, 'throwException'), array(), function($details) {});
 		$subject->throwException();
-		$this->assertFalse(ob_get_length());
+		$this->assertEmpty(ob_get_length());
 	}
 }
 

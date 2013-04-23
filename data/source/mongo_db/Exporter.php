@@ -13,7 +13,8 @@ use lithium\util\Set;
 class Exporter extends \lithium\core\StaticObject {
 
 	protected static $_classes = array(
-		'set' => 'lithium\data\collection\DocumentSet'
+		'set' => 'lithium\data\collection\DocumentSet',
+		'entity' => 'lithium\data\collection\Document',
 	);
 
 	protected static $_commands = array(
@@ -108,7 +109,7 @@ class Exporter extends \lithium\core\StaticObject {
 
 		foreach ($update as $key => $value) {
 			$original = $export['data'];
-			$isArray = is_object($value) && get_class($value) === static::$_classes['set'];
+			$isArray = is_object($value) && $value instanceof static::$_classes['set'];
 
 			$options = array(
 				'indexed' => null,
@@ -121,11 +122,15 @@ class Exporter extends \lithium\core\StaticObject {
 			if ($isArray) {
 				$newValue = $value->to('array', $options);
 				$originalValue = null;
-				if (isset($original[$key])) {
+				$shouldConvert = (isset($original[$key]) && (
+					$original[$key] instanceof static::$_classes['set'] ||
+					$original[$key] instanceof static::$_classes['entity']
+				));
+				if ($shouldConvert) {
 					$originalValue = $original[$key]->to('array', $options);
 				}
 				if ($newValue !== $originalValue) {
-					$value = $value->to('array', $options);
+					$value = $newValue;
 				}
 			}
 			$result = static::_append($result, "{$path}{$key}", $value, 'update');

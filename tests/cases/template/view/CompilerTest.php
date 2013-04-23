@@ -58,7 +58,7 @@ class CompilerTest extends \lithium\test\Unit {
 
 	public function testTemplateContentRewriting() {
 		$template = Compiler::template("{$this->_path}/{$this->_file}");
-		$this->assertTrue(file_exists($template));
+		$this->assertFileExists($template);
 
 		$expected = array(
 			"<?php echo 'this is unescaped content'; ?" . ">",
@@ -82,7 +82,7 @@ class CompilerTest extends \lithium\test\Unit {
 	public function testFallbackWithNonWritableDirectory() {
 		$this->expectException('/failed to open stream/');
 		$result = Compiler::template("{$this->_path}/{$this->_file}", array(
-			'path' => LITHIUM_APP_PATH . '/foo',
+			'path' => Libraries::get(true, 'path') . '/foo',
 			'fallback' => true
 		));
 		$this->assertEqual("{$this->_path}/{$this->_file}", $result);
@@ -90,7 +90,7 @@ class CompilerTest extends \lithium\test\Unit {
 		$this->expectException('/Could not write compiled template/');
 		$this->expectException('/failed to open stream/');
 		$result = Compiler::template("{$this->_path}/{$this->_file}", array(
-			'path' => LITHIUM_APP_PATH . '/foo',
+			'path' => Libraries::get(true, 'path') . '/foo',
 			'fallback' => false
 		));
 	}

@@ -41,8 +41,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	/**
 	 * Initializer.  Checks if the configured path exists.
 	 *
-	 * @return void
-	 * @throws \Exception
+	 * @throws lithium\core\ConfigException
 	 */
 	protected function _init() {
 		parent::_init();
@@ -59,7 +58,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
 	 * @return array Returns the message template. If the scope is not equal to the current scope
-	 * or `$category` is not `'messageTemplate'` null is returned.
+	 *         or `$category` is not `'messageTemplate'` null is returned.
 	 */
 	public function read($category, $locale, $scope) {
 		if ($scope !== $this->_config['scope']) {

@@ -79,7 +79,7 @@ class RecordSetTest extends \lithium\test\Unit {
 
 	public function testInit() {
 		$recordSet = new MockRecordSet();
-		$this->assertTrue($recordSet instanceof RecordSet);
+		$this->assertInstanceOf('lithium\data\collection\RecordSet', $recordSet);
 
 		$recordSet = new MockRecordSet(array(
 			'model'  => $this->_model,
@@ -98,14 +98,14 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->assertTrue($this->_recordSet->offsetExists(3));
 		$this->assertTrue($this->_recordSet->offsetExists(4));
 
-		$this->assertTrue(isset($this->_recordSet[3]));
+		$this->assertArrayHasKey(3, $this->_recordSet);
 
 		$this->assertFalse($this->_objectRecordSet->offsetExists(0));
 		$this->assertTrue($this->_objectRecordSet->offsetExists(1));
 		$this->assertTrue($this->_objectRecordSet->offsetExists(2));
 		$this->assertTrue($this->_objectRecordSet->offsetExists(3));
 		$this->assertTrue($this->_objectRecordSet->offsetExists(4));
-		$this->assertTrue(isset($this->_objectRecordSet[3]));
+		$this->assertArrayHasKey(3, $this->_objectRecordSet);
 	}
 
 	public function testOffsetGet() {
@@ -199,14 +199,14 @@ class RecordSetTest extends \lithium\test\Unit {
 	}
 
 	public function testOffsetSet() {
-		$this->assertEqual(0, count($this->_recordSet->get('_data')));
+		$this->assertCount(0, $this->_recordSet->get('_data'));
 		$this->_recordSet[5] = $expected = array('id' => 5, 'data' => 'data5');
 		$this->assertEqual($expected, $this->_recordSet[5]->to('array'));
-		$this->assertEqual(5, count($this->_recordSet->get('_data')));
+		$this->assertCount(5, $this->_recordSet->get('_data'));
 
 		$this->_recordSet[] = $expected = array('id' => 6, 'data' => 'data6');
 		$this->assertEqual($expected, $this->_recordSet[6]->to('array'));
-		$this->assertEqual(6, count($this->_recordSet->get('_data')));
+		$this->assertCount(6, $this->_recordSet->get('_data'));
 
 		$this->_objectRecordSet[5] = $expected = new MockPostObject(array(
 			'id' => 5, 'data' => 'data5'
@@ -307,7 +307,6 @@ class RecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual($this->_records[1], $this->_recordSet->next()->to('array'));
 		$this->assertEqual($this->_records[1], $this->_recordSet->current()->to('array'));
 
-
 		$this->assertEqual($this->_records[0], $this->_recordSet->rewind()->to('array'));
 		$this->assertEqual($this->_records[1], $this->_recordSet->next()->to('array'));
 		$this->assertEqual($this->_records[1], $this->_recordSet->current()->to('array'));
@@ -327,7 +326,6 @@ class RecordSetTest extends \lithium\test\Unit {
 		$result = $this->_objectRecordSet->current();
 		$this->assertEqual($this->_objectRecordSet[2]->id, $result->id);
 		$this->assertEqual($this->_objectRecordSet[2]->data, $result->data);
-
 
 		$result = $this->_objectRecordSet->rewind();
 		$this->assertEqual($this->_objectRecordSet[1]->id, $result->id);
@@ -522,7 +520,7 @@ class RecordSetTest extends \lithium\test\Unit {
 			)
 		);
 		$posts = new MockRecordSet(array('data' => $expected));
-		$this->assertEqual(3, count($posts->get('_data')));
+		$this->assertCount(3, $posts->get('_data'));
 
 		$this->assertEqual($expected['post1'], $posts->first());
 		$this->assertEqual($expected['post1'], $posts->current());
@@ -539,7 +537,7 @@ class RecordSetTest extends \lithium\test\Unit {
 
 		$posts = new MockRecordSet();
 		$posts->set($expected);
-		$this->assertEqual(3, count($posts->get('_data')));
+		$this->assertCount(3, $posts->get('_data'));
 
 		$this->assertEqual($expected['post1'], $posts->first());
 		$this->assertEqual($expected['post1'], $posts->current());
@@ -630,7 +628,6 @@ class RecordSetTest extends \lithium\test\Unit {
 		}
 		$this->assertEqual(4, $i);
 
-
 		$records = array(
 			array(false),
 			array('id' => 1, 'data' => 'data1'),
@@ -693,7 +690,7 @@ class RecordSetTest extends \lithium\test\Unit {
 			}
 		}
 
-		$this->assertEqual(3, count($recordSet));
+		$this->assertCount(3, $recordSet);
 
 		$expected = array(
 			2 => array('id' => 2, 'data' => 'data2'),

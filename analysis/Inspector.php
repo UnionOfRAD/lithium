@@ -22,7 +22,7 @@ use lithium\core\Libraries;
  * can be used to gather information about any PHP source file for purposes of
  * test metrics or static analysis.
  */
-class Inspector extends \lithium\core\StaticObject {
+class Inspector {
 
 	/**
 	 * classes used
@@ -58,10 +58,7 @@ class Inspector extends \lithium\core\StaticObject {
 	 */
 	public static function isCallable($object, $method, $internal = false) {
 		$methodExists = method_exists($object, $method);
-		$callable = function($object, $method) {
-			return is_callable(array($object, $method));
-		};
-		return $internal ? $methodExists : $methodExists && $callable($object, $method);
+		return $internal ? $methodExists : $methodExists && is_callable(array($object, $method));
 	}
 
 	/**
@@ -140,8 +137,8 @@ class Inspector extends \lithium\core\StaticObject {
 			if (method_exists($inspector, static::$_methodMap[$key])) {
 				$setAccess = (
 					($type === 'method' || $type === 'property') &&
-					array_intersect($result['modifiers'], array('private', 'protected')) != array()
-					&& method_exists($inspector, 'setAccessible')
+					array_intersect($result['modifiers'], array('private', 'protected')) !== array() &&
+					method_exists($inspector, 'setAccessible')
 				);
 
 				if ($setAccess) {
@@ -286,7 +283,7 @@ class Inspector extends \lithium\core\StaticObject {
 			case null:
 				return $methods;
 			case 'extents':
-				if ($methods->getName() == array()) {
+				if ($methods->getName() === array()) {
 					return array();
 				}
 
@@ -342,7 +339,7 @@ class Inspector extends \lithium\core\StaticObject {
 			$class = __CLASS__;
 			$modifiers = array_values($class::invokeMethod('_modifiers', array($item)));
 			$setAccess = (
-				array_intersect($modifiers, array('private', 'protected')) != array()
+				array_intersect($modifiers, array('private', 'protected')) !== array()
 			);
 			if ($setAccess) {
 				$item->setAccessible(true);
@@ -585,6 +582,35 @@ class Inspector extends \lithium\core\StaticObject {
 			return (method_exists($inspector, $method) && $inspector->{$method}());
 		});
 	}
+
+	/**
+	 * Returns an instance of a class with given `config`. The `name` could be a key from the
+	 * `classes` array, a fully namespaced class name, or an object. Typically this method is used
+	 * in `_init` to create the dependencies used in the current class.
+	 *
+	 * @param string|object $name A `classes` key or fully-namespaced class name.
+	 * @param array $options The configuration passed to the constructor.
+	 * @return object
+	 */
+	protected static function _instance($name, array $options = array()) {
+		if (is_string($name) && isset(static::$_classes[$name])) {
+			$name = static::$_classes[$name];
+		}
+		return Libraries::instance(null, $name, $options);
+	}
+
+	/**
+	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
+	 * `forward_static_call_array()`.
+	 *
+	 * @param string $method Name of the method to call.
+	 * @param array $params Parameter list to use when calling `$method`.
+	 * @return mixed Returns the result of the method call.
+	 */
+	public static function invokeMethod($method, $params = array()) {
+		return forward_static_call_array(array(get_called_class(), $method), $params);
+	}
+
 }
 
 ?>

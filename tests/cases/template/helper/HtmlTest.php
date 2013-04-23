@@ -48,9 +48,12 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function tearDown() {
 		Router::reset();
-
-		foreach ($this->_routes as $route) {
-			Router::connect($route);
+		foreach ($this->_routes as $scope => $routes) {
+			Router::scope($scope, function() use ($routes) {
+				foreach ($routes as $route) {
+					Router::connect($route);
+				}
+			});
 		}
 		unset($this->html);
 	}
@@ -346,10 +349,10 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function testNonInlineScriptsAndStyles() {
 		$result = trim($this->context->scripts());
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = $this->html->script('application', array('inline' => false));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = $this->context->scripts();
 		$this->assertTags($result, array('script' => array(
@@ -357,10 +360,10 @@ class HtmlTest extends \lithium\test\Unit {
 		)));
 
 		$result = trim($this->context->styles());
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = $this->html->style('base', array('inline' => false));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = $this->context->styles();
 		$this->assertTags($result, array('link' => array(
@@ -385,6 +388,66 @@ class HtmlTest extends \lithium\test\Unit {
 		$this->assertNulL($this->html->script(array('foo', 'bar'), array('inline' => false)));
 		$result = $this->context->scripts();
 		$this->assertTags($result, $expected);
+	}
+
+	public function testScopeOption() {
+		$result = array();
+
+		$this->context = new MockRenderer(array(
+			'request' => new Request(array(
+				'base' => '', 'host' => 'foo.local'
+			)),
+			'response' => new Response(),
+			'handlers' => array(
+				'url' => function($url, $ref, array $options = array()) use (&$result) {
+					$result = compact('options');
+				},
+				'path' => function($path, $ref, array $options = array()) use (&$result) {
+					$result = compact('options');
+				}
+			)
+		));
+		$this->html = new Html(array('context' => &$this->context));
+
+		$this->html->link('home', '/home');
+		$this->assertFalse(isset($result['options']['scope']));
+		$this->html->link('home', '/home', array('scope' => 'app'));
+		$this->assertEqual('app', $result['options']['scope']);
+
+		$this->html->link(
+			'RSS Feed',
+			array('controller' => 'posts', 'type' => 'rss'),
+			array('type' => 'rss')
+		);
+		$this->assertFalse(isset($result['options']['scope']));
+		$this->html->link(
+			'RSS Feed',
+			array('controller' => 'posts', 'type' => 'rss'),
+			array('type' => 'rss', 'scope' => 'app')
+		);
+		$this->assertEqual('app', $result['options']['scope']);
+
+		$this->html->script('script.js');
+		$this->assertFalse(isset($result['options']['scope']));
+		$this->html->script('script.js', array('scope' => 'app'));
+		$this->assertEqual('app', $result['options']['scope']);
+
+		$this->html->image('test.gif');
+		$this->assertFalse(isset($result['options']['scope']));
+		$this->html->image('test.gif', array('scope' => 'app'));
+		$this->assertEqual('app', $result['options']['scope']);
+
+		$this->html->style('screen');
+		$this->assertFalse(isset($result['options']['scope']));
+		$this->html->style('screen', array('scope' => 'app'));
+		$this->assertEqual('app', $result['options']['scope']);
+
+		$this->html->link('home', '/home');
+		$this->assertFalse(isset($result['options']['scope']));
+
+		$expected = array('app' => array('domain' => 'bob'));
+		$this->html->link('home', '/home', array('scope' => $expected));
+		$this->assertEqual($expected, $result['options']['scope']);
 	}
 }
 

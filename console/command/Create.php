@@ -19,7 +19,6 @@ use lithium\core\ClassNotFoundException;
  *
  * `li3 create --template=controller Posts`
  * `li3 create --template=model Posts`
- *
  */
 class Create extends \lithium\console\Command {
 
@@ -117,10 +116,10 @@ class Create extends \lithium\console\Command {
 	 */
 	protected function _default($name) {
 		$commands = array(
-			array('model', Inflector::pluralize($name)),
-			array('controller', Inflector::pluralize($name)),
-			array('test', 'model', Inflector::pluralize($name)),
-			array('test', 'controller', Inflector::pluralize($name))
+			array('model', $name),
+			array('controller', $name),
+			array('test', 'model', $name),
+			array('test', 'controller', $name)
 		);
 		foreach ($commands as $args) {
 			$command = $this->template = $this->request->params['command'] = array_shift($args);
@@ -215,13 +214,12 @@ class Create extends \lithium\console\Command {
 		return parent::_instance($name, $config);
 	}
 
-
 	/**
 	 * Save a template with the current params. Writes file to `Create::$path`.
 	 *
 	 * @param array $params
 	 * @return string A result string on success of writing the file. If any errors occur along
-	 * the way such as missing information boolean false is returned.
+	 *         the way such as missing information boolean false is returned.
 	 */
 	protected function _save(array $params = array()) {
 		$defaults = array('namespace' => null, 'class' => null);

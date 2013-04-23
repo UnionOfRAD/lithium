@@ -10,6 +10,7 @@ namespace lithium\tests\cases\security\auth\adapter;
 
 use lithium\tests\mocks\security\auth\adapter\MockHttp;
 use lithium\action\Request;
+use lithium\core\Libraries;
 
 class HttpTest extends \lithium\test\Unit {
 
@@ -24,9 +25,10 @@ class HttpTest extends \lithium\test\Unit {
 	public function testCheckBasicIsFalse() {
 		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($this->request);
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
-		$expected = array('WWW-Authenticate: Basic realm="' . basename(LITHIUM_APP_PATH) . '"');
+		$basic = basename(Libraries::get(true, 'path'));
+		$expected = array('WWW-Authenticate: Basic realm="' . $basic . '"');
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
 	}
@@ -37,7 +39,7 @@ class HttpTest extends \lithium\test\Unit {
 		));
 		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($request);
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$expected = array();
 		$result = $http->headers;
@@ -63,7 +65,7 @@ class HttpTest extends \lithium\test\Unit {
 		$request = new Request(array('env' => array('PHP_AUTH_DIGEST' => $digest)));
 		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($request);
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$expected = array();
 		$result = $http->headers;

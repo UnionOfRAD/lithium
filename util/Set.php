@@ -234,20 +234,20 @@ class Set {
 	 *
 	 * @param array $data An array of data to extract from.
 	 * @param string $path An absolute XPath 2.0 path. Only absolute paths starting with a
-	 *               single slash are supported right now. Implemented selectors:
-	 *               - `'/User/id'`: Similar to the classic {n}.User.id.
-	 *               - `'/User[2]/name'`: Selects the name of the second User.
-	 *               - `'/User[id>2]'`: Selects all Users with an id > 2.
-	 *               - `'/User[id>2][<5]'`: Selects all Users with an id > 2 but < 5.
-	 *               - `'/Post/Comment[author_name=John]/../name'`: Selects the name of
-	 *                 all posts that have at least one comment written by John.
-	 *               - `'/Posts[name]'`: Selects all Posts that have a `'name'` key.
-	 *               - `'/Comment/.[1]'`: Selects the contents of the first comment.
-	 *               - `'/Comment/.[:last]'`: Selects the last comment.
-	 *               - `'/Comment/.[:first]'`: Selects the first comment.
-	 *               - `'/Comment[text=/lithium/i]`': Selects the all comments that have
-	 *                 a text matching the regex `/lithium/i`.
-	 *               - `'/Comment/@*'`: Selects all key names of all comments.
+	 *        single slash are supported right now. Implemented selectors:
+	 *        - `'/User/id'`: Similar to the classic {n}.User.id.
+	 *        - `'/User[2]/name'`: Selects the name of the second User.
+	 *        - `'/User[id>2]'`: Selects all Users with an id > 2.
+	 *        - `'/User[id>2][<5]'`: Selects all Users with an id > 2 but < 5.
+	 *        - `'/Post/Comment[author_name=John]/../name'`: Selects the name of
+	 *          all posts that have at least one comment written by John.
+	 *        - `'/Posts[name]'`: Selects all Posts that have a `'name'` key.
+	 *        - `'/Comment/.[1]'`: Selects the contents of the first comment.
+	 *        - `'/Comment/.[:last]'`: Selects the last comment.
+	 *        - `'/Comment/.[:first]'`: Selects the first comment.
+	 *        - `'/Comment[text=/lithium/i]`': Selects the all comments that have
+	 *          a text matching the regex `/lithium/i`.
+	 *        - `'/Comment/@*'`: Selects all key names of all comments.
 	 * @param array $options Currently only supports `'flatten'` which can be
 	 *              disabled for higher XPath-ness.
 	 * @return array An array of matched items.
@@ -403,8 +403,8 @@ class Set {
 	 *
 	 * @param array $data array to flatten
 	 * @param array $options Available options are:
-	 *              - `'separator'`: String to separate array keys in path (defaults to `'.'`).
-	 *              - `'path'`: Starting point (defaults to null).
+	 *        - `'separator'`: String to separate array keys in path (defaults to `'.'`).
+	 *        - `'path'`: Starting point (defaults to null).
 	 * @return array
 	 */
 	public static function flatten($data, array $options = array()) {
@@ -431,10 +431,10 @@ class Set {
 	 *
 	 * @param array $data The one-dimensional array to expand.
 	 * @param array $options The options used when expanding the array:
-	 *              - `'separator'` _string_: The delimiter to use when separating keys. Defaults
-	 *                to `'.'`.
-	 * @return array Returns a multi-dimensional array expanded from a one dimensional dot-separated
-	 *         array.
+	 *        - `'separator'` _string_: The delimiter to use when separating keys. Defaults
+	 *          to `'.'`.
+	 * @return array Returns a multi-dimensional array expanded from a one dimensional
+	 *         dot-separated array.
 	 */
 	public static function expand(array $data, array $options = array()) {
 		$defaults = array('separator' => '.');
@@ -552,7 +552,7 @@ class Set {
 	 *
 	 * @param array $array The array to check.  If null, the value of the current Set object.
 	 * @return mixed `true` if values are numeric, `false` if not and `null` if the array to
-	 * check is empty.
+	 *               check is empty.
 	 */
 	public static function isNumeric($array = null) {
 		if (empty($array)) {
@@ -622,7 +622,7 @@ class Set {
 			}
 			$val = $data[$key];
 
-			if ($op === '=' && $expected && $expected{0} === '/') {
+			if ($op === '=' && $expected && $expected[0] === '/') {
 				return preg_match($expected, $val);
 			} elseif ($op === '=' && $val != $expected) {
 				return false;

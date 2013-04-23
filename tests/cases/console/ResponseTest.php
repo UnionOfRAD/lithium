@@ -32,8 +32,8 @@ class ResponseTest extends \lithium\test\Unit {
 
 	public function testConstructWithoutConfig() {
 		$response = new Response();
-		$this->assertTrue(is_resource($response->output));
-		$this->assertTrue(is_resource($response->error));
+		$this->assertInternalType('resource', $response->output);
+		$this->assertInternalType('resource', $response->error);
 	}
 
 	public function testConstructWithConfigOutput() {
@@ -44,7 +44,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$response = new Response(array(
 			'output' => $stream
 		));
-		$this->assertTrue(is_resource($response->output));
+		$this->assertInternalType('resource', $response->output);
 		$this->assertEqual($stream, $response->output);
 
 	}
@@ -55,7 +55,7 @@ class ResponseTest extends \lithium\test\Unit {
 
 		$stream = fopen($this->streams['error'], 'w');
 		$response = new Response(array('error' => $stream));
-		$this->assertTrue(is_resource($response->error));
+		$this->assertInternalType('resource', $response->error);
 		$this->assertEqual($stream, $response->error);
 	}
 
@@ -64,8 +64,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$response = new Response(array('output' => fopen($this->streams['output'], 'w+')));
-		$this->assertTrue(is_resource($response->output));
-
+		$this->assertInternalType('resource', $response->output);
 
 		$this->assertEqual(2, $response->output('ok'));
 		$this->assertEqual('ok', file_get_contents($this->streams['output']));
@@ -76,7 +75,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$response = new Response(array('error' => fopen($this->streams['error'], 'w+')));
-		$this->assertTrue(is_resource($response->error));
+		$this->assertInternalType('resource', $response->error);
 		$this->assertEqual(2, $response->error('ok'));
 		$this->assertEqual('ok', file_get_contents($this->streams['error']));
 	}

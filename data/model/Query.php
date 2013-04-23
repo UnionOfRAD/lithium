@@ -83,7 +83,6 @@ class Query extends \lithium\core\Object {
 	 * The query's fields
 	 *
 	 * @see lithium\data\model\Query::fields()
-	 *
 	 * @var array
 	 */
 	protected $_fields = array(0 => array(), 1 => array());
@@ -93,7 +92,6 @@ class Query extends \lithium\core\Object {
 	 * unique aliases
 	 *
 	 * @see lithium\data\model\Query::alias()
-	 *
 	 * @var array
 	 */
 	protected $_alias = array();
@@ -102,7 +100,6 @@ class Query extends \lithium\core\Object {
 	 * Map beetween generated aliases and corresponding relation paths
 	 *
 	 * @see lithium\data\model\Query::alias()
-	 *
 	 * @var array
 	 */
 	protected $_paths = array();
@@ -111,7 +108,6 @@ class Query extends \lithium\core\Object {
 	 * Map beetween generated aliases and corresponding models.
 	 *
 	 * @see lithium\data\model\Query::alias()
-	 *
 	 * @var array
 	 */
 	protected $_models = array();
@@ -128,7 +124,6 @@ class Query extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-
 	protected $_initializers = array(
 		'model', 'entity', 'conditions', 'having', 'group', 'order',
 		'limit', 'offset', 'page', 'data', 'calculate', 'schema', 'comment'
@@ -334,17 +329,17 @@ class Query extends \lithium\core\Object {
 	 *
 	 * Usage:
 	 * {{{
-	 *	// to add a field
-	 *   $query->fields('created');
+	 * // to add a field
+	 * $query->fields('created');
 	 * }}}
 	 * {{{
-	 *	// to add several fields
-	 *   $query->fields(array('title','body','modified'));
+	 * // to add several fields
+	 * $query->fields(array('title','body','modified'));
 	 * }}}
 	 * {{{
-	 *	// to reset fields to none
-	 *   $query->fields(false);
-	 *   // should be followed by a 2nd call to fields with required fields
+	 * // to reset fields to none
+	 * $query->fields(false);
+	 * // should be followed by a 2nd call to fields with required fields
 	 * }}}
 	 *
 	 * @param mixed $fields string, array or `false`
@@ -789,7 +784,7 @@ class Query extends \lithium\core\Object {
 		}
 		$key = $model::key($this->_entity->data());
 
-		if (!$key && $this->_type != "create") {
+		if (!$key && $this->_type !== 'create') {
 			throw new ConfigException('No matching primary key found.');
 		}
 		if (is_array($key)) {
@@ -807,12 +802,10 @@ class Query extends \lithium\core\Object {
 	 * during the export according the export's `mode` option and the query `with` option.
 	 *
 	 * @see lithium\data\model\Query::export()
-	 *
 	 * @param string $relpath a dotted relation path
 	 * @param string $query a query instance
 	 * @return mixed
 	 */
-
 	public function childs($relpath = null, $query = null) {
 		if (!$model = $this->model()) {
 			throw new ConfigException("No binded model.");

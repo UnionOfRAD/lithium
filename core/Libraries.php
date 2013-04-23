@@ -13,6 +13,7 @@ use lithium\util\String;
 use lithium\util\collection\Filters;
 use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
+use Closure;
 
 /**
  * Manages all aspects of class and file location, naming and mapping. Implements auto-loading for
@@ -277,6 +278,7 @@ class Libraries {
 	 */
 	public static function add($name, array $config = array()) {
 		$defaults = array(
+			'name' => $name,
 			'path' => null,
 			'prefix' => $name . "\\",
 			'suffix' => '.php',
@@ -398,7 +400,6 @@ class Libraries {
 	 *
 	 * @param mixed $name A string or array of library names indicating the libraries you wish to
 	 *        remove, i.e. `'app'` or `'lithium'`. This can also be used to unload plugins by  name.
-	 * @return void
 	 */
 	public static function remove($name) {
 		foreach ((array) $name as $library) {
@@ -418,7 +419,6 @@ class Libraries {
 	 * @param mixed $library The name of a library added to the application with `Libraries::add()`,
 	 *              or `true` to search all libraries.
 	 * @param array $options The options this method accepts:
-	 *
 	 *              - `'path'` _string_: A physical filesystem path relative to the directory of the
 	 *                library being searched. If provided, only the classes or namespaces within
 	 *                this path will be returned.
@@ -714,7 +714,7 @@ class Libraries {
 	 *
 	 * @see lithium\util\collection\Filters
 	 * @param string $method The name of the method to apply the closure to.
-	 * @param closure $filter The closure that is used to filter the method.
+	 * @param Closure $filter The closure that is used to filter the method.
 	 * @return void
 	 */
 	public static function applyFilter($method, $filter = null) {

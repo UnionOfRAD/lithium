@@ -13,10 +13,6 @@ use lithium\storage\session\adapter\Memory;
 use lithium\tests\mocks\storage\session\adapter\SessionStorageConditional;
 use lithium\tests\mocks\storage\session\strategy\MockEncrypt;
 
-/**
- *
- * @todo Refactor this to get rid of the very integration-style tests.
- */
 class SessionTest extends \lithium\test\Unit {
 
 	public function setUp() {
@@ -56,7 +52,7 @@ class SessionTest extends \lithium\test\Unit {
 
 		Session::reset();
 		$this->assertNull(Session::read('key'));
-		$this->assertIdentical(false, Session::write('key', 'value'));
+		$this->assertFalse(Session::write('key', 'value'));
 	}
 
 	public function testNamedConfigurationReadWrite() {
@@ -78,7 +74,7 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertEqual($result, 'value');
 
 		$result = Session::read('key', array('name' => 'store2'));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	public function testSessionConfigReset() {
@@ -86,9 +82,9 @@ class SessionTest extends \lithium\test\Unit {
 		$this->assertEqual(Session::read('key'), 'value');
 
 		Session::reset();
-		$this->assertFalse(Session::config());
+		$this->assertEmpty(Session::config());
 
-		$this->assertFalse(Session::read('key'));
+		$this->assertEmpty(Session::read('key'));
 		$this->assertFalse(Session::write('key', 'value'));
 	}
 
@@ -166,10 +162,7 @@ class SessionTest extends \lithium\test\Unit {
 	/**
 	 * Tests querying session keys from the primary adapter.
 	 * The memory adapter returns a UUID.
-	 *
-	 * @return void
 	 */
-
 	public function testKey() {
 		$result = Session::key();
 		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/";
@@ -182,7 +175,7 @@ class SessionTest extends \lithium\test\Unit {
 		));
 		$this->assertTrue(Session::write('key', 'value'));
 		$this->assertEqual(Session::read('key'), 'value');
-		$this->assertFalse(Session::read('key', array('fail' => true)));
+		$this->assertEmpty(Session::read('key', array('fail' => true)));
 	}
 
 	public function testSessionState() {
@@ -295,7 +288,7 @@ class SessionTest extends \lithium\test\Unit {
 		$encrypted = Session::read('test', array('strategies' => false));
 
 		$this->assertNotEqual($value, $encrypted);
-		$this->assertTrue(is_string($encrypted));
+		$this->assertInternalType('string', $encrypted);
 
 		$result = Session::read('test');
 		$this->assertEqual($value, $result);

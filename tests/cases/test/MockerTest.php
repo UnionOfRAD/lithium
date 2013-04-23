@@ -9,6 +9,8 @@
 namespace lithium\tests\cases\test;
 
 use lithium\test\Mocker;
+use lithium\data\entity\document\Mock as Document;
+use lithium\tests\mocks\data\mockPost\Mock as MockPost;
 
 /**
  * WARNING:
@@ -18,6 +20,10 @@ class MockerTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		Mocker::register();
+	}
+
+	public function tearDown() {
+		Mocker::applyFilter(false);
 	}
 
 	public function testAutoloadRegister() {
@@ -36,15 +42,39 @@ class MockerTest extends \lithium\test\Unit {
 	}
 
 	public function testBasicCreationExtendsCorrectParent() {
-		$mocker = 'lithium\console\Request';
 		$mockeeObj = new \lithium\console\request\Mock();
-		$this->assertTrue(is_a($mockeeObj, $mocker));
+		$this->assertInstanceOf('lithium\console\Request', $mockeeObj);
 	}
 
-	public function testCannotMockNonLithiumClasses() {
+	public function testCanMockNonLithiumClasses() {
 		$mockee = 'stdClass\Mock';
 		Mocker::create($mockee);
-		$this->assertTrue(!class_exists($mockee));
+		$this->assertTrue(class_exists($mockee));
+	}
+
+	public function testNonLithiumInstanceClass() {
+		$std = new \lithium\tests\mocks\test\mockNonLi3StdClass\Mock;
+
+		$this->assertInternalType('bool', $std->method1());
+
+		$std->applyFilter('method1', function($self, $params, $chain) {
+			return array();
+		});
+
+		$this->assertInternalType('array', $std->method1());
+	}
+
+	public function testNonLithiumStaticClass() {
+		$class = 'lithium\analysis\debugger\Mock';
+		$var = array('foo', 'bar', 'baz');
+
+		$this->assertInternalType('string', $class::export($var));
+
+		$class::applyFilter('export', function($self, $params, $chain) {
+			return array();
+		});
+
+		$this->assertInternalType('array', $class::export($var));
 	}
 
 	public function testCannotCreateNonStandardMockClass() {
@@ -64,7 +94,7 @@ class MockerTest extends \lithium\test\Unit {
 
 		$filteredResult = $dispatcher->config(array());
 
-		$this->assertEqual(0, count($filteredResult));
+		$this->assertCount(0, $filteredResult);
 		$this->assertNotEqual($filteredResult, $originalResult);
 	}
 
@@ -95,20 +125,20 @@ class MockerTest extends \lithium\test\Unit {
 
 		$filteredResult = $mockee::tokenize($code, array('wrap' => true));
 
-		$this->assertEqual(0, count($filteredResult));
+		$this->assertCount(0, $filteredResult);
 		$this->assertNotEqual($filteredResult, $originalResult);
 	}
 
 	public function testFilteringStaticClassCanReturnOriginal() {
-		$mockee = 'lithium\analysis\inspector\Mock';
+		$mockee = 'lithium\analysis\debugger\Mock';
 
-		$originalResult = $mockee::methods('lithium\analysis\Inspector');
+		$originalResult = $mockee::export(array('foo', 'bar', 'baz'));
 
-		$mockee::applyFilter('tokenize', function($self, $params, $chain) {
+		$mockee::applyFilter('export', function($self, $params, $chain) {
 			return $chain->next($self, $params, $chain);
 		});
 
-		$filteredResult = $mockee::methods('lithium\analysis\Inspector');
+		$filteredResult = $mockee::export(array('foo', 'bar', 'baz'));
 
 		$this->assertEqual($filteredResult, $originalResult);
 	}
@@ -116,11 +146,11 @@ class MockerTest extends \lithium\test\Unit {
 	public function testOriginalMethodNotCalled() {
 		$http = new \lithium\tests\mocks\security\auth\adapter\mockHttp\Mock;
 
-		$this->assertEqual(0, count($http->headers));
+		$this->assertCount(0, $http->headers);
 
 		$http->_writeHeader('Content-type: text/html');
 
-		$this->assertEqual(1, count($http->headers));
+		$this->assertCount(1, $http->headers);
 
 		$http->applyFilter('_writeHeader', function($self, $params, $chain) {
 			return false;
@@ -128,7 +158,7 @@ class MockerTest extends \lithium\test\Unit {
 
 		$http->_writeHeader('Content-type: application/pdf');
 
-		$this->assertEqual(1, count($http->headers));
+		$this->assertCount(1, $http->headers);
 	}
 
 	public function testFilteringAFilteredMethod() {
@@ -136,7 +166,7 @@ class MockerTest extends \lithium\test\Unit {
 		$adapt::applyFilter('_initAdapter', function($self, $params, $chain) {
 			return false;
 		});
-		$this->assertIdentical(false, $adapt::_initAdapter('foo', array()));
+		$this->assertFalse($adapt::_initAdapter('foo', array()));
 	}
 
 	public function testStaticResults() {
@@ -144,19 +174,19 @@ class MockerTest extends \lithium\test\Unit {
 		$docblock::applyFilter(array('comment', 'tags'), function($self, $params, $chain) {
 			return false;
 		});
-		$docblock::comment('foo', 'foobar');
+		$docblock::comment('foobar');
 		$docblock::comment('bar');
-		$docblock::tags('baz');
+		$docblock::tags('baz', 'foo');
 
-		$this->assertIdentical(2, count($docblock::$results['comment']));
-		$this->assertIdentical(array('foo', 'foobar'), $docblock::$results['comment'][0]['args']);
-		$this->assertIdentical(false, $docblock::$results['comment'][0]['result']);
-		$this->assertIdentical(array('bar'), $docblock::$results['comment'][1]['args']);
-		$this->assertIdentical(false, $docblock::$results['comment'][1]['result']);
+		$this->assertIdentical(2, count($docblock::$staticResults['comment']));
+		$this->assertIdentical(array('foobar'), $docblock::$staticResults['comment'][0]['args']);
+		$this->assertFalse($docblock::$staticResults['comment'][0]['result']);
+		$this->assertIdentical(array('bar'), $docblock::$staticResults['comment'][1]['args']);
+		$this->assertFalse($docblock::$staticResults['comment'][1]['result']);
 
-		$this->assertIdentical(1, count($docblock::$results['tags']));
-		$this->assertIdentical(array('baz'), $docblock::$results['tags'][0]['args']);
-		$this->assertIdentical(false, $docblock::$results['tags'][0]['result']);
+		$this->assertIdentical(1, count($docblock::$staticResults['tags']));
+		$this->assertIdentical(array('baz', 'foo'), $docblock::$staticResults['tags'][0]['args']);
+		$this->assertFalse($docblock::$staticResults['tags'][0]['result']);
 	}
 
 	public function testInstanceResults() {
@@ -170,13 +200,13 @@ class MockerTest extends \lithium\test\Unit {
 
 		$this->assertIdentical(2, count($debugger->results['names']));
 		$this->assertIdentical(array('foo', 'foobar'), $debugger->results['names'][0]['args']);
-		$this->assertIdentical(false, $debugger->results['names'][0]['result']);
+		$this->assertFalse($debugger->results['names'][0]['result']);
 		$this->assertIdentical(array('bar'), $debugger->results['names'][1]['args']);
-		$this->assertIdentical(false, $debugger->results['names'][1]['result']);
+		$this->assertFalse($debugger->results['names'][1]['result']);
 
 		$this->assertIdentical(1, count($debugger->results['meta']));
 		$this->assertIdentical(array('baz'), $debugger->results['meta'][0]['args']);
-		$this->assertIdentical(false, $debugger->results['meta'][0]['result']);
+		$this->assertFalse($debugger->results['meta'][0]['result']);
 	}
 
 	public function testSkipByReference() {
@@ -199,7 +229,226 @@ class MockerTest extends \lithium\test\Unit {
 	}
 
 	public function testChainReturnsMockerChain() {
-		$this->assertTrue(Mocker::chain(new \stdClass) instanceof \lithium\test\MockerChain);
+		$this->assertInstanceOf('lithium\test\MockerChain', Mocker::chain(new \stdClass));
+	}
+
+	public function testMergeWithEmptyArray() {
+		$results = array();
+		$staticResults = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+		);
+
+		$this->assertEqual($staticResults, Mocker::mergeResults($results, $staticResults));
+		$this->assertEqual($staticResults, Mocker::mergeResults($staticResults, $results));
+	}
+
+	public function testMultipleResultsSimple() {
+		$results = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+		);
+		$staticResults = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 0,
+				),
+			),
+		);
+		$expected = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 0,
+				),
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+		);
+		$this->assertEqual($expected, Mocker::mergeResults($results, $staticResults));
+	}
+
+	public function testMultipleResultsComplex() {
+		$results = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+			'method2' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+		);
+		$staticResults = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 0,
+				),
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 200,
+				),
+			),
+		);
+		$expected = array(
+			'method1' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 0,
+				),
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 200,
+				),
+			),
+			'method2' => array(
+				array(
+					'args' => array(),
+					'results' => true,
+					'time' => 100,
+				),
+			),
+		);
+
+		$this->assertEqual($expected, Mocker::mergeResults($results, $staticResults));
+	}
+
+	public function testCreateFunction() {
+		$obj = new \lithium\tests\mocks\test\MockStdClass;
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function($obj) {
+			return 'foo';
+		});
+		$this->assertIdentical('foo', $obj->getClass());
+	}
+
+	public function testCreateFunctionWithByReferenceParam() {
+		Mocker::overwriteFunction('lithium\tests\mocks\test\getmxrr', function($host, &$mxhosts) {
+			$mxhosts = 'foo_bar';
+			return;
+		});
+		$foo = 'baz';
+		\lithium\tests\mocks\test\getmxrr('foo', $foo);
+		$this->assertIdentical('foo_bar', $foo);
+	}
+
+	public function testCallFunctionUsesGlobalFallback() {
+		$result = Mocker::callFunction('foo\bar\baz\get_called_class');
+		$this->assertIdentical('lithium\test\Mocker', $result);
+	}
+
+	public function testMultipleCreateFunction() {
+		$obj = new \lithium\tests\mocks\test\MockStdClass;
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function($obj) {
+			return 'foo';
+		});
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function($obj) {
+			return 'bar';
+		});
+		$this->assertIdentical('bar', $obj->getClass());
+	}
+
+	public function testResetSpecificFunctions() {
+		$obj = new \lithium\tests\mocks\test\MockStdClass;
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function($obj) {
+			return 'baz';
+		});
+		Mocker::overwriteFunction('lithium\tests\mocks\test\is_executable', function($foo) {
+			return 'qux';
+		});
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', false);
+
+		$this->assertIdentical('lithium\tests\mocks\test\MockStdClass', $obj->getClass());
+		$this->assertIdentical('qux', $obj->isExecutable());
+	}
+
+	public function testResetAllFunctions() {
+		$obj = new \lithium\tests\mocks\test\MockStdClass;
+		Mocker::overwriteFunction('lithium\tests\mocks\test\get_class', function($obj) {
+			return 'baz';
+		});
+		Mocker::overwriteFunction('lithium\tests\mocks\test\is_executable', function($foo) {
+			return 'qux';
+		});
+		Mocker::overwriteFunction(false);
+
+		$this->assertIdentical('lithium\tests\mocks\test\MockStdClass', $obj->getClass());
+		$this->assertInternalType('bool', $obj->isExecutable());
+	}
+
+	public function testMagicCallGetStoredResultsWhenCalled() {
+		$obj = new \lithium\tests\mocks\test\mockStdClass\Mock;
+
+		$obj->__call('foo', array());
+		$results = Mocker::mergeResults($obj->results, $obj::$staticResults);
+
+		$this->assertArrayHasKey('__call', $results);
+		$this->assertArrayNotHasKey('__callStatic', $results);
+	}
+
+	public function testMagicCallStaticGetStoredResultsWhenCalled() {
+		$obj = new \lithium\tests\mocks\test\mockStdClass\Mock;
+
+		$obj->__callStatic('foo', array());
+		$results = Mocker::mergeResults($obj->results, $obj::$staticResults);
+
+		$this->assertArrayHasKey('__callStatic', $results);
+		$this->assertArrayNotHasKey('__call', $results);
+	}
+
+	public function testMagicCallGetStoredResultsWhenCalledIndirectly() {
+		$obj = new \lithium\tests\mocks\test\mockStdClass\Mock;
+
+		$obj->methodBar();
+		$results = Mocker::mergeResults($obj->results, $obj::$staticResults);
+
+		$this->assertArrayHasKey('__call', $results);
+		$this->assertCount(2, $results['__call']);
+	}
+
+	public function testDoesNotThrowExceptionWhenMockingIterator() {
+		$this->assertNotException('Exception', function() {
+			return new \lithium\util\collection\Mock;
+		});
+	}
+
+	public function testMockDocument() {
+		$document = new Document();
+	}
+
+	public function testMockModel() {
+		$entity = MockPost::create();
 	}
 
 }

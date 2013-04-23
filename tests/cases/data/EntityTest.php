@@ -47,14 +47,14 @@ class EntityTest extends \lithium\test\Unit {
 		$this->assertEqual('foo', $entity->test_field);
 		$this->assertEqual(array('test_me' => 'bar'), $entity->test_relationship);
 
-		$this->assertTrue(isset($entity->test_field));
+		$this->assertFalse(isset($entity->field));
 		$this->assertTrue(isset($entity->test_relationship));
 
-		$this->assertFalse(empty($entity->test_field));
-		$this->assertFalse(empty($entity->test_relationship));
+		$this->assertNotEmpty($entity->test_field);
+		$this->assertNotEmpty($entity->test_relationship);
 
-		$this->assertTrue(empty($entity->test_invisible_field));
-		$this->assertTrue(empty($entity->test_invisible_relationship));
+		$this->assertEmpty($entity->test_invisible_field);
+		$this->assertEmpty($entity->test_invisible_relationship);
 	}
 
 	public function testIncrement() {
@@ -118,6 +118,71 @@ class EntityTest extends \lithium\test\Unit {
 		$entity->errors($errors);
 		$this->assertEqual($errors, $entity->errors());
 		$this->assertEqual('Something bad happened.', $entity->errors('foo'));
+
+		$otherError = array('bar' => 'Something really bad happened.');
+		$errors += $otherError;
+		$entity->errors($otherError);
+		$this->assertEqual($errors, $entity->errors());
+
+		$this->assertCount(2, $entity->errors());
+		$this->assertEqual('Something bad happened.', $entity->errors('foo'));
+		$this->assertEqual('Something really bad happened.', $entity->errors('bar'));
+	}
+
+	public function testResetErrors() {
+		$entity = new Entity();
+		$errors = array(
+			'foo' => 'Something bad happened.',
+			'bar' => 'Something really bad happened.'
+		);
+
+		$entity->errors($errors);
+		$this->assertEqual($errors, $entity->errors());
+
+		$entity->errors(false);
+		$this->assertEmpty($entity->errors());
+	}
+
+	public function testAppendingErrors() {
+		$entity = new Entity();
+		$expected = array(
+			'Something bad happened.',
+			'Something really bad happened.'
+		);
+
+		$entity->errors('foo', $expected[0]);
+		$entity->errors('foo', $expected[1]);
+
+		$this->assertCount(1, $entity->errors());
+		$this->assertEqual($expected, $entity->errors('foo'));
+	}
+
+	public function testAppendingErrorsWithArraySyntax() {
+		$entity = new Entity();
+		$expected = array(
+			'Something bad happened.',
+			'Something really bad happened.'
+		);
+
+		$entity->errors(array('foo' => $expected[0]));
+		$entity->errors(array('foo' => $expected[1]));
+
+		$this->assertCount(1, $entity->errors());
+		$this->assertEqual($expected, $entity->errors('foo'));
+	}
+
+	public function testAppendingErrorsWithMixedSyntax() {
+		$entity = new Entity();
+		$expected = array(
+			'Something bad happened.',
+			'Something really bad happened.'
+		);
+
+		$entity->errors('foo', $expected[0]);
+		$entity->errors(array('foo' => $expected[1]));
+
+		$this->assertCount(1, $entity->errors());
+		$this->assertEqual($expected, $entity->errors('foo'));
 	}
 
 	public function testConversion() {
@@ -141,9 +206,7 @@ class EntityTest extends \lithium\test\Unit {
 		$this->assertTrue($entity->modified('foo'));
 		$this->assertTrue($entity->modified('baz'));
 
-		/**
-		 * and last, checking a non-existing field
-		 */
+		/* and last, checking a non-existing field */
 		$this->assertNull($entity->modified('ole'));
 
 		$subentity = new Entity();
@@ -152,7 +215,7 @@ class EntityTest extends \lithium\test\Unit {
 		$this->assertEqual(array('foo' => true, 'baz' => true, 'ble' => true), $entity->modified());
 
 		$this->assertTrue($entity->ble->modified('foo'));
-		$this->assertFalse($entity->ble->modified('iak'));
+		$this->assertEmpty($entity->ble->modified('iak'));
 		$this->assertEqual($entity->ble->modified(), array('foo' => true, 'baz' => true));
 
 		$data = array('foo' => 'bar', 'baz' => 'dib'); //it's the default data array in the test
@@ -160,16 +223,12 @@ class EntityTest extends \lithium\test\Unit {
 		$entity->set($data);
 		$entity->sync();
 
-		/**
-		 * Checking empty values
-		 */
+		/* Checking empty values */
 		$entity->foo = '';
 		$this->assertTrue($entity->modified('foo'));
 		$this->assertEqual(array('foo' => true, 'baz' => false), $entity->modified());
 
-		/**
-		 * and checking null values
-		 */
+		/* and checking null values */
 		$entity->sync();
 		$entity->foo = null;
 		$this->assertTrue($entity->modified('foo'));

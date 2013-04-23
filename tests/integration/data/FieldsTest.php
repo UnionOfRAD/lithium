@@ -2,137 +2,141 @@
 
 namespace lithium\tests\integration\data;
 
-use lithium\data\Connections;
-use lithium\data\Entity;
-use lithium\data\source\Database;
-use lithium\tests\mocks\data\MockEmployees;
-use lithium\tests\mocks\data\MockCompanies;
+use lithium\tests\fixture\model\gallery\Images;
+use lithium\tests\fixture\model\gallery\Galleries;
+use li3_fixtures\test\Fixtures;
 
-class FieldsTest extends \lithium\test\Integration {
+class FieldsTest extends \lithium\tests\integration\data\Base {
 
-	public $db = null;
+	protected $_fixtures = array(
+		'images' => 'lithium\tests\fixture\model\gallery\ImagesFixture',
+		'galleries' => 'lithium\tests\fixture\model\gallery\GalleriesFixture',
+	);
 
-	protected $_dbConfig = null;
+	/**
+	 * Skip the test if no test database connection available.
+	 */
+	public function skip() {
+		parent::connect($this->_connection);
+		if (!class_exists('li3_fixtures\test\Fixtures')) {
+			$this->skipIf(true, "These tests need `'li3_fixtures'` to be runned.");
+		}
+		$this->skipIf($this->with(array('CouchDb')));
+	}
 
+	/**
+	 * Creating the test database
+	 */
 	public function setUp() {
-		$mockBase = LITHIUM_LIBRARY_PATH . '/lithium/tests/mocks/data/source/database/adapter/';
-		$files = array('companies' => '_companies.sql', 'employees' => '_employees.sql');
-		$files = array_diff_key($files, array_flip($this->db->sources()));
+		Fixtures::config(array(
+			'db' => array(
+				'adapter' => 'Connection',
+				'connection' => $this->_connection,
+				'fixtures' => $this->_fixtures
+			)
+		));
+		Fixtures::create('db');
 
-		foreach ($files as $file) {
-			$sqlFile = $mockBase . strtolower($this->_dbConfig['adapter']) . $file;
-			$this->skipIf(!file_exists($sqlFile), "SQL file $sqlFile does not exist.");
-			$sql = file_get_contents($sqlFile);
-			$this->db->read($sql, array('return' => 'resource'));
+		$db = $this->_db;
+		if (!$db::enabled('schema')) {
+			$gallery = Fixtures::get('db', 'galleries');
+			$images = Fixtures::get('db', 'images');
+			Galleries::schema($gallery->fields());
+			Images::schema($images->fields());
 		}
 	}
 
+	/**
+	 * Dropping the test database
+	 */
 	public function tearDown() {
-		$this->db->read('DROP TABLE IF EXISTS `employees`;');
-		$this->db->read('DROP TABLE IF EXISTS `companies`;');
-	}
-
-	public function skip() {
-		$connection = 'lithium_mysql_test';
-		$this->_dbConfig = Connections::get($connection, array(
-			'config' => true
-		));
-		$isConnected = $this->_dbConfig && Connections::get($connection)->isConnected(array(
-			'autoConnect' => true
-		));
-		$isAvailable = $this->_dbConfig && $isConnected;
-		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
-
-		$this->db = Connections::get($connection);
-		$this->skipIf(
-			!($this->db instanceof Database),
-			"The {$connection} connection is not a relational database."
-		);
+		Fixtures::clear('db');
 	}
 
 	public function testSingleField() {
-		$new = MockCompanies::create(array('name' => 'Acme, Inc.'));
-		$key = MockCompanies::meta('key');
+		$new = Galleries::create(array('name' => 'People'));
+		$key = Galleries::meta('key');
 		$new->save();
 		$id = is_object($new->{$key}) ? (string) $new->{$key} : $new->{$key};
 
-		$entity = MockCompanies::first($id);
+		$entity = Galleries::first($id);
 
-		$this->assertTrue($entity instanceof Entity);
-		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
+		$this->assertInstanceOf('lithium\data\Entity', $entity);
 
 		$expected = array(
-			$key => $id, 'name' => 'Acme, Inc.', 'active' => null,
-			'created' => null, 'modified' => null
+			$key => $id,
+			'name' => 'People',
+			'active' => true
 		);
 		$result = $entity->data();
-		$this->assertEqual($expected, $result);
+		$this->assertEqual($expected, array_filter($result));
 
-		$entity = MockCompanies::first(array(
+		$entity = Galleries::first(array(
 			'conditions' => array($key => $id),
 			'fields' => array($key)
 		));
 
-		$this->assertTrue($entity instanceof Entity);
-		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
+		$this->assertInstanceOf('lithium\data\Entity', $entity);
 
 		$expected = array($key => $id);
 		$result = $entity->data();
 		$this->assertEqual($expected, $result);
 
-		$entity = MockCompanies::find('first',array(
+		$entity = Galleries::find('first',array(
 			'conditions' => array($key => $id),
 			'fields' => array($key, 'name')
 		));
-		$this->assertTrue($entity instanceof Entity);
-		$this->skipIf(!$entity instanceof Entity, 'Queried object is not an entity.');
+		$this->assertInstanceOf('lithium\data\Entity', $entity);
 
-		$entity->name = 'Acme, Incorporated';
+		$entity->name = 'Celebrities';
 		$result = $entity->save();
 		$this->assertTrue($result);
 
-		$entity = MockCompanies::find('first',array(
+		$entity = Galleries::find('first',array(
 			'conditions' => array($key => $id),
 			'fields' => array($key, 'name')
 		));
-		$this->assertEqual($entity->name, 'Acme, Incorporated');
+		$this->assertEqual($entity->name, 'Celebrities');
 		$new->delete();
 	}
 
 	public function testFieldsWithJoins() {
-		$new = MockCompanies::create(array('name' => 'Acme, Inc.'));
-		$cKey = MockCompanies::meta('key');
+		$db = $this->_db;
+		$this->skipIf(!$db::enabled('relationships'));
+		$this->skipIf($this->with(array('MongoDb')));
+
+		$new = Galleries::create(array('name' => 'Celebrities'));
+		$cKey = Galleries::meta('key');
 		$result = $new->save();
+		$this->assertTrue($result);
 		$cId = (string) $new->{$cKey};
 
-		$this->skipIf(!$result, 'Could not save MockCompanies');
-
-		$new = MockEmployees::create(array(
-			'company_id' => $cId,
-			'name' => 'John Doe'
+		$new = Images::create(array(
+			'gallery_id' => $cId,
+			'title' => 'John Doe'
 		));
-		$eKey = MockEmployees::meta('key');
+		$eKey = Images::meta('key');
 		$result = $new->save();
-		$this->skipIf(!$result, 'Could not save MockEmployee');
-		$eId = (string) $new->{$eKey};
+		$this->assertTrue($result);
 
-		$entity = MockCompanies::first(array(
-			'with' => 'Employees',
+		$eId = (string) $new->{$eKey};
+		$entity = Galleries::first(array(
+			'with' => 'Images',
 			'conditions' => array(
-				'MockCompanies.id' => $cId
+				'Galleries.id' => $cId
 			),
 			'fields' => array(
-				'MockCompanies' => array('id', 'name'),
-				'Employees' => array('id', 'name')
+				'Galleries' => array('name'),
+				'Images' => array('id', 'title')
 			)
 		));
 		$expected = array(
 			'id' => $cId,
-			'name' => 'Acme, Inc.',
-			'employees' => array (
-				$eId => array (
+			'name' => 'Celebrities',
+			'images' => array(
+				$eId => array(
 					'id' => $eId,
-					'name' => 'John Doe'
+					'title' => 'John Doe'
 				)
 			)
 		);

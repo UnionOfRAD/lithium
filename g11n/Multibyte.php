@@ -6,7 +6,6 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 namespace lithium\g11n;
-use lithium\core\Libraries;
 
 /**
  * The `Multibyte` class helps operating with UTF-8 encoded strings. Here
@@ -56,6 +55,16 @@ class Multibyte extends \lithium\core\Adaptable {
 	 * indicating any multibyte encoding. Don't use quick mode for integrity
 	 * validation of UTF-8 encoded strings.
 	 *
+	 * Meaning of RegExp:
+	 * '[\x09\x0A\x0D\x20-\x7E]';            // ASCII
+	 * '|[\xC2-\xDF][\x80-\xBF]';            // non-overlong 2-byte
+	 * '|\xE0[\xA0-\xBF][\x80-\xBF]';        // excluding overlongs
+	 * '|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}'; // straight 3-byte
+	 * '|\xED[\x80-\x9F][\x80-\xBF]';        // excluding surrogates
+	 * '|\xF0[\x90-\xBF][\x80-\xBF]{2}';     // planes 1-3
+	 * '|[\xF1-\xF3][\x80-\xBF]{3}';         // planes 4-15
+	 * '|\xF4[\x80-\x8F][\x80-\xBF]{2}';     // plane 16
+	 *
 	 * @link http://www.w3.org/International/questions/qa-forms-utf-8.en
 	 * @param string $string The string to analyze.
 	 * @param array $options Allows to toggle mode via the `'quick'` option, defaults to `false`.
@@ -69,14 +78,14 @@ class Multibyte extends \lithium\core\Adaptable {
 			$regex = '/[^\x09\x0A\x0D\x20-\x7E]/m';
 		} else {
 			$regex  = '/\A(';
-			$regex .= '[\x09\x0A\x0D\x20-\x7E]';            // ASCII
-			$regex .= '|[\xC2-\xDF][\x80-\xBF]';            // non-overlong 2-byte
-			$regex .= '|\xE0[\xA0-\xBF][\x80-\xBF]';        // excluding overlongs
-			$regex .= '|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}'; // straight 3-byte
-			$regex .= '|\xED[\x80-\x9F][\x80-\xBF]';        // excluding surrogates
-			$regex .= '|\xF0[\x90-\xBF][\x80-\xBF]{2}';     // planes 1-3
-			$regex .= '|[\xF1-\xF3][\x80-\xBF]{3}';         // planes 4-15
-			$regex .= '|\xF4[\x80-\x8F][\x80-\xBF]{2}';     // plane 16
+			$regex .= '[\x09\x0A\x0D\x20-\x7E]';
+			$regex .= '|[\xC2-\xDF][\x80-\xBF]';
+			$regex .= '|\xE0[\xA0-\xBF][\x80-\xBF]';
+			$regex .= '|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}';
+			$regex .= '|\xED[\x80-\x9F][\x80-\xBF]';
+			$regex .= '|\xF0[\x90-\xBF][\x80-\xBF]{2}';
+			$regex .= '|[\xF1-\xF3][\x80-\xBF]{3}';
+			$regex .= '|\xF4[\x80-\x8F][\x80-\xBF]{2}';
 			$regex .= ')*\z/m';
 		}
 		return (boolean) preg_match($regex, $string);

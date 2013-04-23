@@ -247,12 +247,18 @@ class Test extends \lithium\console\Command {
 	 * @return string the name of the library
 	 */
 	protected function _library($path) {
+		$result = null;
+		$match = '';
 		foreach (Libraries::get() as $name => $library) {
 			if (strpos($path, $library['path']) !== 0) {
 				continue;
 			}
-			return $name;
+			if (strlen($library['path']) > strlen($match)) {
+				$result = $name;
+				$match = $library['path'];
+			}
 		}
+		return $result;
 	}
 
 	/**
@@ -290,7 +296,7 @@ class Test extends \lithium\console\Command {
 				return $v;
 			});
 
-			$library = basename($this->request->env('working'));
+			$library = $this->_library($this->request->env('working') . '/' . $path);
 			$parts = explode('/', str_replace("../", "", $path));
 			$plugin = array_shift($parts);
 

@@ -11,16 +11,15 @@ namespace lithium\tests\cases\data;
 use stdClass;
 use lithium\util\Inflector;
 use lithium\data\Model;
-use lithium\data\Entity;
 use lithium\data\Schema;
-use lithium\data\model\Query;
-use lithium\data\entity\Record;
 use lithium\tests\mocks\data\MockTag;
 use lithium\tests\mocks\data\MockPost;
 use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\data\MockTagging;
 use lithium\tests\mocks\data\MockCreator;
 use lithium\tests\mocks\data\MockPostForValidates;
+use lithium\tests\mocks\data\MockProductForSchemas;
+use lithium\tests\mocks\data\MockAntiqueForSchemas;
 use lithium\tests\mocks\data\MockBadConnection;
 
 class ModelTest extends \lithium\test\Unit {
@@ -54,7 +53,8 @@ class ModelTest extends \lithium\test\Unit {
 				'author_id' => array('type' => 'integer'),
 				'title' => array('type' => 'string'),
 				'body' => array('type' => 'text')
-		)));
+			)
+		));
 	}
 
 	public function tearDown() {
@@ -91,7 +91,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('post', MockPost::meta('source'));
 
 		MockPost::config(array('meta' => array('source' => false)));
-		$this->assertIdentical(false, MockPost::meta('source'));
+		$this->assertFalse(MockPost::meta('source'));
 
 		MockPost::config(array('meta' => array('source' => null)));
 		$this->assertIdentical('mock_posts', MockPost::meta('source'));
@@ -143,7 +143,7 @@ class ModelTest extends \lithium\test\Unit {
 	public function testInstanceMethods() {
 		MockPost::instanceMethods(array());
 		$methods = MockPost::instanceMethods();
-		$this->assertTrue(empty($methods));
+		$this->assertEmpty($methods);
 
 		MockPost::instanceMethods(array(
 			'first' => array(
@@ -154,14 +154,14 @@ class ModelTest extends \lithium\test\Unit {
 		));
 
 		$methods = MockPost::instanceMethods();
-		$this->assertEqual(2, count($methods));
+		$this->assertCount(2, $methods);
 
 		MockPost::instanceMethods(array(
 			'third' => function($entity) {}
 		));
 
 		$methods = MockPost::instanceMethods();
-		$this->assertEqual(3, count($methods));
+		$this->assertCount(3, $methods);
 	}
 
 	public function testMetaInformation() {
@@ -205,16 +205,50 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testSchemaLoading() {
 		$result = MockPost::schema();
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 		$this->assertEqual($result->fields(), MockPost::schema()->fields());
 
 		MockPost::config(array('schema' => $this->_altSchema));
 		$this->assertEqual($this->_altSchema->fields(), MockPost::schema()->fields());
 	}
 
+	public function testSchemaInheritance() {
+		$result = MockAntiqueForSchemas::schema();
+		$this->assertTrue(array_key_exists('price', $result->fields()));
+	}
+
+	public function testInitializationInheritance() {
+		$meta = array (
+			'name' => 'MockAntiqueForSchemas',
+			'source' => 'mock_products',
+			'title' => 'name',
+			'class' => 'lithium\tests\mocks\data\MockAntiqueForSchemas',
+			'connection' => false
+		);
+		$this->assertEqual($meta, MockAntiqueForSchemas::meta());
+
+		$this->assertArrayHasKey('MockCreator', MockAntiqueForSchemas::relations());
+
+		$this->assertCount(3, MockAntiqueForSchemas::finders());
+
+		$this->assertCount(1, MockAntiqueForSchemas::initializers());
+
+		$config = array(
+			'query' => array(
+				'with' => array('MockCreator')
+			)
+		);
+		MockProductForSchemas::config(compact('config'));
+		$this->assertEqual(MockProductForSchemas::query(), MockAntiqueForSchemas::query());
+
+		$expected = array('limit' => 50) + MockProductForSchemas::query();
+		MockAntiqueForSchemas::config(array('query' => $expected));
+		$this->assertEqual($expected, MockAntiqueForSchemas::query());
+	}
+
 	public function testFieldIntrospection() {
-		$this->assertTrue(MockComment::hasField('comment_id'));
-		$this->assertFalse(MockComment::hasField('foo'));
+		$this->assertNotEmpty(MockComment::hasField('comment_id'));
+		$this->assertEmpty(MockComment::hasField('foo'));
 		$this->assertEqual('comment_id', MockComment::hasField(array('comment_id')));
 	}
 
@@ -244,8 +278,8 @@ class ModelTest extends \lithium\test\Unit {
 		$result = MockComment::relations('belongsTo');
 		$this->assertEqual($expected, $result);
 
-		$this->assertFalse(MockComment::relations('hasMany'));
-		$this->assertFalse(MockPost::relations('belongsTo'));
+		$this->assertEmpty(MockComment::relations('hasMany'));
+		$this->assertEmpty(MockPost::relations('belongsTo'));
 
 		$expected = array(
 			'name' => 'MockPost',
@@ -301,7 +335,7 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testSimpleFind() {
 		$result = MockPost::find('all');
-		$this->assertTrue($result['query'] instanceof Query);
+		$this->assertInstanceOf('lithium\data\model\Query', $result['query']);
 	}
 
 	public function testMagicFinders() {
@@ -314,7 +348,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('read', $result['query']->type());
 
 		$result = MockPost::findAllByFoo(13, array('order' => array('created_at' => 'desc')));
-		$this->assertFalse($result['query']->data());
+		$this->assertEmpty($result['query']->data());
 		$this->assertEqual(array('foo' => 13), $result['query']->conditions());
 		$this->assertEqual(array('created_at' => 'desc'), $result['query']->order());
 
@@ -329,7 +363,7 @@ class ModelTest extends \lithium\test\Unit {
 	 */
 	public function testSimpleFindFirst() {
 		$result = MockComment::first();
-		$this->assertTrue($result instanceof Record);
+		$this->assertInstanceOf('lithium\data\entity\Record', $result);
 
 		$expected = 'First comment';
 		$this->assertEqual($expected, $result->text);
@@ -337,8 +371,8 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testSimpleFindList() {
 		$result = MockComment::find('list');
-		$this->assertTrue(!empty($result));
-		$this->assertTrue(is_array($result));
+		$this->assertNotEmpty($result);
+		$this->assertInternalType('array', $result);
 	}
 
 	public function testFilteredFind() {
@@ -416,7 +450,8 @@ class ModelTest extends \lithium\test\Unit {
 		$result = $model::key(array(
 			'client_id' => 3,
 			'invoice_id' => 5,
-			'payment' => '100'));
+			'payment' => '100')
+		);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -424,9 +459,9 @@ class ModelTest extends \lithium\test\Unit {
 		$post = MockPostForValidates::create();
 
 		$result = $post->validates();
-		$this->assertTrue($result === false);
+		$this->assertFalse($result);
 		$result = $post->errors();
-		$this->assertTrue(!empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = array(
 			'title' => array('please enter a title'),
@@ -440,9 +475,9 @@ class ModelTest extends \lithium\test\Unit {
 		$post = MockPostForValidates::create(array('title' => 'new post'));
 
 		$result = $post->validates();
-		$this->assertTrue($result === false);
+		$this->assertFalse($result);
 		$result = $post->errors();
-		$this->assertTrue(!empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = array(
 			'email' => array('email is empty', 'email is not valid')
@@ -455,10 +490,10 @@ class ModelTest extends \lithium\test\Unit {
 		$post = MockPostForValidates::create(array('title' => 'new post', 'email' => 'something'));
 
 		$result = $post->validates();
-		$this->assertIdentical(false, $result);
+		$this->assertFalse($result);
 
 		$result = $post->errors();
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$expected = array('email' => array('email is not valid'));
 		$result = $post->errors();
@@ -471,9 +506,9 @@ class ModelTest extends \lithium\test\Unit {
 		));
 
 		$result = $post->validates();
-		$this->assertTrue($result === true);
+		$this->assertTrue($result);
 		$result = $post->errors();
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 	}
 
 	public function testCustomValidationCriteria() {
@@ -488,7 +523,7 @@ class ModelTest extends \lithium\test\Unit {
 		));
 
 		$result = $post->validates(array('rules' => $validates));
-		$this->assertTrue($result === true);
+		$this->assertTrue($result);
 		$this->assertIdentical(array(), $post->errors());
 	}
 
@@ -496,8 +531,8 @@ class ModelTest extends \lithium\test\Unit {
 		$post = MockPostForValidates::create();
 		$events = 'customEvent';
 
-		$this->assertIdentical(false, $post->validates(compact('events')));
-		$this->assertTrue($post->errors());
+		$this->assertFalse($post->validates(compact('events')));
+		$this->assertNotEmpty($post->errors());
 
 		$expected = array(
 			'title' => array('please enter a title'),
@@ -518,9 +553,9 @@ class ModelTest extends \lithium\test\Unit {
 
 		$events = 'customEvent';
 		$result = $post->validates(compact('events'));
-		$this->assertTrue($result === true);
+		$this->assertTrue($result);
 		$result = $post->errors();
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 	}
 
 	public function testValidatesCustomEventsFalse() {
@@ -529,9 +564,9 @@ class ModelTest extends \lithium\test\Unit {
 		$events = array('customEvent','anotherCustomEvent');
 
 		$result = $post->validates(compact('events'));
-		$this->assertTrue($result === false);
+		$this->assertFalse($result);
 		$result = $post->errors();
-		$this->assertTrue(!empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = array(
 			'title' => array('please enter a title'),
@@ -554,9 +589,9 @@ class ModelTest extends \lithium\test\Unit {
 		$events = array('customEvent','anotherCustomEvent');
 
 		$result = $post->validates(compact('events'));
-		$this->assertTrue($result === false);
+		$this->assertFalse($result);
 		$result = $post->errors();
-		$this->assertTrue(!empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = array(
 			'email' => array('email is not in 2nd list')
@@ -573,9 +608,46 @@ class ModelTest extends \lithium\test\Unit {
 		$events = array('customEvent','anotherCustomEvent');
 
 		$result = $post->validates(compact('events'));
-		$this->assertTrue($result === true);
+		$this->assertTrue($result);
 		$result = $post->errors();
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
+	}
+
+	public function testValidationInheritance() {
+		$product = MockProductForSchemas::create();
+		$antique = MockAntiqueForSchemas::create();
+
+		$errors = array(
+			'name' => array('Name cannot be empty.'),
+			'price' => array(
+				'Price cannot be empty.',
+				'Price must have a numeric value.'
+			)
+		);
+
+		$this->assertFalse($product->validates());
+		$this->assertEqual($errors, $product->errors());
+
+		$errors += array(
+			'refurb' => array('Must have a boolean value.')
+		);
+
+		$this->assertFalse($antique->validates());
+		$this->assertEqual($errors, $antique->errors());
+	}
+
+	public function testErrorsIsClearedOnEachValidates() {
+		$post = MockPostForValidates::create(array('title' => 'new post'));
+		$result = $post->validates();
+		$this->assertFalse($result);
+		$result = $post->errors();
+		$this->assertNotEmpty($result);
+
+		$post->email = 'contact@lithify.me';
+		$result = $post->validates();
+		$this->assertTrue($result);
+		$result = $post->errors();
+		$this->assertEmpty($result);
 	}
 
 	public function testDefaultValuesFromSchema() {
@@ -627,7 +699,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual($this->_altSchema->fields(), MockPost::schema()->fields());
 
 		$post = MockPost::create(array('title' => 'New post'));
-		$this->assertTrue($post instanceof Entity);
+		$this->assertInstanceOf('lithium\data\Entity', $post);
 		$this->assertEqual('New post', $post->title);
 	}
 
@@ -673,7 +745,7 @@ class ModelTest extends \lithium\test\Unit {
 				'title' => 'A title must be present'
 			)
 		));
-		$this->assertIdentical(false, $result);
+		$this->assertFalse($result);
 	}
 
 	public function testSaveFailedWithValidationByModelDefinition() {
@@ -681,9 +753,9 @@ class ModelTest extends \lithium\test\Unit {
 		$post = MockPostForValidates::create();
 
 		$result = $post->save();
-		$this->assertTrue($result === false);
+		$this->assertFalse($result);
 		$result = $post->errors();
-		$this->assertTrue(!empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = array(
 			'title' => array('please enter a title'),
@@ -698,9 +770,9 @@ class ModelTest extends \lithium\test\Unit {
 		$events = array('customEvent','anotherCustomEvent');
 
 		$result = $post->save(null,compact('events'));
-		$this->assertTrue($result === false);
+		$this->assertFalse($result);
 		$result = $post->errors();
-		$this->assertTrue(!empty($result));
+		$this->assertNotEmpty($result);
 
 		$expected = array(
 			'title' => array('please enter a title'),
@@ -834,17 +906,16 @@ class ModelTest extends \lithium\test\Unit {
 
 		$this->assertIdentical('mock_posts', MockPost::meta('source'));
 		$this->assertIdentical('name', MockPost::meta('title'));
-		$this->assertIdentical(null, MockPost::meta('unexisting'));
+		$this->assertEmpty(MockPost::meta('unexisting'));
 
 		$config = array(
 			'schema' => new Schema(array(
-					'fields' => array(
-						'id' => array('type' => 'integer'),
-						'name' => array('type' => 'string'),
-						'label' => array('type' => 'string')
-					)
+				'fields' => array(
+					'id' => array('type' => 'integer'),
+					'name' => array('type' => 'string'),
+					'label' => array('type' => 'string')
 				)
-			),
+			)),
 			'initializers' => array(
 				'source' => function($self) {
 					return Inflector::tableize($self::meta('name'));
@@ -862,7 +933,7 @@ class ModelTest extends \lithium\test\Unit {
 		MockPost::config($config);
 		$this->assertIdentical('cool_posts', MockPost::meta('source'));
 		$this->assertIdentical('label1', MockPost::meta('title'));
-		$this->assertFalse('label2' === MockPost::meta('title'));
+		$this->assertNotIdentical('label2', MockPost::meta('title'));
 		$this->assertIdentical('label1', MockPost::meta('title'));
 		$meta = MockPost::meta();
 		$this->assertIdentical('label1', $meta['title']);
@@ -905,7 +976,7 @@ class ModelTest extends \lithium\test\Unit {
 	public function testRespondsToInstanceMethod() {
 		$this->assertFalse(MockPost::respondsTo('foo_Bar_Baz'));
 		MockPost::instanceMethods(array(
-		    'foo_Bar_Baz' => function($entity) {}
+			'foo_Bar_Baz' => function($entity) {}
 		));
 		$this->assertTrue(MockPost::respondsTo('foo_Bar_Baz'));
 	}

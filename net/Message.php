@@ -41,13 +41,6 @@ class Message extends \lithium\core\Object {
 	public $port = null;
 
 	/**
-	 * Absolute path of the request.
-	 *
-	 * @var string
-	 */
-	public $path = null;
-
-	/**
 	 * The username for this endpoint.
 	 *
 	 * @var string
@@ -62,23 +55,30 @@ class Message extends \lithium\core\Object {
 	public $password = null;
 
 	/**
+	 * Absolute path of the request.
+	 *
+	 * @var string
+	 */
+	public $path = null;
+
+	/**
 	 * The body of the message.
 	 *
-	 * @var array
+	 * @var mixed
 	 */
-	public $body = array();
+	public $body = null;
 
 	/**
 	 * Adds config values to the public properties when a new object is created.
 	 *
 	 * @param array $config Configuration options : default value
-	 * - `scheme`: tcp
-	 * - `host`: localhost
-	 * - `port`: null
-	 * - `username`: null
-	 * - `password`: null
-	 * - `path`: null
-	 * - `body`: null
+	 *        - `'scheme'` _string_: 'tcp'
+	 *        - `'host'` _string_: 'localhost'
+	 *        - `'port'` _integer_: null
+	 *        - `'username'` _string_: null
+	 *        - `'password'` _string_: null
+	 *        - `'path'` _string_: null
+	 *        - `'body'` _mixed_: null
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -99,11 +99,11 @@ class Message extends \lithium\core\Object {
 	}
 
 	/**
-	 * Add body parts.
+	 * Add body parts and compile the message body.
 	 *
 	 * @param mixed $data
 	 * @param array $options
-	 *        - `'buffer'`: split the body string
+	 *        - `'buffer'` _integer_: split the body string
 	 * @return array
 	 */
 	public function body($data = null, $options = array()) {

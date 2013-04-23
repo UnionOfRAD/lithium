@@ -76,13 +76,14 @@ class Inflector {
 	 *
 	 * @see lithium\util\Inflector::rules()
 	 * @var array Contains the following keys:
-	 *   - `'rules'`: An array of regular expression rules in the form of `'match' => 'replace'`,
-	 *     which specify the matching and replacing rules for the pluralization of words.
-	 *   - `'uninflected'`: A indexed array containing regex word patterns which do not get
-	 *     inflected (i.e. singular and plural are the same).
-	 *   - `'irregular'`: Contains key-value pairs of specific words which are not inflected
-	 *     according to the rules. This is populated from `Inflector::$_plural` when the class
-	 *     is loaded.
+	 *      - `'rules'`: An array of regular expression rules in the form of
+	 *        `'match' => 'replace'`, which specify the matching and replacing rules for
+	 *        the pluralization of words.
+	 *      - `'uninflected'`: A indexed array containing regex word patterns which do not
+	 *        get inflected (i.e. singular and plural are the same).
+	 *      - `'irregular'`: Contains key-value pairs of specific words which are
+	 *        not inflected according to the rules. This is populated from `Inflector::$_plural`
+	 *        when the class is loaded.
 	 */
 	protected static $_singular = array(
 		'rules' => array(
@@ -137,12 +138,13 @@ class Inflector {
 	 *
 	 * @see lithium\util\Inflector::rules()
 	 * @var array Contains the following keys:
-	 *   - `'rules'`: An array of regular expression rules in the form of `'match' => 'replace'`,
-	 *     which specify the matching and replacing rules for the pluralization of words.
-	 *   - `'uninflected'`: A indexed array containing regex word patterns which do not get
-	 *     inflected (i.e. singular and plural are the same).
-	 *   - `'irregular'`: Contains key-value pairs of specific words which are not inflected
-	 *     according to the rules.
+	 *      - `'rules'`: An array of regular expression rules in the form of
+	 *        `'match' => 'replace'`, which specify the matching and replacing
+	 *        rules for the pluralization of words.
+	 *      - `'uninflected'`: A indexed array containing regex word patterns
+	 *        which do not get inflected (i.e. singular and plural are the same).
+	 *      - `'irregular'`: Contains key-value pairs of specific words which are
+	 *        not inflected according to the rules.
 	 */
 	protected static $_plural = array(
 		'rules' => array(
@@ -286,8 +288,8 @@ class Inflector {
 		extract(static::$_plural);
 
 		if (!isset($regexUninflected) || !isset($regexIrregular)) {
-			$regexUninflected = static::_enclose(join( '|', $uninflected + static::$_uninflected));
-			$regexIrregular = static::_enclose(join( '|', array_keys($irregular)));
+			$regexUninflected = static::_enclose(join('|', $uninflected + static::$_uninflected));
+			$regexIrregular = static::_enclose(join('|', array_keys($irregular)));
 			static::$_plural += compact('regexUninflected', 'regexIrregular');
 		}
 		if (preg_match('/(' . $regexUninflected . ')$/i', $word, $regs)) {
@@ -343,8 +345,6 @@ class Inflector {
 	/**
 	 * Clears local in-memory caches.  Can be used to force a full-cache clear when updating
 	 * inflection rules mid-way through request execution.
-	 *
-	 * @return void
 	 */
 	public static function reset() {
 		static::$_singularized = static::$_pluralized = array();

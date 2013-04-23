@@ -123,7 +123,6 @@ class Cache extends \lithium\core\Adaptable {
 		return static::_filter(__FUNCTION__, $params, $method, $settings[$name]['filters']);
 	}
 
-
 	/**
 	 * Reads from the specified cache configuration
 	 *

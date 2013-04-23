@@ -46,7 +46,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $set->next();
-		$this->assertTrue(empty($result));
+		$this->assertEmpty($result);
 
 		$expected = array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one');
 		$result = $set->rewind()->data();
@@ -194,8 +194,10 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->forceArray = 'foo';
 		$result = $doc->export();
 
-		$this->assertTrue($result['update']['forceArray'] instanceof DocumentSet);
-		$this->assertTrue($result['update']['array'] instanceof DocumentSet);
+		$obj = $result['update']['forceArray'];
+		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $obj);
+		$obj = $result['update']['array'];
+		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $obj);
 		$this->assertIdentical(array('foo'), $result['update']['forceArray']->data());
 
 		$doc->forceArray = false;
@@ -226,7 +228,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual('Crystal Reports', $doc->profile->dislikes);
 
 		$doc->{'profile.foo.bar'} = 'baz';
-		$this->assertTrue($doc->profile->foo instanceof Document);
+		$this->assertInstanceOf('lithium\data\entity\Document', $doc->profile->foo);
 		$this->assertEqual(array('bar' => 'baz'), $doc->profile->foo->data());
 
 		$post = new Document(array('model' => $this->_model, 'data' => array(
@@ -243,7 +245,7 @@ class DocumentTest extends \lithium\test\Unit {
 	public function testNoItems() {
 		$doc = new Document(array('model' => $this->_model, 'data' => array()));
 		$result = $doc->_id;
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	public function testWithData() {
@@ -301,7 +303,7 @@ class DocumentTest extends \lithium\test\Unit {
 		)));
 
 		$this->assertEqual('father', $doc->type);
-		$this->assertTrue($doc->children instanceof DocumentSet);
+		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $doc->children);
 
 		$expected = array('_id' => 124, 'type' => 'child', 'children' => null);
 		$result = $doc->children[124]->data();
@@ -321,8 +323,8 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$this->assertEqual('father', $doc->name);
 
-		$this->assertTrue(is_object($doc->child), 'children is not an object');
-		$this->assertTrue($doc->child instanceof Document, 'Child is not of the type Document');
+		$this->assertInternalType('object', $doc->child, 'children is not an object');
+		$this->assertInstanceOf('lithium\data\entity\Document', $doc->child);
 		$this->skipIf(!$doc->child instanceof Document, 'Child is not of the type Document');
 
 		$expected = 124;
@@ -340,8 +342,8 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc->arr1 = array('something' => 'else');
 		$doc->arr2 = array('some' => 'noses', 'have' => 'it');
 
-		$this->assertTrue($doc->arr1 instanceof Document);
-		$this->assertTrue($doc->arr2 instanceof Document);
+		$this->assertInstanceOf('lithium\data\entity\Document', $doc->arr1);
+		$this->assertInstanceOf('lithium\data\entity\Document', $doc->arr2);
 	}
 
 	public function testRewindNoData() {
@@ -403,8 +405,8 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual(12, $doc->_id);
 		$this->assertEqual('bird', $doc->name);
 
-		$this->assertTrue(is_object($doc->arr), 'arr is not an object');
-		$this->assertTrue($doc->arr instanceof Document, 'arr is not of the type Document');
+		$this->assertInternalType('object', $doc->arr, 'arr is not an object');
+		$this->assertInstanceOf('lithium\data\entity\Document', $doc->arr);
 		$this->skipIf(!$doc->arr instanceof Document, 'arr is not of the type Document');
 
 		$this->assertEqual(33, $doc->arr->_id);
@@ -420,7 +422,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual(12, $doc->_id);
 		$this->assertEqual('Joe', $doc->name);
 
-		$this->assertTrue($doc->sons instanceof DocumentSet, 'arr is not an array');
+		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $doc->sons);
 		$this->assertEqual(array('Moe', 'Greg'), $doc->sons->data());
 	}
 
@@ -654,8 +656,9 @@ class DocumentTest extends \lithium\test\Unit {
 		$result = $doc->errors('title');
 		$this->assertEqual($expected, $result);
 
+		/* Errors are appended so, both errors are expected to be in an array */
 		$doc->errors('title', 'Too generic');
-		$expected = 'Too generic';
+		$expected = array('Too short', 'Too generic');
 		$result = $doc->errors('title');
 		$this->assertEqual($expected, $result);
 	}
@@ -667,7 +670,7 @@ class DocumentTest extends \lithium\test\Unit {
 
 		$this->assertTrue(isset($doc->top));
 		$this->assertTrue(isset($doc->second->level));
-		$this->assertTrue($doc->second instanceof Document);
+		$this->assertInstanceOf('lithium\data\entity\Document', $doc->second);
 
 		$this->assertEqual('level', $doc->top);
 		$this->assertEqual('of data', $doc->second->level);
@@ -710,7 +713,10 @@ class DocumentTest extends \lithium\test\Unit {
 	 */
 	public function testNestedObjectExistence() {
 		$model = $this->_model;
-		$data = array('foo' => array('bar' => 'bar', 'baz' => 'dib'));
+		$data = array(
+			'foo' => array('bar' => 'bar', 'baz' => 'dib'),
+			'deeply' => array('nested' => array('object' => array('should' => 'exist')))
+		);
 		$doc = new Document(compact('model', 'data') + array('exists' => false));
 
 		$this->assertFalse($doc->exists());
@@ -719,6 +725,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc = new Document(compact('model', 'data') + array('exists' => true));
 		$this->assertTrue($doc->exists());
 		$this->assertTrue($doc->foo->exists());
+		$this->assertTrue($doc->deeply->nested->object->exists());
 
 		$doc = new Document(compact('model', 'data') + array('exists' => true));
 		$subDoc = new Document(array('data' => array('bar' => 'stuff')));
@@ -749,8 +756,8 @@ class DocumentTest extends \lithium\test\Unit {
 		$expected = array('foo' => 'bar', 'baz' => 'dib', 'nested.more' => 'data');
 		$this->assertFalse($newData['exists']);
 		$this->assertEqual(array('foo' => 'bar', 'baz' => 'dib'), $newData['data']);
-		$this->assertEqual(3, count($newData['update']));
-		$this->assertTrue($newData['update']['nested'] instanceof Document);
+		$this->assertCount(3, $newData['update']);
+		$this->assertInstanceOf('lithium\data\entity\Document', $newData['update']['nested']);
 
 		$result = $newData['update']['nested']->export();
 		$this->assertFalse($result['exists']);
@@ -841,7 +848,7 @@ class DocumentTest extends \lithium\test\Unit {
 		$doc = new Document(array('schema' => new Schema(array('fields' => array(
 			'foo' => array('type' => 'string', 'default' => 'bar')
 		)))));
-		$this->assertFalse($doc->data());
+		$this->assertEmpty($doc->data());
 
 		$this->assertEqual('bar', $doc->foo);
 		$this->assertEqual(array('foo' => 'bar'), $doc->data());
@@ -892,7 +899,6 @@ class DocumentTest extends \lithium\test\Unit {
 	 * Ensures that the data returned from the `data()` method matches the
 	 * internal state of the object.
 	 */
-
 	public function testEnsureArrayExportFidelity() {
 		$data = array(
 			'department_3' => 0,

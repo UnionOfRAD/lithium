@@ -63,7 +63,21 @@ class ResponseTest extends \lithium\test\Unit {
 	public function testResponseCaching() {
 		$this->response->body = 'Document body';
 
-		$expires = strtotime('+1 hour');
+		$time = time();
+		$expires = strtotime("@{$time} +1 hour");
+		$this->response->cache($expires);
+		ob_start();
+		$this->response->render();
+		$result = ob_get_clean();
+		$headers = array (
+			'HTTP/1.1 200 OK',
+			'Expires: ' . gmdate('D, d M Y H:i:s', $expires) . ' GMT',
+			'Cache-Control: max-age=' . ($expires - $time),
+			'Pragma: cache'
+		);
+		$this->assertIdentical($headers, $this->response->testHeaders);
+
+		$expires = strtotime("@{$time} +2 hours");
 		$this->response->cache($expires);
 		ob_start();
 		$this->response->render();
@@ -72,19 +86,6 @@ class ResponseTest extends \lithium\test\Unit {
 			'HTTP/1.1 200 OK',
 			'Expires: ' . gmdate('D, d M Y H:i:s', $expires) . ' GMT',
 			'Cache-Control: max-age=' . ($expires - time()),
-			'Pragma: cache'
-		);
-		$this->assertIdentical($headers, $this->response->testHeaders);
-
-		$expires = '+2 hours';
-		$this->response->cache($expires);
-		ob_start();
-		$this->response->render();
-		$result = ob_get_clean();
-		$headers = array (
-			'HTTP/1.1 200 OK',
-			'Expires: ' . gmdate('D, d M Y H:i:s', strtotime($expires)) . ' GMT',
-			'Cache-Control: max-age=' . (strtotime($expires) - time()),
 			'Pragma: cache'
 		);
 		$this->assertIdentical($headers, $this->response->testHeaders);
@@ -204,7 +205,7 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	public static function match($url) {
-		if ($url == array('controller' => 'foo_bar', 'action' => 'index')) {
+		if ($url === array('controller' => 'foo_bar', 'action' => 'index')) {
 			return '/foo_bar';
 		}
 	}

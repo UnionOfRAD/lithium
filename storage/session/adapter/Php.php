@@ -11,6 +11,8 @@ namespace lithium\storage\session\adapter;
 use lithium\util\Set;
 use RuntimeException;
 use lithium\core\ConfigException;
+use lithium\core\Libraries;
+use Closure;
 
 /**
  * A minimal adapter to interface with native PHP sessions.
@@ -42,7 +44,7 @@ class Php extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		if (empty($config['session.name'])) {
-			$config['session.name'] = basename(LITHIUM_APP_PATH);
+			$config['session.name'] = basename(Libraries::get(true, 'path'));
 		}
 		parent::__construct($config + $this->_defaults);
 	}
@@ -77,23 +79,25 @@ class Php extends \lithium\core\Object {
 	 *         false otherwise.
 	 */
 	protected static function _start() {
-		if (session_id()) {
+		if (static::isStarted()) {
 			return true;
 		}
-		if (!isset($_SESSION)) {
-			session_cache_limiter('nocache');
-		}
+		session_cache_limiter('nocache');
 		return session_start();
 	}
 
 	/**
 	 * Obtain the status of the session.
 	 *
-	 * @return boolean True if $_SESSION is accessible and if a '_timestamp' key
-	 *         has been set, false otherwise.
+	 * @return boolean True if a session is currently started, False otherwise. If PHP5.4
+	 *                 then we know, if PHP5.3 then we cannot tell for sure if a session
+	 *                 has been closed.
 	 */
 	public static function isStarted() {
-		return (boolean) session_id();
+		if (function_exists("session_status")) {
+			return session_status() === PHP_SESSION_ACTIVE;
+		}
+		return isset($_SESSION) && session_id();
 	}
 
 	/**
@@ -103,7 +107,7 @@ class Php extends \lithium\core\Object {
 	 * @return mixed Session ID, or `null` if the session has not been started.
 	 */
 	public static function key($key = null) {
-		if ($key) {
+		if ($key !== null) {
 			return session_id($key);
 		}
 		return session_id() ?: null;
@@ -114,7 +118,7 @@ class Php extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of the entry to be checked.
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return closure Function returning boolean `true` if the key exists, `false` otherwise.
+	 * @return Closure Function returning boolean `true` if the key exists, `false` otherwise.
 	 */
 	public static function check($key, array $options = array()) {
 		if (!static::isStarted() && !static::_start()) {
@@ -131,7 +135,7 @@ class Php extends \lithium\core\Object {
 	 * @param null|string $key Key of the entry to be read. If no key is passed, all
 	 *        current session data is returned.
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return closure Function returning data in the session if successful, `false` otherwise.
+	 * @return Closure Function returning data in the session if successful, `false` otherwise.
 	 */
 	public static function read($key = null, array $options = array()) {
 		if (!static::isStarted() && !static::_start()) {
@@ -162,7 +166,7 @@ class Php extends \lithium\core\Object {
 	 * @param string $key Key of the item to be stored.
 	 * @param mixed $value The value to be stored.
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public static function write($key, $value, array $options = array()) {
 		if (!static::isStarted() && !static::_start()) {
@@ -182,7 +186,7 @@ class Php extends \lithium\core\Object {
 	 *
 	 * @param string $key The key to be deleted
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return closure Function returning boolean `true` if the key no longer exists
+	 * @return Closure Function returning boolean `true` if the key no longer exists
 	 *         in the session, `false` otherwise
 	 */
 	public static function delete($key, array $options = array()) {
@@ -202,7 +206,7 @@ class Php extends \lithium\core\Object {
 	 * Clears all keys from the session.
 	 *
 	 * @param array $options Options array. Not used fro this adapter method.
-	 * @return closure Function returning boolean `true` on successful clear, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful clear, `false` otherwise.
 	 */
 	public function clear(array $options = array()) {
 		if (!static::isStarted() && !static::_start()) {
@@ -217,10 +221,14 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Determines if PHP sessions are enabled.
 	 *
-	 * @return boolean True if enabled (that is, if session_id() returns a value), false otherwise.
+	 * @return boolean Returns `true` if enabled (PHP session functionality can be disabled
+	 *         completely), `false` otherwise.
 	 */
 	public static function enabled() {
-		return (boolean) session_id();
+		if (function_exists("session_status")) {
+			return session_status() !== PHP_SESSION_DISABLED;
+		}
+		return in_array('session', get_loaded_extensions());
 	}
 
 	/**

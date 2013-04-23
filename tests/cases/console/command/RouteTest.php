@@ -59,8 +59,8 @@ class RouteTest extends \lithium\test\Unit {
 			'Router::connect("/", "Pages::view");',
 			'Router::connect("/pages/{:args}", "Pages::view");',
 			'if (!Environment::is("production")) {',
-				'Router::connect("/test/{:args}", ' . $testParams . ');',
-				'Router::connect("/test", ' . $testParams . ');',
+			'	Router::connect("/test/{:args}", ' . $testParams . ');',
+			'	Router::connect("/test", ' . $testParams . ');',
 			'}',
 			'?>'
 		);
@@ -98,17 +98,16 @@ class RouteTest extends \lithium\test\Unit {
 	 * routes are connected to the router.
 	 */
 	public function testRouteLoading() {
-		$this->assertFalse(Router::get());
-
+		$this->assertEmpty(Router::get(null, true));
 		$command = new Route(array('routes' => $this->_config['routes']));
-		$this->assertEqual(4, count(Router::get()));
+		$this->assertCount(4, Router::get(null, true));
 
 		Router::reset();
 
 		$request = new Request();
 		$request->params['env'] = 'production';
 		$command = new Route(compact('request') + array('routes' => $this->_config['routes']));
-		$this->assertEqual(2, count(Router::get()));
+		$this->assertCount(2, Router::get(null, true));
 	}
 
 	/**
@@ -127,11 +126,11 @@ class RouteTest extends \lithium\test\Unit {
 
 		$command->all();
 
-		$expected = 'TemplateParams--------------
-			/{"controller":"Pages","action":"view"}
-			/pages/{:args}{"controller":"Pages","action":"view"}
-			/test/{:args}{"controller":"lithium\\test\\\\Controller","action":"index"}
-			/test{"controller":"lithium\\test\\\\Controller","action":"index"}';
+		$expected = 'TemplateParams--------------';
+		$expected .= '/{"controller":"Pages","action":"view"}';
+		$expected .= '/pages/{:args}{"controller":"Pages","action":"view"}';
+		$expected .= '/test/{:args}{"controller":"lithium\\test\\\\Controller","action":"index"}';
+		$expected .= '/test{"controller":"lithium\\test\\\\Controller","action":"index"}';
 		$this->assertEqual($this->_strip($expected),$this->_strip($command->response->output));
 	}
 
@@ -154,9 +153,9 @@ class RouteTest extends \lithium\test\Unit {
 
 		$command->all();
 
-		$expected = 'TemplateParams--------------
-			/{"controller":"Pages","action":"view"}
-			/pages/{:args}{"controller":"Pages","action":"view"}';
+		$expected = 'TemplateParams--------------';
+		$expected .= '/{"controller":"Pages","action":"view"}';
+		$expected .= '/pages/{:args}{"controller":"Pages","action":"view"}';
 		$this->assertEqual($this->_strip($expected),$this->_strip($command->response->output));
 	}
 
@@ -172,11 +171,11 @@ class RouteTest extends \lithium\test\Unit {
 
 		$command->run();
 
-		$expected = 'TemplateParams--------------
-			/{"controller":"Pages","action":"view"}
-			/pages/{:args}{"controller":"Pages","action":"view"}
-			/test/{:args}{"controller":"lithium\\test\\\\Controller","action":"index"}
-			/test{"controller":"lithium\\test\\\\Controller","action":"index"}';
+		$expected = 'TemplateParams--------------';
+		$expected .= '/{"controller":"Pages","action":"view"}';
+		$expected .= '/pages/{:args}{"controller":"Pages","action":"view"}';
+		$expected .= '/test/{:args}{"controller":"lithium\\test\\\\Controller","action":"index"}';
+		$expected .= '/test{"controller":"lithium\\test\\\\Controller","action":"index"}';
 		$this->assertEqual($this->_strip($expected),$this->_strip($command->response->output));
 	}
 

@@ -48,7 +48,7 @@ class QueryTest extends \lithium\test\Unit {
 	 */
 	public function testObjectConstruction() {
 		$query = new Query();
-		$this->assertFalse($query->conditions());
+		$this->assertEmpty($query->conditions());
 
 		$query = new Query(array('conditions' => 'foo', 'limit' => '10'));
 		$this->assertEqual(array('foo'), $query->conditions());
@@ -199,7 +199,7 @@ class QueryTest extends \lithium\test\Unit {
 		$result = $queryRecord->title;
 		$this->assertEqual($expected, $result);
 
-		$this->assertTrue($record === $query->entity());
+		$this->assertIdentical($record, $query->entity());
 	}
 
 	public function testComment() {
@@ -295,7 +295,7 @@ class QueryTest extends \lithium\test\Unit {
 		$ds = new MockDatabase();
 		$export = $query->export($ds);
 
-		$this->assertTrue(is_array($export));
+		$this->assertInternalType('array', $export);
 		$this->skipIf(!is_array($export), 'Query::export() does not return an array');
 
 		$expected = array(
@@ -374,14 +374,14 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $joins);
 
 		$this->assertEqual('bar', $joins[0]['foo']);
-		$this->assertFalse(isset($joins[0]['bar']));
+		$this->assertArrayNotHasKey('bar', $joins[0]);
 
 		$this->assertEqual('baz', $joins[1]['bar']);
-		$this->assertFalse(isset($joins[1]['foo']));
+		$this->assertArrayNotHasKey('foo', $joins[1]);
 
 		$query->joins('zim', array('dib' => 'gir'));
 		$joins = $query->joins();
-		$this->assertEqual(3, count($joins));
+		$this->assertCount(3, $joins);
 
 		$this->assertEqual('gir', $joins['zim']['dib']);
 
@@ -407,9 +407,8 @@ class QueryTest extends \lithium\test\Unit {
 			'fieldName' => 'mock_query_comments',
 			'alias' => 'MockQueryComment'
 		));
-		$keyExists = isset($export['relationships']);
-		$this->assertTrue($keyExists);
-		$this->skipIf(!$keyExists);
+		$this->assertArrayHasKey('relationships', $export);
+		$this->skipIf(!isset($export['relationships']));
 		$this->assertEqual($expected, $export['relationships']);
 
 		$query = new Query(compact('model') + array(
@@ -421,8 +420,8 @@ class QueryTest extends \lithium\test\Unit {
 		));
 		$expected = 'SELECT * FROM {foo} AS {MockQueryPost} LEFT JOIN AS ';
 		$expected .= '{MockQueryComment} ON {MockQueryPost}.{id} = {MockQueryComment}';
-		$expected .= '.{mock_query_post_id} GROUP BY author_id ORDER BY author_id ASC ';
-		$expected .= 'LIMIT 3;';
+		$expected .= '.{mock_query_post_id} GROUP BY {MockQueryPost}.{author_id} ORDER BY ';
+		$expected .= '{MockQueryPost}.{author_id} ASC LIMIT 3;';
 		$this->assertEqual($expected, $this->db->renderCommand($query));
 	}
 

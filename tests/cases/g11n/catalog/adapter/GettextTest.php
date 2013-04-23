@@ -54,7 +54,7 @@ class GettextTest extends \lithium\test\Unit {
 
 	public function testReadNonExistent() {
 		$result = $this->adapter->read('messageTemplate', 'root', null);
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	public function testReadUnreadable() {
@@ -229,7 +229,7 @@ EOD;
 		file_put_contents($file, $data);
 
 		$result = $this->adapter->read('message', 'de', null);
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	public function testReadAndWritePoWithFlagsAndComments() {
@@ -478,7 +478,7 @@ EOD;
 			)
 		);
 		$this->adapter->write('message', 'de', null, $data);
-		$this->assertTrue(file_exists("{$this->_path}/de/LC_MESSAGES/default.po"));
+		$this->assertFileExists("{$this->_path}/de/LC_MESSAGES/default.po");
 	}
 
 	public function testWriteMessageTemplateCompilesPot() {
@@ -493,7 +493,7 @@ EOD;
 			)
 		);
 		$this->adapter->write('messageTemplate', 'root', null, $data);
-		$this->assertTrue(file_exists("{$this->_path}/message_default.pot"));
+		$this->assertFileExists("{$this->_path}/message_default.pot");
 	}
 
 	public function testWriteReadPo() {
@@ -622,7 +622,7 @@ EOD;
 				'flags' => array(),
 				'translated' => array('translated 1-0', 'translated 1-1'),
 				'occurrences' => array(
-					array('file' => LITHIUM_APP_PATH . '/testa.php', 'line' => 22),
+					array('file' => Libraries::get(true, 'path') . '/testa.php', 'line' => 22),
 					array('file' => '/testb.php', 'line' => 23)
 				),
 				'comments' => array()
@@ -798,7 +798,7 @@ EOD;
 		file_put_contents($file, $data);
 
 		$result = $this->adapter->read('message', 'de', null);
-		$this->assertTrue(is_callable($result['pluralRule']['translated']));
+		$this->assertInternalType('callable', $result['pluralRule']['translated']);
 		$this->assertEqual(true, $result['pluralRule']['translated'](3));
 		$this->assertEqual(0, $result['pluralRule']['translated'](1));
 	}

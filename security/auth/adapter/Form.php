@@ -11,6 +11,7 @@ namespace lithium\security\auth\adapter;
 use lithium\core\Libraries;
 use UnexpectedValueException;
 use lithium\security\Password;
+use lithium\core\ClassNotFoundException;
 
 /**
  * The `Form` adapter provides basic authentication facilities for checking credentials submitted
@@ -306,7 +307,10 @@ class Form extends \lithium\core\Object {
 				$this->_fields[$val] = $val;
 			}
 		}
-		$this->_model = Libraries::locate('models', $this->_model);
+		if (!class_exists($model = Libraries::locate('models', $this->_model))) {
+			throw new ClassNotFoundException("Model class '{$this->_model}' not found.");
+		}
+		$this->_model = $model;
 	}
 
 	/**

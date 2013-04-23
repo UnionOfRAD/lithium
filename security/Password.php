@@ -145,9 +145,9 @@ class Password {
 	 */
 	public static function salt($type = null, $count = null) {
 		switch (true) {
-			case CRYPT_BLOWFISH == 1 && (!$type || $type === 'bf'):
+			case CRYPT_BLOWFISH === 1 && (!$type || $type === 'bf'):
 				return static::_genSaltBf($count);
-			case CRYPT_EXT_DES == 1 && (!$type || $type === 'xdes'):
+			case CRYPT_EXT_DES === 1 && (!$type || $type === 'xdes'):
 				return static::_genSaltXDES($count);
 			default:
 				return static::_genSaltMD5();

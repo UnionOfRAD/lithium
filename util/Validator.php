@@ -10,6 +10,7 @@ namespace lithium\util;
 
 use lithium\util\Set;
 use InvalidArgumentException;
+use Closure;
 
 /**
  * The `Validator` class provides static access to commonly used data validation logic. These common
@@ -234,10 +235,9 @@ class Validator extends \lithium\core\StaticObject {
 				              '((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468]' .
 				              '[048]|[3579][26])00)))))))\\,?\\ ((1[6-9]|[2-9]\\d)\\d{2}))$/',
 				'My'       => '%^(Jan(uary)?|Feb(ruary)?|Ma(r(ch)?|y)|Apr(il)?|Ju((ly?)|(ne?))|' .
-				              'Aug(ust)?|Oct(ober)?|(Sep(?=\\b|t)t?|Nov|Dec)(ember)?)[ /]((1[6-9]' .
+				              'Aug(ust)?|Oct(ober)?|(Sep(?=\\b|t)t?|Nov|Dec)(ember)?)\\ ((1[6-9]' .
 				              '|[2-9]\\d)\\d{2})$%',
-				'my'       => '%^(((0[123456789]|10|11|12)([- /.])(([1][9][0-9][0-9])|([2][0-9]' .
-				              '[0-9][0-9]))))$%'
+				'my'       => '%^(0?[1-9]|1[012])([- /.])((1[6-9])|([2-9]\\d)\\d{2})$%'
 			),
 			'ip' => function($value, $format = null, array $options = array()) {
 				$options += array('flags' => array());
@@ -361,6 +361,7 @@ class Validator extends \lithium\core\StaticObject {
 			}
 			list($prefix, $host) = explode('@', $params['value']);
 
+			$mxhosts = array();
 			if (getmxrr($host, $mxhosts)) {
 				return is_array($mxhosts);
 			}
@@ -406,53 +407,51 @@ class Validator extends \lithium\core\StaticObject {
 	 *
 	 * @param array $values An array of key/value pairs, where the values are to be checked.
 	 * @param array $rules An array of rules to check the values in `$values` against. Each key in
-	 *              `$rules` should match a key contained in `$values`, and each value should be a
-	 *              validation rule in one of the allowable formats. For example, if you are
-	 *              validating a data set containing a `'credit_card'` key, possible values for
-	 *              `$rules` would be as follows:
-	 *              - `array('credit_card' => 'You must include a credit card number')`: This is the
-	 *                simplest form of validation rule, in which the value is simply a message to
-	 *                display if the rule fails. Using this format, all other validation settings
-	 *                inherit from the defaults, including the validation rule itself, which only
-	 *                checks to see that the corresponding key in `$values` is present and contains
-	 *                a value that is not empty. _Please note when globalizing validation messages:_
-	 *                When specifying messages, it may be preferable to use a code string (i.e.
-	 *                `'ERR_NO_TITLE'`) instead of the full text of the validation error. These code
-	 *                strings may then be translated by the appropriate tools in the templating
-	 *                layer.
-	 *              - `array('credit_card' => array('creditCard', 'message' => 'Invalid CC #'))`:
-	 *                In the second format, the validation rule (in this case `creditCard`) and
-	 *                associated configuration are specified as an array, where the rule to use is
-	 *                the first value in the array (no key), and additional settings are specified
-	 *                as other keys in the array. Please see the list below for more information on
-	 *                allowed keys.
-	 *              - The final format allows you to apply multiple validation rules to a single
-	 *                value, and it is specified as follows:
-	 *
-	 * `array('credit_card' => array(
-	 * 	array('notEmpty', 'message' => 'You must include credit card number'),
-	 * 	array('creditCard', 'message' => 'Your credit card number must be valid')
-	 * ));`
+	 *        `$rules` should match a key contained in `$values`, and each value should be a
+	 *        validation rule in one of the allowable formats. For example, if you are
+	 *        validating a data set containing a `'credit_card'` key, possible values for
+	 *        `$rules` would be as follows:
+	 *        - `array('credit_card' => 'You must include a credit card number')`: This is the
+	 *          simplest form of validation rule, in which the value is simply a message to
+	 *          display if the rule fails. Using this format, all other validation settings
+	 *          inherit from the defaults, including the validation rule itself, which only
+	 *          checks to see that the corresponding key in `$values` is present and contains
+	 *          a value that is not empty. _Please note when globalizing validation messages:_
+	 *          When specifying messages, it may be preferable to use a code string (i.e.
+	 *          `'ERR_NO_TITLE'`) instead of the full text of the validation error. These code
+	 *          strings may then be translated by the appropriate tools in the templating layer.
+	 *         - `array('credit_card' => array('creditCard', 'message' => 'Invalid CC #'))`:
+	 *           In the second format, the validation rule (in this case `creditCard`) and
+	 *           associated configuration are specified as an array, where the rule to use is
+	 *           the first value in the array (no key), and additional settings are specified
+	 *           as other keys in the array. Please see the list below for more information on
+	 *           allowed keys.
+	 *         - The final format allows you to apply multiple validation rules to a single
+	 *           value, and it is specified as follows:
+	 *           `array('credit_card' => array(
+	 *                array('notEmpty', 'message' => 'You must include credit card number'),
+	 *                array('creditCard', 'message' => 'Your credit card number must be valid')
+	 *           ));`
 	 * @param array $options Validator-specific options.
-	 *
-	 * Each rule defined as an array can contain any of the following settings (in addition to the
-	 * first value, which represents the rule to be used):
-	 *  - `'message'` _string_: The error message to be returned if the validation rule fails. See
-	 *    the note above regarding globalization of error messages.
-	 *  - `'required`' _boolean_: Represents whether the value is required to be present in
-	 *    `$values`. If `'required'` is set to `false`, the validation rule will be skipped if the
-	 *     corresponding key is not present. Defaults to `true`.
-	 *  - `'skipEmpty'` _boolean_: Similar to `'required'`, this setting (if `true`) will cause the
-	 *    validation rule to be skipped if the corresponding value is empty (an empty string or
-	 *    `null`). Defaults to `false`.
-	 *  - `'format'` _string_: If the validation rule has multiple format definitions (see the
-	 *    `add()` or `__init()` methods), the name of the format to be used can be specified here.
-	 *    Additionally, two special values can be used: either `'any'`, which means that all formats
-	 *    will be checked and the rule will pass if any format passes, or `'all'`, which requires
-	 *    all formats to pass in order for the rule check to succeed.
+	 *        Each rule defined as an array can contain any of the following settings
+	 *        (in addition to the first value, which represents the rule to be used):
+	 *        - `'message'` _string_: The error message to be returned if the validation
+	 *          rule fails. See the note above regarding globalization of error messages.
+	 *        - `'required`' _boolean_: Represents whether the value is required to be
+	 *          present in `$values`. If `'required'` is set to `false`, the validation rule
+	 *          will be skipped if the corresponding key is not present. Defaults to `true`.
+	 *        - `'skipEmpty'` _boolean_: Similar to `'required'`, this setting (if `true`)
+	 *          will cause the validation rule to be skipped if the corresponding value
+	 *          is empty (an empty string or `null`). Defaults to `false`.
+	 *        - `'format'` _string_: If the validation rule has multiple format definitions
+	 *          (see the `add()` or `__init()` methods), the name of the format to be used
+	 *          can be specified here. Additionally, two special values can be used:
+	 *          either `'any'`, which means that all formats will be checked and the rule
+	 *          will pass if any format passes, or `'all'`, which requires all formats to
+	 *          pass in order for the rule check to succeed.
 	 * @return array Returns an array containing all validation failures for data in `$values`,
-	 *         where each key matches a key in `$values`, and each value is an array of that
-	 *         element's validation errors.
+	 *         where each key matches a key in `$values`, and each value is an array of
+	 *         that element's validation errors.
 	 * @filter
 	 */
 	public static function check(array $values, array $rules, array $options = array()) {
@@ -565,15 +564,14 @@ class Validator extends \lithium\core\StaticObject {
 	 *
 	 * @see lithium\util\Validator::$_rules
 	 * @param mixed $name The name of the validation rule (string), or an array of key/value pairs
-	 *              of names and rules.
+	 *        of names and rules.
 	 * @param string $rule If $name is a string, this should be a string regular expression, or a
-	 *               closure that returns a boolean indicating success. Should be left blank if
-	 *               `$name` is an array.
+	 *        closure that returns a boolean indicating success. Should be left blank if
+	 *        `$name` is an array.
 	 * @param array $options The default options for validating this rule. An option which applies
-	 *              to all regular expression rules is `'contains'` which, if set to true, allows
-	 *              validated values to simply _contain_ a match to a rule, rather than exactly
-	 *              matching it in whole.
-	 * @return void
+	 *        to all regular expression rules is `'contains'` which, if set to true, allows
+	 *        validated values to simply _contain_ a match to a rule, rather than exactly
+	 *        matching it in whole.
 	 */
 	public static function add($name, $rule = null, array $options = array()) {
 		if (!is_array($name)) {
@@ -622,10 +620,10 @@ class Validator extends \lithium\core\StaticObject {
 	 * Returns a list of available validation rules, or the configuration details of a single rule.
 	 *
 	 * @param string $name Optional name of a rule to get the details of. If not specified, an array
-	 *               of all available rule names is returned. Otherwise, returns the details of a
-	 *               single rule. This can be a regular expression string, a closure object, or an
-	 *               array of available rule formats made up of string regular expressions,
-	 *               closures, or both.
+	 *        of all available rule names is returned. Otherwise, returns the details of a
+	 *        single rule. This can be a regular expression string, a closure object, or an
+	 *        array of available rule formats made up of string regular expressions,
+	 *        closures, or both.
 	 * @return mixed Returns either an single array of rule names, or the details of a single rule.
 	 */
 	public static function rules($name = null) {
@@ -640,7 +638,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * and an array specifying which formats within the rule to use.
 	 *
 	 * @param array $rules All available rules.
-	 * @return closure Function returning boolean `true` if validation succeeded, `false` otherwise.
+	 * @return Closure Function returning boolean `true` if validation succeeded, `false` otherwise.
 	 */
 	protected static function _checkFormats($rules) {
 		return function($self, $params, $chain) use ($rules) {

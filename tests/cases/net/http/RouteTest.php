@@ -171,6 +171,11 @@ class RouteTest extends \lithium\test\Unit {
 		$result = $route->parse($request);
 		$this->assertEqual($expected, $result->params);
 
+		$request->url = '/posts/view/0';
+		$result = $route->parse($request);
+		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '0');
+		$this->assertEqual($expected, $result->params);
+
 		$request->url = '/posts/view/5';
 		$result = $route->parse($request);
 		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '5');
@@ -207,9 +212,31 @@ class RouteTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result->params);
 	}
 
+	public function testRouteParsingWithParamsEqualsToZero() {
+		$route = new Route(array(
+			'template' => '/{:controller}/{:action}/{:value}/{:id}.{:type}',
+			'params' => array('id' => null)
+		));
+		$request = new Request();
+		$default = array('controller' => 'posts');
+
+		$request->url = '/posts/action/0/123.json';
+		$result = $route->parse($request);
+		$expected = array(
+			'action' => 'action',
+			'value' => 0,
+			'id' => '123',
+			'type' => 'json'
+		) + $default;
+		$this->assertEqual($expected, $result->params);
+	}
+
 	public function testRouteMatchingWithEmptyTrailingParams() {
 		$route = new Route(array(
 			'template' => '/{:controller}/{:action}/{:args}',
+			'modifiers' => array('args' => function($value) {
+				return explode('/', $value);
+			}),
 			'formatters' => array('args' => function($value) {
 				return is_array($value) ? join('/', $value) : $value;
 			})
@@ -544,6 +571,107 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Test route matching for routes with specified request method (http:method)
+	 */
+	public function testMatchWithRequestMethod() {
+		$parameters = array('controller' => 'resource', 'action' => 'create');
+
+		$route = new Route(array(
+			'template' => '/resource',
+			'params' => $parameters + array('http:method' => 'POST')
+		));
+
+		$result = $route->match(array(
+			'controller' => 'resource', 'action' => 'create', 'http:method' => 'POST'
+		));
+		$this->assertEqual('/resource', $result);
+
+		$result = $route->match(array('controller' => 'resource', 'action' => 'create'));
+		$this->assertEqual(false, $result);
+	}
+
+	/**
+	 * Test route matching for routes with specified request method (http:method) and a param
+	 */
+	public function testMatchWithRequestMethodWithParam() {
+		$parameters = array('controller' => 'resource', 'action' => 'create');
+
+		$route = new Route(array(
+			'template' => '/{:param}',
+			'params' => $parameters + array('http:method' => 'POST')
+		));
+
+		$result = $route->match(array(
+			'controller' => 'resource',
+			'action' => 'create',
+			'param' => 'value',
+			'http:method' => 'POST'
+		));
+		$this->assertEqual('/value', $result);
+
+		$result = $route->match(array(
+			'controller' => 'resource', 'action' => 'create', 'param' => 'value'
+		));
+		$this->assertEqual(false, $result);
+	}
+
+	/**
+	 * Test route matching for routes with no request method (http:method)
+	 */
+	public function testMatchWithNoRequestMethod() {
+		$parameters = array('controller' => 'resource', 'action' => 'create');
+
+		$route = new Route(array(
+			'template' => '/resource',
+			'params' => $parameters
+		));
+
+		$result = $route->match(array('controller' => 'resource', 'action' => 'create'));
+		$this->assertEqual('/resource', $result);
+		$result = $route->match(array(
+			'controller' => 'resource', 'action' => 'create', 'http:method' => 'GET'
+		));
+		$this->assertEqual('/resource', $result);
+		$result = $route->match(array(
+			'controller' => 'resource', 'action' => 'create', 'http:method' => 'POST'
+		));
+		$this->assertEqual('/resource', $result);
+		$result = $route->match(array(
+			'controller' => 'resource', 'action' => 'create', 'http:method' => 'PUT'
+		));
+		$this->assertEqual('/resource', $result);
+	}
+
+	/**
+	 * Test route matching for routes with request method (http:method) GET
+	 */
+	public function testMatchWithRequestMethodGet() {
+		$parameters = array('controller' => 'resource', 'action' => 'create');
+
+		$route = new Route(array(
+			'template' => '/resource',
+			'params' => $parameters + array('http:method' => 'GET')
+		));
+
+		$result = $route->match(array(
+			'controller' => 'resource', 'action' => 'create', 'http:method' => 'GET')
+		);
+		$this->assertEqual('/resource', $result);
+
+		$result = $route->match(array('controller' => 'resource', 'action' => 'create'));
+		$this->assertEqual('/resource', $result);
+
+		$result = $route->match(array(
+			'controller' => 'resource', 'action' => 'create', 'http:method' => 'POST')
+		);
+		$this->assertEqual(false, $result);
+		$result = $route->match(array(
+			'controller' => 'resource', 'action' => 'create', 'http:method' => 'PUT')
+		);
+		$this->assertEqual(false, $result);
+	}
+
+	/**
 	 * Tests that routes with optional trailing elements have unnecessary slashes trimmed.
 	 */
 	public function testTrimmingEmptyPathElements() {
@@ -560,7 +688,12 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	public function testUrlEncodedArgs() {
-		$route = new Route(array('template' => '/{:controller}/{:action}/{:args}'));
+		$route = new Route(array(
+			'template' => '/{:controller}/{:action}/{:args}',
+			'modifiers' => array('args' => function($value) {
+				return explode('/', $value);
+			})
+		));
 		$request = new Request();
 		$request->url = '/posts/index/Food%20%26%20Dining';
 		$result = $route->parse($request);

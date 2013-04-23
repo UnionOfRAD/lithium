@@ -69,7 +69,7 @@ class FilterTest extends \lithium\test\Integration {
 			$report->run();
 
 			if (array_key_exists("Coverage", $filters)) {
-				$expected = 40;
+				$expected = 66.67;
 
 				$result = $report->results['filters'];
 
@@ -91,7 +91,6 @@ class FilterTest extends \lithium\test\Integration {
 	 *
 	 * @todo This needs further refactoring.
 	 */
-
 	protected function _powerPerms($arr) {
 		$powerSet = $this->_powerSet($arr);
 		$result = array();

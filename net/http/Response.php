@@ -85,10 +85,21 @@ class Response extends \lithium\net\http\Message {
 	/**
 	 * Adds config values to the public properties when a new object is created.
 	 *
-	 * @param array $config
+	 * @param array $config Configuration options : default value
+	 *        - `'protocol'` _string_: null
+	 *        - `'version'` _string_: '1.1'
+	 *        - `'headers'` _array_: array()
+	 *        - `'body'` _mixed_: null
+	 *        - `'message'` _string_: null
+	 *        - `'status'` _mixed_: null
+	 *        - `'type'` _string_: null
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('message' => null, 'type' => null);
+		$defaults = array(
+			'message' => null,
+			'status' => null,
+			'type' => null
+		);
 		parent::__construct($config + $defaults);
 
 		if ($this->_config['message']) {
@@ -96,6 +107,9 @@ class Response extends \lithium\net\http\Message {
 		}
 		if (isset($this->headers['Transfer-Encoding'])) {
 			$this->body = $this->_httpChunkedDecode($this->body);
+		}
+		if ($status = $this->_config['status']) {
+			$this->status($status);
 		}
 		if ($type = $this->_config['type']) {
 			$this->type($type);
@@ -115,39 +129,48 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
-	 * Return body parts and decode it into formatted type.
+	 * Add data to or compile and return the HTTP message body, optionally decoding its parts
+	 * according to content type.
 	 *
 	 * @see lithium\net\Message::body()
 	 * @see lithium\net\http\Message::_decode()
 	 * @param mixed $data
 	 * @param array $options
+	 *        - `'buffer'` _integer_: split the body string
+	 *        - `'encode'` _boolean_: encode the body based on the content type
+	 *        - `'decode'` _boolean_: decode the body based on the content type
 	 * @return array
 	 */
 	public function body($data = null, $options = array()) {
 		$defaults = array('decode' => true);
 		return parent::body($data, $options + $defaults);
 	}
+
 	/**
 	 * Set and get the status for the response.
 	 *
-	 * @param string $key
-	 * @param string $data
+	 * @param string $key Optional. Set to 'code' or 'message' to return just the code or message
+	 *        of the status, otherwise returns the full status header.
+	 * @param string $status The code or message of the status you wish to set.
 	 * @return string Returns the full HTTP status, with version, code and message.
 	 */
-	public function status($key = null, $data = null) {
-		if ($data === null) {
-			$data = $key;
+	public function status($key = null, $status = null) {
+		if ($status === null) {
+			$status = $key;
 		}
-		if ($data) {
+		if ($status) {
 			$this->status = array('code' => null, 'message' => null);
 
-			if (is_numeric($data) && isset($this->_statuses[$data])) {
-				$this->status = array('code' => $data, 'message' => $this->_statuses[$data]);
+			if (is_array($status)) {
+				$key = null;
+				$this->status = $status + $this->status;	
+			} elseif (is_numeric($status) && isset($this->_statuses[$status])) {
+				$this->status = array('code' => $status, 'message' => $this->_statuses[$status]);
 			} else {
 				$statuses = array_flip($this->_statuses);
 
-				if (isset($statuses[$data])) {
-					$this->status = array('code' => $statuses[$data], 'message' => $data);
+				if (isset($statuses[$status])) {
+					$this->status = array('code' => $statuses[$status], 'message' => $status);
 				}
 			}
 		}
@@ -210,14 +233,14 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
-	* Decodes content bodies transferred with HTTP chunked encoding.
-	*
-	* @link http://en.wikipedia.org/wiki/Chunked_transfer_encoding Wikipedia: Chunked encoding
-	* @param string $body A chunked HTTP message body.
-	* @return string Returns the value of `$body` with chunks decoded, but only if the value of the
-	*         `Transfer-Encoding` header is set to `'chunked'`. Otherwise, returns `$body`
-	*         unmodified.
-	*/
+	 * Decodes content bodies transferred with HTTP chunked encoding.
+	 *
+	 * @link http://en.wikipedia.org/wiki/Chunked_transfer_encoding Wikipedia: Chunked encoding
+	 * @param string $body A chunked HTTP message body.
+	 * @return string Returns the value of `$body` with chunks decoded, but only if the value of the
+	 *         `Transfer-Encoding` header is set to `'chunked'`. Otherwise, returns `$body`
+	 *         unmodified.
+	 */
 	protected function _httpChunkedDecode($body) {
 		if (stripos($this->headers['Transfer-Encoding'], 'chunked') === false) {
 			return $body;
@@ -228,10 +251,10 @@ class Response extends \lithium\net\http\Message {
 	}
 
 	/**
-	* Return the response as a string.
-	*
-	* @return string
-	*/
+	 * Return the response as a string.
+	 *
+	 * @return string
+	 */
 	public function __toString() {
 		$first = "{$this->protocol} {$this->status['code']} {$this->status['message']}";
 		if ($type = $this->headers('Content-Type')) {

@@ -35,7 +35,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testBasicCacheConfig() {
 		$result = Cache::config();
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$config = array('default' => array('adapter' => '\some\adapter', 'filters' => array()));
 		$result = Cache::config($config);
@@ -221,7 +221,7 @@ class CacheTest extends \lithium\test\Unit {
 
 		Cache::write('default', 'some_key', 'some value', '+1 minute');
 		$result = Cache::read('default', 'some_key', compact('conditions'));
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$this->assertFalse(Cache::read('non_existing', 'key_value', compact('conditions')));
 	}
@@ -386,7 +386,7 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 
 		$result = Cache::read('default', 'key_value', compact('conditions'));
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 		$result = Cache::write('default', 'keyed', 'some data', '+1 minute', compact('conditions'));
 		$this->assertTrue($result);
@@ -415,7 +415,7 @@ class CacheTest extends \lithium\test\Unit {
 
 		$result = Cache::delete('default', 'to delete');
 		$this->assertTrue($result);
-		$this->assertFalse(Cache::read('default', 'to delete'));
+		$this->assertEmpty(Cache::read('default', 'to delete'));
 	}
 
 	public function testCacheWriteAndDeleteWithConditions() {
@@ -466,7 +466,7 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$result = Cache::read('default', 'to delete');
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 
 	}
 
@@ -500,7 +500,7 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 
 		$result = Cache::config();
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 
 	public function testIncrement() {
@@ -519,7 +519,7 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$result = Cache::increment('default', 'increment');
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$result = Cache::read('default', 'increment');
 		$this->assertEqual(6, $result);
@@ -541,7 +541,7 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$result = Cache::decrement('default', 'decrement');
-		$this->assertTrue($result);
+		$this->assertNotEmpty($result);
 
 		$result = Cache::read('default', 'decrement');
 		$this->assertEqual(4, $result);
@@ -559,7 +559,7 @@ class CacheTest extends \lithium\test\Unit {
 
 	public function testIntegrationFileAdapterCacheConfig() {
 		$result = Cache::config();
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 		$config = array('default' => array('adapter' => 'File', 'filters' => array()));
 
 		Cache::config($config);
@@ -577,17 +577,18 @@ class CacheTest extends \lithium\test\Unit {
 		));
 		Cache::config($config);
 
-		$result = Cache::write('default', 'key', 'value', '+1 minute');
-		$this->assertTrue($result);
+		$time = time();
+		$result = Cache::write('default', 'key', 'value', "@{$time} +1 minute");
+		$this->assertNotEmpty($result);
 
-		$time = time() + 60;
+		$time = $time + 60;
 		$result = file_get_contents("{$path}/key");
 		$expected = "{:expiry:$time}\nvalue";
 		$this->assertEqual($result, $expected);
 
 		$result = unlink("{$path}/key");
 		$this->assertTrue($result);
-		$this->assertFalse(file_exists("{$path}/key"));
+		$this->assertFileNotExists("{$path}/key");
 	}
 
 	public function testIntegrationFileAdapterWithStrategies() {
@@ -603,10 +604,11 @@ class CacheTest extends \lithium\test\Unit {
 		Cache::config($config);
 
 		$data = array('some' => 'data');
-		$result = Cache::write('default', 'key', $data, '+1 minute');
-		$this->assertTrue($result);
+		$time = time();
+		$result = Cache::write('default', 'key', $data, "@{$time} +1 minute");
+		$this->assertNotEmpty($result);
 
-		$time = time() + 60;
+		$time = $time + 60;
 		$result = file_get_contents("{$path}/key");
 
 		$expected = "{:expiry:$time}\na:1:{s:4:\"some\";s:4:\"data\";}";
@@ -617,7 +619,7 @@ class CacheTest extends \lithium\test\Unit {
 
 		$result = unlink("{$path}/key");
 		$this->assertTrue($result);
-		$this->assertFalse(file_exists("{$path}/key"));
+		$this->assertFileNotExists("{$path}/key");
 	}
 
 	public function testIntegrationFileAdapterMultipleStrategies() {
@@ -633,10 +635,11 @@ class CacheTest extends \lithium\test\Unit {
 		Cache::config($config);
 
 		$data = array('some' => 'data');
-		$result = Cache::write('default', 'key', $data, '+1 minute');
-		$this->assertTrue($result);
+		$time = time();
+		$result = Cache::write('default', 'key', $data, "@{$time} +1 minute");
+		$this->assertNotEmpty($result);
 
-		$time = time() + 60;
+		$time = $time + 60;
 		$result = file_get_contents("{$path}/key");
 
 		$expected = "{:expiry:$time}\nYToxOntzOjQ6InNvbWUiO3M6NDoiZGF0YSI7fQ==";
@@ -647,7 +650,7 @@ class CacheTest extends \lithium\test\Unit {
 
 		$result = unlink("{$path}/key");
 		$this->assertTrue($result);
-		$this->assertFalse(file_exists("{$path}/key"));
+		$this->assertFileNotExists("{$path}/key");
 	}
 }
 

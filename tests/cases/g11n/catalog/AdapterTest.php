@@ -101,7 +101,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 
@@ -122,7 +123,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
@@ -146,7 +148,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
@@ -170,7 +173,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 
@@ -192,7 +196,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
@@ -216,7 +221,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
@@ -233,7 +239,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge(array(), $item);
 		$this->assertEqual($expected, $result);
 	}
@@ -257,7 +264,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array(),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
@@ -281,7 +289,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array('fuzzy' => false),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 
@@ -303,7 +312,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array('fuzzy' => true),
 				'comments' => array(),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
@@ -327,7 +337,8 @@ class AdapterTest extends \lithium\test\Unit {
 				'flags' => array(),
 				'comments' => array('a', 'b'),
 				'occurrences' => array()
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
@@ -354,7 +365,8 @@ class AdapterTest extends \lithium\test\Unit {
 					array('file' => 'a.php', 'line' => 2),
 					array('file' => 'b.php', 'line' => 55)
 				)
-		));
+			)
+		);
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}

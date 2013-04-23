@@ -238,7 +238,7 @@ EOD;
 		$this->adapter = new Code(array('path' => $this->_path, 'scope' => 'li3_bot'));
 
 		$results = $this->adapter->read('messageTemplate', 'root', null);
-		$this->assertFalse($results);
+		$this->assertEmpty($results);
 
 		$results = $this->adapter->read('messageTemplate', 'root', 'li3_bot');
 		$expected = array('singular' => 'simple 1');
@@ -248,7 +248,7 @@ EOD;
 
 	public function testNoReadSupportForOtherCategories() {
 		$result = $this->adapter->read('message', 'de', null);
-		$this->assertFalse($result);
+		$this->assertEmpty($result);
 	}
 }
 

@@ -8,55 +8,57 @@
 
 namespace lithium\tests\integration\data;
 
-use lithium\data\Connections;
-use lithium\tests\mocks\data\Companies;
-use lithium\tests\mocks\data\Employees;
+use lithium\tests\fixture\model\gallery\Images;
+use lithium\tests\fixture\model\gallery\Galleries;
+use li3_fixtures\test\Fixtures;
 
-class SourceTest extends \lithium\test\Integration {
+class SourceTest extends \lithium\tests\integration\data\Base {
 
-	protected $_database = null;
-
-	protected $_connection = null;
-
-	protected $_classes = array(
-		'employees' => 'lithium\tests\mocks\data\Employees',
-		'companies' => 'lithium\tests\mocks\data\Companies'
+	protected $_fixtures = array(
+		'images' => 'lithium\tests\fixture\model\gallery\ImagesFixture',
+		'galleries' => 'lithium\tests\fixture\model\gallery\GalleriesFixture',
 	);
 
-	public $companiesData = array(
+	protected $_classes = array(
+		'images' => 'lithium\tests\fixture\model\gallery\Images',
+		'galleries' => 'lithium\tests\fixture\model\gallery\Galleries'
+	);
+
+	public $galleriesData = array(
 		array('name' => 'StuffMart', 'active' => true),
 		array('name' => 'Ma \'n Pa\'s Data Warehousing & Bait Shop', 'active' => false)
 	);
 
 	/**
+	 * Skip the test if no test database connection available.
+	 */
+	public function skip() {
+		parent::connect($this->_connection);
+		if (!class_exists('li3_fixtures\test\Fixtures')) {
+			$this->skipIf(true, "These tests need `'li3_fixtures'` to be runned.");
+		}
+	}
+
+	/**
 	 * Creating the test database
 	 */
 	public function setUp() {
-		$this->_connection->connection->put($this->_database);
+		Fixtures::config(array(
+			'db' => array(
+				'adapter' => 'Connection',
+				'connection' => $this->_connection,
+				'fixtures' => $this->_fixtures
+			)
+		));
+		Fixtures::create('db');
 	}
 
 	/**
 	 * Dropping the test database
 	 */
 	public function tearDown() {
-		$this->_connection->connection->delete($this->_database);
-	}
-
-	/**
-	 * Skip the test if no test database connection available.
-	 */
-	public function skip() {
-		$connection = 'lithium_couch_test';
-		$config = Connections::get($connection, array('config' => true));
-		$isConnected = $config && Connections::get($connection)->isConnected(array(
-			'autoConnect' => true
-		));
-		$isAvailable = $config && $isConnected;
-		$this->skipIf(!$isAvailable, "No {$connection} connection available.");
-
-		$this->_key = Companies::key();
-		$this->_database = $config['database'];
-		$this->_connection = Connections::get($connection);
+		Fixtures::clear('db');
+		Galleries::reset();
 	}
 
 	/**
@@ -64,8 +66,8 @@ class SourceTest extends \lithium\test\Integration {
 	 * to an arbitrary data store, re-read and updated.
 	 */
 	public function testSingleReadWriteWithKey() {
-		$key = Companies::meta('key');
-		$new = Companies::create(array($key => 12345, 'name' => 'Acme, Inc.'));
+		$key = Galleries::meta('key');
+		$new = Galleries::create(array($key => 12345, 'name' => 'Acme, Inc.'));
 
 		$result = $new->data();
 		$expected = array($key => 12345, 'name' => 'Acme, Inc.');
@@ -76,19 +78,19 @@ class SourceTest extends \lithium\test\Integration {
 		$this->assertTrue($new->save());
 		$this->assertTrue($new->exists());
 
-		$existing = Companies::find(12345);
+		$existing = Galleries::find(12345);
 		$result = $existing->data();
 		$this->assertEqual($expected[$key], $result[$key]);
 		$this->assertEqual($expected['name'], $result['name']);
 		$this->assertTrue($existing->exists());
 
-		$existing->name = 'Big Brother and the Holding Companies';
+		$existing->name = 'Big Brother and the Holding Galleries';
 		$result = $existing->save();
 		$this->assertTrue($result);
 
-		$existing = Companies::find(12345);
+		$existing = Galleries::find(12345);
 		$result = $existing->data();
-		$expected['name'] = 'Big Brother and the Holding Companies';
+		$expected['name'] = 'Big Brother and the Holding Galleries';
 		$this->assertEqual($expected[$key], $result[$key]);
 		$this->assertEqual($expected['name'], $result['name']);
 
@@ -96,26 +98,26 @@ class SourceTest extends \lithium\test\Integration {
 	}
 
 	public function testRewind() {
-		$key = Companies::meta('key');
-		$new = Companies::create(array($key => 12345, 'name' => 'Acme, Inc.'));
+		$key = Galleries::meta('key');
+		$new = Galleries::create(array($key => 12345, 'name' => 'Acme, Inc.'));
 
 		$result = $new->data();
-		$this->assertTrue($result !== null);
+		$this->assertNotEmpty($result);
 		$this->assertTrue($new->save());
 		$this->assertTrue($new->exists());
 
-		$result = Companies::all(12345);
-		$this->assertTrue($result !== null);
+		$result = Galleries::all(12345);
+		$this->assertNotNull($result);
 
 		$result = $result->rewind();
-		$this->assertTrue($result !== null);
-		$this->assertTrue(!is_string($result));
+		$this->assertNotNull($result);
+		$this->assertInstanceOf('lithium\data\Entity', $result);
 	}
 
 	public function testFindFirstWithFieldsOption() {
 		return;
-		$key = Companies::meta('key');
-		$new = Companies::create(array($key => 1111, 'name' => 'Test find first with fields.'));
+		$key = Galleries::meta('key');
+		$new = Galleries::create(array($key => 1111, 'name' => 'Test find first with fields.'));
 		$result = $new->data();
 
 		$expected = array($key => 1111, 'name' => 'Test find first with fields.');
@@ -125,8 +127,8 @@ class SourceTest extends \lithium\test\Integration {
 		$this->assertTrue($new->save());
 		$this->assertTrue($new->exists());
 
-		$result = Companies::find('first', array('fields' => array('name')));
-		$this->assertFalse(is_null($result));
+		$result = Galleries::find('first', array('fields' => array('name')));
+		$this->assertNotInternalType('null', $result);
 
 		$this->skipIf(is_null($result), 'No result returned to test');
 		$result = $result->data();
@@ -136,41 +138,42 @@ class SourceTest extends \lithium\test\Integration {
 	}
 
 	public function testReadWriteMultiple() {
-		$companies = array();
-		$key = Companies::meta('key');
+		$this->skipIf($this->with(array('CouchDb')));
+		$galleries = array();
+		$key = Galleries::meta('key');
 
-		foreach ($this->companiesData as $data) {
-			$companies[] = Companies::create($data);
-			$this->assertTrue(end($companies)->save());
-			$this->assertTrue(end($companies)->$key);
+		foreach ($this->galleriesData as $data) {
+			$galleries[] = Galleries::create($data);
+			$this->assertTrue(end($galleries)->save());
+			$this->assertNotEmpty(end($galleries)->$key);
 		}
 
-		$this->assertIdentical(2, Companies::count());
-		$this->assertIdentical(1, Companies::count(array('active' => true)));
-		$this->assertIdentical(1, Companies::count(array('active' => false)));
-		$this->assertIdentical(0, Companies::count(array('active' => null)));
-		$all = Companies::all();
-		$this->assertIdentical(2, Companies::count());
+		$this->assertIdentical(2, Galleries::count());
+		$this->assertIdentical(1, Galleries::count(array('active' => true)));
+		$this->assertIdentical(1, Galleries::count(array('active' => false)));
+		$this->assertIdentical(0, Galleries::count(array('active' => null)));
+		$all = Galleries::all();
+		$this->assertIdentical(2, Galleries::count());
 
-		$expected = count($this->companiesData);
+		$expected = count($this->galleriesData);
 		$this->assertEqual($expected, $all->count());
 		$this->assertEqual($expected, count($all));
 
 		$id = (string) $all->first()->{$key};
 		$this->assertTrue(strlen($id) > 0);
-		$this->assertTrue($all->data());
+		$this->assertNotEmpty($all->data());
 
-		foreach ($companies as $companies) {
-			$this->assertTrue($companies->delete());
+		foreach ($galleries as $galleries) {
+			$this->assertTrue($galleries->delete());
 		}
-		$this->assertIdentical(0, Companies::count());
+		$this->assertIdentical(0, Galleries::count());
 	}
 
 	public function testEntityFields() {
-		foreach ($this->companiesData as $data) {
-			Companies::create($data)->save();
+		foreach ($this->galleriesData as $data) {
+			Galleries::create($data)->save();
 		}
-		$all = Companies::all();
+		$all = Galleries::all();
 
 		$result = $all->first(function($doc) { return $doc->name === 'StuffMart'; });
 		$this->assertEqual('StuffMart', $result->name);
@@ -184,7 +187,7 @@ class SourceTest extends \lithium\test\Integration {
 		$result = $result->data();
 		$this->assertEqual('Ma \'n Pa\'s Data Warehousing & Bait Shop', $result['name']);
 
-		$this->assertNull($all->next());
+		$this->assertFalse($all->next());
 	}
 
 	/**
@@ -195,59 +198,57 @@ class SourceTest extends \lithium\test\Integration {
 	 * @return void
 	 */
 	public function testGetRecordByGeneratedId() {
-		$key = Companies::meta('key');
-		$companies = Companies::create(array('name' => 'Test Companies'));
-		$this->assertTrue($companies->save());
+		$key = Galleries::meta('key');
+		$galleries = Galleries::create(array('name' => 'Test Galleries'));
+		$this->assertTrue($galleries->save());
 
-		$id = (string) $companies->{$key};
-		$companiesCopy = Companies::find($id)->data();
-		$data = $companies->data();
+		$id = (string) $galleries->{$key};
+		$galleriesCopy = Galleries::find($id)->data();
+		$data = $galleries->data();
 
 		foreach ($data as $key => $value) {
-			$this->assertTrue(isset($companiesCopy[$key]));
-			$this->assertEqual($data[$key], $companiesCopy[$key]);
+			$this->assertTrue(isset($galleriesCopy[$key]));
+			$this->assertEqual($data[$key], $galleriesCopy[$key]);
 		}
 	}
 
 	/**
 	 * Tests the default relationship information provided by the backend data source.
-	 *
-	 * @return void
 	 */
 	public function testDefaultRelationshipInfo() {
-		$connection = $this->_connection;
-		$message = "Relationships are not supported by this adapter.";
-		$this->skipIf(!$connection::enabled('relationships'), $message);
+		$db = $this->_db;
+		$this->skipIf(!$db::enabled('relationships'));
+		$this->assertEqual(array('Images'), array_keys(Galleries::relations()));
+		$this->assertEqual(array(
+			'Galleries', 'ImagesTags', 'Comments'
+		), array_keys(Images::relations()));
 
-		$this->assertEqual(array('Employeess'), array_keys(Companies::relations()));
-		$this->assertEqual(array('Companies'), array_keys(Employees::relations()));
+		$this->assertEqual(array('Images'), Galleries::relations('hasMany'));
+		$this->assertEqual(array('Galleries'), Images::relations('belongsTo'));
 
-		$this->assertEqual(array('Employeess'), Companies::relations('hasMany'));
-		$this->assertEqual(array('Companies'), Employees::relations('belongsTo'));
+		$this->assertEmpty(Galleries::relations('belongsTo'));
+		$this->assertEmpty(Galleries::relations('hasOne'));
 
-		$this->assertFalse(Companies::relations('belongsTo'));
-		$this->assertFalse(Companies::relations('hasOne'));
+		$this->assertEqual(array('ImagesTags', 'Comments'), Images::relations('hasMany'));
+		$this->assertEmpty(Images::relations('hasOne'));
 
-		$this->assertFalse(Employees::relations('hasMany'));
-		$this->assertFalse(Employees::relations('hasOne'));
-
-		$result = Companies::relations('Employeess');
+		$result = Galleries::relations('Images');
 
 		$this->assertEqual('hasMany', $result->data('type'));
-		$this->assertEqual($this->_classes['employees'], $result->data('to'));
+		$this->assertEqual($this->_classes['images'], $result->data('to'));
 	}
 
 	public function testAbstractTypeHandling() {
-		$key = Companies::meta('key');
+		$key = Galleries::meta('key');
 
-		foreach ($this->companiesData as $data) {
-			$companies[] = Companies::create($data);
-			$this->assertTrue(end($companies)->save());
-			$this->assertTrue(end($companies)->{$key});
+		foreach ($this->galleriesData as $data) {
+			$galleries[] = Galleries::create($data);
+			$this->assertTrue(end($galleries)->save());
+			$this->assertNotEmpty(end($galleries)->{$key});
 		}
 
-		foreach (Companies::all() as $companies) {
-			$this->assertTrue($companies->delete());
+		foreach (Galleries::all() as $galleries) {
+			$this->assertTrue($galleries->delete());
 		}
 	}
 }

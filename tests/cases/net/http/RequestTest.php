@@ -111,6 +111,17 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testQueryStringMerge() {
+		$expected = "?param=foo";
+		$this->request->query = array('param' => 'value');
+		$result = $this->request->queryString(array('param' => 'foo'));
+		$this->assertEqual($expected, $result);
+
+		$expected = "?param=foo&param2=bar";
+		$result = $this->request->queryString(array('param' => 'foo', 'param2' => 'bar'));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testToString() {
 		$expected = join("\r\n", array(
 			'GET / HTTP/1.1',
@@ -237,6 +248,25 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testToUrlOverride() {
+		$request = new Request(array(
+			'scheme' => 'http',
+			'host' => 'localhost',
+			'port' => 80,
+			'query' => array('foo' => 'bar', 'bin' => 'baz')
+		));
+
+		$result = $request->to('url', array(
+			'scheme' => 'https',
+			'host' => 'lithium.com',
+			'port' => 443,
+			'query' => array('foo' => 'you')
+		));
+		$expected = 'https://lithium.com:443/?foo=you';
+
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testToContext() {
 		$expected = array('http' => array(
 			'method' => 'GET',
@@ -300,6 +330,14 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testParseUrlToConfig() {
 		$url = "http://localhost/path/one.php?param=1&param=2";
+		$config = parse_url($url);
+		$request = new Request($config);
+
+		$expected = $url;
+		$result = $request->to('url');
+		$this->assertEqual($expected, $result);
+
+		$url = "http://localhost:80/path/one.php?param=1&param=2";
 		$config = parse_url($url);
 		$request = new Request($config);
 

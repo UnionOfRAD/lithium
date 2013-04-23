@@ -8,6 +8,7 @@
 
 namespace lithium\tests\integration\g11n;
 
+use lithium\core\Libraries;
 use lithium\g11n\Catalog;
 use lithium\util\Validator;
 
@@ -21,8 +22,9 @@ class ResourcesValidatorTest extends \lithium\test\Integration {
 		Catalog::config(array(
 			'lithium' => array(
 				'adapter' => 'Php',
-				'path' => LITHIUM_LIBRARY_PATH . '/lithium/g11n/resources/php'
-		)));
+				'path' => Libraries::get('lithium', 'path') . '/g11n/resources/php'
+			)
+		));
 		Validator::__init();
 	}
 

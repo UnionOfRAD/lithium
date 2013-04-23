@@ -11,7 +11,6 @@ namespace lithium\tests\cases\storage\session\strategy;
 use lithium\storage\session\strategy\Hmac;
 use lithium\tests\mocks\storage\session\strategy\MockCookieSession;
 
-
 class HmacTest extends \lithium\test\Unit {
 
 	public function setUp() {
@@ -29,7 +28,7 @@ class HmacTest extends \lithium\test\Unit {
 	public function testConstruct() {
 		$secret = 'foo';
 		$hmac = new Hmac(compact('secret'));
-		$this->assertTrue($hmac instanceof Hmac);
+		$this->assertInstanceOf('lithium\storage\session\strategy\Hmac', $hmac);
 	}
 
 	public function testWrite() {

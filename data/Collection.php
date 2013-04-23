@@ -8,6 +8,8 @@
 
 namespace lithium\data;
 
+use Closure;
+
 /**
  * The `Collection` class extends the generic `lithium\util\Collection` class to provide
  * context-specific features for working with sets of data persisted by a backend data store. This
@@ -77,6 +79,7 @@ abstract class Collection extends \lithium\util\Collection {
 
 	/**
 	 * Setted to `true` when the collection has begun iterating.
+	 *
 	 * @var integer
 	 */
 	protected $_started = false;
@@ -205,7 +208,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * current `Collection`.
 	 *
 	 * @param string $offset String or integer indicating the offset or
-	 *               index of an entity in the set.
+	 *        index of an entity in the set.
 	 * @return boolean Result.
 	 */
 	public function offsetExists($offset) {
@@ -344,11 +347,11 @@ abstract class Collection extends \lithium\util\Collection {
 	 * objects contained in this collection.
 	 *
 	 * @param mixed $filter Callback to use for filtering, or array of key/value pairs which entity
-	 *              properties will be matched against.
+	 *        properties will be matched against.
 	 * @param array $options Options to modify the behavior of this method. See the documentation
-	 *              for the `$options` parameter of `lithium\util\Collection::find()`.
+	 *        for the `$options` parameter of `lithium\util\Collection::find()`.
 	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
-	 * `$options` argument, then an instance of this class will be returned.
+	 *         `$options` argument, then an instance of this class will be returned.
 	 */
 	public function find($filter, array $options = array()) {
 		$this->offsetGet(null);
@@ -374,7 +377,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * `Collection`.
 	 *
 	 * @param array $filter An array of key/value pairs used to filter `Collection` items.
-	 * @return closure Returns a closure that wraps the array and attempts to match each value
+	 * @return Closure Returns a closure that wraps the array and attempts to match each value
 	 *         against `Collection` item properties.
 	 */
 	protected function _filterFromArray(array $filter) {
@@ -418,8 +421,8 @@ abstract class Collection extends \lithium\util\Collection {
 	 *
 	 * @param callback $filter The filter to apply.
 	 * @param array $options The available options are:
-	 *              - `'collect'`: If `true`, the results will be returned wrapped
-	 *              in a new `Collection` object or subclass.
+	 *        - `'collect'`: If `true`, the results will be returned wrapped
+	 *        in a new `Collection` object or subclass.
 	 * @return object The filtered data.
 	 */
 	public function map($filter, array $options = array()) {
@@ -460,9 +463,9 @@ abstract class Collection extends \lithium\util\Collection {
 	 * Overriden to load any data that has not yet been loaded.
 	 *
 	 * @param mixed $field The field to sort the data on, can also be a callback
-	 * to a custom sort function.
+	 *        to a custom sort function.
 	 * @param array $options The available options are:
-	 *              - No options yet implemented
+	 *        - No options yet implemented
 	 * @return $this, useful for chaining this with other methods.
 	 */
 	public function sort($field = 'id', array $options = array()) {
@@ -480,7 +483,7 @@ abstract class Collection extends \lithium\util\Collection {
 
 				return strcmp($a->$field, $b->$field);
 			};
-		} else if (is_callable($field)) {
+		} elseif (is_callable($field)) {
 			$sorter = $field;
 		}
 
@@ -514,7 +517,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @see lithium\util\Collection::formats()
 	 * @see lithium\util\Collection::$_formats
 	 * @param string $format By default the only supported value is `'array'`. However, additional
-	 *               format handlers can be registered using the `formats()` method.
+	 *        format handlers can be registered using the `formats()` method.
 	 * @param array $options Options for converting this collection:
 	 *        - `'internal'` _boolean_: Indicates whether the current internal representation of the
 	 *          collection should be exported. Defaults to `false`, which uses the standard iterator
@@ -554,7 +557,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 *
 	 * @param string $name Stat name.
 	 * @return mixed Single stat if `$name` supplied, else all stats for this
-	 *               `Collection`.
+	 *         `Collection`.
 	 */
 	public function stats($name = null) {
 		if ($name) {
@@ -566,8 +569,6 @@ abstract class Collection extends \lithium\util\Collection {
 	/**
 	 * Executes when the associated result resource pointer reaches the end of its data set. The
 	 * resource is freed by the connection, and the reference to the connection is unlinked.
-	 *
-	 * @return void
 	 */
 	public function close() {
 		if (!empty($this->_result)) {
@@ -589,8 +590,6 @@ abstract class Collection extends \lithium\util\Collection {
 
 	/**
 	 * Ensures that the data set's connection is closed when the object is destroyed.
-	 *
-	 * @return void
 	 */
 	public function __destruct() {
 		$this->close();
@@ -613,7 +612,6 @@ abstract class Collection extends \lithium\util\Collection {
 	 *
 	 * @see lithium\data\Collection::_populate()
 	 * @see lithium\data\Collection::_offsetSet()
-	 *
 	 * @param mixed $data An array or an `Entity` object to set.
 	 * @param mixed $offset The offset. If offset is `null` data is simply appended to the set.
 	 * @param array $options Any additional options to pass to the `Entity`'s constructor.

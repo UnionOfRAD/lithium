@@ -21,8 +21,8 @@ use lithium\util\String;
  *
  * {{{
  * Session::config(array('default' => array(
- *	'adapter' => 'Cookie',
- *	'strategies' => array('Hmac' => array('secret' => 'foobar'))
+ *    'adapter' => 'Cookie',
+ *    'strategies' => array('Hmac' => array('secret' => 'foobar'))
  * )));
  * }}}
  *

@@ -10,6 +10,8 @@ namespace lithium\analysis\logger\adapter;
 
 use lithium\util\Inflector;
 use lithium\core\NetworkException;
+use lithium\core\Libraries;
+use Closure;
 
 /**
  * The `Growl` logger implements support for the [ Growl](http://growl.info/) notification system
@@ -99,7 +101,7 @@ class Growl extends \lithium\core\Object {
 	 *                Growl to be able to send. Defaults to `array('Errors', 'Messages')`.
 	 */
 	public function __construct(array $config = array()) {
-		$name = basename(LITHIUM_APP_PATH);
+		$name = basename(Libraries::get(true, 'path'));
 
 		$defaults = compact('name') + array(
 			'host'     => '127.0.0.1',
@@ -116,14 +118,14 @@ class Growl extends \lithium\core\Object {
 	/**
 	 * Writes `$message` to a new Growl notification.
 	 *
-	 * @param string $type The `Logger`-based priority of the message. This value is mapped to
-	 *               a Growl-specific priority value if possible.
+	 * @param string $priority The `Logger`-based priority of the message. This value is mapped
+	 *               to a Growl-specific priority value if possible.
 	 * @param string $message Message to be shown.
 	 * @param array $options Any options that are passed to the `notify()` method. See the
 	 *              `$options` parameter of `notify()`.
-	 * @return closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($type, $message, array $options = array()) {
+	public function write($priority, $message, array $options = array()) {
 		$_self =& $this;
 		$_priorities = $this->_priorities;
 

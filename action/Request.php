@@ -8,6 +8,7 @@
 
 namespace lithium\action;
 
+use lithium\core\Libraries;
 use lithium\util\Set;
 use lithium\util\Validator;
 
@@ -49,16 +50,16 @@ class Request extends \lithium\net\http\Request {
 	public $persist = array();
 
 	/**
-	 * POST data.
+	 * Data found in the HTTP request body, most often populated by `$_POST` and `$_FILES`.
 	 *
-	 * @var data
+	 * @var array
 	 */
 	public $data = array();
 
 	/**
-	 * GET data.
+	 * Key/value pairs found encoded in the request URL after '?', populated by `$_GET`.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	public $query = array();
 
@@ -70,19 +71,19 @@ class Request extends \lithium\net\http\Request {
 	protected $_base = null;
 
 	/**
-	 * Holds the environment variables for the request. Retrieved with env().
+	 * Computed environment variables for the request. Retrieved with env().
 	 *
 	 * @var array
 	 * @see lithium\action\Request::env()
 	 */
-	protected $_env = array();
+	protected $_computed = array();
 
 	/**
-	 * Classes used by `Request`.
+	 * Holds the server globals & environment variables.
 	 *
 	 * @var array
 	 */
-	protected $_classes = array('media' => 'lithium\net\http\Media');
+	protected $_env = array();
 
 	/**
 	 * If POST / PUT data is coming from an input stream (rather than `$_POST`), this specified
@@ -117,7 +118,7 @@ class Request extends \lithium\net\http\Request {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'classes' => 'merge', 'env', 'detectors' => 'merge', 'base', 'type', 'stream'
+		'classes' => 'merge', 'detectors' => 'merge', 'type', 'stream'
 	);
 
 	/**
@@ -136,17 +137,92 @@ class Request extends \lithium\net\http\Request {
 	protected $_locale = null;
 
 	/**
-	 * Initialize request object, pulling request data from superglobals.
+	 * Adds config values to the public properties when a new object is created, pulling
+	 * request data from superglobals if `globals` is set to `true`.
 	 *
-	 * Defines an artificial `'PLATFORM'` environment variable as either
-	 * `'IIS'`, `'CGI'` or `null` to allow checking for the SAPI in a
-	 * normalized way.
+	 * @param array $config Configuration options : default values are:
+	 *        - `'base'` _string_: null
+	 *        - `'url'` _string_: null
+	 *        - `'protocol'` _string_: null
+	 *        - `'version'` _string_: '1.1'
+	 *        - `'method'` _string_: 'GET'
+	 *        - `'scheme'` _string_: 'http'
+	 *        - `'host'` _string_: 'localhost'
+	 *        - `'port'` _integer_: null
+	 *        - `'username'` _string_: null
+	 *        - `'password'` _string_: null
+	 *        - `'path'` _string_: null
+	 *        - `'query'` _array_: array()
+	 *        - `'headers'` _array_: array()
+	 *        - `'type'` _string_: null
+	 *        - `'auth'` _mixed_: null
+	 *        - `'body'` _mixed_: null
+	 *        - `'data'` _array_: array()
+	 *        - `'env'` _array_: array()
+	 *        - `'globals'` _boolean_: true
+	 */
+	public function __construct(array $config = array()) {
+		$defaults = array(
+			'base' => null,
+			'url' => null,
+			'env' => array(),
+			'query' => array(),
+			'data' => array(),
+			'globals' => true
+		);
+		$config += $defaults;
+
+		if ($config['globals'] === true) {
+			if (isset($_SERVER)) {
+				$config['env'] += $_SERVER;
+			}
+			if (isset($_ENV)) {
+				$config['env'] += $_ENV;
+			}
+			if (isset($_GET)) {
+				$config['query'] += $_GET;
+			}
+			if (isset($_POST)) {
+				$config['data'] += $_POST;
+			}
+		}
+
+		$this->_env = $config['env'];
+
+		if (!isset($config['host'])) {
+			$config['host'] = $this->env('HTTP_HOST');
+		}
+
+		if (!isset($config['protocol'])) {
+			$config['protocol'] = $this->env('SERVER_PROTOCOL');
+		}
+
+		if ($config['protocol'] && strpos($config['protocol'], '/')) {
+			list($scheme, $version) = explode('/', $config['protocol']);
+			$https = ($this->env('HTTPS') ? 's' : '');
+			$scheme = strtolower($scheme) . $https;
+			if (!isset($config['scheme'])) {
+				$config['scheme'] = $scheme;
+			}
+			if (!isset($config['version'])) {
+				$config['version'] = $version;
+			}
+		}
+
+		$this->_base = $this->_base($config['base']);
+		$this->url = $this->_url($config['url']);
+
+		parent::__construct($config);
+	}
+
+	/**
+	 * Initialize request object
 	 *
-	 * @return void
+	 * Defines an artificial `'PLATFORM'` environment variable as either `'IIS'`, `'CGI'` or `null`
+	 * to allow checking for the SAPI in a normalized way.
 	 */
 	protected function _init() {
 		parent::_init();
-
 		$mobile = array(
 			'iPhone', 'MIDP', 'AvantGo', 'BlackBerry', 'J2ME', 'Opera Mini', 'DoCoMo', 'NetFront',
 			'Nokia', 'PalmOS', 'PalmSource', 'portalmmm', 'Plucker', 'ReqwirelessWeb', 'iPod',
@@ -156,36 +232,15 @@ class Request extends \lithium\net\http\Request {
 			$mobile = array_merge($mobile, (array) $this->_config['detectors']['mobile'][1]);
 		}
 		$this->_detectors['mobile'][1] = $mobile;
-		$defaults = array('REQUEST_METHOD' => 'GET', 'CONTENT_TYPE' => 'text/html');
-		$this->_env += (array) $_SERVER + (array) $_ENV + $defaults;
-		$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
-		$this->_env['PLATFORM'] = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
-		$this->_base = $this->_base();
-		$this->url = $this->_url();
 
-		if (!empty($this->_config['query'])) {
-			$this->query = $this->_config['query'];
-		}
-		if (isset($_GET)) {
-			$this->query += $_GET;
-		}
-		if (!empty($this->_config['data'])) {
-			$this->data = $this->_config['data'];
-		}
-		if (isset($_POST)) {
-			$this->data += $_POST;
-		}
+		$this->data = $this->_config['data'];
 		if (isset($this->data['_method'])) {
-			$this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'] = strtoupper($this->data['_method']);
+			$this->_computed['HTTP_X_HTTP_METHOD_OVERRIDE'] = strtoupper($this->data['_method']);
 			unset($this->data['_method']);
 		}
-		if (!empty($this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
-			$this->_env['REQUEST_METHOD'] = $this->_env['HTTP_X_HTTP_METHOD_OVERRIDE'];
-		}
 		$type = $this->type($this->_config['type'] ?: $this->env('CONTENT_TYPE'));
-		$this->method = $method = strtoupper($this->_env['REQUEST_METHOD']);
+		$this->method = $method = strtoupper($this->env('REQUEST_METHOD'));
 		$hasBody = in_array($method, array('POST', 'PUT', 'PATCH'));
-
 		if (!$this->data && $hasBody && $type !== 'html') {
 			$this->_stream = $this->_stream ?: fopen('php://input', 'r');
 			$media = $this->_classes['media'];
@@ -231,67 +286,108 @@ class Request extends \lithium\net\http\Request {
 	 * @todo Refactor to lazy-load environment settings
 	 */
 	public function env($key) {
-		if (strtolower($key) === 'base') {
-			return $this->_base;
+		if (array_key_exists($key, $this->_computed)) {
+			return $this->_computed[$key];
 		}
 
-		if ($key === 'SCRIPT_NAME' && !isset($this->_env['SCRIPT_NAME'])) {
-			if ($this->_env['PLATFORM'] === 'CGI' || isset($this->_env['SCRIPT_URL'])) {
-				$key = 'SCRIPT_URL';
+		$val = null;
+		if (!empty($this->_env[$key])) {
+			$val = $this->_env[$key];
+			if ($key !== 'REMOTE_ADDR' && $key !== 'HTTPS' && $key !== 'REQUEST_METHOD') {
+				return $this->_computed[$key] = $val;
 			}
-		}
-
-		$val = array_key_exists($key, $this->_env) ? $this->_env[$key] : getenv($key);
-		$this->_env[$key] = $val;
-
-		if ($key == 'REMOTE_ADDR') {
-			$https = array('HTTP_X_FORWARDED_FOR', 'HTTP_PC_REMOTE_ADDR', 'HTTP_X_REAL_IP');
-			foreach ($https as $altKey) {
-				if ($addr = $this->env($altKey)) {
-					$val = $addr;
-					break;
-				}
-			}
-		}
-
-		if ($val !== null && $val !== false && $key !== 'HTTPS') {
-			return $val;
 		}
 
 		switch ($key) {
+			case 'BASE':
+			case 'base':
+				return $this->_base($this->_config['base']);
+			break;
+			case 'HTTP_HOST':
+				$val = 'localhost';
+			break;
+			case 'SERVER_PROTOCOL':
+				$val = 'HTTP/1.1';
+			break;
+			case 'REQUEST_METHOD':
+				if ($this->env('HTTP_X_HTTP_METHOD_OVERRIDE')) {
+					$val = $this->env('HTTP_X_HTTP_METHOD_OVERRIDE');
+				} elseif (isset($this->_env['REQUEST_METHOD'])) {
+					$val = $this->_env['REQUEST_METHOD'];
+				} else {
+					$val = 'GET';
+				}
+			break;
+			case 'CONTENT_TYPE':
+				$val = 'text/html';
+			break;
+			case 'PLATFORM':
+				$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
+				$val = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
+			break;
+			case 'REMOTE_ADDR':
+				$https = array(
+					'HTTP_X_FORWARDED_FOR',
+					'HTTP_PC_REMOTE_ADDR',
+					'HTTP_X_REAL_IP'
+				);
+				foreach ($https as $altKey) {
+					if ($addr = $this->env($altKey)) {
+						list($val) = explode(', ', $addr);
+						break;
+					}
+				}
+			break;
+			case 'SCRIPT_NAME':
+				if ($this->env('PLATFORM') === 'CGI') {
+					return $this->env('SCRIPT_URL');
+				}
+				$val = null;
+			break;
 			case 'HTTPS':
 				if (isset($this->_env['SCRIPT_URI'])) {
-					return (strpos($this->_env['SCRIPT_URI'], 'https://') === 0);
+					$val = strpos($this->_env['SCRIPT_URI'], 'https://') === 0;
+				} elseif (isset($this->_env['HTTPS'])) {
+					$val = (!empty($this->_env['HTTPS']) && $this->_env['HTTPS'] !== 'off');
+				} else {
+					$val = false;
 				}
-				if (isset($this->_env['HTTPS'])) {
-					return (!empty($this->_env['HTTPS']) && $this->_env['HTTPS'] !== 'off');
-				}
-				return false;
+			break;
 			case 'SERVER_ADDR':
 				if (empty($this->_env['SERVER_ADDR']) && !empty($this->_env['LOCAL_ADDR'])) {
-					return $this->_env['LOCAL_ADDR'];
+					$val = $this->_env['LOCAL_ADDR'];
+				} elseif (isset($this->_env['SERVER_ADDR'])) {
+					$val = $this->_env['SERVER_ADDR'];
 				}
-				return $this->_env['SERVER_ADDR'];
+			break;
 			case 'SCRIPT_FILENAME':
-				if ($this->_env['PLATFORM'] == 'IIS') {
-					return str_replace('\\\\', '\\', $this->env('PATH_TRANSLATED'));
+				if ($this->env('PLATFORM') === 'IIS') {
+					$val = str_replace('\\\\', '\\', $this->env('PATH_TRANSLATED'));
+				} elseif (isset($this->_env['DOCUMENT_ROOT']) && isset($this->_env['PHP_SELF'])) {
+					$val = $this->_env['DOCUMENT_ROOT'] . $this->_env['PHP_SELF'];
 				}
-				return $this->env('DOCUMENT_ROOT') . $this->env('PHP_SELF');
+			break;
 			case 'DOCUMENT_ROOT':
 				$fileName = $this->env('SCRIPT_FILENAME');
 				$offset = (!strpos($this->env('SCRIPT_NAME'), '.php')) ? 4 : 0;
 				$offset = strlen($fileName) - (strlen($this->env('SCRIPT_NAME')) + $offset);
-				return substr($fileName, 0, $offset);
+				$val = substr($fileName, 0, $offset);
+			break;
 			case 'PHP_SELF':
-				return str_replace('\\', '/', str_replace(
-					$this->env('DOCUMENT_ROOT'), '', $this->env('SCRIPT_FILENAME')
-				));
+				$val = '/';
+			break;
 			case 'CGI':
 			case 'CGI_MODE':
-				return ($this->_env['PLATFORM'] === 'CGI');
+				$val = $this->env('PLATFORM') === 'CGI';
+			break;
 			case 'HTTP_BASE':
-				return preg_replace('/^([^.])*/i', null, $this->_env['HTTP_HOST']);
+				$val = preg_replace('/^([^.])*/i', null, $this->env('HTTP_HOST'));
+			break;
+			default:
+				$val = array_key_exists($key, $this->_env) ? $this->_env[$key] : $val;
+			break;
 		}
+		return $this->_computed[$key] = $val;
 	}
 
 	/**
@@ -299,10 +395,10 @@ class Request extends \lithium\net\http\Request {
 	 *
 	 * @see lithium\net\http\Media::negotiate()
 	 * @param $type mixed If not specified, returns the media type name that the client prefers,
-	 *              using content negotiation. If a media type name (string) is passed, returns
-	 *              `true` or `false`, indicating whether or not that type is accepted by the client
-	 *              at all. If `true`, returns the raw content types from the `Accept` header,
-	 *              parsed into an array and sorted by client preference.
+	 *        using content negotiation. If a media type name (string) is passed, returns `true` or
+	 *        `false`, indicating whether or not that type is accepted by the client at all.
+	 *        If `true`, returns the raw content types from the `Accept` header, parsed into an array
+	 *        and sorted by client preference.
 	 * @return string Returns a simple type name if the type is registered (i.e. `'json'`), or
 	 *         a fully-qualified content-type if not (i.e. `'image/jpeg'`), or a boolean or array,
 	 *         depending on the value of `$type`.
@@ -365,11 +461,12 @@ class Request extends \lithium\net\http\Request {
 	 * section on content negotiation) and the routing system for more information.
 	 *
 	 *  _Note_: All keys should be _lower-cased_, even when getting HTTP headers.
+	 *
 	 * @see lithium\action\Request::env()
 	 * @see lithium\net\http\Media::type()
 	 * @see lithium\net\http\Router
 	 * @param string $key A prefixed key indicating what part of the request data the requested
-	 *               value should come from, and the name of the value to retrieve, in lower case.
+	 *        value should come from, and the name of the value to retrieve, in lower case.
 	 * @return string Returns the value of a GET, POST, routing or environment variable, or an
 	 *         HTTP header or method name.
 	 */
@@ -420,7 +517,7 @@ class Request extends \lithium\net\http\Request {
 	 * @see lithium\action\Request::detect()
 	 * @see lithium\net\http\Media::type()
 	 * @param string $flag The name of the flag to check, which should be the name of a valid
-	 *               detector (that is either built-in or defined with `detect()`).
+	 *        detector (that is either built-in or defined with `detect()`).
 	 * @return boolean Returns `true` if the detector check succeeds (see the details for the
 	 *         built-in detectors above, or `detect()`), otherwise `false`.
 	 */
@@ -431,7 +528,7 @@ class Request extends \lithium\net\http\Request {
 			if (!in_array($flag, $media::types())) {
 				return false;
 			}
-			return $this->type() == $flag;
+			return $this->type() === $flag;
 		}
 		$detector = $this->_detectors[$flag];
 
@@ -449,7 +546,7 @@ class Request extends \lithium\net\http\Request {
 		if (Validator::isRegex($check)) {
 			return (boolean) preg_match($check, $this->env($key));
 		}
-		return ($this->env($key) == $check);
+		return ($this->env($key) === $check);
 	}
 
 	/**
@@ -479,19 +576,18 @@ class Request extends \lithium\net\http\Request {
 	 * {{{ embed:lithium\tests\cases\action\RequestTest::testDetect(11-12) }}}
 	 *
 	 * @see lithium\action\Request::is()
-	 * @param string $flag The name of the detector check. Used in subsequent calls to
-	 *               `Request::is()`.
+	 * @param string $flag The name of the detector check. Used in subsequent calls to `Request::is()`.
 	 * @param mixed $detector Detectors can be specified in four different ways:
-	 *              - The name of an HTTP header or environment variable. If a string, calling the
-	 *                detector will check that the header or environment variable exists and is set
-	 *                to a non-empty value.
-	 *              - A two-element array containing a header/environment variable name, and a value
-	 *                to match against. The second element of the array must be an exact match to
-	 *                the header or variable value.
-	 *              - A two-element array containing a header/environment variable name, and a
-	 *                regular expression that matches against the value, as in the example above.
-	 *              - A closure which accepts an instance of the `Request` object and returns a
-	 *                boolean value.
+	 *        - The name of an HTTP header or environment variable. If a string, calling the detector
+	 *          will check that the header or environment variable exists and is set to a non-empty
+	 *          value.
+	 *        - A two-element array containing a header/environment variable name, and a value to match
+	 *          against. The second element of the array must be an exact match to the header or
+	 *          variable value.
+	 *        - A two-element array containing a header/environment variable name, and a regular
+	 *          expression that matches against the value, as in the example above.
+	 *        - A closure which accepts an instance of the `Request` object and returns a boolean
+	 *          value.
 	 * @return void
 	 */
 	public function detect($flag, $detector = null) {
@@ -514,11 +610,19 @@ class Request extends \lithium\net\http\Request {
 			if (!$local) {
 				return $ref;
 			}
-			if (strpos($ref, '://') === false) {
+			$url = parse_url($ref) + array('path' => '');
+			if (empty($url['host']) || $url['host'] === $this->env('HTTP_HOST')) {
+				$ref = $url['path'];
+				if (!empty($url['query'])) {
+					$ref .= '?' . $url['query'];
+				}
+				if (!empty($url['fragment'])) {
+					$ref .= '#' . $url['fragment'];
+				}
 				return $ref;
 			}
 		}
-		return ($default != null) ? $default : '/';
+		return ($default !== null) ? $default : '/';
 	}
 
 	/**
@@ -532,9 +636,7 @@ class Request extends \lithium\net\http\Request {
 	 */
 	public function to($format, array $options = array()) {
 		$defaults = array(
-			'scheme' => $this->env('HTTPS') ? 'https' : 'http',
-			'host' => $this->env('HTTP_HOST'),
-			'path' => $this->_base . '/' . $this->url
+			'path' => $this->env('base') . '/' . $this->url
 		);
 		return parent::to($format, $options + $defaults);
 	}
@@ -544,7 +646,7 @@ class Request extends \lithium\net\http\Request {
 	 * "[Globalization](http://lithify.me/docs/manual/07_globalization)" in the manual.
 	 *
 	 * @param string $locale An optional locale string like `'en'`, `'en_US'` or `'de_DE'`. If
-	 *               specified, will overwrite the existing locale.
+	 *        specified, will overwrite the existing locale.
 	 * @return Returns the currently set locale string.
 	 */
 	public function locale($locale = null) {
@@ -560,35 +662,42 @@ class Request extends \lithium\net\http\Request {
 	}
 
 	/**
-	 * Find the base path of the current request.
+	 * Extract the base url from the `SCRIPT_FILENAME` environment variables.
 	 *
-	 * @todo Replace string directory names with configuration.
+	 * @param string $base The base path. If `null`, `'PHP_SELF'` will be used instead.
 	 * @return string
 	 */
-	protected function _base() {
-		if (isset($this->_base)) {
-			return $this->_base;
+	protected function _base($base = null) {
+		if ($base === null) {
+			$base = dirname($this->env('PHP_SELF'));
+			$path = dirname(Libraries::get($this->library ?: true, 'path'));
+			if (($root = $this->env('DOCUMENT_ROOT')) && strpos($path, $root) === 0) {
+				$root = str_replace($root, '', $path);
+				$i = 0;
+				$max = min(strlen($base), strlen($root));
+				while ($i < $max && ($base[$i] === $root[$i]) && ++$i) {}
+				$base = substr($root, 0, $i);
+			}
 		}
-		$base = str_replace('\\', '/', dirname($this->env('PHP_SELF')));
-		return rtrim(str_replace(array("/app/webroot", '/webroot'), '', $base), '/');
+		return rtrim(str_replace('\\', '/', $base), '/');
 	}
 
 	/**
-	 * Return the full url of the current request.
+	 * Extract the url from `REQUEST_URI` && `PHP_SELF` environment variables.
 	 *
+	 * @param  string The base url If `null`, environment variables will be used instead.
 	 * @return string
 	 */
-	protected function _url() {
-		if (isset($this->_config['url'])) {
-			return rtrim($this->_config['url'], '/');
-		}
-		if (!empty($_GET['url'])) {
-			return rtrim($_GET['url'], '/');
-		}
-		if ($uri = $this->env('REQUEST_URI')) {
+	protected function _url($url = null) {
+		if ($url !== null) {
+			return '/' . trim($url, '/');
+		} elseif ($uri = $this->env('REQUEST_URI')) {
 			list($uri) = explode('?', $uri, 2);
-			$base = '/^' . preg_quote($this->env('base'), '/') . '/';
-			return trim(preg_replace($base, '', $uri), '/') ?: '/';
+			$base = str_replace('\\', '/', dirname($this->env('PHP_SELF')));
+			$i = 0;
+			$max = min(strlen($base), strlen($uri));
+			while ($i < $max && ($base[$i] === $uri[$i]) && ++$i) {}
+			return '/' . trim(substr($uri, $i), '/') ?: '/';
 		}
 		return '/';
 	}
@@ -599,7 +708,7 @@ class Request extends \lithium\net\http\Request {
 	 * @return array
 	 */
 	protected function _parseFiles() {
-		if (isset($_FILES) && $_FILES) {
+		if (!empty($_FILES)) {
 			$result = array();
 
 			$normalize = function($key, $value) use ($result, &$normalize){

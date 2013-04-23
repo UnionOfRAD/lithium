@@ -24,7 +24,8 @@ class RecordTest extends \lithium\test\Unit {
 		$schema = new Schema(array(
 			'fields' => array(
 				'id' => 'int', 'title' => 'string', 'body' => 'text'
-		)));
+			)
+		));
 		$model::config(array(
 			'meta' => array('connection' => false, 'key' => 'id', 'locked' => true),
 			'schema' => $schema
@@ -97,7 +98,7 @@ class RecordTest extends \lithium\test\Unit {
 	 * Test the ability to set multiple field's values, and that they can be read back.
 	 */
 	public function testSetData() {
-		$this->assertFalse($this->record->data());
+		$this->assertEmpty($this->record->data());
 		$expected = array('id' => 1, 'name' => 'Joe Bloggs', 'address' => 'The Park');
 		$this->record->set($expected);
 		$this->assertEqual($expected, $this->record->data());
