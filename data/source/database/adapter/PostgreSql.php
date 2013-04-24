@@ -458,8 +458,19 @@ class PostgreSql extends \lithium\data\source\Database {
 		return $column;
 	}
 
-	protected function _toNativeBoolean($value) {
-		return $this->connection->quote($value ? 't' : 'f');
+	/**
+	 * Overridden from parent to provide custom formatter for booleans.
+	 *
+	 * @see \lithium\data\source\Database::_formatters()
+	 */
+	protected function _formatters() {
+		$self = $this;
+
+		return (array(
+			'boolean' => function($value) use ($self){
+				return $self->connection->quote($value ? 't' : 'f');
+			}
+		) + parent::_formatters());
 	}
 
 	/**
