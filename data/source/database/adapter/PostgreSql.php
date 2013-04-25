@@ -32,9 +32,8 @@ class PostgreSql extends \lithium\data\source\Database {
 		'text' => array('use' => 'text'),
 		'integer' => array('use' => 'integer', 'formatter' => 'intval'),
 		'float' => array('use' => 'real', 'formatter' => 'floatval'),
-		'datetime' => array(
-			'use' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
-		),
+		'datetime' => array('use' => 'timestamp', 'format' => 'Y-m-d H:i:s'),
+		'timestamp' => array('use' => 'timestamp', 'format' => 'Y-m-d H:i:s'),
 		'time' => array('use' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
 		'date' => array('use' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
 		'binary' => array('use' => 'bytea'),
@@ -219,25 +218,29 @@ class PostgreSql extends \lithium\data\source\Database {
 			$name = $self->connection->quote($self->invokeMethod('_entityName', array($entity)));
 			$schema = $self->connection->quote($schema);
 
-			$sql = "SELECT DISTINCT table_schema AS schema, column_name AS field, data_type AS type,
-					is_nullable AS null, column_default AS default, ordinal_position AS position,
-					character_maximum_length AS char_length, character_octet_length AS oct_length
-					FROM information_schema.columns
-					WHERE table_name = {$name} AND table_schema = {$schema} ORDER BY position";
+			$sql = 'SELECT "column_name" AS "field", "data_type" AS "type",	';
+			$sql .= '"is_nullable" AS "null", "column_default" AS "default", ';
+			$sql .= '"character_maximum_length" AS "char_length" ';
+			$sql .= 'FROM "information_schema"."columns" WHERE "table_name" = ' . $name;
+			$sql .= ' AND table_schema = ' . $schema . ' ORDER BY "ordinal_position"';
 
 			$columns = $self->connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-
 			$fields = array();
 
 			foreach ($columns as $column) {
-				$match = $self->invokeMethod('_column', array($column['type']));
+				$schema = $self->invokeMethod('_column', array($column['type']));
+				$default = $column['default'];
 
-				if (preg_match('/nextval\([\'"]?([\w.]+)/', $column['default'])) {
-					$default = null;
+				if (preg_match("/^'(.*)'::/", $default, $match)) {
+					$default = $match[1];
+				} elseif ($default === 'true') {
+					$default = true;
+				} elseif ($default === 'false') {
+					$default = false;
 				} else {
-					$default = $column['default'];
+					$default = null;
 				}
-				$fields[$column['field']] = $match + array(
+				$fields[$column['field']] = $schema + array(
 					'null'     => ($column['null'] === 'YES' ? true : false),
 					'default'  => $default
 				);
@@ -459,18 +462,29 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Overridden from parent to provide custom formatter for booleans.
+	 * Provide an associative array of Closures to be used as the "formatter" key inside of the
+	 * `Database::$_columns` specification.
 	 *
-	 * @see \lithium\data\source\Database::_formatters()
+	 * @see lithium\data\source\Database::_formatters()
 	 */
 	protected function _formatters() {
 		$self = $this;
 
-		return (array(
+		$datetime = $timestamp = function($format, $value) use ($self) {
+			if ($format && (($time = strtotime($value)) !== false)) {
+				$val = date($format, $time);
+				if (!preg_match('/^' . preg_quote($val) . '\.\d+$/', $value)) {
+					$value = $val;
+				}
+			}
+			return $self->connection->quote($value);
+		};
+
+		return compact('datetime', 'timestamp') + array(
 			'boolean' => function($value) use ($self){
 				return $self->connection->quote($value ? 't' : 'f');
 			}
-		) + parent::_formatters());
+		) + parent::_formatters();
 	}
 
 	/**

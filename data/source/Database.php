@@ -183,20 +183,22 @@ abstract class Database extends \lithium\data\Source {
 	 * Initialize `Database::$_strategies` because Closures cannot be created within the class
 	 * definition.
 	 *
-	 * @see \lithium\data\source\Database::$_strategies
+	 * @see lithium\data\source\Database::$_strategies
 	 */
 	protected function _init() {
 		parent::_init();
 
-		array_walk($this->_columns, function(&$spec, $type, $formatters){
-			if (array_key_exists($type, $formatters)) {
-				$spec['formatter'] = $formatters[$type];
+		$formatters = $this->_formatters();
+
+		foreach ($this->_columns as $type => $column) {
+			if (isset($formatters[$type])) {
+				$this->_columns[$type]['formatter'] = $formatters[$type];
 			}
-		}, $this->_formatters());
+		}
 
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
-				'{:having} {:order} {:limit};{:comment}'
+			          '{:having} {:order} {:limit};{:comment}'
 		);
 
 		$this->_strategies += array(
@@ -405,70 +407,61 @@ abstract class Database extends \lithium\data\Source {
 			return 'NULL';
 		}
 
-		$type = ( isset($schema['type']) ? $schema['type'] : $this->_introspectType($value) );
+		$type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value);
+		$column = isset($this->_columns[$type]) ? $this->_columns[$type] : null;
 
-		$spec = ( isset($this->_columns[$type]) ? $this->_columns[$type] : null );
-
-		return $this->_cast($type, $value, $spec);
+		return $this->_cast($type, $value, $column, $schema);
 	}
 
 	/**
 	 * Cast a value according to a column type, used by `Database::value()`
 	 *
-	 * @see \lithium\data\source\Database::value()
+	 * @see lithium\data\source\Database::value()
 	 * @param string $type Name of the column type
 	 * @param string $value Value to cast
+	 * @param array $column The column definition
 	 * @return mixed Casted value
 	 */
-	protected function _cast($type, $value, $spec = null) {
-		extract($spec + array(
-			'name' => null,
-			'formatter' => null,
-			'format' => null,
-		));
-
-		if ($formatter) {
-			if ($format) {
-				return $formatter($value, $format);
-			}
-
-			return $formatter($value);
-		}
+	protected function _cast($type, $value, $column, $schema = array()) {
+		$column += array('formatter' => null, 'format' => null);
+		$schema += array('default' => null, 'null' => false);
 
 		if (is_object($value)) {
 			return $value;
 		}
-
+		if ($formatter = $column['formatter']) {
+			$format = $column['format'];
+			return $format ? $formatter($format, $value) : $formatter($value);
+		}
 		return $this->connection->quote($value);
 	}
 
 	/**
 	 * Provide an associative array of Closures to be used as the "formatter" key inside of the
-	 * `Database::$_columns` specification. Each formatter should return the appropriately quoted
+	 * `Database::$_columns` specification. Each Closure should return the appropriately quoted
 	 * or unquoted value and accept one or two parameters:
 	 *  - @param mixed $value to be formatted
 	 *  - @param mixed $format to apply to $value
 	 *
-	 * @see \lithium\data\source\Database::$_columns
-	 * @see \lithium\data\source\Database::_init()
-	 * @return array of column types to \Closure formatter
+	 * @see lithium\data\source\Database::$_columns
+	 * @see lithium\data\source\Database::_init()
+	 * @return array of column types to Closure formatter
 	 */
 	protected function _formatters() {
 		$self = $this;
 
-		$datetime = $timestamp = $date = $time = function($value, $format) use ($self){
-			if ($time = strtotime($value)) {
-				return $self->connection->quote(date($format, $time));
+		$datetime = $timestamp = $date = $time = function($format, $value) use ($self) {
+			if ($format && (($time = strtotime($value)) !== false)) {
+				$value = date($format, $time);
 			}
-
-			return $value;
+			return $self->connection->quote($value);
 		};
 
-		return (compact('datetime', 'timestamp', 'date', 'time') + array(
-			'boolean' => function($value){
+		return compact('datetime', 'timestamp', 'date', 'time') + array(
+			'boolean' => function($value) {
 				return $value ? 1 : 0;
 			}
-		));
+		);
 	}
 
 	/**
@@ -1406,16 +1399,6 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Please remove this method and use the `_formatters()` method instead.
-	 *
-	 * @deprecated in favor of `_formatters()`
-	 * @see \lithium\data\source\Database::_formatters()
-	 */
-	protected function _toNativeBoolean($value) {
-		return $value ? 1 : 0;
-	}
-
-	/**
 	 * Throw a `QueryException` error
 	 *
 	 * @param string $sql The offending SQL string
@@ -1563,7 +1546,7 @@ abstract class Database extends \lithium\data\Source {
 		$meta = isset($this->_metas[$type][$name]) ? $this->_metas[$type][$name] : null;
 		if (!$meta || (isset($meta['options']) && !in_array($value, $meta['options']))) {
 			return;
-}
+		}
 		$meta += array('keyword' => '', 'escape' => false, 'join' => ' ');
 		extract($meta);
 		if ($escape === true) {

@@ -2,8 +2,8 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright	 Copyright 2012, Union of RAD (http://union-of-rad.org)
- * @license	   http://opensource.org/licenses/bsd-license.php The BSD License
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
 namespace lithium\tests\cases\data\source;
@@ -113,18 +113,6 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$result = $this->db->value((object) 'CURRENT_TIMESTAMP', array('type' => 'timestamp'));
 		$this->assertIdentical('CURRENT_TIMESTAMP', $result);
-
-		$result = $this->db->value('CURRENT_TIMESTAMP', array('type' => 'timestamp'));
-		$this->assertIdentical(
-			'CURRENT_TIMESTAMP', $result,
-			'Anything that `strtotime()` does not recognize should be passed through untouched'
-		);
-
-		$result = $this->db->value('Hello World', array('type' => 'timestamp'));
-		$this->assertIdentical(
-			"Hello World", $result,
-			'Even nonsensical values are passed through for the actual RDBMS to handle'
-		);
 
 		$result = $this->db->value('2012-05-25 22:44:00', array('type' => 'timestamp'));
 		$this->assertIdentical("'2012-05-25 22:44:00'", $result);
@@ -756,7 +744,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model,
-			'conditions' => array( (object) 'lower(title) = \'test\'')
+			'conditions' => array((object) 'lower(title) = \'test\'')
 		));
 
 		$this->assertEqual($sql, $this->db->renderCommand($query));
@@ -766,14 +754,14 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model,
-			'conditions' => array( (object) 'lower(title) = REGEXP \'^test$\'')
+			'conditions' => array((object) 'lower(title) = REGEXP \'^test$\'')
 		));
 
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model,
-			'conditions' => array( 'lower(title)' => (object) 'REGEXP \'^test$\'')
+			'conditions' => array('lower(title)' => (object) 'REGEXP \'^test$\'')
 		));
 
 		$this->assertEqual($sql, $this->db->renderCommand($query));
