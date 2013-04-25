@@ -32,7 +32,8 @@ class MySql extends \lithium\data\source\Database {
 		'text' => array('use' => 'text'),
 		'integer' => array('use' => 'int', 'length' => 11, 'formatter' => 'intval'),
 		'float' => array('use' => 'float', 'formatter' => 'floatval'),
-		'datetime' => array('use' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
+		'datetime' => array('use' => 'datetime', 'format' => 'Y-m-d H:i:s'),
+		'timestamp' => array('use' => 'timestamp', 'format' => 'Y-m-d H:i:s'),
 		'time' => array('use' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
 		'date' => array('use' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
 		'binary' => array('use' => 'blob'),
@@ -213,11 +214,17 @@ class MySql extends \lithium\data\source\Database {
 			$fields = array();
 
 			foreach ($columns as $column) {
-				$match = $self->invokeMethod('_column', array($column['type']));
+				$schema = $self->invokeMethod('_column', array($column['type']));
+				$default = $column['default'];
 
-				$fields[$column['field']] = $match + array(
+				if ($default === 'CURRENT_TIMESTAMP') {
+					$default = null;
+				} elseif ($schema['type'] === 'boolean') {
+					$default = !!$default;
+				}
+				$fields[$column['field']] = $schema + array(
 					'null'     => ($column['null'] === 'YES' ? true : false),
-					'default'  => $column['default']
+					'default'  => $default
 				);
 			}
 			return $self->invokeMethod('_instance', array('schema', compact('fields')));

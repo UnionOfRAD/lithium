@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -48,16 +48,16 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testDefaultConfig() {
 		$expected = array(
-			'persistent'    => true,
-			'host'          => 'localhost',
-			'login'         => 'root',
-			'password'      => '',
-			'database'      => null,
-			'encoding'      => null,
-			'dsn'           => null,
-			'options'       => array(),
-			'autoConnect'   => true,
-			'init'          => true
+			'persistent'  => true,
+			'host'        => 'localhost',
+			'login'       => 'root',
+			'password'    => '',
+			'database'    => null,
+			'encoding'    => null,
+			'dsn'         => null,
+			'options'     => array(),
+			'autoConnect' => true,
+			'init'        => true
 		);
 		$result = $this->db->testConfig();
 		$this->assertEqual($expected, $result);
@@ -108,17 +108,11 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->value('1', array('type' => 'string'));
 		$this->assertIdentical("'1'", $result);
 
-		$result = $this->db->value((object) 'CURRENT_TIMESTAMP', array('type' => 'timestamp'));
-		$this->assertIdentical('CURRENT_TIMESTAMP', $result);
-
 		$result = $this->db->value((object) 'REGEXP "^fo$"');
 		$this->assertIdentical('REGEXP "^fo$"', $result);
 
-		$date = date_default_timezone_get();
-		date_default_timezone_set('UTC');
-		$result = $this->db->value('Hello World', array('type' => 'timestamp'));
-		$this->assertIdentical("'1970-01-01 00:00:00'", $result);
-		date_default_timezone_set($date);
+		$result = $this->db->value((object) 'CURRENT_TIMESTAMP', array('type' => 'timestamp'));
+		$this->assertIdentical('CURRENT_TIMESTAMP', $result);
 
 		$result = $this->db->value('2012-05-25 22:44:00', array('type' => 'timestamp'));
 		$this->assertIdentical("'2012-05-25 22:44:00'", $result);
