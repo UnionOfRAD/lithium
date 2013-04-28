@@ -451,6 +451,19 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEmpty($request->params);
 	}
 
+	public function testActionWithProcess() {
+		Router::connect('/{:controller}/{:action}/{:args}');
+		$request = Router::process(new Request(array('url' => '/users/toJson')));
+
+		$params = array('controller' => 'Users', 'action' => 'toJson', 'args' => array());
+		$this->assertEqual($params, $request->params);
+
+		$request = Router::process(new Request(array('url' => '/users/to_json')));
+
+		$params = array('controller' => 'Users', 'action' => 'to_json', 'args' => array());
+		$this->assertEqual($params, $request->params);
+	}
+
 	/**
 	 * Tests that the order of the parameters is respected so it can trim
 	 * the URL correctly.
@@ -775,11 +788,10 @@ class RouterTest extends \lithium\test\Unit {
 
 	public function testRouteModifiers() {
 		$modifiers = Router::modifiers();
-		$this->assertEqual(array('args', 'controller', 'action'), array_keys($modifiers));
+		$this->assertEqual(array('args', 'controller'), array_keys($modifiers));
 
 		$this->assertEqual(array('foo', 'bar'), $modifiers['args']('foo/bar'));
 		$this->assertIdentical('HelloWorld', $modifiers['controller']('hello_world'));
-		$this->assertIdentical('listItems', $modifiers['action']('list_items'));
 	}
 
 	public function testAttachAbsolute() {

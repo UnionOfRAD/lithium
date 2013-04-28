@@ -211,9 +211,6 @@ class Router extends \lithium\core\StaticObject {
 				},
 				'controller' => function($value) {
 					return Inflector::camelize($value);
-				},
-				'action' => function($value) {
-					return Inflector::camelize($value, false);
 				}
 			);
 		}
