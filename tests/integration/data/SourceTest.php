@@ -17,6 +17,8 @@ class SourceTest extends \lithium\tests\integration\data\Base {
 	protected $_fixtures = array(
 		'images' => 'lithium\tests\fixture\model\gallery\ImagesFixture',
 		'galleries' => 'lithium\tests\fixture\model\gallery\GalleriesFixture',
+		'images_tags' => 'lithium\tests\fixture\model\gallery\ImagesTagsFixture',
+		'tags' => 'lithium\tests\fixture\model\gallery\TagsFixture',
 	);
 
 	protected $_classes = array(
@@ -219,9 +221,11 @@ class SourceTest extends \lithium\tests\integration\data\Base {
 		$db = $this->_db;
 		$this->skipIf(!$db::enabled('relationships'));
 		$this->assertEqual(array('Images'), array_keys(Galleries::relations()));
+		$result = array_keys(Images::relations());
+		sort($result);
 		$this->assertEqual(array(
-			'Galleries', 'ImagesTags', 'Comments'
-		), array_keys(Images::relations()));
+			'Comments', 'Galleries', 'ImagesTags', 'Tags'
+		), $result);
 
 		$this->assertEqual(array('Images'), Galleries::relations('hasMany'));
 		$this->assertEqual(array('Galleries'), Images::relations('belongsTo'));

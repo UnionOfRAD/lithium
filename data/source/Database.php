@@ -54,7 +54,7 @@ abstract class Database extends \lithium\data\Source {
 		'create' => "INSERT INTO {:source} ({:fields}) VALUES ({:values});{:comment}",
 		'update' => "UPDATE {:source} SET {:fields} {:conditions};{:comment}",
 		'delete' => "DELETE {:flags} FROM {:source} {:conditions};{:comment}",
-		'join' => "{:type} JOIN {:source} {:alias} {:constraints}",
+		'join' => "{:mode} JOIN {:source} {:alias} {:constraints}",
 		'schema' => "CREATE TABLE {:source} (\n{:columns}{:constraints}){:table};{:comment}",
 		'drop'   => "DROP TABLE {:exists}{:source};"
 	);
@@ -180,6 +180,7 @@ abstract class Database extends \lithium\data\Source {
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
 			          '{:having} {:order} {:limit};{:comment}'
 		);
+
 		$this->_strategies += array(
 			'joined' => function($self, $model, $context) {
 
@@ -206,19 +207,66 @@ abstract class Database extends \lithium\data\Source {
 							}
 							extract($with[$relPath]);
 						}
-						$to = $context->alias($alias, $relPath);
 
-						$deps[$to] = $deps[$from];
-						$deps[$to][] = $from;
+						if ($rel->type() !== 'hasAndBelongsToMany') {
+							$to = $context->alias($alias, $relPath);
 
-						if ($context->relationships($relPath) === null) {
-							$context->relationships($relPath, array(
-								'type' => $rel->type(),
-								'model' => $rel->to(),
-								'fieldName' => $rel->fieldName(),
-								'alias' => $to
-							));
-							$self->join($context, $rel, $from, $to, $constraints);
+							$deps[$to] = $deps[$from];
+							$deps[$to][] = $from;
+
+							if ($context->relationships($relPath) === null) {
+								$context->relationships($relPath, array(
+									'type' => $rel->type(),
+									'model' => $rel->to(),
+									'fieldName' => $rel->fieldName(),
+									'alias' => $to
+								));
+								$self->join($context, $rel, $from, $to, $constraints);
+							}
+						} else {
+							$nameVia = $rel->data('via');
+							$relnameVia = $path ? $path . '.' . $nameVia : $nameVia;
+
+							if (!$relVia = $model::relations($nameVia)) {
+								$message = "Model relationship `{$nameVia}` not found.";
+								throw new QueryException($message);
+							}
+
+							if (!$config = $context->relationships($relnameVia)) {
+								$aliasVia = $context->alias($nameVia, $relnameVia);
+								$context->relationships($relnameVia, array(
+									'type' => $relVia->type(),
+									'model' => $relVia->to(),
+									'fieldName' => $relVia->fieldName(),
+									'alias' => $aliasVia
+								));
+								$self->join($context, $relVia, $from, $aliasVia, $self->on($rel));
+							} else {
+								$aliasVia = $config['alias'];
+							}
+
+							$deps[$aliasVia] = $deps[$from];
+							$deps[$aliasVia][] = $from;
+
+							if (!$context->relationships($relPath)) {
+								$to = $context->alias($alias, $relPath);
+								$modelVia = $relVia->data('to');
+								if (!$relTo = $modelVia::relations($name)) {
+									$message = "Model relationship `{$name}` ";
+									$message .= "via `{$nameVia}` not found.";
+									throw new QueryException($message);
+								}
+								$context->relationships($relPath, array(
+									'type' => $rel->type(),
+									'model' => $relTo->to(),
+									'fieldName' => $rel->fieldName(),
+									'alias' => $to
+								));
+								$self->join($context, $relTo, $aliasVia, $to, $constraints);
+							}
+
+							$deps[$to] = $deps[$aliasVia];
+							$deps[$to][] = $aliasVia;
 						}
 
 						if (!empty($childs)) {
@@ -227,7 +275,7 @@ abstract class Database extends \lithium\data\Source {
 					}
 				};
 
-				$tree = Set::expand(Set::normalize(array_keys($with)));
+				$tree = Set::expand(array_fill_keys(array_keys($with), false));
 				$alias = $context->alias();
 				$deps = array($alias => array());
 				$strategy($strategy, $model, $tree, '', $alias, $deps);
@@ -634,23 +682,27 @@ abstract class Database extends \lithium\data\Source {
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
-		$field = Inflector::underscore(Inflector::singularize($name));
-		$key = "{$field}_id";
-		$primary = $class::meta('key');
-
-		if (is_array($primary)) {
-			$key = array_combine($primary, $primary);
-		} elseif ($type === 'hasMany' || $type === 'hasOne') {
-			if ($type === 'hasMany') {
-				$field = Inflector::pluralize($field);
-			}
-			$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
-			$key = array($primary => "{$secondary}_id");
-		}
-
 		$from = $class;
-		$fieldName = $field;
-		$config += compact('type', 'name', 'key', 'from', 'fieldName');
+		$primary = $class::meta('key');
+		if (!isset($config['key'])) {
+			if (is_array($primary)) {
+				$key = array_combine($primary, $primary);
+			} elseif ($type === 'hasOne' || $type === 'hasMany') {
+				$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
+				$key = array($primary => "{$secondary}_id");
+			} elseif ($type === 'hasAndBelongsToMany') {
+				$secondary = Inflector::underscore(Inflector::singularize($name));
+				$key = array($primary => "{$secondary}_id");
+				$viaRel = $from::relations($config['via']);
+				$via = $viaRel->to();
+				$toRel = $via::relations($name);
+				$config += array('to' => $toRel->to());
+			} else {
+				$key = Inflector::underscore(Inflector::singularize($name)) . '_id';
+			}
+			$config += compact('key');
+		}
+		$config += compact('type', 'name', 'from');
 		return $this->_instance('relationship', $config);
 	}
 
@@ -1060,7 +1112,7 @@ abstract class Database extends \lithium\data\Source {
 				$result .= ' ';
 			}
 			$join = is_array($join) ? $this->_instance('query', $join) : $join;
-			$options['keys'] = array('source', 'alias', 'constraints');
+			$options['keys'] = array('mode', 'source', 'alias', 'constraints');
 			$result .= $this->renderCommand('join', $join->export($this, $options));
 		}
 		return $result;
@@ -1376,9 +1428,13 @@ abstract class Database extends \lithium\data\Source {
 	 * Applying a strategy to a `lithium\data\model\Query` object
 	 *
 	 * @param array $options The option array
-	 * @param object $context A query object to configure
+	 * @param object $context A find query object to configure
 	 */
 	public function applyStrategy($options, $context) {
+		if ($context->type() !== 'read') {
+			return;
+		}
+
 		$options += array('strategy' => 'joined');
 		if (!$model = $context->model()) {
 			throw new ConfigException('The `\'with\'` option need a valid `\'model\'` option.');
@@ -1420,7 +1476,7 @@ abstract class Database extends \lithium\data\Source {
 		}
 
 		$context->joins($toAlias, compact('constraints', 'model') + array(
-			'type' => 'LEFT',
+			'mode' => 'LEFT',
 			'alias' => $toAlias
 		));
 	}
@@ -1453,6 +1509,9 @@ abstract class Database extends \lithium\data\Source {
 	 * @return array A constraints array.
 	 */
 	public function on($rel, $aliasFrom = null, $aliasTo = null, $constraints = array()) {
+		if ($rel->type() === 'hasAndBelongsToMany') {
+			return $constraints;
+		}
 		$model = $rel->from();
 
 		$aliasFrom = $aliasFrom ?: $model::meta('name');

@@ -12,6 +12,7 @@ use lithium\core\Libraries;
 use lithium\util\Set;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
+use lithium\data\model\Relationship;
 use BadMethodCallException;
 
 /**
@@ -118,6 +119,23 @@ class Model extends \lithium\core\StaticObject {
 	public $belongsTo = array();
 
 	/**
+	 * Model hasAndBelongsToMany relations.
+	 *
+	 * @var array
+	 */
+	public $hasAndBelongsToMany = array();
+
+	/**
+	 * Array of named callable objects representing different strategies for performing habtm
+	 * saves of queries. Only the two following strategies are implemented.
+	 * - the `'flush'` strategy delete and recreate all Habtm associations.
+	 * - the `'diff'` strategy only append/delete the difference.
+	 *
+	 * @var array
+	 */
+	protected $_habtm = array();
+
+	/**
 	 * Stores model instances for internal use.
 	 *
 	 * While the `Model` public API does not require instantiation thanks to late static binding
@@ -164,6 +182,13 @@ class Model extends \lithium\core\StaticObject {
 	protected $_relations = array();
 
 	/**
+	 * Matching between relation's fieldnames and their corresponding relation name.
+	 *
+	 * @var array
+	 */
+	protected $_fieldNames = array();
+
+	/**
 	 * List of relation types.
 	 *
 	 * Valid relation types are:
@@ -171,10 +196,11 @@ class Model extends \lithium\core\StaticObject {
 	 * - `belongsTo`
 	 * - `hasOne`
 	 * - `hasMany`
+	 * - `hasAndBelongsToMany`
 	 *
 	 * @var array
 	 */
-	protected $_relationTypes = array('belongsTo', 'hasOne', 'hasMany');
+	protected $_relationTypes = array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany');
 
 	/**
 	 * Store available relation names for this model which still unloaded.
@@ -449,6 +475,56 @@ class Model extends \lithium\core\StaticObject {
 				$titleKeys = array('title', 'name');
 				$titleKeys = array_merge($titleKeys, (array) $self::meta('key'));
 				return $self::hasField($titleKeys);
+			}
+		);
+
+		$self->_habtm += array(
+			'flush' => function($entity, $rel, $relVia, &$foreignKeys, array &$options = array()) {
+				$to = $rel->to();
+				$middle = $relVia->to();
+				$middle::remove($foreignKeys);
+				foreach ($entity as $relEntity) {
+					$relEntity->save(null, $options);
+					$keys = $to::key($relEntity);
+					$foreignKeys2 = $rel->foreignKey($keys);
+					$habtm = $middle::create($foreignKeys + $foreignKeys2);
+					$habtm->save(null, $options);
+				}
+			},
+			'diff' => function($entity, $rel, $relVia, &$foreignKeys, array &$options = array()) {
+				$to = $rel->to();
+				$middle = $relVia->to();
+				$alreadySaved = $middle::find('all', array(
+					'conditions' => array('or' => $foreignKeys)
+				))->data();
+
+				foreach ($entity as $relEntity) {
+					$relEntity->save(null, $options);
+					$keys = $to::key($relEntity);
+					$foreignKeys2 = $rel->foreignKey($keys);
+					$toFind = count($foreignKeys2);
+					$finded = false;
+					foreach ($alreadySaved as $key => $value) {
+						$intersect = array_intersect_assoc($foreignKeys2, $value);
+						if (count($intersect) === $toFind) {
+							unset($alreadySaved[$key]);
+							$finded = true;
+							break;
+						}
+					}
+
+					if (!$finded) {
+						$habtm = $middle::create($foreignKeys + $foreignKeys2);
+						$habtm->save(null, $options);
+					}
+				}
+				$toDelete = array();
+				foreach ($alreadySaved as $key => $value) {
+					$toDelete[] = $middle::key($value);
+				}
+				if ($toDelete) {
+					$middle::remove(array('or' => $toDelete));
+				}
 			}
 		);
 
@@ -792,6 +868,10 @@ class Model extends \lithium\core\StaticObject {
 			return static::_relations();
 		}
 
+		if (isset($self->_fieldNames[$type])) {
+			$type = $self->_fieldNames[$type];
+		}
+
 		if (isset($self->_relations[$type])) {
 			return $self->_relations[$type];
 		}
@@ -858,10 +938,14 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function bind($type, $name, array $config = array()) {
 		$self = static::_object();
+		if (!isset($config['fieldName'])) {
+			$config['fieldName'] = $self->_fieldName($type, $name);
+		}
 
 		if (!in_array($type, $self->_relationTypes)) {
 			throw new ConfigException("Invalid relationship type `{$type}` specified.");
 		}
+		$self->_fieldNames[$config['fieldName']] = $name;
 		$rel = static::connection()->relationship(get_called_class(), $type, $name, $config);
 		return $self->_relations[$name] = $rel;
 	}
@@ -1018,7 +1102,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * {{{
 	 * if (!$post->save($someData)) {
-	 *  return array('errors' => $post->errors());
+	 *     return array('errors' => $post->errors());
 	 * }
 	 * }}}
 	 *
@@ -1057,6 +1141,29 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public function save($entity, $data = null, array $options = array()) {
 		$self = static::_object();
+		$options += array('with' => false);
+
+		if ($data) {
+			$entity->set($data);
+		}
+
+		if ($options['with']) {
+			$self->_saveRelations($entity, 'belongsTo', array('validate' => false) + $options);
+		}
+
+		$result = $self->_save($entity, null, $options);
+
+		if ($options['with']) {
+			$self->_saveRelations($entity, array(
+				'hasAndBelongsToMany', 'hasMany', 'hasOne'
+			), array('validate' => false) + $options);
+		}
+
+		return $result;
+	}
+
+	protected function _save($entity, $data = null, array $options = array()) {
+		$self = static::_object();
 		$_meta = array('model' => get_called_class()) + $self->_meta;
 		$_schema = $self->schema();
 
@@ -1068,15 +1175,12 @@ class Model extends \lithium\core\StaticObject {
 			'locked' => $self->_meta['locked']
 		);
 		$options += $defaults;
-		$params = compact('entity', 'data', 'options');
+		$params = compact('entity', 'options');
 
 		$filter = function($self, $params) use ($_meta, $_schema) {
 			$entity = $params['entity'];
 			$options = $params['options'];
 
-			if ($params['data']) {
-				$entity->set($params['data']);
-			}
 			if ($rules = $options['validate']) {
 				$events = $options['events'];
 				$validateOpts = is_array($rules) ? compact('rules','events') : compact('events');
@@ -1102,6 +1206,73 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Save entity's relations helper.
+	 *
+	 * @param object $entity The record or document object to be saved in the database.
+	 * @param array $types Type of relations to save.
+	 */
+	protected function _saveRelations($entity, $types, array $options = array()) {
+		$model = $entity->model();
+		$types = (array) $types;
+		foreach ($types as $type) {
+			if ($options['with'] === true) {
+				$with = array_fill_keys($model::relations($type), true);
+			} else {
+				$with = Set::expand(Set::normalize((array) $options['with']));
+			}
+			foreach ($with as $relName => $value) {
+				$rel = $model::relations($relName);
+				$fieldName = $rel->fieldName();
+				if (!isset($entity->$fieldName) || $rel->link() !== Relationship::LINK_KEY) {
+					continue;
+				}
+				$options['with'] = $value;
+				switch ($rel->type()){
+					case 'hasAndBelongsToMany':
+						$relVia = $model::relations($rel->via());
+						$keys = $model::key($entity);
+						$foreignKeys = $relVia->foreignKey($keys);
+						$viaMode = $rel->viaMode() ?: 'diff';
+						if (!isset($this->_habtm[$viaMode])) {
+							throw new UnexpectedValueException("HABTM mode `{$viaMode}` does not exist.");
+						}
+						$toVia = $relVia->to();
+						$rel = $toVia::relations($relName);
+						$this->_habtm[$viaMode]($entity->$fieldName, $rel, $relVia, $foreignKeys, $options);
+						unset($entity->{$relVia->fieldName()});
+					break;
+					case 'hasMany':
+						$keys = $model::key($entity);
+						$foreignKeys = $rel->foreignKey($keys);
+						$to = $rel->to();
+						$data = array_fill_keys(array_keys($foreignKeys), null);
+						$to::update($data, $foreignKeys);
+						foreach ($entity->$fieldName as $relEntity) {
+							$relEntity->set($foreignKeys);
+							$relEntity->save(null, $options);
+						}
+					break;
+					case 'hasOne':
+						$keys = $model::key($entity);
+						$foreignKeys = $rel->foreignKey($keys);
+						$relEntity = $entity->$fieldName;
+						$relEntity->set($foreignKeys);
+						$relEntity->save(null, $options);
+					break;
+					case 'belongsTo':
+						$relEntity = $entity->$fieldName;
+						$relEntity->save();
+						$relModel = $relEntity->model();
+						$keys = $relModel::key($relEntity);
+						$foreignKeys = $rel->foreignKey($keys);
+						$entity->set($foreignKeys);
+					break;
+				}
+			}
+		}
+	}
+
+	/**
 	 * An important part of describing the business logic of a model class is defining the
 	 * validation rules. In Lithium models, rules are defined through the `$validates` class
 	 * property, and are used by this method before saving to verify the correctness of the data
@@ -1117,28 +1288,28 @@ class Model extends \lithium\core\StaticObject {
 	 * validation rules. Any rules defined in the `Validator` class can be used to validate fields.
 	 * See the `Validator` class to add custom rules, or override built-in rules.
 	 *
-	 * @see lithium\data\Model::$validates
-	 * @see lithium\util\Validator::check()
-	 * @see lithium\data\Entity::errors()
+	 * @see LF\Data\Model::$validates
+	 * @see LF\Util\Validator::check()
+	 * @see LF\Data\Entity::errors()
 	 * @param string $entity Model entity to validate. Typically either a `Record` or `Document`
-	 *        object. In the following example:
-	 *        {{{
-	 *            $post = Posts::create($data);
-	 *            $success = $post->validates();
-	 *        }}}
-	 *        The `$entity` parameter is equal to the `$post` object instance.
+	 *               object. In the following example:
+	 * {{{
+	 * $post = Posts::create($data);
+	 * $success = $post->validates();
+	 * }}}
+	 * The `$entity` parameter is equal to the `$post` object instance.
 	 * @param array $options Available options:
-	 *        - `'rules'` _array_: If specified, this array will _replace_ the default
-	 *          validation rules defined in `$validates`.
-	 *        - `'events'` _mixed_: A string or array defining one or more validation
-	 *          _events_. Events are different contexts in which data events can occur, and
-	 *          correspond to the optional `'on'` key in validation rules. For example, by
-	 *          default, `'events'` is set to either `'create'` or `'update'`, depending on
-	 *          whether `$entity` already exists. Then, individual rules can specify
-	 *          `'on' => 'create'` or `'on' => 'update'` to only be applied at certain times.
-	 *          Using this parameter, you can set up custom events in your rules as well, such
-	 *          as `'on' => 'login'`. Note that when defining validation rules, the `'on'` key
-	 *          can also be an array of multiple events.
+	 *              - `'rules'` _array_: If specified, this array will _replace_ the default
+	 *                validation rules defined in `$validates`.
+	 *              - `'events'` _mixed_: A string or array defining one or more validation
+	 *                 _events_. Events are different contexts in which data events can occur, and
+	 *                correspond to the optional `'on'` key in validation rules. For example, by
+	 *                default, `'events'` is set to either `'create'` or `'update'`, depending on
+	 *                whether `$entity` already exists. Then, individual rules can specify
+	 *                `'on' => 'create'` or `'on' => 'update'` to only be applied at certain times.
+	 *                Using this parameter, you can set up custom events in your rules as well, such
+	 *                as `'on' => 'login'`. Note that when defining validation rules, the `'on'` key
+	 *                can also be an array of multiple events.
 	 * @return boolean Returns `true` if all validation rules on all fields succeed, otherwise
 	 *         `false`. After validation, the messages for any validation failures are assigned to
 	 *         the entity, and accessible through the `errors()` method of the entity object.
@@ -1148,13 +1319,35 @@ class Model extends \lithium\core\StaticObject {
 		$defaults = array(
 			'rules' => $this->validates,
 			'events' => $entity->exists() ? 'update' : 'create',
-			'model' => get_called_class()
+			'model' => get_called_class(),
+			'with' => false
 		);
 		$options += $defaults;
 		$self = static::_object();
 		$validator = $self->_classes['validator'];
 		$entity->errors(false);
 		$params = compact('entity', 'options');
+
+		if ($options['with']) {
+			$model = $entity->model();
+			if ($options['with'] === true) {
+				$with = array_fill_keys(array_keys($model::relations()), true);
+			} else {
+				$with = Set::expand(Set::normalize((array) $options['with']));
+			}
+			foreach ($with as $relName => $value) {
+				$rel = $model::relations($relName);
+				$fieldName = $rel->fieldName();
+				if (!isset($entity->$fieldName)) {
+					continue;
+				}
+				$options['with'] = $value;
+				$errors = (array) $entity->$fieldName->validates($options);
+				if ($errors && !array_filter($errors)) {
+					return false;
+				}
+			}
+		}
 
 		$filter = function($parent, $params) use ($validator) {
 			$entity = $params['entity'];
@@ -1322,20 +1515,35 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	protected static function _relationsToLoad() {
 		try {
-			if (!static::connection()) {
+			if (!$connection = static::connection()) {
 				return;
 			}
 		} catch (ConfigExcepton $e) {
 			return;
 		}
+
+		if (!$connection::enabled('relationships')) {
+			return;
+		}
+
 		$self = static::_object();
 
 		foreach ($self->_relationTypes as $type) {
 			$self->$type = Set::normalize($self->$type);
 			foreach ($self->$type as $name => $config) {
 				$self->_relationsToLoad[$name] = $type;
+				$fieldName = $self->_fieldName($type, $name);
+				$self->_fieldNames[$fieldName] = $name;
 			}
 		}
+	}
+
+	protected function _fieldName($type, $name) {
+		if (!isset($this->{$type}[$name]['fieldName'])) {
+			$fieldName = static::connection()->fieldName($type, $name);
+			$this->{$type}[$name]['fieldName'] = $fieldName;
+		}
+		return $this->{$type}[$name]['fieldName'];
 	}
 
 	/**

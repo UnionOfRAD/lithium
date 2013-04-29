@@ -439,6 +439,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$result = $this->db->connection->queries;
 		$createOpts = array(
+			'with' => false,
 			'validate' => true,
 			'events' => 'create',
 			'whitelist' => null,
@@ -540,7 +541,10 @@ class MongoDbTest extends \lithium\test\Unit {
 		));
 		$to::config(array('meta' => array('key' => '_id')));
 
-		$result = $this->db->relationship($from, 'belongsTo', 'MockPost');
+		$result = $this->db->relationship($from, 'belongsTo', 'MockPost', array(
+			'fieldName' => 'mockPost'
+		));
+
 		$expected = array(
 			'name' => 'MockPost',
 			'type' => 'belongsTo',
@@ -550,7 +554,8 @@ class MongoDbTest extends \lithium\test\Unit {
 			'to'   => $to,
 			'fields' => true,
 			'fieldName' => 'mockPost',
-			'constraints' => null,
+			'constraints' => array(),
+			'via' => null,
 			'init' => true
 		);
 		$this->assertEqual($expected, $result->data());
@@ -603,8 +608,8 @@ class MongoDbTest extends \lithium\test\Unit {
 			'collection' => 'posts',
 			'data' => array('initial' => 'one', 'values' => 'two', '_id' => $document->_id),
 			'options' => array(
-				'validate' => true, 'events' => 'create', 'whitelist' => null, 'callbacks' => true,
-				'locked' => false, 'safe' => false, 'fsync' => false
+				'with' => false, 'validate' => true, 'events' => 'create', 'whitelist' => null,
+				'callbacks' => true, 'locked' => false, 'safe' => false, 'fsync' => false
 			)
 		);
 		$this->assertEqual($expected, $result);
@@ -620,7 +625,7 @@ class MongoDbTest extends \lithium\test\Unit {
 			'conditions' => array('_id' => $document->_id),
 			'update' => array('$set' => array('values' => 'new')),
 			'options' => array(
-				'validate' => true, 'events' => 'update', 'whitelist' => null,
+				'with' => false, 'validate' => true, 'events' => 'update', 'whitelist' => null,
 				'callbacks' => true, 'locked' => false, 'upsert' => false, 'multiple' => true,
 				'safe' => false, 'fsync' => false
 			)

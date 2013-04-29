@@ -629,7 +629,6 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
 		$key = Inflector::camelize($type === 'belongsTo' ? $class::meta('name') : $name, false);
-
 		$config += compact('name', 'type', 'key');
 		$config['from'] = $class;
 		$relationship = $this->_classes['relationship'];
@@ -637,7 +636,8 @@ class MongoDb extends \lithium\data\Source {
 		$defaultLinks = array(
 			'hasOne' => $relationship::LINK_EMBEDDED,
 			'hasMany' => $relationship::LINK_EMBEDDED,
-			'belongsTo' => $relationship::LINK_CONTAINED
+			'belongsTo' => $relationship::LINK_CONTAINED,
+			'hasAndBelongsToMany' => $relationship::LINK_KEY,
 		);
 		$config += array('link' => $defaultLinks[$type]);
 		return new $relationship($config);
@@ -838,6 +838,23 @@ class MongoDb extends \lithium\data\Source {
 		if (!$this->_isConnected && !$this->connect()) {
 			throw new NetworkException("Could not connect to the database.");
 		}
+	}
+
+	/**
+	 * Returns the field name of a relation name (camelBack).
+	 *
+	 * @param string The type of the relation.
+	 * @param string The name of the relation.
+	 * @return string
+	 */
+	public function fieldName($type, $name) {
+		$fieldName = Inflector::camelize($name, false);
+		if (preg_match('/Many$/', $type)) {
+			$fieldName = Inflector::pluralize($fieldName);
+		} else {
+			$fieldName = Inflector::singularize($fieldName);
+		}
+		return $fieldName;
 	}
 }
 

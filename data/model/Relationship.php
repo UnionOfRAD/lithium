@@ -9,7 +9,6 @@
 namespace lithium\data\model;
 
 use lithium\core\Libraries;
-use lithium\util\Inflector;
 use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
 
@@ -18,6 +17,15 @@ use lithium\core\ClassNotFoundException;
  * classes together.
  */
 class Relationship extends \lithium\core\Object {
+
+	/**
+	 * Class dependencies.
+	 *
+	 * @var array
+	 */
+	protected $_classes = array(
+		'entity'      => 'lithium\data\Entity'
+	);
 
 	/**
 	 * A relationship linking type defined by one document or record (or multiple) being embedded
@@ -63,7 +71,7 @@ class Relationship extends \lithium\core\Object {
 	 *          referenced in the originating model.
 	 *        - `'key'` _mixed_: An array of fields that define the relationship, where the
 	 *          keys are fields in the originating model, and the values are fields in the
-	 *          target model. If the relationship is not deined by keys, this array should be
+	 *          target model. If the relationship is not defined by keys, this array should be
 	 *          empty.
 	 *        - `'type'` _string_: The type of relationship. Should be one of `'belongsTo'`,
 	 *          `'hasOne'` or `'hasMany'`.
@@ -90,6 +98,8 @@ class Relationship extends \lithium\core\Object {
 	 *          other database-native value. If an array, maps fields from the related object
 	 *          either to fields elsewhere, or to arbitrary expressions. In either case, _the
 	 *          values specified here will be literally interpreted by the database_.
+	 *        - `via` _string_: HABTM specific option with indicate the relation name of the
+	 *          middle class
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -101,21 +111,24 @@ class Relationship extends \lithium\core\Object {
 			'link' => static::LINK_KEY,
 			'fields' => true,
 			'fieldName' => null,
-			'constraints' => array()
+			'constraints' => array(),
+			'via' => null
 		);
-		parent::__construct($config + $defaults);
+		$config += $defaults;
+		if (!$config['type'] || !$config['fieldName']) {
+			throw new ConfigException("`'type'`, `'fieldName'` and `'from'` options can't be empty.");
+		}
+		if (!$config['to'] && !$config['name']) {
+			throw new ConfigException("`'to'` and `'name'` options can't both be empty.");
+		}
+		parent::__construct($config);
 	}
 
 	protected function _init() {
 		parent::_init();
 		$config =& $this->_config;
-		$type = $config['type'];
-
-		$name = ($type === 'hasOne') ? Inflector::pluralize($config['name']) : $config['name'];
-		$config['fieldName'] = $config['fieldName'] ?: lcfirst($name);
-
 		if (!$config['to']) {
-			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $name;
+			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $config['name'];
 			$config['to'] = Libraries::locate('models', $assoc);
 		}
 		if (!$config['key'] || !is_array($config['key'])) {
@@ -146,12 +159,18 @@ class Relationship extends \lithium\core\Object {
 	}
 
 	protected function _keys($keys) {
-		$config = $this->_config;
-		$hasRel = ($related = ($config['type'] === 'belongsTo') ? $config['to'] : $config['from']);
-
-		if (!$hasRel || !$keys) {
+		if (!$keys) {
 			return array();
 		}
+		$config = $this->_config;
+
+		$hasRelation = ($config['type'] === 'hasOne' || $config['type'] === 'hasMany');
+		if ($hasRelation) {
+			$related = $config['from'];
+		} else {
+			$related = $config['to'];
+		}
+
 		if (!class_exists($related)) {
 			throw new ClassNotFoundException("Related model class '{$related}' not found.");
 		}
@@ -161,12 +180,35 @@ class Relationship extends \lithium\core\Object {
 		$keys = (array) $keys;
 		$related = (array) $related::key();
 
-		if (count($keys) !== count($related)) {
-			$msg  = "Unmatched keys in relationship `{$config['name']}` between models ";
+		if (count($keys) != count($related)) {
+			$msg = "Unmatched keys in relationship `{$config['name']}` between models ";
 			$msg .= "`{$config['from']}` and `{$config['to']}`.";
 			throw new ConfigException($msg);
 		}
-		return array_combine($keys, $related);
+		return $hasRelation ? array_combine($related, $keys) : array_combine($keys, $related);
+	}
+
+	/**
+	 * Build foreign keys from relation's primary keys
+	 *
+	 * @param $primaryKeys The relation primary keys.
+	 * @return array The corresponding foreign keys.
+	 */
+	public function foreignKey($primaryKeys) {
+		$result = array();
+		$entity = $this->_classes['entity'];
+		if ($primaryKeys instanceof $entity) {
+			$primaryKeys = $primaryKeys->to('array');
+		}
+		if ($this->_config['type'] === 'belongsTo') {
+			$keys = array_flip($this->_config['key']);
+		} else {
+			$keys = $this->_config['key'];
+		}
+		foreach ($keys as $key => $foreignKey) {
+			$result[$foreignKey] = $primaryKeys[$key];
+		}
+		return $result;
 	}
 }
 

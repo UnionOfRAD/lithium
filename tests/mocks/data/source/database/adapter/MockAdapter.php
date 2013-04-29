@@ -146,6 +146,21 @@ class MockAdapter extends \lithium\data\source\Database {
 	}
 
 	protected function _insertId($query) {}
+
+	public static function enabled($feature = null) {
+		if (!$feature) {
+			return true;
+		}
+		$features = array(
+			'arrays' => false,
+			'transactions' => true,
+			'booleans' => true,
+			'schema' => true,
+			'relationships' => true,
+			'sources' => true
+		);
+		return isset($features[$feature]) ? $features[$feature] : null;
+	}
 }
 
 ?>
