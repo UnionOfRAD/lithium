@@ -981,6 +981,25 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue(MockPost::respondsTo('foo_Bar_Baz'));
 	}
 
+	public function testFieldName() {
+		MockPost::bind('hasMany', 'MockTag');
+		$relation = MockPost::relations('MockComment');
+		$this->assertEqual('mock_comments', $relation->fieldName());
+
+		$relation = MockPost::relations('MockTag');
+		$this->assertEqual('mock_tags', $relation->fieldName());
+
+		$relation = MockComment::relations('MockPost');
+		$this->assertEqual('mock_post', $relation->fieldName());
+	}
+
+	public function testRelationFromFieldName() {
+		MockPost::bind('hasMany', 'MockTag');
+		$this->assertEqual('MockComment', MockPost::relations('mock_comments')->name());
+		$this->assertEqual('MockTag', MockPost::relations('mock_tags')->name());
+		$this->assertEqual('MockPost', MockComment::relations('mock_post')->name());
+		$this->assertNull(MockPost::relations('undefined'));
+	}
 }
 
 ?>

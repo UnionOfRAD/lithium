@@ -157,6 +157,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_model,
 			'fields' => array('MockDatabaseComment'),
 			'with' => array('MockDatabaseComment')
@@ -171,6 +172,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$options = array(
+			'type' => 'read',
 			'model' => $this->_model,
 			'with' => 'MockDatabaseComment'
 		);
@@ -857,6 +859,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testFields() {
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_model,
 			'with' => array('MockDatabaseComment')
 		));
@@ -1432,6 +1435,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testExportedFieldsWithJoinedStrategy() {
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'with' => array('Image.ImageTag.Tag')
 		));
@@ -1439,6 +1443,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual('*', $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'id',
 			'with' => array('Image.ImageTag.Tag')
@@ -1448,6 +1453,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'Tag.id',
 			'with' => array('Image.ImageTag.Tag')
@@ -1457,6 +1463,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'Tag',
 			'with' => array('Image.ImageTag.Tag')
@@ -1466,6 +1473,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'Tag.*',
 			'with' => array('Image.ImageTag.Tag')
@@ -1477,6 +1485,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testExportedFieldsWithJoinedStrategyAndRecursiveRelation() {
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'with' => array('Parent.Parent')
 		));
@@ -1485,6 +1494,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'Parent.name',
 			'with' => array('Parent.Parent')
@@ -1494,6 +1504,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'ParentOfParent.name',
 			'with' => array('Parent.Parent' => array('alias' => 'ParentOfParent'))
