@@ -18,9 +18,9 @@ use lithium\template\View;
 
 class RendererTest extends \lithium\test\Unit {
 
+	public $subject;
+
 	public function setUp() {
-		$this->_routes = Router::get();
-		Router::reset();
 		Router::connect('/{:controller}/{:action}');
 		$this->subject = new Simple(array(
 			'request' => new Request(array(
@@ -32,13 +32,6 @@ class RendererTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Router::reset();
-		foreach ($this->_routes as $scope => $routes) {
-			Router::scope($scope, function() use ($routes) {
-				foreach ($routes as $route) {
-					Router::connect($route);
-				}
-			});
-		}
 	}
 
 	public function testInitialization() {

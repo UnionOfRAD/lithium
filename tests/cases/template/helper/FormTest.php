@@ -38,14 +38,10 @@ class FormTest extends \lithium\test\Unit {
 
 	public $base = null;
 
-	protected $_routes = array();
-
 	/**
 	 * Initialize test by creating a new object instance with a default context.
 	 */
 	public function setUp() {
-		$this->_routes = Router::get();
-		Router::reset();
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}', array('id' => null));
 		Router::connect('/{:controller}/{:action}/{:args}');
 
@@ -61,13 +57,6 @@ class FormTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Router::reset();
-		foreach ($this->_routes as $scope => $routes) {
-			Router::scope($scope, function() use ($routes) {
-				foreach ($routes as $route) {
-					Router::connect($route);
-				}
-			});
-		}
 	}
 
 	public function testFormCreation() {
