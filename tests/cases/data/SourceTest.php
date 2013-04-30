@@ -43,9 +43,9 @@ class SourceTest extends \lithium\test\Unit {
 
 	public function testItem() {
 		$source = new MockSource();
-		$entity = $source->item('Foo', array('foo' => 'bar'));
+		$entity = $source->item('lithium\tests\mocks\data\MockPost', array('foo' => 'bar'));
 		$this->assertInstanceOf('lithium\data\Entity', $entity);
-		$this->assertEqual('Foo', $entity->model());
+		$this->assertEqual('lithium\tests\mocks\data\MockPost', $entity->model());
 		$this->assertEqual(array('foo' => 'bar'), $entity->data());
 	}
 }

@@ -710,15 +710,12 @@ abstract class Database extends \lithium\data\Source {
 		if (is_array($primary)) {
 			$key = array_combine($primary, $primary);
 		} elseif ($type === 'hasMany' || $type === 'hasOne') {
-			if ($type === 'hasMany') {
-				$field = Inflector::pluralize($field);
-			}
 			$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
 			$key = array($primary => "{$secondary}_id");
 		}
 
 		$from = $class;
-		$fieldName = $field;
+		$fieldName = $this->relationFieldName($type, $name);
 		$config += compact('type', 'name', 'key', 'from', 'fieldName');
 		return $this->_instance('relationship', $config);
 	}

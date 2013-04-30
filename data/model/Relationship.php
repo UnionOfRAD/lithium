@@ -9,7 +9,6 @@
 namespace lithium\data\model;
 
 use lithium\core\Libraries;
-use lithium\util\Inflector;
 use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
 
@@ -63,7 +62,7 @@ class Relationship extends \lithium\core\Object {
 	 *          referenced in the originating model.
 	 *        - `'key'` _mixed_: An array of fields that define the relationship, where the
 	 *          keys are fields in the originating model, and the values are fields in the
-	 *          target model. If the relationship is not deined by keys, this array should be
+	 *          target model. If the relationship is not defined by keys, this array should be
 	 *          empty.
 	 *        - `'type'` _string_: The type of relationship. Should be one of `'belongsTo'`,
 	 *          `'hasOne'` or `'hasMany'`.
@@ -103,7 +102,14 @@ class Relationship extends \lithium\core\Object {
 			'fieldName' => null,
 			'constraints' => array()
 		);
-		parent::__construct($config + $defaults);
+		$config += $defaults;
+		if (!$config['type'] || !$config['fieldName']) {
+			throw new ConfigException("`'type'`, `'fieldName'` and `'from'` options can't be empty.");
+		}
+		if (!$config['to'] && !$config['name']) {
+			throw new ConfigException("`'to'` and `'name'` options can't both be empty.");
+		}
+		parent::__construct($config);
 	}
 
 	protected function _init() {
@@ -111,11 +117,8 @@ class Relationship extends \lithium\core\Object {
 		$config =& $this->_config;
 		$type = $config['type'];
 
-		$name = ($type === 'hasOne') ? Inflector::pluralize($config['name']) : $config['name'];
-		$config['fieldName'] = $config['fieldName'] ?: lcfirst($name);
-
 		if (!$config['to']) {
-			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $name;
+			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $config['name'];
 			$config['to'] = Libraries::locate('models', $assoc);
 		}
 		if (!$config['key'] || !is_array($config['key'])) {
