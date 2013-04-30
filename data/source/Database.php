@@ -176,10 +176,31 @@ abstract class Database extends \lithium\data\Source {
 			'dsn'        => null,
 			'options'    => array()
 		);
+		parent::__construct($config + $defaults);
+	}
+
+	/**
+	 * Initialize `Database::$_strategies` because Closures cannot be created within the class
+	 * definition.
+	 *
+	 * @see lithium\data\source\Database::$_strategies
+	 */
+	protected function _init() {
+		parent::_init();
+
+		$formatters = $this->_formatters();
+
+		foreach ($this->_columns as $type => $column) {
+			if (isset($formatters[$type])) {
+				$this->_columns[$type]['formatter'] = $formatters[$type];
+			}
+		}
+
 		$this->_strings += array(
 			'read' => 'SELECT {:fields} FROM {:source} {:alias} {:joins} {:conditions} {:group} ' .
 			          '{:having} {:order} {:limit};{:comment}'
 		);
+
 		$this->_strategies += array(
 			'joined' => function($self, $model, $context) {
 
@@ -251,7 +272,6 @@ abstract class Database extends \lithium\data\Source {
 				throw new QueryException("This strategy is not yet implemented.");
 			}
 		);
-		parent::__construct($config + $defaults);
 	}
 
 	public function connect() {
@@ -387,14 +407,61 @@ abstract class Database extends \lithium\data\Source {
 			return 'NULL';
 		}
 
-		switch ($type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value)) {
-			case 'boolean':
-			case 'float':
-			case 'integer':
-				return $this->_cast($type, $value);
-			default:
-				return $this->connection->quote($this->_cast($type, $value));
+		$type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value);
+		$column = isset($this->_columns[$type]) ? $this->_columns[$type] : null;
+
+		return $this->_cast($type, $value, $column, $schema);
+	}
+
+	/**
+	 * Cast a value according to a column type, used by `Database::value()`
+	 *
+	 * @see lithium\data\source\Database::value()
+	 * @param string $type Name of the column type
+	 * @param string $value Value to cast
+	 * @param array $column The column definition
+	 * @return mixed Casted value
+	 */
+	protected function _cast($type, $value, $column, $schema = array()) {
+		$column += array('formatter' => null, 'format' => null);
+		$schema += array('default' => null, 'null' => false);
+
+		if (is_object($value)) {
+			return $value;
 		}
+		if ($formatter = $column['formatter']) {
+			$format = $column['format'];
+			return $format ? $formatter($format, $value) : $formatter($value);
+		}
+		return $this->connection->quote($value);
+	}
+
+	/**
+	 * Provide an associative array of Closures to be used as the "formatter" key inside of the
+	 * `Database::$_columns` specification. Each Closure should return the appropriately quoted
+	 * or unquoted value and accept one or two parameters:
+	 *  - @param mixed $value to be formatted
+	 *  - @param mixed $format to apply to $value
+	 *
+	 * @see lithium\data\source\Database::$_columns
+	 * @see lithium\data\source\Database::_init()
+	 * @return array of column types to Closure formatter
+	 */
+	protected function _formatters() {
+		$self = $this;
+
+		$datetime = $timestamp = $date = $time = function($format, $value) use ($self) {
+			if ($format && (($time = strtotime($value)) !== false)) {
+				$value = date($format, $time);
+			}
+			return $self->connection->quote($value);
+		};
+
+		return compact('datetime', 'timestamp', 'date', 'time') + array(
+			'boolean' => function($value) {
+				return $value ? 1 : 0;
+			}
+		);
 	}
 
 	/**
@@ -540,7 +607,9 @@ abstract class Database extends \lithium\data\Source {
 					}
 					$data['fields'] = $fields;
 					$data['limit'] = '';
-					$data['conditions'] = $this->conditions(array("{$name}.{$key}" => $ids), $query);
+					$data['conditions'] = $this->conditions(array(
+						"{$name}.{$key}" => $ids
+					), $query);
 					return $data;
 				}
 			}
@@ -1193,32 +1262,8 @@ abstract class Database extends \lithium\data\Source {
 		return $alias ? "AS " . $this->name($alias) : null;
 	}
 
-	/**
-	 * Cast a value according to a column type.
-	 *
-	 * @param string $type Name of the column type
-	 * @param string $value Value to cast
-	 * @return mixed Casted value
-	 */
-	protected function _cast($type, $value) {
-		if (is_object($value) || $value === null) {
-			return $value;
-		}
-		if ($type === 'boolean') {
-			return $this->_toNativeBoolean($value);
-		}
-		if (!isset($this->_columns[$type]) || !isset($this->_columns[$type]['formatter'])) {
-			return $value;
-		}
-
-		$column = $this->_columns[$type];
-
-		switch ($column['formatter']) {
-			case 'date':
-				return $column['formatter']($column['format'], strtotime($value));
-			default:
-				return $column['formatter']($value);
-		}
+	public function cast($entity, array $data, array $options = array()) {
+		return $data;
 	}
 
 	protected function _createFields($data, $schema, $context) {
@@ -1351,10 +1396,6 @@ abstract class Database extends \lithium\data\Source {
 			return ($value === 't' || $value === 'T' || $value === 'true');
 		}
 		return (boolean) $value;
-	}
-
-	protected function _toNativeBoolean($value) {
-		return $value ? 1 : 0;
 	}
 
 	/**

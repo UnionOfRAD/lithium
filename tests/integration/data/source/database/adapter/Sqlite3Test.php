@@ -18,15 +18,13 @@ use lithium\tests\fixture\model\gallery\Galleries;
 
 class Sqlite3Test extends \lithium\tests\integration\data\Base {
 
-	protected $_schema = array(
-		'fields' => array(
-			'id' => array('type' => 'id'),
-			'name' => array('type' => 'string', 'length' => 255),
-			'active' => array('type' => 'boolean'),
-			'created' => array('type' => 'datetime', 'null' => true),
-			'modified' => array('type' => 'datetime', 'null' => true)
-		)
-	);
+	protected $_schema = array('fields' => array(
+		'id' => array('type' => 'id'),
+		'name' => array('type' => 'string', 'length' => 255),
+		'active' => array('type' => 'boolean'),
+		'created' => array('type' => 'datetime', 'null' => true),
+		'modified' => array('type' => 'datetime', 'null' => true)
+	));
 
 	/**
 	 * Skip the test if a Sqlite3 adapter configuration is unavailable.
@@ -40,10 +38,12 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 		$this->_db->dropSchema('galleries');
 		$schema = new Schema($this->_schema);
 		$this->_db->createSchema('galleries', $schema);
+		Galleries::config(array('meta' => array('connection' => $this->_connection)));
 	}
 
 	public function tearDown() {
 		$this->_db->dropSchema('galleries');
+		Galleries::reset();
 	}
 
 	public function testEnabledFeatures() {
@@ -122,6 +122,20 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 		$this->assertIdentical(1, $this->_db->value(true));
 		$this->assertIdentical(1, $this->_db->value('1'));
 		$this->assertIdentical(1.1, $this->_db->value('1.1'));
+	}
+
+	public function testValueWithSchema() {
+		$result = $this->_db->value('2013-01-07 13:57:03.621684', array('type' => 'timestamp'));
+		$this->assertIdentical("'2013-01-07 13:57:03'", $result);
+
+		$result = $this->_db->value('2012-05-25 22:44:00', array('type' => 'timestamp'));
+		$this->assertIdentical("'2012-05-25 22:44:00'", $result);
+
+		$result = $this->_db->value('2012-00-00', array('type' => 'date'));
+		$this->assertIdentical("'2011-11-30'", $result);
+
+		$result = $this->_db->value((object) "'2012-00-00'", array('type' => 'date'));
+		$this->assertIdentical("'2012-00-00'", $result);
 	}
 
 	public function testNameQuoting() {
@@ -232,7 +246,6 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 		$db->dropSchema('galleries');
 		$schema = new Schema($this->_schema);
 		$db->createSchema('galleries', $schema);
-		Galleries::config(array('meta' => array('connection' => $connection)));
 
 		for ($i = 1; $i < 9; $i++) {
 			Galleries::create(array('id' => $i, 'name' => "Title {$i}"))->save();
@@ -247,8 +260,49 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 		$this->assertIdentical(8, $cpt);
 		$this->assertCount(8, $galleries);
 
-		Galleries::reset();
 		$db->dropSchema('galleries');
+	}
+
+	public function testDefaultValues() {
+		$this->_db->dropSchema('galleries');
+
+		$schema = new Schema(array('fields' => array(
+			'id' => array('type' => 'id'),
+			'name' => array('type' => 'string', 'length' => 255, 'default' => 'image'),
+			'active' => array('type' => 'boolean', 'default' => false),
+			'show' => array('type' => 'boolean', 'default' => true),
+			'empty' => array('type' => 'text', 'null' => true),
+			'created' => array(
+				'type' => 'timestamp', 'null' => true, 'default' => (object) 'CURRENT_TIMESTAMP'
+			),
+			'modified' => array(
+				'type' => 'timestamp', 'null' => false, 'default' => (object) 'CURRENT_TIMESTAMP'
+			)
+		)));
+
+		$this->_db->createSchema('galleries', $schema);
+
+		$gallery = Galleries::create();
+		$this->assertEqual('image', $gallery->name);
+		$this->assertEqual(false, $gallery->active);
+		$this->assertEqual(true, $gallery->show);
+		$this->assertEqual(null, $gallery->empty);
+
+		$gallery->save();
+		$result = Galleries::find('first')->data();
+
+		$this->assertEqual(1, $result['id']);
+		$this->assertEqual('image', $result['name']);
+		$this->assertEqual(false, $result['active']);
+		$this->assertEqual(true, $result['show']);
+		$this->assertEqual(null, $result['empty']);
+
+		$this->assertPattern('$\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$', $result['created']);
+		$this->assertPattern('$\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$', $result['modified']);
+
+		$time = time();
+		$this->assertTrue($time - strtotime($result['created']) < 24 * 3600);
+		$this->assertTrue($time - strtotime($result['modified']) < 24 * 3600);
 	}
 }
 
