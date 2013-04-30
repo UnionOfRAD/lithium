@@ -433,6 +433,39 @@ class Media extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function asset($path, $type, array $options = array()) {
+		$options = static::_assetOptions($path, $type, $options);
+		$params = compact('path', 'type', 'options');
+
+		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+			$path = $params['path'];
+			$type = $params['type'];
+			$options = $params['options'];
+			$library = $options['library'];
+
+			if (preg_match('/^(?:[a-z0-9-]+:)?\/\//i', $path)) {
+				return $path;
+			}
+			$config = Libraries::get($library);
+			$paths = $options['paths'];
+			$config['default'] ? end($paths) : reset($paths);
+			$options['library'] = basename($config['path']);
+
+			if ($options['suffix'] && strpos($path, $options['suffix']) === false) {
+				$path .= $options['suffix'];
+			}
+			return $self::filterAssetPath($path, $paths, $config, compact('type') + $options);
+		});
+	}
+
+	/**
+	 * Initialize options for `Media::asset()`.
+	 *
+	 * @param string $path The path to the asset.
+	 * @param string $type The asset type.
+	 * @param array $options Contains setting for finding and handling the path.
+	 * @return array The initialized options.
+	 */
+	protected static function _assetOptions($path, $type, $options) {
 		$defaults = array(
 			'base' => null,
 			'timestamp' => false,
@@ -442,16 +475,13 @@ class Media extends \lithium\core\StaticObject {
 			'check' => false,
 			'library' => true
 		);
-		if (!$paths = static::_assets($type)) {
-			$type = 'generic';
-			$paths = static::_assets('generic');
-		}
 
 		$base = isset($options['base']) ? rtrim($options['base'], '/') : '';
 		$options += array('scope' => static::scope());
 		$name = $options['scope'];
 
-		if ($name && $config = static::attached($name)) {
+		if ($config = static::attached($name)) {
+			$base = isset($config['base']) ? '/' . $config['base'] : $base;
 			$defaults = array_merge($defaults, $config);
 
 			if (preg_match('/^((?:[a-z0-9-]+:)?\/\/)([^\/]*)/i', $base, $match)) {
@@ -474,34 +504,19 @@ class Media extends \lithium\core\StaticObject {
 					} else {
 						$host = $defaults['scheme'] . $defaults['host'];
 					}
+					$base = trim($base, '/');
+					$base = $base ? '/' . $base : '';
 				}
-				$base = $host ? ($base ? '/' . ltrim($base, '/') : '') : $base;
 				$options['base'] = rtrim($host . $base . '/' . $defaults['prefix'], '/');
 			}
 		}
 
-		$options += ($paths + $defaults);
-		$params = compact('path', 'type', 'options');
+		if (!$paths = static::_assets($type)) {
+			$type = 'generic';
+			$paths = static::_assets('generic');
+		}
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$path = $params['path'];
-			$type = $params['type'];
-			$options = $params['options'];
-			$library = $options['library'];
-
-			if (preg_match('/^(?:[a-z0-9-]+:)?\/\//i', $path)) {
-				return $path;
-			}
-			$config = Libraries::get($library);
-			$paths = $options['paths'];
-			$config['default'] ? end($paths) : reset($paths);
-			$options['library'] = basename($config['path']);
-
-			if ($options['suffix'] && strpos($path, $options['suffix']) === false) {
-				$path .= $options['suffix'];
-			}
-			return $self::filterAssetPath($path, $paths, $config, compact('type') + $options);
-		});
+		return $options + $paths + $defaults;
 	}
 
 	/**
@@ -1070,6 +1085,7 @@ class Media extends \lithium\core\StaticObject {
 				'absolute' => false,
 				'host' => 'localhost',
 				'scheme' => 'http://',
+				'base' => null,
 				'prefix' => '',
 				'path' => null,
 				'timestamp' => false,
@@ -1079,6 +1095,7 @@ class Media extends \lithium\core\StaticObject {
 			);
 			$config += $defaults;
 			$config['prefix'] = trim($config['prefix'], '/');
+			$config['base'] = $config['base'] ? trim($config['base'], '/') : $config['base'];
 			return $config;
 		};
 	}

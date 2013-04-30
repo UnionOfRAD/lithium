@@ -16,23 +16,12 @@ class RouterTest extends \lithium\test\Unit {
 
 	public $request = null;
 
-	protected $_routes = array();
-
 	public function setUp() {
 		$this->request = new Request();
-		$this->_routes = Router::get();
-		Router::reset();
 	}
 
 	public function tearDown() {
 		Router::reset();
-		foreach ($this->_routes as $scope => $routes) {
-			Router::scope($scope, function() use ($routes) {
-				foreach ($routes as $route) {
-					Router::connect($route);
-				}
-			});
-		}
 	}
 
 	public function testBasicRouteConnection() {
@@ -462,6 +451,19 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEmpty($request->params);
 	}
 
+	public function testActionWithProcess() {
+		Router::connect('/{:controller}/{:action}/{:args}');
+		$request = Router::process(new Request(array('url' => '/users/toJson')));
+
+		$params = array('controller' => 'Users', 'action' => 'toJson', 'args' => array());
+		$this->assertEqual($params, $request->params);
+
+		$request = Router::process(new Request(array('url' => '/users/to_json')));
+
+		$params = array('controller' => 'Users', 'action' => 'to_json', 'args' => array());
+		$this->assertEqual($params, $request->params);
+	}
+
 	/**
 	 * Tests that the order of the parameters is respected so it can trim
 	 * the URL correctly.
@@ -786,11 +788,10 @@ class RouterTest extends \lithium\test\Unit {
 
 	public function testRouteModifiers() {
 		$modifiers = Router::modifiers();
-		$this->assertEqual(array('args', 'controller', 'action'), array_keys($modifiers));
+		$this->assertEqual(array('args', 'controller'), array_keys($modifiers));
 
 		$this->assertEqual(array('foo', 'bar'), $modifiers['args']('foo/bar'));
 		$this->assertIdentical('HelloWorld', $modifiers['controller']('hello_world'));
-		$this->assertIdentical('listItems', $modifiers['action']('list_items'));
 	}
 
 	public function testAttachAbsolute() {
@@ -811,6 +812,7 @@ class RouterTest extends \lithium\test\Unit {
 			'absolute' => true,
 			'host' => 'admin.myserver.com',
 			'scheme' => 'http',
+			'base' => null,
 			'prefix' => 'web/tests',
 			'pattern' => '@^http://(?P<subdomain>[a-z]+)\\.(?P<domain>[^/]+?)\\.' .
 			             '(?P<tld>[^/]+?)/web/tests/@',
@@ -840,6 +842,7 @@ class RouterTest extends \lithium\test\Unit {
 			'absolute' => true,
 			'host' => 'admin.myserver.co.uk',
 			'scheme' => 'https',
+			'base' => null,
 			'prefix' => '',
 			'pattern' => '@^(?P<scheme>https)://(?P<subdomain>[a-z]+)\\.(?P<domain>[^/]+?)\\.' .
 			             '(?P<tld>[^/]+?)/@',
@@ -858,6 +861,7 @@ class RouterTest extends \lithium\test\Unit {
 			'absolute' => true,
 			'host' => null,
 			'scheme' => null,
+			'base' => null,
 			'prefix' => '',
 			'pattern' => '@^(.*?)//localhost/@',
 			'params' => array()
@@ -877,6 +881,7 @@ class RouterTest extends \lithium\test\Unit {
 			'absolute' => true,
 			'host' => 'www.hostname.com',
 			'scheme' => 'http',
+			'base' => null,
 			'prefix' => 'web/tests',
 			'pattern' => '@^http://www\.hostname\.com/web/tests/@',
 			'params' => array()
@@ -896,6 +901,7 @@ class RouterTest extends \lithium\test\Unit {
 			'absolute' => true,
 			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
 			'scheme' => 'http',
+			'base' => null,
 			'prefix' => 'web/tests',
 			'pattern' => '@^http://(?P<subdomain>[a-z]+)\\.(?P<domain>[^/]+?)\\.' .
 			             '(?P<tld>[^/]+?)/web/tests/@',
@@ -914,6 +920,7 @@ class RouterTest extends \lithium\test\Unit {
 			'absolute' => true,
 			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
 			'scheme' => '{:scheme:https}',
+			'base' => null,
 			'prefix' => '',
 			'pattern' => '@^(?P<scheme>https)://(?P<subdomain>[a-z]+)\\.(?P<domain>[^/]+?)\\.' .
 			             '(?P<tld>[^/]+?)/@',
@@ -1330,7 +1337,7 @@ class RouterTest extends \lithium\test\Unit {
 
 		Router::scope(false);
 		$result = Router::match('/controller/action/hello', $request);
-		$this->assertIdentical('request/base/controller/action/hello', $result);
+		$this->assertIdentical('/request/base/controller/action/hello', $result);
 	}
 
 	public function testUnexistingScopedRoute() {
@@ -1686,6 +1693,7 @@ class RouterTest extends \lithium\test\Unit {
 			'absolute' => true,
 			'host' => 'admin.myserver.co.uk',
 			'scheme' => '{:scheme:https}',
+			'base' => null,
 			'prefix' => '',
 			'pattern' => '@^(?P<scheme>https)://(?P<subdomain>[a-z]+)\\.' .
 			             '(?P<domain>[^/]+?)\\.(?P<tld>[^/]+?)/@',
@@ -1746,8 +1754,9 @@ class RouterTest extends \lithium\test\Unit {
 			'scope1' => array (
 				'prefix' => 'scope1',
 				'absolute' => true,
-				'host' => NULL,
-				'scheme' => NULL,
+				'host' => null,
+				'scheme' => null,
+				'base' => null,
 				'pattern' => '@^(.*?)//localhost/scope1/@',
 				'library' => 'scope1',
 				'values' => array (),
@@ -1757,8 +1766,9 @@ class RouterTest extends \lithium\test\Unit {
 				'prefix' => 'scope2',
 				'library' => 'app',
 				'absolute' => false,
-				'host' => NULL,
-				'scheme' => NULL,
+				'host' => null,
+				'scheme' => null,
+				'base' => null,
 				'pattern' => '@^/scope2/@',
 				'values' => array (),
 				'params' => array ()
@@ -1766,8 +1776,9 @@ class RouterTest extends \lithium\test\Unit {
 			'scope3' => array (
 				'prefix' => 'scope3',
 				'absolute' => false,
-				'host' => NULL,
-				'scheme' => NULL,
+				'host' => null,
+				'scheme' => null,
+				'base' => null,
 				'pattern' => '@^/scope3/@',
 				'library' => 'scope3',
 				'values' => array (),
@@ -1775,6 +1786,23 @@ class RouterTest extends \lithium\test\Unit {
 			)
 		);
 		$this->assertEqual($expected, Router::attached());
+	}
+
+	public function testScopeBase() {
+		$request = new Request(array('base' => 'lithium/app'));
+		Router::connect('/{:controller}/{:action}');
+		$url = array('controller' => 'HelloWorld');
+
+		$expected = '/lithium/app/hello_world';
+		$this->assertEqual($expected, Router::match($url, $request));
+
+		Router::attach(false, array('base' => 'lithium'));
+		$expected = '/lithium/hello_world';
+		$this->assertEqual($expected, Router::match($url, $request));
+
+		Router::attach(false, array('base' => ''));
+		$expected = '/hello_world';
+		$this->assertEqual($expected, Router::match($url, $request));
 	}
 }
 
