@@ -1285,13 +1285,20 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function applyFilter($method, $closure = null) {
 		$instance = static::_object();
+
+		if ($method === false) {
+			$instance->_instanceFilters = array();
+			return;
+		}
 		$methods = (array) $method;
 
 		foreach ($methods as $method) {
-			if (!isset($instance->_instanceFilters[$method])) {
+			if (!isset($instance->_instanceFilters[$method]) || $closure === false) {
 				$instance->_instanceFilters[$method] = array();
 			}
-			$instance->_instanceFilters[$method][] = $closure;
+			if ($closure !== false) {
+				$instance->_instanceFilters[$method][] = $closure;
+			}
 		}
 	}
 
