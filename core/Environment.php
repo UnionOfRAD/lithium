@@ -332,7 +332,7 @@ class Environment {
 					return 'test';
 				case ($request->env('PLATFORM') == 'CLI'):
 					return 'development';
-				case (preg_match('/^test\//', $request->url) && $isLocal):
+				case (preg_match('/^\/test/', $request->url) && $isLocal):
 					return 'test';
 				case ($isLocal):
 					return 'development';
