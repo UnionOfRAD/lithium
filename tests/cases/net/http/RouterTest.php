@@ -247,6 +247,7 @@ class RouterTest extends \lithium\test\Unit {
 	public function testShorthandParameterMatching() {
 		Router::reset();
 		Router::connect('/posts/{:page:[0-9]+}', array('Posts::index', 'page' => '1'));
+		Router::connect('/admin/posts/{:page:[0-9]+}', array('Posts::index', 'page' => '1', 'library' => 'admin'));
 
 		$result = Router::match(array('controller' => 'posts', 'page' => '5'));
 		$expected = '/posts/5';
@@ -255,6 +256,10 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match(array('Posts::index', 'page' => '10'));
 		$expected = '/posts/10';
 		$this->assertIdentical($expected, $result);
+
+		$result = Router::match(array("admin.Posts::index", 'page' => '9'));
+		$expected = '/admin/posts/9';
+		$this->assertEqual($expected, $result);
 
 		$request = new Request(array('url' => '/posts/13'));
 		$result = Router::process($request);
