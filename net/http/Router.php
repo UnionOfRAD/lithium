@@ -378,32 +378,32 @@ class Router extends \lithium\core\StaticObject {
 		unset($url['#']);
 
 		$scope = $options['scope'];
-		if (!isset(static::$_configurations[$scope])) {
-			$url = static::_formatError($url);
-			throw new RoutingException("No configuration found for scope `{$scope}`.");
-		}
-		foreach (static::$_configurations[$scope] as $route) {
-			if (!$match = $route->match($url, $context)) {
-				continue;
+		if (isset(static::$_configurations[$scope])) {
+			foreach (static::$_configurations[$scope] as $route) {
+				if (!$match = $route->match($url, $context)) {
+					continue;
+				}
+				if ($route->canContinue()) {
+					$stack[] = $match;
+					$export = $route->export();
+					$keys = $export['match'] + $export['keys'] + $export['defaults'];
+					unset($keys['args']);
+					$url = array_diff_key($url, $keys);
+					continue;
+				}
+				if ($stack) {
+					$stack[] = $match;
+					$match = static::_compileStack($stack);
+				}
+				$path = rtrim("{$base}{$match}{$suffix}", '/') ?: '/';
+				$path = ($options) ? static::_prefix($path, $context, $options) : $path;
+				return $path ?: '/';
 			}
-			if ($route->canContinue()) {
-				$stack[] = $match;
-				$export = $route->export();
-				$keys = $export['match'] + $export['keys'] + $export['defaults'];
-				unset($keys['args']);
-				$url = array_diff_key($url, $keys);
-				continue;
-			}
-			if ($stack) {
-				$stack[] = $match;
-				$match = static::_compileStack($stack);
-			}
-			$path = rtrim("{$base}{$match}{$suffix}", '/') ?: '/';
-			$path = ($options) ? static::_prefix($path, $context, $options) : $path;
-			return $path ?: '/';
 		}
 		$url = static::_formatError($url);
-		throw new RoutingException("No parameter match found for URL `{$url}`.");
+		$message = "No parameter match found for URL `{$url}`";
+		$message .= $scope ? " in `{$scope}` scope." : '.';
+		throw new RoutingException($message);
 	}
 
 	/**

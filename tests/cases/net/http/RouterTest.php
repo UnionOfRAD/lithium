@@ -1350,7 +1350,21 @@ class RouterTest extends \lithium\test\Unit {
 			Router::connect('/user/view/{:args}', array('User::view'));
 		});
 		Router::scope('tests');
-		$this->expectException('/No configuration found for scope `app`./');
+
+		$ex = "No parameter match found for URL `('controller' => 'User', ";
+		$ex .= "'action' => 'view', 'args' => 'bob')` in `app` scope.";
+		$this->expectException($ex);
+
+		$result = Router::match(array(
+			'User::view', 'args' => 'bob'
+		), null, array('scope' => 'app'));
+	}
+
+	public function testMatchWithNoRouteDefined() {
+		$ex = "No parameter match found for URL `('controller' => 'User', ";
+		$ex .= "'action' => 'view', 'args' => 'bob')` in `app` scope.";
+		$this->expectException($ex);
+
 		$result = Router::match(array(
 			'User::view', 'args' => 'bob'
 		), null, array('scope' => 'app'));
