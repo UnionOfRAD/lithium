@@ -617,7 +617,7 @@ class Router extends \lithium\core\StaticObject {
 	 * @return array
 	 */
 	protected static function _parseString($path, $context, array $options = array()) {
-		if (!preg_match('/^[A-Za-z0-9_\\\\]+::[A-Za-z0-9_]+$/', $path)) {
+		if (!preg_match('/^[A-Za-z0-9._\\\\]+::[A-Za-z0-9_]+$/', $path)) {
 			$base = rtrim($options['base'], '/');
 			if ((!$path || $path[0] != '/') && $context && isset($context->controller)) {
 				$formatters = static::formatters();
