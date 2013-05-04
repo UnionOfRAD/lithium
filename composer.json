@@ -18,5 +18,9 @@
 	"require": {
 		"php": ">=5.3.6",
 		"composer/installers": "dev-master"
-	}
+	},
+	"autoload": {
+		"psr-0": { "lithium": "" }
+	},
+	"target-dir": "lithium"
 }
