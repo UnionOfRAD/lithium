@@ -703,8 +703,6 @@ abstract class Database extends \lithium\data\Source {
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
-		$field = Inflector::underscore(Inflector::singularize($name));
-		$key = "{$field}_id";
 		$primary = $class::meta('key');
 
 		if (is_array($primary)) {
@@ -712,6 +710,8 @@ abstract class Database extends \lithium\data\Source {
 		} elseif ($type === 'hasMany' || $type === 'hasOne') {
 			$secondary = Inflector::underscore(Inflector::singularize($class::meta('name')));
 			$key = array($primary => "{$secondary}_id");
+		} else {
+			$key = Inflector::underscore(Inflector::singularize($name)) . '_id';
 		}
 
 		$from = $class;
