@@ -56,9 +56,9 @@ class Controller extends \lithium\core\Object {
 				$options['title'] = 'All Tests';
 			}
 
-			$this->_saveCtrlContext();
+			$self->invokeMethod('_saveCtrlContext');
 			$report = Dispatcher::run($group, $options);
-			$this->_restoreCtrlContext();
+			$self->invokeMethod('_restoreCtrlContext');
 
 			$filters = Libraries::locate('test.filter');
 			$menu = Libraries::locate('tests', null, array(
