@@ -678,7 +678,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'scorer' => array('like' => '%howard%')
 		)));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ";
-		$sql .= "WHERE ({scorer} like '%howard%');";
+		$sql .= "WHERE ({scorer} LIKE '%howard%');";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 
 		$conditions = "custom conditions string";
@@ -695,7 +695,21 @@ class DatabaseTest extends \lithium\test\Unit {
 			)
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
-		$sql .= "({field} like '%value%' AND {field} not like '%value2%');";
+		$sql .= "({field} LIKE '%value%' AND {field} NOT LIKE '%value2%');";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => array(
+			'scorer' => array('is' => null)
+		)));
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ";
+		$sql .= "WHERE ({scorer} IS NULL);";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => array(
+			'scorer' => array('is not' => null)
+		)));
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ";
+		$sql .= "WHERE ({scorer} IS NOT NULL);";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
