@@ -86,12 +86,11 @@ abstract class Database extends \lithium\data\Source {
 		'>=' => array(),
 		'!=' => array('multiple' => 'NOT IN'),
 		'<>' => array('multiple' => 'NOT IN'),
-		'between' => array('format' => 'BETWEEN ? AND ?'),
 		'BETWEEN' => array('format' => 'BETWEEN ? AND ?'),
-		'like' => array(),
 		'LIKE' => array(),
-		'not like' => array(),
-		'NOT LIKE' => array()
+		'NOT LIKE' => array(),
+		'IS' => array(),
+		'IS NOT' => array()
 	);
 
 	protected $_constraintTypes = array(
@@ -953,7 +952,7 @@ abstract class Database extends \lithium\data\Source {
 				if (isset($value)) {
 					return $this->name($key) . ' = ' . $this->value($value, $fieldMeta);
 				}
-				return $this->name($key) . " IS NULL";
+				return $this->name($key) . ' IS NULL';
 			case is_numeric($key) && is_array($value):
 				$result = array();
 				foreach ($value as $cKey => $cValue) {
@@ -971,18 +970,40 @@ abstract class Database extends \lithium\data\Source {
 					$result[] = $this->_processConditions($cKey, $cValue, $context, $schema, $glue);
 				}
 				return '(' . implode(' ' . $glue . ' ', $result) . ')';
-			case (is_string($key) && is_array($value) && isset($this->_operators[key($value)])):
-				foreach ($value as $op => $val) {
-					$result[] = $this->_operator($key, array($op => $val), $fieldMeta);
-				}
-				return '(' . implode(' ' . $glue . ' ', $result) . ')';
+			case $result = $this->_processOperator($key, $value, $fieldMeta, $glue):
+				return $result;
 			case is_array($value):
-				if (!is_numeric($op = key($value))) {
-					throw new QueryException("Unsupported operator `{$op}`.");
-				}
 				$value = join(', ', $this->value($value, $fieldMeta));
 				return "{$this->name($key)} IN ({$value})";
 		}
+	}
+
+	/**
+	 * Helper method used by `_processConditions`.
+	 *
+	 * @param string The field name string.
+	 * @param array The operator to parse.
+	 * @param array The schema of the field.
+	 * @param string The glue operator (e.g `'AND'` or '`OR`'.
+	 * @return mixed Returns the operator expression string or `false` if no operator
+	 *         is applicable.
+	 * @throws A `QueryException` if the operator is not supported.
+	 */
+	protected function _processOperator($key, $value, $fieldMeta, $glue) {
+		if(!is_string($key) || !is_array($value)) {
+			return false;
+		}
+		$operator = strtoupper(key($value));
+		if(!is_numeric($operator)) {
+			if(!isset($this->_operators[$operator])){
+				throw new QueryException("Unsupported operator `{$operator}`.");
+			}
+			foreach ($value as $op => $val) {
+				$result[] = $this->_operator($key, array($op => $val), $fieldMeta);
+			}
+			return '(' . implode(' ' . $glue . ' ', $result) . ')';
+		}
+		return false;
 	}
 
 	/**
@@ -1299,11 +1320,15 @@ abstract class Database extends \lithium\data\Source {
 		$options += $defaults;
 
 		list($op, $value) = each($value);
+		$op = strtoupper($op);
 		$config = $this->_operators[$op];
 		$key = $this->name($key);
 		$values = array();
 
 		if (!is_object($value)) {
+			if ($value === null) {
+				$value = array(null);
+			}
 			foreach ((array) $value as $val) {
 				$values[] = $this->value($val, $schema);
 			}
