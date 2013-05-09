@@ -1091,7 +1091,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'alias' => 'Comments',
 			'conditions' => array('Comment.id' => 1),
 			'joins' => array(array(
-				'type' => 'INNER',
+				'mode' => 'INNER',
 				'source' => 'posts',
 				'alias' => 'Post',
 				'constraints' => array('Comment.post_id' => array('<=' => 'Post.id'))
@@ -1116,7 +1116,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'alias' => 'Comments',
 			'conditions' => array('Comment.id' => 1),
 			'joins' => array(array(
-				'type' => 'LEFT',
+				'mode' => 'LEFT',
 				'source' => 'posts',
 				'alias' => 'Post',
 				'constraints' => array(
@@ -1139,7 +1139,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'source' => 'comments',
 			'alias' => 'Comments',
 			'joins' => array(array(
-				'type' => 'LEFT',
+				'mode' => 'LEFT',
 				'source' => 'posts',
 				'alias' => 'Post',
 				'constraints' => array(
@@ -1160,7 +1160,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'alias' => 'Comment',
 			'conditions' => array('Comment.id' => 1),
 			'joins' => array(array(
-				'type' => 'INNER',
+				'mode' => 'INNER',
 				'source' => 'posts',
 				'alias' => 'Post',
 				'constraints' => array('Comment.post_id' => 'Post.id')
@@ -1419,7 +1419,7 @@ class DatabaseTest extends \lithium\test\Unit {
 					'MockDatabasePost.published' => (object) "'yes'"
 				),
 				'model' => 'lithium\tests\mocks\data\model\MockDatabaseComment',
-				'type' => 'LEFT',
+				'mode' => 'LEFT',
 				'alias' => 'MockDatabaseComment'
 			)
 		);
@@ -1439,7 +1439,7 @@ class DatabaseTest extends \lithium\test\Unit {
 					'published' => (object) "'yes'"
 				),
 				'model' => 'lithium\tests\mocks\data\model\MockDatabaseComment',
-				'type' => 'LEFT',
+				'mode' => 'LEFT',
 				'alias' => 'MockDatabaseComment'
 			)
 		);
