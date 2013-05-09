@@ -204,8 +204,7 @@ class MemcacheTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->memcache, $params);
-		$this->assertFalse($result);
-
+		$this->assertNull($result);
 	}
 
 	public function testDelete() {
