@@ -990,12 +990,12 @@ abstract class Database extends \lithium\data\Source {
 	 * @throws A `QueryException` if the operator is not supported.
 	 */
 	protected function _processOperator($key, $value, $fieldMeta, $glue) {
-		if(!is_string($key) || !is_array($value)) {
+		if (!is_string($key) || !is_array($value)) {
 			return false;
 		}
 		$operator = strtoupper(key($value));
-		if(!is_numeric($operator)) {
-			if(!isset($this->_operators[$operator])){
+		if (!is_numeric($operator)) {
+			if (!isset($this->_operators[$operator])) {
 				throw new QueryException("Unsupported operator `{$operator}`.");
 			}
 			foreach ($value as $op => $val) {
