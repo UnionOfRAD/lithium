@@ -159,6 +159,8 @@ class SessionTest extends \lithium\test\Integration {
 		$this->expectException('/Possible data tampering: HMAC signature does not match data./');
 		Session::read($key, $config);
 		$_SESSION = $cache;
+
+		Session::reset();
 	}
 
 	public function testEncryptStrategyWithPhpAdapter() {
