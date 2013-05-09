@@ -54,7 +54,7 @@ abstract class Database extends \lithium\data\Source {
 		'create' => "INSERT INTO {:source} ({:fields}) VALUES ({:values});{:comment}",
 		'update' => "UPDATE {:source} SET {:fields} {:conditions};{:comment}",
 		'delete' => "DELETE {:flags} FROM {:source} {:conditions};{:comment}",
-		'join' => "{:type} JOIN {:source} {:alias} {:constraints}",
+		'join' => "{:mode} JOIN {:source} {:alias} {:constraints}",
 		'schema' => "CREATE TABLE {:source} (\n{:columns}{:constraints}){:table};{:comment}",
 		'drop'   => "DROP TABLE {:exists}{:source};"
 	);
@@ -247,7 +247,7 @@ abstract class Database extends \lithium\data\Source {
 					}
 				};
 
-				$tree = Set::expand(Set::normalize(array_keys($with)));
+				$tree = Set::expand(array_fill_keys(array_keys($with), false));
 				$alias = $context->alias();
 				$deps = array($alias => array());
 				$strategy($strategy, $model, $tree, '', $alias, $deps);
@@ -1147,7 +1147,7 @@ abstract class Database extends \lithium\data\Source {
 				$result .= ' ';
 			}
 			$join = is_array($join) ? $this->_instance('query', $join) : $join;
-			$options['keys'] = array('source', 'alias', 'constraints');
+			$options['keys'] = array('mode', 'source', 'alias', 'constraints');
 			$result .= $this->renderCommand('join', $join->export($this, $options));
 		}
 		return $result;
@@ -1439,9 +1439,13 @@ abstract class Database extends \lithium\data\Source {
 	 * Applying a strategy to a `lithium\data\model\Query` object
 	 *
 	 * @param array $options The option array
-	 * @param object $context A query object to configure
+	 * @param object $context A find query object to configure
 	 */
 	public function applyStrategy($options, $context) {
+		if ($context->type() !== 'read') {
+			return;
+		}
+
 		$options += array('strategy' => 'joined');
 		if (!$model = $context->model()) {
 			throw new ConfigException('The `\'with\'` option need a valid `\'model\'` option.');
@@ -1483,7 +1487,7 @@ abstract class Database extends \lithium\data\Source {
 		}
 
 		$context->joins($toAlias, compact('constraints', 'model') + array(
-			'type' => 'LEFT',
+			'mode' => 'LEFT',
 			'alias' => $toAlias
 		));
 	}
