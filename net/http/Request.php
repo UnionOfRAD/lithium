@@ -50,6 +50,13 @@ class Request extends \lithium\net\http\Message {
 	 */
 	public $cookies = array();
 
+ 	/**
+	 * An array of closures representing various formats this object can be exported to.
+	 *
+	 * @var array
+	 */
+	protected $_formats = array();
+
 	/**
 	 * Adds config values to the public properties when a new object is created.
 	 *
@@ -101,6 +108,32 @@ class Request extends \lithium\net\http\Message {
 		}
 		$this->headers($this->_config['headers']);
 		$this->cookies($this->_config['cookies']);
+
+		$this->_formats += array(
+			'url' => function($req, $options) {
+				$options['port'] = $options['port'] ? ":{$options['port']}" : '';
+				$options['path'] = str_replace('//', '/', $options['path']);
+				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
+			},
+			'context' => function($req, $options, $defaults) {
+				return array('http' => array_diff_key($options, $defaults) + array(
+					'content' => $req->body(),
+					'method' => $options['method'],
+					'header' => $req->headers($options['headers']),
+					'protocol_version' => $options['version'],
+					'ignore_errors' => $options['ignore_errors'],
+					'follow_location' => $options['follow_location'],
+					'request_fulluri' => $options['request_fulluri'],
+					'proxy' => $options['proxy']
+				));
+			},
+			'string' => function($req, $options) {
+				$body = $req->body();
+				$path = str_replace('//', '/', $options['path']) . $options['query'];
+				$status = "{$options['method']} {$path} {$req->protocol}";
+				return join("\r\n", array($status, join("\r\n", $req->headers()), "", $body));
+			}
+		);
 	}
 
 	/**
@@ -287,34 +320,13 @@ class Request extends \lithium\net\http\Message {
 			$this->headers('Cookie', $this->_cookies());
 		}
 		$body = $this->body($options['body']);
+
 		if ($body || !in_array($options['method'], array('GET', 'HEAD', 'DELETE'))) {
 			$this->headers('Content-Length', strlen($body));
 		}
 
-		switch ($format) {
-			case 'url':
-				$options['port'] = $options['port'] ? ":{$options['port']}" : '';
-				$options['path'] = str_replace('//', '/', $options['path']);
-				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
-			case 'context':
-				$base = array(
-					'content' => $body,
-					'method' => $options['method'],
-					'header' => $this->headers($options['headers']),
-					'protocol_version' => $options['version'],
-					'ignore_errors' => $options['ignore_errors'],
-					'follow_location' => $options['follow_location'],
-					'request_fulluri' => $options['request_fulluri'],
-					'proxy' => $options['proxy']
-				);
-				return array('http' => array_diff_key($options, $defaults) + $base);
-			case 'string':
-				$path = str_replace('//', '/', $options['path']) . $options['query'];
-				$status = "{$options['method']} {$path} {$this->protocol}";
-				return join("\r\n", array($status, join("\r\n", $this->headers()), "", $body));
-			default:
-				return parent::to($format, $options);
-		}
+		$conv = isset($this->_formats[$format]) ? $this->_formats[$format] : null;
+		return $conv ? $conv($this, $options, $defaults) : parent::to($format, $options);
 	}
 
 	/**
