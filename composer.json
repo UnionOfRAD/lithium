@@ -20,5 +20,6 @@
 	"autoload": {
 		"psr-0": { "lithium": "" }
 	},
-	"target-dir": "lithium"
+	"target-dir": "lithium",
+	"bin" : ["console/li3"]
 }
