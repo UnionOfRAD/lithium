@@ -70,6 +70,16 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertEqual('ok', file_get_contents($this->streams['output']));
 	}
 
+	public function testStyledOutput() {
+		$base = Libraries::get(true, 'resources') . '/tmp/tests';
+		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
+
+		$response = new Response(array('output' => fopen($this->streams['output'], 'w+')));
+		$response->styles(array('heading' => "\033[1;36m"));
+		$response->output('{:heading}ok');
+		$this->assertEqual("\033[1;36mok", file_get_contents($this->streams['output']));
+	}
+
 	public function testError() {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");

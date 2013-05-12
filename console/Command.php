@@ -261,7 +261,7 @@ class Command extends \lithium\core\Object {
 			$line = strlen($text);
 		}
 		$this->hr($line);
-		$this->out($text, 1, 'heading');
+		$this->out($text, 'heading');
 		$this->hr($line);
 	}
 
