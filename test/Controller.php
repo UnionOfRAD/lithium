@@ -12,12 +12,20 @@ use lithium\test\Dispatcher;
 use lithium\core\Libraries;
 use lithium\test\Group;
 use lithium\util\Set;
+use lithium\net\http\Router;
 
 /**
  * The Test Controller for running the html version of the test suite
  *
  */
 class Controller extends \lithium\core\Object {
+
+	/**
+	 * Saved context.
+	 *
+	 * @var array
+	 */
+	protected $_context = array();
 
 	/**
 	 * Magic method to make Controller callable.
@@ -47,7 +55,11 @@ class Controller extends \lithium\core\Object {
 				$group = Group::all();
 				$options['title'] = 'All Tests';
 			}
+
+			$self->invokeMethod('_saveCtrlContext');
 			$report = Dispatcher::run($group, $options);
+			$self->invokeMethod('_restoreCtrlContext');
+
 			$filters = Libraries::locate('test.filter');
 			$menu = Libraries::locate('tests', null, array(
 				'filter' => '/cases|integration|functional/',
@@ -58,6 +70,28 @@ class Controller extends \lithium\core\Object {
 			$result = compact('request', 'report', 'filters', 'menu');
 			return $report->render('layout', $result);
 		});
+	}
+
+	protected function _saveCtrlContext() {
+		$this->_context['scope'] = Router::scope(false);
+		$this->_context['routes'] = Router::get();
+		$this->_context['scopes'] = Router::attached();
+		Router::reset();
+	}
+
+	protected function _restoreCtrlContext() {
+		Router::reset();
+		foreach ($this->_context['routes'] as $scope => $routes) {
+			Router::scope($scope, function() use ($routes) {
+				foreach ($routes as $route) {
+					Router::connect($route);
+				}
+			});
+		}
+		foreach ($this->_context['scopes'] as $scope => $attachment) {
+			Router::attach($scope, $attachment);
+		}
+		Router::scope($this->_context['scope']);
 	}
 }
 

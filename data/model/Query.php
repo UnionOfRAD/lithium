@@ -30,14 +30,6 @@ use InvalidArgumentException;
 class Query extends \lithium\core\Object {
 
 	/**
-	 * The 'type' of query to be performed. This is either `'create'`, `'read'`, `'update'` or
-	 * `'delete'`, and corresponds to the method to be executed.
-	 *
-	 * @var string
-	 */
-	protected $_type = null;
-
-	/**
 	 * Array containing mappings of relationship and field names, which allow database results to
 	 * be mapped to the correct objects.
 	 *
@@ -117,7 +109,7 @@ class Query extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('type', 'map');
+	protected $_autoConfig = array('map');
 
 	/**
 	 * Initialization methods on construct
@@ -148,7 +140,8 @@ class Query extends \lithium\core\Object {
 	 * core data source and implement custom fucntionality.
 	 *
 	 * @param array $config Config options:
-	 *        - `'type'` _string_: The type of the query (`read`, `insert`, `update`, `delete`).
+	 *        - `'type'` _string_: The type of the query (`read`, `create`, `update`, `delete`).
+	 *        - `'mode'` _string_: `JOIN` mode for a join query.
 	 *        - `'entity'` _object_: The base entity to query on. If set `'model'` is optionnal.
 	 *        - `'model'` _string_: The base model to query on.
 	 *        - `'source'` _string_: The name of the table/collection. Unnecessary
@@ -175,6 +168,8 @@ class Query extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
+			'type' => 'read',
+			'mode' => null,
 			'model' => null,
 			'entity' => null,
 			'source' => null,
@@ -202,8 +197,6 @@ class Query extends \lithium\core\Object {
 
 	protected function _init() {
 		parent::_init();
-		unset($this->_config['type']);
-
 		$keys = array_keys($this->_config);
 		foreach ($this->_initializers as $key) {
 			$val = $this->_config[$key];
@@ -234,15 +227,6 @@ class Query extends \lithium\core\Object {
 		$this->fields($this->_config['fields']);
 
 		unset($this->_config['entity'], $this->_config['init']);
-	}
-
-	/**
-	 * Get method of type, i.e. 'read', 'update', 'create', 'delete'.
-	 *
-	 * @return string
-	 */
-	public function type() {
-		return $this->_type;
 	}
 
 	/**
@@ -574,10 +558,7 @@ class Query extends \lithium\core\Object {
 			$keys =& $this->_config;
 		}
 
-		$results = array('type' => $this->_type);
-
-		$apply = array_intersect_key($keys, array_flip($source->methods()));
-		$copy = array_diff_key($keys, $apply);
+		list($copy, $apply) = Set::slice($keys, $source->methods());
 
 		if (isset($keys['with'])) {
 			$this->applyStrategy($source);
@@ -784,7 +765,7 @@ class Query extends \lithium\core\Object {
 		}
 		$key = $model::key($this->_entity->data());
 
-		if (!$key && $this->_type !== 'create') {
+		if (!$key && $this->type() !== 'create') {
 			throw new ConfigException('No matching primary key found.');
 		}
 		if (is_array($key)) {

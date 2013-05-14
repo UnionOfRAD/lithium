@@ -65,8 +65,6 @@ class RouteTest extends \lithium\test\Unit {
 			'?>'
 		);
 		file_put_contents($this->_config['routes'], join("\n", $content));
-
-		Router::reset();
 	}
 
 	/**
@@ -76,6 +74,7 @@ class RouteTest extends \lithium\test\Unit {
 		if (file_exists($this->_config['routes'])) {
 			unlink($this->_config['routes']);
 		}
+		Router::reset();
 	}
 
 	/**

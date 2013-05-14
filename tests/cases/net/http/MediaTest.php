@@ -21,7 +21,7 @@ class MediaTest extends \lithium\test\Unit {
 	/**
 	 * Reset the `Media` class to its default state.
 	 */
-	public function setUp() {
+	public function tearDown() {
 		Media::reset();
 	}
 
@@ -740,6 +740,7 @@ class MediaTest extends \lithium\test\Unit {
 			'absolute' => false,
 			'host' => 'localhost',
 			'scheme' => 'http://',
+			'base' => null,
 			'prefix' => 'web/assets/app',
 			'path' => $webroot,
 			'timestamp' => false,
@@ -754,6 +755,7 @@ class MediaTest extends \lithium\test\Unit {
 			'absolute' => true,
 			'host' => 'www.hostname.com',
 			'scheme' => 'http://',
+			'base' => null,
 			'prefix' => 'web/assets/tests',
 			'path' => $webroot,
 			'timestamp' => false,
@@ -983,6 +985,7 @@ class MediaTest extends \lithium\test\Unit {
 				'absolute' => true,
 				'host' => 'localhost',
 				'scheme' => 'http://',
+				'base' => null,
 				'path' => null,
 				'timestamp' => false,
 				'filter' => null,
@@ -994,6 +997,7 @@ class MediaTest extends \lithium\test\Unit {
 				'absolute' => false,
 				'host' => 'localhost',
 				'scheme' => 'http://',
+				'base' => null,
 				'path' => null,
 				'timestamp' => false,
 				'filter' => null,
@@ -1005,6 +1009,7 @@ class MediaTest extends \lithium\test\Unit {
 				'absolute' => false,
 				'host' => 'localhost',
 				'scheme' => 'http://',
+				'base' => null,
 				'path' => null,
 				'timestamp' => false,
 				'filter' => null,
@@ -1057,6 +1062,14 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertIdentical($third, $second);
 	}
 
+	public function testScopeBase() {
+		$result = Media::asset('style.css', 'css');
+		$this->assertEqual('/css/style.css', $result);
+
+		Media::attach(false, array('base' => 'lithium/app/webroot'));
+		$result = Media::asset('style.css', 'css');
+		$this->assertEqual('/lithium/app/webroot/css/style.css', $result);
+	}
 }
 
 ?>

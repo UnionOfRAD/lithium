@@ -164,6 +164,13 @@ class Model extends \lithium\core\StaticObject {
 	protected $_relations = array();
 
 	/**
+	 * Matching between relation's fieldnames and their corresponding relation name.
+	 *
+	 * @var array
+	 */
+	protected $_relationFieldNames = array();
+
+	/**
 	 * List of relation types.
 	 *
 	 * Valid relation types are:
@@ -792,6 +799,10 @@ class Model extends \lithium\core\StaticObject {
 			return static::_relations();
 		}
 
+		if (isset($self->_relationFieldNames[$type])) {
+			$type = $self->_relationFieldNames[$type];
+		}
+
 		if (isset($self->_relations[$type])) {
 			return $self->_relations[$type];
 		}
@@ -858,10 +869,14 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function bind($type, $name, array $config = array()) {
 		$self = static::_object();
+		if (!isset($config['fieldName'])) {
+			$config['fieldName'] = $self->_relationFieldName($type, $name);
+		}
 
 		if (!in_array($type, $self->_relationTypes)) {
 			throw new ConfigException("Invalid relationship type `{$type}` specified.");
 		}
+		$self->_relationFieldNames[$config['fieldName']] = $name;
 		$rel = static::connection()->relationship(get_called_class(), $type, $name, $config);
 		return $self->_relations[$name] = $rel;
 	}
@@ -1018,7 +1033,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * {{{
 	 * if (!$post->save($someData)) {
-	 *  return array('errors' => $post->errors());
+	 *     return array('errors' => $post->errors());
 	 * }
 	 * }}}
 	 *
@@ -1270,13 +1285,20 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function applyFilter($method, $closure = null) {
 		$instance = static::_object();
+
+		if ($method === false) {
+			$instance->_instanceFilters = array();
+			return;
+		}
 		$methods = (array) $method;
 
 		foreach ($methods as $method) {
-			if (!isset($instance->_instanceFilters[$method])) {
+			if (!isset($instance->_instanceFilters[$method]) || $closure === false) {
 				$instance->_instanceFilters[$method] = array();
 			}
-			$instance->_instanceFilters[$method][] = $closure;
+			if ($closure !== false) {
+				$instance->_instanceFilters[$method][] = $closure;
+			}
 		}
 	}
 
@@ -1322,20 +1344,35 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	protected static function _relationsToLoad() {
 		try {
-			if (!static::connection()) {
+			if (!$connection = static::connection()) {
 				return;
 			}
 		} catch (ConfigExcepton $e) {
 			return;
 		}
+
+		if (!$connection::enabled('relationships')) {
+			return;
+		}
+
 		$self = static::_object();
 
 		foreach ($self->_relationTypes as $type) {
 			$self->$type = Set::normalize($self->$type);
 			foreach ($self->$type as $name => $config) {
 				$self->_relationsToLoad[$name] = $type;
+				$fieldName = $self->_relationFieldName($type, $name);
+				$self->_relationFieldNames[$fieldName] = $name;
 			}
 		}
+	}
+
+	protected function _relationFieldName($type, $name) {
+		if (!isset($this->{$type}[$name]['fieldName'])) {
+			$fieldName = static::connection()->relationFieldName($type, $name);
+			$this->{$type}[$name]['fieldName'] = $fieldName;
+		}
+		return $this->{$type}[$name]['fieldName'];
 	}
 
 	/**
@@ -1349,9 +1386,16 @@ class Model extends \lithium\core\StaticObject {
 
 		return array(
 			'first' => function($self, $params, $chain) {
-				$params['options']['limit'] = 1;
+				$options =& $params['options'];
+				$options['limit'] = 1;
 				$data = $chain->next($self, $params, $chain);
-				$data = is_object($data) ? $data->rewind() : $data;
+
+				if (isset($options['return']) && $options['return'] === 'array') {
+					$data = is_array($data) ? reset($data) : $data;
+				} else {
+					$data = is_object($data) ? $data->rewind() : $data;
+				}
+
 				return $data ?: null;
 			},
 			'list' => function($self, $params, $chain) {

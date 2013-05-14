@@ -37,9 +37,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 		'text' => array('use' => 'text'),
 		'integer' => array('use' => 'integer', 'formatter' => 'intval'),
 		'float' => array('use' => 'real', 'formatter' => 'floatval'),
-		'datetime' => array(
-			'use' => 'text', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
-		),
+		'datetime' => array('use' => 'text', 'format' => 'Y-m-d H:i:s'),
+		'timestamp' => array('use' => 'text', 'format' => 'Y-m-d H:i:s'),
 		'time' => array('use' => 'text', 'format' => 'H:i:s', 'formatter' => 'date'),
 		'date' => array('use' => 'text', 'format' => 'Y-m-d', 'formatter' => 'date'),
 		'binary' => array('use' => 'blob'),
@@ -213,10 +212,19 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$columns = $self->read("PRAGMA table_info({$name})", array('return' => 'array'));
 			$fields = array();
 			foreach ($columns as $column) {
-				$fields[$column['name']] = $self->invokeMethod('_column', array($column['type']));
-				$fields[$column['name']] += array(
-					'null' => $column['notnull'] == 1,
-					'default' => $column['dflt_value']
+				$schema = $self->invokeMethod('_column', array($column['type']));
+				$default = $column['dflt_value'];
+
+				if (preg_match("/^'(.*)'/", $default, $match)) {
+					$default = $match[1];
+				} elseif ($schema['type'] === 'boolean') {
+					$default = !!$default;
+				} else {
+					$default = null;
+				}
+				$fields[$column['name']] = $schema + array(
+					'null' => $column['notnull'] === '1',
+					'default' => $default
 				);
 			}
 			return $self->invokeMethod('_instance', array('schema', compact('fields')));

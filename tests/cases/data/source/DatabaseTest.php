@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2012, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -48,16 +48,16 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testDefaultConfig() {
 		$expected = array(
-			'persistent'    => true,
-			'host'          => 'localhost',
-			'login'         => 'root',
-			'password'      => '',
-			'database'      => null,
-			'encoding'      => null,
-			'dsn'           => null,
-			'options'       => array(),
-			'autoConnect'   => true,
-			'init'          => true
+			'persistent'  => true,
+			'host'        => 'localhost',
+			'login'       => 'root',
+			'password'    => '',
+			'database'    => null,
+			'encoding'    => null,
+			'dsn'         => null,
+			'options'     => array(),
+			'autoConnect' => true,
+			'init'        => true
 		);
 		$result = $this->db->testConfig();
 		$this->assertEqual($expected, $result);
@@ -108,17 +108,11 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->db->value('1', array('type' => 'string'));
 		$this->assertIdentical("'1'", $result);
 
-		$result = $this->db->value((object) 'CURRENT_TIMESTAMP', array('type' => 'timestamp'));
-		$this->assertIdentical('CURRENT_TIMESTAMP', $result);
-
 		$result = $this->db->value((object) 'REGEXP "^fo$"');
 		$this->assertIdentical('REGEXP "^fo$"', $result);
 
-		$date = date_default_timezone_get();
-		date_default_timezone_set('UTC');
-		$result = $this->db->value('Hello World', array('type' => 'timestamp'));
-		$this->assertIdentical("'1970-01-01 00:00:00'", $result);
-		date_default_timezone_set($date);
+		$result = $this->db->value((object) 'CURRENT_TIMESTAMP', array('type' => 'timestamp'));
+		$this->assertIdentical('CURRENT_TIMESTAMP', $result);
 
 		$result = $this->db->value('2012-05-25 22:44:00', array('type' => 'timestamp'));
 		$this->assertIdentical("'2012-05-25 22:44:00'", $result);
@@ -163,6 +157,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_model,
 			'fields' => array('MockDatabaseComment'),
 			'with' => array('MockDatabaseComment')
@@ -177,6 +172,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$options = array(
+			'type' => 'read',
 			'model' => $this->_model,
 			'with' => 'MockDatabaseComment'
 		);
@@ -682,7 +678,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'scorer' => array('like' => '%howard%')
 		)));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ";
-		$sql .= "WHERE ({scorer} like '%howard%');";
+		$sql .= "WHERE ({scorer} LIKE '%howard%');";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 
 		$conditions = "custom conditions string";
@@ -699,7 +695,21 @@ class DatabaseTest extends \lithium\test\Unit {
 			)
 		));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
-		$sql .= "({field} like '%value%' AND {field} not like '%value2%');";
+		$sql .= "({field} LIKE '%value%' AND {field} NOT LIKE '%value2%');";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => array(
+			'scorer' => array('is' => null)
+		)));
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ";
+		$sql .= "WHERE ({scorer} IS NULL);";
+		$this->assertEqual($sql, $this->db->renderCommand($query));
+
+		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => array(
+			'scorer' => array('is not' => null)
+		)));
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} ";
+		$sql .= "WHERE ({scorer} IS NOT NULL);";
 		$this->assertEqual($sql, $this->db->renderCommand($query));
 	}
 
@@ -863,6 +873,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testFields() {
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_model,
 			'with' => array('MockDatabaseComment')
 		));
@@ -1080,7 +1091,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'alias' => 'Comments',
 			'conditions' => array('Comment.id' => 1),
 			'joins' => array(array(
-				'type' => 'INNER',
+				'mode' => 'INNER',
 				'source' => 'posts',
 				'alias' => 'Post',
 				'constraints' => array('Comment.post_id' => array('<=' => 'Post.id'))
@@ -1105,7 +1116,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'alias' => 'Comments',
 			'conditions' => array('Comment.id' => 1),
 			'joins' => array(array(
-				'type' => 'LEFT',
+				'mode' => 'LEFT',
 				'source' => 'posts',
 				'alias' => 'Post',
 				'constraints' => array(
@@ -1128,7 +1139,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'source' => 'comments',
 			'alias' => 'Comments',
 			'joins' => array(array(
-				'type' => 'LEFT',
+				'mode' => 'LEFT',
 				'source' => 'posts',
 				'alias' => 'Post',
 				'constraints' => array(
@@ -1149,7 +1160,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'alias' => 'Comment',
 			'conditions' => array('Comment.id' => 1),
 			'joins' => array(array(
-				'type' => 'INNER',
+				'mode' => 'INNER',
 				'source' => 'posts',
 				'alias' => 'Post',
 				'constraints' => array('Comment.post_id' => 'Post.id')
@@ -1408,7 +1419,7 @@ class DatabaseTest extends \lithium\test\Unit {
 					'MockDatabasePost.published' => (object) "'yes'"
 				),
 				'model' => 'lithium\tests\mocks\data\model\MockDatabaseComment',
-				'type' => 'LEFT',
+				'mode' => 'LEFT',
 				'alias' => 'MockDatabaseComment'
 			)
 		);
@@ -1428,7 +1439,7 @@ class DatabaseTest extends \lithium\test\Unit {
 					'published' => (object) "'yes'"
 				),
 				'model' => 'lithium\tests\mocks\data\model\MockDatabaseComment',
-				'type' => 'LEFT',
+				'mode' => 'LEFT',
 				'alias' => 'MockDatabaseComment'
 			)
 		);
@@ -1438,6 +1449,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testExportedFieldsWithJoinedStrategy() {
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'with' => array('Image.ImageTag.Tag')
 		));
@@ -1445,6 +1457,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual('*', $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'id',
 			'with' => array('Image.ImageTag.Tag')
@@ -1454,6 +1467,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'Tag.id',
 			'with' => array('Image.ImageTag.Tag')
@@ -1463,6 +1477,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'Tag',
 			'with' => array('Image.ImageTag.Tag')
@@ -1472,6 +1487,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'Tag.*',
 			'with' => array('Image.ImageTag.Tag')
@@ -1483,6 +1499,7 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testExportedFieldsWithJoinedStrategyAndRecursiveRelation() {
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'with' => array('Parent.Parent')
 		));
@@ -1491,6 +1508,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'Parent.name',
 			'with' => array('Parent.Parent')
@@ -1500,6 +1518,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result['fields']);
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $this->_gallery,
 			'fields' => 'ParentOfParent.name',
 			'with' => array('Parent.Parent' => array('alias' => 'ParentOfParent'))

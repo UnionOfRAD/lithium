@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data;
 
+use lithium\data\model\Query;
 use stdClass;
 use lithium\util\Inflector;
 use lithium\data\Model;
@@ -820,7 +821,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('published' => false), $query->conditions());
 
 		$keys = array_keys(array_filter($query->export(MockPost::$connection)));
-		$this->assertEqual(array('type', 'conditions', 'model', 'source', 'alias'), $keys);
+		$this->assertEqual(array('conditions', 'model', 'type', 'source', 'alias'), $keys);
 	}
 
 	public function testFindFirst() {
@@ -832,6 +833,15 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = $tag['query']->export(MockTag::$connection);
 		$this->assertEqual($expected, $tag2['query']->export(MockTag::$connection));
 		$this->assertEqual($expected, $tag3['query']->export(MockTag::$connection));
+
+		$tag = MockTag::find('first', array(
+			'conditions' => array('id' => 2),
+			'return' => 'array'
+		));
+
+		$expected['return'] = 'array';
+		$this->assertTrue($tag instanceof Query);
+		$this->assertEqual($expected, $tag->export(MockTag::$connection));
 	}
 
 	/**
@@ -981,6 +991,25 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertTrue(MockPost::respondsTo('foo_Bar_Baz'));
 	}
 
+	public function testFieldName() {
+		MockPost::bind('hasMany', 'MockTag');
+		$relation = MockPost::relations('MockComment');
+		$this->assertEqual('mock_comments', $relation->fieldName());
+
+		$relation = MockPost::relations('MockTag');
+		$this->assertEqual('mock_tags', $relation->fieldName());
+
+		$relation = MockComment::relations('MockPost');
+		$this->assertEqual('mock_post', $relation->fieldName());
+	}
+
+	public function testRelationFromFieldName() {
+		MockPost::bind('hasMany', 'MockTag');
+		$this->assertEqual('MockComment', MockPost::relations('mock_comments')->name());
+		$this->assertEqual('MockTag', MockPost::relations('mock_tags')->name());
+		$this->assertEqual('MockPost', MockComment::relations('mock_post')->name());
+		$this->assertNull(MockPost::relations('undefined'));
+	}
 }
 
 ?>

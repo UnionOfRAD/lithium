@@ -1,6 +1,5 @@
 {
 	"name": "UnionOfRAD/lithium",
-	"type": "lithium-library",
 	"description": "The core library of the Lithium PHP framework",
 	"keywords": ["lithium", "framework"],
 	"homepage": "http://lithify.me",
@@ -16,7 +15,11 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.6",
-		"composer/installers": "dev-master"
-	}
+		"php": ">=5.3.6"
+	},
+	"autoload": {
+		"psr-0": { "lithium": "" }
+	},
+	"target-dir": "lithium",
+	"bin" : ["console/li3"]
 }

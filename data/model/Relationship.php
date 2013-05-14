@@ -9,7 +9,6 @@
 namespace lithium\data\model;
 
 use lithium\core\Libraries;
-use lithium\util\Inflector;
 use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
 
@@ -18,6 +17,15 @@ use lithium\core\ClassNotFoundException;
  * classes together.
  */
 class Relationship extends \lithium\core\Object {
+
+	/**
+	 * Class dependencies.
+	 *
+	 * @var array
+	 */
+	protected $_classes = array(
+		'entity'      => 'lithium\data\Entity'
+	);
 
 	/**
 	 * A relationship linking type defined by one document or record (or multiple) being embedded
@@ -63,7 +71,7 @@ class Relationship extends \lithium\core\Object {
 	 *          referenced in the originating model.
 	 *        - `'key'` _mixed_: An array of fields that define the relationship, where the
 	 *          keys are fields in the originating model, and the values are fields in the
-	 *          target model. If the relationship is not deined by keys, this array should be
+	 *          target model. If the relationship is not defined by keys, this array should be
 	 *          empty.
 	 *        - `'type'` _string_: The type of relationship. Should be one of `'belongsTo'`,
 	 *          `'hasOne'` or `'hasMany'`.
@@ -103,19 +111,21 @@ class Relationship extends \lithium\core\Object {
 			'fieldName' => null,
 			'constraints' => array()
 		);
-		parent::__construct($config + $defaults);
+		$config += $defaults;
+		if (!$config['type'] || !$config['fieldName']) {
+			throw new ConfigException("`'type'`, `'fieldName'` and `'from'` options can't be empty.");
+		}
+		if (!$config['to'] && !$config['name']) {
+			throw new ConfigException("`'to'` and `'name'` options can't both be empty.");
+		}
+		parent::__construct($config);
 	}
 
 	protected function _init() {
 		parent::_init();
 		$config =& $this->_config;
-		$type = $config['type'];
-
-		$name = ($type === 'hasOne') ? Inflector::pluralize($config['name']) : $config['name'];
-		$config['fieldName'] = $config['fieldName'] ?: lcfirst($name);
-
 		if (!$config['to']) {
-			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $name;
+			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $config['name'];
 			$config['to'] = Libraries::locate('models', $assoc);
 		}
 		if (!$config['key'] || !is_array($config['key'])) {
@@ -146,12 +156,18 @@ class Relationship extends \lithium\core\Object {
 	}
 
 	protected function _keys($keys) {
-		$config = $this->_config;
-		$hasRel = ($related = ($config['type'] === 'belongsTo') ? $config['to'] : $config['from']);
-
-		if (!$hasRel || !$keys) {
+		if (!$keys) {
 			return array();
 		}
+		$config = $this->_config;
+
+		$hasType = ($config['type'] === 'hasOne' || $config['type'] === 'hasMany');
+		if ($hasType) {
+			$related = $config['from'];
+		} else {
+			$related = $config['to'];
+		}
+
 		if (!class_exists($related)) {
 			throw new ClassNotFoundException("Related model class '{$related}' not found.");
 		}
@@ -162,11 +178,36 @@ class Relationship extends \lithium\core\Object {
 		$related = (array) $related::key();
 
 		if (count($keys) !== count($related)) {
-			$msg  = "Unmatched keys in relationship `{$config['name']}` between models ";
+			$msg = "Unmatched keys in relationship `{$config['name']}` between models ";
 			$msg .= "`{$config['from']}` and `{$config['to']}`.";
 			throw new ConfigException($msg);
 		}
-		return array_combine($keys, $related);
+		return $hasType ? array_combine($related, $keys) : array_combine($keys, $related);
+	}
+
+	/**
+	 * Build foreign keys from primary keys array.
+	 *
+	 * @param $primaryKey An array where keys are primary keys and values are
+	 *                    the associated values of primary keys.
+	 * @return array An array where keys are foreign keys and values are
+	 *               the associated values of foreign keys.
+	 */
+	public function foreignKey($primaryKey) {
+		$result = array();
+		$entity = $this->_classes['entity'];
+		if ($primaryKey instanceof $entity) {
+			$primaryKey = $primaryKey->to('array');
+		}
+		if ($this->_config['type'] === 'belongsTo') {
+			$keys = array_flip($this->_config['key']);
+		} else {
+			$keys = $this->_config['key'];
+		}
+		foreach ($keys as $key => $foreignKey) {
+			$result[$foreignKey] = $primaryKey[$key];
+		}
+		return $result;
 	}
 }
 

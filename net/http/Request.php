@@ -9,6 +9,7 @@
 namespace lithium\net\http;
 
 use lithium\util\String;
+use UnexpectedValueException;
 
 /**
  * Facilitates HTTP request creation by assembling connection and path info, `GET` and `POST` data,
@@ -49,6 +50,13 @@ class Request extends \lithium\net\http\Message {
 	 */
 	public $cookies = array();
 
+ 	/**
+	 * An array of closures representing various formats this object can be exported to.
+	 *
+	 * @var array
+	 */
+	protected $_formats = array();
+
 	/**
 	 * Adds config values to the public properties when a new object is created.
 	 *
@@ -64,6 +72,7 @@ class Request extends \lithium\net\http\Message {
 	 *        - `'path'` _string_: null
 	 *        - `'query'` _array_: array()
 	 *        - `'headers'` _array_: array()
+	 *        - `'cookies'` _array_: array()
 	 *        - `'type'` _string_: null
 	 *        - `'auth'` _mixed_: null
 	 *        - `'body'` _mixed_: null
@@ -75,6 +84,7 @@ class Request extends \lithium\net\http\Message {
 		$defaults = array(
 			'method' => 'GET',
 			'query' => array(),
+			'cookies' => array(),
 			'type' => null,
 			'auth' => null,
 			'proxy' => null,
@@ -97,6 +107,33 @@ class Request extends \lithium\net\http\Message {
 			$this->type($type);
 		}
 		$this->headers($this->_config['headers']);
+		$this->cookies($this->_config['cookies']);
+
+		$this->_formats += array(
+			'url' => function($req, $options) {
+				$options['port'] = $options['port'] ? ":{$options['port']}" : '';
+				$options['path'] = str_replace('//', '/', $options['path']);
+				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
+			},
+			'context' => function($req, $options, $defaults) {
+				return array('http' => array_diff_key($options, $defaults) + array(
+					'content' => $req->body(),
+					'method' => $options['method'],
+					'header' => $req->headers($options['headers']),
+					'protocol_version' => $options['version'],
+					'ignore_errors' => $options['ignore_errors'],
+					'follow_location' => $options['follow_location'],
+					'request_fulluri' => $options['request_fulluri'],
+					'proxy' => $options['proxy']
+				));
+			},
+			'string' => function($req, $options) {
+				$body = $req->body();
+				$path = str_replace('//', '/', $options['path']) . $options['query'];
+				$status = "{$options['method']} {$path} {$req->protocol}";
+				return join("\r\n", array($status, join("\r\n", $req->headers()), "", $body));
+			}
+		);
 	}
 
 	/**
@@ -114,6 +151,57 @@ class Request extends \lithium\net\http\Message {
 	public function body($data = null, $options = array()) {
 		$defaults = array('encode' => true);
 		return parent::body($data, $options + $defaults);
+	}
+
+	/**
+	 * Add a cookie to header output, or return a single cookie or full cookie list.
+	 *
+	 * NOTE: Cookies values are expected to be scalar. This function will not serialize cookie values.
+	 * If you wish to store a non-scalar value, you must serialize the data first.
+	 *
+	 * @param string $key
+	 * @param string $value
+	 * @return mixed
+	 */
+	public function cookies($key = null, $value = null) {
+		if (is_string($key)) {
+			if ($value === null) {
+				return isset($this->cookies[$key]) ? $this->cookies[$key] : null;
+			}
+			if ($value === false) {
+				unset($this->cookies[$key]);
+				return $this->cookies;
+			}
+		}
+		if ($key) {
+			$cookies = is_array($key) ? $key : array($key => $value);
+			$this->cookies = $cookies + $this->cookies;
+		}
+		return $this->cookies;
+	}
+
+	/**
+	 * Render `Cookie` header, urlencoding invalid characters.
+	 *
+	 * NOTE: Technically '+' is a valid character, but many browsers erroneously convert these to
+	 * spaces, so we must escape this too.
+	 *
+	 * @return string
+	 */
+	protected function _cookies() {
+		$cookies = $this->cookies;
+		$invalid = str_split(",; \+\t\r\n\013\014");
+		$replace = array_map('rawurlencode', $invalid);
+		
+		foreach($cookies as $key => &$value) {
+			if (!is_scalar($value)) {
+				$message = "Non-scalar value cannot be rendered for cookie `{$key}`";
+				throw new UnexpectedValueException($message);
+			}
+			$value = strtr($value, array_combine($invalid, $replace));
+			$value = "{$key}={$value}";
+		}
+		return implode('; ', $cookies);
 	}
 
 	/**
@@ -199,6 +287,7 @@ class Request extends \lithium\net\http\Message {
 			'username' => $this->username,
 			'password' => $this->password,
 			'headers' => array(),
+			'cookies' => array(),
 			'proxy' => $this->_config['proxy'],
 			'body' => null,
 			'version' => $this->version,
@@ -227,33 +316,17 @@ class Request extends \lithium\net\http\Message {
 			$data = $auth::encode($options['username'], $options['password'], $data);
 			$this->headers('Authorization', $auth::header($data));
 		}
-		$body = $this->body($options['body']);
-		$this->headers('Content-Length', strlen($body));
-
-		switch ($format) {
-			case 'url':
-				$options['port'] = $options['port'] ? ":{$options['port']}" : '';
-				$options['path'] = str_replace('//', '/', $options['path']);
-				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
-			case 'context':
-				$base = array(
-					'content' => $body,
-					'method' => $options['method'],
-					'header' => $this->headers($options['headers']),
-					'protocol_version' => $options['version'],
-					'ignore_errors' => $options['ignore_errors'],
-					'follow_location' => $options['follow_location'],
-					'request_fulluri' => $options['request_fulluri'],
-					'proxy' => $options['proxy']
-				);
-				return array('http' => array_diff_key($options, $defaults) + $base);
-			case 'string':
-				$path = str_replace('//', '/', $this->path) . $options['query'];
-				$status = "{$this->method} {$path} {$this->protocol}";
-				return join("\r\n", array($status, join("\r\n", $this->headers()), "", $body));
-			default:
-				return parent::to($format, $options);
+		if ($this->cookies($options['cookies'])) {
+			$this->headers('Cookie', $this->_cookies());
 		}
+		$body = $this->body($options['body']);
+
+		if ($body || !in_array($options['method'], array('GET', 'HEAD', 'DELETE'))) {
+			$this->headers('Content-Length', strlen($body));
+		}
+
+		$conv = isset($this->_formats[$format]) ? $this->_formats[$format] : null;
+		return $conv ? $conv($this, $options, $defaults) : parent::to($format, $options);
 	}
 
 	/**

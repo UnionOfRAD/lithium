@@ -18,8 +18,8 @@ class MockResponse extends \lithium\action\Response {
 		$this->headers = array();
 	}
 
-	protected function _writeHeader($header, $code = null) {
-		$this->testHeaders[] = $header;
+	protected function _writeHeaders($header, $code = null) {
+		$this->testHeaders = array_merge($this->testHeaders, (array) $header);
 	}
 }
 

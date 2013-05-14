@@ -9,6 +9,7 @@
 namespace lithium\data;
 
 use lithium\core\NetworkException;
+use lithium\util\Inflector;
 
 /**
  * This is the base class for Lithium's data abstraction layer.
@@ -276,6 +277,35 @@ abstract class Source extends \lithium\core\Object {
 	 * @param object $context A query object to configure
 	 */
 	public function applyStrategy($options, $context) {}
+
+	/**
+	 * With no parameter, checks a specific supported feature.
+	 *
+	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
+	 *        `"arrays"`.
+	 * @return boolean Returns `true` if the particular feature (or if MongoDB) support is enabled,
+	 *         otherwise `false`.
+	 */
+	public static function enabled($feature = null) {
+		return false;
+	}
+
+	/**
+	 * Returns the field name of a relation name (underscore).
+	 *
+	 * @param string The type of the relation.
+	 * @param string The name of the relation.
+	 * @return string
+	 */
+	public function relationFieldName($type, $name) {
+		$fieldName = Inflector::underscore($name);
+		if (preg_match('/Many$/', $type)) {
+			$fieldName = Inflector::pluralize($fieldName);
+		} else {
+			$fieldName = Inflector::singularize($fieldName);
+		}
+		return $fieldName;
+	}
 }
 
 ?>

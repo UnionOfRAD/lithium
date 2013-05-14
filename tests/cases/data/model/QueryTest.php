@@ -310,6 +310,7 @@ class QueryTest extends \lithium\test\Unit {
 			'joins',
 			'limit',
 			'map',
+			'mode',
 			'model',
 			'offset',
 			'order',
@@ -345,7 +346,7 @@ class QueryTest extends \lithium\test\Unit {
 		$query = new Query($options);
 
 		$result = $query->export($this->db, array(
-			'keys' => array('data', 'conditions')
+			'keys' => array('type', 'data', 'conditions')
 		));
 		$expected = array(
 			'type' => 'update',
@@ -398,7 +399,11 @@ class QueryTest extends \lithium\test\Unit {
 		$model::meta('source', 'foo');
 		$model::bind('hasMany', 'MockQueryComment');
 
-		$query = new Query(compact('model') + array('with' => 'MockQueryComment'));
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $model,
+			'with' => 'MockQueryComment'
+		));
 		$export = $query->export(new MockDatabase());
 
 		$expected = array('MockQueryComment' => array(
@@ -496,7 +501,10 @@ class QueryTest extends \lithium\test\Unit {
 	}
 
 	public function testAutomaticAliasing() {
-		$query = new Query(array('model' => $this->_model));
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_model
+		));
 		$this->assertEqual('MockQueryPost', $query->alias());
 	}
 
@@ -519,7 +527,9 @@ class QueryTest extends \lithium\test\Unit {
 	public function testQueryWithCustomAlias() {
 		$model = 'lithium\tests\mocks\data\model\MockQueryComment';
 
-		$query = new Query(compact('model') + array(
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $model,
 			'source' => 'my_custom_table',
 			'alias' => 'MyCustomAlias'
 		));
@@ -604,7 +614,10 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $query->paths($this->db));
 
 		$model = 'lithium\tests\mocks\data\model\MockQueryPost';
-		$query = new Query(compact('model'));
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $model
+		));
 		$query->alias(null, 'MockQueryComment');
 		$query->alias('MockQueryPost2', 'MockQueryComment.MockQueryPost');
 
@@ -619,6 +632,7 @@ class QueryTest extends \lithium\test\Unit {
 	public function testModels() {
 		$model = 'lithium\tests\mocks\data\model\MockQueryPost';
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $model,
 			'with' => 'MockQueryComment'
 		));
@@ -630,6 +644,7 @@ class QueryTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $query->models($this->db));
 
 		$query = new Query(array(
+			'type' => 'read',
 			'model' => $model,
 			'alias' => 'Post',
 			'with' => array(
@@ -648,13 +663,13 @@ class QueryTest extends \lithium\test\Unit {
 
 	public function testExportWithJoinedStrategy() {
 		$query = new Query(array(
+			'type' => 'read',
 			'alias' => 'MyAlias',
 			'model' => 'lithium\tests\mocks\data\model\MockGallery',
 			'calculate' => 'MyCalculate',
 			'comment' => 'No comment',
 			'conditions' => array('id' => 2),
 			'fields' => array('Tag'),
-			'type' => 'read',
 			'with' => array('Image.ImageTag.Tag', 'Image', 'Image.ImageTag')
 		));
 		$export = $query->export($this->db);
@@ -675,6 +690,7 @@ class QueryTest extends \lithium\test\Unit {
 			'order' => null,
 			'limit' => null,
 			'joins' => $joins,
+			'mode' => null,
 			'model' => 'lithium\tests\mocks\data\model\MockGallery',
 			'calculate' => 'MyCalculate',
 			'with' => array(

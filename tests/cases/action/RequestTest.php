@@ -303,7 +303,7 @@ class RequestTest extends \lithium\test\Unit {
 			'DOCUMENT_ROOT' => $this->_docroot,
 			'PHP_SELF' => '/lithium/app/other/webroot/index.php'
 		)));
-		$this->assertEqual('/lithium', $request->env('base'));
+		$this->assertEqual('/lithium/app/other', $request->env('base'));
 	}
 
 	public function testServerHttpBase() {
@@ -448,6 +448,17 @@ class RequestTest extends \lithium\test\Unit {
 	public function testTypeforNginx() {
 		$request = new Request($this->_nginxConfig);
 		$this->assertEqual('html', $request->type());
+	}
+
+	public function testHeaders() {
+		$request = new Request(array('env' => array(
+			'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+			'HTTP_COOKIE' => 'name=value; name2=value2',
+			'HTTP_CUSTOM_HEADER' => 'foobar'
+		)));
+		$this->assertEqual('application/json; charset=UTF-8', $request->headers('Content-Type'));
+		$this->assertEqual('name=value; name2=value2', $request->headers('Cookie'));
+		$this->assertEqual('foobar', $request->headers('Custom-Header'));
 	}
 
 	public function testRefererDefault() {
@@ -1188,6 +1199,86 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $request->to('url'));
 	}
 
+	public function testConvertToString() {
+		$request = new Request(array(
+			'env' => array(
+				'HTTP_HOST' => 'foo.com',
+				'HTTPS' => 'on',
+				'CONTENT_TYPE' => 'text/html',
+				'HTTP_CUSTOM_HEADER' => 'foobar'
+			),
+			'base' => '/the/base/path',
+			'url' => '/posts',
+			'query' => array('some' => 'query', 'parameter' => 'values')
+		));
+		$expected = join("\r\n", array(
+			'GET /the/base/path/posts?some=query&parameter=values HTTP/1.1',
+			'Host: foo.com',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Custom-Header: foobar',
+			'Content-Type: text/html',
+			'',''
+		));
+		$this->assertEqual($expected, $request->to('string'));
+	}
+
+	public function testConvertToStringWithPost() {
+		$request = new Request(array(
+			'env' => array(
+				'HTTP_HOST' => 'lithify.me',
+				'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
+				'HTTP_USER_AGENT' => 'Mozilla/5.0'
+			),
+			'url' => '/posts',
+			'data' => array('some' => 'body', 'parameter' => 'values')
+		));
+		$expected = join("\r\n", array(
+			'GET /posts HTTP/1.1',
+			'Host: lithify.me',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/x-www-form-urlencoded',
+			'Content-Length: 26',
+			'', 'some=body&parameter=values'
+		));
+		$this->assertEqual($expected, $request->to('string'));
+	}
+
+	public function testConvertToStringWithJson() {
+		$expected = join("\r\n", array(
+			'GET /posts HTTP/1.1',
+			'Host: lithify.me',
+			'Connection: Close',
+			'User-Agent: Mozilla/5.0',
+			'Content-Type: application/json',
+			'Content-Length: 36',
+			'', '{"some":"body","parameter":"values"}'
+		));
+
+		$request = new Request(array(
+			'env' => array(
+				'HTTP_HOST' => 'lithify.me',
+				'CONTENT_TYPE' => 'application/json',
+				'HTTP_USER_AGENT' => 'Mozilla/5.0'
+			),
+			'url' => '/posts',
+			'body' => '{"some":"body","parameter":"values"}'
+		));
+		$this->assertEqual($expected, $request->to('string'));
+
+		$request = new Request(array(
+			'env' => array(
+				'HTTP_HOST' => 'lithify.me',
+				'CONTENT_TYPE' => 'application/json',
+				'HTTP_USER_AGENT' => 'Mozilla/5.0'
+			),
+			'url' => '/posts',
+			'data' => array('some' => 'body', 'parameter' => 'values')
+		));
+		$this->assertEqual($expected, $request->to('string'));
+	}
+
 	/**
 	 * Tests that the HTTP request method set by `Request` from the server information is not
 	 * overwritten in a parent class.
@@ -1219,31 +1310,7 @@ class RequestTest extends \lithium\test\Unit {
 		)));
 
 		$this->assertIdentical('/lithium', $request->env('base'));
-		$this->assertIdentical('/hello/world', $request->url);
-	}
-
-	public function testRequestUriWithCustomLib() {
-		$resources = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($resources), "Can't write to resources directory.");
-		$myApp = $resources . '/www2/li3/myapp';
-		mkdir($myApp, 0777, true);
-		Libraries::add('myapp', array('path' => $myApp));
-		$root = $resources . '/www2';
-
-		$request = new Request(array(
-			'env' => array(
-				'DOCUMENT_ROOT' => $root,
-				'REQUEST_URI' => '/li3/myapp/web/root/hello/world?page=1',
-				'PHP_SELF' => '/li3/myapp/web/root/index.php'
-			),
-			'globals' => false
-		));
-		$this->assertIdentical('/li3/myapp/web/root', $request->env('base'));
-		$request->params['library'] = 'myapp';
-		$this->assertIdentical('/li3', $request->env('base'));
-		$this->assertIdentical('/hello/world', $request->url);
-
-		Libraries::remove('myapp');
+		$this->assertIdentical('/app/webroot/hello/world', $request->url);
 	}
 
 	public function testRequestUriWithVirtualHost() {
@@ -1255,6 +1322,17 @@ class RequestTest extends \lithium\test\Unit {
 
 		$this->assertIdentical('', $request->env('base'));
 		$this->assertIdentical('/hello/world', $request->url);
+	}
+
+	public function testRequestUriWithAdminRoute() {
+		$request = new Request(array('env' => array(
+			'DOCUMENT_ROOT' => $this->_docroot . '/lithium/app/webroot',
+			'REQUEST_URI' => '/lithium/admin/hello/world?page=1',
+			'PHP_SELF' => '/lithium/app/webroot/index.php'
+		)));
+
+		$this->assertIdentical('/lithium', $request->env('base'));
+		$this->assertIdentical('/admin/hello/world', $request->url);
 	}
 
 	public function testRequestWithNoGlobals() {
@@ -1291,7 +1369,7 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertIdentical('HTTP/1.0', $request->protocol);
 		$this->assertIdentical('1.0', $request->version);
 		$this->assertIdentical('/hello/world', $request->url);
-		$this->assertIdentical('/lithium', $request->env('base'));
+		$this->assertIdentical('/lithium/app', $request->env('base'));
 	}
 
 	public function testEnvVariablesArePopulated() {
@@ -1324,7 +1402,6 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertIdentical('HTTP/1.1', $request->protocol);
 		$this->assertIdentical('1.1', $request->version);
 	}
-
 }
 
 ?>
