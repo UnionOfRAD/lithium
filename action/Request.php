@@ -93,8 +93,14 @@ class Request extends \lithium\net\http\Request {
 	protected $_stream = null;
 
 	/**
-	 * Options used to detect request type.
+	 * Options used to detect features of the request, using `is()`. For example:
 	 *
+	 * {{{ embed:lithium\tests\cases\action\RequestTest::testRequestTypeIsMobile(4-4) }}}
+	 *
+	 *
+	 * Custom detectors can be added using `detect()`.
+	 *
+	 * @see lithium\action\Request::is()
 	 * @see lithium\action\Request::detect()
 	 * @var array
 	 */

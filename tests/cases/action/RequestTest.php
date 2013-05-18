@@ -900,7 +900,8 @@ class RequestTest extends \lithium\test\Unit {
 		$request = new Request(array('env' => array(
 			'HTTP_USER_AGENT' => 'Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en)'
 		)));
-		$this->assertTrue($request->is('mobile'));
+		$isMobile = $request->is('mobile');
+		$this->assertTrue($isMobile);
 	}
 
 	public function testUrlFromConstructor() {
