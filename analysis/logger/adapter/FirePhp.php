@@ -156,7 +156,7 @@ class FirePhp extends \lithium\core\Object {
 	}
 
 	/**
-	 * Heper method that writes the message to the header of a bound `Response` object. If no
+	 * Helper method that writes the message to the header of a bound `Response` object. If no
 	 * `Response` object is bound when this method is called, it is stored in a message queue.
 	 *
 	 * @see lithium\analysis\logger\adapter\FirePhp::_format()
