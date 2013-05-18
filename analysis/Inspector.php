@@ -25,7 +25,7 @@ use lithium\core\Libraries;
 class Inspector {
 
 	/**
-	 * classes used
+	 * Class dependencies.
 	 *
 	 * @var array
 	 */
@@ -54,7 +54,7 @@ class Inspector {
 	 * @param  string|object $class      Class to inspect.
 	 * @param  string        $method     Method name.
 	 * @param  bool          $internal   Interal call or not.
-	 * @return bool
+	 * @return bool True if the method can be called or false otherwise.
 	 */
 	public static function isCallable($object, $method, $internal = false) {
 		$methodExists = method_exists($object, $method);
@@ -83,7 +83,7 @@ class Inspector {
 	}
 
 	/**
-	 * Detailed source code identifier analysis
+	 * Detailed source code identifier analysis.
 	 *
 	 * Analyzes a passed $identifier for more detailed information such
 	 * as method/property modifiers (e.g. `public`, `private`, `abstract`)
@@ -261,8 +261,17 @@ class Inspector {
 	 *         an array with starting and ending line numbers as values.
 	 *        - `'ranges'`: Returns a two-dimensional array where each key is a method name,
 	 *         and each value is an array of line numbers which are contained in the method.
-	 * @param array $options
-	 * @return mixed array|null|object
+	 * @param array $options Set of options applied directly (check `_items()` for more options):
+	 *        - `'methods'` _array_: An arbitrary list of methods to search, as a string (single
+	 *          method name) or array of method names.
+	 *        - `'group'`: If true (default) the array is grouped by context (ex.: method name), if
+	 *         false the results are sequentially appended to an array.
+	 *        -'self': If true (default), only returns properties defined in `$class`,
+	 *         excluding properties from inherited classes.
+	 * @return mixed Return value depends on the $format given:
+	 *        - `null` on failure.
+	 *        - `lithium\util\Collection` if $format is `null`
+	 *        - `array` if $format is either `'extends'` or `'ranges'`.
 	 */
 	public static function methods($class, $format = null, array $options = array()) {
 		$defaults = array('methods' => array(), 'group' => true, 'self' => true);
@@ -317,10 +326,12 @@ class Inspector {
 	 * Returns various information on the properties of an object.
 	 *
 	 * @param mixed $class A string class name or an object instance, from which to get methods.
-	 * @param array $options Set of options:
-	 *        -'self': If true (default), only returns properties defined in `$class`,
+	 * @param array $options Set of options applied directly (check `_items()` for more options):
+	 *        - `'properties'`: array of properties to gather information from.
+	 *        - `'self'`: If true (default), only returns properties defined in `$class`,
 	 *         excluding properties from inherited classes.
-	 * @return mixed object lithium\analysis\Inspector._items.map|null
+	 * @return mixed Returns an array with information about the properties from the class given in
+	 *               $class or null on error.
 	 */
 	public static function properties($class, array $options = array()) {
 		$defaults = array('properties' => array(), 'self' => true);
@@ -422,9 +433,11 @@ class Inspector {
 	 * Gets an array of classes and their corresponding definition files, or examines a file and
 	 * returns the classes it defines.
 	 *
-	 * @param array $options
+	 * @param array $options Option consists of:
+	 *        - `'group'`: Can be `classes` for grouping by class name or `files` for grouping by
+	 *         filename.
+	 *         - `'file': Valid file path for inspecting the containing classes.
 	 * @return array Associative of classes and their corresponding definition files
-	 * @todo Document valid options
 	 */
 	public static function classes(array $options = array()) {
 		$defaults = array('group' => 'classes', 'file' => null);
@@ -471,16 +484,19 @@ class Inspector {
 	 *
 	 * @param mixed $classes Either a string specifying a class, or a numerically indexed array
 	 *        of classes
-	 * @param array $options
-	 * @return array An array of the static and dynamic class dependencies
-	 * @todo Document valid options
+	 * @param array $options Option consists of:
+	 *        - `'type'`: The type of dependency to check: `static` for static dependencies,
+	 *         `dynamic`for dynamic dependencies or `null` for both merged in the same array.
+	 *         Defaults to `null`.
+	 * @return array An array of the static and dynamic class dependencies or each if `type` is
+	 *         defined in $options.
 	 */
 	public static function dependencies($classes, array $options = array()) {
 		$defaults = array('type' => null);
 		$options += $defaults;
 		$static = $dynamic = array();
 		$trim = function($c) { return trim(trim($c, '\\')); };
-		$join = function ($i) { return join('', $i); };
+		$join = function($i) { return join('', $i); };
 
 		foreach ((array) $classes as $class) {
 			$data = explode("\n", file_get_contents(Libraries::path($class)));
@@ -535,6 +551,10 @@ class Inspector {
 	 * @param string $method A getter method to call on the `ReflectionClass` instance, which will
 	 *               return an array of items, i.e. `'getProperties'` or `'getMethods'`.
 	 * @param array $options The options used to filter the resulting method list.
+	 *         - `'names'`: array of properties for filtering the result.
+	 *         - `'self'`: If true (default), only returns properties defined in `$class`,
+	 *         excluding properties from inherited classes.
+	 *         - `'public'`: If true (default) forces the property to be recognized as public.
 	 * @return object Returns a `Collection` object instance containing the results of the items
 	 *         returned from the call to the method specified in `$method`, after being passed
 	 *         through the filters specified in `$options`.
@@ -588,9 +608,10 @@ class Inspector {
 	 * `classes` array, a fully namespaced class name, or an object. Typically this method is used
 	 * in `_init` to create the dependencies used in the current class.
 	 *
-	 * @param string|object $name A `classes` key or fully-namespaced class name.
+	 * @param string|object $name A `$_classes` key or fully-namespaced class name.
 	 * @param array $options The configuration passed to the constructor.
-	 * @return object
+	 * @see  lithium\core\Libraries::instance()
+	 * @return object An object instance of the given value in `$name`.
 	 */
 	protected static function _instance($name, array $options = array()) {
 		if (is_string($name) && isset(static::$_classes[$name])) {
