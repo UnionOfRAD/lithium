@@ -56,6 +56,12 @@ class Simple extends \lithium\template\view\Renderer {
 		return isset($options['template']) ? $options['template'] : '';
 	}
 
+	/**
+	 * Renders `$data` into an easier to understand, or flat, array.
+	 *
+	 * @param array $data Data to traverse.
+	 * @return array
+	 */
 	protected function _toString($data) {
 		foreach ($data as $key => $val) {
 			switch (true) {

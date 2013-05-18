@@ -125,6 +125,12 @@ class Form extends \lithium\template\Helper {
 	 */
 	protected $_bindingOptions = array();
 
+	/**
+	 * Sets up defaults and passes to parent to setup class.
+	 *
+	 * @param  array $config Configuration options.
+	 * @return void
+	 */
 	public function __construct(array $config = array()) {
 		$self =& $this;
 
