@@ -65,6 +65,12 @@ abstract class Helper extends \lithium\core\Object {
 		'nohref', 'noshade', 'nowrap', 'multiple', 'noresize', 'async', 'autofocus'
 	);
 
+	/**
+	 * Sets up defaults and passes to parent to setup class.
+	 *
+	 * @param  array $config Configuration options.
+	 * @return void
+	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('handlers' => array(), 'context' => null);
 		parent::__construct($config + $defaults);
