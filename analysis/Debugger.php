@@ -136,6 +136,7 @@ class Debugger {
 	 *
 	 * @param mixed $reference File or class name to inspect.
 	 * @param integer $callLine Line number of class reference.
+	 * @return mixed Returns the line number where the method called is defined.
 	 */
 	protected static function _definition($reference, $callLine) {
 		if (file_exists($reference)) {
@@ -171,6 +172,14 @@ class Debugger {
 		}
 	}
 
+	/**
+	 * Helper method for caching closure function references to help the process of building the
+	 * stack trace.
+	 * @param  array $frame Backtrace information.
+	 * @param  Closure $function The method related to $frame information.
+	 * @return string Returns either the cached or the fetched closure function reference while
+	 *                writing its reference to the cache array `$_closureCache`.
+	 */
 	protected static function _closureDef($frame, $function) {
 		$reference = '::';
 		$frame += array('file' => '??', 'line' => '??');
