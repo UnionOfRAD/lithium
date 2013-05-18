@@ -153,7 +153,7 @@ use Closure;
  * }}}
  *
  * In order to make the `speak()` method filterable we'll need to create a class
- * called `MockPerson` and we'll make it's speak method filterable, however
+ * called `MockPerson` and we'll make its `speak()` method filterable, however
  * there is already an issue since a filter works inside of an anonymous
  * function you cannot call `parent`, so `MockPerson` will also need an instance
  * of `Person`.
@@ -176,7 +176,7 @@ use Closure;
  * modify the class. However this isn't possible with the current implementation
  * since `_openMouth` is protected and we can't call protected methods within an
  * anonymous function. The trick is that when you are extending a class you can
- * make a method MORE visible than it's parent, with the exception of private
+ * make a method MORE visible than its parent, with the exception of private
  * methods. So let's make a class `DelegatePerson` that simply extends `Person`
  * and makes `_openMouth()` public.
  *
@@ -195,7 +195,7 @@ use Closure;
  * In short, this is a hack. When you are inside of a namespace `foo\bar\baz`
  * and you call a function `file_get_contents` it first searches the current
  * namespace for that function `foo\bar\baz\file_get_contents`. `Mocker` simply
- * creates that function dynamically, so when it's called it delegates back to
+ * creates that function dynamically, so when its called it delegates back to
  * `Mocker` which will determine if it should call a user-defined function or
  * if it should go back to the original PHP function.
  */
