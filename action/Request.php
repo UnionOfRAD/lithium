@@ -422,6 +422,12 @@ class Request extends \lithium\net\http\Request {
 		return $media::negotiate($this) ?: 'html';
 	}
 
+	/**
+	 * Parses the `HTTP_ACCEPT` information the requesting client sends, and converts
+	 * that data to an array for consumption by the rest of the framework.
+	 *
+	 * @return array All the types of content the client can accept.
+	 */
 	protected function _parseAccept() {
 		if ($this->_acceptContent) {
 			return $this->_acceptContent;
