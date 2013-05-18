@@ -53,6 +53,7 @@ use Closure;
  * class you want to mock with the '\Mock' at the end. The autoloader will
  * detect you want to autoload it, and create it for you. Now you can filter
  * any method.
+ *
  * {{{
  * use lithium\console\dispatcher\Mock as DispatcherMock;
  * $dispatcher = new DispatcherMock();
@@ -140,6 +141,7 @@ use Closure;
  * ### Theory
  * I'll walk you through the steps I did in order to figure out how `Mocker`
  * should work. The goal here is to mock class `Person`.
+ *
  * {{{
  * class Person {
  *   public function speak() {
