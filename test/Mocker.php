@@ -19,8 +19,14 @@ use Closure;
 
 /**
  * The Mocker class aids in the creation of Mocks on the fly, allowing you to
- * use Lithium filters on most methods in the class.
+ * use Lithium filters on most methods in a class as close to the test as
+ * possible.
  *
+ * ## How to use it
+ * To create a new Mock, you need to register `Mocker`, then call or instantiate
+ * the same class but with '\Mock' appended to the end of the class name.
+ *
+ * ### Registering Mocker
  * To enable the autoloading of mocks you simply need to make a simple method
  * call.
  * {{{
@@ -42,6 +48,7 @@ use Closure;
  * }
  * }}}
  *
+ * ### Usage and Examples
  * Using Mocker is the fun magical part, it's autoloaded so simply call the
  * class you want to mock with the '\Mock' at the end. The autoloader will
  * detect you want to autoload it, and create it for you. Now you can filter
@@ -119,6 +126,78 @@ use Closure;
  *
  * }
  * }}}
+ *
+ * ## How does Mocking classes work?
+ * This section isn't necessary to read, but can help other better understand it
+ * so that they can add new features, or debug current ones.
+ *
+ * ### TLDR
+ * The `Mocker` class dynamically makes two classes, a `Delegate` and a `Mock`.
+ * Both of these classes extend the target class. The `Delegate` is passed into
+ * the `Mock` class for it to call within (anonymous functions) filters. This
+ * allows public and protected methods to be filterable.
+ *
+ * ### Theory
+ * I'll walk you through the steps I did in order to figure out how `Mocker`
+ * should work. The goal here is to mock class `Person`.
+ * {{{
+ * class Person {
+ *   public function speak() {
+ *     $this->_openMouth();
+ *     return true;
+ *   }
+ *   protected function _openMouth() {
+ *     return $this->mouth = 'open';
+ *   }
+ * }
+ * }}}
+ *
+ * In order to make the `speak()` method filterable we'll need to create a class
+ * called `MockPerson` and we'll make it's speak method filterable, however
+ * there is already an issue since a filter works inside of an anonymous
+ * function you cannot call `parent`, so `MockPerson` will also need an instance
+ * of `Person`.
+ *
+ * {{{
+ * class MockPerson extends Person {
+ *   public $person;
+ *   public function speak() {
+ *     $params = compact();
+ *     $person = $this->person;
+ *     return $this->_filter(__METHOD__, array(), function($self, $params) use (&$person) {
+ *       return $person->speak();
+ *     };
+ *   }
+ * }
+ * }}}
+ *
+ * You might stop here and call it a day, but what about filtering protected
+ * methods? For example you might want to make sure `_openMouth()` does not
+ * modify the class. However this isn't possible with the current implementation
+ * since `_openMouth` is protected and we can't call protected methods within an
+ * anonymous function. The trick is that when you are extending a class you can
+ * make a method MORE visible than it's parent, with the exception of private
+ * methods. So let's make a class `DelegatePerson` that simply extends `Person`
+ * and makes `_openMouth()` public.
+ *
+ * {{{
+ * class DelegatePerson extends Person {
+ *   public function _openMouth() {
+ *     parent::_openMouth();
+ *   }
+ * }
+ * }}}
+ *
+ * Now we simply pass `DelegatePerson` to `MockPerson` and all methods are now
+ * filterable.
+ *
+ * ## How does overwriting PHP functions work?
+ * In short, this is a hack. When you are inside of a namespace `foo\bar\baz`
+ * and you call a function `file_get_contents` it first searches the current
+ * namespace for that function `foo\bar\baz\file_get_contents`. `Mocker` simply
+ * creates that function dynamically, so when it's called it delegates back to
+ * `Mocker` which will determine if it should call a user-defined function or
+ * if it should go back to the original PHP function.
  */
 class Mocker {
 
@@ -146,13 +225,15 @@ class Mocker {
 	protected static $_functionResults = array();
 
 	/**
-	 * A list of code to be generated for the delegator.
+	 * A list of code to be generated for the `Delegate`.
 	 *
-	 * The MockDelgate directly extends the mocker and makes all methods
-	 * publically available to other classes but should not be accessed directly
-	 * by any other application. This should be called only by the mocker and
-	 * the mockee and never by the consumer.
+	 * The `Delegate` directly extends the class you wish to mock and makes all
+	 * methods publically available to other classes but should not be accessed
+	 * directly by any other classes other than `Mock`.
 	 *
+	 * @item variable `$parent` Instance of `Mock`. Allows `Delegate` to send
+	 *                          calls back to `Mock` if it was called directly
+	 *                          from a parent class.
 	 * @var array
 	 */
 	protected static $_mockDelegateIngredients = array(
@@ -204,7 +285,7 @@ class Mocker {
 	);
 
 	/**
-	 * List of code to be generated for the function mock.
+	 * List of code to be generated for overwriting php functions.
 	 *
 	 * @var array
 	 */
@@ -225,16 +306,20 @@ class Mocker {
 	);
 
 	/**
-	 * A list of code to be generated for the mocker.
+	 * A list of code to be generated for the `Mock`.
 	 *
-	 * The Mock class directly extends the mock class but only directly
-	 * interacts with the MockDelegate directly. This class is the actual
-	 * interface for consumers, instantiation or static method calls, and can
-	 * have most of its methods filtered.
+	 * The Mock class directly extends the class you wish to mock but only
+	 * interacts with the `Delegate` directly. This class is the public
+	 * interface for users.
 	 *
-	 * The `$results` variable holds all method calls allowing you for you
-	 * make your own custom assertions on them.
-	 *
+	 * @item variable `$results` All method calls allowing you for you make your
+	 *                           own custom assertions.
+	 * @item variable `$staticResults` See `$results`.
+	 * @item variable `$mocker` Home of the `Delegate` defined above.
+	 * @item variable `$_safeVars` Variables that should not be deleted on
+	 *                             `Mock`. We delete them so they cannot be
+	 *                             accessed directly, but sent to `Delegate` via
+	 *                             PHP magic methods on `Mock`.
 	 * @var array
 	 */
 	protected static $_mockIngredients = array(
