@@ -808,32 +808,43 @@ class Form extends \lithium\template\Helper {
 	 * @return array Defaults array contents.
 	 */
 	protected function _defaults($method, $name, $options) {
-		$methodConfig = isset($this->_config[$method]) ? $this->_config[$method] : array();
-		$options += $methodConfig + $this->_config['base'];
-		$options = $this->_generators($method, $name, $options);
+		$config = $this->_config;
+		$params = compact('method', 'name', 'options');
+		$tpls = $this->_templateMap;
 
-		$hasValue = (
-			(!isset($options['value']) || $options['value'] === null) &&
-			$name && $value = $this->binding($name)->data
-		);
-		$isZero = (isset($value) && ($value === 0 || $value === "0"));
-		if ($hasValue || $isZero) {
-			$options['value'] = $value;
-		}
-		if (isset($options['value']) && !$isZero) {
-			$isZero = ($options['value'] === 0 || $options['value'] === "0");
-		}
-		if (isset($options['default']) && empty($options['value']) && !$isZero) {
-			$options['value'] = $options['default'];
-		}
-		unset($options['default']);
+		return $this->_filter(__METHOD__, $params, function($self, $params) use ($config, $tpls) {
+			$method = $params['method'];
+			$name = $params['name'];
+			$options = $params['options'];
 
-		$generator = $this->_config['attributes']['name'];
-		$name = $generator($method, $name, $options);
+			$methodConfig = isset($config[$method]) ? $config[$method] : array();
+			$options += $methodConfig + $config['base'];
+			$options = $this->invokeMethod('_generators', array($method, $name, $options));
 
-		$tplKey = isset($options['template']) ? $options['template'] : $method;
-		$template = isset($this->_templateMap[$tplKey]) ? $this->_templateMap[$tplKey] : $tplKey;
-		return array($name, $options, $template);
+			$hasValue = (
+				(!isset($options['value']) || $options['value'] === null) &&
+				$name && $value = $self->binding($name)->data
+			);
+			$isZero = (isset($value) && ($value === 0 || $value === "0"));
+
+			if ($hasValue || $isZero) {
+				$options['value'] = $value;
+			}
+			if (isset($options['value']) && !$isZero) {
+				$isZero = ($options['value'] === 0 || $options['value'] === "0");
+			}
+			if (isset($options['default']) && empty($options['value']) && !$isZero) {
+				$options['value'] = $options['default'];
+			}
+			unset($options['default']);
+
+			$generator = $config['attributes']['name'];
+			$name = $generator($method, $name, $options);
+
+			$tplKey = isset($options['template']) ? $options['template'] : $method;
+			$template = isset($tpls[$tplKey]) ? $tpls[$tplKey] : $tplKey;
+			return array($name, $options, $template);
+		});
 	}
 
 	/**

@@ -287,6 +287,13 @@ class FormTest extends \lithium\test\Unit {
 		)));
 	}
 
+	public function testHiddenFieldWithValue() {
+		$result = $this->form->hidden('my_field', array('value' => 'custom'));
+		$this->assertTags($result, array('input' => array(
+			'type' => 'hidden', 'name' => 'my_field', 'id' => 'MyField', 'value' => 'custom'
+		)));
+	}
+
 	public function testLabelGeneration() {
 		$result = $this->form->label('next', 'Enter the next value >>');
 		$this->assertTags($result, array(
