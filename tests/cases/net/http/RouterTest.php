@@ -1823,6 +1823,33 @@ class RouterTest extends \lithium\test\Unit {
 		$expected = '/hello_world';
 		$this->assertEqual($expected, Router::match($url, $request));
 	}
+
+	public function testMatchOverRequestParamsWithScope() {
+		Router::scope('app1', function(){
+			Router::connect('/hello/world1', 'HelloApp1::index');
+		});
+		Router::scope('app2', function(){
+			Router::connect('/hello/world2', 'HelloApp2::index');
+		});
+
+		$request = new Request(array('url' => '/hello/world1'));
+		$result = Router::process($request);
+
+		$expected = array('controller' => 'HelloApp1', 'action' => 'index', 'library' => 'app1');
+		$this->assertEqual($expected, $result->params);
+
+		$result = Router::match($result->params);
+		$this->assertEqual('/hello/world1', $result);
+
+		$request = new Request(array('url' => '/hello/world2'));
+		$result = Router::process($request);
+
+		$expected = array('controller' => 'HelloApp2', 'action' => 'index', 'library' => 'app2');
+		$this->assertEqual($expected, $result->params);
+
+		$result = Router::match($result->params);
+		$this->assertEqual('/hello/world2', $result);
+	}
 }
 
 ?>

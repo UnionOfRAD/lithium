@@ -48,7 +48,7 @@ class Configuration extends \lithium\core\Object {
 	 * @param array $config Configuration to set.
 	 */
 	public function set($name = null, $config = null) {
-		if ($config && is_array($config)) {
+		if (is_array($config)) {
 			$this->_configurations[$name] = $config;
 			return;
 		}
