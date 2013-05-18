@@ -364,7 +364,7 @@ class Router extends \lithium\core\StaticObject {
 	 *         prefixed with the base URL of the application.
 	 */
 	public static function match($url = array(), $context = null, array $options = array()) {
-		$options = static::_matchOptions($context, $options);
+		$options = static::_matchOptions($url, $context, $options);
 
 		if (is_string($url = static::_prepareParams($url, $context, $options))) {
 			return $url;
@@ -409,11 +409,13 @@ class Router extends \lithium\core\StaticObject {
 	/**
 	 * Initialize options for `Router::match()`.
 	 *
+	 * @param string|array $url Options to match to a URL. Optionally, this can be a string
+	 *        containing a manually generated URL.
 	 * @param object $context An instance of `lithium\action\Request`.
 	 * @param array $options Options for the generation of the matched URL.
 	 * @return array The initialized options.
 	 */
-	protected static function _matchOptions($context, $options) {
+	protected static function _matchOptions(&$url, $context, $options) {
 		$defaults = array(
 			'scheme' => null,
 			'host' => null,
@@ -441,6 +443,9 @@ class Router extends \lithium\core\StaticObject {
 			}
 		}
 		if ($config = static::attached($scope, $vars)) {
+			if (is_array($url)) {
+				unset($url['library']);
+			}
 			$config['host'] = $config['host'] ? : $defaults['host'];
 			if ($config['scheme'] === false) {
 				$config['scheme'] = '//';
@@ -760,9 +765,11 @@ class Router extends \lithium\core\StaticObject {
 			$name = '__defaultScope__';
 		}
 
-		$config = static::$_scopes->get($name);
-		if (!$config || $name === null) {
-			return $config;
+		if ($name === null) {
+			return static::$_scopes->get();
+		} elseif (!$config = static::$_scopes->get($name)){
+			static::$_scopes->set($name, array());
+			$config = static::$_scopes->get($name);
 		}
 		$vars += $config['values'];
 		$match = '@\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*?)\}@S';
@@ -799,9 +806,12 @@ class Router extends \lithium\core\StaticObject {
 				'base' => null,
 				'prefix' => '',
 				'pattern' => '',
-				'library' => $name !== '__defaultScope__' ? $name : null,
 				'values' => array()
 			);
+
+			if ($name !== '__defaultScope__') {
+				$defaults['library'] = $name;
+			}
 
 			$config += $defaults;
 
@@ -891,7 +901,10 @@ class Router extends \lithium\core\StaticObject {
 
 		if ($match) {
 			$result = array_intersect_key($match, array_flip($config['params']));
-			$request->params = array('library' => $config['library']);
+			$request->params = array();
+			if (isset($config['library'])) {
+				$request->params['library'] = $config['library'];
+			}
 			$request->params += $result;
 			if ($config['prefix']) {
 				$url = preg_replace('@^/' . trim($config['prefix'], '/') . '@', '', $url);
