@@ -819,7 +819,7 @@ class Form extends \lithium\template\Helper {
 
 			$methodConfig = isset($config[$method]) ? $config[$method] : array();
 			$options += $methodConfig + $config['base'];
-			$options = $this->invokeMethod('_generators', array($method, $name, $options));
+			$options = $self->invokeMethod('_generators', array($method, $name, $options));
 
 			$hasValue = (
 				(!isset($options['value']) || $options['value'] === null) &&
