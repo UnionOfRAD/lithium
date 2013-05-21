@@ -1212,13 +1212,14 @@ class RequestTest extends \lithium\test\Unit {
 			'url' => '/posts',
 			'query' => array('some' => 'query', 'parameter' => 'values')
 		));
+
 		$expected = join("\r\n", array(
 			'GET /the/base/path/posts?some=query&parameter=values HTTP/1.1',
 			'Host: foo.com',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
-			'Custom-Header: foobar',
 			'Content-Type: text/html',
+			'Custom-Header: foobar',
 			'',''
 		));
 		$this->assertEqual($expected, $request->to('string'));
@@ -1234,6 +1235,7 @@ class RequestTest extends \lithium\test\Unit {
 			'url' => '/posts',
 			'data' => array('some' => 'body', 'parameter' => 'values')
 		));
+
 		$expected = join("\r\n", array(
 			'GET /posts HTTP/1.1',
 			'Host: lithify.me',
@@ -1266,6 +1268,7 @@ class RequestTest extends \lithium\test\Unit {
 			'url' => '/posts',
 			'body' => '{"some":"body","parameter":"values"}'
 		));
+
 		$this->assertEqual($expected, $request->to('string'));
 
 		$request = new Request(array(
@@ -1277,6 +1280,7 @@ class RequestTest extends \lithium\test\Unit {
 			'url' => '/posts',
 			'data' => array('some' => 'body', 'parameter' => 'values')
 		));
+
 		$this->assertEqual($expected, $request->to('string'));
 	}
 

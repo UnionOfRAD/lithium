@@ -106,42 +106,41 @@ class Message extends \lithium\net\Message {
 			$replace = ($value === false) ? $value : $replace;
 
 			foreach ((array) $key as $header => $value) {
-				if (!is_string($header)) {
-					if (preg_match('/(.*?):(.+)/', $value, $match)) {
-						$this->headers($match[1], trim($match[2]), $replace);
-					}
-				} else {
+				if (is_string($header)) {
 					$this->headers($header, $value, $replace);
+					continue;
+				}
+				if (preg_match('/(.*?):(.+)/', $value, $match)) {
+					$this->headers($match[1], trim($match[2]), $replace);
 				}
 			}
-		} else {
+		} elseif ($key) {
 			if ($value === null) {
 				return isset($this->headers[$key]) ? $this->headers[$key] : null;
-			}
-			if ($value === false) {
+			} elseif ($value === false) {
 				unset($this->headers[$key]);
-			}
-			elseif (!$replace && isset($this->headers[$key])) {
-				$this->headers[$key] = (array) $this->headers[$key];
-				if (is_array($value)) {
-					$this->headers[$key] = array_merge($this->headers[$key], $value);
-				} else {
-					$this->headers[$key][] = $value;
-				}
-			} else {
+			} elseif ($replace) {
 				$this->headers[$key] = $value;
+			} else {
+				$this->headers[$key] = (array) $this->headers[$key];
+
+				if (is_string($value)) {
+					$this->headers[$key][] = $value;
+				} else {
+					$this->headers[$key] = array_merge($this->headers[$key], $value);
+				}
 			}
 		}
 		$headers = array();
 
 		foreach ($this->headers as $key => $value) {
-			if (is_array($value)) {
-				foreach ($value as $val) {
-					$headers[] = "{$key}: {$val}";
-				}
+			if (is_scalar($value)) {
+				$headers[] = "{$key}: {$value}";
 				continue;
 			}
-			$headers[] = "{$key}: {$value}";
+			foreach ($value as $val) {
+				$headers[] = "{$key}: {$val}";
+			}
 		}
 		return $headers;
 	}
@@ -179,7 +178,7 @@ class Message extends \lithium\net\Message {
 		if (is_string($data)) {
 			$type = $data;
 		} elseif (!empty($data['content'])) {
-			$header = is_array($data['content']) ? reset($data['content']) : $data['content'];
+			$header = is_string($data['content']) ? $data['content'] : reset($data['content']);
 		}
 		$this->headers('Content-Type', $header);
 		return ($this->_type = $type);

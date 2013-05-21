@@ -191,17 +191,14 @@ class Request extends \lithium\net\http\Request {
 				$config['data'] += $_POST;
 			}
 		}
-
 		$this->_env = $config['env'];
 
 		if (!isset($config['host'])) {
 			$config['host'] = $this->env('HTTP_HOST');
 		}
-
 		if (!isset($config['protocol'])) {
 			$config['protocol'] = $this->env('SERVER_PROTOCOL');
 		}
-
 		if ($config['protocol'] && strpos($config['protocol'], '/')) {
 			list($scheme, $version) = explode('/', $config['protocol']);
 			$https = ($this->env('HTTPS') ? 's' : '');
@@ -213,11 +210,20 @@ class Request extends \lithium\net\http\Request {
 				$config['version'] = $version;
 			}
 		}
-
 		$this->_base = $this->_base($config['base']);
 		$this->url = $this->_url($config['url']);
-
 		parent::__construct($config);
+
+		$this->headers('Content-Type', $this->env('CONTENT_TYPE'));
+		$this->headers('Content-Length', $this->env('CONTENT_LENGTH'));
+
+		foreach ($this->_env as $name => $value) {
+			if (substr($name, 0, 5) == 'HTTP_') {
+				$name = str_replace('_', ' ', substr($name, 5));
+				$name = str_replace(' ', '-', ucwords(strtolower($name)));
+				$this->headers($name, $value);
+			}
+		}
 	}
 
 	/**
@@ -246,6 +252,7 @@ class Request extends \lithium\net\http\Request {
 		$type = $this->type($this->_config['type'] ?: $this->env('CONTENT_TYPE'));
 		$this->method = $method = strtoupper($this->env('REQUEST_METHOD'));
 		$hasBody = in_array($method, array('POST', 'PUT', 'PATCH'));
+
 		if (!$this->body && $hasBody && $type !== 'html') {
 			$this->_stream = $this->_stream ?: fopen('php://input', 'r');
 			$this->body = stream_get_contents($this->_stream);
@@ -297,15 +304,14 @@ class Request extends \lithium\net\http\Request {
 		if (array_key_exists($key, $this->_computed)) {
 			return $this->_computed[$key];
 		}
-
 		$val = null;
+
 		if (!empty($this->_env[$key])) {
 			$val = $this->_env[$key];
 			if ($key !== 'REMOTE_ADDR' && $key !== 'HTTPS' && $key !== 'REQUEST_METHOD') {
 				return $this->_computed[$key] = $val;
 			}
 		}
-
 		switch ($key) {
 			case 'BASE':
 			case 'base':
@@ -576,39 +582,6 @@ class Request extends \lithium\net\http\Request {
 			$type = $this->params['type'];
 		}
 		return parent::type($type);
-	}
-
-	/**
-	 * Expands on `\net\http\Message::headers()` by translating field names and values to those
-	 * provided by the server environment.
-	 *
-	 * @param string $key
-	 * @param string $value
-	 * @param boolean $replace
-	 * @return mixed
-	 */
-	public function headers($key = null, $value = null, $replace = true) {
-		if (is_string($key) && !isset($this->headers[$key]) && $value === null) {
-			$env = strtoupper(str_replace('-', '_', $key));
-			if (!in_array($env, array('CONTENT_TYPE', 'CONTENT_LENGTH'))) {
-				$env = 'HTTP_' . $env;
-			}
-			if (!empty($this->_env[$env])) {
-				$this->headers($key, $this->_env[$env]);
-				return $this->_env[$env];
-			}
-		}
-		if (!$key) {
-			foreach ($this->_env as $name => $value) {
-				if (substr($name, 0, 5) == 'HTTP_') {
-					$name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
-					$this->headers($name, $value);
-				}
-			}
-			$this->headers('Content-Type');
-			$this->headers('Content-Length');
-		}
-		return parent::headers($key, $value, $replace);
 	}
 
 	/**
