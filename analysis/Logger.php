@@ -144,7 +144,7 @@ class Logger extends \lithium\core\Adaptable {
 	 *
 	 * @param  string  $method     Method name.
 	 * @param  bool    $internal   Interal call or not.
-	 * @return bool
+	 * @return bool Returns `true` on success, `false` otherwise.
 	 */
 	public static function respondsTo($method, $internal = false) {
 		return isset(static::$_priorities[$method]) || parent::respondsTo($method, $internal);
