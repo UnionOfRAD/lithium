@@ -188,18 +188,18 @@ abstract class Renderer extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 
-		$request =& $this->_request;
-		$context =& $this->_context;
+		$req =& $this->_request;
+		$ctx =& $this->_context;
 		$classes =& $this->_classes;
 		$h = $this->_view ? $this->_view->outputFilters['h'] : null;
 
 		$this->_handlers += array(
-			'url' => function($url, $ref, array $options = array()) use (&$classes, &$request, $h) {
-				$url = $classes['router']::match($url ?: '', $request, $options);
+			'url' => function($url, $ref, array $options = array()) use (&$classes, &$req, $h) {
+				$url = $classes['router']::match($url ?: '', $req, $options);
 				return $h ? str_replace('&amp;', '&', $h($url)) : $url;
 			},
-			'path' => function($path, $ref, array $options = array()) use (&$classes, &$request) {
-				$defaults = array('base' => $request ? $request->env('base') : '');
+			'path' => function($path, $ref, array $options = array()) use (&$classes, &$req, $h) {
+				$defaults = array('base' => $req ? $req->env('base') : '');
 				$type = 'generic';
 
 				if (is_array($ref) && $ref[0] && $ref[1]) {
@@ -207,19 +207,20 @@ abstract class Renderer extends \lithium\core\Object {
 					list($class, $method) = explode('::', $methodRef);
 					$type = $helper->contentMap[$method];
 				}
-				return $classes['media']::asset($path, $type, $options + $defaults);
+				$path = $classes['media']::asset($path, $type, $options + $defaults);
+				return $h ? $h($path) : $path;
 			},
 			'options' => '_attributes',
 			'title'   => 'escape',
 			'value'   => 'escape',
-			'scripts' => function($scripts) use (&$context) {
-				return "\n\t" . join("\n\t", $context['scripts']) . "\n";
+			'scripts' => function($scripts) use (&$ctx) {
+				return "\n\t" . join("\n\t", $ctx['scripts']) . "\n";
 			},
-			'styles' => function($styles) use (&$context) {
-				return "\n\t" . join("\n\t", $context['styles']) . "\n";
+			'styles' => function($styles) use (&$ctx) {
+				return "\n\t" . join("\n\t", $ctx['styles']) . "\n";
 			},
-			'head' => function($head) use (&$context) {
-				return "\n\t" . join("\n\t", $context['head']) . "\n";
+			'head' => function($head) use (&$ctx) {
+				return "\n\t" . join("\n\t", $ctx['head']) . "\n";
 			}
 		);
 		unset($this->_config['view']);

@@ -96,6 +96,24 @@ class RendererTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that asset paths are properly escaped.
+	 */
+	public function testAssetPathEscaping() {
+		$this->subject = new Simple(array(
+			'response' => new Response(), 'view' => new View(), 'request' => new Request(array(
+				'base' => '/foo/index.php/>"><script>alert(\'hehe\');</script><link href="HTTP',
+				'url' => 'foo/index.php/%3E%22%3E%3Cscript%3Ealert%28%27hehe%27%29;%3C/script%3' .
+				         'E%3Clink%20href=%22HTTP/1.0%22%3C',
+				'env' => array('HTTP_HOST' => 'foo.local')
+			))
+		));
+
+		$expected = "/foo/index.php/&gt;&quot;&gt;&lt;script&gt;alert(&#039;hehe&#039;);&lt;";
+		$expected .= "/script&gt;&lt;link href=&quot;HTTP/somefile";
+		$this->assertEqual($expected, $this->subject->path("somefile"));
+	}
+
+	/**
 	 * Tests built-in content handlers for generating URLs, paths to static assets, and handling
 	 * output of elements written to the request context.
 	 */
