@@ -179,7 +179,7 @@ class RecordSet extends \lithium\data\Collection {
 						);
 					}
 					$opts = array('class' => 'set') + $options;
-					$record[$min][$name][$field] = $conn->item($primary, $rel, $opts);
+					$record[$min][$name][$field] = $conn->item($relModel, $rel, $opts);
 				} else {
 					$record[$min][$name][$field] = $this->_hydrateRecord(
 						$subrelations, $relModel, $record, $min, $max, $relName, $relMap, $conn
