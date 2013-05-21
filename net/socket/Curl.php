@@ -153,9 +153,9 @@ class Curl extends \lithium\net\Socket {
 			if (isset($data->method) && $data->method === 'POST') {
 				$this->set(array(CURLOPT_POST => true, CURLOPT_POSTFIELDS => $data->body()));
 			}
-			if (isset($data->method) && $data->method === 'PUT') {
+			if (isset($data->method) && in_array($data->method,array('PUT','PATCH'))) {
 				$this->set(array(
-					CURLOPT_CUSTOMREQUEST => 'PUT',
+					CURLOPT_CUSTOMREQUEST => $data->method,
 					CURLOPT_POSTFIELDS => $data->body()
 				));
 			}
