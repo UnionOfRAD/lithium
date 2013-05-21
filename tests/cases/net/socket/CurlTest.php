@@ -216,6 +216,22 @@ EOD;
 		$this->assertFalse(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
 		$this->assertTrue($stream->close());
 	}
+	public function testSendPatchThenGet() {
+		$postConfig = array('method' => 'PATCH', 'body' => '{"body"}');
+		$stream = new Curl($this->_testConfig);
+		$this->assertInternalType('resource', $stream->open());
+		$this->assertTrue($stream->write(new Request($postConfig + $this->_testConfig)));
+		$this->assertTrue(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
+		$this->assertEqual($stream->options[CURLOPT_CUSTOMREQUEST],'PATCH');
+		$this->assertTrue(isset($stream->options[CURLOPT_POSTFIELDS]));
+		$this->assertEqual($stream->options[CURLOPT_POSTFIELDS],$postConfig['body']);
+		$this->assertTrue($stream->close());
+
+		$this->assertInternalType('resource', $stream->open());
+		$this->assertTrue($stream->write(new Request($this->_testConfig)));
+		$this->assertFalse(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
+		$this->assertTrue($stream->close());
+	}
 
 	public function testCurlAdapter() {
 		$socket = new Curl($this->_testConfig);
