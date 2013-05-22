@@ -102,7 +102,7 @@ class Message extends \lithium\net\Message {
 	 *         `'Key: Value'`.
 	 */
 	public function headers($key = null, $value = null, $replace = true) {
-		if (!is_string($key) || strpos($key, ':') !== false) {
+		if (!is_string($key)) {
 			$replace = ($value === false) ? $value : $replace;
 
 			foreach ((array) $key as $header => $value) {
@@ -110,18 +110,18 @@ class Message extends \lithium\net\Message {
 					$this->headers($header, $value, $replace);
 					continue;
 				}
-				if (preg_match('/(.*?):(.+)/', $value, $match)) {
-					$this->headers($match[1], trim($match[2]), $replace);
-				}
+				$this->headers($value, null, $replace);
 			}
 		} elseif ($key) {
-			if ($value === null) {
+			if (strpos($key, ':') !== false) {
+				if (preg_match('/(.*?):(.+)/', $key, $match)) {
+					$this->headers($match[1], trim($match[2]), $replace);
+				}
+			} elseif ($value === null) {
 				return isset($this->headers[$key]) ? $this->headers[$key] : null;
 			} elseif ($value === false) {
 				unset($this->headers[$key]);
-			} elseif ($replace) {
-				$this->headers[$key] = $value;
-			} else {
+			} elseif (!$replace && isset($this->headers[$key]) && $value != $this->headers[$key]) {
 				$this->headers[$key] = (array) $this->headers[$key];
 
 				if (is_string($value)) {
@@ -129,6 +129,8 @@ class Message extends \lithium\net\Message {
 				} else {
 					$this->headers[$key] = array_merge($this->headers[$key], $value);
 				}
+			} else {
+				$this->headers[$key] = $value;
 			}
 		}
 		$headers = array();

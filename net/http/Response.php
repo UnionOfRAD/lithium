@@ -184,7 +184,7 @@ class Response extends \lithium\net\http\Message {
 
 			if (is_array($status)) {
 				$key = null;
-				$this->status = $status + $this->status;	
+				$this->status = $status + $this->status;
 			} elseif (is_numeric($status) && isset($this->_statuses[$status])) {
 				$this->status = array('code' => $status, 'message' => $this->_statuses[$status]);
 			} else {
@@ -277,9 +277,9 @@ class Response extends \lithium\net\http\Message {
 	 */
 	protected function _cookies() {
 		$cookies = array();
-		foreach($this->cookies() as $name => $value) {
+		foreach ($this->cookies() as $name => $value) {
 			if (!isset($value['value'])) {
-				foreach($value as $set) {
+				foreach ($value as $set) {
 					$cookies[] = compact('name') + $set;
 				}
 			} else {
@@ -290,7 +290,7 @@ class Response extends \lithium\net\http\Message {
 		$replace = array_map('rawurlencode', $invalid);
 		$replace = array_combine($invalid, $replace);
 
-		foreach($cookies as &$cookie) {
+		foreach ($cookies as &$cookie) {
 			if (!is_scalar($cookie['value'])) {
 				$message = "Non-scalar value cannot be rendered for cookie `{$cookie['name']}`";
 				throw new UnexpectedValueException($message);
@@ -376,13 +376,13 @@ class Response extends \lithium\net\http\Message {
 	 * @param array $headers Array of `Set-Cookie` headers or `null` if no cookies to set.
 	 */
 	protected function _parseCookies($headers) {
-		foreach((array) $headers as $header) {
+		foreach ((array) $headers as $header) {
 			$parts = array_map('trim', array_filter(explode('; ', $header)));
 			$cookie = array_shift($parts);
 			list($name, $value) = array_map('urldecode', explode('=', $cookie, 2)) + array('','');
 
 			$options = array();
-			foreach($parts as $part) {
+			foreach ($parts as $part) {
 				$part = array_map('urldecode', explode('=', $part, 2)) + array('','');
 				$options[strtolower($part[0])] = $part[1] ?: true;
 			}
@@ -403,7 +403,7 @@ class Response extends \lithium\net\http\Message {
 	 *         unmodified.
 	 */
 	protected function _httpChunkedDecode($body) {
-		if (stripos($this->headers['Transfer-Encoding'], 'chunked') === false) {
+		if (stripos($this->headers('Transfer-Encoding'), 'chunked') === false) {
 			return $body;
 		}
 		$stream = fopen('data://text/plain,' . $body, 'r');
