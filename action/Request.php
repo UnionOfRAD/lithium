@@ -689,7 +689,7 @@ class Request extends \lithium\net\http\Request {
 	 */
 	protected function _base($base = null) {
 		if ($base === null) {
-			$base = dirname($this->env('PHP_SELF'));
+			$base = preg_replace('/[^\/]+$/', '', $this->env('PHP_SELF'));
 		}
 		$base = trim(str_replace(array("/app/webroot", '/webroot'), '', $base), '/');
 		return $base ? '/' . $base : '';
