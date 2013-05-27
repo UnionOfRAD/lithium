@@ -419,7 +419,10 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	public function to($format, array $options = array()) {
 		$defaults = array('handlers' => array(
 			'MongoId' => function($value) { return (string) $value; },
-			'MongoDate' => function($value) { return $value->sec; }
+			'MongoDate' => function($value) {
+				$time = microtime($value->sec. $value->usec);
+				return date('r', $time);
+			}
 		));
 		$options += $defaults;
 		$options['internal'] = false;

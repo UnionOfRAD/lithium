@@ -826,7 +826,7 @@ class DocumentTest extends \lithium\test\Unit {
 		)));
 		$result = $doc->data();
 		$this->assertPattern('/^[a-f0-9]{24}$/', $result['_id']);
-		$this->assertEqual($time, $result['date']);
+		$this->assertEqual(date('r', $time), $result['date']);
 	}
 
 	public function testArrayInterface() {
