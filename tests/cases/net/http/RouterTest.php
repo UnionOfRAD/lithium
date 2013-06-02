@@ -1809,17 +1809,21 @@ class RouterTest extends \lithium\test\Unit {
 
 	public function testScopeBase() {
 		$request = new Request(array('base' => 'lithium/app'));
-		Router::connect('/{:controller}/{:action}');
 		$url = array('controller' => 'HelloWorld');
+
+		Router::scope('app', function(){
+			Router::connect('/{:controller}/{:action}');
+		});
+		Router::scope('app');
 
 		$expected = '/lithium/app/hello_world';
 		$this->assertEqual($expected, Router::match($url, $request));
 
-		Router::attach(false, array('base' => 'lithium'));
+		Router::attach('app', array('base' => 'lithium'));
 		$expected = '/lithium/hello_world';
 		$this->assertEqual($expected, Router::match($url, $request));
 
-		Router::attach(false, array('base' => ''));
+		Router::attach('app', array('base' => ''));
 		$expected = '/hello_world';
 		$this->assertEqual($expected, Router::match($url, $request));
 	}
@@ -1849,6 +1853,23 @@ class RouterTest extends \lithium\test\Unit {
 
 		$result = Router::match($result->params);
 		$this->assertEqual('/hello/world2', $result);
+	}
+
+	public function testLibraryBasedRoute() {
+		$route = Router::connect('/{:library}/{:controller}/{:action}',
+			array('library' => 'app'),
+			array('persist' => array('library'))
+		);
+
+		$expected = '/app/hello/world';
+		$result = Router::match(array('controller' => 'hello', 'action' => 'world'));
+		$this->assertEqual($expected, $result);
+
+		$expected = '/myapp/hello/world';
+		$result = Router::match(array(
+			'library' => 'myapp', 'controller' => 'hello', 'action' => 'world'
+		));
+		$this->assertEqual($expected, $result);
 	}
 }
 
