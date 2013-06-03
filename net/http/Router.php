@@ -465,6 +465,9 @@ class Router extends \lithium\core\StaticObject {
 	protected static function _compileStack($stack) {
 		$result = null;
 
+		list($url, $query) = array_pad(explode('?', array_pop($stack), 2), 2, null);
+		array_push($stack, $url);
+
 		foreach (array_reverse($stack) as $fragment) {
 			if ($result) {
 				$result = str_replace('{:args}', ltrim($result, '/'), $fragment);
@@ -472,7 +475,7 @@ class Router extends \lithium\core\StaticObject {
 			}
 			$result = $fragment;
 		}
-		return $result;
+		return $result . ($query ? '?' . $query : '');
 	}
 
 	protected static function _formatError($url) {

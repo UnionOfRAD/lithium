@@ -772,6 +772,16 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertIdentical('/versions/13', $result);
 	}
 
+	public function testRouteContinuationsWithQueryString() {
+		Router::connect('/{:args}/page-{:page:[\d]+}', array(), array('continue' => true));
+		Router::connect('/hello/world', 'Hello::world');
+
+		$expected = '/hello/world/page-2?foo=bar';
+
+		$result = Router::match(array('Hello::world', 'page' => 2, '?' => array('foo' => 'bar')));
+		$this->assertEqual($expected, $result);
+	}
+
 	/**
 	 * Tests default route formatters, and setting/getting new formatters.
 	 */
