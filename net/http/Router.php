@@ -464,16 +464,10 @@ class Router extends \lithium\core\StaticObject {
 
 	protected static function _compileStack($stack) {
 		$result = null;
-
-		list($url, $query) = array_pad(explode('?', array_pop($stack), 2), 2, null);
-		array_push($stack, $url);
-
+		list($result, $query) = array_pad(explode('?', array_pop($stack), 2), 2, null);
 		foreach (array_reverse($stack) as $fragment) {
-			if ($result) {
-				$result = str_replace('{:args}', ltrim($result, '/'), $fragment);
-				continue;
-			}
-			$result = $fragment;
+			$result = ltrim($result, '/');
+			$result = str_replace(($result ? '' : '/') . '{:args}', $result, $fragment);
 		}
 		return $result . ($query ? '?' . $query : '');
 	}
@@ -770,7 +764,7 @@ class Router extends \lithium\core\StaticObject {
 
 		if ($name === null) {
 			return static::$_scopes->get();
-		} elseif (!$config = static::$_scopes->get($name)){
+		} elseif (!$config = static::$_scopes->get($name)) {
 			static::$_scopes->set($name, array());
 			$config = static::$_scopes->get($name);
 		}

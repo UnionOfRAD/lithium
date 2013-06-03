@@ -782,6 +782,16 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testRouteContinuationsOnRootUrl() {
+		Router::connect('/{:args}/page-{:page:[\d]+}', array(), array('continue' => true));
+		Router::connect('/', 'Home::index');
+
+		$expected = '/page-1';
+
+		$result = Router::match(array('Home::index', 'page' => 1));
+		$this->assertEqual($expected, $result);
+	}
+
 	/**
 	 * Tests default route formatters, and setting/getting new formatters.
 	 */
