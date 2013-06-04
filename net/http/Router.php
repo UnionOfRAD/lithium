@@ -700,6 +700,10 @@ class Router extends \lithium\core\StaticObject {
 	 * @param array Variables to populate for the scope.
 	 */
 	public static function attach($name, $config = null, array $vars = array()) {
+		if ($name === false) {
+			return null;
+		}
+
 		if (!isset(static::$_scopes)) {
 			static::_initScopes();
 		}
@@ -712,9 +716,6 @@ class Router extends \lithium\core\StaticObject {
 			return;
 		}
 
-		if ($name === false) {
-			$name = '__defaultScope__';
-		}
 		if (is_array($config) || $config === false) {
 			static::$_scopes->set($name, $config);
 		}
@@ -757,17 +758,17 @@ class Router extends \lithium\core\StaticObject {
 	 *         if `$name === null`.
 	 */
 	public static function attached($name = null, array $vars = array()) {
+		if ($name === false) {
+			return null;
+		}
+
 		if (!isset(static::$_scopes)) {
 			static::_initScopes();
 		}
 
-		if ($name === false) {
-			$name = '__defaultScope__';
-		}
-
 		if ($name === null) {
 			return static::$_scopes->get();
-		} elseif (!$config = static::$_scopes->get($name)){
+		} elseif (!$config = static::$_scopes->get($name)) {
 			static::$_scopes->set($name, array());
 			$config = static::$_scopes->get($name);
 		}
@@ -806,12 +807,9 @@ class Router extends \lithium\core\StaticObject {
 				'base' => null,
 				'prefix' => '',
 				'pattern' => '',
-				'values' => array()
+				'values' => array(),
+				'library' => $name
 			);
-
-			if ($name !== '__defaultScope__') {
-				$defaults['library'] = $name;
-			}
 
 			$config += $defaults;
 
