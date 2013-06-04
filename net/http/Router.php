@@ -464,15 +464,12 @@ class Router extends \lithium\core\StaticObject {
 
 	protected static function _compileStack($stack) {
 		$result = null;
-
+		list($result, $query) = array_pad(explode('?', array_pop($stack), 2), 2, null);
 		foreach (array_reverse($stack) as $fragment) {
-			if ($result) {
-				$result = str_replace('{:args}', ltrim($result, '/'), $fragment);
-				continue;
-			}
-			$result = $fragment;
+			$result = ltrim($result, '/');
+			$result = str_replace(($result ? '' : '/') . '{:args}', $result, $fragment);
 		}
-		return $result;
+		return $result . ($query ? '?' . $query : '');
 	}
 
 	protected static function _formatError($url) {
