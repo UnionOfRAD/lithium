@@ -131,7 +131,7 @@ class MongoDb extends \lithium\data\Source {
 	 *           `$options` parameter of
 	 *            [`Mongo::__construct()`](http://www.php.net/manual/en/mongo.construct.php) for
 	 *            more information. Defaults to `false`, meaning no persistent connection is made.
-	 *        - `'timeout'` _integer_: The number of milliseconds a connection attempt will wait
+	 *        - `'connectTimeoutMS'` _integer_: The number of milliseconds a connection attempt will wait
 	 *          before timing out and throwing an exception. Defaults to `100`.
 	 *        - `'schema'` _closure_: A closure or anonymous function which returns the schema
 	 *          information for a model class. See the `$_schema` property for more information.
@@ -158,7 +158,7 @@ class MongoDb extends \lithium\data\Source {
 			'login'      => null,
 			'password'   => null,
 			'database'   => null,
-			'timeout'    => 100,
+			'connectTimeoutMS'    => 100,
 			'replicaSet' => false,
 			'schema'     => null,
 			'gridPrefix' => 'fs',
@@ -249,7 +249,7 @@ class MongoDb extends \lithium\data\Source {
 
 		$options = array(
 			'connect' => true,
-			'timeout' => $cfg['timeout'],
+			'connectTimeoutMS' => $cfg['connectTimeoutMS'],
 			'replicaSet' => $cfg['replicaSet']
 		);
 
