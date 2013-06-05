@@ -76,7 +76,10 @@ class DocumentSet extends \lithium\data\Collection {
 	public function to($format, array $options = array()) {
 		$options += array('handlers' => array(
 			'MongoId' => function($value) { return (string) $value; },
-			'MongoDate' => function($value) { return $value->sec; }
+			'MongoDate' => function($value) {
+				$time = microtime($value->sec. $value->usec);
+				return date('r', $time);
+			}
 		));
 
 		$this->offsetGet(null);

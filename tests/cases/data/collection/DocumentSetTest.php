@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\collection;
 
+use MongoDate;
 use lithium\data\source\MongoDb;
 use lithium\data\source\mongo_db\Schema;
 use lithium\data\entity\Document;
@@ -175,6 +176,25 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$this->assertInternalType('object', $doc[1]);
 		$this->assertInternalType('object', $doc[2]);
 		$this->assertCount(3, $doc);
+	}
+
+	public function testArrayConversion() {
+		$time = time();
+
+		$schema = new Schema();
+		$first  = (object) array('name' => 'First', 'date' => new MongoDate($time));
+		$second = (object) array('name' => 'Second', 'date' => new MongoDate($time));
+		$third  = (object) array('name' => 'Third', 'date' => new MongoDate($time));
+		$doc = new DocumentSet(compact('schema') + array(
+			'data' => array($first, $second, $third)
+		));
+
+		$results = $doc->data();
+
+		$this->assertEqual(array('name' => 'First', 'date' => date('r', $time)), $results[0]);
+		$this->assertEqual(array('name' => 'Second', 'date' => date('r', $time)), $results[1]);
+		$this->assertEqual(array('name' => 'Third', 'date' => date('r', $time)), $results[2]);
+		$this->assertCount(3, $results);
 	}
 
 	public function testOffsetSet() {
