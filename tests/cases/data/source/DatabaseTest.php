@@ -1657,6 +1657,20 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testCleanRenderCommand() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('title' => '{:foobar}'),
+			'exists' => false
+		));
+
+		$query = new Query(compact('entity') + array('type' => 'create'));
+		$result = $this->db->create($query);
+
+		$expected = "INSERT INTO {mock_database_posts} ({title}) VALUES ('{:foobar}');";
+		$this->assertEqual($expected, $this->db->sql);
+	}
 }
 
 ?>

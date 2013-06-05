@@ -750,7 +750,12 @@ abstract class Database extends \lithium\data\Source {
 		}
 		$template = $this->_strings[$type];
 		$data = array_filter($data);
-		return trim(String::insert($template, $data, array('clean' => true)));
+		$placeholders = array();
+		foreach ($data as $key => $value) {
+			$placeholders[$key] = "{{$key}}";
+		}
+		$template = String::insert($template, $placeholders, array('clean' => true));
+		return trim(String::insert($template, $data, array('before' => '{')));
 	}
 
 	/**
