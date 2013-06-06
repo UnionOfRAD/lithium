@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\collection;
 
+use lithium\data\Connections;
 use lithium\data\source\MongoDb;
 use lithium\data\source\mongo_db\Schema;
 use lithium\data\entity\Document;
@@ -22,13 +23,15 @@ class DocumentSetTest extends \lithium\test\Unit {
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
 	public function setUp() {
-		MockDocumentPost::config(array('connection' => 'mongo'));
-		MockDocumentPost::$connection = new MongoDb(array('autoConnect' => false));
-		MockDocumentPost::$connection->connection = new MockMongoConnection();
+		$connection = new MongoDb(array('autoConnect' => false));
+		$connection->connection = new MockMongoConnection();
+		Connections::add('mockconn', array('object' => $connection));
+		MockDocumentPost::config(array('meta' => array('connection' => 'mockconn')));
 	}
 
 	public function tearDown() {
-		MockDocumentPost::$connection = null;
+		Connections::remove('mockconn');
+		MockDocumentPost::reset();
 	}
 
 	public function testInitialCasting() {
@@ -190,7 +193,6 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$resource = new MockResult();
 
 		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
-		$model = $this->_model;
 
 		$result = $doc->rewind();
 		$this->assertInstanceOf('lithium\data\entity\Document', $result);
@@ -212,7 +214,6 @@ class DocumentSetTest extends \lithium\test\Unit {
 	public function testOffsetGetBackwards() {
 		$resource = new MockResult();
 		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
-		$model = $this->_model;
 
 		$expected = array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib');
 		$this->assertEqual($expected, $doc['6c8f86167675abfabdbf0302']->data());

@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\template\helper;
 
-class MockFormPost extends \lithium\tests\mocks\data\MockBase {
+class MockFormPost extends \lithium\data\Model {
 
 	public $hasMany = array('MockQueryComment');
 

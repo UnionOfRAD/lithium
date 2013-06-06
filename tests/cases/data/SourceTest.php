@@ -18,7 +18,7 @@ class SourceTest extends \lithium\test\Unit {
 		$expected = array(
 			'connect', 'disconnect', 'sources', 'describe', 'create', 'read', 'update', 'delete',
 			'schema', 'result', 'cast', 'relationship', 'calculation', '__construct', '__destruct',
-			'_init', 'isConnected', 'name', 'methods', 'configureClass', 'item', 'applyStrategy',
+			'_init', 'isConnected', 'name', 'methods', 'configureClass', 'applyStrategy',
 			'applyFilter', 'invokeMethod', '__set_state', '_instance', '_filter', '_parents',
 			'_stop'
 		);
@@ -30,7 +30,15 @@ class SourceTest extends \lithium\test\Unit {
 		$name = '{(\'Li\':"∆")}';
 		$this->assertEqual($name, $source->name($name));
 
-		$expected = array('meta' => array('locked' => true, 'key' => 'id'));
+		$expected = array(
+			'classes' => array(
+				'entity' => 'lithium\data\entity\Record',
+				'set' => 'lithium\data\collection\RecordSet',
+				'relationship' => 'lithium\data\model\Relationship',
+				'schema' => 'lithium\data\Schema'
+			),
+			'meta' => array('locked' => true, 'key' => 'id')
+		);
 		$this->assertEqual($expected, $source->configureClass('Foo'));
 	}
 
@@ -39,14 +47,6 @@ class SourceTest extends \lithium\test\Unit {
 		$this->assertFalse($source->isConnected());
 		$this->assertTrue($source->isConnected(array('autoConnect' => true)));
 		$this->assertTrue($source->isConnected());
-	}
-
-	public function testItem() {
-		$source = new MockSource();
-		$entity = $source->item('lithium\tests\mocks\data\MockPost', array('foo' => 'bar'));
-		$this->assertInstanceOf('lithium\data\Entity', $entity);
-		$this->assertEqual('lithium\tests\mocks\data\MockPost', $entity->model());
-		$this->assertEqual(array('foo' => 'bar'), $entity->data());
 	}
 }
 

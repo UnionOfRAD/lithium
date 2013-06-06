@@ -8,11 +8,9 @@
 
 namespace lithium\tests\mocks\data;
 
-class MockPost extends \lithium\tests\mocks\data\MockBase {
+class MockPost extends \lithium\data\Model {
 
 	public $hasMany = array('MockComment');
-
-	public static $connection = null;
 
 	protected $_meta = array('connection' => false, 'key' => 'id');
 

@@ -10,23 +10,28 @@ namespace lithium\tests\cases\data\entity;
 
 use MongoId;
 use MongoDate;
+use lithium\data\Connections;
 use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 use lithium\data\source\mongo_db\Schema;
 use lithium\tests\mocks\data\model\MockDocumentPost;
-use lithium\tests\mocks\data\model\MockDocumentMultipleKey;
 use lithium\tests\mocks\data\source\MockMongoConnection;
-use lithium\tests\mocks\data\model\MockDocumentSource;
 
 class DocumentTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
 	public function setUp() {
-		MockDocumentPost::$connection = new MongoDb(array('autoConnect' => false));
-		MockDocumentPost::$connection->connection = new MockMongoConnection();
-		MockDocumentMultipleKey::$connection = new MockDocumentSource();
+		$connection = new MongoDb(array('autoConnect' => false));
+		$connection->connection = new MockMongoConnection();
+		Connections::add('mockconn', array('object' => $connection));
+		MockDocumentPost::config(array('meta' => array('connection' => 'mockconn')));
+	}
+
+	public function tearDown() {
+		Connections::remove('mockconn');
+		MockDocumentPost::reset();
 	}
 
 	public function testFindAllAndIterate() {

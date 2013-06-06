@@ -8,13 +8,11 @@
 
 namespace lithium\tests\mocks\data\model;
 
-class MockDatabasePostRevision extends \lithium\tests\mocks\data\MockBase {
-
-	public static $connection = null;
+class MockDatabasePostRevision extends \lithium\data\Model {
 
 	public $belongsTo = array('MockDatabasePost');
 
-	protected $_meta = array('connection' => null);
+	protected $_meta = array('connection' => false);
 
 	protected $_schema = array(
 		'id' => array('type' => 'integer'),

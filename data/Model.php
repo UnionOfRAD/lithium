@@ -150,10 +150,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'connections' => 'lithium\data\Connections',
-		'query'       => 'lithium\data\model\Query',
-		'validator'   => 'lithium\util\Validator',
-		'entity'      => 'lithium\data\Entity'
+		'connections' => 'lithium\data\Connections'
 	);
 
 	/**
@@ -432,7 +429,9 @@ class Model extends \lithium\core\StaticObject {
 		}
 
 		$tmp = $self->_meta + $inherited['meta'];
-		$source = array('meta' => array(), 'finders' => array(), 'schema' => array());
+		$source = array(
+			'classes' => array(), 'meta' => array(), 'finders' => array(), 'schema' => array()
+		);
 
 		$self->_classes += $inherited['classes'];
 		$classes = $self->_classes;
@@ -443,6 +442,7 @@ class Model extends \lithium\core\StaticObject {
 		}
 
 		$self->_query += $inherited['query'];
+		$self->_classes += $source['classes'];
 
 		$local = compact('class') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $inherited['meta']);
@@ -471,6 +471,12 @@ class Model extends \lithium\core\StaticObject {
 		}
 
 		$self->_finders += $source['finders'] + $inherited['finders'] + $self->_findFilters();
+
+		$self->_classes += array(
+			'query'       => 'lithium\data\model\Query',
+			'validator'   => 'lithium\util\Validator',
+			'entity'      => 'lithium\data\Entity'
+		);
 
 		static::_relationsToLoad();
 		return $self;
@@ -905,7 +911,6 @@ class Model extends \lithium\core\StaticObject {
 				throw new ConfigException("Could not load schema object for model `{$class}`.");
 			}
 			$key = (array) $self::meta('key');
-
 			if ($self->_schema && $self->_schema->fields() && !$self->_schema->has($key)) {
 				$key = implode('`, `', $key);
 				throw new ConfigException("Missing key `{$key}` from schema.");
@@ -975,9 +980,18 @@ class Model extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function create(array $data = array(), array $options = array()) {
+		$defaults = array('defaults' => true, 'class' => 'entity');
+		$options += $defaults;
 		return static::_filter(__FUNCTION__, compact('data', 'options'), function($self, $params) {
-			$data = Set::merge(Set::expand($self::schema()->defaults()), $params['data']);
-			return $self::connection()->item($self, $data, $params['options']);
+			if ($params['options']['defaults']) {
+				$data = Set::merge(Set::expand($self::schema()->defaults()), $params['data']);
+			} else {
+				$data = $params['data'];
+			}
+			$class = $params['options']['class'];
+			unset($params['options']['class']);
+			$options = array('model' => $self, 'data' => $data) + $params['options'];
+			return $self::invokeMethod('_instance', array($class, $options));
 		});
 	}
 
