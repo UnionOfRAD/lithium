@@ -9,8 +9,8 @@
 namespace lithium\tests\cases\data;
 
 use stdClass;
-use lithium\data\entity\Document;
-use lithium\data\collection\DocumentSet;
+use lithium\tests\mocks\data\MockCollection;
+use lithium\data\Entity;
 
 /**
  * lithium\data\Connections Test.
@@ -35,7 +35,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::stats()`.
 	 */
 	public function testGetStats() {
-		$collection = new DocumentSet(array('stats' => array('foo' => 'bar')));
+		$collection = new MockCollection(array('stats' => array('foo' => 'bar')));
 		$this->assertNull($collection->stats('bar'));
 		$this->assertEqual('bar', $collection->stats('foo'));
 		$this->assertEqual(array('foo' => 'bar'), $collection->stats());
@@ -47,7 +47,7 @@ class CollectionTest extends \lithium\test\Unit {
 	public function testAccessorMethods() {
 		$model = $this->_model;
 		$model::config(array('meta' => array('connection' => false, 'key' => 'id')));
-		$collection = new DocumentSet(compact('model'));
+		$collection = new MockCollection(compact('model'));
 		$this->assertEqual($model, $collection->model());
 		$this->assertEqual(compact('model'), $collection->meta());
 	}
@@ -56,10 +56,10 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::offsetExists()`.
 	 */
 	public function testOffsetExists() {
-		$collection = new DocumentSet();
+		$collection = new MockCollection();
 		$this->assertEqual($collection->offsetExists(0), false);
 
-		$collection = new DocumentSet(array('data' => array('bar', 'baz', 'bob' => 'bill')));
+		$collection = new MockCollection(array('data' => array('bar', 'baz', 'bob' => 'bill')));
 		$this->assertEqual($collection->offsetExists(0), true);
 		$this->assertEqual($collection->offsetExists(1), true);
 	}
@@ -68,7 +68,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::rewind` and `Collection::current`.
 	 */
 	public function testNextRewindCurrent() {
-		$collection = new DocumentSet(array('data' => array(
+		$collection = new MockCollection(array('data' => array(
 			'title' => 'Lorem Ipsum',
 			'value' => 42,
 			'foo'   => 'bar'
@@ -84,7 +84,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::each`.
 	 */
 	public function testEach() {
-		$collection = new DocumentSet(array('data' => array(
+		$collection = new MockCollection(array('data' => array(
 			'Lorem Ipsum',
 			'value',
 			'bar'
@@ -104,7 +104,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::map`.
 	 */
 	public function testMap() {
-		$collection = new DocumentSet(array('data' => array(
+		$collection = new MockCollection(array('data' => array(
 			'Lorem Ipsum',
 			'value',
 			'bar'
@@ -125,7 +125,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::reduce`.
 	 */
 	public function testReduce() {
-		$collection = new DocumentSet();
+		$collection = new MockCollection();
 		$collection->set(array(
 			'title' => 'Lorem Ipsum',
 			'key'   => 'value',
@@ -147,7 +147,7 @@ class CollectionTest extends \lithium\test\Unit {
 			'value',
 			'bar'
 		);
-		$collection = new DocumentSet(array('data' => $data));
+		$collection = new MockCollection(array('data' => $data));
 		$this->assertEqual($data, $collection->data());
 	}
 
@@ -155,7 +155,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests the sort method in `lithium\data\Collection`.
 	 */
 	public function testSort() {
-		$collection = new DocumentSet(array('data' => array(
+		$collection = new MockCollection(array('data' => array(
 			array('id' => 1, 'name' => 'Annie'),
 			array('id' => 2, 'name' => 'Zilean'),
 			array('id' => 3, 'name' => 'Trynamere'),
@@ -172,12 +172,12 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests that arrays can be used to filter objects in `find()` and `first()` methods.
 	 */
 	public function testArrayFiltering() {
-		$collection = new DocumentSet(array('data' => array(
-			new Document(array('data' => array('id' => 1, 'name' => 'Annie', 'active' => 1))),
-			new Document(array('data' => array('id' => 2, 'name' => 'Zilean', 'active' => 1))),
-			new Document(array('data' => array('id' => 3, 'name' => 'Trynamere', 'active' => 0))),
-			new Document(array('data' => array('id' => 4, 'name' => 'Katarina', 'active' => 1))),
-			new Document(array('data' => array('id' => 5, 'name' => 'Nunu', 'active' => 0)))
+		$collection = new MockCollection(array('data' => array(
+			new Entity(array('data' => array('id' => 1, 'name' => 'Annie', 'active' => 1))),
+			new Entity(array('data' => array('id' => 2, 'name' => 'Zilean', 'active' => 1))),
+			new Entity(array('data' => array('id' => 3, 'name' => 'Trynamere', 'active' => 0))),
+			new Entity(array('data' => array('id' => 4, 'name' => 'Katarina', 'active' => 1))),
+			new Entity(array('data' => array('id' => 5, 'name' => 'Nunu', 'active' => 0)))
 		)));
 		$result = $collection->find(array('active' => 1))->data();
 		$expected = array(
@@ -200,10 +200,10 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::closed` && `Collection::close`.
 	 */
 	public function testClosed() {
-		$collection = new DocumentSet();
+		$collection = new MockCollection();
 		$this->assertTrue($collection->closed());
 
-		$collection = new DocumentSet(array('result' => 'foo'));
+		$collection = new MockCollection(array('result' => 'foo'));
 		$this->assertFalse($collection->closed());
 		$collection->close();
 		$this->assertTrue($collection->closed());
@@ -215,10 +215,29 @@ class CollectionTest extends \lithium\test\Unit {
 	public function testAssignTo() {
 		$parent = new stdClass();
 		$config = array('valid' => false, 'model' => $this->_model);
-		$collection = new DocumentSet;
+		$collection = new MockCollection();
 		$collection->assignTo($parent, $config);
 		$this->assertEqual($this->_model, $collection->model());
 		$this->assertEqual($parent, $collection->parent());
+	}
+
+	public function testHandlers() {
+		$handlers = array(
+			'stdClass' => function($value) { return substr($value->scalar, -1); }
+		);
+		$array = new MockCollection(compact('handlers') + array(
+			'data' => array(
+				array(
+					'value' => (object) 'hello'
+				),
+				array(
+					'value' => (object) 'world'
+				)
+			)
+		));
+
+		$expected = array(array('value' => 'o'), array('value' => 'd'));
+		$this->assertIdentical($expected, $array->to('array', array('indexed' => false)));
 	}
 }
 

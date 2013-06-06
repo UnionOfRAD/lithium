@@ -23,6 +23,10 @@ class DocumentSet extends \lithium\data\Collection {
 	protected function _init() {
 		parent::_init();
 		$this->_original = $this->_data;
+		$this->_handlers += array(
+			'MongoId' => function($value) { return (string) $value; },
+			'MongoDate' => function($value) { return $value->sec; }
+		);
 	}
 
 	public function sync($id = null, array $data = array(), array $options = array()) {
@@ -74,11 +78,6 @@ class DocumentSet extends \lithium\data\Collection {
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
-		$options += array('handlers' => array(
-			'MongoId' => function($value) { return (string) $value; },
-			'MongoDate' => function($value) { return $value->sec; }
-		));
-
 		$this->offsetGet(null);
 		return parent::to($format, $options);
 	}

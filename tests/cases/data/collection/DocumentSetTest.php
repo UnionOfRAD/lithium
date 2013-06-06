@@ -329,6 +329,50 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$this->assertEqual($doc, $doc->foo->parent());
 		$this->assertEqual($expected, $doc->foo[0]->data());
 	}
+
+	public function testHandlers() {
+		$model = $this->_model;
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'date' => array('type' => 'date')
+		)));
+		$handlers = array(
+			'MongoId' => function($value) { return substr((string) $value, -1); },
+			'MongoDate' => function($value) { return date('d/m/Y H:i', $value->sec); }
+		);
+		$array = new DocumentSet(compact('model', 'schema', 'handlers') + array(
+			'data' => array(
+				array(
+					'_id' => '4cb4ab6d7addf98506010002',
+					'date' => '2013-06-06 13:00:00'
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010003',
+					'date' => '2013-06-06 12:00:00'
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010004',
+					'date' => '2013-06-06 11:00:00'
+				)
+			)
+		));
+
+		$expected = array(
+			array(
+				'_id' => '2',
+				'date' => '06/06/2013 13:00'
+			),
+			array(
+				'_id' => '3',
+				'date' => '06/06/2013 12:00'
+			),
+			array (
+				'_id' => '4',
+				'date' => '06/06/2013 11:00'
+			)
+		);
+		$this->assertIdentical($expected, $array->to('array', array('indexed' => false)));
+	}
 }
 
 ?>
