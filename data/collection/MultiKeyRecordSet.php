@@ -236,7 +236,8 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 
 	protected function _set($data = null, $offset = null, $options = array()) {
 		if ($model = $this->_model) {
-			$data = !is_object($data) ? $model::connection()->item($model, $data, $options) : $data;
+			$options += array('defaults' => false);
+			$data = !is_object($data) ? $model::create($data, $options) : $data;
 			$key = $model::key($data);
 		} else {
 			$key = $offset;

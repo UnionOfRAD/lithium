@@ -569,8 +569,8 @@ abstract class Database extends \lithium\data\Source {
 					}
 					return Set::expand($records);
 				case 'item':
-					return $self->item($query->model(), array(), compact('query', 'result') + array(
-						'class' => 'set'
+					return $model::create(array(), compact('query', 'result') + array(
+						'class' => 'set', 'defaults' => false
 					));
 			}
 		});

@@ -133,12 +133,13 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 				return $this->_updated[$name];
 			}
 			if (isset($field['array']) && $field['array'] && ($model = $this->_model)) {
-				$this->_updated[$name] = $model::connection()->item($model, array(), array(
+				$this->_updated[$name] = $model::create(array(), array(
 					'class' => 'set',
 					'schema' => $this->schema(),
 					'pathKey' => $this->_pathKey ? $this->_pathKey . '.' . $name : $name,
 					'parent' => $this,
-					'model' => $this->_model
+					'model' => $this->_model,
+					'defaults' => false
 				));
 				return $this->_updated[$name];
 			}
@@ -249,7 +250,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			}
 
 			if ($next === null && ($model = $this->_model)) {
-				$current->set(array($key => $model::connection()->item($model)));
+				$current->set(array($key => $model::create(array(), array('defaults' => false))));
 				$next =& $current->{$key};
 			}
 			$current =& $next;

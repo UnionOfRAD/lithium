@@ -266,8 +266,10 @@ class CouchDb extends \lithium\data\source\Http {
 				$stats = $result;
 			}
 			$stats += array('total_rows' => null, 'offset' => null);
-			$opts = compact('stats') + array('class' => 'set', 'exists' => true);
-			return $self->item($query->model(), $data, $opts);
+			$opts = compact('stats') + array(
+				'class' => 'set', 'exists' => true, 'defaults' => false
+			);
+			return $model::create($data, $opts);
 		});
 	}
 

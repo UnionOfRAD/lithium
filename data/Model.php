@@ -973,8 +973,14 @@ class Model extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function create(array $data = array(), array $options = array()) {
+		$defaults = array('defaults' => true);
+		$options += $defaults;
 		return static::_filter(__FUNCTION__, compact('data', 'options'), function($self, $params) {
-			$data = Set::merge(Set::expand($self::schema()->defaults()), $params['data']);
+			if ($params['options']['defaults']) {
+				$data = Set::merge(Set::expand($self::schema()->defaults()), $params['data']);
+			} else {
+				$data = $params['data'];
+			}
 			return $self::connection()->item($self, $data, $params['options']);
 		});
 	}
