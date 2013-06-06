@@ -687,6 +687,13 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = 'mock_creators';
 		$result = MockCreator::meta('source');
 		$this->assertEqual($expected, $result);
+
+		$creator = MockCreator::create(array('name' => 'Homer'), array('defaults' => false));
+		$expected = array(
+			'name' => 'Homer'
+		);
+		$result = $creator->data();
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testModelWithNoBackend() {

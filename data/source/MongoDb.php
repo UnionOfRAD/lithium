@@ -474,11 +474,12 @@ class MongoDb extends \lithium\data\Source {
 			$options = $params['options'];
 			$args = $query->export($self);
 			$source = $args['source'];
+			$model = $query->model();
 
 			if ($group = $args['group']) {
 				$result = $self->invokeMethod('_group', array($group, $args, $options));
-				$config = array('class' => 'set') + compact('query') + $result;
-				return $self->item($query->model(), $config['data'], $config);
+				$config = array('class' => 'set', 'defaults' => false) + compact('query') + $result;
+				return $model::create($config['data'], $config);
 			}
 			$collection = $self->connection->{$source};
 
@@ -493,8 +494,8 @@ class MongoDb extends \lithium\data\Source {
 
 			$resource = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
 			$result = $self->invokeMethod('_instance', array('result', compact('resource')));
-			$config = compact('result', 'query') + array('class' => 'set');
-			return $self->item($query->model(), array(), $config);
+			$config = compact('result', 'query') + array('class' => 'set', 'defaults' => false);
+			return $model::create(array(), $config);
 		});
 	}
 
