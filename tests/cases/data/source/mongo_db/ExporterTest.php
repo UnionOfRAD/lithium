@@ -656,7 +656,7 @@ class ExporterTest extends \lithium\test\Unit {
 		}
 	}
 
-	public function testToData() {
+	public function testToDataOnDocumentSet() {
 		$data = array(
 			array(
 				'_id' => '4c8f86167675abfabd970300',
@@ -723,6 +723,43 @@ class ExporterTest extends \lithium\test\Unit {
 		$accounts = $result['4c8f86167675abfabd970301']['accounts'];
 		$this->assertEqual('Foo2', $accounts['4fb6e2dd3e91581fe6e75738']['name']);
 		$this->assertEqual('Bar2', $accounts['4fb6e2df3e91581fe6e75739']['name']);
+	}
+
+	public function testToDataOnDocument() {
+		$data = array(
+			'_id' => '4c8f86167675abfabd970300',
+			'accounts' => array(
+				array(
+					'_id' => "4fb6e2dd3e91581fe6e75736",
+					'name' => 'Foo1'
+				),
+				array(
+					'_id' => "4fb6e2df3e91581fe6e75737",
+					'name' => 'Bar1'
+				)
+			)
+		);
+
+		$model = $this->_model;
+		$handlers = $this->_handlers;
+		$options = compact('model', 'handlers');
+		$schema = new Schema(array('fields' => $this->_schema));
+		$set = $schema->cast(null, null, $data, $options);
+
+		$result = $set->data();
+		$accounts = $result['accounts'];
+		$this->assertEqual('Foo1', $accounts[0]['name']);
+		$this->assertEqual('Bar1', $accounts[1]['name']);
+
+		$result = $set->to('array', array('indexed' => false));
+		$accounts = $result['accounts'];
+		$this->assertEqual('Foo1', $accounts[0]['name']);
+		$this->assertEqual('Bar1', $accounts[1]['name']);
+
+		$result = $set->to('array', array('indexed' => true));
+		$accounts = $result['accounts'];
+		$this->assertEqual('Foo1', $accounts['4fb6e2dd3e91581fe6e75736']['name']);
+		$this->assertEqual('Bar1', $accounts['4fb6e2df3e91581fe6e75737']['name']);
 	}
 
 	public function testIndexesOnExportingDocumentSet() {

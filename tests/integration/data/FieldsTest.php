@@ -134,7 +134,7 @@ class FieldsTest extends \lithium\tests\integration\data\Base {
 			'id' => $cId,
 			'name' => 'Celebrities',
 			'images' => array(
-				$eId => array(
+				array(
 					'id' => $eId,
 					'title' => 'John Doe'
 				)
