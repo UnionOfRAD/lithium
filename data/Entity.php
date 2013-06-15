@@ -475,6 +475,7 @@ class Entity extends \lithium\core\Object {
 				$data = $this->_updated;
 				$rel = array_map(function($obj) { return $obj->data(); }, $this->_relationships);
 				$data = $rel + $data;
+				$options['indexed'] = isset($options['indexed']) ? $options['indexed'] : false;
 				$result = Collection::toArray($data, $options);
 			break;
 			case 'string':
