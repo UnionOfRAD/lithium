@@ -434,13 +434,15 @@ class Model extends \lithium\core\StaticObject {
 		$tmp = $self->_meta + $inherited['meta'];
 		$source = array('meta' => array(), 'finders' => array(), 'schema' => array());
 
+		$self->_classes += $inherited['classes'];
+		$classes = $self->_classes;
+
 		if ($tmp['connection']) {
-			$conn = $inherited['classes']['connections']::get($tmp['connection']);
+			$conn = $classes['connections']::get($tmp['connection']);
 			$source = (($conn) ? $conn->configureClass($class) : array()) + $source;
 		}
 
 		$self->_query += $inherited['query'];
-		$self->_classes += $inherited['classes'];
 
 		$local = compact('class') + $self->_meta;
 		$self->_meta = ($local + $source['meta'] + $inherited['meta']);
