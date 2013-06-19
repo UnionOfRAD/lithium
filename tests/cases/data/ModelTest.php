@@ -22,6 +22,7 @@ use lithium\tests\mocks\data\MockPostForValidates;
 use lithium\tests\mocks\data\MockProductForSchemas;
 use lithium\tests\mocks\data\MockAntiqueForSchemas;
 use lithium\tests\mocks\data\MockBadConnection;
+use lithium\tests\mocks\core\MockCallable;
 
 class ModelTest extends \lithium\test\Unit {
 
@@ -245,6 +246,14 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array('limit' => 50) + MockProductForSchemas::query();
 		MockAntiqueForSchemas::config(array('query' => $expected));
 		$this->assertEqual($expected, MockAntiqueForSchemas::query());
+
+		MockPostForValidates::config(array(
+			'classes' => array('connections' => 'lithium\tests\mocks\data\MockConnections'),
+			'meta' => array('connection' => new MockCallable())
+		));
+		$conn = MockPostForValidates::connection();
+
+		$this->assertInstanceOf('lithium\tests\mocks\core\MockCallable', $conn);
 	}
 
 	public function testFieldIntrospection() {
