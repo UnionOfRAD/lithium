@@ -399,55 +399,23 @@ class Model extends \lithium\core\StaticObject {
 		}
 		static::$_initialized[$class] = true;
 
-		$inherited = array_fill_keys($self->_autoConfig, array());
-		$inheritedAttrs = array_fill_keys($self->_inherit, array());
+		$self->_applyInheritance($self);
 
-		foreach (static::_parents() as $parent) {
-			$parentConfig = get_class_vars($parent);
-
-			foreach ($self->_autoConfig as $key) {
-				if (isset($parentConfig["_{$key}"])) {
-					$val = $parentConfig["_{$key}"];
-					$inherited[$key] = is_array($val) ? $inherited[$key] + $val : $val;
-				}
-			}
-
-			foreach ($self->_inherit as $key) {
-				if (isset($parentConfig["{$key}"])) {
-					$val = $parentConfig["{$key}"];
-					$inheritedAttrs[$key] = $inheritedAttrs[$key] + $val;
-				}
-			}
-
-			if ($parent === __CLASS__) {
-				break;
-			}
-		}
-
-		foreach ($inheritedAttrs as $key => $value) {
-			$self->{$key} += $value;
-		}
-
-		$tmp = $self->_meta + $inherited['meta'];
 		$source = array(
 			'classes' => array(), 'meta' => array(), 'finders' => array(), 'schema' => array()
 		);
 
-		$self->_classes += $inherited['classes'];
-		$classes = $self->_classes;
-
-		if ($tmp['connection']) {
-			$conn = $classes['connections']::get($tmp['connection']);
+		$meta = $self->_meta;
+		if ($meta['connection']) {
+			$classes = $self->_classes;
+			$conn = $classes['connections']::get($meta['connection']);
 			$source = (($conn) ? $conn->configureClass($class) : array()) + $source;
 		}
 
-		$self->_query += $inherited['query'];
 		$self->_classes += $source['classes'];
+		$self->_meta = compact('class') + $self->_meta + $source['meta'];
 
-		$local = compact('class') + $self->_meta;
-		$self->_meta = ($local + $source['meta'] + $inherited['meta']);
-
-		$self->_initializers += $inherited['initializers'] + array(
+		$self->_initializers += array(
 			'name' => function($self) {
 				return basename(str_replace('\\', '/', $self));
 			},
@@ -461,16 +429,13 @@ class Model extends \lithium\core\StaticObject {
 			}
 		);
 
-		$source['schema'] = $source['schema'] + $inherited['schema'];
 		if (is_object($self->_schema)) {
 			$self->_schema->append($source['schema']);
-		} elseif (is_array($self->_schema)) {
-			$self->_schema = $self->_schema + $source['schema'];
 		} else {
-			$self->_schema = $source['schema'];
+			$self->_schema += $source['schema'];
 		}
 
-		$self->_finders += $source['finders'] + $inherited['finders'] + $self->_findFilters();
+		$self->_finders += $source['finders'] + $self->_findFilters();
 
 		$self->_classes += array(
 			'query'       => 'lithium\data\model\Query',
@@ -480,6 +445,40 @@ class Model extends \lithium\core\StaticObject {
 
 		static::_relationsToLoad();
 		return $self;
+	}
+
+	/**
+	 * Merge parent class attributes to a class instance.
+	 *
+	 * @param string $self The instance to initialize.
+	 */
+	protected function _applyInheritance($self) {
+		$tmp = array_map(function($k){ return '_' . $k; }, $self->_autoConfig);
+		$inherited = array_fill_keys($tmp, array()) + array_fill_keys($self->_inherit, array());
+
+		foreach (static::_parents() as $parent) {
+			$parentConfig = get_class_vars($parent);
+
+			foreach ($inherited as $key => $value) {
+				if (isset($parentConfig["{$key}"])) {
+					$val = $parentConfig["{$key}"];
+					$inherited[$key] += $val;
+				}
+			}
+
+			if ($parent === __CLASS__) {
+				break;
+			}
+		}
+
+		if (is_array($self->_schema)) {
+			$self->_schema += $inherited['_schema'];
+		}
+		unset($inherited['_schema']);
+
+		foreach ($inherited as $key => $value) {
+			$self->{$key} += $value;
+		}
 	}
 
 	/**
