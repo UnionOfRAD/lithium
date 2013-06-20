@@ -106,13 +106,30 @@ class Entity extends \lithium\core\Object {
 	protected $_schema = array();
 
 	/**
+	 * Hold the "data export" handlers where the keys are fully-namespaced class
+	 * names, and the values are closures that take an instance of the class as a
+	 * parameter, and return an array or scalar value that the instance represents.
+	 *
+	 * @see lithium\data\Entity::to()
+	 * @var array
+	 */
+	protected $_handlers = array();
+
+	/**
 	 * Auto configuration.
 	 *
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'classes' => 'merge', 'parent', 'schema', 'data',
-		'model', 'exists', 'pathKey', 'relationships'
+		'classes' => 'merge',
+		'parent',
+		'schema',
+		'data',
+		'model',
+		'exists',
+		'pathKey',
+		'relationships',
+		'handlers'
 	);
 
 	/**
@@ -470,6 +487,10 @@ class Entity extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
+		$defaults = array('handlers' => array());
+		$options += $defaults;
+
+		$options['handlers'] += $this->_handlers;
 		switch ($format) {
 			case 'array':
 				$data = $this->_updated;

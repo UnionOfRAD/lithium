@@ -8,9 +8,7 @@
 
 namespace lithium\tests\mocks\data\model;
 
-class MockDatabaseTagging extends \lithium\tests\mocks\data\MockBase {
-
-	public static $connection = null;
+class MockDatabaseTagging extends \lithium\data\Model {
 
 	public $belongsTo = array('MockDatabasePost', 'MockDatabaseTag');
 

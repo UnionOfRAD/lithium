@@ -102,12 +102,22 @@ abstract class Collection extends \lithium\util\Collection {
 	protected $_schema = null;
 
 	/**
+	 * Hold the "data export" handlers where the keys are fully-namespaced class
+	 * names, and the values are closures that take an instance of the class as a
+	 * parameter, and return an array or scalar value that the instance represents.
+	 *
+	 * @see lithium\data\Collection::to()
+	 * @var array
+	 */
+	protected $_handlers = array();
+
+	/**
 	 * Holds an array of values that should be processed on initialization.
 	 *
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists', 'schema'
+		'model', 'result', 'query', 'parent', 'stats', 'pathKey', 'exists', 'schema', 'handlers'
 	);
 
 	/**
@@ -527,9 +537,10 @@ abstract class Collection extends \lithium\util\Collection {
 	 *         string.
 	 */
 	public function to($format, array $options = array()) {
-		$defaults = array('internal' => false, 'indexed' => true);
+		$defaults = array('internal' => false, 'indexed' => true, 'handlers' => array());
 		$options += $defaults;
 
+		$options['handlers'] += $this->_handlers;
 		$this->offsetGet(null);
 
 		$index = $options['indexed'] || ($options['indexed'] === null && $this->_parent === null);

@@ -14,6 +14,11 @@ namespace lithium\data\entity;
  */
 class Record extends \lithium\data\Entity {
 
+	protected function _init() {
+		parent::_init();
+		$this->_handlers += array('stdClass' => function($item) { return $item; });
+	}
+
 	/**
 	 * Converts a `Record` object to another specified format.
 	 *
@@ -22,10 +27,6 @@ class Record extends \lithium\data\Entity {
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
-		$defaults = array('handlers' => array(
-			'stdClass' => function($item) { return $item; }
-		));
-		$options += $defaults;
 		return parent::to($format, $options);
 	}
 }

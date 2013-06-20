@@ -247,27 +247,10 @@ abstract class Source extends \lithium\core\Object {
 	 *         dependencies.
 	 */
 	public function configureClass($class) {
-		return array('meta' => array('key' => 'id', 'locked' => true));
-	}
-
-	/**
-	 * This method is responsible for factorying a new instance of a single entity object of correct
-	 * type, matching the current data source class.
-	 *
-	 * @param string $model A fully-namespaced class name representing the model class to which the
-	 *               `Entity` object will be bound.
-	 * @param array $data The default data with which the new `Entity` should be populated.
-	 * @param array $options Any additional options to pass to the `Entity`'s constructor
-	 * @return object Returns a new, un-saved `Entity` object bound to the model class specified
-	 *         in `$model`.
-	 */
-	public function item($model, array $data = array(), array $options = array()) {
-		$defaults = array('class' => 'entity');
-		$options += $defaults;
-
-		$class = $options['class'];
-		unset($options['class']);
-		return $this->_instance($class, compact('model', 'data') + $options);
+		return array(
+			'classes' => $this->_classes,
+			'meta' => array('key' => 'id', 'locked' => true)
+		);
 	}
 
 	/**

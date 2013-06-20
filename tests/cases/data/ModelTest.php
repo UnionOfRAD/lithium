@@ -13,6 +13,7 @@ use stdClass;
 use lithium\util\Inflector;
 use lithium\data\Model;
 use lithium\data\Schema;
+use lithium\data\Connections;
 use lithium\tests\mocks\data\MockTag;
 use lithium\tests\mocks\data\MockPost;
 use lithium\tests\mocks\data\MockComment;
@@ -23,31 +24,27 @@ use lithium\tests\mocks\data\MockProductForSchemas;
 use lithium\tests\mocks\data\MockAntiqueForSchemas;
 use lithium\tests\mocks\data\MockBadConnection;
 use lithium\tests\mocks\core\MockCallable;
+use lithium\tests\mocks\data\MockSource;
+use lithium\tests\mocks\data\model\MockDatabase;
 
 class ModelTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\MockModelCompositePk';
 
-	protected $_database = 'lithium\tests\mocks\data\MockSource';
-
 	protected $_altSchema = null;
 
 	public function setUp() {
-		$database = $this->_database;
+		Connections::add('mocksource', array('object' => new MockSource()));
+		Connections::add('mockconn', array('object' => new MockDatabase()));
 
-		$class = 'lithium\tests\mocks\data\MockPost';
-		$connection = new $database();
-		MockPost::$connection = $connection;
-		MockTag::$connection = $connection;
-		MockComment::$connection = $connection;
-		MockCreator::$connection = $connection;
+		MockPost::config(array('meta' => array('connection' => 'mocksource')));
+		MockTag::config(array('meta' => array('connection' => 'mocksource')));
+		MockComment::config(array('meta' => array('connection' => 'mocksource')));
+		MockCreator::config(array('meta' => array('connection' => 'mocksource')));
 
-		$config = MockPost::$connection->configureClass($class);
-		MockPost::config(array('meta' => array('connection' => true) + $config['meta']));
-		MockTag::config(array('meta' => array('connection' => true)));
-		MockComment::config(array('meta' => array('connection' => true)));
-		MockCreator::config(array('meta' => array('connection' => true)));
-		MockPostForValidates::config(array('meta' => array('locked' => true)));
+		MockAntiqueForSchemas::config(array('meta' => array('connection' => 'mockconn')));
+		MockProductForSchemas::config(array('meta' => array('connection' => 'mockconn')));
+		MockPostForValidates::config(array('meta' => array('connection' => 'mockconn')));
 
 		$this->_altSchema = new Schema(array(
 			'fields' => array(
@@ -60,15 +57,15 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		MockPost::$connection = null;
-		MockTag::$connection = null;
-		MockComment::$connection = null;
-		MockCreator::$connection = null;
+		Connections::remove('mocksource');
+		Connections::remove('mockconn');
 		MockPost::reset();
 		MockTag::reset();
 		MockComment::reset();
-		MockPostForValidates::reset();
 		MockCreator::reset();
+		MockAntiqueForSchemas::reset();
+		MockProductForSchemas::reset();
+		MockPostForValidates::reset();
 	}
 
 	public function testOverrideMeta() {
@@ -100,12 +97,13 @@ class ModelTest extends \lithium\test\Unit {
 
 		MockPost::config();
 		$this->assertEqual('mock_posts', MockPost::meta('source'));
-		$this->assertTrue(MockPost::meta('connection'));
+		$this->assertEqual('mocksource', MockPost::meta('connection'));
 
 		MockPost::config(array('meta' => array('source' => 'toreset')));
 		MockPost::reset();
+		MockPost::config(array('meta' => array('connection' => 'mocksource')));
 		$this->assertEqual('mock_posts', MockPost::meta('source'));
-		$this->assertFalse(MockPost::meta('connection'));
+		$this->assertEqual('mocksource', MockPost::meta('connection'));
 
 		MockPost::config(array('query' => array('with' => array('MockComment'), 'limit' => 10)));
 		$expected =  array(
@@ -123,6 +121,7 @@ class ModelTest extends \lithium\test\Unit {
 		);
 		MockPost::finder('myFinder', $finder);
 		$result = MockPost::find('myFinder');
+
 		$expected = $finder + array(
 			'order' => null,
 			'limit' => 10,
@@ -138,6 +137,7 @@ class ModelTest extends \lithium\test\Unit {
 			'fields' => array('id', 'title')
 		);
 		MockPost::reset();
+		MockPost::config(array('meta' => array('connection' => 'mocksource')));
 		$result = MockPost::finder('myFinder');
 		$this->assertNull($result);
 	}
@@ -168,32 +168,26 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testMetaInformation() {
 		$class = 'lithium\tests\mocks\data\MockPost';
-		$config = MockPost::$connection->configureClass($class);
 		$expected = compact('class') + array(
 			'name'        => 'MockPost',
 			'key'         => 'id',
 			'title'       => 'title',
 			'source'      => 'mock_posts',
-			'connection'  => true,
+			'connection'  => 'mocksource',
 			'locked'      => true
 		);
 
-		MockPost::config(array('meta' => array('connection' => true) + $config['meta']));
 		$this->assertEqual($expected, MockPost::meta());
 
 		$class = 'lithium\tests\mocks\data\MockComment';
-		$config = MockComment::$connection->configureClass($class);
 		$expected = compact('class') + array(
 			'name'        => 'MockComment',
 			'key'         => 'comment_id',
 			'title'       => 'comment_id',
 			'source'      => 'mock_comments',
-			'connection'  => true,
+			'connection'  => 'mocksource',
 			'locked'      => true
 		);
-		unset($config['meta']['key']);
-
-		MockComment::config(array('meta' => array('connection' => true) + $config['meta']));
 		$this->assertEqual($expected, MockComment::meta());
 
 		$expected += array('foo' => 'bar');
@@ -221,11 +215,13 @@ class ModelTest extends \lithium\test\Unit {
 
 	public function testInitializationInheritance() {
 		$meta = array (
-			'name' => 'MockAntiqueForSchemas',
-			'source' => 'mock_products',
-			'title' => 'name',
-			'class' => 'lithium\tests\mocks\data\MockAntiqueForSchemas',
-			'connection' => false
+			'name'       => 'MockAntiqueForSchemas',
+			'source'     => 'mock_products',
+			'title'      => 'name',
+			'class'      => 'lithium\tests\mocks\data\MockAntiqueForSchemas',
+			'connection' => 'mockconn',
+			'key'        => 'id',
+			'locked'     => true
 		);
 		$this->assertEqual($meta, MockAntiqueForSchemas::meta());
 
@@ -235,11 +231,7 @@ class ModelTest extends \lithium\test\Unit {
 
 		$this->assertCount(1, MockAntiqueForSchemas::initializers());
 
-		$config = array(
-			'query' => array(
-				'with' => array('MockCreator')
-			)
-		);
+		$config = array('query' => array('with' => array('MockCreator')));
 		MockProductForSchemas::config(compact('config'));
 		$this->assertEqual(MockProductForSchemas::query(), MockAntiqueForSchemas::query());
 
@@ -270,10 +262,6 @@ class ModelTest extends \lithium\test\Unit {
 	 * @return void
 	 */
 	public function testRelationshipIntrospection() {
-		MockPost::config(array('meta' => array('connection' => true)));
-		MockComment::config(array('meta' => array('connection' => true)));
-		MockTag::config(array('meta' => array('connection' => true)));
-
 		$result = array_keys(MockPost::relations());
 		$expected = array('MockComment');
 		$this->assertEqual($expected, $result);
@@ -696,13 +684,18 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = 'mock_creators';
 		$result = MockCreator::meta('source');
 		$this->assertEqual($expected, $result);
+
+		$creator = MockCreator::create(array('name' => 'Homer'), array('defaults' => false));
+		$expected = array(
+			'name' => 'Homer'
+		);
+		$result = $creator->data();
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testModelWithNoBackend() {
 		MockPost::reset();
 		$this->assertFalse(MockPost::meta('connection'));
-		MockPost::config(array('meta' => array('connection' => true)));
-		$this->assertTrue(MockPost::meta('connection'));
 		$schema = MockPost::schema();
 
 		MockPost::config(array('schema' => $this->_altSchema));
@@ -759,7 +752,6 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testSaveFailedWithValidationByModelDefinition() {
-		MockPostForValidates::config(array('locked' => true));
 		$post = MockPostForValidates::create();
 
 		$result = $post->save();
@@ -829,7 +821,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('delete', $query->type());
 		$this->assertEqual(array('published' => false), $query->conditions());
 
-		$keys = array_keys(array_filter($query->export(MockPost::$connection)));
+		$keys = array_keys(array_filter($query->export(MockPost::connection())));
 		$this->assertEqual(array('conditions', 'model', 'type', 'source', 'alias'), $keys);
 	}
 
@@ -839,9 +831,9 @@ class ModelTest extends \lithium\test\Unit {
 		$tag2 = MockTag::find(2);
 		$tag3 = MockTag::first(2);
 
-		$expected = $tag['query']->export(MockTag::$connection);
-		$this->assertEqual($expected, $tag2['query']->export(MockTag::$connection));
-		$this->assertEqual($expected, $tag3['query']->export(MockTag::$connection));
+		$expected = $tag['query']->export(MockTag::connection());
+		$this->assertEqual($expected, $tag2['query']->export(MockTag::connection()));
+		$this->assertEqual($expected, $tag3['query']->export(MockTag::connection()));
 
 		$tag = MockTag::find('first', array(
 			'conditions' => array('id' => 2),
@@ -850,7 +842,7 @@ class ModelTest extends \lithium\test\Unit {
 
 		$expected['return'] = 'array';
 		$this->assertTrue($tag instanceof Query);
-		$this->assertEqual($expected, $tag->export(MockTag::$connection));
+		$this->assertEqual($expected, $tag->export(MockTag::connection()));
 	}
 
 	/**

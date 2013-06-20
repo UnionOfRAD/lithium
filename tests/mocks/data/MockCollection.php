@@ -8,9 +8,12 @@
 
 namespace lithium\tests\mocks\data;
 
-class MockTag extends \lithium\data\Model {
-
-	protected $_meta = array('connection' => false);
+class MockCollection extends \lithium\data\Collection {
+	protected function _populate() {}
+	protected function _set($data = null, $offset = null, $options = array()) {
+		$this->_data[$offset] = $data;
+		return $data;
+	}
 }
 
 ?>

@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\template\helper;
 
-class MockFormPostInfo extends \lithium\tests\mocks\data\MockBase {
+class MockFormPostInfo extends \lithium\data\Model {
 
 	protected $_schema = array(
 		'id' => array('type' => 'integer'),

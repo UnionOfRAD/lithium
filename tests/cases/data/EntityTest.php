@@ -277,6 +277,19 @@ class EntityTest extends \lithium\test\Unit {
 		$this->assertFalse($entity->respondsTo('fooBarBaz'));
 	}
 
+	public function testHandlers() {
+		$handlers = array(
+			'stdClass' => function($value) { return substr($value->scalar, -1); }
+		);
+		$array = new Entity(compact('handlers') + array(
+			'data' => array(
+				'value' => (object) 'hello'
+			)
+		));
+
+		$expected = array('value' => 'o');
+		$this->assertIdentical($expected, $array->to('array', array('indexed' => false)));
+	}
 }
 
 ?>

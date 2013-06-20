@@ -109,6 +109,15 @@ class Connections extends \lithium\core\Adaptable {
 	}
 
 	/**
+	 * Removing a configuration.
+	 *
+	 * @param string $name The name by which this connection is referenced.
+	 */
+	public static function remove($name) {
+		unset(static::$_configurations[$name]);
+	}
+
+	/**
 	 * Read the configuration or access the connections you have set up.
 	 *
 	 * Usage:

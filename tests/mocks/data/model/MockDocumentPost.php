@@ -11,13 +11,9 @@ namespace lithium\tests\mocks\data\model;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 
-class MockDocumentPost extends \lithium\tests\mocks\data\MockBase {
+class MockDocumentPost extends \lithium\data\Model {
 
 	protected $_meta = array('connection' => false, 'initialized' => true, 'key' => '_id');
-
-	protected static $_connection;
-
-	public static function __init() {}
 
 	public static function schema($field = null) {
 		$schema = parent::schema();

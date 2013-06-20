@@ -8,9 +8,12 @@
 
 namespace lithium\tests\mocks\data;
 
-class MockProductForSchemas extends \lithium\tests\mocks\data\MockBase {
+class MockProductForSchemas extends \lithium\data\Model {
+
+	protected $_meta = array('connection' => false);
 
 	protected $_schema = array(
+		'id' => array('type' => 'id'),
 		'name' => array('type' => 'string', 'null' => false),
 		'price' => array('type' => 'string', 'null' => false),
 	);

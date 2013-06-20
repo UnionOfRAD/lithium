@@ -10,23 +10,28 @@ namespace lithium\tests\cases\data\entity;
 
 use MongoId;
 use MongoDate;
+use lithium\data\Connections;
 use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 use lithium\data\source\mongo_db\Schema;
 use lithium\tests\mocks\data\model\MockDocumentPost;
-use lithium\tests\mocks\data\model\MockDocumentMultipleKey;
 use lithium\tests\mocks\data\source\MockMongoConnection;
-use lithium\tests\mocks\data\model\MockDocumentSource;
 
 class DocumentTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
 	public function setUp() {
-		MockDocumentPost::$connection = new MongoDb(array('autoConnect' => false));
-		MockDocumentPost::$connection->connection = new MockMongoConnection();
-		MockDocumentMultipleKey::$connection = new MockDocumentSource();
+		$connection = new MongoDb(array('autoConnect' => false));
+		$connection->connection = new MockMongoConnection();
+		Connections::add('mockconn', array('object' => $connection));
+		MockDocumentPost::config(array('meta' => array('connection' => 'mockconn')));
+	}
+
+	public function tearDown() {
+		Connections::remove('mockconn');
+		MockDocumentPost::reset();
 	}
 
 	public function testFindAllAndIterate() {
@@ -913,6 +918,27 @@ class DocumentTest extends \lithium\test\Unit {
 		);
 		$doc = new Document(compact('data'));
 		$this->assertIdentical($data, $doc->data());
+	}
+
+	public function testHandlers() {
+		$model = $this->_model;
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'date' => array('type' => 'date')
+		)));
+		$handlers = array(
+			'MongoId' => function($value) { return substr((string) $value, -1); },
+			'MongoDate' => function($value) { return date('d/m/Y H:i', $value->sec); }
+		);
+		$array = new Document(compact('model', 'schema', 'handlers') + array(
+			'data' => array(
+				'_id' => '4cb4ab6d7addf98506010002',
+				'date' => '2013-06-06 13:00:00'
+			)
+		));
+
+		$expected = array('_id' => '2', 'date' => '06/06/2013 13:00');
+		$this->assertIdentical($expected, $array->to('array', array('indexed' => false)));
 	}
 }
 
