@@ -95,6 +95,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function configureClass($class) {
 		return array(
+			'classes' => $this->_classes,
 			'meta' => array('key' => 'id', 'locked' => false),
 			'schema' => array(
 				'id' => array('type' => 'string'),
@@ -266,8 +267,11 @@ class CouchDb extends \lithium\data\source\Http {
 				$stats = $result;
 			}
 			$stats += array('total_rows' => null, 'offset' => null);
-			$opts = compact('stats') + array('class' => 'set', 'exists' => true);
-			return $self->item($query->model(), $data, $opts);
+			$opts = compact('stats') + array(
+				'class' => 'set', 'exists' => true, 'defaults' => false
+			);
+
+			return $self->item($model, $data, $opts);
 		});
 	}
 
@@ -401,16 +405,20 @@ class CouchDb extends \lithium\data\source\Http {
 		$defaults = array('class' => 'entity');
 		$options += $defaults;
 
-		if (isset($data['doc'])) {
-			return parent::item($model, $this->_format($data['doc']), $options);
+		if ($options['class'] === 'entity') {
+			return $model::create($this->_format($data), $options);
 		}
-		if (isset($data['value'])) {
-			$data = $data['value'];
+
+		foreach ($data as $key => $value) {
+			if (isset($value['doc'])) {
+				$value = $value['doc'];
+			}
+			if (isset($value['value'])) {
+				$value = $value['value'];
+			}
+			$data[$key] = $this->_format($value);
 		}
-		if (isset($options['class']) && $options['class'] === 'entity') {
-			$data = $this->_format($data);
-		}
-		return parent::item($model, $data, $options);
+		return $model::create($data, $options);
 	}
 
 	/**
@@ -514,6 +522,7 @@ class CouchDb extends \lithium\data\source\Http {
 		}
 		return $data;
 	}
+
 }
 
 ?>

@@ -8,14 +8,12 @@
 
 namespace lithium\tests\mocks\data\model;
 
-class MockImageTag extends \lithium\tests\mocks\data\MockBase {
+class MockImageTag extends \lithium\data\Model {
 
 	public $belongsTo = array(
 		'Image' => array('to' => 'lithium\tests\mocks\data\model\MockImage'),
 		'Tag' => array('to' => 'lithium\tests\mocks\data\model\MockTag')
 	);
-
-	public static $connection = null;
 
 	protected $_meta = array(
 		'key' => 'id',

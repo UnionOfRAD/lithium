@@ -81,10 +81,9 @@ class DocumentSchema extends \lithium\data\Schema {
 			$config += compact('pathKey') + array_diff_key($options, $defaults);
 
 			if (!$pathKey && $model = $options['model']) {
-				$connection = $model::connection();
 				$exists = is_object($object) ? $object->exists() : false;
-				$config += array('class' => $class, 'exists' => $exists);
-				$val = $connection->item($model, $val, $config);
+				$config += array('class' => $class, 'exists' => $exists, 'defaults' => false);
+				$val = $model::create($val, $config);
 			} else {
 				$config['data'] = $val;
 				$val = $this->_instance($class, $config);

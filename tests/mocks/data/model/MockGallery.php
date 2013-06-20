@@ -8,7 +8,7 @@
 
 namespace lithium\tests\mocks\data\model;
 
-class MockGallery extends \lithium\tests\mocks\data\MockBase {
+class MockGallery extends \lithium\data\Model {
 
 	public $hasMany = array(
 		'Image' => array('to' => 'lithium\tests\mocks\data\model\MockImage')
@@ -16,8 +16,6 @@ class MockGallery extends \lithium\tests\mocks\data\MockBase {
 	public $belongsTo = array(
 		'Parent' => array('to' => 'lithium\tests\mocks\data\model\MockGallery')
 	);
-
-	public static $connection = null;
 
 	protected $_meta = array(
 		'key' => 'id',

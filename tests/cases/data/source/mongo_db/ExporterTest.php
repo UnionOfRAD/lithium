@@ -10,12 +10,14 @@ namespace lithium\tests\cases\data\source\mongo_db;
 
 use MongoId;
 use MongoDate;
+use lithium\data\Connections;
 use lithium\data\source\MongoDb;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 use lithium\data\source\mongo_db\Schema;
 use lithium\data\source\mongo_db\Exporter;
 use lithium\tests\mocks\data\source\mongo_db\MockResult;
+use lithium\tests\mocks\data\source\MockMongoPost;
 
 class ExporterTest extends \lithium\test\Unit {
 
@@ -65,12 +67,17 @@ class ExporterTest extends \lithium\test\Unit {
 			'binary'  => function($v) { return new MongoBinData($v); }
 		);
 		$model = $this->_model;
-		$model::$connection = new MongoDb(array('autoConnect' => false));
+		Connections::add('mockconn', array('object' => new MongoDb(array('autoConnect' => false))));
+		$model::config(array('meta' => array('connection' => 'mockconn')));
 
 		$model::schema(false);
 		$model::schema($this->_schema);
 	}
 
+	public function tearDown() {
+		Connections::remove('mockconn');
+		MockMongoPost::reset();
+	}
 	public function testInvalid() {
 		$this->assertNull(Exporter::get(null, null));
 	}

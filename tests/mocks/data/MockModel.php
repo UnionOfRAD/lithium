@@ -12,7 +12,7 @@ use lithium\tests\mocks\data\source\database\adapter\MockAdapter;
 
 class MockModel extends \lithium\data\Model {
 
-	public static function __init() {}
+	protected $_meta = array('connection' => false);
 
 	public static function &connection($records = null) {
 		$mock = new MockAdapter(compact('records') + array(

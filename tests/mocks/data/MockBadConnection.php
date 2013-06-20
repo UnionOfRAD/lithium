@@ -10,8 +10,6 @@ namespace lithium\tests\mocks\data;
 
 class MockBadConnection extends \lithium\data\Model {
 
-	public static $connection = null;
-
 	protected $_meta = array('connection' => 'bad_connection');
 }
 

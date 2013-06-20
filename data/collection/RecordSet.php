@@ -79,7 +79,8 @@ class RecordSet extends \lithium\data\Collection {
 
 	protected function _set($data = null, $offset = null, $options = array()) {
 		if ($model = $this->_model) {
-			$data = !is_object($data) ? $model::connection()->item($model, $data, $options) : $data;
+			$options += array('defaults' => false);
+			$data = !is_object($data) ? $model::create($data, $options) : $data;
 			$key = $model::key($data);
 		} else {
 			$key = $offset;
@@ -148,7 +149,7 @@ class RecordSet extends \lithium\data\Collection {
 	 * @return object Returns a `Record` object
 	 */
 	protected function _hydrateRecord($relations, $primary, $record, $min, $max, $name, &$relMap, $conn) {
-		$options = array('exists' => true);
+		$options = array('exists' => true, 'defaults' => false);
 
 		$count = count($record);
 		if (!empty($relations)) {
@@ -179,7 +180,7 @@ class RecordSet extends \lithium\data\Collection {
 						);
 					}
 					$opts = array('class' => 'set') + $options;
-					$record[$min][$name][$field] = $conn->item($primary, $rel, $opts);
+					$record[$min][$name][$field] = $relModel::create($rel, $opts);
 				} else {
 					$record[$min][$name][$field] = $this->_hydrateRecord(
 						$subrelations, $relModel, $record, $min, $max, $relName, $relMap, $conn
@@ -187,8 +188,8 @@ class RecordSet extends \lithium\data\Collection {
 				}
 			}
 		}
-		return $conn->item(
-			$primary, isset($record[$min][$name]) ? $record[$min][$name] : array(), $options
+		return $primary::create(
+			isset($record[$min][$name]) ? $record[$min][$name] : array(), $options
 		);
 	}
 

@@ -8,13 +8,30 @@
 
 namespace lithium\tests\cases\data\model;
 
+use lithium\data\Connections;
+use lithium\tests\mocks\data\model\MockDatabase;
 use lithium\data\model\Relationship;
 use lithium\tests\mocks\data\model\MockGallery;
+use lithium\tests\mocks\data\model\MockImage;
 
 class RelationshipTest extends \lithium\test\Unit {
 
 	protected $_gallery = 'lithium\tests\mocks\data\model\MockGallery';
 	protected $_image = 'lithium\tests\mocks\data\model\MockImage';
+
+	public function setUp() {
+		$this->_db = new MockDatabase();
+		Connections::add('mockconn', array('object' => $this->_db));
+
+		MockGallery::config(array('meta' => array('connection' => 'mockconn')));
+		MockImage::config(array('meta' => array('connection' => 'mockconn')));
+	}
+
+	public function testDown() {
+		Connections::remove('mockconn');
+		MockGallery::reset();
+		MockImage::reset();
+	}
 
 	public function testRespondsTo() {
 		$query = new Relationship(array(

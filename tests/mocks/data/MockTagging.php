@@ -8,9 +8,7 @@
 
 namespace lithium\tests\mocks\data;
 
-class MockTagging extends \lithium\tests\mocks\data\MockBase {
-
-	public static $connection = null;
+class MockTagging extends \lithium\data\Model {
 
 	protected $_meta = array(
 		'connection' => false,

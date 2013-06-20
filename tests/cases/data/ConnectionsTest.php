@@ -138,6 +138,20 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$this->assertInstanceOf('lithium\data\source\Mock', Connections::get(false));
 	}
 
+	public function testConnectionRemove() {
+		$result = Connections::add('conn-to-remove', array('type' => 'Mock') + $this->config);
+		$expected = $this->config + array('type' => 'Mock');
+		$this->assertEqual($expected, $result);
+
+		$result = Connections::get('conn-to-remove');
+		$this->assertInstanceOf('lithium\data\source\Mock', $result);
+
+		Connections::remove('conn-to-remove');
+
+		$result = Connections::get('conn-to-remove');
+		$this->assertNull($result);
+	}
+
 	protected function _canConnect($host, $port) {
 		$success = false;
 		set_error_handler(function() {});

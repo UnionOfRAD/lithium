@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data\collection;
 
+use lithium\data\Connections;
 use lithium\data\source\MongoDb;
 use lithium\data\source\mongo_db\Schema;
 use lithium\data\entity\Document;
@@ -22,13 +23,15 @@ class DocumentSetTest extends \lithium\test\Unit {
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
 	public function setUp() {
-		MockDocumentPost::config(array('connection' => 'mongo'));
-		MockDocumentPost::$connection = new MongoDb(array('autoConnect' => false));
-		MockDocumentPost::$connection->connection = new MockMongoConnection();
+		$connection = new MongoDb(array('autoConnect' => false));
+		$connection->connection = new MockMongoConnection();
+		Connections::add('mockconn', array('object' => $connection));
+		MockDocumentPost::config(array('meta' => array('connection' => 'mockconn')));
 	}
 
 	public function tearDown() {
-		MockDocumentPost::$connection = null;
+		Connections::remove('mockconn');
+		MockDocumentPost::reset();
 	}
 
 	public function testInitialCasting() {
@@ -190,7 +193,6 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$resource = new MockResult();
 
 		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
-		$model = $this->_model;
 
 		$result = $doc->rewind();
 		$this->assertInstanceOf('lithium\data\entity\Document', $result);
@@ -212,7 +214,6 @@ class DocumentSetTest extends \lithium\test\Unit {
 	public function testOffsetGetBackwards() {
 		$resource = new MockResult();
 		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
-		$model = $this->_model;
 
 		$expected = array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib');
 		$this->assertEqual($expected, $doc['6c8f86167675abfabdbf0302']->data());
@@ -327,6 +328,50 @@ class DocumentSetTest extends \lithium\test\Unit {
 		$doc = new Document(compact('model', 'schema', 'data'));
 		$this->assertEqual($doc, $doc->foo->parent());
 		$this->assertEqual($expected, $doc->foo[0]->data());
+	}
+
+	public function testHandlers() {
+		$model = $this->_model;
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'date' => array('type' => 'date')
+		)));
+		$handlers = array(
+			'MongoId' => function($value) { return substr((string) $value, -1); },
+			'MongoDate' => function($value) { return date('d/m/Y H:i', $value->sec); }
+		);
+		$array = new DocumentSet(compact('model', 'schema', 'handlers') + array(
+			'data' => array(
+				array(
+					'_id' => '4cb4ab6d7addf98506010002',
+					'date' => '2013-06-06 13:00:00'
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010003',
+					'date' => '2013-06-06 12:00:00'
+				),
+				array(
+					'_id' => '4cb4ab6d7addf98506010004',
+					'date' => '2013-06-06 11:00:00'
+				)
+			)
+		));
+
+		$expected = array(
+			array(
+				'_id' => '2',
+				'date' => '06/06/2013 13:00'
+			),
+			array(
+				'_id' => '3',
+				'date' => '06/06/2013 12:00'
+			),
+			array (
+				'_id' => '4',
+				'date' => '06/06/2013 11:00'
+			)
+		);
+		$this->assertIdentical($expected, $array->to('array', array('indexed' => false)));
 	}
 }
 

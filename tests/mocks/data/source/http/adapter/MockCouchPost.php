@@ -10,9 +10,7 @@ namespace lithium\tests\mocks\data\source\http\adapter;
 
 use lithium\data\DocumentSchema;
 
-class MockCouchPost extends \lithium\tests\mocks\data\MockBase {
-
-	public static $connection;
+class MockCouchPost extends \lithium\data\Model {
 
 	protected $_meta = array('source' => 'posts', 'connection' => false, 'key' => 'id');
 
