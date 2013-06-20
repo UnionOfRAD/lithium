@@ -68,6 +68,8 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 	 */
 	public function tearDown() {
 		Fixtures::clear('db');
+		Galleries::reset();
+		Images::reset();
 	}
 
 	public function testConnectWithNoDatabase() {
@@ -158,6 +160,32 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 
 		$gallery = Galleries::find('first', $opts + array('with' => 'Images'))->data();
 		$this->assertEqual(reset($expected), $gallery);
+	}
+
+	public function testOneToManyUsingSameKeyName() {
+		Fixtures::drop('db', array('galleries'));
+		$fixture = Fixtures::get('db', 'galleries');
+		$fixture->alter('change', 'id', array(
+			'to' => 'gallery_id'
+		));
+		Fixtures::save('db', array('galleries'));
+
+		Galleries::reset();
+		Galleries::config(array('meta' => array(
+			'connection' => $this->_connection, 'key' => 'gallery_id'
+		)));
+
+		$opts = array('conditions' => array('Galleries.gallery_id' => 1));
+
+		$query = new Query($opts + array(
+			'type' => 'read',
+			'model' => 'lithium\tests\fixture\model\gallery\Galleries',
+			'source' => 'galleries',
+			'alias' => 'Galleries',
+			'with' => array('Images')
+		));
+		$galleries = $this->_db->read($query);
+		$this->assertCount(3, $galleries->first()->images);
 	}
 
 	public function testUpdate() {
