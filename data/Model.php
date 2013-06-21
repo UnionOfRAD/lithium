@@ -982,13 +982,13 @@ class Model extends \lithium\core\StaticObject {
 		$defaults = array('defaults' => true, 'class' => 'entity');
 		$options += $defaults;
 		return static::_filter(__FUNCTION__, compact('data', 'options'), function($self, $params) {
-			if ($params['options']['defaults']) {
+			$class = $params['options']['class'];
+			unset($params['options']['class']);
+			if ($class === 'entity' && $params['options']['defaults']) {
 				$data = Set::merge(Set::expand($self::schema()->defaults()), $params['data']);
 			} else {
 				$data = $params['data'];
 			}
-			$class = $params['options']['class'];
-			unset($params['options']['class']);
 			$options = array('model' => $self, 'data' => $data) + $params['options'];
 			return $self::invokeMethod('_instance', array($class, $options));
 		});
