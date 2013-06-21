@@ -693,6 +693,30 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCreateCollection() {
+		MockCreator::config(array(
+			'meta' => array('key' => 'name', 'connection' => 'mockconn')
+		));
+
+		$expected = array(
+			array('name' => 'Homer'),
+			array('name' => 'Bart'),
+			array('name' => 'Marge'),
+			array('name' => 'Lisa')
+		);
+
+		$data = array();
+		foreach ($expected as $value) {
+			$data[] = MockCreator::create($value, array('defaults' => false));
+		}
+
+		$result = MockCreator::create($data, array('class' => 'set'));
+		$this->assertCount(4, $result);
+		$this->assertInstanceOf('lithium\data\collection\RecordSet', $result);
+
+		$this->assertEqual($expected, $result->to('array', array('indexed' => false)));
+	}
+
 	public function testModelWithNoBackend() {
 		MockPost::reset();
 		$this->assertFalse(MockPost::meta('connection'));
