@@ -8,9 +8,13 @@
 
 namespace lithium\tests\mocks\data;
 
-class MockAntiqueForSchemas extends \lithium\tests\mocks\data\MockProductForSchemas {
+class MockSubProduct extends \lithium\tests\mocks\data\MockProduct {
 
 	protected $_meta = array('source' => 'mock_products', 'connection' => false);
+
+	protected $_custom = array(
+		'prop2' => 'value2'
+	);
 
 	protected $_schema = array(
 		'refurb' => array('type' => 'boolean')

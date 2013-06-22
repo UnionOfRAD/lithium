@@ -20,8 +20,8 @@ use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\data\MockTagging;
 use lithium\tests\mocks\data\MockCreator;
 use lithium\tests\mocks\data\MockPostForValidates;
-use lithium\tests\mocks\data\MockProductForSchemas;
-use lithium\tests\mocks\data\MockAntiqueForSchemas;
+use lithium\tests\mocks\data\MockProduct;
+use lithium\tests\mocks\data\MockSubProduct;
 use lithium\tests\mocks\data\MockBadConnection;
 use lithium\tests\mocks\core\MockCallable;
 use lithium\tests\mocks\data\MockSource;
@@ -42,8 +42,8 @@ class ModelTest extends \lithium\test\Unit {
 		MockComment::config(array('meta' => array('connection' => 'mocksource')));
 		MockCreator::config(array('meta' => array('connection' => 'mocksource')));
 
-		MockAntiqueForSchemas::config(array('meta' => array('connection' => 'mockconn')));
-		MockProductForSchemas::config(array('meta' => array('connection' => 'mockconn')));
+		MockSubProduct::config(array('meta' => array('connection' => 'mockconn')));
+		MockProduct::config(array('meta' => array('connection' => 'mockconn')));
 		MockPostForValidates::config(array('meta' => array('connection' => 'mockconn')));
 
 		$this->_altSchema = new Schema(array(
@@ -63,8 +63,8 @@ class ModelTest extends \lithium\test\Unit {
 		MockTag::reset();
 		MockComment::reset();
 		MockCreator::reset();
-		MockAntiqueForSchemas::reset();
-		MockProductForSchemas::reset();
+		MockSubProduct::reset();
+		MockProduct::reset();
 		MockPostForValidates::reset();
 	}
 
@@ -209,35 +209,35 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testSchemaInheritance() {
-		$result = MockAntiqueForSchemas::schema();
+		$result = MockSubProduct::schema();
 		$this->assertTrue(array_key_exists('price', $result->fields()));
 	}
 
 	public function testInitializationInheritance() {
 		$meta = array (
-			'name'       => 'MockAntiqueForSchemas',
+			'name'       => 'MockSubProduct',
 			'source'     => 'mock_products',
 			'title'      => 'name',
-			'class'      => 'lithium\tests\mocks\data\MockAntiqueForSchemas',
+			'class'      => 'lithium\tests\mocks\data\MockSubProduct',
 			'connection' => 'mockconn',
 			'key'        => 'id',
 			'locked'     => true
 		);
-		$this->assertEqual($meta, MockAntiqueForSchemas::meta());
+		$this->assertEqual($meta, MockSubProduct::meta());
 
-		$this->assertArrayHasKey('MockCreator', MockAntiqueForSchemas::relations());
+		$this->assertArrayHasKey('MockCreator', MockSubProduct::relations());
 
-		$this->assertCount(3, MockAntiqueForSchemas::finders());
+		$this->assertCount(3, MockSubProduct::finders());
 
-		$this->assertCount(1, MockAntiqueForSchemas::initializers());
+		$this->assertCount(1, MockSubProduct::initializers());
 
 		$config = array('query' => array('with' => array('MockCreator')));
-		MockProductForSchemas::config(compact('config'));
-		$this->assertEqual(MockProductForSchemas::query(), MockAntiqueForSchemas::query());
+		MockProduct::config(compact('config'));
+		$this->assertEqual(MockProduct::query(), MockSubProduct::query());
 
-		$expected = array('limit' => 50) + MockProductForSchemas::query();
-		MockAntiqueForSchemas::config(array('query' => $expected));
-		$this->assertEqual($expected, MockAntiqueForSchemas::query());
+		$expected = array('limit' => 50) + MockProduct::query();
+		MockSubProduct::config(array('query' => $expected));
+		$this->assertEqual($expected, MockSubProduct::query());
 
 		MockPostForValidates::config(array(
 			'classes' => array('connections' => 'lithium\tests\mocks\data\MockConnections'),
@@ -246,6 +246,28 @@ class ModelTest extends \lithium\test\Unit {
 		$conn = MockPostForValidates::connection();
 
 		$this->assertInstanceOf('lithium\tests\mocks\core\MockCallable', $conn);
+	}
+
+	public function testCustomAttributesInheritance() {
+		$expected = array(
+			'prop1' => 'value1',
+			'prop2' => 'value2'
+		);
+		$result = MockSubProduct::attribute('_custom');
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testAttributesInheritanceWithObject() {
+		$expected = array(
+			'id' => array('type' => 'id'),
+			'title' => array('type' => 'string', 'null' => false),
+			'body' => array('type' => 'text', 'null' => false)
+		);
+		$schema = new Schema(array('fields' => $expected));
+
+		MockSubProduct::config(compact('schema'));
+		$result = MockSubProduct::schema();
+		$this->assertEqual($expected, $result->fields());
 	}
 
 	public function testFieldIntrospection() {
@@ -612,8 +634,8 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testValidationInheritance() {
-		$product = MockProductForSchemas::create();
-		$antique = MockAntiqueForSchemas::create();
+		$product = MockProduct::create();
+		$antique = MockSubProduct::create();
 
 		$errors = array(
 			'name' => array('Name cannot be empty.'),
