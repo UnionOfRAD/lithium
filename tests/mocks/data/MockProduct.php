@@ -8,9 +8,15 @@
 
 namespace lithium\tests\mocks\data;
 
-class MockProductForSchemas extends \lithium\data\Model {
+class MockProduct extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => false);
+	protected $_meta = array('source' => 'mock_products', 'connection' => false);
+
+	protected $_inherit = array('_custom');
+
+	protected $_custom = array(
+		'prop1' => 'value1'
+	);
 
 	protected $_schema = array(
 		'id' => array('type' => 'id'),
@@ -47,6 +53,11 @@ class MockProductForSchemas extends \lithium\data\Model {
 	public static function initializers() {
 		$self = static::_object();
 		return $self->_initializers;
+	}
+
+	public static function attribute($name) {
+		$self = static::_object();
+		return isset($self->$name) ? $self->$name : null;
 	}
 }
 

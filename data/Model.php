@@ -336,18 +336,12 @@ class Model extends \lithium\core\StaticObject {
 	);
 
 	/**
-	 * Holds an array of values that should be processed on `Model::config()`. Each value should
-	 * have a matching inherited public property defined in the class.
+	 * Holds an array of attributes to be inherited.
 	 *
-	 * @see lithium\data\Model::config()
+	 * @see lithium\data\Model::_getInheritedAttributes()
 	 * @var array
 	 */
-	protected $_inherit = array(
-		'validates',
-		'belongsTo',
-		'hasMany',
-		'hasOne'
-	);
+	protected $_inherit = array();
 
 	/**
 	 * Configures the model for use. This method will set the `Model::$_schema`, `Model::$_meta`,
@@ -399,7 +393,7 @@ class Model extends \lithium\core\StaticObject {
 		}
 		static::$_initialized[$class] = true;
 
-		$self->_applyInheritance($self);
+		$self->_applyAttrsInheritance();
 
 		$source = array(
 			'classes' => array(), 'meta' => array(), 'finders' => array(), 'schema' => array()
@@ -448,13 +442,11 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Merge parent class attributes to a class instance.
-	 *
-	 * @param string $self The instance to initialize.
+	 * Merge parent class attributes to the current instance.
 	 */
-	protected function _applyInheritance($self) {
-		$tmp = array_map(function($k){ return '_' . $k; }, $self->_autoConfig);
-		$inherited = array_fill_keys($tmp, array()) + array_fill_keys($self->_inherit, array());
+	protected function _applyAttrsInheritance() {
+
+		$inherited = array_fill_keys($this->_getInheritedAttrs(), array());
 
 		foreach (static::_parents() as $parent) {
 			$parentConfig = get_class_vars($parent);
@@ -462,7 +454,9 @@ class Model extends \lithium\core\StaticObject {
 			foreach ($inherited as $key => $value) {
 				if (isset($parentConfig["{$key}"])) {
 					$val = $parentConfig["{$key}"];
-					$inherited[$key] += $val;
+					if (is_array($val)) {
+						$inherited[$key] += $val;
+					}
 				}
 			}
 
@@ -471,16 +465,32 @@ class Model extends \lithium\core\StaticObject {
 			}
 		}
 
-		if (is_array($self->_schema)) {
-			$self->_schema += $inherited['_schema'];
-		}
-		unset($inherited['_schema']);
-
 		foreach ($inherited as $key => $value) {
-			$self->{$key} += $value;
+			if (is_array($this->{$key})) {
+				$this->{$key} += $value;
+			}
 		}
 	}
 
+	/**
+	 * Return inherited attributes.
+	 *
+	 * @param array
+	 */
+	protected function _getInheritedAttrs() {
+		return array_merge($this->_inherit, array(
+			'validates',
+			'belongsTo',
+			'hasMany',
+			'hasOne',
+			'_meta',
+			'_finders',
+			'_query',
+			'_schema',
+			'_classes',
+			'_initializers'
+		));
+	}
 	/**
 	 * Returns an instance of a class with given `config`. The `name` could be a key from the
 	 * `classes` array, a fully-namespaced class name, or an object. Typically this method is used
