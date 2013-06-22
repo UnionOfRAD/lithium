@@ -12,7 +12,7 @@ class MockProduct extends \lithium\data\Model {
 
 	protected $_meta = array('source' => 'mock_products', 'connection' => false);
 
-	protected $_inherit = array('_custom');
+	protected $_inherits = array('_custom');
 
 	protected $_custom = array(
 		'prop1' => 'value1'
