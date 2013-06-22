@@ -338,10 +338,10 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Holds an array of attributes to be inherited.
 	 *
-	 * @see lithium\data\Model::_getInheritedAttributes()
+	 * @see lithium\data\Model::_inherited()
 	 * @var array
 	 */
-	protected $_inherit = array();
+	protected $_inherits = array();
 
 	/**
 	 * Configures the model for use. This method will set the `Model::$_schema`, `Model::$_meta`,
@@ -393,7 +393,7 @@ class Model extends \lithium\core\StaticObject {
 		}
 		static::$_initialized[$class] = true;
 
-		$self->_applyAttrsInheritance();
+		$self->_inherit();
 
 		$source = array(
 			'classes' => array(), 'meta' => array(), 'finders' => array(), 'schema' => array()
@@ -444,9 +444,9 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Merge parent class attributes to the current instance.
 	 */
-	protected function _applyAttrsInheritance() {
+	protected function _inherit() {
 
-		$inherited = array_fill_keys($this->_getInheritedAttrs(), array());
+		$inherited = array_fill_keys($this->_inherited(), array());
 
 		foreach (static::_parents() as $parent) {
 			$parentConfig = get_class_vars($parent);
@@ -477,8 +477,8 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @param array
 	 */
-	protected function _getInheritedAttrs() {
-		return array_merge($this->_inherit, array(
+	protected function _inherited() {
+		return array_merge($this->_inherits, array(
 			'validates',
 			'belongsTo',
 			'hasMany',
