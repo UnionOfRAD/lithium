@@ -397,6 +397,27 @@ class Request extends \lithium\net\http\Request {
 			case 'HTTP_BASE':
 				$val = preg_replace('/^([^.])*/i', null, $this->env('HTTP_HOST'));
 			break;
+			case 'PHP_AUTH_USER':
+			case 'PHP_AUTH_PW':
+			case 'PHP_AUTH_DIGEST':
+				if (!$header = $this->env('HTTP_AUTHORIZATION')) {
+					if (!$header = $this->env('REDIRECT_HTTP_AUTHORIZATION')) {
+						return $this->_computed[$key] = $val;
+					}
+				}
+				if (stripos($header, 'basic') === 0) {
+					$decoded = base64_decode(substr($header, strlen('basic ')));
+
+					if (strpos($decoded, ':') !== false) {
+						list($user, $password) = explode(':', $decoded, 2);
+
+						$this->_computed['PHP_AUTH_USER'] = $user;
+						$this->_computed['PHP_AUTH_PW'] = $password;
+						return $this->_computed[$key];
+					}
+				} elseif (stripos($header, 'digest') === 0) {
+					return $this->_computed[$key] = substr($header, strlen('digest '));
+				}
 			default:
 				$val = array_key_exists($key, $this->_env) ? $this->_env[$key] : $val;
 			break;

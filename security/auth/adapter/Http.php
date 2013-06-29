@@ -25,8 +25,18 @@ use lithium\core\Libraries;
  * )))
  * }}}
  *
+ * When running PHP as a CGI/FCGI PHP doesn't automatically parse the authorization
+ * header into `PHP_AUTH_*` headers. Lithium will work arround this issue by looking for
+ * a `HTTP_AUTHORIZATION` header instead. When using PHP as a CGI/FCGI in combination
+ * with Apache you must additionally add the following rewrite rule to your configuration
+ * in order to make the header available so Lithium can pick it up:
+ * {{{
+ * RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+ * }}}
+ *
  * @link http://tools.ietf.org/html/rfc2068#section-14.8
  * @see lithium\action\Request
+ * @see lithium\action\Request::env
  */
 class Http extends \lithium\core\Object {
 
