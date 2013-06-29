@@ -14,17 +14,10 @@ use lithium\core\Libraries;
 
 class HttpTest extends \lithium\test\Unit {
 
-	public $request;
-
-	public function setUp() {
-		$this->request = new Request();
-	}
-
-	public function tearDown() {}
-
 	public function testCheckBasicIsFalse() {
+		$request = new Request();
 		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
-		$result = $http->check($this->request);
+		$result = $http->check($request);
 		$this->assertEmpty($result);
 
 		$basic = basename(Libraries::get(true, 'path'));
@@ -47,8 +40,9 @@ class HttpTest extends \lithium\test\Unit {
 	}
 
 	public function testCheckDigestIsFalse() {
+		$request = new Request();
 		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
-		$result = $http->check($this->request);
+		$result = $http->check($request);
 		$this->assertFalse($result);
 		$this->assertPattern('/Digest/', $http->headers[0]);
 		$this->assertPattern('/realm="app",/', $http->headers[0]);
