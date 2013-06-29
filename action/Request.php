@@ -406,7 +406,7 @@ class Request extends \lithium\net\http\Request {
 					}
 				}
 				if (stripos($header, 'basic') === 0) {
-					$decoded = base64_decode(substr($header, 6));
+					$decoded = base64_decode(substr($header, strlen('basic ')));
 
 					if (strpos($decoded, ':') !== false) {
 						list($user, $password) = explode(':', $decoded, 2);
@@ -416,7 +416,7 @@ class Request extends \lithium\net\http\Request {
 						return $this->_computed[$key];
 					}
 				} elseif (stripos($header, 'digest') === 0) {
-					return $this->_computed[$key] = substr($header, 7);
+					return $this->_computed[$key] = substr($header, strlen('digest '));
 				}
 			default:
 				$val = array_key_exists($key, $this->_env) ? $this->_env[$key] : $val;
