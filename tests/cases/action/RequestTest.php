@@ -246,6 +246,92 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual('123.456.789.000', $request->env('REMOTE_ADDR'));
 	}
 
+	public function testPhpAuthBasic() {
+		$request = new Request(array('env' => array(
+			'PHP_AUTH_USER' => 'test-user',
+			'PHP_AUTH_PW' => 'test-password'
+		)));
+		$this->assertEqual('test-user', $request->env('PHP_AUTH_USER'));
+		$this->assertEqual('test-password', $request->env('PHP_AUTH_PW'));
+
+		$request = new Request(array('env' => array(
+			'PHP_AUTH_USER' => 'test-user',
+			'PHP_AUTH_PW' => ''
+		)));
+		$this->assertEqual('test-user', $request->env('PHP_AUTH_USER'));
+		$this->assertNull($request->env('PHP_AUTH_PW'));
+
+		$request = new Request(array('env' => array(
+			'PHP_AUTH_USER' => '',
+			'PHP_AUTH_PW' => 'test-password'
+		)));
+		$this->assertNull($request->env('PHP_AUTH_USER'));
+		$this->assertEqual('test-password', $request->env('PHP_AUTH_PW'));
+	}
+
+	public function testCgiPhpAuthBasic() {
+		$request = new Request(array('env' => array(
+			'HTTP_AUTHORIZATION' => 'Basic dGVzdC11c2VyOnRlc3QtcGFzc3dvcmQ=',
+		)));
+		$this->assertEqual('test-user', $request->env('PHP_AUTH_USER'));
+		$this->assertEqual('test-password', $request->env('PHP_AUTH_PW'));
+
+		$request = new Request(array('env' => array(
+			'REDIRECT_HTTP_AUTHORIZATION' => 'Basic dGVzdC11c2VyOnRlc3QtcGFzc3dvcmQ=',
+		)));
+		$this->assertEqual('test-user', $request->env('PHP_AUTH_USER'));
+		$this->assertEqual('test-password', $request->env('PHP_AUTH_PW'));
+	}
+
+	public function testCgiPhpAuthBasicFailMissingPassword() {
+		$request = new Request(array('env' => array(
+			'HTTP_AUTHORIZATION' => 'Basic dGVzdC11c2VyOg==',
+		)));
+		$this->assertEqual('test-user', $request->env('PHP_AUTH_USER'));
+		$this->assertIdentical('', $request->env('PHP_AUTH_PW'));
+
+		$request = new Request(array('env' => array(
+			'HTTP_AUTHORIZATION' => 'Basic nRlc3QtcGFzc3dvcmQ=',
+		)));
+		$this->assertNull($request->env('PHP_AUTH_USER'));
+		$this->assertNull($request->env('PHP_AUTH_PW'));
+	}
+
+	public function testCgiPhpAuthBasicFailMissingPasswordAndColon() {
+		$request = new Request(array('env' => array(
+			'HTTP_AUTHORIZATION' => 'Basic dGVzdC11c2Vy',
+		)));
+		$this->assertNull($request->env('PHP_AUTH_USER'));
+		$this->assertNull($request->env('PHP_AUTH_PW'));
+	}
+
+	public function testCgiPhpAuthBasicFailMissingUser() {
+		$request = new Request(array('env' => array(
+			'HTTP_AUTHORIZATION' => 'Basic nRlc3QtcGFzc3dvcmQ=',
+		)));
+		$this->assertNull($request->env('PHP_AUTH_USER'));
+		$this->assertNull($request->env('PHP_AUTH_PW'));
+	}
+
+	public function testPhpAuthDigest() {
+		$request = new Request(array('env' => array(
+			'PHP_AUTH_DIGEST' => 'test-digest'
+		)));
+		$this->assertEqual('test-digest', $request->env('PHP_AUTH_DIGEST'));
+	}
+
+	public function testCgiPhpAuthDigest() {
+		$request = new Request(array('env' => array(
+			'HTTP_AUTHORIZATION' => 'Digest test-digest'
+		)));
+		$this->assertEqual('test-digest', $request->env('PHP_AUTH_DIGEST'));
+
+		$request = new Request(array('env' => array(
+			'REDIRECT_HTTP_AUTHORIZATION' => 'Digest test-digest'
+		)));
+		$this->assertEqual('test-digest', $request->env('PHP_AUTH_DIGEST'));
+	}
+
 	public function testBase() {
 		$request = new Request(array('env' => array('PHP_SELF' => '/index.php')));
 		$this->assertEmpty($request->env('base'));
