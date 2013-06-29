@@ -14,7 +14,7 @@ use lithium\core\Libraries;
 
 class HttpTest extends \lithium\test\Unit {
 
-	public function testCheckBasicIsFalse() {
+	public function testCheckBasicIsFalseRequestsAuth() {
 		$request = new Request();
 		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($request);
@@ -26,7 +26,7 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testCheckBasicIsTrue() {
+	public function testCheckBasicIsTrueProcessesAuthAndSucceeds() {
 		$request = new Request(array(
 			'env' => array('PHP_AUTH_USER' => 'gwoo', 'PHP_AUTH_PW' => 'li3')
 		));
@@ -39,7 +39,7 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testCheckDigestIsFalse() {
+	public function testCheckDigestIsFalseRequestsAuth() {
 		$request = new Request();
 		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($request);
@@ -50,7 +50,7 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertPattern('/nonce=/', $http->headers[0]);
 	}
 
-	public function testCheckDigestIsTrue() {
+	public function testCheckDigestIsTrueProcessesAuthAndSucceeds() {
 		$digest = 'qop="auth",nonce="4bca0fbca7bd0",';
 		$digest .= 'nc="00000001",cnonce="95b2cd1e179bf5414e52ed62811481cf",';
 		$digest .= 'uri="/http_auth",realm="app",';
