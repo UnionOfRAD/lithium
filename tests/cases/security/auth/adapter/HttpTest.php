@@ -39,6 +39,28 @@ class HttpTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCheckBasicIsTrueProcessesAuthAndSucceedsCgi() {
+		$basic = 'Z3dvbzpsaTM=';
+
+		$request = new Request(array('env' => array('HTTP_AUTHORIZATION' => "Basic {$basic}")));
+		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
+		$result = $http->check($request);
+		$this->assertNotEmpty($result);
+
+		$expected = array();
+		$result = $http->headers;
+		$this->assertEqual($expected, $result);
+
+		$request = new Request(array('env' => array('REDIRECT_HTTP_AUTHORIZATION' => "Basic {$basic}")));
+		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
+		$result = $http->check($request);
+		$this->assertNotEmpty($result);
+
+		$expected = array();
+		$result = $http->headers;
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCheckDigestIsFalseRequestsAuth() {
 		$request = new Request();
 		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
@@ -65,6 +87,37 @@ class HttpTest extends \lithium\test\Unit {
 		$expected = array();
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testCheckDigestIsTrueProcessesAuthAndSucceedsCgi() {
+		$digest  = 'qop="auth",nonce="4bca0fbca7bd0",';
+		$digest .= 'nc="00000001",cnonce="95b2cd1e179bf5414e52ed62811481cf",';
+		$digest .= 'uri="/http_auth",realm="app",';
+		$digest .= 'opaque="d3fb67a7aa4d887ec4bf83040a820a46",username="gwoo",';
+		$digest .= 'response="04d7d878c67f289f37e553d2025e3a52"';
+
+		$request = new Request(array(
+			'env' => array('HTTP_AUTHORIZATION' => "Digest {$digest}")
+		));
+		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
+		$result = $http->check($request);
+		$this->assertNotEmpty($result);
+
+		$expected = array();
+		$result = $http->headers;
+		$this->assertEqual($expected, $result);
+
+		$request = new Request(array(
+			'env' => array('REDIRECT_HTTP_AUTHORIZATION' => "Digest {$digest}")
+		));
+		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
+		$result = $http->check($request);
+		$this->assertNotEmpty($result);
+
+		$expected = array();
+		$result = $http->headers;
+		$this->assertEqual($expected, $result);
+
 	}
 }
 
