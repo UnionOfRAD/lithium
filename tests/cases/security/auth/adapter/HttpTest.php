@@ -51,11 +51,12 @@ class HttpTest extends \lithium\test\Unit {
 	}
 
 	public function testCheckDigestIsTrueProcessesAuthAndSucceeds() {
-		$digest = 'qop="auth",nonce="4bca0fbca7bd0",';
+		$digest  = 'qop="auth",nonce="4bca0fbca7bd0",';
 		$digest .= 'nc="00000001",cnonce="95b2cd1e179bf5414e52ed62811481cf",';
 		$digest .= 'uri="/http_auth",realm="app",';
 		$digest .= 'opaque="d3fb67a7aa4d887ec4bf83040a820a46",username="gwoo",';
 		$digest .= 'response="04d7d878c67f289f37e553d2025e3a52"';
+
 		$request = new Request(array('env' => array('PHP_AUTH_DIGEST' => $digest)));
 		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($request);
