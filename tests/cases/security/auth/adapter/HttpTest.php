@@ -42,7 +42,9 @@ class HttpTest extends \lithium\test\Unit {
 	public function testCheckBasicIsTrueProcessesAuthAndSucceedsCgi() {
 		$basic = 'Z3dvbzpsaTM=';
 
-		$request = new Request(array('env' => array('HTTP_AUTHORIZATION' => "Basic {$basic}")));
+		$request = new Request(array(
+			'env' => array('HTTP_AUTHORIZATION' => "Basic {$basic}")
+		));
 		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($request);
 		$this->assertNotEmpty($result);
@@ -51,7 +53,9 @@ class HttpTest extends \lithium\test\Unit {
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
 
-		$request = new Request(array('env' => array('REDIRECT_HTTP_AUTHORIZATION' => "Basic {$basic}")));
+		$request = new Request(array(
+			'env' => array('REDIRECT_HTTP_AUTHORIZATION' => "Basic {$basic}")
+		));
 		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
 		$result = $http->check($request);
 		$this->assertNotEmpty($result);
@@ -117,7 +121,6 @@ class HttpTest extends \lithium\test\Unit {
 		$expected = array();
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
-
 	}
 }
 
