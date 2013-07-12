@@ -11,7 +11,7 @@ namespace lithium\core;
 use lithium\core\Environment;
 
 /**
- * The `Configuration` class allow to store `Environement` based configurations.
+ * The `Configuration` class allow to store `Environment` based configurations.
  *
  * @see lithium\core\Environment
  */
