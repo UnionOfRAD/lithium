@@ -172,10 +172,8 @@ class Validator extends \lithium\core\StaticObject {
 
 	/**
 	 * Initializes the list of default validation rules.
-	 *
-	 * @return void
 	 */
-	public static function __init() {
+	public static function reset() {
 		$alnum = '[A-Fa-f0-9]';
 		$class = get_called_class();
 		static::$_methodFilters[$class] = array();
@@ -444,7 +442,7 @@ class Validator extends \lithium\core\StaticObject {
 	 *          will cause the validation rule to be skipped if the corresponding value
 	 *          is empty (an empty string or `null`). Defaults to `false`.
 	 *        - `'format'` _string_: If the validation rule has multiple format definitions
-	 *          (see the `add()` or `__init()` methods), the name of the format to be used
+	 *          (see the `add()` or `init()` methods), the name of the format to be used
 	 *          can be specified here. Additionally, two special values can be used:
 	 *          either `'any'`, which means that all formats will be checked and the rule
 	 *          will pass if any format passes, or `'all'`, which requires all formats to
@@ -672,4 +670,5 @@ class Validator extends \lithium\core\StaticObject {
 	}
 }
 
+Validator::reset();
 ?>

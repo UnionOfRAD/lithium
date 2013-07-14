@@ -18,18 +18,17 @@ class ResourcesValidatorTest extends \lithium\test\Integration {
 
 	public function setUp() {
 		$this->_backup['catalogConfig'] = Catalog::config();
-		Catalog::reset();
 		Catalog::config(array(
 			'lithium' => array(
 				'adapter' => 'Php',
 				'path' => Libraries::get('lithium', 'path') . '/g11n/resources/php'
 			)
 		));
-		Validator::__init();
 	}
 
 	public function tearDown() {
 		Catalog::reset();
+		Validator::reset();
 		Catalog::config($this->_backup['catalogConfig']);
 	}
 

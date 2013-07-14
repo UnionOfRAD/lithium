@@ -18,7 +18,6 @@ class CatalogInflectorTest extends \lithium\test\Integration {
 
 	public function setUp() {
 		$this->_backup['catalogConfig'] = Catalog::config();
-		Catalog::reset();
 		Catalog::config(array(
 			'runtime' => array('adapter' => new Memory())
 		));
