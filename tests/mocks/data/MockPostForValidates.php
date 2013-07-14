@@ -35,7 +35,7 @@ class MockPostForValidates extends \lithium\data\Model {
 		)
 	);
 
-	public static function __init() {
+	public static function init() {
 		$class = __CLASS__;
 		Validator::add('modelIsSet', function($value, $format, $options) use ($class) {
 			if (isset($options['model']) && $options['model'] = $class) {
@@ -45,5 +45,7 @@ class MockPostForValidates extends \lithium\data\Model {
 		});
 	}
 }
+
+MockPostForValidates::init();
 
 ?>

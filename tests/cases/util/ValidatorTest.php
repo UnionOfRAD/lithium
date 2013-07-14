@@ -13,11 +13,10 @@ use lithium\test\Mocker;
 
 class ValidatorTest extends \lithium\test\Unit {
 
-	public function setUp() {
-		Validator::__init();
-	}
+	public function setUp() {}
 
 	public function tearDown() {
+		Validator::reset();
 		Mocker::overwriteFunction(false);
 	}
 
@@ -85,7 +84,7 @@ class ValidatorTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests that the rules state is reset when calling `Validator::__init()`.
+	 * Tests that the rules state is reset when calling `Validator::reset()`.
 	 */
 	public function testStateReset() {
 		$this->assertNull(Validator::rules('foo'));
@@ -93,7 +92,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		Validator::add('foo', '/foo/');
 		$this->assertEqual('/foo/', Validator::rules('foo'));
 
-		Validator::__init();
+		Validator::reset();
 		$this->assertNull(Validator::rules('foo'));
 	}
 

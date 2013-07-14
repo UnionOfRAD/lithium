@@ -12,6 +12,7 @@ use stdClass;
 use SplFileInfo;
 use lithium\util\Inflector;
 use lithium\core\Libraries;
+use lithium\tests\mocks\core\MockInitMethod;
 
 class LibrariesTest extends \lithium\test\Unit {
 
@@ -772,6 +773,11 @@ EOD;
 
 		$result = $object->testMe();
 		$this->assertEqual('patched class', $result);
+	}
+
+	public function testDeprectatedInit() {
+		$this->expectException("/Deprecated/");
+		MockInitMethod::li3();
 	}
 }
 
