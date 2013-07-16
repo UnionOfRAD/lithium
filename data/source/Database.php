@@ -1243,7 +1243,7 @@ abstract class Database extends \lithium\data\Source {
 			$field = array($field => $direction);
 		}
 
-		if (!is_array($field)) {
+		if (!is_array($field) || empty($field)) {
 			return;
 		}
 		$result = array();
