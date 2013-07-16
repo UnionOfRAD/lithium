@@ -607,6 +607,10 @@ class DatabaseTest extends \lithium\test\Unit {
 		$result = $this->_db->order(array('author_id', "title" => "DESC"), $query);
 		$expected = 'ORDER BY {MockDatabasePost}.{author_id} ASC, {MockDatabasePost}.{title} DESC';
 		$this->assertEqual($expected, $result);
+
+		$result = $this->_db->order(array(), $query);
+		$expected = '';
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testOrderOnRelated() {
