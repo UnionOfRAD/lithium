@@ -200,15 +200,19 @@ class Message extends \lithium\net\Message {
 	public function body($data = null, $options = array()) {
 		$default = array('buffer' => null, 'encode' => false, 'decode' => false);
 		$options += $default;
-		$body = $this->body = array_filter(array_merge((array) $this->body, (array) $data));
 
-		if (empty($options['buffer']) && empty($body)) {
+		if (!empty($data)) {
+			$this->body = array_merge((array) $this->body, (array) $data);
+		}
+		$body = $this->body;
+
+		if (empty($options['buffer']) && (!$body || !array_filter(array_flip($body)))) {
 			return "";
 		}
 		if ($options['encode']) {
 			$body = $this->_encode($body);
 		}
-		$body = is_array($body) ? join("\r\n", $body) : $body;
+		$body = is_string($body) ? $body : join("\r\n", (array) $body);
 
 		if ($options['decode']) {
 			$body = $this->_decode($body);

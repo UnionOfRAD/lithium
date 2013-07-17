@@ -76,8 +76,18 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testReturnStringIfNoBufferAndEmptyBody() {
 		$this->message->type("json");
+		$result = $this->message->body("", array('encode' => true));
+		$this->assertIdentical("", $result);
+
+		$this->message->type("json");
 		$result = $this->message->body(array(""), array('encode' => true));
 		$this->assertIdentical("", $result);
+	}
+
+	public function testReturnProperlyWithEmptyValues() {
+		$this->message->type("json");
+		$result = $this->message->body(array("myvar" => ""), array('encode' => true));
+		$this->assertIdentical('{"myvar":""}', $result);
 	}
 }
 
