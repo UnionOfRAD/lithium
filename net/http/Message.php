@@ -206,7 +206,7 @@ class Message extends \lithium\net\Message {
 		}
 		$body = $this->body;
 
-		if (empty($options['buffer']) && (!$body || !array_filter(array_flip($body)))) {
+		if (empty($options['buffer']) && empty($body)) {
 			return "";
 		}
 		if ($options['encode']) {

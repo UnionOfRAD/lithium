@@ -81,7 +81,7 @@ class MessageTest extends \lithium\test\Unit {
 
 		$this->message->type("json");
 		$result = $this->message->body(array(""), array('encode' => true));
-		$this->assertIdentical("", $result);
+		$this->assertIdentical('[""]', $result);
 	}
 
 	public function testReturnProperlyWithEmptyValues() {
