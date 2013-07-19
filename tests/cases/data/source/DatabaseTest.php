@@ -101,6 +101,9 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$result = $this->_db->name("Model.name");
 		$this->assertEqual("{Model}.{name}", $result);
+
+		$result = $this->_db->name("Model.name name");
+		$this->assertEqual("{Model}.{name name}", $result);
 	}
 
 	public function testValueWithSchema() {

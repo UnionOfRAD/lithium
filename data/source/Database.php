@@ -355,7 +355,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function _splitFieldname($field) {
 		if (is_string($field)) {
-			if (preg_match('/^[a-z0-9_-]+\.([a-z0-9_-]+|\*)$/i', $field)) {
+			if (preg_match('/^[a-z0-9_-]+\.([a-z 0-9_-]+|\*)$/i', $field)) {
 				return explode('.', $field, 2);
 			}
 		}
