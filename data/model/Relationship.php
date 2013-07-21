@@ -160,13 +160,8 @@ class Relationship extends \lithium\core\Object {
 			return array();
 		}
 		$config = $this->_config;
-
 		$hasType = ($config['type'] === 'hasOne' || $config['type'] === 'hasMany');
-		if ($hasType) {
-			$related = $config['from'];
-		} else {
-			$related = $config['to'];
-		}
+		$related = Libraries::locate('models', $config[$hasType ? 'from' : 'to']);
 
 		if (!class_exists($related)) {
 			throw new ClassNotFoundException("Related model class '{$related}' not found.");
