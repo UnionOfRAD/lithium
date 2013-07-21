@@ -24,7 +24,7 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 
 	protected $_types = array();
 
-	protected $_autoConfig = array('fields', 'meta', 'locked');
+	protected $_autoConfig = array('fields', 'meta', 'locked', 'types');
 
 	public function __construct(array $config = array()) {
 		$defaults = array('fields' => array());

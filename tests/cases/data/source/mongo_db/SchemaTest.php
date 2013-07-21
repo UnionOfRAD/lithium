@@ -14,14 +14,14 @@ use lithium\data\source\mongo_db\Schema;
 
 class SchemaTest extends \lithium\test\Unit {
 
-	public $db;
+	protected $_db;
 
 	public function skip() {
 		$this->skipIf(!MongoDb::enabled(), 'MongoDb is not enabled');
 	}
 
 	public function setUp() {
-		$this->db = new MongoDb(array('autoConnect' => false));
+		$this->_db = new MongoDb(array('autoConnect' => false));
 	}
 
 	public function testCastingIdArray() {
@@ -31,7 +31,7 @@ class SchemaTest extends \lithium\test\Unit {
 		)));
 
 		$result = $schema->cast(null, null, array('users' => new MongoId()), array(
-			'database' => $this->db
+			'database' => $this->_db
 		));
 
 		$this->assertEqual(array('users'), array_keys($result->data()));
@@ -44,7 +44,7 @@ class SchemaTest extends \lithium\test\Unit {
 			'_id' => array('type' => 'id'),
 			'foo' => array('type' => 'string', 'array' => true)
 		)));
-		$result = $schema->cast(null, null, null, array('database' => $this->db));
+		$result = $schema->cast(null, null, null, array('database' => $this->_db));
 	}
 }
 
