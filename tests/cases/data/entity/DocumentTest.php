@@ -8,23 +8,19 @@
 
 namespace lithium\tests\cases\data\entity;
 
-use MongoId;
-use MongoDate;
 use lithium\data\Connections;
-use lithium\data\source\MongoDb;
+use lithium\data\DocumentSchema;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
-use lithium\data\source\mongo_db\Schema;
+use lithium\tests\mocks\data\MockDocumentSource;
 use lithium\tests\mocks\data\model\MockDocumentPost;
-use lithium\tests\mocks\data\source\MockMongoConnection;
 
 class DocumentTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
 	public function setUp() {
-		$connection = new MongoDb(array('autoConnect' => false));
-		$connection->connection = new MockMongoConnection();
+		$connection = new MockDocumentSource();
 		Connections::add('mockconn', array('object' => $connection));
 		MockDocumentPost::config(array('meta' => array('connection' => 'mockconn')));
 	}
@@ -183,7 +179,7 @@ class DocumentTest extends \lithium\test\Unit {
 	}
 
 	public function testSetAndCoerceArray() {
-		$schema = new Schema(array('fields' => array(
+		$schema = new DocumentSchema(array('fields' => array(
 			'forceArray' => array('type' => 'string', 'array' => true),
 			'array' => array('type' => 'string', 'array' => true),
 			'dictionary' => array('type' => 'string', 'array' => true),
@@ -821,19 +817,6 @@ class DocumentTest extends \lithium\test\Unit {
 		$this->assertEqual(array('evenMore' => 'foo!') + $nested['data'], $nested['update']);
 	}
 
-	public function testArrayConversion() {
-		$this->skipIf(!MongoDb::enabled(), "MongoDB not enabled, skipping conversion tests.");
-
-		$time = time();
-		$doc = new Document(array('data' => array(
-			'_id' => new MongoId(),
-			'date' => new MongoDate($time)
-		)));
-		$result = $doc->data();
-		$this->assertPattern('/^[a-f0-9]{24}$/', $result['_id']);
-		$this->assertEqual($time, $result['date']);
-	}
-
 	public function testArrayInterface() {
 		$doc = new Document();
 		$doc->field = 'value';
@@ -850,7 +833,7 @@ class DocumentTest extends \lithium\test\Unit {
 	 * Tests that unassigned fields with default schema values are auto-populated at access time.
 	 */
 	public function testSchemaValueInitialization() {
-		$doc = new Document(array('schema' => new Schema(array('fields' => array(
+		$doc = new Document(array('schema' => new DocumentSchema(array('fields' => array(
 			'foo' => array('type' => 'string', 'default' => 'bar')
 		)))));
 		$this->assertEmpty($doc->data());
@@ -877,7 +860,7 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testWithArraySchemaReusedName() {
 		$model = $this->_model;
-		$schema = new Schema(array('fields' => array(
+		$schema = new DocumentSchema(array('fields' => array(
 			'_id' => array('type' => 'id'),
 			'bar' => array('array' => true),
 			'foo' => array('type' => 'object', 'array' => true),
@@ -922,17 +905,24 @@ class DocumentTest extends \lithium\test\Unit {
 
 	public function testHandlers() {
 		$model = $this->_model;
-		$schema = new Schema(array('fields' => array(
-			'_id' => array('type' => 'id'),
-			'date' => array('type' => 'date')
-		)));
+		$schema = new DocumentSchema(array(
+			'fields' => array(
+				'_id' => array('type' => 'id'),
+				'date' => array('type' => 'date')
+			),
+			'types' => array(
+				'date' => 'date'
+			),
+			'handlers' => array(
+				'date' => function($v) { return (object) $v; },
+			)
+		));
 		$handlers = array(
-			'MongoId' => function($value) { return substr((string) $value, -1); },
-			'MongoDate' => function($value) { return date('d/m/Y H:i', $value->sec); }
+			'stdClass' => function($value) { return date('d/m/Y H:i', strtotime($value->scalar)); }
 		);
 		$array = new Document(compact('model', 'schema', 'handlers') + array(
 			'data' => array(
-				'_id' => '4cb4ab6d7addf98506010002',
+				'_id' => '2',
 				'date' => '2013-06-06 13:00:00'
 			)
 		));

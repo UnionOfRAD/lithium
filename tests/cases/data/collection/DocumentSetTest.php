@@ -9,13 +9,12 @@
 namespace lithium\tests\cases\data\collection;
 
 use lithium\data\Connections;
-use lithium\data\source\MongoDb;
-use lithium\data\source\mongo_db\Schema;
+use lithium\data\DocumentSchema;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 use lithium\tests\mocks\data\model\MockDocumentPost;
 use lithium\tests\mocks\data\source\mongo_db\MockResult;
-use lithium\tests\mocks\data\source\MockMongoConnection;
+use lithium\tests\mocks\data\MockDocumentSource;
 use lithium\util\Collection;
 
 class DocumentSetTest extends \lithium\test\Unit {
@@ -23,8 +22,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
 	public function setUp() {
-		$connection = new MongoDb(array('autoConnect' => false));
-		$connection->connection = new MockMongoConnection();
+		$connection = new MockDocumentSource();
 		Connections::add('mockconn', array('object' => $connection));
 		MockDocumentPost::config(array('meta' => array('connection' => 'mockconn')));
 	}
@@ -36,11 +34,19 @@ class DocumentSetTest extends \lithium\test\Unit {
 
 	public function testInitialCasting() {
 		$model = $this->_model;
-		$schema = new Schema(array('fields' => array(
-			'_id' => array('type' => 'id'),
-			'foo' => array('type' => 'object'),
-			'foo.bar' => array('type' => 'int')
-		)));
+		$schema = new DocumentSchema(array(
+			'fields' => array(
+				'_id' => array('type' => 'id'),
+				'foo' => array('type' => 'object'),
+				'foo.bar' => array('type' => 'int')
+			),
+			'types' => array(
+				'int' => 'integer'
+			),
+			'handlers' => array(
+				'integer' => function($v) { return (integer) $v; },
+			)
+		));
 
 		$array = new DocumentSet(compact('model', 'schema') + array(
 			'pathKey' => 'foo.bar',
@@ -55,12 +61,20 @@ class DocumentSetTest extends \lithium\test\Unit {
 	public function testInitialCastingOnSubObject() {
 		$model = $this->_model;
 
-		$schema = new Schema(array('fields' => array(
-			'_id' => array('type' => 'id'),
-			'body' => array('type' => 'string'),
-			'foo' => array('type' => 'object'),
-			'foo.bar' => array('type' => 'int')
-		)));
+		$schema = new DocumentSchema(array(
+			'fields' => array(
+				'_id' => array('type' => 'id'),
+				'body' => array('type' => 'string'),
+				'foo' => array('type' => 'object'),
+				'foo.bar' => array('type' => 'int')
+			),
+			'types' => array(
+				'int' => 'integer'
+			),
+			'handlers' => array(
+				'integer' => function($v) { return (integer) $v; },
+			)
+		));
 
 		$array = new DocumentSet(compact('model', 'schema') + array(
 			'data' => array(
@@ -83,7 +97,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 		));
 
 		foreach ($array as $document) {
-			$this->assertInstanceOf('MongoId', $document->_id);
+			$this->assertInternalType('string', $document->_id);
 			$this->assertInternalType('string', $document->body);
 			$this->assertInternalType('object', $document->foo);
 			$this->assertInternalType('string', $document->foo->bar);
@@ -110,7 +124,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 		));
 
 		foreach ($array as $document) {
-			$this->assertInstanceOf('MongoId', $document->_id);
+			$this->assertInternalType('string', $document->_id);
 			$this->assertInternalType('string', $document->body);
 			$this->assertInternalType('object', $document->foo);
 			$this->assertInternalType('int', $document->foo->bar);
@@ -166,7 +180,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 	}
 
 	public function testArrayOfObjects() {
-		$schema = new Schema();
+		$schema = new DocumentSchema();
 		$first  = (object) array('name' => 'First');
 		$second = (object) array('name' => 'Second');
 		$third  = (object) array('name' => 'Third');
@@ -196,7 +210,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 
 		$result = $doc->rewind();
 		$this->assertInstanceOf('lithium\data\entity\Document', $result);
-		$this->assertInternalType('object', $result['_id']);
+		$this->assertInternalType('string', $result['_id']);
 
 		$expected = array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar');
 		$this->assertEqual($expected, $result->data());
@@ -303,7 +317,7 @@ class DocumentSetTest extends \lithium\test\Unit {
 
 	public function testParent() {
 		$model = $this->_model;
-		$schema = new Schema(array('fields' => array(
+		$schema = new DocumentSchema(array('fields' => array(
 			'_id' => array('type' => 'id'),
 			'bar' => array('array' => true),
 			'foo' => array('type' => 'object', 'array' => true),
@@ -332,26 +346,33 @@ class DocumentSetTest extends \lithium\test\Unit {
 
 	public function testHandlers() {
 		$model = $this->_model;
-		$schema = new Schema(array('fields' => array(
-			'_id' => array('type' => 'id'),
-			'date' => array('type' => 'date')
-		)));
+		$schema = new DocumentSchema(array(
+			'fields' => array(
+				'_id' => array('type' => 'id'),
+				'date' => array('type' => 'date')
+			),
+			'types' => array(
+				'date' => 'date'
+			),
+			'handlers' => array(
+				'date' => function($v) { return (object) $v; },
+			)
+		));
 		$handlers = array(
-			'MongoId' => function($value) { return substr((string) $value, -1); },
-			'MongoDate' => function($value) { return date('d/m/Y H:i', $value->sec); }
+			'stdClass' => function($value) { return date('d/m/Y H:i', strtotime($value->scalar)); }
 		);
 		$array = new DocumentSet(compact('model', 'schema', 'handlers') + array(
 			'data' => array(
 				array(
-					'_id' => '4cb4ab6d7addf98506010002',
+					'_id' => '2',
 					'date' => '2013-06-06 13:00:00'
 				),
 				array(
-					'_id' => '4cb4ab6d7addf98506010003',
+					'_id' => '3',
 					'date' => '2013-06-06 12:00:00'
 				),
 				array(
-					'_id' => '4cb4ab6d7addf98506010004',
+					'_id' => '4',
 					'date' => '2013-06-06 11:00:00'
 				)
 			)

@@ -453,6 +453,18 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = Exporter::get('update', $doc->export());
 		$this->assertEqual($result['update'], $data);
 	}
+
+	public function testArrayConversion() {
+		$time = time();
+		$doc = new Document(array('data' => array(
+			'_id' => new MongoId(),
+			'date' => new MongoDate($time)
+		)));
+		$result = $doc->data();
+		$this->assertPattern('/^[a-f0-9]{24}$/', $result['_id']);
+		$this->assertEqual($time, $result['date']);
+	}
+
 	/**
 	 * Allow basic type field to be replaced by a `Document` / `DocumentSet` type.
 	 */
