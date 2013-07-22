@@ -10,6 +10,7 @@ namespace lithium\data\source;
 
 use MongoCode;
 use MongoRegex;
+use lithium\core\Libraries;
 use lithium\util\Inflector;
 use lithium\core\NetworkException;
 use Exception;
@@ -633,20 +634,46 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array
 	 */
 	public function relationship($class, $type, $name, array $config = array()) {
-		$key = Inflector::camelize($type === 'belongsTo' ? $class::meta('name') : $name, false);
+		$key = null;
+		$relationship = $this->_classes['relationship'];
+
+		if (!isset($config['key'])) {
+			$to = Libraries::locate('models', isset($config['to']) ? $config['to'] : $name);
+			$keys = array(array($class, $name), array($to, $class::meta('name')));
+
+			foreach ($keys as $map) {
+				list($on, $key) = $map;
+				$key = ($type === 'hasMany') ? $key : Inflector::singularize($key);
+				$key = lcfirst(Inflector::camelize($key));
+
+				if (!$on::hasField($key)) {
+					continue;
+				}
+				if ($on === $class) {
+					$config['key'] = array($key => $on::key());
+				} else {
+					$config['key'] = array($class::key() => $key);
+				}
+				$schema = $on::schema($key);
+				$isArray = (isset($schema['array']) && $schema['array'] === true);
+				$config += array(
+					'link' => $isArray ? $relationship::LINK_KEY_LIST : $relationship::LINK_KEY
+				);
+				break;
+			}
+		}
+		$key = Inflector::camelize($type === 'belongsTo' ? $name : $class::meta('name'), false);
 
 		$fieldName = $this->relationFieldName($type, $name);
 		$config += compact('name', 'type', 'key', 'fieldName');
 		$config['from'] = $class;
-		$relationship = $this->_classes['relationship'];
 
 		$defaultLinks = array(
 			'hasOne' => $relationship::LINK_EMBEDDED,
 			'hasMany' => $relationship::LINK_EMBEDDED,
 			'belongsTo' => $relationship::LINK_CONTAINED
 		);
-		$config += array('link' => $defaultLinks[$type]);
-		return new $relationship($config);
+		return $this->_instance('relationship', $config + array('link' => $defaultLinks[$type]));
 	}
 
 	/**
