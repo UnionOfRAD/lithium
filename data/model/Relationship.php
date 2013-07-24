@@ -116,6 +116,7 @@ class Relationship extends \lithium\core\Object {
 			'fields'      => true,
 			'fieldName'   => null,
 			'constraints' => array(),
+			'mode'        => 'LEFT',
 			'strategy'    => null
 		);
 		$config += $defaults;
