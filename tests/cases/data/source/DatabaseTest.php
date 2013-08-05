@@ -922,7 +922,6 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testReadConditionsWithModel() {
-		$model = $this->_model;
 		$options = array(
 			'type' => 'read',
 			'model' => $this->_model,
@@ -1062,6 +1061,40 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected .= '{mock_database_comments} AS {MockDatabaseComment} ON ';
 		$expected .= '{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id};';
 		$this->assertEqual($expected, $this->_db->sql);
+	}
+
+	public function testRelationshipModeOverwritten() {
+		$options = array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array(
+				'MockDatabaseComment' => array(
+					'mode' => 'RIGHT',
+				),
+			),
+		);
+		$result = $this->_db->read(new Query($options), $options);
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} RIGHT JOIN ';
+		$expected .= '{mock_database_comments} AS {MockDatabaseComment} ON ';
+		$expected .= '{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id};';
+		$this->assertEqual($expected, $this->_db->sql);
+	}
+
+	public function testRelationshipModeSetInModel() {
+		$model = $this->_model;
+		$instance = $model::invokeMethod('_object');
+		$instance->hasMany['MockDatabaseComment']['mode'] = 'RIGHT';
+		$options = array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array('MockDatabaseComment'),
+		);
+		$result = $this->_db->read(new Query($options), $options);
+		$expected = 'SELECT * FROM {mock_database_posts} AS {MockDatabasePost} RIGHT JOIN ';
+		$expected .= '{mock_database_comments} AS {MockDatabaseComment} ON ';
+		$expected .= '{MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id};';
+		$this->assertEqual($expected, $this->_db->sql);
+		$instance->hasMany['MockDatabaseComment']['mode'] = 'LEFT';
 	}
 
 	public function testReadWithRelationshipWithNullConstraint() {

@@ -100,6 +100,7 @@ class Relationship extends \lithium\core\Object {
 	 *          other database-native value. If an array, maps fields from the related object
 	 *          either to fields elsewhere, or to arbitrary expressions. In either case, _the
 	 *          values specified here will be literally interpreted by the database_.
+	 *        - `'mode'` _string_: Join mode to be used for this relationship.
 	 *        - `'strategy'` _\Closure_: An anonymous function used by an instantiating class,
 	 *          such as a database object, to provide additional, dynamic configuration, after
 	 *          the `Relationship` instance has finished configuring itself.
@@ -155,17 +156,22 @@ class Relationship extends \lithium\core\Object {
 	}
 
 	/**
+	 * Getter/setter for configuration.
+	 *
 	 * Returns the named configuration item, or all configuration data, if no parameter is given.
 	 *
-	 * @param string $key The name of the configuration item to return, or `null` to return all
-	 *               items.
+	 * @param string $key Key you wish to retrieve, `null` if you want all.
+	 * @param mixed $value If provided, will set the value of `$key`.
 	 * @return mixed Returns a single configuration item (mixed), or an array of all items.
 	 */
-	public function data($key = null) {
-		if (!$key) {
+	public function data($key = null, $value = false) {
+		if (!$key || !isset($this->_config[$key])) {
 			return $this->_config;
 		}
-		return isset($this->_config[$key]) ? $this->_config[$key] : null;
+		if ($value !== false) {
+			$this->_config[$key] = $value;
+		}
+		return $this->_config[$key];
 	}
 
 	/**
