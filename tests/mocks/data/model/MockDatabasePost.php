@@ -11,7 +11,9 @@ namespace lithium\tests\mocks\data\model;
 class MockDatabasePost extends \lithium\data\Model {
 
 	public $hasMany = array(
-		'MockDatabaseComment',
+		'MockDatabaseComment' => array(
+			'mode' => 'LEFT',
+		),
 		'MockDatabasePostRevision' => array(
 			'constraints' => array('MockDatabasePostRevision.deleted' => null)
 		)

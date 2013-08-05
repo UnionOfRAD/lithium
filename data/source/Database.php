@@ -212,12 +212,14 @@ abstract class Database extends \lithium\data\Source {
 						}
 
 						$constraints = array();
+						$mode = $rel->mode();
 						$alias = $name;
 						$relPath = $path ? $path . '.' . $name : $name;
 						if (isset($with[$relPath])) {
 							list($unallowed, $allowed) = Set::slice($with[$relPath], array(
 								'alias',
-								'constraints'
+								'constraints',
+								'mode',
 							));
 							if ($unallowed) {
 								$message = "Only `'alias'` and `'constraints'` are allowed in ";
@@ -227,6 +229,7 @@ abstract class Database extends \lithium\data\Source {
 							extract($with[$relPath]);
 						}
 						$to = $context->alias($alias, $relPath);
+						$mode = $rel->data('mode', $mode);
 
 						$deps[$to] = $deps[$from];
 						$deps[$to][] = $from;
@@ -236,7 +239,7 @@ abstract class Database extends \lithium\data\Source {
 								'type' => $rel->type(),
 								'model' => $rel->to(),
 								'fieldName' => $rel->fieldName(),
-								'alias' => $to
+								'alias' => $to,
 							));
 							$self->join($context, $rel, $from, $to, $constraints);
 						}
@@ -1491,8 +1494,9 @@ abstract class Database extends \lithium\data\Source {
 			$constraints = (array) $constraints;
 		}
 
-		$context->joins($toAlias, compact('constraints', 'model') + array(
-			'mode' => 'LEFT',
+		$mode = $rel->mode();
+
+		$context->joins($toAlias, compact('constraints', 'model', 'mode') + array(
 			'alias' => $toAlias
 		));
 	}
