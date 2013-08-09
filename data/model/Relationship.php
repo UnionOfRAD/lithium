@@ -98,20 +98,25 @@ class Relationship extends \lithium\core\Object {
 	 *          other database-native value. If an array, maps fields from the related object
 	 *          either to fields elsewhere, or to arbitrary expressions. In either case, _the
 	 *          values specified here will be literally interpreted by the database_.
+	 *        - `'strategy'` _closure_: An anonymous function used by an instantiating class,
+	 *          such as a database object, to provide additional, dynamic configuration, after
+	 *          the `Relationship` instance has finished configuring itself.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'name' => null,
-			'key' => array(),
-			'type' => null,
-			'to'   => null,
-			'from' => null,
-			'link' => static::LINK_KEY,
-			'fields' => true,
-			'fieldName' => null,
-			'constraints' => array()
+			'name'        => null,
+			'key'         => array(),
+			'type'        => null,
+			'to'          => null,
+			'from'        => null,
+			'link'        => static::LINK_KEY,
+			'fields'      => true,
+			'fieldName'   => null,
+			'constraints' => array(),
+			'strategy'    => null
 		);
 		$config += $defaults;
+
 		if (!$config['type'] || !$config['fieldName']) {
 			throw new ConfigException("`'type'`, `'fieldName'` and `'from'` options can't be empty.");
 		}
@@ -124,12 +129,17 @@ class Relationship extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 		$config =& $this->_config;
+
 		if (!$config['to']) {
 			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $config['name'];
 			$config['to'] = Libraries::locate('models', $assoc);
 		}
 		if (!$config['key'] || !is_array($config['key'])) {
 			$config['key'] = $this->_keys($config['key']);
+		}
+		if ($config['strategy']) {
+			$config = (array) $config['strategy']($this) + $config;
+			unset($this->_config['strategy']);
 		}
 	}
 

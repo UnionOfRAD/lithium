@@ -541,16 +541,14 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$result = $this->_db->relationship($from, 'belongsTo', 'MockPost');
 
-		$expected = array(
+		$expected = compact('to', 'from') + array(
 			'name' => 'MockPost',
 			'type' => 'belongsTo',
-			'key' => array('mockComment' => '_id'),
-			'from' => $from,
+			'key' => array(),
 			'link' => 'contained',
-			'to'   => $to,
 			'fields' => true,
 			'fieldName' => 'mockPost',
-			'constraints' => null,
+			'constraints' => array(),
 			'init' => true
 		);
 		$this->assertEqual($expected, $result->data());
