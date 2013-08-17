@@ -486,7 +486,7 @@ class Mocker {
 
 		$reflectedClass = new ReflectionClass($mocker);
 		$reflecedMethods = $reflectedClass->getMethods();
-		$getByReference = false;
+		$getByReference = true;
 		$staticApplyFilter = true;
 		$constructor = false;
 		foreach ($reflecedMethods as $methodId => $method) {
