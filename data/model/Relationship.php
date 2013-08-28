@@ -8,6 +8,7 @@
 
 namespace lithium\data\model;
 
+use lithium\util\Set;
 use lithium\core\Libraries;
 use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
@@ -126,6 +127,10 @@ class Relationship extends \lithium\core\Object {
 		parent::__construct($config);
 	}
 
+	/**
+	 * Initializes the `Relationship` object by attempting to automatically generate any values
+	 * that were not provided in the constructor configuration.
+	 */
 	protected function _init() {
 		parent::_init();
 		$config =& $this->_config;
@@ -133,7 +138,10 @@ class Relationship extends \lithium\core\Object {
 		if (!$config['to']) {
 			$assoc = preg_replace("/\\w+$/", "", $config['from']) . $config['name'];
 			$config['to'] = Libraries::locate('models', $assoc);
+		} elseif (!strpos($config['to'], '\\')) {
+			$config['to'] = preg_replace("/\\w+$/", "", $config['from']) . $config['to'];
 		}
+
 		if (!$config['key'] || !is_array($config['key'])) {
 			$config['key'] = $this->_keys($config['key']);
 		}
@@ -143,6 +151,13 @@ class Relationship extends \lithium\core\Object {
 		}
 	}
 
+	/**
+	 * Returns the named configuration item, or all configuration data, if no parameter is given.
+	 *
+	 * @param string $key The name of the configuration item to return, or `null` to return all
+	 *               items.
+	 * @return mixed Returns a single configuration item (mixed), or an array of all items.
+	 */
 	public function data($key = null) {
 		if (!$key) {
 			return $this->_config;
@@ -150,8 +165,73 @@ class Relationship extends \lithium\core\Object {
 		return isset($this->_config[$key]) ? $this->_config[$key] : null;
 	}
 
+	/**
+	 * Allows relationship configuration items to be queried by name as methods.
+	 *
+	 * @param string $name The name of the configuration item to query.
+	 * @param array $args Unused.
+	 * @return mixed Returns the value of the given configuration item.
+	 */
 	public function __call($name, $args = array()) {
 		return $this->data($name);
+	}
+
+	/**
+	 * Gets a related object (or objects) for the given object connected to it by this relationship.
+	 *
+	 * @param object $object The object to get the related data for.
+	 * @param array $options Additional options to merge into the query to be performed, where
+	 *              applicable.
+	 * @return object Returns the object(s) for this relationship.
+	 */
+	public function get($object, array $options = array()) {
+		$model = $this->to();
+		$link = $this->link();
+		$strategies = $this->_strategies();
+
+		if (!isset($strategies[$link]) || !is_callable($strategies[$link])) {
+			$msg = "Attempted to get object for invalid relationship link type `{$link}`.";
+			throw new ConfigException($msg);
+		}
+		return $strategies[$link]($object, $this, $options);
+	}
+
+	/**
+	 * Generates query parameters for a related object (or objects) for the given object
+	 * connected to it by this relationship.
+	 *
+	 * @param object $object The object to get the related data for.
+	 * @return object Returns the object(s) for this relationship.
+	 */
+	public function query($object) {
+		$conditions = (array) $this->constraints();
+
+		foreach ($this->key() as $from => $to) {
+			$conditions[$to] = $object->{$from};
+		}
+		$fields = $this->fields();
+		$fields = $fields === true ? null : $fields;
+		return compact('conditions', 'fields');
+	}
+
+	/**
+	 * Build foreign keys from primary keys array.
+	 *
+	 * @param $primaryKey An array where keys are primary keys and values are
+	 *                    the associated values of primary keys.
+	 * @return array An array where keys are foreign keys and values are
+	 *               the associated values of foreign keys.
+	 */
+	public function foreignKey($primaryKey) {
+		$result = array();
+		$entity = $this->_classes['entity'];
+		$keys = ($this->type() === 'belongsTo') ? array_flip($this->key()) : $this->key();
+		$primaryKey = ($primaryKey instanceof $entity) ? $primaryKey->to('array') : $primaryKey;
+
+		foreach ($keys as $key => $foreignKey) {
+			$result[$foreignKey] = $primaryKey[$key];
+		}
+		return $result;
 	}
 
 	/**
@@ -165,6 +245,10 @@ class Relationship extends \lithium\core\Object {
 		return is_callable(array($this, $method), true);
 	}
 
+	/**
+	 * Generates an array of relationship key pairs, where the keys are fields on the origin model,
+	 * and values are fields on the lniked model.
+	 */
 	protected function _keys($keys) {
 		if (!$keys) {
 			return array();
@@ -191,28 +275,29 @@ class Relationship extends \lithium\core\Object {
 	}
 
 	/**
-	 * Build foreign keys from primary keys array.
-	 *
-	 * @param $primaryKey An array where keys are primary keys and values are
-	 *                    the associated values of primary keys.
-	 * @return array An array where keys are foreign keys and values are
-	 *               the associated values of foreign keys.
+	 * Strategies used to query related objects, indexed by key.
 	 */
-	public function foreignKey($primaryKey) {
-		$result = array();
-		$entity = $this->_classes['entity'];
-		if ($primaryKey instanceof $entity) {
-			$primaryKey = $primaryKey->to('array');
-		}
-		if ($this->_config['type'] === 'belongsTo') {
-			$keys = array_flip($this->_config['key']);
-		} else {
-			$keys = $this->_config['key'];
-		}
-		foreach ($keys as $key => $foreignKey) {
-			$result[$foreignKey] = $primaryKey[$key];
-		}
-		return $result;
+	protected function _strategies() {
+		return array(
+			static::LINK_EMBEDDED => function($object, $relationship) {
+				$fieldName = $relationship->fieldName();
+				return $object->{$fieldName};
+			},
+			static::LINK_CONTAINED => function($object, $relationship) {
+				$isArray = ($relationship->type() === "hasMany");
+				return $isArray ? $object->parent()->parent() : $object->parent();
+			},
+			static::LINK_KEY => function($object, $relationship, $options) {
+				$model = $relationship->to();
+				$query = $relationship->query($object);
+				return $model::first(Set::merge($query, $options));
+			},
+			static::LINK_KEY_LIST  => function($object, $relationship, $options) {
+				$model = $relationship->to();
+				$query = $relationship->query($object);
+				return $model::all(Set::merge($query, $options));
+			}
+		);
 	}
 }
 
