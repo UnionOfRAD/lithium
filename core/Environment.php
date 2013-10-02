@@ -117,9 +117,13 @@ class Environment {
 	 * environment, removing any environment-specific configurations, and removing the custom
 	 * environment detector, if any has been specified.
 	 *
-	 * @return void
+	 * @param $env If set, delete the defined environment only.
 	 */
-	public static function reset() {
+	public static function reset($env = null) {
+		if ($env) {
+			unset(static::$_configurations[$env]);
+			return;
+		}
 		static::$_current = '';
 		static::$_detector = null;
 		static::$_configurations = array(

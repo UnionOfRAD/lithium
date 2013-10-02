@@ -166,7 +166,7 @@ class EnvironmentTest extends \lithium\test\Unit {
 	/**
 	 * Tests resetting the `Environment` class to its default state.
 	 */
-	public function testReset() {
+	public function testResetAll() {
 		Environment::set('test', array('foo' => 'bar'));
 		Environment::set('test');
 		$this->assertEqual('test', Environment::get());
@@ -175,6 +175,22 @@ class EnvironmentTest extends \lithium\test\Unit {
 		Environment::reset();
 		$this->assertEqual('', Environment::get());
 		$this->assertNull(Environment::get('foo'));
+	}
+
+	public function testResetASpecificEnv() {
+		Environment::set('test', array('foo' => 'bar'));
+		Environment::set('development', array('hello' => 'world'));
+
+		Environment::set('test');
+		$this->assertEqual('test', Environment::get());
+		$this->assertEqual('bar', Environment::get('foo'));
+
+		Environment::reset('test');
+		$this->assertEqual('test', Environment::get());
+		$this->assertNull(Environment::get('foo'));
+
+		Environment::set('development');
+		$this->assertEqual('world', Environment::get('hello'));
 	}
 
 	/**
