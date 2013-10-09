@@ -177,7 +177,7 @@ class Entity extends \lithium\core\Object {
 	 * @param string $value Property value.
 	 * @return mixed Result.
 	 */
-	public function __set($name, $value = null) {
+	public function __set($name, $value) {
 		if (is_array($name) && !$value) {
 			return array_map(array(&$this, '__set'), array_keys($name), array_values($name));
 		}
