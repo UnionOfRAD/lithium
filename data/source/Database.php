@@ -422,6 +422,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @return mixed Casted value
 	 */
 	protected function _cast($type, $value, $column, $schema = array()) {
+		$column = (array) $column; $schema = (array) $schema;
 		$column += array('formatter' => null, 'format' => null);
 		$schema += array('default' => null, 'null' => false);
 
