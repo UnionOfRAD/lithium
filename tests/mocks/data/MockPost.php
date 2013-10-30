@@ -22,6 +22,9 @@ class MockPost extends \lithium\data\Model {
 		return;
 	}
 
+	public function haveAnArray($someArray) {
+		return;
+	}
 }
 
 ?>
