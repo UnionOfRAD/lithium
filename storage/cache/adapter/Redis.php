@@ -75,12 +75,17 @@ class Redis extends \lithium\core\Object {
 	 *          connection when attempting to connect to the Redis server. If `true`, it will
 	 *          attempt to reuse an existing connection when connecting, and the connection will
 	 *          not close when the request is terminated. Defaults to `false`.
+	 *        - `'timeout'` _float_: A float indicating the connection timeout. Defaults to 0.0
+	 *        - `'retry'` _intiger_: A initiger indicating the delay between reconnection attempts.
+	 *          Defaults to 100.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'host' => '127.0.0.1:6379',
 			'expiry' => '+1 hour',
-			'persistent' => false
+			'persistent' => false,
+			'timeout' => 0.0,
+			'retry' => 0
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -94,11 +99,27 @@ class Redis extends \lithium\core\Object {
 		if (!$this->connection) {
 			$this->connection = new RedisCore();
 		}
-		list($ip, $port) = explode(':', $this->_config['host']);
 		$method = $this->_config['persistent'] ? 'pconnect' : 'connect';
-		$this->connection->{$method}($ip, $port);
+		list($host, $port, $timeout, $retry) = $this->_formatConnection();
+		if (strpos('/', $host) === 0) {
+			$this->connection->{$method}($host, $timeout, null, $retry);
+		} else {
+			$this->connection->{$method}($host, $port, $timeout, null, $retry);
+		}
 	}
 
+	/**
+	 * Formats standard `'host|socket[:port]'` strings into arrays used by `Redis`.
+	 *
+	 * @return array Returns an array of `Redis` connection parameters.
+	 */
+	protected function _formatConnection() {
+		return explode(':', $this->_config['host']) + array(
+			1 => -1,
+			2 => $this->_config['timeout'],
+			3 => $this->_config['retry']
+		);
+	}
 	/**
 	 * Dispatches a not-found method to the Redis connection object.
 	 *
