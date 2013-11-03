@@ -572,8 +572,8 @@ class Mocker {
 	protected static function _methodParams(ReflectionFunctionAbstract $method) {
 		$pattern = '/Parameter #[0-9]+ \[ [^\>]+>([^\]]+) \]/';
 		$replace = array(
-			'from' => array('Array', 'or NULL'),
-			'to' => array('array()', ''),
+			'from' => array(' Array', 'or NULL'),
+			'to' => array(' array()', ''),
 		);
 		preg_match_all($pattern, $method, $matches);
 		$params = implode(', ', $matches[1]);
