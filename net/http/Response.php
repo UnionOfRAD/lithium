@@ -406,7 +406,7 @@ class Response extends \lithium\net\http\Message {
 		if (stripos($this->headers('Transfer-Encoding'), 'chunked') === false) {
 			return $body;
 		}
-		$stream = fopen('data://text/plain,' . $body, 'r');
+		$stream = fopen('data://text/plain;base64,' . base64_encode($body), 'r');
 		stream_filter_append($stream, 'dechunk');
 		return trim(stream_get_contents($stream));
 	}

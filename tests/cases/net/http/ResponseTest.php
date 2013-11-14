@@ -390,6 +390,17 @@ class ResponseTest extends \lithium\test\Unit {
 		$response = new Response(compact('message'));
 		$result = $response->body();
 		$this->assertEqual($expected, $result);
+
+		$expected = '1+1 is 2, 10%40 is 20.';
+		$message = $headers . join("\r\n", array(
+			'22',
+			$expected,
+			'',
+		));
+
+		$response = new Response(compact('message'));
+		$result = $response->body();
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testTypePriority() {
