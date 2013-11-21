@@ -51,10 +51,8 @@ class Profiler extends \lithium\test\Filter {
 	/**
 	 * Verifies that the corresponding function exists for each built-in profiler check.
 	 * Initializes display formatters.
-	 *
-	 * @return void
 	 */
-	public static function __init() {
+	public static function reset() {
 		foreach (static::$_metrics as $name => $check) {
 			$function = current((array) $check['function']);
 
@@ -243,4 +241,5 @@ class Profiler extends \lithium\test\Filter {
 	}
 }
 
+Profiler::reset();
 ?>

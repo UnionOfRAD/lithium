@@ -57,49 +57,6 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	protected static $_runOptions = array();
 
 	/**
-	 * Setup basic error handling checks/types, as well as register the error and exception
-	 * handlers.
-	 *
-	 * Called on static class initialization (i.e. when first loaded).
-	 *
-	 * @return void
-	 */
-	public static function __init() {
-		static::$_checks = array(
-			'type'  => function($config, $info) {
-				return (boolean) array_filter((array) $config['type'], function($type) use ($info) {
-					return $type === $info['type'] || is_subclass_of($info['type'], $type);
-				});
-			},
-			'code' => function($config, $info) {
-				return ($config['code'] & $info['code']);
-			},
-			'stack' => function($config, $info) {
-				return (boolean) array_intersect((array) $config['stack'], $info['stack']);
-			},
-			'message' => function($config, $info) {
-				return preg_match($config['message'], $info['message']);
-			}
-		);
-		$self = get_called_class();
-
-		static::$_exceptionHandler = function($exception, $return = false) use ($self) {
-			if (ob_get_length()) {
-				ob_end_clean();
-			}
-			$info = compact('exception') + array(
-				'type' => get_class($exception),
-				'stack' => $self::trace($exception->getTrace())
-			);
-			foreach (array('message', 'file', 'line', 'trace') as $key) {
-				$method = 'get' . ucfirst($key);
-				$info[$key] = $exception->{$method}();
-			}
-			return $return ? $info : $self::handle($info);
-		};
-	}
-
-	/**
 	 * Configure the `ErrorHandler`.
 	 *
 	 * @param array $config Configuration directives.
@@ -125,7 +82,6 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 *                where the error occurred. The exception will be caught at the first point in
 	 *                the stack trace inside a matching `try`/`catch` block, or that has a matching
 	 *                error handler applied using the `apply()` method.
-	 * @return void
 	 */
 	public static function run(array $config = array()) {
 		$defaults = array('trapErrors' => false, 'convertErrors' => true);
@@ -158,8 +114,6 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	/**
 	 * Returns the state of the `ErrorHandler`, indicating whether or not custom error/exception
 	 * handers have been regsitered.
-	 *
-	 * @return void
 	 */
 	public static function isRunning() {
 		return static::$_isRunning;
@@ -169,8 +123,6 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 * Unooks `ErrorHandler`'s exception and error handlers, and restores PHP's defaults. May have
 	 * unexpected results if it is not matched with a prior call to `run()`, or if other error
 	 * handlers are set after a call to `run()`.
-	 *
-	 * @return void
 	 */
 	public static function stop() {
 		restore_error_handler();
@@ -179,16 +131,46 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Wipes out all configuration and resets the error handler to its initial state when loaded.
-	 * Mainly used for testing.
-	 *
-	 * @return void
+	 * Setup basic error handling checks/types, as well as register the error and exception
+	 * handlers and wipes out all configuration and resets the error handler to its initial state
+	 * when loaded. Mainly used for testing.
 	 */
 	public static function reset() {
 		static::$_config = array();
 		static::$_checks = array();
 		static::$_exceptionHandler = null;
-		static::__init();
+		static::$_checks = array(
+			'type'  => function($config, $info) {
+				return (boolean) array_filter((array) $config['type'], function($type) use ($info) {
+					return $type === $info['type'] || is_subclass_of($info['type'], $type);
+				});
+			},
+			'code' => function($config, $info) {
+				return ($config['code'] & $info['code']);
+			},
+			'stack' => function($config, $info) {
+				return (boolean) array_intersect((array) $config['stack'], $info['stack']);
+			},
+			'message' => function($config, $info) {
+				return preg_match($config['message'], $info['message']);
+			}
+		);
+		$self = get_called_class();
+
+		static::$_exceptionHandler = function($exception, $return = false) use ($self) {
+			if (ob_get_length()) {
+				ob_end_clean();
+			}
+			$info = compact('exception') + array(
+				'type' => get_class($exception),
+				'stack' => $self::trace($exception->getTrace())
+			);
+			foreach (array('message', 'file', 'line', 'trace') as $key) {
+				$method = 'get' . ucfirst($key);
+				$info[$key] = $exception->{$method}();
+			}
+			return $return ? $info : $self::handle($info);
+		};
 	}
 
 	/**
@@ -323,4 +305,5 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	}
 }
 
+ErrorHandler::reset();
 ?>

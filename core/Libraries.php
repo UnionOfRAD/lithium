@@ -484,9 +484,8 @@ class Libraries {
 	}
 
 	/**
-	 * Loads the class definition specified by `$class`. Also calls the `__init()` method on the
-	 * class, if defined.  Looks through the list of libraries defined in `$_configurations`, which
-	 * are added through `lithium\core\Libraries::add()`.
+	 * Loads the class definition specified by `$class`. Looks through the list of libraries
+	 * defined in `$_configurations`, which are added through `lithium\core\Libraries::add()`.
 	 *
 	 * @see lithium\core\Libraries::add()
 	 * @see lithium\core\Libraries::path()
@@ -501,7 +500,10 @@ class Libraries {
 
 		if ($path && include $path) {
 			static::$_cachedPaths[$class] = $path;
-			method_exists($class, '__init') ? $class::__init() : null;
+			if (method_exists($class, '__init')) {
+				$msg = "Deprecated `{$class}::__init()` method, needs to be called it manually.";
+				throw new RuntimeException($msg);
+			}
 		} elseif ($require) {
 			throw new RuntimeException("Failed to load class `{$class}` from path `{$path}`.");
 		}
