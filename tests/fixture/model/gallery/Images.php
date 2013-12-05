@@ -14,6 +14,7 @@ class Images extends \lithium\data\Model {
 
 	public $hasMany = array('ImagesTags', 'Comments');
 
+	protected $_meta = array('connection' => 'test');
 }
 
 ?>

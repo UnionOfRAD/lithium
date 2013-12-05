@@ -1298,7 +1298,9 @@ class Model extends \lithium\core\StaticObject {
 		if ($conn = $connections::get($name)) {
 			return $conn;
 		}
-		throw new ConfigException("The data connection `{$name}` is not configured.");
+		$class = get_called_class();
+		$msg = "The data connection `{$name}` is not configured for model `{$class}`.";
+		throw new ConfigException($msg);
 	}
 
 	/**

@@ -8,9 +8,7 @@
 
 namespace lithium\tests\fixture\model\gallery;
 
-class Galleries extends \lithium\data\Model {
-
-	public $hasMany = array('Images');
+class Comments extends \lithium\data\Model {
 
 	protected $_meta = array('connection' => 'test');
 }

@@ -12,6 +12,7 @@ class ImagesTags extends \lithium\data\Model {
 
 	public $belongsTo = array('Images', 'Tags');
 
+	protected $_meta = array('connection' => 'test');
 }
 
 ?>
