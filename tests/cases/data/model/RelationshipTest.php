@@ -143,6 +143,27 @@ class RelationshipTest extends \lithium\test\Unit {
 			'fieldName' => 'field_id'
 		));
 	}
+
+	/**
+	 * Tests that queries are correctly generated for each relationship/key type.
+	 */
+	public function testQueryGeneration() {
+		$relationship = new Relationship(array(
+			'name' => 'Users',
+			'type' => 'hasMany',
+			'link' => Relationship::LINK_KEY_LIST,
+			'from' => 'my\models\Groups',
+			'to'   => 'my\models\Users',
+			'key'  => array('users' => '_id'),
+			'fieldName' => 'users'
+		));
+
+		$this->assertNull($relationship->query((object) array()));
+
+		$keys = array(1, 2, 3);
+		$expected = array('conditions' => array('_id' => $keys), 'fields' => null);
+		$this->assertEqual($expected, $relationship->query((object) array('users' => $keys)));
+	}
 }
 
 ?>

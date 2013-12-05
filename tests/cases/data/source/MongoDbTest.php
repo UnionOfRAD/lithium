@@ -534,7 +534,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$to = 'lithium\tests\mocks\data\MockPost';
 
 		$from::config(array(
-			'meta' => array('connection' => 'mockconn'),
+			'meta' => array('connection' => 'mockconn', 'key' => '_id'),
 			'schema' => new Schema(array('fields' => array('comment_id')))
 		));
 		$to::config(array('meta' => array('key' => '_id', 'connection' => 'mockconn')));
@@ -552,6 +552,23 @@ class MongoDbTest extends \lithium\test\Unit {
 			'init' => true
 		);
 		$this->assertEqual($expected, $result->data());
+
+		$from::config(array('meta' => array('name' => 'Groups'), 'schema' => new Schema(array(
+			'fields' => array('_id' => 'id', 'users' => array('id', 'array' => true))
+		))));
+
+		$to::config(array('meta' => array('name' => 'Users'), 'schema' => new Schema(array(
+			'fields' => array('_id' => 'id', 'group' => 'id')
+		))));
+
+		$result = $this->_db->relationship($from, 'hasMany', 'Users', compact('to'));
+		$this->assertEqual('keylist', $result->link());
+		$this->assertEqual(array('users' => '_id'), $result->key());
+
+		$to::config(array('meta' => array('name' => 'Permissions')));
+		$result = $this->_db->relationship($from, 'hasMany', 'Permissions', compact('to'));
+		$this->assertEqual('key', $result->link());
+		$this->assertEqual(array('_id' => 'group'), $result->key());
 	}
 
 	public function testCreateNoConnectionException() {

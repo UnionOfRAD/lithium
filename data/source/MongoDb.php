@@ -644,21 +644,25 @@ class MongoDb extends \lithium\data\Source {
 				}
 				$result = array();
 				$to = $rel->to();
-				$keys = array(array($class, $name), array($to, $class::meta('name')));
+				$local = $class::key();
+				$className = $class::meta('name');
+
+				$keys = array(
+					array($class, $name),
+					array($to, Inflector::singularize($className)),
+					array($to, $className)
+				);
 
 				foreach ($keys as $map) {
 					list($on, $key) = $map;
-					$key = ($type === 'hasMany') ? $key : Inflector::singularize($key);
 					$key = lcfirst(Inflector::camelize($key));
 
 					if (!$on::hasField($key)) {
 						continue;
 					}
-					if ($on === $class) {
-						$result['key'] = array($key => $on::key());
-					} else {
-						$result['key'] = array($class::key() => $key);
-					}
+					$join = ($on === $class) ? array($key => $on::key()) : array($local => $key);
+					$result['key'] = $join;
+
 					if (isset($config['link'])) {
 						return $result;
 					}

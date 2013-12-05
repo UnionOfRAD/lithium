@@ -8,6 +8,7 @@
 
 namespace lithium\data\model;
 
+use Countable;
 use lithium\util\Set;
 use lithium\core\Libraries;
 use lithium\core\ConfigException;
@@ -207,7 +208,14 @@ class Relationship extends \lithium\core\Object {
 		$conditions = (array) $this->constraints();
 
 		foreach ($this->key() as $from => $to) {
+			if (!isset($object->{$from})) {
+				return null;
+			}
 			$conditions[$to] = $object->{$from};
+
+			if (is_object($conditions[$to]) && $conditions[$to] instanceof Countable) {
+				$conditions[$to] = iterator_to_array($conditions[$to]);
+			}
 		}
 		$fields = $this->fields();
 		$fields = $fields === true ? null : $fields;
@@ -290,7 +298,8 @@ class Relationship extends \lithium\core\Object {
 			static::LINK_KEY => function($object, $relationship, $options) {
 				$model = $relationship->to();
 				$query = $relationship->query($object);
-				return $model::first(Set::merge($query, $options));
+				$method = ($relationship->type() === "hasMany") ? 'all' : 'first';
+				return $model::$method(Set::merge($query, $options));
 			},
 			static::LINK_KEY_LIST  => function($object, $relationship, $options) {
 				$model = $relationship->to();
