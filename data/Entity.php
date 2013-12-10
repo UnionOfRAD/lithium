@@ -273,6 +273,15 @@ class Entity extends \lithium\core\Object {
 		return $this->_model;
 	}
 
+	/**
+	 * Returns the parent object of this object, if any.
+	 *
+	 * @return object Returns the object that contains this object, or `null`.
+	 */
+	public function parent() {
+		return $this->_parent;
+	}
+
 	public function schema($field = null) {
 		$schema = null;
 

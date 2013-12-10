@@ -642,6 +642,9 @@ class MongoDb extends \lithium\data\Source {
 				if (isset($config['key'])) {
 					return array();
 				}
+				$link = null;
+				$hasLink = isset($config['link']);
+
 				$result = array();
 				$to = $rel->to();
 				$local = $class::key();
@@ -671,11 +674,13 @@ class MongoDb extends \lithium\data\Source {
 					if ($fieldType === 'id' || $fieldType === 'MongoId') {
 						$isArray = $on::schema()->is('array', $key);
 						$link = $isArray ? $rel::LINK_KEY_LIST : $rel::LINK_KEY;
-						return compact('link') + $result;
+						break;
 					}
 				}
-				$link = $type === "belongsTo" ? $rel::LINK_CONTAINED : $rel::LINK_EMBEDDED;
-				return compact('link') + $result;
+				if (!$link && !$hasLink) {
+					$link = ($type === "belongsTo") ? $rel::LINK_CONTAINED : $rel::LINK_EMBEDDED;
+				}
+				return $result + ($hasLink ? array() : compact('link'));
 			}
 		));
 	}
