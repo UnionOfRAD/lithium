@@ -1,4 +1,5 @@
 <?php
+
 define('LITHIUM_APP_PATH', dirname(__DIR__));
 define('LITHIUM_LIBRARY_PATH', dirname(LITHIUM_APP_PATH) . '/libraries');
 
