@@ -19,8 +19,8 @@ php:
 
 before_script:
   - php tests/ci/depends.php $OPCODE_CACHE
-  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database lithium_test;'; fi"
-  - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'create database lithium_test;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database lithium_test; create database lithium_test_alternative'; fi"
+  - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'create database lithium_test; create database lithium_test_alternative' -U postgres; fi"
   - cd ..
   - mkdir libraries
   - mv lithium libraries
