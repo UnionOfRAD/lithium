@@ -48,15 +48,22 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 				'adapter' => 'Connection',
 				'connection' => $this->_connection,
 				'fixtures' => $this->_fixtures
+			),
+			'db_alternative' => array(
+				'adapter' => 'Connection',
+				'connection' => $this->_connection . '_alternative',
+				'fixtures' => $this->_fixtures
 			)
 		);
 
 		if ($this->with('PostgreSql')) {
-			$options['db']['alters']['change']['id'] = array(
-				'value' => function ($id) {
-					return (object) 'default';
-				}
-			);
+			foreach ($options as $key => &$value) {
+				$value['alters']['change']['id'] = array(
+					'value' => function ($id) {
+						return (object) 'default';
+					}
+				);
+			}
 		}
 
 		Fixtures::config($options);
@@ -250,6 +257,40 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 	public function testRemove() {
 		$this->assertTrue(Galleries::remove());
 		$this->assertTrue(Images::remove());
+	}
+
+	public function testSwitchingDatabase() {
+		$connection1 = $this->_connection;
+		$connection2 = $this->_connection . '_alternative';
+
+		$hasConnection2 = Connections::get($connection2, array(
+			'config' => true
+		));
+		$this->skipIf(!$hasConnection2, "The `'{$connection2}' connection is not configured`.");
+		$this->skipIf(!$this->with(array('MySql', 'PostgreSql', 'Sqlite3')));
+
+		parent::connect($connection2);
+		Galleries::config(array('meta' => array('connection' => $connection2)));
+
+		Fixtures::save('db_alternative');
+
+		$gallery = Galleries::create(array('name' => 'record_in_db_alternative'));
+		$gallery->save();
+
+		$expected = 3;
+		$result = Galleries::find('all')->count();
+		$this->assertEqual($expected, $result);
+
+		Fixtures::clear('db_alternative');
+
+		parent::connect($connection1);
+		Fixtures::save('db');
+
+		Galleries::config(array('meta' => array('connection' => $connection1)));
+
+		$expected = 2;
+		$result = Galleries::find('all')->count();
+		$this->assertEqual($expected, $result);
 	}
 }
 
