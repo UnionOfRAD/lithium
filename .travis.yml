@@ -11,6 +11,7 @@ env:
   - OPCODE_CACHE=apc;DB=sqlite
   - OPCODE_CACHE=apc;DB=mongodb
   - OPCODE_CACHE=apc;DB=couchdb
+  - echo 'mbstring.func_overload = 4' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 php:
   - 5.3
