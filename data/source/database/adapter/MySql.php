@@ -316,7 +316,12 @@ class MySql extends \lithium\data\source\Database {
 	protected function _execute($sql, array $options = array()) {
 		$defaults = array('buffered' => true);
 		$options += $defaults;
-		$this->connection->exec("USE  `{$this->_config['database']}`");
+
+		static $usedDatabase;
+		if ($usedDatabase != $this->_config['database']) {
+			$this->connection->exec("USE  `{$this->_config['database']}`");
+			$usedDatabase = $this->_config['database'];
+		}
 
 		$conn = $this->connection;
 
