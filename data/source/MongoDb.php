@@ -10,7 +10,6 @@ namespace lithium\data\source;
 
 use MongoCode;
 use MongoRegex;
-use lithium\core\Libraries;
 use lithium\util\Inflector;
 use lithium\core\NetworkException;
 use Exception;
@@ -652,10 +651,10 @@ class MongoDb extends \lithium\data\Source {
 
 				$keys = array(
 					array($class, $name),
+					array($class, Inflector::singularize($name)),
 					array($to, Inflector::singularize($className)),
 					array($to, $className)
 				);
-
 				foreach ($keys as $map) {
 					list($on, $key) = $map;
 					$key = lcfirst(Inflector::camelize($key));
