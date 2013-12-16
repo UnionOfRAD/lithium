@@ -16,50 +16,6 @@ foreach (explode(' ', getenv('PHP_EXT')) ?: array() as $extension) {
  * for preparing test runs.
  */
 class PhpExtensions {
-
-	/**
-	 * Holds build, configure and install instructions for PHP extensions.
-	 *
-	 * @var array Extensions to build keyed by extension name.
-	 */
-	protected static $_extensions = array(
-		'memcached' => array(
-			'ini' => array(
-				'extension=memcached.so'
-			)
-		),
-		'apc' => array(
-			'require' => array(
-				'php' => array('<', '5.5')
-			),
-			'ini' => array(
-				'extension=apc.so',
-				'apc.enabled=1',
-				'apc.enable_cli=1'
-			)
-		),
-		'xcache' => array(
-			'require' => array(
-				'php' => array('<', '5.4')
-			),
-			'build' => array(
-				'url' => 'http://xcache.lighttpd.net/pub/Releases/1.3.2/xcache-1.3.2.tar.gz',
-				'configure' => array('--enable-xcache'),
-			),
-			'ini' => array(
-				'extension=xcache.so',
-				'xcache.cacher=false',
-				'xcache.admin.enable_auth=0',
-				'xcache.var_size=1M'
-			)
-		),
-		'mongo' => array(
-			'ini' => array(
-				'extension=mongo.so'
-			)
-		)
-	);
-
 	/**
 	 * Install extension by given name.
 	 *
@@ -70,38 +26,47 @@ class PhpExtensions {
 	 * @return void
 	 */
 	public static function install($name) {
-		if (!isset(static::$_extensions[$name])) {
+		if (!method_exists('PhpExtensions', $method = "_{$name}")) {
 			return;
 		}
-		$extension = static::$_extensions[$name];
-		echo $name;
-
-		if (isset($extension['require']['php'])) {
-			$version = $extension['require']['php'];
-
-			if (!version_compare(PHP_VERSION, $version[1], $version[0])) {
-				$message = " => not installed, requires a PHP version %s %s (%s installed)\n";
-				printf($message, $version[0], $version[1], PHP_VERSION);
-				return;
-			}
-		}
-		if (isset($extension['build'])) {
-			static::_system(sprintf('wget %s > /dev/null 2>&1', $extension['build']['url']));
-			$file = basename($extension['build']['url']);
-
-			static::_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
-			$folder = basename($file, '.tgz');
-			$folder = basename($folder, '.tar.gz');
-
-			$message  = 'sh -c "cd %s && phpize && ./configure %s ';
-			$message .= '&& make && sudo make install" > /dev/null 2>&1';
-			static::_system(sprintf($message, $folder, implode(' ', $extension['build']['configure'])));
-		}
-
-		foreach ($extension['ini'] as $ini) {
-			static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
-		}
+		printf("=> installing (%s)\n", $name);
+		static::$method();
 		printf("=> installed (%s)\n", $name);
+	}
+
+	protected static function _apc() {
+		if (!static::_requirePhpVersion('<', '5.5')) {
+			return false;
+		}
+		static::_ini(array(
+			'extension=apc.so',
+			'apc.enabled=1',
+			'apc.enable_cli=1'
+		));
+	}
+
+	protected static function _memcached() {
+		static::_ini(array('extension=memcached.so'));
+	}
+
+	protected static function _xcache() {
+		if (!static::_requirePhpVersion('<', '5.4')) {
+			return false;
+		}
+		static::_build(array(
+			'url' => 'http://xcache.lighttpd.net/pub/Releases/1.3.2/xcache-1.3.2.tar.gz',
+			'configure' => array('--enable-xcache'),
+		));
+		static::_ini(array(
+			'extension=xcache.so',
+			'xcache.cacher=false',
+			'xcache.admin.enable_auth=0',
+			'xcache.var_size=1M'
+		));
+	}
+
+	protected static function _mongo() {
+		static::_ini(array('extension=mongo.so'));
 	}
 
 	/**
@@ -118,6 +83,42 @@ class PhpExtensions {
 			printf("=> Command '%s' failed !", $command);
 			exit($return);
 		}
+	}
+
+	protected static function _ini($data) {
+		foreach ($data as $ini) {
+			static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
+		}
+	}
+
+	protected static function _build($data) {
+		echo "=> building\n";
+
+		static::_system(sprintf('wget %s > /dev/null 2>&1', $data['url']));
+		$file = basename($data['url']);
+
+		static::_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
+		$folder = basename($file, '.tgz');
+		$folder = basename($folder, '.tar.gz');
+
+		$message  = 'sh -c "cd %s && phpize && ./configure %s ';
+		$message .= '&& make && sudo make install" > /dev/null 2>&1';
+		static::_system(sprintf(
+			$message, $folder, implode(' ', $data['configure'])
+		));
+
+		echo "=> built\n";
+	}
+
+	protected static function _requirePhpVersion($op, $version) {
+		if (!version_compare(PHP_VERSION, $version, $op)) {
+			printf(
+				"=> not installed, requires a PHP version %s %s (%s installed)\n",
+				$op, $version, PHP_VERSION
+			);
+			return false;
+		}
+		return true;
 	}
 }
 
