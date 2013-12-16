@@ -59,7 +59,8 @@ class String {
 	 * @link http://www.ietf.org/rfc/rfc4122.txt RFC 4122: UUID URN Namespace
 	 */
 	public static function uuid() {
-		$uuid = static::random(16);
+		$encode = ini_get('mbstring.func_overload') >= 2 ? static::ENCODE_BASE_64 : null;
+		$uuid = static::random(16, compact('encode'));
 		$uuid[6] = chr(ord($uuid[6]) & static::UUID_CLEAR_VER | static::UUID_VERSION_4);
 		$uuid[8] = chr(ord($uuid[8]) & static::UUID_CLEAR_VAR | static::UUID_VAR_RFC);
 
