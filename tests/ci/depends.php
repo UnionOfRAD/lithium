@@ -7,16 +7,8 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-$opcodeCache = getenv('OPCODE_CACHE');
-$db = getenv('DB');
-
-if ($opcodeCache == 'apc') {
-	PhpExtensions::install('apc');
-} elseif ($opcodeCache == 'xcache') {
-	PhpExtensions::install('xcache');
-}
-if ($db == 'mongodb') {
-	PhpExtensions::install('mongo');
+foreach (explode(' ', getenv('PHP_EXT')) ?: array() as $extension) {
+	PhpExtensions::install($extension);
 }
 
 /**

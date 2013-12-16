@@ -7,13 +7,13 @@ services:
 
 env:
   # Test compatiblity with opcode caches.
-  - OPCODE_CACHE=apc
-  - OPCODE_CACHE=xcache
+  - PHP_EXT=apc
+  - PHP_EXT=xcache
   # Test each database in isolation.
   - DB=mysql
   - DB=pgsql
   - DB=sqlite
-  - DB=mongodb
+  - DB=mongodb PHP_EXT=mongo
   - DB=couchdb
 
 php:
