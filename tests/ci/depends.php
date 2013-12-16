@@ -15,7 +15,9 @@ if ($opcodeCache == 'apc' && PHP_VERSION_ID < 50500) {
 } else {
 	PhpExtensions::install('xcache');
 }
-PhpExtensions::install('mongo');
+if ($db == 'mongodb') {
+	PhpExtensions::install('mongo');
+}
 
 /**
  * Class to install native PHP extensions mainly
