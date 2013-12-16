@@ -34,4 +34,4 @@ script:
   - ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases && ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration
 
 notifications:
-    irc: "irc.freenode.org#li3-core"
+  email: false
