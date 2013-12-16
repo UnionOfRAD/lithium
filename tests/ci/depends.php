@@ -12,7 +12,7 @@ $db = getenv('DB');
 
 if ($opcodeCache == 'apc' && PHP_VERSION_ID < 50500) {
 	PhpExtensions::install('apc');
-} else {
+} elseif ($opcodeCache == 'xcache') {
 	PhpExtensions::install('xcache');
 }
 if ($db == 'mongodb') {
