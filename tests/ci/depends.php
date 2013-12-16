@@ -10,7 +10,7 @@
 $opcodeCache = getenv('OPCODE_CACHE');
 $db = getenv('DB');
 
-if ($opcodeCache == 'apc' && PHP_VERSION_ID < 50500) {
+if ($opcodeCache == 'apc') {
 	PhpExtensions::install('apc');
 } elseif ($opcodeCache == 'xcache') {
 	PhpExtensions::install('xcache');
@@ -37,6 +37,9 @@ class PhpExtensions {
 			)
 		),
 		'apc' => array(
+			'require' => array(
+				'php' => array('<', '5.5')
+			),
 			'ini' => array(
 				'extension=apc.so',
 				'apc.enabled=1',
