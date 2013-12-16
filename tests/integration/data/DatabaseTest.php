@@ -267,11 +267,16 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$connection1 = $this->_connection;
 		$connection2 = $this->_connection . '_alternative';
 
-		$hasConnection2 = Connections::get($connection2, array(
-			'config' => true
-		));
-		$this->skipIf(!$hasConnection2, "The `'{$connection2}' connection is not configured`.");
+		$connectionConfig1 = Connections::get($connection1, array('config' => true));
+		$connectionConfig2 = Connections::get($connection2, array('config' => true));
+
+		parent::connect($connection2);
+		$this->skipIf(!$connectionConfig2, "The `'{$connection2}' connection is not available`.");
 		$this->skipIf(!$this->with(array('MySql', 'PostgreSql', 'Sqlite3')));
+
+		$bothInMemory = $connectionConfig1['database'] == ':memory:';
+		$bothInMemory = $bothInMemory && $connectionConfig2['database'] == ':memory:';
+		$this->skipIf($bothInMemory, 'Cannot use two connections with in memory databases');
 
 		Galleries::config(array('meta' => array('connection' => $connection1)));
 
@@ -305,11 +310,16 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$connection1 = $this->_connection;
 		$connection2 = $this->_connection . '_alternative';
 
-		$hasConnection2 = Connections::get($connection2, array(
-			'config' => true
-		));
-		$this->skipIf(!$hasConnection2, "The `'{$connection2}' connection is not configured`.");
+		$connectionConfig1 = Connections::get($connection1, array('config' => true));
+		$connectionConfig2 = Connections::get($connection2, array('config' => true));
+
+		parent::connect($connection2);
+		$this->skipIf(!$connectionConfig2, "The `'{$connection2}' connection is not available`.");
 		$this->skipIf(!$this->with(array('MySql', 'PostgreSql', 'Sqlite3')));
+
+		$bothInMemory = $connectionConfig1['database'] == ':memory:';
+		$bothInMemory = $bothInMemory && $connectionConfig2['database'] == ':memory:';
+		$this->skipIf($bothInMemory, 'Cannot use two connections with in memory databases');
 
 		Fixtures::save('db_alternative');
 
