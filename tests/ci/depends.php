@@ -32,17 +32,11 @@ class PhpExtensions {
 	 */
 	protected static $_extensions = array(
 		'memcached' => array(
-			'url' => false,
-			'require' => array(),
-			'configure' => array(),
 			'ini' => array(
 				'extension=memcached.so'
 			)
 		),
 		'apc' => array(
-			'url' => false,
-			'require' => array(),
-			'configure' => array(),
 			'ini' => array(
 				'extension=apc.so',
 				'apc.enabled=1',
@@ -50,11 +44,13 @@ class PhpExtensions {
 			)
 		),
 		'xcache' => array(
-			'url' => 'http://xcache.lighttpd.net/pub/Releases/1.3.2/xcache-1.3.2.tar.gz',
 			'require' => array(
 				'php' => array('<', '5.4')
 			),
-			'configure' => array('--enable-xcache'),
+			'build' => array(
+				'url' => 'http://xcache.lighttpd.net/pub/Releases/1.3.2/xcache-1.3.2.tar.gz',
+				'configure' => array('--enable-xcache'),
+			),
 			'ini' => array(
 				'extension=xcache.so',
 				'xcache.cacher=false',
@@ -63,9 +59,6 @@ class PhpExtensions {
 			)
 		),
 		'mongo' => array(
-			'url' => false,
-			'require' => array(),
-			'configure' => array(),
 			'ini' => array(
 				'extension=mongo.so'
 			)
@@ -97,9 +90,9 @@ class PhpExtensions {
 				return;
 			}
 		}
-		if ($extension['url']) {
-			static::_system(sprintf('wget %s > /dev/null 2>&1', $extension['url']));
-			$file = basename($extension['url']);
+		if (isset($extension['build'])) {
+			static::_system(sprintf('wget %s > /dev/null 2>&1', $extension['build']['url']));
+			$file = basename($extension['build']['url']);
 
 			static::_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
 			$folder = basename($file, '.tgz');
@@ -107,7 +100,7 @@ class PhpExtensions {
 
 			$message  = 'sh -c "cd %s && phpize && ./configure %s ';
 			$message .= '&& make && sudo make install" > /dev/null 2>&1';
-			static::_system(sprintf($message, $folder, implode(' ', $extension['configure'])));
+			static::_system(sprintf($message, $folder, implode(' ', $extension['build']['configure'])));
 		}
 
 		foreach ($extension['ini'] as $ini) {
