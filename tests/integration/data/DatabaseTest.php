@@ -259,6 +259,10 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$this->assertTrue(Images::remove());
 	}
 
+	/**
+	 * Prove that one model's connection can be switched while
+	 * keeping on working upon the correct databases.
+	 */
 	public function testSwitchingDatabaseOnModel() {
 		$connection1 = $this->_connection;
 		$connection2 = $this->_connection . '_alternative';
@@ -293,6 +297,10 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		Fixtures::clear('db_alternative');
 	}
 
+	/**
+	 * Prove that two distinct models each having a different connection to a different
+	 * database are working independently upon the correct databases.
+	 */
 	public function testSwitchingDatabaseDistinctModels() {
 		$connection1 = $this->_connection;
 		$connection2 = $this->_connection . '_alternative';
