@@ -292,6 +292,55 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 
 		Fixtures::clear('db_alternative');
 	}
+
+	public function testSwitchingDatabaseDistinctModels() {
+		$connection1 = $this->_connection;
+		$connection2 = $this->_connection . '_alternative';
+
+		$hasConnection2 = Connections::get($connection2, array(
+			'config' => true
+		));
+		$this->skipIf(!$hasConnection2, "The `'{$connection2}' connection is not configured`.");
+		$this->skipIf(!$this->with(array('MySql', 'PostgreSql', 'Sqlite3')));
+
+		Fixtures::save('db_alternative');
+
+		Galleries::config(array('meta' => array('connection' => $connection1)));
+		Images::config(array('meta' => array('connection' => $connection1)));
+
+		$galleriesCountOriginal = Galleries::find('count');
+		$imagesCountOriginal = Images::find('count');
+
+		$gallery = Galleries::create(array('name' => 'record_in_db'));
+		$gallery->save();
+
+		$image = Images::find('first', array('conditions' => array('id' => 1)));
+		$image->delete();
+
+		Galleries::config(array('meta' => array('connection' => $connection2)));
+		Images::config(array('meta' => array('connection' => $connection2)));
+
+		$expected = $imagesCountOriginal;
+		$result = Images::find('count');
+		$this->assertEqual($expected, $result);
+
+		$expected = $galleriesCountOriginal;
+		$result = Galleries::find('count');
+		$this->assertEqual($expected, $result);
+
+		Galleries::config(array('meta' => array('connection' => $connection1)));
+		Images::config(array('meta' => array('connection' => $connection1)));
+
+		$expected = $galleriesCountOriginal + 1;
+		$result = Galleries::find('count');
+		$this->assertEqual($expected, $result);
+
+		$expected = $imagesCountOriginal - 1;
+		$result = Images::find('count');
+		$this->assertEqual($expected, $result);
+
+		Fixtures::clear('db_alternative');
+	}
 }
 
 ?>
