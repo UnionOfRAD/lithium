@@ -318,20 +318,8 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$image->delete();
 
 		Galleries::config(array('meta' => array('connection' => $connection2)));
-		Images::config(array('meta' => array('connection' => $connection2)));
-
-		$expected = $imagesCountOriginal;
-		$result = Images::find('count');
-		$this->assertEqual($expected, $result);
 
 		$expected = $galleriesCountOriginal;
-		$result = Galleries::find('count');
-		$this->assertEqual($expected, $result);
-
-		Galleries::config(array('meta' => array('connection' => $connection1)));
-		Images::config(array('meta' => array('connection' => $connection1)));
-
-		$expected = $galleriesCountOriginal + 1;
 		$result = Galleries::find('count');
 		$this->assertEqual($expected, $result);
 
