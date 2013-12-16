@@ -32,7 +32,7 @@ class PhpExtensions {
 	 */
 	protected static $_extensions = array(
 		'memcached' => array(
-			'url' => 'http://pecl.php.net/get/memcached-2.0.1.tgz',
+			'url' => false,
 			'require' => array(),
 			'configure' => array(),
 			'ini' => array(
@@ -40,7 +40,7 @@ class PhpExtensions {
 			)
 		),
 		'apc' => array(
-			'url' => 'http://pecl.php.net/get/APC-3.1.10.tgz',
+			'url' => false,
 			'require' => array(),
 			'configure' => array(),
 			'ini' => array(
@@ -63,7 +63,7 @@ class PhpExtensions {
 			)
 		),
 		'mongo' => array(
-			'url' => 'http://pecl.php.net/get/mongo-1.2.7.tgz',
+			'url' => false,
 			'require' => array(),
 			'configure' => array(),
 			'ini' => array(
@@ -97,22 +97,23 @@ class PhpExtensions {
 				return;
 			}
 		}
+		if ($extension['url']) {
+			static::_system(sprintf('wget %s > /dev/null 2>&1', $extension['url']));
+			$file = basename($extension['url']);
 
-		static::_system(sprintf('wget %s > /dev/null 2>&1', $extension['url']));
-		$file = basename($extension['url']);
+			static::_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
+			$folder = basename($file, '.tgz');
+			$folder = basename($folder, '.tar.gz');
 
-		static::_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
-		$folder = basename($file, '.tgz');
-		$folder = basename($folder, '.tar.gz');
-
-		$message  = 'sh -c "cd %s && phpize && ./configure %s ';
-		$message .= '&& make && sudo make install" > /dev/null 2>&1';
-		static::_system(sprintf($message, $folder, implode(' ', $extension['configure'])));
+			$message  = 'sh -c "cd %s && phpize && ./configure %s ';
+			$message .= '&& make && sudo make install" > /dev/null 2>&1';
+			static::_system(sprintf($message, $folder, implode(' ', $extension['configure'])));
+		}
 
 		foreach ($extension['ini'] as $ini) {
 			static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
 		}
-		printf("=> installed (%s)\n", $folder);
+		printf("=> installed (%s)\n", $name);
 	}
 
 	/**
