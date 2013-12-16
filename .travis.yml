@@ -31,7 +31,8 @@ before_script:
   - cp ../libraries/lithium/tests/ci/config/bootstrap.$DB.php config/bootstrap.php
 
 script:
-  - ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases && ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration
+  - ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases
+  - ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration
 
 notifications:
   email: false
