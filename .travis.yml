@@ -32,7 +32,7 @@ before_script:
   - mkdir -p ci/config
   - cd ci
   - cp ../libraries/lithium/tests/ci/config/libraries.php config/libraries.php
-  - cp ../libraries/lithium/tests/ci/config/bootstrap.$DB.php config/bootstrap.php
+  - cp ../libraries/lithium/tests/ci/config/bootstrap.php config/bootstrap.php
 
 script:
   - ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases
