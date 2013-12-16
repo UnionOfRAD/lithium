@@ -6,11 +6,15 @@ services:
   - couchdb
 
 env:
-  - OPCODE_CACHE=apc;DB=mysql
-  - OPCODE_CACHE=apc;DB=pgsql
-  - OPCODE_CACHE=apc;DB=sqlite
-  - OPCODE_CACHE=apc;DB=mongodb
-  - OPCODE_CACHE=apc;DB=couchdb
+  # Test compatiblity with opcode caches.
+  - OPCODE_CACHE=apc
+  - OPCODE_CACHE=xcache
+  # Test each database in isolation.
+  - DB=mysql
+  - DB=pgsql
+  - DB=sqlite
+  - DB=mongodb
+  - DB=couchdb
 
 php:
   - 5.3
