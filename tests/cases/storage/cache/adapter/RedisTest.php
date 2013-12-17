@@ -393,7 +393,6 @@ class RedisTest extends \lithium\test\Unit {
 	}
 
 	public function testMethodDispatch() {
-
 		$this->_redis->flushdb();
 		$this->_redis->set('some_key', 'somevalue');
 
@@ -401,7 +400,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($result, array('some_key'), 'redis method dispatch failed');
 
 		$result = $this->redis->info();
-		$this->assertInternalType('array', $assertInternalType, 'redis method dispatch failed');
+		$this->assertInternalType('array', $result, 'redis method dispatch failed');
 	}
 
 	public function testRespondsTo() {
