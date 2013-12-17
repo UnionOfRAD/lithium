@@ -8,7 +8,7 @@ services:
 
 env:
   # Run one build with as many enabled and compatible extensions as possible.
-  - PHP_EXT="redis"
+  - PHP_EXT="memcached redis"
   # Test compatiblity with opcode caches in isolation.
   - PHP_EXT=apc
   - PHP_EXT=xcache
