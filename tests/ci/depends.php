@@ -7,107 +7,83 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-if (isset($argv[1]) && 'APC' === strtoupper($argv[1]) && PHP_VERSION_ID < 50500) {
-	PhpExtensions::install('apc');
-} else {
-	PhpExtensions::install('xcache');
+foreach (explode(' ', getenv('PHP_EXT')) ?: array() as $extension) {
+	PhpExtensions::install($extension);
 }
-PhpExtensions::install('mongo');
 
 /**
- * Class to install native PHP extensions mainly
- * for preparing test runs.
+ * Class to install native PHP extensions mainly for preparing test runs.
  */
 class PhpExtensions {
 
 	/**
-	 * Holds build, configure and install instructions for PHP extensions.
-	 *
-	 * @var array Extensions to build keyed by extension name.
-	 */
-	protected static $_extensions = array(
-		'memcached' => array(
-			'url' => 'http://pecl.php.net/get/memcached-2.0.1.tgz',
-			'require' => array(),
-			'configure' => array(),
-			'ini' => array(
-				'extension=memcached.so'
-			)
-		),
-		'apc' => array(
-			'url' => 'http://pecl.php.net/get/APC-3.1.10.tgz',
-			'require' => array(),
-			'configure' => array(),
-			'ini' => array(
-				'extension=apc.so',
-				'apc.enabled=1',
-				'apc.enable_cli=1'
-			)
-		),
-		'xcache' => array(
-			'url' => 'http://xcache.lighttpd.net/pub/Releases/1.3.2/xcache-1.3.2.tar.gz',
-			'require' => array(
-				'php' => array('<', '5.4')
-			),
-			'configure' => array('--enable-xcache'),
-			'ini' => array(
-				'extension=xcache.so',
-				'xcache.cacher=false',
-				'xcache.admin.enable_auth=0',
-				'xcache.var_size=1M'
-			)
-		),
-		'mongo' => array(
-			'url' => 'http://pecl.php.net/get/mongo-1.2.7.tgz',
-			'require' => array(),
-			'configure' => array(),
-			'ini' => array(
-				'extension=mongo.so'
-			)
-		)
-	);
-
-	/**
 	 * Install extension by given name.
 	 *
-	 * Uses configration retrieved as per `php_ini_loaded_file()`.
-	 *
-	 * @see http://php.net/php_ini_loaded_file
 	 * @param string $name The name of the extension to install.
 	 * @return void
 	 */
 	public static function install($name) {
-		if (!isset(static::$_extensions[$name])) {
+		if (!method_exists('PhpExtensions', $method = "_{$name}")) {
 			return;
 		}
-		$extension = static::$_extensions[$name];
-		echo $name;
+		printf("=> installing (%s)\n", $name);
+		static::$method();
+		printf("=> installed (%s)\n", $name);
+	}
 
-		if (isset($extension['require']['php'])) {
-			$version = $extension['require']['php'];
+	protected static function _opcache() {
+		if (version_compare(PHP_VERSION, '5.5', '<')) {
+			static::_pecl('zendopcache', '7.0.2');
 
-			if (!version_compare(PHP_VERSION, $version[1], $version[0])) {
-				$message = " => not installed, requires a PHP version %s %s (%s installed)\n";
-				printf($message, $version[0], $version[1], PHP_VERSION);
-				return;
-			}
+			$pattern  = '/home/travis/.phpenv/versions/';
+			$pattern .= phpversion() . '/lib/php/extensions/*/opcache.so';
+			$files = glob($pattern);
+			static::_ini(array(
+				'zend_extension=' . array_pop($files)
+			));
 		}
+		static::_ini(array(
+			'opcache.enable=1',
+			'opache.enable_cli=1'
+		));
+	}
 
-		static::_system(sprintf('wget %s > /dev/null 2>&1', $extension['url']));
-		$file = basename($extension['url']);
+	protected static function _apcu() {
+		static::_pecl('apcu', '4.0.2');
+		static::_ini(array(
+			'extension=apcu.so',
+			'apc.enabled=1',
+			'apc.enable_cli=1'
+		));
+	}
 
-		static::_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
-		$folder = basename($file, '.tgz');
-		$folder = basename($folder, '.tar.gz');
+	protected static function _apc() {
+		static::_ini(array(
+			'extension=apc.so',
+			'apc.enabled=1',
+			'apc.enable_cli=1'
+		));
+	}
 
-		$message  = 'sh -c "cd %s && phpize && ./configure %s ';
-		$message .= '&& make && sudo make install" > /dev/null 2>&1';
-		static::_system(sprintf($message, $folder, implode(' ', $extension['configure'])));
+	protected static function _memcached() {
+		static::_ini(array('extension=memcached.so'));
+	}
 
-		foreach ($extension['ini'] as $ini) {
-			static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
-		}
-		printf("=> installed (%s)\n", $folder);
+	protected static function _xcache() {
+		static::_build(array(
+			'url' => 'http://xcache.lighttpd.net/pub/Releases/3.1.0/xcache-3.1.0.tar.gz',
+			'configure' => array('--enable-xcache'),
+		));
+		static::_ini(array(
+			'extension=xcache.so',
+			'xcache.cacher=false',
+			'xcache.admin.enable_auth=0',
+			'xcache.var_size=1M'
+		));
+	}
+
+	protected static function _mongo() {
+		static::_ini(array('extension=mongo.so'));
 	}
 
 	/**
@@ -124,6 +100,49 @@ class PhpExtensions {
 			printf("=> Command '%s' failed !", $command);
 			exit($return);
 		}
+	}
+
+	/**
+	 * Add INI settings. Uses configration retrieved as per `php_ini_loaded_file()`.
+	 *
+	 * @see http://php.net/php_ini_loaded_file
+	 * @param array $data INI settings to add.
+	 * @return void
+	 */
+	protected static function _ini($data) {
+		foreach ($data as $ini) {
+			static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
+		}
+	}
+
+	protected static function _pecl($name, $forceVersion = null) {
+		echo "=> installing from pecl\n";
+
+		if ($forceVersion) {
+			static::_system(sprintf('pecl install -f %s-%s', $name, $forceVersion));
+		} else {
+			static::_system(sprintf('pecl install %s', $name));
+		}
+		echo "=> installed from pecl\n";
+	}
+
+	protected static function _build($data) {
+		echo "=> building\n";
+
+		static::_system(sprintf('wget %s > /dev/null 2>&1', $data['url']));
+		$file = basename($data['url']);
+
+		static::_system(sprintf('tar -xzf %s > /dev/null 2>&1', $file));
+		$folder = basename($file, '.tgz');
+		$folder = basename($folder, '.tar.gz');
+
+		$message  = 'sh -c "cd %s && phpize && ./configure %s ';
+		$message .= '&& make && sudo make install" > /dev/null 2>&1';
+		static::_system(sprintf(
+			$message, $folder, implode(' ', $data['configure'])
+		));
+
+		echo "=> built\n";
 	}
 }
 

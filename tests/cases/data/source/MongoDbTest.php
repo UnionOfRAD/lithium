@@ -90,6 +90,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	public function testBadConnection() {
 		$db = new MongoDb(array('host' => null, 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
+		$this->expectException('/getaddrinfo failed/');
 		$this->assertFalse($db->connect());
 		$this->assertTrue($db->disconnect());
 	}
@@ -604,6 +605,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	public function testCreateNoConnectionException() {
 		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
+		$this->expectException('/getaddrinfo failed/');
 		$result = $db->create(null);
 	}
 
