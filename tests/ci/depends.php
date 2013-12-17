@@ -12,17 +12,13 @@ foreach (explode(' ', getenv('PHP_EXT')) ?: array() as $extension) {
 }
 
 /**
- * Class to install native PHP extensions mainly
- * for preparing test runs.
+ * Class to install native PHP extensions mainly for preparing test runs.
  */
 class PhpExtensions {
 
 	/**
 	 * Install extension by given name.
 	 *
-	 * Uses configration retrieved as per `php_ini_loaded_file()`.
-	 *
-	 * @see http://php.net/php_ini_loaded_file
 	 * @param string $name The name of the extension to install.
 	 * @return void
 	 */
@@ -106,6 +102,13 @@ class PhpExtensions {
 		}
 	}
 
+	/**
+	 * Add INI settings. Uses configration retrieved as per `php_ini_loaded_file()`.
+	 *
+	 * @see http://php.net/php_ini_loaded_file
+	 * @param array $data INI settings to add.
+	 * @return void
+	 */
 	protected static function _ini($data) {
 		foreach ($data as $ini) {
 			static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
