@@ -34,6 +34,23 @@ class PhpExtensions {
 		printf("=> installed (%s)\n", $name);
 	}
 
+	protected static function _opcache() {
+		if (version_compare(PHP_VERSION, '5.5', '<')) {
+			static::_pecl('zendopcache', '7.0.2');
+
+			$pattern  = '/home/travis/.phpenv/versions/';
+			$pattern .= phpversion() . '/lib/php/extensions/*/opcache.so';
+			$files = glob($pattern);
+			static::_ini(array(
+				'zend_extension=' . array_pop($files)
+			));
+		}
+		static::_ini(array(
+			'opcache.enable=1',
+			'opache.enable_cli=1'
+		));
+	}
+
 	protected static function _apc() {
 		if (!static::_requirePhpVersion('<', '5.5')) {
 			return false;
