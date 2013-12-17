@@ -42,8 +42,12 @@ before_script:
   - cp ../libraries/lithium/tests/ci/config/bootstrap.php config/bootstrap.php
 
 script:
-  - ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases
-  - ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration
+  # Run all tests.
+  - sh -c "if [ '$DB' = '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases; fi"
+  - sh -c "if [ '$DB' = '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration; fi"
+  # Run just the database related tests.
+  - sh -c "if [ '$DB' != '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases/data; fi"
+  - sh -c "if [ '$DB' != '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration/data; fi"
 
 notifications:
   email: false
