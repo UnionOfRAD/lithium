@@ -52,9 +52,6 @@ class PhpExtensions {
 	}
 
 	protected static function _apc() {
-		if (!static::_requirePhpVersion('<', '5.5')) {
-			return false;
-		}
 		static::_ini(array(
 			'extension=apc.so',
 			'apc.enabled=1',
@@ -67,9 +64,6 @@ class PhpExtensions {
 	}
 
 	protected static function _xcache() {
-		if (!static::_requirePhpVersion('<', '5.4')) {
-			return false;
-		}
 		static::_build(array(
 			'url' => 'http://xcache.lighttpd.net/pub/Releases/1.3.2/xcache-1.3.2.tar.gz',
 			'configure' => array('--enable-xcache'),
@@ -136,17 +130,6 @@ class PhpExtensions {
 		));
 
 		echo "=> built\n";
-	}
-
-	protected static function _requirePhpVersion($op, $version) {
-		if (!version_compare(PHP_VERSION, $version, $op)) {
-			printf(
-				"=> not installed, requires a PHP version %s %s (%s installed)\n",
-				$op, $version, PHP_VERSION
-			);
-			return false;
-		}
-		return true;
 	}
 }
 
