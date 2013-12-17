@@ -91,6 +91,17 @@ class PhpExtensions {
 		}
 	}
 
+	protected static function _pecl($name, $forceVersion = null) {
+		echo "=> installing from pecl\n";
+
+		if ($forceVersion) {
+			static::_system(sprintf('pecl install -f %s-%s', $name, $forceVersion));
+		} else {
+			static::_system(sprintf('pecl install %s', $name));
+		}
+		echo "=> installed from pecl\n";
+	}
+
 	protected static function _build($data) {
 		echo "=> building\n";
 
