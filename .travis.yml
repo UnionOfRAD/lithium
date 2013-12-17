@@ -6,7 +6,9 @@ services:
   - couchdb
 
 env:
-  # Test compatiblity with opcode caches.
+  # Run one build with as many enabled and compatible extensions as possible.
+  # - PHP_EXT=""
+  # Test compatiblity with opcode caches in isolation.
   - PHP_EXT=apc
   - PHP_EXT=xcache
   # Test each database in isolation.
