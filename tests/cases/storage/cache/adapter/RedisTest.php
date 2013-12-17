@@ -81,7 +81,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_redis->ttl($key);
-		$this->assertEqual($time - time(), $result);
+		$this->assertTrue($result == 5 || $result == 4);
 
 		$result = $this->_redis->delete($key);
 		$this->assertTrue($result);
@@ -103,7 +103,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_redis->ttl($key);
-		$this->assertEqual($time - time(), $result);
+		$this->assertTrue($result == 60 || $result == 59);
 
 		$result = $this->_redis->delete($key);
 		$this->assertTrue($result);
@@ -127,7 +127,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_redis->ttl($key);
-		$this->assertEqual($time - time(), $result);
+		$this->assertTrue($result == 5 || $result == 4);
 
 		$result = $this->_redis->delete($key);
 		$this->assertTrue($result);
@@ -163,12 +163,13 @@ class RedisTest extends \lithium\test\Unit {
 		$key = 'another_read_key';
 		$data = 'read data';
 		$time = strtotime('+1 minute');
+		$expiry = $time - time();
 
-		$result = $this->_redis->set($key, $data);
+		$result = $this->_redis->set($key, $data, $expiry);
 		$this->assertTrue($result);
 
 		$result = $this->_redis->ttl($key);
-		$this->assertTrue($result);
+		$this->assertTrue($result == $expiry || $result == $expiry - 1);
 
 		$closure = $this->redis->read($key);
 		$this->assertInternalType('callable', $closure);
