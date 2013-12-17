@@ -16,6 +16,7 @@ foreach (explode(' ', getenv('PHP_EXT')) ?: array() as $extension) {
  * for preparing test runs.
  */
 class PhpExtensions {
+
 	/**
 	 * Install extension by given name.
 	 *
