@@ -26,8 +26,6 @@ php:
 matrix:
   exclude:
     - php: 5.5
-      env: PHP_EXT=xcache
-    - php: 5.5
       env: PHP_EXT=apc
 
 before_script:
