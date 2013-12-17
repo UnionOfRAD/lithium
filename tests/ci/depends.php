@@ -31,6 +31,10 @@ class PhpExtensions {
 		printf("=> installed (%s)\n", $name);
 	}
 
+	protected static function _redis() {
+		static::_pecl('redis');
+	}
+
 	protected static function _opcache() {
 		if (version_compare(PHP_VERSION, '5.5', '<')) {
 			static::_pecl('zendopcache', '7.0.2');

@@ -4,10 +4,11 @@ services:
   - mongodb
   - memcache
   - couchdb
+  - redis
 
 env:
   # Run one build with as many enabled and compatible extensions as possible.
-  # - PHP_EXT=""
+  - PHP_EXT="redis"
   # Test compatiblity with opcode caches in isolation.
   - PHP_EXT=apc
   - PHP_EXT=xcache
