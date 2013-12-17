@@ -65,7 +65,7 @@ class PhpExtensions {
 
 	protected static function _xcache() {
 		static::_build(array(
-			'url' => 'http://xcache.lighttpd.net/pub/Releases/1.3.2/xcache-1.3.2.tar.gz',
+			'url' => 'http://xcache.lighttpd.net/pub/Releases/3.1.0/xcache-3.1.0.tar.gz',
 			'configure' => array('--enable-xcache'),
 		));
 		static::_ini(array(
