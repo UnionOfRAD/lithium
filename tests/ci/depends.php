@@ -52,6 +52,15 @@ class PhpExtensions {
 		));
 	}
 
+	protected static function _apcu() {
+		static::_pecl('apcu', '4.0.2');
+		static::_ini(array(
+			'extension=apcu.so',
+			'apc.enabled=1',
+			'apc.enable_cli=1'
+		));
+	}
+
 	protected static function _apc() {
 		static::_ini(array(
 			'extension=apc.so',
