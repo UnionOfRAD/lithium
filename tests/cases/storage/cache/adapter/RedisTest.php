@@ -81,10 +81,10 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_redis->ttl($key);
-		$this->assertEqual($time - time(), $result);
+		$this->assertTrue($result == 5 || $result == 4);
 
 		$result = $this->_redis->delete($key);
-		$this->assertTrue($result);
+		$this->assertEqual(1, $result);
 
 		$key = 'another_key';
 		$data = 'more_data';
@@ -103,10 +103,10 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_redis->ttl($key);
-		$this->assertEqual($time - time(), $result);
+		$this->assertTrue($result == 60 || $result == 59);
 
 		$result = $this->_redis->delete($key);
-		$this->assertTrue($result);
+		$this->assertEqual(1, $result);
 	}
 
 	public function testWriteDefaultCacheExpiry() {
@@ -127,10 +127,10 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_redis->ttl($key);
-		$this->assertEqual($time - time(), $result);
+		$this->assertTrue($result == 5 || $result == 4);
 
 		$result = $this->_redis->delete($key);
-		$this->assertTrue($result);
+		$this->assertEqual(1, $result);
 	}
 
 	public function testWriteNoCacheExpiry() {
@@ -139,7 +139,7 @@ class RedisTest extends \lithium\test\Unit {
 		$data = 'value';
 		$redis->write($key, $data)->__invoke(null, compact('key', 'data'), null);
 		$this->assertEqual($data, $this->_redis->get($key));
-		$this->assertTrue($this->_redis->delete($key));
+		$this->assertEqual(1, $this->_redis->delete($key));
 	}
 
 	public function testSimpleRead() {
@@ -158,17 +158,18 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_redis->delete($key);
-		$this->assertTrue($result);
+		$this->assertEqual(1, $result);
 
 		$key = 'another_read_key';
 		$data = 'read data';
 		$time = strtotime('+1 minute');
+		$expiry = $time - time();
 
-		$result = $this->_redis->set($key, $data);
+		$result = $this->_redis->set($key, $data, $expiry);
 		$this->assertTrue($result);
 
 		$result = $this->_redis->ttl($key);
-		$this->assertTrue($result);
+		$this->assertTrue($result == $expiry || $result == $expiry - 1);
 
 		$closure = $this->redis->read($key);
 		$this->assertInternalType('callable', $closure);
@@ -179,7 +180,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_redis->delete($key);
-		$this->assertTrue($result);
+		$this->assertEqual(1, $result);
 	}
 
 	public function testMultiRead() {
@@ -197,7 +198,7 @@ class RedisTest extends \lithium\test\Unit {
 
 		foreach ($data as $k => $v) {
 			$result = $this->_redis->delete($k);
-			$this->assertTrue($result);
+			$this->assertEqual(1, $result);
 		}
 	}
 
@@ -245,7 +246,7 @@ class RedisTest extends \lithium\test\Unit {
 		$result = $closure($this->redis, $params, null);
 		$this->assertTrue($result);
 
-		$this->assertFalse($this->_redis->delete($key));
+		$this->assertEqual(0, $this->_redis->delete($key));
 	}
 
 	public function testDeleteNonExistentKey() {
@@ -325,7 +326,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($value - 1, $result);
 
 		$result = $this->_redis->delete($key);
-		$this->assertTrue($result);
+		$this->assertEqual(1, $result);
 	}
 
 	public function testDecrementNonIntegerValue() {
@@ -346,7 +347,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($value, $result);
 
 		$result = $this->_redis->delete($key);
-		$this->assertTrue($result);
+		$this->assertEqual(1, $result);
 	}
 
 	public function testIncrement() {
@@ -367,7 +368,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($value + 1, $result);
 
 		$result = $this->_redis->delete($key);
-		$this->assertTrue($result);
+		$this->assertEqual(1, $result);
 	}
 
 	public function testIncrementNonIntegerValue() {
@@ -388,11 +389,10 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($value, $result);
 
 		$result = $this->_redis->delete($key);
-		$this->assertTrue($result);
+		$this->assertEqual(1, $result);
 	}
 
 	public function testMethodDispatch() {
-
 		$this->_redis->flushdb();
 		$this->_redis->set('some_key', 'somevalue');
 
@@ -400,7 +400,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual($result, array('some_key'), 'redis method dispatch failed');
 
 		$result = $this->redis->info();
-		$this->assertInternalType('array', $assertInternalType, 'redis method dispatch failed');
+		$this->assertInternalType('array', $result, 'redis method dispatch failed');
 	}
 
 	public function testRespondsTo() {
