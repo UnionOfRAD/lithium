@@ -238,17 +238,17 @@ class MemcacheTest extends \lithium\test\Unit {
 	public function testDeprecatedConnectionSettings() {
 		$servers = array(array('127.0.0.1', 11211, 1));
 		$test = new Memcache(compact('servers'));
-		$servers[0] = array_combine(array('host', 'port', 'weight'), $servers[0]);
+		$servers[0] = array_combine(array('host', 'port'), array_slice($servers[0], 0, 2));
 		$this->assertEqual($servers, $test->connection->getServerList());
 	}
 
 	public function testSimpleConnectionSettings() {
 		$test = new Memcache(array('host' => '127.0.0.1'));
-		$hosts = array(array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 0));
+		$hosts = array(array('host' => '127.0.0.1', 'port' => 11211));
 		$this->assertEqual($hosts, $test->connection->getServerList());
 
 		$test = new Memcache(array('host' => '127.0.0.1:11222'));
-		$hosts = array(array('host' => '127.0.0.1', 'port' => 11222, 'weight' => 0));
+		$hosts = array(array('host' => '127.0.0.1', 'port' => 11222));
 		$this->assertEqual($hosts, $test->connection->getServerList());
 	}
 
@@ -259,9 +259,9 @@ class MemcacheTest extends \lithium\test\Unit {
 			'127.0.0.3:11224'
 		)));
 		$hosts = array(
-			array('host' => '127.0.0.1', 'port' => 11222, 'weight' => 1),
-			array('host' => '127.0.0.2', 'port' => 11223, 'weight' => 2),
-			array('host' => '127.0.0.3', 'port' => 11224, 'weight' => 0)
+			array('host' => '127.0.0.1', 'port' => 11222),
+			array('host' => '127.0.0.2', 'port' => 11223),
+			array('host' => '127.0.0.3', 'port' => 11224)
 		);
 		$this->assertEqual($hosts, $test->connection->getServerList());
 	}
