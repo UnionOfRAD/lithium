@@ -58,15 +58,12 @@ class Compiler extends \lithium\core\StaticObject {
 
 		$stats = stat($file);
 
-		if (!$stats['ino']) {
-			$stats['ino'] = hash('md5', $file);
-		}
 		$dir = dirname($file);
-
 		$oname  = basename(dirname(dirname($dir))) . '_' . basename(dirname($dir));
 		$oname .= '_' . basename($dir) . '_' . basename($file, '.php');
+		$oname .= '_' . ($stats['ino'] ?: hash('md5', $file));
 
-		$template = "template_{$oname}_{$stats['ino']}_{$stats['mtime']}_{$stats['size']}.php";
+		$template = "template_{$oname}_{$stats['mtime']}_{$stats['size']}.php";
 		$template = "{$options['path']}/{$template}";
 
 		if (file_exists($template)) {
