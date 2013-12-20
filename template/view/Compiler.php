@@ -58,7 +58,10 @@ class Compiler extends \lithium\core\StaticObject {
 
 		$stats = stat($file);
 		$dir = dirname($file);
-		$oname = basename(dirname($dir)) . '_' . basename($dir) . '_' . basename($file, '.php');
+
+		$oname  = basename(dirname(dirname($dir))) . '_' . basename(dirname($dir));
+		$oname .= '_' . basename($dir) . '_' . basename($file, '.php');
+
 		$template = "template_{$oname}_{$stats['ino']}_{$stats['mtime']}_{$stats['size']}.php";
 		$template = "{$options['path']}/{$template}";
 

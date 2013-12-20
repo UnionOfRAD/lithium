@@ -66,7 +66,9 @@ class FileTest extends \lithium\test\Unit {
 	 *       directory.
 	 */
 	public function testTemplateLocating() {
-		$path = Libraries::get(true, 'path') . '/views/pages/home.html.php';
+		$base =  Libraries::get(true, 'path');
+
+		$path = $base . '/views/pages/home.html.php';
 		$this->skipIf(!file_exists($path), 'No default app template.');
 
 		$file = new File(array('paths' => array(
@@ -76,7 +78,8 @@ class FileTest extends \lithium\test\Unit {
 		$template = $file->template('template', array(
 			'controller' => 'pages', 'template' => 'home', 'type' => 'html'
 		));
-		$this->assertPattern('/template_views_pages_home\.html_[0-9]+/', $template);
+		$pattern = '/template_' . basename($base) . '_views_pages_home\.html_[0-9]+/';
+		$this->assertPattern($pattern, $template);
 
 		$file = new File(array('compile' => false, 'paths' => array(
 			'template' => '{:library}/views/{:controller}/{:template}.{:type}.php'
