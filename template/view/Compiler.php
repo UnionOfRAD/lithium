@@ -75,7 +75,7 @@ class Compiler extends \lithium\core\StaticObject {
 		$compiled = static::compile(file_get_contents($file));
 
 		if (is_writable($cachePath) && file_put_contents($template, $compiled) !== false) {
-			foreach (glob("{$options['path']}/template_{$oname}_*.php") as $expired) {
+			foreach (glob("{$options['path']}/template_{$oname}_*.php", GLOB_NOSORT) as $expired) {
 				if ($expired !== $template) {
 					unlink($expired);
 				}
