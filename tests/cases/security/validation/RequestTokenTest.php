@@ -62,6 +62,14 @@ class RequestTokenTest extends \lithium\test\Unit {
 		$this->assertEqual(array('security.token' => $reallyNewToken), self::$_storage);
 	}
 
+	public function testTokenGenerationWithProvidedAlgo() {
+		$token = RequestToken::get(array('type' => 'sha512', 'regenerate' => true));
+		$this->assertPattern('/^[a-f0-9]{128}$/', $token);
+
+		$token = RequestToken::get(array('type' => 'md5', 'regenerate' => true));
+		$this->assertPattern('/^[a-f0-9]{32}$/', $token);
+	}
+
 	/**
 	 * Tests that a random sequence of keys and tokens properly match one another.
 	 */
