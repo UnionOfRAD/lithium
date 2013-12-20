@@ -200,6 +200,28 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testTranslateContext() {
+		$data = array(
+			'fast|speed' => 'rapide',
+			'fast|go without food' => 'jeûner'
+		);
+		Catalog::write('runtime', 'message', 'fr', $data);
+
+		$expected = 'rapide';
+		$result = Message::translate('fast', array(
+			'locale' => 'fr',
+			'context' => 'speed'
+		));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'jeûner';
+		$result = Message::translate('fast', array(
+			'locale' => 'fr',
+			'context' => 'go without food'
+		));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testTranslateLocales() {
 		$data = array(
 			'catalog' => 'Katalog'

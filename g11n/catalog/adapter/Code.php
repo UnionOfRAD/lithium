@@ -113,6 +113,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 
 		$defaults = array(
 			'ids' => array(),
+			'context' => null,
 			'open' => false,
 			'position' => 0,
 			'occurrence' => array('file' => $file, 'line' => null)
@@ -127,6 +128,51 @@ class Code extends \lithium\g11n\catalog\Adapter {
 		$tokens = token_get_all($contents);
 		unset($contents);
 
+		$findContext = function ($position) use ($tokens) {
+			$ignore  = array(T_WHITESPACE, '(', ')', T_ARRAY, ',');
+			$open    = 1;
+			$options = array();
+			$depth   = 0;
+
+			while (isset($tokens[$position]) && $token = $tokens[$position]) {
+				if (!is_array($token)) {
+					$token = array(0 => null, 1 => $token, 2 => null);
+				}
+				if ($token[1] === '(') {
+					$open++;
+				} elseif ($token[1] === ')' && --$open === 0) {
+					break;
+				}
+				if ($token[0] === T_ARRAY || $token[1] === '[') {
+					$depth++;
+				} elseif ($depth > 1 && ($token[1] === ')' || $token[1] === ']')) {
+					$depth--;
+				}
+				if ($depth === 1 && $open === 2) {
+					if (!in_array($token[0] ? : $token[1], $ignore)) {
+						$options[] = $token;
+					}
+				}
+				$position++;
+			}
+
+			foreach ($options as $i => $token) {
+				if (!(isset($options[$i + 1]) && isset($options[$i + 2]))) {
+					break;
+				}
+
+				$condition1 = substr($token[1], 1, -1) === 'context';
+				$condition2 = $options[$i + 1][0] === T_DOUBLE_ARROW;
+				$condition3 = $options[$i + 2][0] === T_CONSTANT_ENCAPSED_STRING;
+
+				if ($condition1 && $condition2 && $condition3) {
+					return $options[$i + 2][1];
+				}
+			}
+
+			return null;
+		};
+
 		foreach ($tokens as $key => $token) {
 			if (!is_array($token)) {
 				$token = array(0 => null, 1 => $token, 2 => null);
@@ -137,7 +183,8 @@ class Code extends \lithium\g11n\catalog\Adapter {
 					$data = $this->_merge($data, array(
 						'id' => $ids['singular'],
 						'ids' => $ids,
-						'occurrences' => array($occurrence)
+						'occurrences' => array($occurrence),
+						'context' => $context
 					));
 					extract($defaults, EXTR_OVERWRITE);
 				} elseif ($token[0] === T_CONSTANT_ENCAPSED_STRING) {
@@ -154,6 +201,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 						continue;
 					}
 					$occurrence['line'] = $token[2];
+					$context = $findContext($key + 2);
 				}
 			}
 		}
@@ -176,7 +224,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 			}
 			return substr($value, 1, -1);
 		};
-		$fields = array('id', 'ids', 'translated');
+		$fields = array('id', 'ids', 'translated', 'context');
 
 		foreach ($fields as $field) {
 			if (isset($item[$field])) {

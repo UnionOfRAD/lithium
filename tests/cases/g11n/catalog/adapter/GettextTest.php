@@ -72,7 +72,8 @@ class GettextTest extends \lithium\test\Unit {
 				),
 				'comments' => array(
 					'comment 1'
-				)
+				),
+				'context' => null
 			)
 		);
 
@@ -100,7 +101,33 @@ EOD;
 				'flags' => array(),
 				'translated' => 'translated 1',
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
+			)
+		);
+		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadPoSingleItemWithContext() {
+		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
+		$data = <<<EOD
+msgctxt "A"
+msgid "singular 1"
+msgstr "translated 1"
+EOD;
+		file_put_contents($file, $data);
+
+		$expected = array(
+			'singular 1|A' => array(
+				'id' => 'singular 1',
+				'ids' => array('singular' => 'singular 1'),
+				'flags' => array(),
+				'translated' => 'translated 1',
+				'occurrences' => array(),
+				'comments' => array(),
+				'context' => 'A'
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
@@ -116,6 +143,17 @@ msgstr "translated 1"
 
 msgid "singular 2"
 msgstr "translated 2"
+
+msgid "context"
+msgstr "context (none specified)"
+
+msgctxt "A"
+msgid "context"
+msgstr "context A"
+
+msgctxt "B"
+msgid "context"
+msgstr "context B"
 EOD;
 		file_put_contents($file, $data);
 
@@ -126,7 +164,8 @@ EOD;
 				'flags' => array(),
 				'translated' => 'translated 1',
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			),
 			'singular 2' => array(
 				'id' => 'singular 2',
@@ -134,7 +173,35 @@ EOD;
 				'flags' => array(),
 				'translated' => 'translated 2',
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
+			),
+			'context' => array(
+				'id' => 'context',
+				'ids' => array('singular' => 'context'),
+				'flags' => array(),
+				'translated' => 'context (none specified)',
+				'occurrences' => array(),
+				'comments' => array(),
+				'context' => null
+			),
+			'context|A' => array(
+				'id' => 'context',
+				'ids' => array('singular' => 'context'),
+				'flags' => array(),
+				'translated' => 'context A',
+				'occurrences' => array(),
+				'comments' => array(),
+				'context' => 'A'
+			),
+			'context|B' => array(
+				'id' => 'context',
+				'ids' => array('singular' => 'context'),
+				'flags' => array(),
+				'translated' => 'context B',
+				'occurrences' => array(),
+				'comments' => array(),
+				'context' => 'B'
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
@@ -159,7 +226,8 @@ EOD;
 				'flags' => array(),
 				'translated' => array('translated 1-0', 'translated 1-1'),
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
@@ -202,7 +270,8 @@ EOD;
 				'flags' => array(),
 				'translated' => 'translated 1',
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
@@ -248,7 +317,8 @@ EOD;
 				'comments' => array(
 					'extracted comment',
 					'translator comment'
-				)
+				),
+				'context' => null
 			)
 		);
 		$po = <<<EOD
@@ -300,7 +370,8 @@ EOD;
 				'flags' => array(),
 				'translated' => 'This is a translation spanning multiple lines.',
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
@@ -327,7 +398,8 @@ EOD;
 				'flags' => array(),
 				'translated' => 'This is a translation spanning multiple lines.',
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
@@ -363,7 +435,8 @@ EOD;
 					'This is a plural translation spanning multiple lines.'
 				),
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
@@ -416,7 +489,8 @@ EOD;
 				'flags' => array(),
 				'translated' => array('translated 1-0', 'translated 1-1'),
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			),
 			'singular 2' => array(
 				'id' => 'singular 2',
@@ -424,7 +498,8 @@ EOD;
 				'flags' => array(),
 				'translated' => 'translated 2',
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$result = $this->adapter->read('message', 'de', null);
@@ -466,6 +541,69 @@ EOD;
 		$this->assert($result);
 	}
 
+	public function testReadMoWithContext() {
+		$file = "{$this->_path}/de/LC_MESSAGES/default.mo";
+		$data = <<<EOD
+3hIElQAAAAAGAAAAHAAAAEwAAAAAAAAAfAAAAAAAAAB8AAAACQAAAH0AAAAJAAAAhwAAAAcAAACRAAAACgAAAJkAAAAKAAAApAAA
+AAAAAACvAAAACQAAALAAAAAJAAAAugAAABgAAADEAAAADAAAAN0AAAAMAAAA6gAAAABBBGNvbnRleHQAQgRjb250ZXh0AGNvbnRl
+eHQAc2luZ3VsYXIgMQBzaW5ndWxhciAyAABjb250ZXh0IEEAY29udGV4dCBCAGNvbnRleHQgKG5vbmUgc3BlY2lmaWVkKQB0cmFu
+c2xhdGVkIDEAdHJhbnNsYXRlZCAyAA==
+EOD;
+
+		file_put_contents($file, base64_decode($data));
+
+		$expected = array(
+			'singular 1' => array(
+				'id' => 'singular 1',
+				'ids' => array('singular' => 'singular 1', 'plural' => null),
+				'flags' => array(),
+				'translated' => 'translated 1',
+				'occurrences' => array(),
+				'comments' => array(),
+				'context' => null
+			),
+			'singular 2' => array(
+				'id' => 'singular 2',
+				'ids' => array('singular' => 'singular 2', 'plural' => null),
+				'flags' => array(),
+				'translated' => 'translated 2',
+				'occurrences' => array(),
+				'comments' => array(),
+				'context' => null
+			),
+			'context' => array(
+				'id' => 'context',
+				'ids' => array('singular' => 'context', 'plural' => null),
+				'flags' => array(),
+				'translated' => 'context (none specified)',
+				'occurrences' => array(),
+				'comments' => array(),
+				'context' => null
+			),
+			'context|A' => array(
+				'id' => 'context',
+				'ids' => array('singular' => 'context', 'plural' => null),
+				'flags' => array(),
+				'translated' => 'context A',
+				'occurrences' => array(),
+				'comments' => array(),
+				'context' => 'A'
+			),
+			'context|B' => array(
+				'id' => 'context',
+				'ids' => array('singular' => 'context', 'plural' => null),
+				'flags' => array(),
+				'translated' => 'context B',
+				'occurrences' => array(),
+				'comments' => array(),
+				'context' => 'B'
+			)
+		);
+		$result = $this->adapter->read('message', 'de', null);
+		unset($result['pluralRule']);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testWriteMessageCompilesPo() {
 		$data = array(
 			'singular 1' => array(
@@ -474,7 +612,8 @@ EOD;
 				'flags' => array(),
 				'translated' => array('translated 1'),
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$this->adapter->write('message', 'de', null, $data);
@@ -489,7 +628,8 @@ EOD;
 				'flags' => array(),
 				'translated' => array(),
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$this->adapter->write('messageTemplate', 'root', null, $data);
@@ -510,7 +650,34 @@ EOD;
 				),
 				'comments' => array(
 					'comment 1'
-				)
+				),
+				'context' => null
+			),
+			'singular 1|A' => array(
+				'id' => 'singular 1',
+				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
+				'flags' => array('fuzzy' => true),
+				'translated' => array('translated singular 1A', 'translated plural 1A'),
+				'occurrences' => array(
+					array('file' => 'test.php', 'line' => 2)
+				),
+				'comments' => array(
+					'comment 1a'
+				),
+				'context' => 'A'
+			),
+			'singular 1|B' => array(
+				'id' => 'singular 1',
+				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
+				'flags' => array('fuzzy' => true),
+				'translated' => array('translated singular 1B', 'translated plural 1B'),
+				'occurrences' => array(
+					array('file' => 'test.php', 'line' => 2)
+				),
+				'comments' => array(
+					'comment 1b'
+				),
+				'context' => 'B'
 			)
 		);
 
@@ -535,7 +702,8 @@ EOD;
 				'flags' => array(),
 				'translated' => array('translated 1-0', 'translated 1-1'),
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			),
 			'singular 2' => array(
 				'id' => 'singular 2',
@@ -543,7 +711,8 @@ EOD;
 				'flags' => array(),
 				'translated' => array('translated 2'),
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$this->adapter->write('message', 'de', null, $data);
@@ -592,7 +761,8 @@ EOD;
 				'flags' => array(),
 				'translated' => '/[0-9].*/i',
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$po = <<<EOD
@@ -625,7 +795,8 @@ EOD;
 					array('file' => Libraries::get(true, 'path') . '/testa.php', 'line' => 22),
 					array('file' => '/testb.php', 'line' => 23)
 				),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$this->adapter->write('messageTemplate', 'root', null, $data);
@@ -688,7 +859,8 @@ EOD;
 					'flags' => array(),
 					'translated' => "this is the{$unescaped}translation",
 					'occurrences' => array(),
-					'comments' => array()
+					'comments' => array(),
+					'context' => null
 				)
 			);
 			$po = <<<EOD
@@ -726,7 +898,8 @@ EOD;
 				'flags' => array(),
 				'translated' => "this is the\r\ntranslation",
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$po = <<<EOD
@@ -750,7 +923,8 @@ EOD;
 				'flags' => array(),
 				'translated' => "this is the\\'translation",
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$po = <<<EOD
@@ -774,7 +948,8 @@ EOD;
 				'flags' => array(),
 				'translated' => "this is the\\\\translation",
 				'occurrences' => array(),
-				'comments' => array()
+				'comments' => array(),
+				'context' => null
 			)
 		);
 		$po = <<<EOD

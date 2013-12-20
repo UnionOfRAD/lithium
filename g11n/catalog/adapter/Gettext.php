@@ -204,7 +204,8 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			'translated' => null,
 			'flags' => array(),
 			'comments' => array(),
-			'occurrences' => array()
+			'occurrences' => array(),
+			'context' => null
 		);
 		$data = array();
 		$item = $defaults;
@@ -304,6 +305,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 		for ($i = 0; $i < $count; $i++) {
 			$singularId = $pluralId = null;
 			$translated = null;
+			$context = null;
 
 			fseek($stream, $offsetId + $i * 8);
 
@@ -321,6 +323,10 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 				list($singularId, $pluralId) = explode("\000", $singularId);
 			}
 
+			if (strpos($singularId, "\004") !== false) {
+				list($context, $singularId) = explode("\004", $singularId);
+			}
+
 			fseek($stream, $offsetTranslated + $i * 8);
 			$length = $this->_readLong($stream, $isBigEndian);
 			$offset = $this->_readLong($stream, $isBigEndian);
@@ -333,7 +339,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			}
 
 			$ids = array('singular' => $singularId, 'plural' => $pluralId);
-			$data = $this->_merge($data, compact('ids', 'translated'));
+			$data = $this->_merge($data, compact('ids', 'translated', 'context'));
 		}
 		return $data;
 	}
@@ -369,6 +375,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	protected function _compilePo($stream, array $data) {
 		$output[] = '# This file is distributed under the same license as the PACKAGE package.';
 		$output[] = '#';
+		$output[] = 'msgctxt ""';
 		$output[] = 'msgid ""';
 		$output[] = 'msgstr ""';
 		$output[] = '"Project-Id-Version: PACKAGE VERSION\n"';
@@ -396,6 +403,10 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			}
 			foreach ($item['flags'] as $flag => $value) {
 				$output[] = "#, {$flag}";
+			}
+
+			if (isset($item['context'])) {
+				$output[] = "msgctxt \"{$item['context']}\"";
 			}
 			$output[] = "msgid \"{$item['ids']['singular']}\"";
 
@@ -463,7 +474,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			$value = addcslashes($value, "\0..\37\\\"");
 			return $value;
 		};
-		$fields = array('id', 'ids', 'translated');
+		$fields = array('id', 'ids', 'translated', 'context');
 
 		foreach ($fields as $field) {
 			if (isset($item[$field])) {
@@ -501,7 +512,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			}
 			return stripcslashes($value);
 		};
-		$fields = array('id', 'ids', 'translated');
+		$fields = array('id', 'ids', 'translated', 'context');
 
 		foreach ($fields as $field) {
 			if (isset($item[$field])) {
