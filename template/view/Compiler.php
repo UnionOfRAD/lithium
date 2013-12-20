@@ -57,6 +57,10 @@ class Compiler extends \lithium\core\StaticObject {
 		$options += $defaults;
 
 		$stats = stat($file);
+
+		if (!$stats['ino']) {
+			$stats['ino'] = hash('md5', $file);
+		}
 		$dir = dirname($file);
 
 		$oname  = basename(dirname(dirname($dir))) . '_' . basename(dirname($dir));
