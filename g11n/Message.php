@@ -88,6 +88,7 @@ class Message extends \lithium\core\StaticObject {
 	 *                           translation.
 	 *              - `'locale'`: The target locale, defaults to current locale.
 	 *              - `'scope'`: The scope of the message.
+	 *              - `'context'`: The disambiguating context (optional).
 	 *              - `'default'`: Is used as a fall back if `_translated()` returns
 	 *                             without a result.
 	 *              - `'noop'`: If `true` no whatsoever lookup takes place.
@@ -99,6 +100,7 @@ class Message extends \lithium\core\StaticObject {
 			'count' => 1,
 			'locale' => Environment::get('locale'),
 			'scope' => null,
+			'context' => null,
 			'default' => null,
 			'noop' => false
 		);
@@ -108,7 +110,8 @@ class Message extends \lithium\core\StaticObject {
 			$result = null;
 		} else {
 			$result = static::_translated($id, abs($options['count']), $options['locale'], array(
-				'scope' => $options['scope']
+				'scope' => $options['scope'],
+				'context' => $options['context']
 			));
 		}
 
@@ -145,7 +148,7 @@ class Message extends \lithium\core\StaticObject {
 		};
 		$tn = function($message1, $message2, $count, array $options = array()) {
 			return Message::translate($message1, $options + compact('count') + array(
-				'default' => $count == 1 ? $message1 : $message2
+				'default' => $count === 1 ? $message1 : $message2
 			));
 		};
 		return compact('t', 'tn');
@@ -180,6 +183,7 @@ class Message extends \lithium\core\StaticObject {
 	 * @param string $locale The target locale.
 	 * @param array $options Passed through to `Catalog::read()`. Valid options are:
 	 *              - `'scope'`: The scope of the message.
+	 *              - `'context'`: The disambiguating context.
 	 * @return string The translation or `null` if none could be found or the plural
 	 *         form could not be determined.
 	 * @filter
@@ -190,6 +194,11 @@ class Message extends \lithium\core\StaticObject {
 		$cache =& static::$_cachedPages;
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use (&$cache) {
 			extract($params);
+
+			if (isset($options['context']) && !is_null($options['context'])) {
+				$context = $options['context'];
+				$id = "{$id}|{$context}";
+			}
 
 			if (!isset($cache[$options['scope']][$locale])) {
 				$cache[$options['scope']][$locale] = Catalog::read(

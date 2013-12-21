@@ -92,7 +92,10 @@ class Php extends \lithium\g11n\catalog\Adapter {
 
 		if (file_exists($file)) {
 			foreach (require $file as $id => $translated) {
-				$data = $this->_merge($data, compact('id', 'translated'));
+				if (strpos($id, '|') !== false) {
+					list($id, $context) = explode('|', $id);
+				}
+				$data = $this->_merge($data, compact('id', 'translated', 'context'));
 			}
 		}
 		return $data;

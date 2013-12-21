@@ -83,6 +83,10 @@ class Adapter extends \lithium\core\Object {
 		);
 		$item += $defaults;
 
+		if (isset($item['context']) && $item['context']) {
+			$id .= '|' . $item['context'];
+		}
+
 		if (!isset($data[$id])) {
 			$data[$id] = $item;
 			return $data;
