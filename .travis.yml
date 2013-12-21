@@ -12,6 +12,7 @@ env:
   # Test compatiblity with opcode caches in isolation.
   - PHP_EXT=apc
   - PHP_EXT=xcache
+  - PHP_EXT=opcache
   # Test each database in isolation.
   - DB=mysql
   - DB=pgsql
