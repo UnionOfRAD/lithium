@@ -10,4 +10,6 @@ Here's what you need to stick to in order to have the best chance of getting you
  * **Maintainability**: code should pass existing [tests](https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Testing), have adequate test coverage and should conform to our [coding standards](https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Coding)
  * **Comprehensibility**: code should be concise and expressive, and should be accompanied by new [documentation](https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Documenting) as appropriate, or updates to existing docs
 
+As always, all contributions are important, and we're very grateful for the help of all those who have gotten us this far. If you're interested in helping out, but feel you could use a little coaching, be sure to drop by #li3-core and introduce yourself -- we'd love to help you get started.
+
 Please see the full documentation over at the [contribution guidelines](http://lithify.me/docs/manual/appendices/contributing.wiki) at [lithify.me](http://lithify.me/)
