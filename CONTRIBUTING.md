@@ -7,7 +7,7 @@ Here's what you need to stick to in order to have the best chance of getting you
  * **Integration**: all pull requests should be submitted against the [`dev`](https://github.com/UnionOfRAD/lithium/tree/dev) branch for integration testing
  * **Branching**: create a short and meaningful branch name that starts with either `bug/` or `feature/`. A good example would be `feature/newMediaEncode` or `bug/modelFindFix`
  * **Conceptual integrity**: code should conform to the goals of the framework
- * **Maintainability**: code should pass existing tests, have adequate test coverage and should conform to our coding standards & QA guidelines
- * **Comprehensibility**: code should be concise and expressive, and should be accompanied by new documentation as appropriate, or updates to existing docs
+ * **Maintainability**: code should pass existing [tests](https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Testing), have adequate test coverage and should conform to our [coding standards](https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Coding)
+ * **Comprehensibility**: code should be concise and expressive, and should be accompanied by new [documentation](https://github.com/UnionOfRAD/lithium/wiki/Spec%3A-Documenting) as appropriate, or updates to existing docs
 
 Please see the full documentation over at the [contribution guidelines](http://lithify.me/docs/manual/appendices/contributing.wiki) at [lithify.me](http://lithify.me/)
