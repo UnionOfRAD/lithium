@@ -7,6 +7,8 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
+use RuntimeException;
+
 foreach (explode(' ', getenv('PHP_EXT')) ?: array() as $extension) {
 	PhpExtensions::install($extension);
 }
@@ -14,6 +16,11 @@ foreach (explode(' ', getenv('PHP_EXT')) ?: array() as $extension) {
 /**
  * Class to install native PHP extensions mainly for preparing test runs
  * in continuous integration environments like Travis CI.
+ *
+ * Both plain PHP.net and HHVM interpreters are supported. Some extensions
+ * cannot be installed with HHVM as they are not yet bundled.
+ *
+ * @link https://github.com/facebook/hhvm/wiki/Extensions
  */
 class PhpExtensions {
 
@@ -33,12 +40,19 @@ class PhpExtensions {
 	}
 
 	protected static function _redis() {
+		if (static::_isHhvm()) {
+			throw new RuntimeException("`redis` cannot be used with HHVM.");
+		}
+
 		static::_ini(array(
 			'extension=redis.so'
 		));
 	}
 
 	protected static function _opcache() {
+		if (static::_isHhvm()) {
+			throw new RuntimeException("`opcache` cannot be used with HHVM.");
+		}
 		if (version_compare(PHP_VERSION, '5.5', '<')) {
 			static::_pecl('zendopcache', 'beta');
 
@@ -56,27 +70,36 @@ class PhpExtensions {
 	}
 
 	protected static function _apcu() {
-		static::_pecl('apcu', '4.0.2');
+		if (!static::_isHhvm()) {
+			static::_pecl('apcu', '4.0.2');
+			static::_ini(array('extension=apcu.so'));
+		}
 		static::_ini(array(
-			'extension=apcu.so',
 			'apc.enabled=1',
 			'apc.enable_cli=1'
 		));
 	}
 
 	protected static function _apc() {
+		if (!static::_isHhvm()) {
+			static::_ini(array('extension=apc.so'));
+		}
 		static::_ini(array(
-			'extension=apc.so',
 			'apc.enabled=1',
 			'apc.enable_cli=1'
 		));
 	}
 
 	protected static function _memcached() {
-		static::_ini(array('extension=memcached.so'));
+		if (!static::_isHhvm()) {
+			static::_ini(array('extension=memcached.so'));
+		}
 	}
 
 	protected static function _xcache() {
+		if (static::_isHhvm()) {
+			throw new RuntimeException("`xcache` cannot be used with HHVM.");
+		}
 		static::_build(array(
 			'url' => 'http://xcache.lighttpd.net/pub/Releases/3.1.0/xcache-3.1.0.tar.gz',
 			'configure' => array('--enable-xcache'),
@@ -90,6 +113,9 @@ class PhpExtensions {
 	}
 
 	protected static function _mongo() {
+		if (static::_isHhvm()) {
+			throw new RuntimeException("`mongo` cannot be used with HHVM.");
+		}
 		static::_ini(array('extension=mongo.so'));
 	}
 
@@ -112,11 +138,16 @@ class PhpExtensions {
 	/**
 	 * Add INI settings. Uses configration retrieved as per `php_ini_loaded_file()`.
 	 *
+	 * Note that in HHVM we currently cannot access the loaded ini file.
+	 *
 	 * @see http://php.net/php_ini_loaded_file
 	 * @param array $data INI settings to add.
 	 * @return void
 	 */
 	protected static function _ini(array $data) {
+		if (static::_isHhvm()) {
+			return;
+		}
 		foreach ($data as $ini) {
 			static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
 		}
@@ -166,6 +197,10 @@ class PhpExtensions {
 		));
 
 		echo "=> built\n";
+	}
+
+	protected static function _isHhvm() {
+		return defined('HHVM_VERSION');
 	}
 }
 
