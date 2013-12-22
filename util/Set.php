@@ -584,7 +584,7 @@ class Set {
 	 * @param integer $length
 	 * @return boolean
 	 */
-	public static function matches($data = array(), $conditions, $i = null, $length = null) {
+	public static function matches($data, $conditions, $i = null, $length = null) {
 		if (!$conditions) {
 			return true;
 		}
