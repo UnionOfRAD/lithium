@@ -504,7 +504,6 @@ class CacheTest extends \lithium\test\Unit {
 
 		$result = Cache::read('default', 'to delete');
 		$this->assertEmpty($result);
-
 	}
 
 	public function testClean() {

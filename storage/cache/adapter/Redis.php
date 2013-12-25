@@ -22,7 +22,8 @@ use Closure;
  * instance of Redis server being available.
  *
  * This adapter natively handles atomic multi-key reads/writes/deletes and supports atomic
- * increment/decrement operations as well as clearing the entire cache.
+ * increment/decrement operations as well as clearing the entire cache. Scope support is
+ * natively available.
  *
  * Serialization of values is not handled natively, the `Serializer` strategy must be used
  * if you plan to store non-scalar values or need to keep type on values.
@@ -71,6 +72,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 *        available settings for this adapter are as follows:
 	 *        - `'host'` _string_: A string in the form of `'host:port'` indicating the Redis server
 	 *          to connect to. Defaults to `'127.0.0.1:6379'`.
+	 *        - `'scope'` : Scope which will prefix keys; per default not set.
 	 *        - `'expiry'` _mixed_: Default expiration for cache values written through this
 	 *          adapter. Defaults to `'+1 hour'`. For acceptable values, see the `$expiry` parameter
 	 *          of `Redis::write()`.
@@ -82,6 +84,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'host' => '127.0.0.1:6379',
+			'scope' => null,
 			'expiry' => '+1 hour',
 			'persistent' => false
 		);
@@ -89,7 +92,8 @@ class Redis extends \lithium\storage\cache\Adapter {
 	}
 
 	/**
-	 * Initialize the Redis connection object and connect to the Redis server.
+	 * Initialize the Redis connection object, connect to the Redis server and sets
+	 * prefix using the scope if provided.
 	 *
 	 * @return void
 	 */
@@ -100,6 +104,10 @@ class Redis extends \lithium\storage\cache\Adapter {
 		list($ip, $port) = explode(':', $this->_config['host']);
 		$method = $this->_config['persistent'] ? 'pconnect' : 'connect';
 		$this->connection->{$method}($ip, $port);
+
+		if ($this->_config['scope']) {
+			$this->connection->setOption(RedisCore::OPT_PREFIX, "{$this->_config['scope']}:");
+		}
 	}
 
 	/**

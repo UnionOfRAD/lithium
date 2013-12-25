@@ -130,8 +130,7 @@ class Memory extends \lithium\storage\cache\Adapter {
 		$cache =& $this->_cache;
 
 		return function($self, $params) use (&$cache, $offset) {
-			extract($params);
-			return $cache[$key] -= 1;
+			return $cache[$params['key']] -= 1;
 		};
 	}
 
@@ -147,8 +146,7 @@ class Memory extends \lithium\storage\cache\Adapter {
 		$cache =& $this->_cache;
 
 		return function($self, $params) use (&$cache, $offset) {
-			extract($params);
-			return $cache[$key] += 1;
+			return $cache[$params['key']] += 1;
 		};
 	}
 

@@ -217,6 +217,22 @@ class MemcacheTest extends \lithium\test\Unit {
 		}
 	}
 
+	public function testWriteWithScope() {
+		$adapter = new Memcache(array('scope' => 'primary'));
+
+		$keys = array('key1' => 'test1');
+		$expiry = '+1 minute';
+		$result = $adapter->write($keys, $expiry);
+		$result($adapter, compact('keys', 'expiry'));
+
+		$expected = 'test1';
+		$result = $this->_conn->get('primary:key1');
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_conn->get('key1');
+		$this->assertFalse($result);
+	}
+
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
@@ -297,6 +313,19 @@ class MemcacheTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
+	public function testReadWithScope() {
+		$adapter = new Memcache(array('scope' => 'primary'));
+
+		$this->_conn->set('primary:key1', 'test1', 60);
+		$this->_conn->set('key1', 'test2', 60);
+
+		$keys = array('key1');
+		$expected = array('key1' => 'test1');
+		$result = $adapter->read($keys);
+		$result = $result($adapter, compact('keys'));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testDelete() {
 		$key = 'delete_key';
 		$data = 'data to delete';
@@ -327,6 +356,24 @@ class MemcacheTest extends \lithium\test\Unit {
 
 		$params = compact('keys');
 		$result = $closure($this->memcache, $params);
+		$this->assertFalse($result);
+	}
+
+	public function testDeleteWithScope() {
+		$adapter = new Memcache(array('scope' => 'primary'));
+
+		$this->_conn->set('primary:key1', 'test1', 60);
+		$this->_conn->set('key1', 'test2', 60);
+
+		$keys = array('key1');
+		$expected = array('key1' => 'test1');
+		$result = $adapter->delete($keys);
+		$result($adapter, compact('keys'));
+
+		$result = (boolean) $this->_conn->get('key1');
+		$this->assertTrue($result);
+
+		$result = $this->_conn->get('primary:key1');
 		$this->assertFalse($result);
 	}
 
@@ -483,6 +530,24 @@ class MemcacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testDecrementWithScope() {
+		$adapter = new Memcache(array('scope' => 'primary'));
+
+		$this->_conn->set('primary:key1', 1, 60);
+		$this->_conn->set('key1', 1, 60);
+
+		$result = $adapter->decrement('key1');
+		$result($adapter, array('key' => 'key1'));
+
+		$expected = 1;
+		$result = $this->_conn->get('key1');
+		$this->assertEqual($expected, $result);
+
+		$expected = 0;
+		$result = $this->_conn->get('primary:key1');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testIncrement() {
 		$time = strtotime('+1 minute');
 		$key = 'increment';
@@ -519,6 +584,24 @@ class MemcacheTest extends \lithium\test\Unit {
 
 		$result = $this->_conn->delete($key);
 		$this->assertTrue($result);
+	}
+
+	public function testIncrementWithScope() {
+		$adapter = new Memcache(array('scope' => 'primary'));
+
+		$this->_conn->set('primary:key1', 1, 60);
+		$this->_conn->set('key1', 1, 60);
+
+		$result = $adapter->increment('key1');
+		$result($adapter, array('key' => 'key1'));
+
+		$expected = 1;
+		$result = $this->_conn->get('key1');
+		$this->assertEqual($expected, $result);
+
+		$expected = 2;
+		$result = $this->_conn->get('primary:key1');
+		$this->assertEqual($expected, $result);
 	}
 }
 

@@ -25,7 +25,8 @@ use Closure;
  * operations as well as clearing the entire cache.
  *
  * Cached item persistence is not guaranteed. Infrequently used items will
- * be evicted from the cache when there is no room to store new ones.
+ * be evicted from the cache when there is no room to store new ones. Scope
+ * support is available but not natively.
  *
  * A simple configuration can be accomplished as follows:
  *
@@ -77,6 +78,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * @param array $config Configuration parameters for this cache adapter.
 	 *              These settings are indexed by name and queryable through
 	 *              `Cache::config('name')`. The available options are as follows:
+	 *              - `'scope'` : Scope which will prefix keys; per default not set.
 	 *              - `'expiry'` _mixed_: The default expiration time for cache values, if no value
 	 *                is otherwise set. See the `$expiry` parameter of `Memcache::write()`.
 	 *              - `'host'` _mixed_: Specifies one or more Memcache servers to connect to, with
@@ -84,6 +86,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
+			'scope' => null,
 			'expiry' => '+1 hour',
 			'host' => '127.0.0.1'
 		);
@@ -155,14 +158,20 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	public function write(array $keys, $expiry = null) {
 		$connection =& $this->connection;
 		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
+		$scope = $this->_config['scope'];
 
-		return function($self, $params) use (&$connection, $expiry) {
+		return function($self, $params) use (&$connection, $expiry, $scope) {
 			if (!$expiry || $expiry === Cache::PERSIST) {
 				$expires = 0;
 			} elseif (is_int($expiry)) {
 				$expires = $expiry + time();
 			} else {
 				$expires = strtotime($expiry);
+			}
+			if ($scope) {
+				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
+					$scope, $params['keys']
+				));
 			}
 			if (count($params['keys']) > 1) {
 				return $connection->setMulti($params['keys'], $expires);
@@ -182,18 +191,30 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 */
 	public function read(array $keys) {
 		$connection =& $this->connection;
+		$scope = $this->_config['scope'];
 
-		return function($self, $params) use (&$connection) {
-			if (count($params['keys']) > 1) {
-				return $connection->getMulti($params['keys']);
+		return function($self, $params) use (&$connection, $scope) {
+			if ($scope) {
+				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
+					$scope, $params['keys']
+				));
 			}
-			$result = $connection->get($key = current($params['keys']));
-			$results = array($key => $result);
 
-			if ($results[$key] === false) {
-				if ($connection->getResultCode() === Memcached::RES_NOTFOUND) {
-					$results = array();
+			if (count($params['keys']) > 1) {
+				if (!$results = $connection->getMulti($params['keys'])) {
+					return array();
 				}
+			} else {
+				$result = $connection->get($key = current($params['keys']));
+
+				if ($result === false && $connection->getResultCode() === Memcached::RES_NOTFOUND) {
+					return array();
+				}
+				$results = array($key => $result);
+			}
+
+			if ($scope) {
+				$results = $self->invokeMethod('_removeScopePrefix', array($scope, $results));
 			}
 			return $results;
 		};
@@ -207,8 +228,15 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 */
 	public function delete(array $keys) {
 		$connection =& $this->connection;
+		$scope = $this->_config['scope'];
 
-		return function($self, $params) use (&$connection) {
+		return function($self, $params) use (&$connection, $scope) {
+			if ($scope) {
+				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
+					$scope, $params['keys']
+				));
+			}
+
 			if (count($params['keys']) > 1) {
 				return $connection->deleteMulti($params['keys']);
 			}
@@ -230,9 +258,12 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 */
 	public function decrement($key, $offset = 1) {
 		$connection =& $this->connection;
+		$scope = $this->_config['scope'];
 
-		return function($self, $params) use (&$connection, $offset) {
-			return $connection->decrement($params['key'], $offset);
+		return function($self, $params) use (&$connection, $offset, $scope) {
+			return $connection->decrement(
+				$scope ? "{$scope}:{$params['key']}" : $params['key'], $offset
+			);
 		};
 	}
 
@@ -249,9 +280,12 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 */
 	public function increment($key, $offset = 1) {
 		$connection =& $this->connection;
+		$scope = $this->_config['scope'];
 
-		return function($self, $params) use (&$connection, $offset) {
-			return $connection->increment($params['key'], $offset);
+		return function($self, $params) use (&$connection, $offset, $scope) {
+			return $connection->increment(
+				$scope ? "{$scope}:{$params['key']}" : $params['key'], $offset
+			);
 		};
 	}
 

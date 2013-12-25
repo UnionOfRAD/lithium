@@ -37,6 +37,16 @@ namespace lithium\storage;
  * );
  * }}}
  *
+ * Adapter configurations can be scoped, adapters will then handle the
+ * namespacing of the keys transparently for you:
+ *
+ * {{{
+ * Cache::config(array(
+ *     'primary'   => array('adapter' => 'Apc', 'scope' => 'primary'),
+ *     'secondary' => array('adapter' => 'Apc', 'scope' => 'secondary')
+ * );
+ * }}}
+ *
  * Cache adapters differ in the functionality they provide and how the provide it. To see
  * if an adapter meets your requirement and for more information on the specifics
  * (i.e. atomicity of operations), consult the documentation the adapter first.

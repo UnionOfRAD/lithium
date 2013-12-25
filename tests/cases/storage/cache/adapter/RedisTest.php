@@ -241,6 +241,22 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertFalse($result);
 	}
 
+	public function testWriteWithScope() {
+		$adapter = new Redis(array('scope' => 'primary'));
+
+		$keys = array('key1' => 'test1');
+		$expiry = '+1 minute';
+		$result = $adapter->write($keys, $expiry);
+		$result($adapter, compact('keys', 'expiry'));
+
+		$expected = 'test1';
+		$result = $this->_redis->get('primary:key1');
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_redis->get('key1');
+		$this->assertFalse($result);
+	}
+
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
@@ -364,6 +380,19 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($result($this->redis, compact('keys', 'expiry')));
 	}
 
+	public function testReadWithScope() {
+		$adapter = new Redis(array('scope' => 'primary'));
+
+		$this->_redis->set('primary:key1', 'test1', 60);
+		$this->_redis->set('key1', 'test2', 60);
+
+		$keys = array('key1');
+		$expected = array('key1' => 'test1');
+		$result = $adapter->read($keys);
+		$result = $result($adapter, compact('keys'));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testDelete() {
 		$key = 'delete_key';
 		$data = 'data to delete';
@@ -391,6 +420,24 @@ class RedisTest extends \lithium\test\Unit {
 
 		$params = compact('keys');
 		$result = $closure($this->redis, $params, null);
+		$this->assertFalse($result);
+	}
+
+	public function testDeleteWithScope() {
+		$adapter = new Redis(array('scope' => 'primary'));
+
+		$this->_redis->set('primary:key1', 'test1', 60);
+		$this->_redis->set('key1', 'test2', 60);
+
+		$keys = array('key1');
+		$expected = array('key1' => 'test1');
+		$result = $adapter->delete($keys);
+		$result($adapter, compact('keys'));
+
+		$result = (boolean) $this->_redis->get('key1');
+		$this->assertTrue($result);
+
+		$result = $this->_redis->get('primary:key1');
 		$this->assertFalse($result);
 	}
 
@@ -487,6 +534,24 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual(1, $result);
 	}
 
+	public function testDecrementWithScope() {
+		$adapter = new Redis(array('scope' => 'primary'));
+
+		$this->_redis->set('primary:key1', 1, 60);
+		$this->_redis->set('key1', 1, 60);
+
+		$result = $adapter->decrement('key1');
+		$result($adapter, array('key' => 'key1'));
+
+		$expected = 1;
+		$result = $this->_redis->get('key1');
+		$this->assertEqual($expected, $result);
+
+		$expected = 0;
+		$result = $this->_redis->get('primary:key1');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testIncrement() {
 		$key = 'increment';
 		$value = 10;
@@ -529,6 +594,24 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual(1, $result);
 	}
 
+	public function testIncrementWithScope() {
+		$adapter = new Redis(array('scope' => 'primary'));
+
+		$this->_redis->set('primary:key1', 1, 60);
+		$this->_redis->set('key1', 1, 60);
+
+		$result = $adapter->increment('key1');
+		$result($adapter, array('key' => 'key1'));
+
+		$expected = 1;
+		$result = $this->_redis->get('key1');
+		$this->assertEqual($expected, $result);
+
+		$expected = 2;
+		$result = $this->_redis->get('primary:key1');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testMethodDispatch() {
 		$this->_redis->flushdb();
 		$this->_redis->set('some_key', 'somevalue');
@@ -550,7 +633,6 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($this->redis->respondsTo('applyFilter'));
 		$this->assertFalse($this->redis->respondsTo('fooBarBaz'));
 	}
-
 }
 
 ?>
