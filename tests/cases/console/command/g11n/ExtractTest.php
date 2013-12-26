@@ -50,9 +50,12 @@ class ExtractTest extends \lithium\test\Unit {
 		rewind($this->command->request->input);
 	}
 
+	/**
+	 * Added realpath() to fix issues when lithium is linked in to the app's libraries directory.
+	 */
 	public function testInit() {
 		$command = new Extract();
-		$this->assertEqual(realpath(Libraries::get(true, 'path')), $command->source);
+		$this->assertEqual(realpath(Libraries::get(true, 'path')), realpath($command->source));
 		$this->assertEqual(Libraries::get(true, 'resources') . '/g11n', $command->destination);
 	}
 
