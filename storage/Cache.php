@@ -112,11 +112,10 @@ class Cache extends \lithium\core\Adaptable {
 		if (!isset($settings[$name])) {
 			return false;
 		}
-		$conditions = $options['conditions'];
-
-		if (is_callable($conditions) && !$conditions()) {
+		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
+
 		$key = static::key($key, $data);
 
 		if (is_array($key)) {
@@ -150,11 +149,10 @@ class Cache extends \lithium\core\Adaptable {
 		if (!isset($settings[$name])) {
 			return false;
 		}
-		$conditions = $options['conditions'];
-
-		if (is_callable($conditions) && !$conditions()) {
+		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
+
 		$key = static::key($key);
 		$method = static::adapter($name)->read($key);
 		$params = compact('key');
@@ -198,9 +196,7 @@ class Cache extends \lithium\core\Adaptable {
 		if (!isset($settings[$name])) {
 			return false;
 		}
-		$conditions = $options['conditions'];
-
-		if (is_callable($conditions) && !$conditions()) {
+		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
 
