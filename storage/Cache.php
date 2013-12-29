@@ -205,8 +205,9 @@ class Cache extends \lithium\core\Adaptable {
 		$filters = $settings[$name]['filters'];
 
 		if ($options['strategies']) {
-			$options += array('key' => $key, 'class' => __CLASS__);
-			$key = static::applyStrategies(__FUNCTION__, $name, $key, $options);
+			$key = static::applyStrategies(__FUNCTION__, $name, $key, array(
+				'key' => $key, 'class' => __CLASS__
+			));
 		}
 		return static::_filter(__FUNCTION__, compact('key'), $method, $filters);
 	}
