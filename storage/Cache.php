@@ -105,7 +105,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return boolean True on successful cache write, false otherwise
 	 * @filter This method may be filtered.
 	 */
-	public static function write($name, $key, $data, $expiry = null, array $options = array()) {
+	public static function write($name, $key, $data = null, $expiry = null, array $options = array()) {
 		$options += array('conditions' => null, 'strategies' => true);
 		$settings = static::config();
 
@@ -120,7 +120,8 @@ class Cache extends \lithium\core\Adaptable {
 
 		if (is_array($key)) {
 			$expiry = $data;
-			$data = null;
+		} else {
+			$keys = array($key => $data);
 		}
 
 		if ($options['strategies']) {
