@@ -124,8 +124,17 @@ class Cache extends \lithium\core\Adaptable {
 		}
 
 		if ($options['strategies']) {
-			$options = array('key' => $key, 'class' => __CLASS__);
-			$data = static::applyStrategies(__FUNCTION__, $name, $data, $options);
+			if (is_array($key)) {
+				foreach ($key as $k => &$v) {
+					$v = static::applyStrategies(__FUNCTION__, $name, $v, array(
+						'key' => $k, 'class' => __CLASS__
+					));
+				}
+			} else {
+				$data = static::applyStrategies(__FUNCTION__, $name, $data, array(
+					'key' => $key, 'class' => __CLASS__
+				));
+			}
 		}
 
 		$method = static::adapter($name)->write($key, $data, $expiry);
@@ -169,9 +178,18 @@ class Cache extends \lithium\core\Adaptable {
 			}
 		}
 
-		if ($options['strategies']) {
-			$options = compact('key') + array('mode' => 'LIFO', 'class' => __CLASS__);
-			$result = static::applyStrategies(__FUNCTION__, $name, $result, $options);
+		if (!$options['strategies']) {
+			return $result;
+		}
+		if (!is_array($key)) {
+			return static::applyStrategies(__FUNCTION__, $name, $result, array(
+				'key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__
+			));
+		}
+		foreach ($result as $k => &$v) {
+			$v = static::applyStrategies(__FUNCTION__, $name, $v, array(
+				'key' => $k, 'mode' => 'LIFO', 'class' => __CLASS__
+			));
 		}
 		return $result;
 	}
@@ -205,9 +223,17 @@ class Cache extends \lithium\core\Adaptable {
 		$filters = $settings[$name]['filters'];
 
 		if ($options['strategies']) {
-			$key = static::applyStrategies(__FUNCTION__, $name, $key, array(
-				'key' => $key, 'class' => __CLASS__
-			));
+			if (is_array($key)) {
+				foreach ($key as &$k) {
+					$k = static::applyStrategies(__FUNCTION__, $name, $k, array(
+						'key' => $k, 'class' => __CLASS__
+					));
+				}
+			} else {
+				$key = static::applyStrategies(__FUNCTION__, $name, $key, array(
+					'key' => $key, 'class' => __CLASS__
+				));
+			}
 		}
 		return static::_filter(__FUNCTION__, compact('key'), $method, $filters);
 	}

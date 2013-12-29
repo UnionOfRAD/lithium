@@ -42,6 +42,58 @@ class CacheTest extends \lithium\test\Integration {
 		$this->assertEqual($config, Cache::config());
 	}
 
+	public function testMultiWriteReadWithStrategies() {
+		Cache::config(array(
+			'default' => array(
+				'adapter' => 'Memory',
+				'strategies' => array('Serializer')
+			)
+		));
+		$keys = array(
+			'key1' => 'data1',
+			'key2' => 'data2'
+		);
+		$result = Cache::write('default', $keys, null);
+		$this->assertTrue($result);
+
+		$expected = array(
+			'key1' => 'data1',
+			'key2' => 'data2'
+		);
+		$keys = array(
+			'key1',
+			'key2'
+		);
+		$result = Cache::read('default', $keys);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testMultiWriteReadWithMultipleStrategies() {
+		Cache::config(array(
+			'default' => array(
+				'adapter' => 'Memory',
+				'strategies' => array('Serializer', 'Base64')
+			)
+		));
+		$keys = array(
+			'key1' => 'data1',
+			'key2' => 'data2'
+		);
+		$result = Cache::write('default', $keys, null);
+		$this->assertTrue($result);
+
+		$expected = array(
+			'key1' => 'data1',
+			'key2' => 'data2'
+		);
+		$keys = array(
+			'key1',
+			'key2'
+		);
+		$result = Cache::read('default', $keys);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testFileAdapterWrite() {
 		$resources = Libraries::get(true, 'resources');
 		$path = "{$resources}/tmp/cache";
