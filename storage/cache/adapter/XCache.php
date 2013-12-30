@@ -40,7 +40,7 @@ use Closure;
  * and `clear` cache functionality, as well as allowing the first four
  * methods to be filtered as per the Lithium filtering system.
  *
- * This adapter does *not* allow multi-key operations for any methods.
+ * This adapter synthetically supports multi-key `write`, `read` and `delete` operations.
  *
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\cache\adapter
@@ -58,43 +58,69 @@ class XCache extends \lithium\core\Object {
 	}
 
 	/**
-	 * Write value(s) to the cache
+	 * Write values to the cache. All items to be cached will receive an
+	 * expiration time of `$expiry`.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @param mixed $data The value to be cached
-	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
+	 * Note that this is not an atomic operation when using multiple keys.
+	 *
+	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
+	 * @param null|string $expiry A `strtotime()` compatible cache time. If no expiry time is set,
 	 *        then the default cache expiration time set with the cache configuration will be used.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $data, $expiry = null) {
-		$expiry = ($expiry) ?: $this->_config['expiry'];
+	public function write(array $keys, $expiry = null) {
+		$expiry = strtotime($expiry ?: $this->_config['expiry']) - time();
 
 		return function($self, $params) use ($expiry) {
-			return xcache_set($params['key'], $params['data'], strtotime($expiry) - time());
+			foreach ($params['keys'] as $key => $value) {
+				if (!xcache_set($key, $value, $expiry)) {
+					return false;
+				}
+			}
+			return true;
 		};
 	}
 
 	/**
-	 * Read value(s) from the cache
+	 * Read values from the cache. Will attempt to return an array of data
+	 * containing key/value pairs of the requested data.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return Closure Function returning cached value if successful, `false` otherwise
+	 * Note that this is not an atomic operation when using multiple keys.
+	 *
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return Closure Function returning cached values keyed by cache keys
+	 *                 on successful read, keys which could not be read will
+	 *                 not be included in the results array.
 	 */
-	public function read($key) {
+	public function read(array $keys) {
 		return function($self, $params) {
-			return xcache_get($params['key']);
+			$results = array();
+
+			foreach ($params['keys'] as $key) {
+				if ($result = xcache_get($key)) {
+					$results[$key] = $result;
+				}
+			}
+			return $results;
 		};
 	}
 
 	/**
-	 * Delete value from the cache
+	 * Will attempt to remove specified keys from the user space cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise
+	 * Note that this is not an atomic operation when using multiple keys.
+	 *
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
 	 */
-	public function delete($key) {
+	public function delete(array $keys) {
 		return function($self, $params) {
-			return xcache_unset($params['key']);
+			foreach ($params['keys'] as $key) {
+				if (!xcache_unset($key)) {
+					return false;
+				}
+			}
+			return true;
 		};
 	}
 
