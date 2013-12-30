@@ -81,7 +81,9 @@ class Cache extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Writes to the specified cache configuration. Can handle single- and multikey writes.
+	 * Writes to the specified cache configuration.
+	 *
+	 * Can handle single- and multi-key writes.
 	 *
 	 * This method has two valid syntaxes depending on if you're storing
 	 * data using a single key or multiple keys as outlined below.
@@ -96,12 +98,13 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * @param string $name Configuration to be used for writing.
 	 * @param mixed $key Key to uniquely identify the cache entry or an array of key/value pairs
-	 *                   for multikey-writes mapping cache keys to data to be cached.
+	 *                   for multi-key writes mapping cache keys to the data to be cached.
 	 * @param mixed $data Data to be cached.
 	 * @param string $expiry A strtotime() compatible cache time.
 	 * @param mixed $options Options for the method, filters and strategies.
-	 * @return boolean True on successful cache write, false otherwise. For multikey writes if
-	 *                 any of the writes fails returns `false`.
+	 * @return boolean `true` on successful cache write, `false` otherwise. When writing
+	 *                 multiple items and an error occurs writing any of the items the
+	 *                 whole operation fails and this method will return `false`.
 	 * @filter This method may be filtered.
 	 */
 	public static function write($name, $key, $data = null, $expiry = null, array $options = array()) {
@@ -136,15 +139,19 @@ class Cache extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Reads from the specified cache configuration. Can handle single- and multikey reads.
+	 * Reads from the specified cache configuration.
+	 *
+	 * Can handle single- and multi-key reads.
 	 *
 	 * @param string $name Configuration to be used for reading.
 	 * @param mixed $key Key to uniquely identify the cache entry or an array of keys
 	 *                   for multikey-reads.
 	 * @param mixed $options Options for the method and strategies.
-	 * @return mixed Read results on successful cache read, null otherwise. For multikey reads
-	 *               will always return an array; if one of the reads fails the key will
-	 *               map to `null`.
+	 * @return mixed For single-key reads will return the result if the cache
+	 *               key has been found otherwise returns `null`. When reading
+	 *               multiple keys a results array is returned mapping keys to
+	 *               retrieved values. Keys where the value couldn't successfully
+	 *               been read will not be contained in the results array.
 	 * @filter This method may be filtered.
 	 */
 	public static function read($name, $key, array $options = array()) {
@@ -194,14 +201,16 @@ class Cache extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Delete one or multiple values from the specified cache configuration.
+	 * Deletes using the specified cache configuration.
+	 *
+	 * Can handle single- and multi-key deletes.
 	 *
 	 * @param string $name The cache configuration to delete from.
 	 * @param mixed $key Key to be deleted or an array of keys to delete.
 	 * @param mixed $options Options for the method and strategies.
-	 * @return boolean True on successful deletion, false otherwise. For
-	 *                 multikey deletes returns `false` if any of the deletes
-	 *                 fails.
+	 * @return boolean `true` on successful cache delete, `false` otherwise. When deleting
+	 *                 multiple items and an error occurs deleting any of the items the
+	 *                 whole operation fails and this method will return `false`.
 	 * @filter This method may be filtered.
 	 * @fixme Support for delete strategies should be removed in future
 	 *        versions as cache strategies don't make any use of them and
