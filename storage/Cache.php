@@ -40,9 +40,6 @@ namespace lithium\storage;
  * This allows a very wide range of flexibility, at the cost of portability.
  *
  * Some cache adapters (e.g. `File`) do _not_ provide the functionality for increment/decrement.
- * Additionally, some cache adapters support multi-key operations for `write`, `read` and `delete`
- * &mdash; please see the individual documentation for cache adapters and the operations that
- * they support.
  *
  * @see lithium\core\Adaptable
  * @see lithium\storage\cache\adapter
@@ -84,7 +81,7 @@ class Cache extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Writes to the specified cache configuration.
+	 * Writes to the specified cache configuration. Can handle single- and multikey writes.
 	 *
 	 * This method has two valid syntaxes depending on if you're storing
 	 * data using a single key or multiple keys as outlined below.
@@ -97,12 +94,14 @@ class Cache extends \lithium\core\Adaptable {
 	 * Cache::write('default', array('foo' => 'bar', ... ), '+1 minute');
 	 * }}}
 	 *
-	 * @param string $name Configuration to be used for writing
-	 * @param mixed $key Key to uniquely identify the cache entry
-	 * @param mixed $data Data to be cached
-	 * @param string $expiry A strtotime() compatible cache time
+	 * @param string $name Configuration to be used for writing.
+	 * @param mixed $key Key to uniquely identify the cache entry or an array of key/value pairs
+	 *                   for multikey-writes mapping cache keys to data to be cached.
+	 * @param mixed $data Data to be cached.
+	 * @param string $expiry A strtotime() compatible cache time.
 	 * @param mixed $options Options for the method, filters and strategies.
-	 * @return boolean True on successful cache write, false otherwise
+	 * @return boolean True on successful cache write, false otherwise. For multikey writes if
+	 *                 any of the writes fails returns `false`.
 	 * @filter This method may be filtered.
 	 */
 	public static function write($name, $key, $data = null, $expiry = null, array $options = array()) {
@@ -115,41 +114,37 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-
 		$key = static::key($key, $data);
 
-		if (is_array($key)) {
+		if ($isMulti = is_array($key)) {
+			$keys = $key;
 			$expiry = $data;
 		} else {
 			$keys = array($key => $data);
 		}
 
 		if ($options['strategies']) {
-			if (is_array($key)) {
-				foreach ($key as $k => &$v) {
-					$v = static::applyStrategies(__FUNCTION__, $name, $v, array(
-						'key' => $k, 'class' => __CLASS__
-					));
-				}
-			} else {
-				$data = static::applyStrategies(__FUNCTION__, $name, $data, array(
+			foreach ($keys as $key => &$value) {
+				$value = static::applyStrategies(__FUNCTION__, $name, $value, array(
 					'key' => $key, 'class' => __CLASS__
 				));
 			}
 		}
-
-		$method = static::adapter($name)->write($key, $data, $expiry);
-		$params = compact('key', 'data', 'expiry');
+		$method = static::adapter($name)->write($keys, $expiry);
+		$params = compact('keys', 'expiry');
 		return static::_filter(__FUNCTION__, $params, $method, $settings[$name]['filters']);
 	}
 
 	/**
-	 * Reads from the specified cache configuration
+	 * Reads from the specified cache configuration. Can handle single- and multikey reads.
 	 *
-	 * @param string $name Configuration to be used for reading
-	 * @param mixed $key Key to be retrieved
+	 * @param string $name Configuration to be used for reading.
+	 * @param mixed $key Key to uniquely identify the cache entry or an array of keys
+	 *                   for multikey-reads.
 	 * @param mixed $options Options for the method and strategies.
-	 * @return mixed Read results on successful cache read, null otherwise
+	 * @return mixed Read results on successful cache read, null otherwise. For multikey reads
+	 *               will always return an array; if one of the reads fails the key will
+	 *               map to `null`.
 	 * @filter This method may be filtered.
 	 */
 	public static function read($name, $key, array $options = array()) {
@@ -162,46 +157,51 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-
 		$key = static::key($key);
-		$method = static::adapter($name)->read($key);
-		$params = compact('key');
+
+		if ($isMulti = is_array($key)) {
+			$keys = $key;
+		} else {
+			$keys = array($key);
+		}
+
+		$method = static::adapter($name)->read($keys);
+		$params = compact('keys');
 		$filters = $settings[$name]['filters'];
-		$result = static::_filter(__FUNCTION__, $params, $method, $filters);
+		$results = static::_filter(__FUNCTION__, $params, $method, $filters);
 
-		if ($result === null && ($write = $options['write'])) {
-			$write = is_callable($write) ? $write() : $write;
-			list($expiry, $value) = each($write);
-			$value = is_callable($value) ? $value() : $value;
+		foreach ($params['keys'] as $key) {
+			if (!isset($results[$key]) && ($write = $options['write'])) {
+				$write = is_callable($write) ? $write() : $write;
+				list($expiry, $value) = each($write);
+				$value = is_callable($value) ? $value() : $value;
 
-			if (static::write($name, $key, $value, $expiry)) {
-				$result = $value;
+				if (static::write($name, $key, $value, $expiry)) {
+					$results[$key] = $value;
+				}
 			}
 		}
+		unset($result);
 
-		if (!$options['strategies']) {
-			return $result;
+		if ($options['strategies']) {
+			foreach ($results as $key => &$result) {
+				$result = static::applyStrategies(__FUNCTION__, $name, $result, array(
+					'key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__
+				));
+			}
 		}
-		if (!is_array($key)) {
-			return static::applyStrategies(__FUNCTION__, $name, $result, array(
-				'key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__
-			));
-		}
-		foreach ($result as $k => &$v) {
-			$v = static::applyStrategies(__FUNCTION__, $name, $v, array(
-				'key' => $k, 'mode' => 'LIFO', 'class' => __CLASS__
-			));
-		}
-		return $result;
+		return $isMulti ? $results : ($results ? reset($results) : null);
 	}
 
 	/**
-	 * Delete a value from the specified cache configuration
+	 * Delete one or multiple values from the specified cache configuration.
 	 *
-	 * @param string $name The cache configuration to delete from
-	 * @param mixed $key Key to be deleted
+	 * @param string $name The cache configuration to delete from.
+	 * @param mixed $key Key to be deleted or an array of keys to delete.
 	 * @param mixed $options Options for the method and strategies.
-	 * @return boolean True on successful deletion, false otherwise
+	 * @return boolean True on successful deletion, false otherwise. For
+	 *                 multikey deletes returns `false` if any of the deletes
+	 *                 fails.
 	 * @filter This method may be filtered.
 	 * @fixme Support for delete strategies should be removed in future
 	 *        versions as cache strategies don't make any use of them and
@@ -220,23 +220,23 @@ class Cache extends \lithium\core\Adaptable {
 		}
 
 		$key = static::key($key);
-		$method = static::adapter($name)->delete($key);
+
+		if ($isMulti = is_array($key)) {
+			$keys = $key;
+		} else {
+			$keys = array($key);
+		}
+		$method = static::adapter($name)->delete($keys);
 		$filters = $settings[$name]['filters'];
 
 		if ($options['strategies']) {
-			if (is_array($key)) {
-				foreach ($key as &$k) {
-					$k = static::applyStrategies(__FUNCTION__, $name, $k, array(
-						'key' => $k, 'class' => __CLASS__
-					));
-				}
-			} else {
+			foreach ($keys as &$key) {
 				$key = static::applyStrategies(__FUNCTION__, $name, $key, array(
 					'key' => $key, 'class' => __CLASS__
 				));
 			}
 		}
-		return static::_filter(__FUNCTION__, compact('key'), $method, $filters);
+		return static::_filter(__FUNCTION__, compact('keys'), $method, $filters);
 	}
 
 	/**
