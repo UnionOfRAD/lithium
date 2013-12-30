@@ -186,6 +186,10 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param mixed $options Options for the method and strategies.
 	 * @return boolean True on successful deletion, false otherwise
 	 * @filter This method may be filtered.
+	 * @fixme Support for delete strategies should be removed in future
+	 *        versions as cache strategies don't make any use of them and
+	 *        the lack of use cases for manipulating the cache key on delete
+	 *        can be doubted.
 	 */
 	public static function delete($name, $key, array $options = array()) {
 		$options += array('conditions' => null, 'strategies' => true);
