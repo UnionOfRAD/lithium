@@ -82,7 +82,7 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @param string $key The key to uniquely identify the cached item.
 	 * @param mixed $data The value to be cached.
-	 * @param string $expiry A strtotime() compatible cache time.
+	 * @param null|string $expiry Unused.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($key, $data, $expiry) {
