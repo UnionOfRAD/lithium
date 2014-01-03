@@ -665,7 +665,7 @@ class ModelTest extends \lithium\test\Unit {
 		$result = $post->errors();
 		$this->assertNotEmpty($result);
 
-		$post->email = 'contact@lithify.me';
+		$post->email = 'contact@li3.me';
 		$result = $post->validates();
 		$this->assertTrue($result);
 		$result = $post->errors();

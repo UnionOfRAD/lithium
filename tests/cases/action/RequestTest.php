@@ -1314,7 +1314,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function testConvertToStringWithPost() {
 		$request = new Request(array(
 			'env' => array(
-				'HTTP_HOST' => 'lithify.me',
+				'HTTP_HOST' => 'li3.me',
 				'CONTENT_TYPE' => 'application/x-www-form-urlencoded',
 				'HTTP_USER_AGENT' => 'Mozilla/5.0'
 			),
@@ -1324,7 +1324,7 @@ class RequestTest extends \lithium\test\Unit {
 
 		$expected = join("\r\n", array(
 			'GET /posts HTTP/1.1',
-			'Host: lithify.me',
+			'Host: li3.me',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/x-www-form-urlencoded',
@@ -1337,7 +1337,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function testConvertToStringWithJson() {
 		$expected = join("\r\n", array(
 			'GET /posts HTTP/1.1',
-			'Host: lithify.me',
+			'Host: li3.me',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Type: application/json',
@@ -1347,7 +1347,7 @@ class RequestTest extends \lithium\test\Unit {
 
 		$request = new Request(array(
 			'env' => array(
-				'HTTP_HOST' => 'lithify.me',
+				'HTTP_HOST' => 'li3.me',
 				'CONTENT_TYPE' => 'application/json',
 				'HTTP_USER_AGENT' => 'Mozilla/5.0'
 			),
@@ -1359,7 +1359,7 @@ class RequestTest extends \lithium\test\Unit {
 
 		$request = new Request(array(
 			'env' => array(
-				'HTTP_HOST' => 'lithify.me',
+				'HTTP_HOST' => 'li3.me',
 				'CONTENT_TYPE' => 'application/json',
 				'HTTP_USER_AGENT' => 'Mozilla/5.0'
 			),

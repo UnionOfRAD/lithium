@@ -684,7 +684,7 @@ class Request extends \lithium\net\http\Request {
 
 	/**
 	 * Sets or returns the current locale string. For more information, see
-	 * "[Globalization](http://lithify.me/docs/manual/07_globalization)" in the manual.
+	 * "[Globalization](http://li3.me/docs/manual/07_globalization)" in the manual.
 	 *
 	 * @param string $locale An optional locale string like `'en'`, `'en_US'` or `'de_DE'`. If
 	 *        specified, will overwrite the existing locale.
