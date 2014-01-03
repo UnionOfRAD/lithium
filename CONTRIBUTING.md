@@ -12,4 +12,4 @@ Here's what you need to stick to in order to have the best chance of getting you
 
 As always, all contributions are important, and we're very grateful for the help of all those who have gotten us this far. If you're interested in helping out, but feel you could use a little coaching, be sure to drop by #li3-core and introduce yourself -- we'd love to help you get started.
 
-Please see the full documentation over at the [contribution guidelines](http://lithify.me/docs/manual/appendices/contributing.wiki) at [lithify.me](http://lithify.me/)
+Please see the full documentation over at the [contribution guidelines](http://li3.me/docs/manual/appendices/contributing.wiki) at [li3.me](http://li3.me/)

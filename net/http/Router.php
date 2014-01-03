@@ -687,7 +687,7 @@ class Router extends \lithium\core\StaticObject {
 	 * {{{
 	 * Router::attach('app', null, array(
 	 *     'subdomain' => 'www',
-	 *     'hostname' => 'lithify',
+	 *     'hostname' => 'li3',
 	 *     'tld' => 'me'
 	 * ));
 	 * }}}
