@@ -207,11 +207,9 @@ class MemcacheTest extends \lithium\test\Unit {
 		$key = 'does_not_exist';
 		$keys = array($key);
 		$closure = $this->memcache->read($keys);
-		$this->assertInternalType('callable', $closure);
 
 		$expected = array();
-		$params = compact('keys');
-		$result = $closure($this->memcache, $params);
+		$result = $closure($this->memcache, compact('keys'));
 		$this->assertIdentical($expected, $result);
 	}
 

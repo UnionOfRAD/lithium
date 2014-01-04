@@ -155,11 +155,9 @@ class XCacheTest extends \lithium\test\Unit {
 		$key = 'does_not_exist';
 		$keys = array($key);
 		$closure = $this->XCache->read($keys);
-		$this->assertInternalType('callable', $closure);
 
 		$expected = array();
-		$params = compact('keys');
-		$result = $closure($this->XCache, $params);
+		$result = $closure($this->XCache, compact('keys'));
 		$this->assertIdentical($expected, $result);
 	}
 

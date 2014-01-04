@@ -233,11 +233,9 @@ class RedisTest extends \lithium\test\Unit {
 		$key = 'does_not_exist';
 		$keys = array($key);
 		$closure = $this->redis->read($keys);
-		$this->assertInternalType('callable', $closure);
 
 		$expected = array();
-		$params = compact('keys');
-		$result = $closure($this->redis, $params, null);
+		$result = $closure($this->redis, compact('keys'));
 		$this->assertIdentical($expected, $result);
 	}
 
