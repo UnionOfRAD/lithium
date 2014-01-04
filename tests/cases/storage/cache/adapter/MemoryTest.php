@@ -176,6 +176,14 @@ class MemoryTest extends \lithium\test\Unit {
 		$this->assertEqual($data - 1, $result);
 	}
 
+	public function testReadKeyThatDoesNotExist() {
+		$key = 'does_not_exist';
+		$closure = $this->Memory->read($key);
+
+		$result = $closure($this->Memory, compact('key'));
+		$this->assertNull($result);
+	}
+
 	public function testClean() {
 		$result = $this->Memory->clean();
 		$this->assertFalse($result);
