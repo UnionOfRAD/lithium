@@ -153,7 +153,7 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$params = compact('key');
 		$result = $closure($this->XCache, $params, null);
-		$this->assertFalse($result);
+		$this->assertNull($result);
 
 	}
 
@@ -236,8 +236,8 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = $this->XCache->clear();
 		$this->assertTrue($result);
 
-		$this->assertFalse(xcache_get($key1));
-		$this->assertFalse(xcache_get($key2));
+		$this->assertNull(xcache_get($key1));
+		$this->assertNull(xcache_get($key2));
 	}
 
 	public function testDecrement() {
