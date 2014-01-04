@@ -88,6 +88,26 @@ class XCacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testWriteMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		$closure = $this->XCache->write($keys, $expiry);
+		$result = $closure($this->XCache, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		foreach ($keys as $key => $data) {
+			$expected = $data;
+			$result = xcache_get($key);
+			$this->assertEqual($expected, $result);
+
+			xcache_unset($key);
+		}
+	}
+
 	public function testWriteDefaultCacheExpiry() {
 		$xCache = new XCache(array('expiry' => '+5 seconds'));
 		$key = 'default_key';
@@ -159,6 +179,35 @@ class XCacheTest extends \lithium\test\Unit {
 		$expected = array();
 		$result = $closure($this->XCache, compact('keys'));
 		$this->assertIdentical($expected, $result);
+	}
+
+	public function testReadMulti() {
+		$keys = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		foreach ($keys as $key => $data) {
+			xcache_set($key, $data, 60);
+		}
+
+		$expected = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		$keys = array(
+			'key1',
+			'key2',
+			'key3'
+		);
+		$closure = $this->XCache->read($keys);
+		$result = $closure($this->XCache, compact('keys'));
+		$this->assertEqual($expected, $result);
+
+		foreach ($keys as $key) {
+			xcache_unset($key);
+		}
 	}
 
 	public function testDelete() {
