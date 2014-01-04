@@ -100,7 +100,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param mixed $key Key to uniquely identify the cache entry or an array of key/value pairs
 	 *                   for multi-key writes mapping cache keys to the data to be cached.
 	 * @param mixed $data Data to be cached.
-	 * @param string $expiry A strtotime() compatible cache time.
+	 * @param string $expiry A `strtotime()` compatible cache time.
 	 * @param mixed $options Options for the method, filters and strategies.
 	 * @return boolean `true` on successful cache write, `false` otherwise. When writing
 	 *                 multiple items and an error occurs writing any of the items the
