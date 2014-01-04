@@ -94,9 +94,9 @@ class Environment {
 	 * in turn passes this on to the _detector_ used to determine the correct environment). Can be
 	 * tested or retrieved using `Environment::is()` or `Environment::get()`.
 	 *
-	 * @see lithium\correct\Environment::set()
-	 * @see lithium\correct\Environment::is()
-	 * @see lithium\correct\Environment::get()
+	 * @see lithium\core\Environment::set()
+	 * @see lithium\core\Environment::is()
+	 * @see lithium\core\Environment::get()
 	 * @var string
 	 */
 	protected static $_current = '';
