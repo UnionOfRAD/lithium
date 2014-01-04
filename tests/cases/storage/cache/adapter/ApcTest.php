@@ -39,16 +39,17 @@ class ApcTest extends \lithium\test\Unit {
 	public function testSimpleWrite() {
 		$key = 'key';
 		$data = 'value';
+		$keys = array($key => $data);
 		$expiry = '+5 seconds';
 
-		$closure = $this->Apc->write($key, $data, $expiry);
+		$closure = $this->Apc->write($keys, $expiry);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->Apc, $params, null);
-		$expected = $data;
+		$params = compact('keys', 'expiry');
+		$result = $closure($this->Apc, $params);
 		$this->assertTrue($result);
 
+		$expected = $data;
 		$result = apc_fetch($key);
 		$this->assertEqual($expected, $result);
 
@@ -57,16 +58,18 @@ class ApcTest extends \lithium\test\Unit {
 
 		$key = 'another_key';
 		$data = 'more_data';
+		$keys = array($key => $data);
 		$expiry = '+1 minute';
 
-		$closure = $this->Apc->write($key, $data, $expiry);
+		$closure = $this->Apc->write($keys, $expiry);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->Apc, $params, null);
-		$expected = $data;
+		$expected = $keys;
+		$params = compact('keys', 'expiry');
+		$result = $closure($this->Apc, $params);
 		$this->assertTrue($result);
 
+		$expected = $data;
 		$result = apc_fetch($key);
 		$this->assertEqual($expected, $result);
 
@@ -78,15 +81,16 @@ class ApcTest extends \lithium\test\Unit {
 		$apc = new Apc(array('expiry' => '+5 seconds'));
 		$key = 'key';
 		$data = 'value';
+		$keys = array($key => $data);
 
-		$closure = $apc->write($key, $data);
+		$closure = $apc->write($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data');
-		$result = $closure($apc, $params, null);
-		$expected = $data;
+		$params = compact('keys');
+		$result = $closure($apc, $params);
 		$this->assertTrue($result);
 
+		$expected = $data;
 		$result = apc_fetch($key);
 		$this->assertEqual($expected, $result);
 
@@ -96,41 +100,41 @@ class ApcTest extends \lithium\test\Unit {
 
 	public function testWriteMulti() {
 		$expiry = '+1 minute';
-		$key = array(
+		$keys = array(
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
 		);
 		$data = null;
 
-		$closure = $this->Apc->write($key, $data, $expiry);
+		$closure = $this->Apc->write($keys, $expiry);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->Apc, $params, null);
+		$params = compact('keys', 'expiry');
+		$result = $closure($this->Apc, $params);
+		$this->assertTrue($result);
 
-		$this->assertEqual(array(), $result);
+		$result = apc_fetch(array_keys($keys));
+		$this->assertEqual($keys, $result);
 
-		$result = apc_fetch(array_keys($key));
-		$this->assertEqual($key, $result);
-
-		$result = apc_delete(array_keys($key));
+		$result = apc_delete(array_keys($keys));
 		$this->assertEqual(array(), $result);
 	}
 
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
+		$keys = array($key);
 
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->Apc->read($key);
+		$closure = $this->Apc->read($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$result = $closure($this->Apc, $params, null);
-		$expected = $data;
+		$expected = array($key => $data);
+		$params = compact('keys');
+		$result = $closure($this->Apc, $params);
 		$this->assertEqual($expected, $result);
 
 		$result = apc_delete($key);
@@ -138,17 +142,17 @@ class ApcTest extends \lithium\test\Unit {
 
 		$key = 'another_read_key';
 		$data = 'read data';
+		$keys = array($key);
 
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->Apc->read($key);
+		$closure = $this->Apc->read($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
+		$expected = array($key => $data);
+		$params = compact('keys');
 		$result = $closure($this->Apc, $params, null);
-		$expected = $data;
-
 		$this->assertEqual($expected, $result);
 
 		$result = apc_delete($key);
@@ -157,123 +161,122 @@ class ApcTest extends \lithium\test\Unit {
 
 	public function testReadMulti() {
 		$expiry = '+1 minute';
-		$key = array(
+		$keys = array(
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
 		);
 		$data = null;
 
-		$closure = $this->Apc->write($key, $data, $expiry);
+		$closure = $this->Apc->write($keys, $expiry);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->Apc, $params, null);
-		$this->assertEqual(array(), $result);
+		$params = compact('keys', 'expiry');
+		$result = $closure($this->Apc, $params);
+		$this->assertTrue($result);
 
 		$expected = array(
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
 		);
-		$result = apc_fetch(array_keys($key));
+		$result = apc_fetch(array_keys($keys));
 		$this->assertEqual($expected, $result);
 
-		$result = apc_delete(array_keys($key));
+		$result = apc_delete(array_keys($keys));
 		$this->assertEqual(array(), $result);
 	}
 
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
-		$closure = $this->Apc->read($key);
+		$keys = array($key);
+		$closure = $this->Apc->read($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
+		$expected = array();
+		$params = compact('keys');
 		$result = $closure($this->Apc, $params, null);
-		$this->assertFalse($result);
+		$this->assertIdentical($expected, $result);
 	}
 
 	public function testDelete() {
 		$key = 'delete_key';
 		$data = 'data to delete';
+		$keys = array($key);
 
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->Apc->delete($key);
+		$closure = $this->Apc->delete($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$result = $closure($this->Apc, $params, null);
+		$params = compact('keys');
+		$result = $closure($this->Apc, $params);
 		$this->assertTrue($result);
 	}
 
 	public function testDeleteMulti() {
 		$expiry = '+1 minute';
-		$key = array(
+		$keys = array(
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
 		);
-		$data = null;
 
-		$closure = $this->Apc->write($key, $data, $expiry);
+		$closure = $this->Apc->write($keys, $expiry);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->Apc, $params, null);
-		$this->assertEqual(array(), $result);
+		$params = compact('keys', 'expiry');
+		$result = $closure($this->Apc, $params);
+		$this->assertTrue($result);
 
-		$expected = array(
-			'key1' => 'data1',
-			'key2' => 'data2',
-			'key3' => 'data3'
-		);
-		$result = apc_delete(array_keys($key));
+		$result = apc_delete(array_keys($keys));
 		$this->assertEqual(array(), $result);
 	}
 
 	public function testDeleteNonExistentKey() {
 		$key = 'delete_key';
 		$data = 'data to delete';
+		$keys = array($key);
 
-		$closure = $this->Apc->delete($key);
+		$closure = $this->Apc->delete($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$result = $closure($this->Apc, $params, null);
+		$params = compact('keys');
+		$result = $closure($this->Apc, $params);
 		$this->assertFalse($result);
 	}
 
 	public function testWriteReadAndDeleteRoundtrip() {
 		$key = 'write_read_key';
 		$data = 'write/read value';
+		$keys = array($key => $data);
 		$expiry = '+5 seconds';
 
-		$closure = $this->Apc->write($key, $data, $expiry);
+		$closure = $this->Apc->write($keys, $expiry);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->Apc, $params, null);
-		$expected = $data;
+		$params = compact('keys', 'expiry');
+		$result = $closure($this->Apc, $params);
 		$this->assertTrue($result);
 
+		$expected = $data;
 		$result = apc_fetch($key);
 		$this->assertEqual($expected, $result);
 
-		$closure = $this->Apc->read($key);
+		$closure = $this->Apc->read(array_keys($keys));
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$result = $closure($this->Apc, $params, null);
-		$expected = $data;
+		$expected = $keys;
+		$params = array('keys' => array($key));
+		$result = $closure($this->Apc, $params);
 		$this->assertEqual($expected, $result);
 
-		$closure = $this->Apc->delete($key);
+		$closure = $this->Apc->delete(array_keys($keys));
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$result = $closure($this->Apc, $params, null);
+		$params = array('keys' => array($key));
+		$result = $closure($this->Apc, $params);
 		$this->assertTrue($result);
 	}
 
