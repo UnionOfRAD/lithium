@@ -86,6 +86,17 @@ class Cache extends \lithium\core\Adaptable {
 	/**
 	 * Writes to the specified cache configuration.
 	 *
+	 * This method has two valid syntaxes depending on if you're storing
+	 * data using a single key or multiple keys as outlined below.
+	 * {{{
+	 * // To write data to a single-key use the following syntax.
+	 * Cache::write('default', 'foo', 'bar', '+1 minute');
+	 *
+	 * // For multi-key writes the $data parameter's role becomes
+	 * // the one of the $expiry parameter.
+	 * Cache::write('default', array('foo' => 'bar', ... ), '+1 minute');
+	 * }}}
+	 *
 	 * @param string $name Configuration to be used for writing
 	 * @param mixed $key Key to uniquely identify the cache entry
 	 * @param mixed $data Data to be cached
