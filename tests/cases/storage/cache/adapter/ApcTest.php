@@ -77,24 +77,58 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
-	public function testWriteDefaultCacheTime() {
+	/**
+	 * Tests that an item can be written to the cache using
+	 * the default expiration.
+	 *
+	 * Note that because of the nature of APC we cannot test if an item
+	 * correctly expires. Expiration checks are done by APC only on each
+	 * _page request_.
+	 */
+	public function testWriteExpiryDefault() {
 		$apc = new Apc(array('expiry' => '+5 seconds'));
-		$key = 'key';
-		$data = 'value';
-		$keys = array($key => $data);
+		$keys = array('key1' => 'data1');
+		$expiry = null;
+		$closure = $apc->write($keys, $expiry);
+		$closure($apc, compact('keys', 'expiry'));
 
-		$closure = $apc->write($keys);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys');
-		$result = $closure($apc, $params);
+		$result = apc_exists('key1');
 		$this->assertTrue($result);
+	}
 
-		$expected = $data;
-		$result = apc_fetch($key);
-		$this->assertEqual($expected, $result);
+	/**
+	 * Tests that an item can be written to the cache using
+	 * `strtotime` syntax.
+	 *
+	 * Note that because of the nature of APC we cannot test if an item
+	 * correctly expires. Expiration checks are done by APC only on each
+	 * _page request_.
+	 */
+	public function testWriteExpiryExpires() {
+		$keys = array('key1' => 'data1');
+		$expiry = '+5 seconds';
+		$closure = $this->Apc->write($keys, $expiry);
+		$closure($this->Apc, compact('keys', 'expiry'));
 
-		$result = apc_delete($key);
+		$result = apc_exists('key1');
+		$this->assertTrue($result);
+	}
+
+	/**
+	 * Tests that an item can be written to the cache using
+	 * TTL syntax.
+	 *
+	 * Note that because of the nature of APC we cannot test if an item
+	 * correctly expires. Expiration checks are done by APC only on each
+	 * _page request_.
+	 */
+	public function testWriteExpiryTtl() {
+		$keys = array('key1' => 'data1');
+		$expiry = 5;
+		$closure = $this->Apc->write($keys, $expiry);
+		$closure($this->Apc, compact('keys', 'expiry'));
+
+		$result = apc_exists('key1');
 		$this->assertTrue($result);
 	}
 

@@ -96,11 +96,21 @@ class Cache extends \lithium\core\Adaptable {
 	 * Cache::write('default', array('foo' => 'bar', ... ), '+1 minute');
 	 * }}}
 	 *
+	 * These two calls are synonymical and demonstrate the two
+	 * possible ways to specify the expiration time.
+	 * {{{
+	 * Cache::write('default', 'foo', 'bar', '+1 minute');
+	 * Cache::write('default', 'foo', 'bar', 60);
+	 * }}}
+	 *
 	 * @param string $name Configuration to be used for writing.
 	 * @param mixed $key Key to uniquely identify the cache entry or an array of key/value pairs
 	 *                   for multi-key writes mapping cache keys to the data to be cached.
 	 * @param mixed $data Data to be cached.
-	 * @param string $expiry A `strtotime()` compatible cache time.
+	 * @param string|integer $expiry A `strtotime()` compatible cache time. Alternatively an integer
+	 *                       denoting the seconds until the item expires (TTL). If no expiry time is
+	 *                       set, then the default cache expiration time set with the cache adapter
+	 *                       configuration will be used.
 	 * @param mixed $options Options for the method, filters and strategies.
 	 * @return boolean `true` on successful cache write, `false` otherwise. When writing
 	 *                 multiple items and an error occurs writing any of the items the

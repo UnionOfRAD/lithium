@@ -117,7 +117,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual(1, $result);
 	}
 
-	public function testWriteDefaultCacheExpiry() {
+	public function testWriteExpiryDefault() {
 		$redis = new Redis(array('expiry' => '+5 seconds'));
 		$key = 'default_key';
 		$data = 'value';
@@ -142,7 +142,7 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertEqual(1, $result);
 	}
 
-	public function testWriteNoCacheExpiry() {
+	public function testWriteNoExpiry() {
 		$redis = new Redis(array('expiry' => null));
 		$key = 'default_key';
 		$data = 'value';
@@ -151,6 +151,50 @@ class RedisTest extends \lithium\test\Unit {
 		$redis->write($keys)->__invoke(null, compact('keys'), null);
 		$this->assertEqual($data, $this->_redis->get($key));
 		$this->assertEqual(1, $this->_redis->delete($key));
+	}
+
+	public function testWriteExpiryExpires() {
+		$keys = array('key1' => 'data1');
+		$expiry = '+5 seconds';
+		$closure = $this->redis->write($keys, $expiry);
+		$closure($this->redis, compact('keys', 'expiry'));
+
+		$result = $this->_redis->exists('key1');
+		$this->assertTrue($result);
+
+		$this->_redis->delete('key1');
+
+		$keys = array('key1' => 'data1');
+		$expiry = '+1 second';
+		$closure = $this->redis->write($keys, $expiry);
+		$closure($this->redis, compact('keys', 'expiry'));
+
+		usleep(1010000);
+
+		$result = $this->_redis->exists('key1');
+		$this->assertFalse($result);
+	}
+
+	public function testWriteExpiryTtl() {
+		$keys = array('key1' => 'data1');
+		$expiry = 5;
+		$closure = $this->redis->write($keys, $expiry);
+		$closure($this->redis, compact('keys', 'expiry'));
+
+		$result = $this->_redis->exists('key1');
+		$this->assertTrue($result);
+
+		$this->_redis->delete('key1');
+
+		$keys = array('key1' => 'data1');
+		$expiry = 1;
+		$closure = $this->redis->write($keys, $expiry);
+		$closure($this->redis, compact('keys', 'expiry'));
+
+		usleep(1010000);
+
+		$result = $this->_redis->exists('key1');
+		$this->assertFalse($result);
 	}
 
 	public function testSimpleRead() {

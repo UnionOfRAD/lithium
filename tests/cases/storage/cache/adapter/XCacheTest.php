@@ -108,7 +108,7 @@ class XCacheTest extends \lithium\test\Unit {
 		}
 	}
 
-	public function testWriteDefaultCacheExpiry() {
+	public function testWriteExpiryDefault() {
 		$xCache = new XCache(array('expiry' => '+5 seconds'));
 		$key = 'default_key';
 		$data = 'value';
@@ -128,7 +128,50 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$result = xcache_unset($key);
 		$this->assertTrue($result);
+	}
 
+	public function testWriteExpiryExpires() {
+		$keys = array('key1' => 'data1');
+		$expiry = '+5 seconds';
+		$closure = $this->XCache->write($keys, $expiry);
+		$closure($this->XCache, compact('keys', 'expiry'));
+
+		$result = xcache_isset('key1');
+		$this->assertTrue($result);
+
+		xcache_unset('key1');
+
+		$keys = array('key1' => 'data1');
+		$expiry = '+1 second';
+		$closure = $this->XCache->write($keys, $expiry);
+		$closure($this->XCache, compact('keys', 'expiry'));
+
+		usleep(1010000);
+
+		$result = xcache_isset('key1');
+		$this->assertFalse($result);
+	}
+
+	public function testWriteExpiryTtl() {
+		$keys = array('key1' => 'data1');
+		$expiry = 5;
+		$closure = $this->XCache->write($keys, $expiry);
+		$closure($this->XCache, compact('keys', 'expiry'));
+
+		$result = xcache_isset('key1');
+		$this->assertTrue($result);
+
+		xcache_unset('key1');
+
+		$keys = array('key1' => 'data1');
+		$expiry = 1;
+		$closure = $this->XCache->write($keys, $expiry);
+		$closure($this->XCache, compact('keys', 'expiry'));
+
+		usleep(1010000);
+
+		$result = xcache_isset('key1');
+		$this->assertFalse($result);
 	}
 
 	public function testSimpleRead() {

@@ -74,8 +74,7 @@ class Memory extends \lithium\core\Object {
 	}
 
 	/**
-	 * Write values to the cache. All items to be cached will receive an
-	 * expiration time of `$expiry`.
+	 * Write values to the cache.
 	 *
 	 * Note that this is not an atomic operation when using multiple keys.
 	 *

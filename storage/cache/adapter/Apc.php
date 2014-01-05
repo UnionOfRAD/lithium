@@ -59,15 +59,14 @@ class Apc extends \lithium\core\Object {
 	 * expiration time of `$expiry`.
 	 *
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
-	 * @param null|string $expiry A `strtotime()` compatible cache time. If no expiry time is set,
-	 *        then the default cache expiration time set with the cache configuration will be used.
+	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
-		$expiry = ($expiry) ?: $this->_config['expiry'];
+		$expiry = $expiry ?: $this->_config['expiry'];
 
 		return function($self, $params) use ($expiry) {
-			$ttl = (is_int($expiry) ? $expiry : strtotime($expiry)) - time();
+			$ttl = is_int($expiry) ? $expiry : strtotime($expiry) - time();
 			return apc_store($params['keys'], null, $ttl) === array();
 		};
 	}

@@ -142,10 +142,11 @@ class Memcache extends \lithium\core\Object {
 	 * Write values to the cache. All items to be cached will receive an
 	 * expiration time of `$expiry`.
 	 *
+	 * Expiration is always based off the current unix time in order to gurantee we never
+	 * exceed the TTL limit of 30 days when specifying the TTL directly.
+	 *
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
-	 * @param null|string $expiry A `strtotime()` compatible cache time. If no expiry time is set,
-	 *        then the default cache expiration time set with the cache configuration will be used.
-	 *        Alternatively supports $expiry to be given as a Unix timestamp.
+	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
@@ -153,7 +154,7 @@ class Memcache extends \lithium\core\Object {
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 
 		return function($self, $params) use (&$connection, $expiry) {
-			$expires = is_int($expiry) ? $expiry : strtotime($expiry);
+			$expires = is_int($expiry) ? $expiry + time() : strtotime($expiry);
 
 			if (count($params['keys']) > 1) {
 				return $connection->setMulti($params['keys'], $expires);

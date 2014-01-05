@@ -64,7 +64,7 @@ class Redis extends \lithium\core\Object {
 	 *
 	 * @todo Implement configurable & optional authentication
 	 * @see lithium\storage\Cache::config()
-	 * @see lithium\storage\cache\adapter\Redis::_ttl()
+	 * @see lithium\storage\cache\adapter\Redis::write()
 	 * @param array $config Configuration parameters for this cache adapter.
 	 *        These settings are indexed by name and queryable through `Cache::config('name')`. The
 	 *        available settings for this adapter are as follows:
@@ -72,7 +72,7 @@ class Redis extends \lithium\core\Object {
 	 *          to connect to. Defaults to `'127.0.0.1:6379'`.
 	 *        - `'expiry'` _mixed_: Default expiration for cache values written through this
 	 *          adapter. Defaults to `'+1 hour'`. For acceptable values, see the `$expiry` parameter
-	 *          of `Redis::_ttl()`.
+	 *          of `Redis::write()`.
 	 *        - `'persistent'` _boolean_: Indicates whether the adapter should use a persistent
 	 *          connection when attempting to connect to the Redis server. If `true`, it will
 	 *          attempt to reuse an existing connection when connecting, and the connection will
@@ -135,39 +135,27 @@ class Redis extends \lithium\core\Object {
 	}
 
 	/**
-	 * Sets expiration time for cache keys
-	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @param mixed $expiry A `strtotime()`-compatible string indicating when the cached item
-	 *              should expire, or a Unix timestamp.
-	 * @return boolean Returns `true` if expiry could be set for the given key, `false` otherwise.
-	 */
-	protected function _ttl($key, $expiry) {
-		return $this->connection->expireAt($key, is_int($expiry) ? $expiry : strtotime($expiry));
-	}
-
-	/**
 	 * Write values to the cache. All items to be cached will receive an
 	 * expiration time of `$expiry`.
 	 *
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
-	 * @param null|string $expiry A `strtotime()` compatible cache time. If no expiry time is set,
-	 *        then the default cache expiration time set with the cache configuration will be used.
+	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
 		$connection =& $this->connection;
-		$expiry = ($expiry) ?: $this->_config['expiry'];
-		$_self =& $this;
+		$expiry = $expiry ?: $this->_config['expiry'];
 
-		return function($self, $params) use (&$_self, &$connection, $expiry) {
+		return function($self, $params) use (&$connection, $expiry) {
+			$expires = is_int($expiry) ? $expiry + time() : strtotime($expiry);
+
 			if (count($params['keys']) > 1) {
 				if ($connection->mset($params['keys'])) {
 					$ttl = array();
 
 					if ($expiry) {
 						foreach ($params['keys'] as $key => $value) {
-							if (!$_self->invokeMethod('_ttl', array($key, $expiry))) {
+							if (!$connection->expireAt($key, $expires)) {
 								return false;
 							}
 						}
@@ -180,7 +168,7 @@ class Redis extends \lithium\core\Object {
 
 			if ($result && $expiry) {
 				foreach ($params['keys'] as $key => $value) {
-					if (!$_self->invokeMethod('_ttl', array($key, $expiry))) {
+					if (!$connection->expireAt($key, $expires)) {
 						return false;
 					}
 				}

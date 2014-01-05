@@ -108,7 +108,7 @@ class FileTest extends \lithium\test\Unit {
 		$this->File->delete(array_keys($keys));
 	}
 
-	public function testWriteDefaultCacheExpiry() {
+	public function testWriteExpiryDefault() {
 		$time = time();
 		$file = new File(array('expiry' => "@{$time} +1 minute"));
 		$key = 'default_keykey';
@@ -132,6 +132,38 @@ class FileTest extends \lithium\test\Unit {
 
 		$this->assertTrue(unlink(Libraries::get(true, 'resources') . "/tmp/cache/{$key}"));
 		$this->assertFileNotExists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}");
+	}
+
+	public function testWriteExpiryExpires() {
+		$now = time();
+
+		$keys = array('key1' => 'data1');
+		$time = $now + 5;
+		$expiry = "@{$now} +5 seconds";
+		$closure = $this->File->write($keys, $expiry);
+		$closure($this->File, compact('keys', 'expiry'));
+
+		$file = Libraries::get(true, 'resources') . '/tmp/cache/key1';
+
+		$expected = "{:expiry:{$time}}\ndata1";
+		$result = file_get_contents($file);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testWriteExpiryTtl() {
+		$now = time();
+
+		$keys = array('key1' => 'data1');
+		$time = $now + 5;
+		$expiry = 5;
+		$closure = $this->File->write($keys, $expiry);
+		$closure($this->File, compact('keys', 'expiry'));
+
+		$file = Libraries::get(true, 'resources') . '/tmp/cache/key1';
+
+		$expected = "{:expiry:{$time}}\ndata1";
+		$result = file_get_contents($file);
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testRead() {

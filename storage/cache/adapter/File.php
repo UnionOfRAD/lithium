@@ -68,17 +68,18 @@ class File extends \lithium\core\Object {
 	 * Note that this is not an atomic operation when using multiple keys.
 	 *
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
-	 * @param null|string $expiry A `strtotime()` compatible cache time. If no expiry time is set,
-	 *        then the default cache expiration time set with the cache configuration will be used.
+	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
 		$path = $this->_config['path'];
-		$expiry = strtotime($expiry ?: $this->_config['expiry']);
+		$expiry = $expiry ?: $this->_config['expiry'];
 
 		return function($self, $params) use (&$path, $expiry) {
+			$expires = is_int($expiry) ? $expiry + time() : strtotime($expiry);
+
 			foreach ($params['keys'] as $key => $value) {
-				$data = "{:expiry:{$expiry}}\n{$value}";
+				$data = "{:expiry:{$expires}}\n{$value}";
 
 				if (!file_put_contents("{$path}/{$key}", $data)) {
 					return false;
