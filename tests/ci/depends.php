@@ -32,7 +32,9 @@ class PhpExtensions {
 	}
 
 	protected static function _redis() {
-		static::_pecl('redis');
+		static::_ini(array(
+			'extension=redis.so'
+		));
 	}
 
 	protected static function _opcache() {
