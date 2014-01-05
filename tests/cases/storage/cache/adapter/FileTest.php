@@ -41,6 +41,8 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
+		$this->File->clear();
+
 		$resources = realpath(Libraries::get(true, 'resources'));
 		$paths = array("{$resources}/tmp/cache", "{$resources}/tmp/cache/templates");
 
