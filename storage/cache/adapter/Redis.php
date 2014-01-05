@@ -167,10 +167,12 @@ class Redis extends \lithium\core\Object {
 
 					if ($expiry) {
 						foreach ($params['keys'] as $key => $value) {
-							$ttl[$key] = $_self->invokeMethod('_ttl', array($key, $expiry));
+							if (!$_self->invokeMethod('_ttl', array($key, $expiry))) {
+								return false;
+							}
 						}
 					}
-					return $ttl;
+					return true;
 				}
 				return false;
 			}
