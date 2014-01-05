@@ -188,7 +188,6 @@ class Cache extends \lithium\core\Adaptable {
 				}
 			}
 		}
-		unset($result);
 
 		if ($options['strategies']) {
 			foreach ($results as $key => &$result) {
