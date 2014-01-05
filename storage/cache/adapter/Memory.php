@@ -84,7 +84,7 @@ class Memory extends \lithium\core\Object {
 	 * @param null|string $expiry Unused.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write(array $keys, $expiry) {
+	public function write(array $keys, $expiry = null) {
 		$cache =& $this->_cache;
 
 		return function($self, $params) use (&$cache) {
