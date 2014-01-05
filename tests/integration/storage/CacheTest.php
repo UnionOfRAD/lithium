@@ -42,6 +42,21 @@ class CacheTest extends \lithium\test\Integration {
 		$this->assertEqual($config, Cache::config());
 	}
 
+	public function testReadThroughWithStrategies() {
+		Cache::config(array(
+			'default' => array(
+				'adapter' => 'Memory',
+				'strategies' => array('Serializer')
+			)
+		));
+
+		$expected = 'bar';
+		$result = Cache::read('default', 'foo', array(
+			'write' => array('+5 seconds' => 'bar')
+		));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testMultiWriteReadWithStrategies() {
 		Cache::config(array(
 			'default' => array(

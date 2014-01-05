@@ -143,10 +143,30 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * Can handle single- and multi-key reads.
 	 *
+	 * Read-through caching can be used by passing expiry and the to-be-cached value
+	 * in the `write` option. Following three ways to achieve this.
+	 * {{{
+	 * Cache::read('default', 'foo', array(
+	 *	'write' => array('+5 days' => 'bar')
+	 * )); // returns `'bar'`
+	 *
+	 * Cache::read('default', 'foo', array(
+	 *	'write' => array('+5 days' => function() { return 'bar'; })
+	 * ));
+	 *
+	 * Cache::read('default', 'foo', array(
+	 *	'write' => function() { return array('+5 days' => 'bar'); }
+	 * ));
+	 * }}}
+	 *
 	 * @param string $name Configuration to be used for reading.
 	 * @param mixed $key Key to uniquely identify the cache entry or an array of keys
 	 *                   for multikey-reads.
 	 * @param mixed $options Options for the method and strategies.
+	 *              - `'write'`: Allows for read-through caching see description for usage.
+	 *              - `'strategies'`: Additional strategies to use.
+	 *              - `'conditions'`: A function or item that must return or evaluate to
+	 *                                `true` in order to continue read operation.
 	 * @return mixed For single-key reads will return the result if the cache
 	 *               key has been found otherwise returns `null`. When reading
 	 *               multiple keys a results array is returned mapping keys to
@@ -177,15 +197,21 @@ class Cache extends \lithium\core\Adaptable {
 		$filters = $settings[$name]['filters'];
 		$results = static::_filter(__FUNCTION__, $params, $method, $filters);
 
-		foreach ($params['keys'] as $key) {
-			if (!isset($results[$key]) && ($write = $options['write'])) {
-				$write = is_callable($write) ? $write() : $write;
-				list($expiry, $value) = each($write);
-				$value = is_callable($value) ? $value() : $value;
+		if ($write = $options['write']) {
+			$write = is_callable($write) ? $write() : $write;
+			list($expiry, $value) = each($write);
+			$value = is_callable($value) ? $value() : $value;
 
-				if (static::write($name, $key, $value, $expiry)) {
-					$results[$key] = $value;
+			foreach ($params['keys'] as $key) {
+				if (isset($results[$key])) {
+					continue;
 				}
+				if (!static::write($name, $key, $value, $expiry)) {
+					return false;
+				}
+				$results[$key] = static::applyStrategies('write', $name, $value, array(
+					'key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__
+				));
 			}
 		}
 
