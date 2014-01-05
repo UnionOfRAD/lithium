@@ -65,7 +65,7 @@ class Memory extends \lithium\core\Object {
 			$results = array();
 
 			foreach ($params['keys'] as $key) {
-				if (isset($cache[$key])) {
+				if (array_key_exists($key, $cache)) {
 					$results[$key] = $cache[$key];
 				}
 			}
