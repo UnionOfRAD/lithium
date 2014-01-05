@@ -14,6 +14,10 @@ use lithium\storage\cache\adapter\Redis;
 
 class RedisTest extends \lithium\test\Unit {
 
+	public $redis;
+
+	protected $_redis;
+
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'host' => '127.0.0.1',
