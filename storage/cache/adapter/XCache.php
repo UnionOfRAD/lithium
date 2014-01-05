@@ -97,9 +97,12 @@ class XCache extends \lithium\core\Object {
 			$results = array();
 
 			foreach ($params['keys'] as $key) {
-				if ($result = xcache_get($key)) {
-					$results[$key] = $result;
+				$result = xcache_get($key);
+
+				if ($result === null && !xcache_isset($key)) {
+					continue;
 				}
+				$results[$key] = $result;
 			}
 			return $results;
 		};
