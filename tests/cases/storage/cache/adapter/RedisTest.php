@@ -202,7 +202,7 @@ class RedisTest extends \lithium\test\Unit {
 
 		$params = array('keys' => array_keys($data));
 		$result = $closure($this->redis, $params, null);
-		$expected = array_values($data);
+		$expected = $data;
 		$this->assertEqual($expected, $result);
 
 		foreach ($data as $k => $v) {

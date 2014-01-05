@@ -203,7 +203,18 @@ class Redis extends \lithium\core\Object {
 
 		return function($self, $params) use (&$connection) {
 			if (count($params['keys']) > 1) {
-				return $connection->getMultiple($params['keys']);
+				$results = array();
+				$data = $connection->mGet($params['keys']);
+
+				foreach ($data as $key => $item) {
+					$key = $params['keys'][$key];
+
+					if ($item === false && !$connection->exists($key)) {
+						continue;
+					}
+					$results[$key] = $item;
+				}
+				return $results;
 			}
 			$result = $connection->get($key = current($params['keys']));
 			return $result === false ? array() : array($key => $result);
