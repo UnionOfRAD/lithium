@@ -190,6 +190,53 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
+	public function testWriteAndReadNull() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null
+		);
+		$result = $this->Apc->write($keys);
+		$this->assertTrue($result($this->Apc, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->Apc->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->Apc, array('keys' => array_keys($keys))));
+	}
+
+	public function testWriteAndReadNullMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null,
+			'key2' => 'data2'
+		);
+		$result = $this->Apc->write($keys);
+		$this->assertTrue($result($this->Apc, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->Apc->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->Apc, array('keys' => array_keys($keys))));
+
+		$keys = array(
+			'key1' => null,
+			'key2' => null
+		);
+		$result = $this->Apc->write($keys);
+		$this->assertTrue($result($this->Apc, compact('keys', 'expiry')));
+	}
+
+	public function testWriteAndReadArray() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => array('foo' => 'bar')
+		);
+		$result = $this->Apc->write($keys);
+		$this->assertTrue($result($this->Apc, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->Apc->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->Apc, array('keys' => array_keys($keys))));
+	}
+
 	public function testDelete() {
 		$key = 'delete_key';
 		$data = 'data to delete';

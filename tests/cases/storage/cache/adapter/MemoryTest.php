@@ -68,6 +68,40 @@ class MemoryTest extends \lithium\test\Unit {
 		$this->assertEqual($keys, $result);
 	}
 
+	public function testWriteAndReadNull() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null
+		);
+		$result = $this->Memory->write($keys);
+		$this->assertTrue($result($this->Memory, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->Memory->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->Memory, array('keys' => array_keys($keys))));
+	}
+
+	public function testWriteAndReadNullMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null,
+			'key2' => 'data2'
+		);
+		$result = $this->Memory->write($keys);
+		$this->assertTrue($result($this->Memory, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->Memory->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->Memory, array('keys' => array_keys($keys))));
+
+		$keys = array(
+			'key1' => null,
+			'key2' => null
+		);
+		$result = $this->Memory->write($keys);
+		$this->assertTrue($result($this->Memory, compact('keys', 'expiry')));
+	}
+
 	public function testWriteAndDelete() {
 		$key = 'key_to_delete';
 		$data = 'some data to be deleted';

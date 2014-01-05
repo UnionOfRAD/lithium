@@ -306,6 +306,40 @@ class MemcacheTest extends \lithium\test\Unit {
 		$this->assertFalse($this->_conn->get($key));
 	}
 
+	public function testWriteAndReadNull() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null
+		);
+		$result = $this->memcache->write($keys);
+		$this->assertTrue($result($this->memcache, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->memcache->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->memcache, array('keys' => array_keys($keys))));
+	}
+
+	public function testWriteAndReadNullMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null,
+			'key2' => 'data2'
+		);
+		$result = $this->memcache->write($keys);
+		$this->assertTrue($result($this->memcache, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->memcache->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->memcache, array('keys' => array_keys($keys))));
+
+		$keys = array(
+			'key1' => null,
+			'key2' => null
+		);
+		$result = $this->memcache->write($keys);
+		$this->assertTrue($result($this->memcache, compact('keys', 'expiry')));
+	}
+
 	public function testClear() {
 		$time = strtotime('+1 minute');
 

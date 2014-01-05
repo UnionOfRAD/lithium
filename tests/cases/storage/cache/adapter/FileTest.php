@@ -209,6 +209,40 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
+	public function testWriteAndReadNull() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null
+		);
+		$result = $this->File->write($keys);
+		$this->assertTrue($result($this->File, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->File->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->File, array('keys' => array_keys($keys))));
+	}
+
+	public function testWriteAndReadNullMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null,
+			'key2' => 'data2'
+		);
+		$result = $this->File->write($keys);
+		$this->assertTrue($result($this->File, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->File->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->File, array('keys' => array_keys($keys))));
+
+		$keys = array(
+			'key1' => null,
+			'key2' => null
+		);
+		$result = $this->File->write($keys);
+		$this->assertTrue($result($this->File, compact('keys', 'expiry')));
+	}
+
 	public function testDelete() {
 		$key = 'key_to_delete';
 		$keys = array($key);

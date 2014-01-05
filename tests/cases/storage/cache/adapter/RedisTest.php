@@ -239,6 +239,40 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
+	public function testWriteAndReadNull() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null
+		);
+		$result = $this->redis->write($keys);
+		$this->assertTrue($result($this->redis, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->redis->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->redis, array('keys' => array_keys($keys))));
+	}
+
+	public function testWriteAndReadNullMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null,
+			'key2' => 'data2'
+		);
+		$result = $this->redis->write($keys);
+		$this->assertTrue($result($this->redis, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->redis->read(array_keys($keys));
+		$this->assertEqual($expected, $a = $result($this->redis, array('keys' => array_keys($keys))));
+
+		$keys = array(
+			'key1' => '',
+			'key2' => 'data2'
+		);
+		$result = $this->redis->write($keys);
+		$this->assertTrue($result($this->redis, compact('keys', 'expiry')));
+	}
+
 	public function testDelete() {
 		$key = 'delete_key';
 		$data = 'data to delete';

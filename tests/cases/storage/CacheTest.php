@@ -357,6 +357,56 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testCacheWriteAndReadNull() {
+		Cache::config(array(
+			'default' => array(
+				'adapter' => 'Memory'
+			)
+		));
+
+		$result = Cache::write('default', 'some_key', null);
+		$this->assertTrue($result);
+
+		$result = Cache::read('default', 'some_key');
+		$this->assertNull($result);
+	}
+
+	public function testCacheWriteAndReadNullMulti() {
+		Cache::config(array(
+			'default' => array(
+				'adapter' => 'Memory'
+			)
+		));
+
+		$keys = array(
+			'key1' => null,
+			'key2' => 'data2'
+		);
+		$result = Cache::write('default', $keys);
+		$this->assertTrue($result);
+
+		$expected = array(
+			'key1' => null,
+			'key2' => 'data2'
+		);
+		$result = Cache::read('default', array_keys($keys));
+		$this->assertEqual($expected, $result);
+
+		$keys = array(
+			'key1' => null,
+			'key2' => null
+		);
+		$result = Cache::write('default', $keys);
+		$this->assertTrue($result);
+
+		$expected = array(
+			'key1' => null,
+			'key2' => null
+		);
+		$result = Cache::read('default', array_keys($keys));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCacheReadAndWriteWithConditions() {
 		$config = array('default' => array(
 			'adapter' => 'Memory', 'filters' => array()

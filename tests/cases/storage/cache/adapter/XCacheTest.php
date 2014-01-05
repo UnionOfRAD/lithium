@@ -210,6 +210,40 @@ class XCacheTest extends \lithium\test\Unit {
 		}
 	}
 
+	public function testWriteAndReadNull() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null
+		);
+		$result = $this->XCache->write($keys);
+		$this->assertTrue($result($this->XCache, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->XCache->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->XCache, array('keys' => array_keys($keys))));
+	}
+
+	public function testWriteAndReadNullMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null,
+			'key2' => 'data2'
+		);
+		$result = $this->XCache->write($keys);
+		$this->assertTrue($result($this->XCache, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->XCache->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->XCache, array('keys' => array_keys($keys))));
+
+		$keys = array(
+			'key1' => null,
+			'key2' => null
+		);
+		$result = $this->XCache->write($keys);
+		$this->assertTrue($result($this->XCache, compact('keys', 'expiry')));
+	}
+
 	public function testDelete() {
 		$key = 'delete_key';
 		$keys = array($key);
