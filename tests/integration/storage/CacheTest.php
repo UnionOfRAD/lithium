@@ -57,6 +57,31 @@ class CacheTest extends \lithium\test\Integration {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testFileAdapterReadThroughWithStrategies() {
+		$resources = Libraries::get(true, 'resources');
+		$path = "{$resources}/tmp/cache";
+		$this->skipIf(!$this->_checkPath(), "{$path} does not have the proper permissions.");
+
+		Cache::config(array(
+			'default' => array(
+				'adapter' => 'File',
+				'strategies' => array('Serializer'),
+				'filters' => array(),
+				'path' => $path
+			)
+		));
+
+		$expected = 'bar';
+		$result = Cache::read('default', 'foo', array(
+			'write' => array('+5 seconds' => 'bar')
+		));
+		$this->assertEqual($expected, $result);
+
+		$expected = 'bar';
+		$result = Cache::read('default', 'foo');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testMultiWriteReadWithStrategies() {
 		Cache::config(array(
 			'default' => array(
