@@ -150,27 +150,19 @@ class Redis extends \lithium\core\Object {
 			$expires = is_int($expiry) ? $expiry + time() : strtotime($expiry);
 
 			if (count($params['keys']) > 1) {
-				if ($connection->mset($params['keys'])) {
-					$ttl = array();
-
-					if ($expiry) {
-						foreach ($params['keys'] as $key => $value) {
-							if (!$connection->expireAt($key, $expires)) {
-								return false;
-							}
-						}
-					}
-					return true;
-				}
+				$result = $connection->mset($params['keys']);
+			} else {
+				$result = $connection->set(key($params['keys']), current($params['keys']));
+			}
+			if (!$result) {
 				return false;
 			}
-			$result = $connection->set(key($params['keys']), current($params['keys']));
-
-			if ($result && $expiry) {
-				foreach ($params['keys'] as $key => $value) {
-					if (!$connection->expireAt($key, $expires)) {
-						return false;
-					}
+			if ($expiry) {
+				return true;
+			}
+			foreach ($params['keys'] as $key => $value) {
+				if (!$connection->expireAt($key, $expires)) {
+					return false;
 				}
 			}
 			return $result;
