@@ -23,6 +23,8 @@ use Closure;
  * As a result, this cache adapter is best suited for generic memoization of data, and
  * should not be used for for anything that must persist longer than the current
  * request cycle.
+ *
+ * This adapter synthetically supports multi-key `write`, `read` and `delete` operations.
  */
 class Memory extends \lithium\core\Object {
 
@@ -46,78 +48,72 @@ class Memory extends \lithium\core\Object {
 	}
 
 	/**
-	 * Read value(s) from the cache
+	 * Read values from the cache. Will attempt to return an array of data
+	 * containing key/value pairs of the requested data.
 	 *
-	 * Note: When using an array of keys in $key for multi-read,
-	 * note that this is not an atomic operation.
+	 * Note that this is not an atomic operation when using multiple keys.
 	 *
-	 * @param string $key The key to uniquely identify the cached item.
-	 * @return Closure Function returning cached value if successful, `false` otherwise.
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return Closure Function returning cached values keyed by cache keys
+	 *                 on successful read, keys which could not be read will
+	 *                 not be included in the results array.
 	 */
-	public function read($key) {
+	public function read(array $keys) {
 		$cache =& $this->_cache;
 
 		return function($self, $params) use (&$cache) {
-			extract($params);
+			$results = array();
 
-			if (is_array($key)) {
-				$results = array();
-
-				foreach ($key as $k) {
-					if (isset($cache[$k])) {
-						$results[$k] = $cache[$k];
-					}
+			foreach ($params['keys'] as $key) {
+				if (array_key_exists($key, $cache)) {
+					$results[$key] = $cache[$key];
 				}
-				return $results;
 			}
-			return isset($cache[$key]) ? $cache[$key] : null;
+			return $results;
 		};
 	}
 
 	/**
-	 * Write value(s) to the cache.
+	 * Write values to the cache. All items to be cached will receive an
+	 * expiration time of `$expiry`.
 	 *
-	 * Note: When using an array of keys => values in $key for multi-write,
-	 * note that this is not an atomic operation.
+	 * Note that this is not an atomic operation when using multiple keys.
 	 *
-	 * @param string $key The key to uniquely identify the cached item.
+	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param mixed $data The value to be cached.
 	 * @param null|string $expiry Unused.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $data, $expiry) {
+	public function write(array $keys, $expiry = null) {
 		$cache =& $this->_cache;
 
 		return function($self, $params) use (&$cache) {
-			extract($params);
-
-			if (is_array($key)) {
-				foreach ($key as $k => &$v) {
-					$cache[$k] = $v;
-				}
-				return true;
+			foreach ($params['keys'] as $key => &$value) {
+				$cache[$key] = $value;
 			}
-			return (boolean) ($cache[$key] = $data);
+			return true;
 		};
 	}
 
 	/**
-	 * Delete value from the cache
+	 * Will attempt to remove specified keys from the user space cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item.
-	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise.
+	 * Note that this is not an atomic operation when using multiple keys.
+	 *
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
 	 */
-	public function delete($key) {
+	public function delete(array $keys) {
 		$cache =& $this->_cache;
 
 		return function($self, $params) use (&$cache) {
-			extract($params);
-			if (isset($cache[$key])) {
+			foreach ($params['keys'] as $key) {
+				if (!isset($cache[$key])) {
+					return false;
+				}
 				unset($cache[$key]);
-				return true;
-			} else {
-				return false;
 			}
+			return true;
 		};
 	}
 

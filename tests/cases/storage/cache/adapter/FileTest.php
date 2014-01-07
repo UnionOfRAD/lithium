@@ -65,14 +65,15 @@ class FileTest extends \lithium\test\Unit {
 	public function testWrite() {
 		$key = 'key';
 		$data = 'data';
+		$keys = array($key => $data);
 		$time = time();
 		$expiry = "@{$time} +1 minute";
 		$time = $time + 60;
 
-		$closure = $this->File->write($key, $data, $expiry);
+		$closure = $this->File->write($keys, $expiry);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data', 'expiry');
+		$params = compact('keys', 'expiry');
 		$result = $closure($this->File, $params, null);
 		$expected = 25;
 		$this->assertEqual($expected, $result);
@@ -87,17 +88,38 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertFileNotExists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}");
 	}
 
+	public function testWriteMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		$closure = $this->File->write($keys, $expiry);
+		$result = $closure($this->File, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		foreach ($keys as $key => $data) {
+			$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
+			$result = file_get_contents($path);
+			$this->assertPattern("/{:expiry:[0-9]+}\n{$data}/", $result);
+		}
+
+		$this->File->delete(array_keys($keys));
+	}
+
 	public function testWriteDefaultCacheExpiry() {
 		$time = time();
 		$file = new File(array('expiry' => "@{$time} +1 minute"));
 		$key = 'default_keykey';
 		$data = 'data';
+		$keys = array($key => $data);
 		$time = $time + 60;
 
-		$closure = $file->write($key, $data);
+		$closure = $file->write($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data');
+		$params = compact('keys');
 		$result = $closure($file, $params, null);
 		$expected = 25;
 		$this->assertEqual($expected, $result);
@@ -114,35 +136,58 @@ class FileTest extends \lithium\test\Unit {
 
 	public function testRead() {
 		$key = 'key';
+		$keys = array($key);
 		$time = time() + 60;
 
-		$closure = $this->File->read($key);
+		$closure = $this->File->read($keys);
 		$this->assertInternalType('callable', $closure);
 
 		$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
 		file_put_contents($path, "{:expiry:$time}\ndata");
 		$this->assertFileExists($path);
 
-		$params = compact('key');
+		$params = compact('keys');
 		$result = $closure($this->File, $params, null);
-		$this->assertEqual('data', $result);
+		$this->assertEqual(array($key => 'data'), $result);
 
 		unlink($path);
+	}
 
-		$key = 'non_existent';
-		$params = compact('key');
-		$closure = $this->File->read($key);
-		$this->assertInternalType('callable', $closure);
+	public function testReadMulti() {
+		$time = time() + 60;
+		$keys = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		foreach ($keys as $key => $data) {
+			$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
+			file_put_contents($path, "{:expiry:{$time}}\n{$data}");
+		}
 
-		$result = $closure($this->File, $params, null);
-		$this->assertFalse($result);
+		$expected = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		$keys = array(
+			'key1',
+			'key2',
+			'key3'
+		);
+		$closure = $this->File->read($keys);
+		$result = $closure($this->File, compact('keys'));
+		$this->assertEqual($expected, $result);
+
+		$this->File->delete($keys);
 	}
 
 	public function testExpiredRead() {
 		$key = 'expired_key';
+		$keys = array($key);
 		$time = time() + 1;
 
-		$closure = $this->File->read($key);
+		$closure = $this->File->read($keys);
 		$this->assertInternalType('callable', $closure);
 		$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
 
@@ -150,28 +195,75 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertFileExists($path);
 
 		sleep(2);
-		$params = compact('key');
-		$this->assertFalse($closure($this->File, $params, null));
 
+		$expected = array();
+		$result = $closure($this->File, compact('keys'));
+		$this->assertIdentical($expected, $result);
+	}
+
+	public function testReadKeyThatDoesNotExist() {
+		$key = 'does_not_exist';
+		$keys = array($key);
+		$closure = $this->File->read($keys);
+
+		$expected = array();
+		$result = $closure($this->File, compact('keys'));
+		$this->assertIdentical($expected, $result);
+	}
+
+	public function testWriteAndReadNull() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null
+		);
+		$result = $this->File->write($keys);
+		$this->assertTrue($result($this->File, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->File->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->File, array('keys' => array_keys($keys))));
+	}
+
+	public function testWriteAndReadNullMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null,
+			'key2' => 'data2'
+		);
+		$result = $this->File->write($keys);
+		$this->assertTrue($result($this->File, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->File->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->File, array('keys' => array_keys($keys))));
+
+		$keys = array(
+			'key1' => null,
+			'key2' => null
+		);
+		$result = $this->File->write($keys);
+		$this->assertTrue($result($this->File, compact('keys', 'expiry')));
 	}
 
 	public function testDelete() {
 		$key = 'key_to_delete';
+		$keys = array($key);
 		$time = time() + 1;
 		$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
 
 		file_put_contents($path, "{:expiry:$time}\ndata");
 		$this->assertFileExists($path);
 
-		$closure = $this->File->delete($key);
+		$closure = $this->File->delete($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$this->assertTrue($closure($this->File, $params, null));
+		$params = compact('keys');
+		$this->assertTrue($closure($this->File, $params));
 
 		$key = 'non_existent';
-		$params = compact('key');
-		$this->assertFalse($closure($this->File, $params, null));
+		$keys = array($key);
+		$params = compact('keys');
+		$this->assertFalse($closure($this->File, $params));
 	}
 
 	public function testClear() {

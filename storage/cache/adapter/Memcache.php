@@ -39,7 +39,7 @@ use Closure;
  * and `clear` cache functionality, as well as allowing the first four
  * methods to be filtered as per the Lithium filtering system.
  *
- * This adapter supports multi-key `write` and `read` operations.
+ * This adapter natively supports multi-key `write` and `read` operations.
  *
  * @see lithium\storage\cache\adapter\Memcache::__construct()
  * @see lithium\storage\Cache::key()
@@ -139,73 +139,71 @@ class Memcache extends \lithium\core\Object {
 	}
 
 	/**
-	 * Write value(s) to the cache.
+	 * Write values to the cache. All items to be cached will receive an
+	 * expiration time of `$expiry`.
 	 *
-	 * This adapter method supports multi-key write. By specifying `$key` as an
-	 * associative array of key/value pairs, `$data` is ignored and all keys that
-	 * are cached will receive an expiration time of `$expiry`.
-	 *
-	 * @param string|array $key The key to uniquely identify the cached item.
-	 * @param mixed $value The value to be cached.
-	 * @param mixed $expiry A Unix timestamp or `strtotime()`-compatible string indicating when
-	 *              `$value` should expire. If no expiry time is set, then the default cache
-	 *              expiration time set with the cache configuration will be used.
+	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
+	 * @param null|string $expiry A `strtotime()` compatible cache time. If no expiry time is set,
+	 *        then the default cache expiration time set with the cache configuration will be used.
+	 *        Alternatively supports $expiry to be given as a Unix timestamp.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $value, $expiry = null) {
+	public function write(array $keys, $expiry = null) {
 		$connection =& $this->connection;
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 
 		return function($self, $params) use (&$connection, $expiry) {
 			$expires = is_int($expiry) ? $expiry : strtotime($expiry);
-			$key = $params['key'];
 
-			if (is_array($key)) {
-				return $connection->setMulti($key, $expires);
+			if (count($params['keys']) > 1) {
+				return $connection->setMulti($params['keys'], $expires);
 			}
-			return $connection->set($key, $params['data'], $expires);
+			return $connection->set(key($params['keys']), current($params['keys']), $expires);
 		};
 	}
 
 	/**
-	 * Read value(s) from the cache.
-	 *
-	 * This adapter method supports multi-key reads. By specifying `$key` as an
-	 * array of key names, this adapter will attempt to return an array of data
+	 * Read values from the cache. Will attempt to return an array of data
 	 * containing key/value pairs of the requested data.
 	 *
-	 * @param string|array $key The key to uniquely identify the cached item.
-	 * @return Closure Function returning cached value if successful, `null` otherwise.
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return Closure Function returning cached values keyed by cache keys
+	 *                 on successful read, keys which could not be read will
+	 *                 not be included in the results array.
 	 */
-	public function read($key) {
+	public function read(array $keys) {
 		$connection =& $this->connection;
 
 		return function($self, $params) use (&$connection) {
-			$key = $params['key'];
-
-			if (is_array($key)) {
-				return $connection->getMulti($key);
+			if (count($params['keys']) > 1) {
+				return $connection->getMulti($params['keys']);
 			}
-			if (($result = $connection->get($key)) === false) {
+			$result = $connection->get($key = current($params['keys']));
+			$results = array($key => $result);
+
+			if ($results[$key] === false) {
 				if ($connection->getResultCode() === Memcached::RES_NOTFOUND) {
-					$result = null;
+					$results = array();
 				}
 			}
-			return $result;
+			return $results;
 		};
 	}
 
 	/**
-	 * Delete value from the cache.
+	 * Will attempt to remove specified keys from the user space cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item.
+	 * @param array $keys Keys to uniquely identify the cached items.
 	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
 	 */
-	public function delete($key) {
+	public function delete(array $keys) {
 		$connection =& $this->connection;
 
 		return function($self, $params) use (&$connection) {
-			return $connection->delete($params['key']);
+			if (count($params['keys']) > 1) {
+				return $connection->deleteMulti($params['keys']);
+			}
+			return $connection->delete(current($params['keys']));
 		};
 	}
 

@@ -27,7 +27,7 @@ use Closure;
  * This adapter does *not* provide increment/decrement functionality. For such
  * functionality, please use a more appropriate cache adapter.
  *
- * This adapter does *not* allow multi-key operations for any methods.
+ * This adapter synthetically supports multi-key `write`, `read` and `delete` operations.
  *
  * The path that the cached files will be written to defaults to
  * `<app>/resources/tmp/cache`, but is user-configurable on cache configuration.
@@ -62,74 +62,93 @@ class File extends \lithium\core\Object {
 	}
 
 	/**
-	 * Write value(s) to the cache.
+	 * Write values to the cache. All items to be cached will receive an
+	 * expiration time of `$expiry`.
 	 *
-	 * @param string $key The key to uniquely identify the cached item.
-	 * @param mixed $data The value to be cached.
-	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
+	 * Note that this is not an atomic operation when using multiple keys.
+	 *
+	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
+	 * @param null|string $expiry A `strtotime()` compatible cache time. If no expiry time is set,
 	 *        then the default cache expiration time set with the cache configuration will be used.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $data, $expiry = null) {
+	public function write(array $keys, $expiry = null) {
 		$path = $this->_config['path'];
-		$expiry = ($expiry) ?: $this->_config['expiry'];
+		$expiry = strtotime($expiry ?: $this->_config['expiry']);
 
 		return function($self, $params) use (&$path, $expiry) {
-			$expiry = strtotime($expiry);
-			$data = "{:expiry:{$expiry}}\n{$params['data']}";
-			$path = "{$path}/{$params['key']}";
-			return file_put_contents($path, $data);
+			foreach ($params['keys'] as $key => $value) {
+				$data = "{:expiry:{$expiry}}\n{$value}";
+
+				if (!file_put_contents("{$path}/{$key}", $data)) {
+					return false;
+				}
+			}
+			return true;
 		};
 	}
 
 	/**
-	 * Read value(s) from the cache.
+	 * Read values from the cache. Will attempt to return an array of data
+	 * containing key/value pairs of the requested data.
 	 *
-	 * @param string $key The key to uniquely identify the cached item.
-	 * @return Closure Function returning cached value if successful, `false` otherwise.
+	 * Note that this is not an atomic operation when using multiple keys.
+	 *
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return Closure Function returning cached values keyed by cache keys
+	 *                 on successful read, keys which could not be read will
+	 *                 not be included in the results array.
 	 */
-	public function read($key) {
+	public function read(array $keys) {
 		$path = $this->_config['path'];
 
 		return function($self, $params) use (&$path) {
-			extract($params);
-			$path = "$path/$key";
-			$file = new SplFileInfo($path);
+			$results = array();
 
-			if (!$file->isFile() || !$file->isReadable()) {
-				return false;
+			foreach ($params['keys'] as $key) {
+				$file = new SplFileInfo($p = "{$path}/{$key}");
+
+				if (!$file->isFile() || !$file->isReadable()) {
+					continue;
+				}
+				$data = file_get_contents($p);
+
+				preg_match('/^\{\:expiry\:(\d+)\}\\n/', $data, $matches);
+				$expiry = $matches[1];
+
+				if ($expiry < time()) {
+					file_exists($p) && unlink($p);
+					continue;
+				}
+				$results[$key] = preg_replace('/^\{\:expiry\:\d+\}\\n/', '', $data, 1);
 			}
-
-			$data = file_get_contents($path);
-			preg_match('/^\{\:expiry\:(\d+)\}\\n/', $data, $matches);
-			$expiry = $matches[1];
-
-			if ($expiry < time()) {
-				file_exists($path) && unlink($path);
-				return false;
-			}
-			return preg_replace('/^\{\:expiry\:\d+\}\\n/', '', $data, 1);
+			return $results;
 		};
 	}
 
 	/**
-	 * Delete an entry from the cache.
+	 * Will attempt to remove specified keys from the user space cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item.
-	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise.
+	 * Note that this is not an atomic operation when using multiple keys.
+	 *
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
 	 */
-	public function delete($key) {
+	public function delete(array $keys) {
 		$path = $this->_config['path'];
 
 		return function($self, $params) use (&$path) {
-			extract($params);
-			$path = "$path/$key";
-			$file = new SplFileInfo($path);
+			foreach ($params['keys'] as $key) {
+				$file = new SplFileInfo($p = "{$path}/{$key}");
 
-			if ($file->isFile() && $file->isReadable()) {
-				return file_exists($path) && unlink($path);
+				if (!$file->isFile() || !$file->isReadable()) {
+					return false;
+				}
+				if (!file_exists($p) || !unlink($p)) {
+					return false;
+				}
 			}
-			return false;
+			return true;
 		};
 	}
 

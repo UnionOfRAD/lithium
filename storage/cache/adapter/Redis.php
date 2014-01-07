@@ -42,6 +42,8 @@ use Closure;
  * and `clear` cache functionality, as well as allowing the first four
  * methods to be filtered as per the Lithium filtering system.
  *
+ * This adapter natively supports multi-key `write`, `read` and `delete` operations.
+ *
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\Cache::adapter()
  * @link https://github.com/nicolasff/phpredis GitHub: PhpRedis Extension
@@ -145,73 +147,91 @@ class Redis extends \lithium\core\Object {
 	}
 
 	/**
-	 * Write value(s) to the cache
+	 * Write values to the cache. All items to be cached will receive an
+	 * expiration time of `$expiry`.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @param mixed $value The value to be cached
-	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
+	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
+	 * @param null|string $expiry A `strtotime()` compatible cache time. If no expiry time is set,
 	 *        then the default cache expiration time set with the cache configuration will be used.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $value = null, $expiry = null) {
+	public function write(array $keys, $expiry = null) {
 		$connection =& $this->connection;
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 		$_self =& $this;
 
 		return function($self, $params) use (&$_self, &$connection, $expiry) {
-			if (is_array($params['key'])) {
-				$expiry = $params['data'];
-
-				if ($connection->mset($params['key'])) {
+			if (count($params['keys']) > 1) {
+				if ($connection->mset($params['keys'])) {
 					$ttl = array();
 
 					if ($expiry) {
-						foreach ($params['key'] as $k => $v) {
-							$ttl[$k] = $_self->invokeMethod('_ttl', array($k, $expiry));
+						foreach ($params['keys'] as $key => $value) {
+							if (!$_self->invokeMethod('_ttl', array($key, $expiry))) {
+								return false;
+							}
 						}
 					}
-					return $ttl;
+					return true;
+				}
+				return false;
+			}
+			$result = $connection->set(key($params['keys']), current($params['keys']));
+
+			if ($result && $expiry) {
+				foreach ($params['keys'] as $key => $value) {
+					if (!$_self->invokeMethod('_ttl', array($key, $expiry))) {
+						return false;
+					}
 				}
 			}
-			if ($result = $connection->set($params['key'], $params['data'])) {
-				if ($expiry) {
-					return $_self->invokeMethod('_ttl', array($params['key'], $expiry));
-				}
-				return $result;
-			}
+			return $result;
 		};
 	}
 
 	/**
-	 * Read value(s) from the cache
+	 * Read values from the cache. Will attempt to return an array of data
+	 * containing key/value pairs of the requested data.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return Closure Function returning cached value if successful, `false` otherwise
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return Closure Function returning cached values keyed by cache keys
+	 *                 on successful read, keys which could not be read will
+	 *                 not be included in the results array.
 	 */
-	public function read($key) {
+	public function read(array $keys) {
 		$connection =& $this->connection;
 
 		return function($self, $params) use (&$connection) {
-			$key = $params['key'];
+			if (count($params['keys']) > 1) {
+				$results = array();
+				$data = $connection->mGet($params['keys']);
 
-			if (is_array($key)) {
-				return $connection->getMultiple($key);
+				foreach ($data as $key => $item) {
+					$key = $params['keys'][$key];
+
+					if ($item === false && !$connection->exists($key)) {
+						continue;
+					}
+					$results[$key] = $item;
+				}
+				return $results;
 			}
-			return $connection->get($key);
+			$result = $connection->get($key = current($params['keys']));
+			return $result === false ? array() : array($key => $result);
 		};
 	}
 
 	/**
-	 * Delete value from the cache
+	 * Will attempt to remove specified keys from the user space cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
 	 */
-	public function delete($key) {
+	public function delete(array $keys) {
 		$connection =& $this->connection;
 
 		return function($self, $params) use (&$connection) {
-			return (boolean) $connection->delete($params['key']);
+			return (boolean) $connection->delete($params['keys']);
 		};
 	}
 

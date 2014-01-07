@@ -49,17 +49,18 @@ class XCacheTest extends \lithium\test\Unit {
 	public function testSimpleWrite() {
 		$key = 'key';
 		$data = 'value';
+		$keys = array($key => $data);
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
-		$closure = $this->XCache->write($key, $data, $expiry);
+		$closure = $this->XCache->write($keys, $expiry);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->XCache, $params, null);
-		$expected = $data;
-		$this->assertEqual($expected, $result);
+		$params = compact('keys', 'expiry');
+		$result = $closure($this->XCache, $params);
+		$this->assertTrue($result);
 
+		$expected = $data;
 		$result = xcache_get($key);
 		$this->assertEqual($expected, $result);
 
@@ -68,17 +69,18 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$key = 'another_key';
 		$data = 'more_data';
+		$keys = array($key => $data);
 		$expiry = '+1 minute';
 		$time = strtotime($expiry);
 
-		$closure = $this->XCache->write($key, $data, $expiry);
+		$closure = $this->XCache->write($keys, $expiry);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->XCache, $params, null);
-		$expected = $data;
-		$this->assertEqual($expected, $result);
+		$params = compact('keys', 'expiry');
+		$result = $closure($this->XCache, $params);
+		$this->assertTrue($result);
 
+		$expected = $data;
 		$result = xcache_get($key);
 		$this->assertEqual($expected, $result);
 
@@ -86,20 +88,41 @@ class XCacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testWriteMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		$closure = $this->XCache->write($keys, $expiry);
+		$result = $closure($this->XCache, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		foreach ($keys as $key => $data) {
+			$expected = $data;
+			$result = xcache_get($key);
+			$this->assertEqual($expected, $result);
+
+			xcache_unset($key);
+		}
+	}
+
 	public function testWriteDefaultCacheExpiry() {
 		$xCache = new XCache(array('expiry' => '+5 seconds'));
 		$key = 'default_key';
 		$data = 'value';
+		$keys = array($key => $data);
 		$time = strtotime('+5 seconds');
 
-		$closure = $xCache->write($key, $data);
+		$closure = $xCache->write($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data');
-		$result = $closure($xCache, $params, null);
-		$expected = $data;
-		$this->assertEqual($expected, $result);
+		$params = compact('keys');
+		$result = $closure($xCache, $params);
+		$this->assertTrue($result);
 
+		$expected = $data;
 		$result = xcache_get($key);
 		$this->assertEqual($expected, $result);
 
@@ -111,17 +134,18 @@ class XCacheTest extends \lithium\test\Unit {
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
+		$keys = array($key);
 		$time = strtotime('+1 minute');
 
 		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->XCache->read($key);
+		$closure = $this->XCache->read($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
-		$expected = $data;
+		$params = compact('keys');
+		$result = $closure($this->XCache, $params);
+		$expected = array($key => $data);
 		$this->assertEqual($expected, $result);
 
 		$result = xcache_unset($key);
@@ -129,17 +153,18 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$key = 'another_read_key';
 		$data = 'read data';
+		$keys = array($key);
 		$time = strtotime('+1 minute');
 
 		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->XCache->read($key);
+		$closure = $this->XCache->read($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
-		$expected = $data;
+		$params = compact('keys');
+		$result = $closure($this->XCache, $params);
+		$expected = array($key => $data);
 		$this->assertEqual($expected, $result);
 
 		$result = xcache_unset($key);
@@ -148,74 +173,141 @@ class XCacheTest extends \lithium\test\Unit {
 
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
-		$closure = $this->XCache->read($key);
-		$this->assertInternalType('callable', $closure);
+		$keys = array($key);
+		$closure = $this->XCache->read($keys);
 
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
-		$this->assertNull($result);
+		$expected = array();
+		$result = $closure($this->XCache, compact('keys'));
+		$this->assertIdentical($expected, $result);
+	}
 
+	public function testReadMulti() {
+		$keys = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		foreach ($keys as $key => $data) {
+			xcache_set($key, $data, 60);
+		}
+
+		$expected = array(
+			'key1' => 'data1',
+			'key2' => 'data2',
+			'key3' => 'data3'
+		);
+		$keys = array(
+			'key1',
+			'key2',
+			'key3'
+		);
+		$closure = $this->XCache->read($keys);
+		$result = $closure($this->XCache, compact('keys'));
+		$this->assertEqual($expected, $result);
+
+		foreach ($keys as $key) {
+			xcache_unset($key);
+		}
+	}
+
+	public function testWriteAndReadNull() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null
+		);
+		$result = $this->XCache->write($keys);
+		$this->assertTrue($result($this->XCache, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->XCache->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->XCache, array('keys' => array_keys($keys))));
+	}
+
+	public function testWriteAndReadNullMulti() {
+		$expiry = '+1 minute';
+		$keys = array(
+			'key1' => null,
+			'key2' => 'data2'
+		);
+		$result = $this->XCache->write($keys);
+		$this->assertTrue($result($this->XCache, compact('keys', 'expiry')));
+
+		$expected = $keys;
+		$result = $this->XCache->read(array_keys($keys));
+		$this->assertEqual($expected, $result($this->XCache, array('keys' => array_keys($keys))));
+
+		$keys = array(
+			'key1' => null,
+			'key2' => null
+		);
+		$result = $this->XCache->write($keys);
+		$this->assertTrue($result($this->XCache, compact('keys', 'expiry')));
 	}
 
 	public function testDelete() {
 		$key = 'delete_key';
+		$keys = array($key);
 		$data = 'data to delete';
 		$time = strtotime('+1 minute');
 
 		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->XCache->delete($key);
+		$closure = $this->XCache->delete($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
+		$params = compact('keys');
+		$result = $closure($this->XCache, $params);
 		$this->assertTrue($result);
 	}
 
 	public function testDeleteNonExistentKey() {
 		$key = 'delete_key';
 		$data = 'data to delete';
+		$keys = array($key);
 		$time = strtotime('+1 minute');
 
-		$closure = $this->XCache->delete($key);
+		$closure = $this->XCache->delete($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
+		$params = compact('keys');
+		$result = $closure($this->XCache, $params);
 		$this->assertFalse($result);
 	}
 
 	public function testWriteReadAndDeleteRoundtrip() {
 		$key = 'write_read_key';
 		$data = 'write/read value';
+		$keys = array($key => $data);
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
-		$closure = $this->XCache->write($key, $data, $expiry);
+		$closure = $this->XCache->write($keys, $expiry);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key', 'data', 'expiry');
-		$result = $closure($this->XCache, $params, null);
-		$expected = $data;
-		$this->assertEqual($expected, $result);
+		$params = compact('keys', 'expiry');
+		$result = $closure($this->XCache, $params);
+		$this->assertTrue($result);
 
+		$expected = $data;
 		$result = xcache_get($key);
 		$this->assertEqual($expected, $result);
 
-		$closure = $this->XCache->read($key);
+		$keys = array($key);
+
+		$closure = $this->XCache->read($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
+		$params = compact('keys');
 		$result = $closure($this->XCache, $params, null);
-		$expected = $data;
+		$expected = array($key => $data);
 		$this->assertEqual($expected, $result);
 
-		$closure = $this->XCache->delete($key);
+		$closure = $this->XCache->delete($keys);
 		$this->assertInternalType('callable', $closure);
 
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
+		$params = compact('keys');
+		$result = $closure($this->XCache, $params);
 		$this->assertTrue($result);
 	}
 
