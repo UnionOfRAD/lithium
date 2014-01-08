@@ -10,6 +10,7 @@ namespace lithium\tests\cases\storage\cache\adapter;
 
 use Exception;
 use Redis as RedisCore;
+use lithium\storage\Cache;
 use lithium\storage\cache\adapter\Redis;
 
 class RedisTest extends \lithium\test\Unit {
@@ -143,14 +144,57 @@ class RedisTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteNoExpiry() {
-		$redis = new Redis(array('expiry' => null));
 		$key = 'default_key';
 		$data = 'value';
 		$keys = array($key => $data);
 
-		$redis->write($keys)->__invoke(null, compact('keys'), null);
-		$this->assertEqual($data, $this->_redis->get($key));
-		$this->assertEqual(1, $this->_redis->delete($key));
+		$redis = new Redis(array('expiry' => null));
+		$expiry = null;
+
+		$closure = $redis->write($keys, $expiry);
+		$result = $closure($redis, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$result = $this->_redis->exists($key);
+		$this->assertTrue($result);
+
+		$expected = -1;
+		$result = $this->_redis->ttl($key);
+		$this->assertEqual($expected, $result);
+
+		$this->_redis->delete($key);
+
+		$redis = new Redis(array('expiry' => Cache::PERSIST));
+		$expiry = Cache::PERSIST;
+
+		$closure = $redis->write($keys, $expiry);
+		$result = $closure($redis, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$result = $this->_redis->exists($key);
+		$this->assertTrue($result);
+
+		$expected = -1;
+		$result = $this->_redis->ttl($key);
+		$this->assertEqual($expected, $result);
+
+		$this->_redis->delete($key);
+
+		$redis = new Redis();
+		$expiry = Cache::PERSIST;
+
+		$closure = $redis->write($keys, $expiry);
+		$result = $closure($redis, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$result = $this->_redis->exists($key);
+		$this->assertTrue($result);
+
+		$expected = -1;
+		$result = $this->_redis->ttl($key);
+		$this->assertEqual($expected, $result);
+
+		$this->_redis->delete($key);
 	}
 
 	public function testWriteExpiryExpires() {

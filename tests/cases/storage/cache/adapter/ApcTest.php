@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\storage\cache\adapter;
 
+use lithium\storage\Cache;
 use lithium\storage\cache\adapter\Apc;
 
 class ApcTest extends \lithium\test\Unit {
@@ -97,11 +98,38 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteNoExpiry() {
-		$apc = new Apc(array('expiry' => null));
 		$keys = array('key1' => 'data1');
+
+		$apc = new Apc(array('expiry' => null));
 		$expiry = null;
 		$closure = $apc->write($keys, $expiry);
-		$closure($apc, compact('keys', 'expiry'));
+
+		$result = $closure($apc, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$result = apc_exists('key1');
+		$this->assertTrue($result);
+
+		apc_delete('key1');
+
+		$apc = new Apc(array('expiry' => Cache::PERSIST));
+		$expiry = Cache::PERSIST;
+
+		$closure = $apc->write($keys, $expiry);
+		$result = $closure($apc, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$result = apc_exists('key1');
+		$this->assertTrue($result);
+
+		apc_delete('key1');
+
+		$apc = new Apc();
+		$expiry = Cache::PERSIST;
+		$closure = $apc->write($keys, $expiry);
+
+		$result = $closure($apc, compact('keys', 'expiry'));
+		$this->assertTrue($result);
 
 		$result = apc_exists('key1');
 		$this->assertTrue($result);
