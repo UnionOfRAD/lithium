@@ -122,7 +122,7 @@ class MemcacheTest extends \lithium\test\Unit {
 		$closure = $this->memcache->write($keys, $expiry);
 		$closure($this->memcache, compact('keys', 'expiry'));
 
-		usleep(1010000);
+		sleep(2);
 
 		$result = $this->_conn->get('key1');
 		$this->assertFalse($result);
@@ -144,7 +144,7 @@ class MemcacheTest extends \lithium\test\Unit {
 		$closure = $this->memcache->write($keys, $expiry);
 		$closure($this->memcache, compact('keys', 'expiry'));
 
-		usleep(1010000);
+		sleep(2);
 
 		$result = $this->_conn->get('key1');
 		$this->assertFalse($result);

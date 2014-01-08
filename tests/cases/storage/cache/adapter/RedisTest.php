@@ -169,7 +169,7 @@ class RedisTest extends \lithium\test\Unit {
 		$closure = $this->redis->write($keys, $expiry);
 		$closure($this->redis, compact('keys', 'expiry'));
 
-		usleep(1010000);
+		sleep(2);
 
 		$result = $this->_redis->exists('key1');
 		$this->assertFalse($result);
@@ -191,7 +191,7 @@ class RedisTest extends \lithium\test\Unit {
 		$closure = $this->redis->write($keys, $expiry);
 		$closure($this->redis, compact('keys', 'expiry'));
 
-		usleep(1010000);
+		sleep(2);
 
 		$result = $this->_redis->exists('key1');
 		$this->assertFalse($result);

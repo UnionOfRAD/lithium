@@ -146,7 +146,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$closure = $this->XCache->write($keys, $expiry);
 		$closure($this->XCache, compact('keys', 'expiry'));
 
-		usleep(1010000);
+		sleep(2);
 
 		$result = xcache_isset('key1');
 		$this->assertFalse($result);
@@ -168,7 +168,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$closure = $this->XCache->write($keys, $expiry);
 		$closure($this->XCache, compact('keys', 'expiry'));
 
-		usleep(1010000);
+		sleep(2);
 
 		$result = xcache_isset('key1');
 		$this->assertFalse($result);
