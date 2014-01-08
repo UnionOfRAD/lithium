@@ -9,6 +9,7 @@
 namespace lithium\storage\cache\adapter;
 
 use Closure;
+use lithium\storage\Cache;
 
 /**
  * An Alternative PHP Cache (APC) cache adapter implementation.
@@ -60,13 +61,20 @@ class Apc extends \lithium\core\Object {
 	 *
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
+	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
-		$expiry = $expiry ?: $this->_config['expiry'];
+		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
 
 		return function($self, $params) use ($expiry) {
-			$ttl = $expiry ? (is_int($expiry) ? $expiry : strtotime($expiry) - time()) : 0;
+			if (!$expiry || $expiry === Cache::PERSIST) {
+				$ttl = 0;
+			} elseif (is_int($expiry)) {
+				$ttl = $expiry;
+			} else {
+				$ttl = strtotime($expiry) - time();
+			}
 			return apc_store($params['keys'], null, $ttl) === array();
 		};
 	}

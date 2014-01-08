@@ -10,6 +10,7 @@ namespace lithium\storage\cache\adapter;
 
 use Memcached;
 use lithium\util\Set;
+use lithium\storage\Cache;
 use Closure;
 
 /**
@@ -147,15 +148,21 @@ class Memcache extends \lithium\core\Object {
 	 *
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
+	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
 		$connection =& $this->connection;
-		$expiry = ($expiry) ?: $this->_config['expiry'];
+		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
 
 		return function($self, $params) use (&$connection, $expiry) {
-			$expires = $expiry ? (is_int($expiry) ? $expiry + time() : strtotime($expiry)) : 0;
-
+			if (!$expiry || $expiry === Cache::PERSIST) {
+				$expires = 0;
+			} elseif (is_int($expiry)) {
+				$expires = $expiry + time();
+			} else {
+				$expires = strtotime($expiry);
+			}
 			if (count($params['keys']) > 1) {
 				return $connection->setMulti($params['keys'], $expires);
 			}

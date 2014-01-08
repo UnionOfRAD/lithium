@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\storage\cache\adapter;
 
 use Memcached;
+use lithium\storage\Cache;
 use lithium\storage\cache\adapter\Memcache;
 
 class MemcacheTest extends \lithium\test\Unit {
@@ -107,15 +108,43 @@ class MemcacheTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteNoExpiry() {
-		$adapter = new Memcache(array('expiry' => null));
-
 		$keys = array('key1' => 'data1');
+
+		$adapter = new Memcache(array('expiry' => null));
 		$expiry = null;
+
 		$closure = $adapter->write($keys, $expiry);
-		$closure($adapter, compact('keys', 'expiry'));
+		$result = $closure($adapter, compact('keys', 'expiry'));
+		$this->assertTrue($result);
 
 		$result = (boolean) $this->_conn->get('key1');
 		$this->assertTrue($result);
+
+		$this->_conn->delete('key1');
+
+		$adapter = new Memcache(array('expiry' => Cache::PERSIST));
+		$expiry = Cache::PERSIST;
+
+		$closure = $adapter->write($keys, $expiry);
+		$result = $closure($adapter, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$result = (boolean) $this->_conn->get('key1');
+		$this->assertTrue($result);
+
+		$this->_conn->delete('key1');
+
+		$adapter = new Memcache();
+		$expiry = Cache::PERSIST;
+
+		$closure = $adapter->write($keys, $expiry);
+		$result = $closure($adapter, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$result = (boolean) $this->_conn->get('key1');
+		$this->assertTrue($result);
+
+		$this->_conn->delete('key1');
 	}
 
 	public function testWriteExpiryExpires() {

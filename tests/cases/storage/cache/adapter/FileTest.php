@@ -10,6 +10,7 @@ namespace lithium\tests\cases\storage\cache\adapter;
 
 use SplFileInfo;
 use lithium\core\Libraries;
+use lithium\storage\Cache;
 use lithium\storage\cache\adapter\File;
 
 class FileTest extends \lithium\test\Unit {
@@ -135,20 +136,47 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteNoExpiry() {
-		$adapter = new File(array('expiry' => null));
-		$keys = array('key1' => 'data1');
-		$expiry = null;
-		$closure = $adapter->write($keys, $expiry);
-		$closure($adapter, compact('keys', 'expiry'));
-
 		$file = Libraries::get(true, 'resources') . '/tmp/cache/key1';
+		$keys = array('key1' => 'data1');
+
+		$adapter = new File(array('expiry' => null));
+		$expiry = null;
+
+		$closure = $adapter->write($keys, $expiry);
+		$result = $closure($adapter, compact('keys', 'expiry'));
+		$this->assertTrue($result);
 
 		$expected = "{:expiry:0}\ndata1";
 		$result = file_get_contents($file);
 		$this->assertEqual($expected, $result);
 
-		$closure = $adapter->delete(array('key1'));
-		$closure($adapter, array('keys' => array('key1')));
+		unlink($file);
+
+		$adapter = new File(array('expiry' => Cache::PERSIST));
+		$expiry = Cache::PERSIST;
+
+		$closure = $adapter->write($keys, $expiry);
+		$result = $closure($adapter, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$expected = "{:expiry:0}\ndata1";
+		$result = file_get_contents($file);
+		$this->assertEqual($expected, $result);
+
+		unlink($file);
+
+		$adapter = new File();
+		$expiry = Cache::PERSIST;
+
+		$closure = $adapter->write($keys, $expiry);
+		$result = $closure($adapter, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$expected = "{:expiry:0}\ndata1";
+		$result = file_get_contents($file);
+		$this->assertEqual($expected, $result);
+
+		unlink($file);
 	}
 
 	public function testWriteExpiryExpires() {

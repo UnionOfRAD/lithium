@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\storage\cache\adapter;
 
+use lithium\storage\Cache;
 use lithium\storage\cache\adapter\XCache;
 
 class XCacheTest extends \lithium\test\Unit {
@@ -131,12 +132,38 @@ class XCacheTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteNoExpiry() {
-		$adapter = new XCache(array('expiry' => null));
-
 		$keys = array('key1' => 'data1');
+
+		$adapter = new XCache(array('expiry' => null));
 		$expiry = null;
+
 		$closure = $adapter->write($keys, $expiry);
-		$closure($adapter, compact('keys', 'expiry'));
+		$result = $closure($adapter, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$result = xcache_isset('key1');
+		$this->assertTrue($result);
+
+		xcache_unset('key1');
+
+		$adapter = new XCache(array('expiry' => Cache::PERSIST));
+		$expiry = Cache::PERSIST;
+
+		$closure = $adapter->write($keys, $expiry);
+		$result = $closure($adapter, compact('keys', 'expiry'));
+		$this->assertTrue($result);
+
+		$result = xcache_isset('key1');
+		$this->assertTrue($result);
+
+		xcache_unset('key1');
+
+		$adapter = new XCache();
+		$expiry = Cache::PERSIST;
+
+		$closure = $adapter->write($keys, $expiry);
+		$result = $closure($adapter, compact('keys', 'expiry'));
+		$this->assertTrue($result);
 
 		$result = xcache_isset('key1');
 		$this->assertTrue($result);

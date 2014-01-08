@@ -47,6 +47,16 @@ namespace lithium\storage;
 class Cache extends \lithium\core\Adaptable {
 
 	/**
+	 * Can be used for expiry parameters or configuration options to
+	 * specify that a cached item should persist as long and expire as
+	 * late as possible.
+	 *
+	 * Please note that most adapters don't gurantee that an item is stored
+	 * as long as specified which holds true for _persistent_ storage, too.
+	 */
+	const PERSIST = 0;
+
+	/**
 	 * Stores configurations for cache adapters
 	 *
 	 * @var array
@@ -110,7 +120,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string|integer $expiry A `strtotime()` compatible cache time. Alternatively an integer
 	 *                       denoting the seconds until the item expires (TTL). If no expiry time is
 	 *                       set, then the default cache expiration time set with the cache adapter
-	 *                       configuration will be used.
+	 *                       configuration will be used. To persist an item use `Cache::PERSIST`.
 	 * @param mixed $options Options for the method, filters and strategies.
 	 * @return boolean `true` on successful cache write, `false` otherwise. When writing
 	 *                 multiple items and an error occurs writing any of the items the

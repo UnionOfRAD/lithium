@@ -8,6 +8,7 @@
 
 namespace lithium\storage\cache\adapter;
 
+use lithium\storage\Cache;
 use Redis as RedisCore;
 use Closure;
 
@@ -140,14 +141,21 @@ class Redis extends \lithium\core\Object {
 	 *
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
+	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
 		$connection =& $this->connection;
-		$expiry = $expiry ?: $this->_config['expiry'];
+		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
 
 		return function($self, $params) use (&$connection, $expiry) {
-			$ttl = $expiry ? (is_int($expiry) ? $expiry : strtotime($expiry) - time()) : null;
+			if (!$expiry || $expiry === Cache::PERSIST) {
+				$ttl = null;
+			} elseif (is_int($expiry)) {
+				$ttl = $expiry;
+			} else {
+				$ttl = strtotime($expiry) - time();
+			}
 
 			if (count($params['keys']) > 1) {
 				if ($ttl) {
