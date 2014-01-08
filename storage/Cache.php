@@ -38,15 +38,22 @@ namespace lithium\storage;
  * }}}
  *
  * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`,
- * `delete` and `clear`, which can be used interchangeably between all adapters. Some adapters
- * may provide additional methods that are not consistently available across other adapters.
- * To make use of these, it is always possible to call:
+ * `delete` and `clear`, which can be used _interchangeably between all adapters_.
  *
- * {{{Cache::adapter('named-configuration')->methodName($argument);}}}
+ * Some adapters however have additional capabilities or differ in their behavior.
+ * The following few points outline where those adapters may differ.
  *
- * This allows a very wide range of flexibility, at the cost of portability.
+ *  1. Functionality for increment/decrement may not always be provided (e.g. `File`).
  *
- * Some cache adapters (e.g. `File`) do _not_ provide the functionality for increment/decrement.
+ *  2. Additional methods may be provided, it's always possible to call them directly.
+ *     This allows a very wide range of flexibility, at the cost of portability.
+ *
+ *     {{{
+ *     Cache::adapter('default')->methodName($argument);
+ *     }}}
+ *
+ *  3. Real persistence or storage as specified by expiration time for cached items
+ *     may not be guaranteed (e.g. `Memcache`).
  *
  * @see lithium\core\Adaptable
  * @see lithium\storage\cache\adapter
@@ -58,8 +65,6 @@ class Cache extends \lithium\core\Adaptable {
 	 * specify that a cached item should persist as long and expire as
 	 * late as possible.
 	 *
-	 * Please note that most adapters don't gurantee that an item is stored
-	 * as long as specified which holds true for _persistent_ storage, too.
 	 */
 	const PERSIST = 0;
 
