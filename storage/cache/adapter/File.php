@@ -117,7 +117,7 @@ class File extends \lithium\core\Object {
 				preg_match('/^\{\:expiry\:(\d+)\}\\n/', $data, $matches);
 				$expiry = $matches[1];
 
-				if ($expiry < time()) {
+				if ($expiry < time() && $expiry != 0) {
 					file_exists($p) && unlink($p);
 					continue;
 				}
