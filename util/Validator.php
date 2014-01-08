@@ -658,14 +658,11 @@ class Validator extends \lithium\core\StaticObject {
 				$regexPassed = (is_string($check) && preg_match($check, $value));
 				$closurePassed = (is_object($check) && $check($value, $format, $options));
 
-				if (!$options['all'] && ($regexPassed || $closurePassed)) {
+				if ($regexPassed || $closurePassed) {
 					return true;
 				}
-				if ($options['all'] && (!$regexPassed && !$closurePassed)) {
-					return false;
-				}
 			}
-			return $options['all'];
+			return false;
 		};
 	}
 }
