@@ -1211,7 +1211,6 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::respondsTo('isCreditCard'));
 		$this->assertFalse(Validator::respondsTo('isFoobar'));
 	}
-
 }
 
 ?>
