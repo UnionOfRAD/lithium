@@ -142,6 +142,14 @@ class XCacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	/**
+	 * Tests that an item can be written to the cache using
+	 * `strtotime` syntax.
+	 *
+	 * Note that because of the nature of XCache we cannot test if an item
+	 * correctly expires. Expiration checks are done by XCache only on each
+	 * _page request_.
+	 */
 	public function testWriteExpiryExpires() {
 		$keys = array('key1' => 'data1');
 		$expiry = '+5 seconds';
@@ -152,18 +160,16 @@ class XCacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		xcache_unset('key1');
-
-		$keys = array('key1' => 'data1');
-		$expiry = '+1 second';
-		$closure = $this->XCache->write($keys, $expiry);
-		$closure($this->XCache, compact('keys', 'expiry'));
-
-		sleep(2);
-
-		$result = xcache_isset('key1');
-		$this->assertFalse($result);
 	}
 
+	/**
+	 * Tests that an item can be written to the cache using
+	 * TTL syntax.
+	 *
+	 * Note that because of the nature of XCache we cannot test if an item
+	 * correctly expires. Expiration checks are done by XCache only on each
+	 * _page request_.
+	 */
 	public function testWriteExpiryTtl() {
 		$keys = array('key1' => 'data1');
 		$expiry = 5;
@@ -179,11 +185,6 @@ class XCacheTest extends \lithium\test\Unit {
 		$expiry = 1;
 		$closure = $this->XCache->write($keys, $expiry);
 		$closure($this->XCache, compact('keys', 'expiry'));
-
-		sleep(2);
-
-		$result = xcache_isset('key1');
-		$this->assertFalse($result);
 	}
 
 	public function testSimpleRead() {
