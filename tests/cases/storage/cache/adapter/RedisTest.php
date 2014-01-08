@@ -269,8 +269,7 @@ class RedisTest extends \lithium\test\Unit {
 
 		$params = array('keys' => $keys, 'expiry' => null);
 		$result = $closure($this->redis, $params, null);
-		$expected = array('key1' => true, 'key2' => true);
-		$this->assertEqual($expected, $result);
+		$this->assertTrue($result);
 
 		$result = $this->_redis->getMultiple(array_keys($keys));
 		$expected = array_values($keys);

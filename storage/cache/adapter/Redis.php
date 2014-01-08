@@ -147,29 +147,30 @@ class Redis extends \lithium\core\Object {
 		$expiry = $expiry ?: $this->_config['expiry'];
 
 		return function($self, $params) use (&$connection, $expiry) {
-			$expires = is_int($expiry) ? $expiry + time() : strtotime($expiry);
-
-			$transaction = $connection->multi();
+			$ttl = is_int($expiry) ? $expiry : strtotime($expiry) - time();
 
 			if (count($params['keys']) > 1) {
-				$result = $connection->mset($params['keys']);
-			} else {
-				$result = $connection->set(key($params['keys']), current($params['keys']));
-			}
-			if (!$result) {
-				$transaction->discard();
-				return false;
-			}
-			if ($expiry) {
-				return $transaction->exec();
-			}
-			foreach ($params['keys'] as $key => $value) {
-				if (!$connection->expireAt($key, $expires)) {
-					$transaction->discard();
-					return false;
+				if ($ttl) {
+					$transaction = $connection->multi();
+
+					foreach ($params['keys'] as $key => $value) {
+						if (!$connection->setex($key, $ttl, $value)) {
+							$transaction->discard();
+							return false;
+						}
+					}
+					return $transaction->exec() === array_fill(0, count($params['keys']), true);
 				}
+				return $connection->mset($params['keys']) ;
+			} else {
+				$key = key($params['keys']);
+				$value = current($params['keys']);
+
+				if ($ttl) {
+					return $connection->setex($key, $ttl, $value);
+				}
+				return $connection->set($key, $value);
 			}
-			return $transaction->exec();
 		};
 	}
 
