@@ -21,14 +21,21 @@ namespace lithium\storage;
  *
  * A simple example configuration:
  *
- * {{{Cache::config(array(
- *     'local' => array('adapter' => 'Apc'),
+ * {{{
+ * Cache::config(array(
+ *     'local' => array(
+ *         'adapter' => 'Apc'
+ *     ),
  *     'distributed' => array(
  *         'adapter' => 'Memcached',
- *         'host' => '127.0.0.1:11211',
+ *         'host' => '127.0.0.1:11211'
  *     ),
- *     'default' => array('adapter' => 'File')
- * ));}}}
+ *     'default' => array(
+ *         'adapter' => 'File',
+ *         'strategies => array('Serializer')
+ *     )
+ * );
+ * }}}
  *
  * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`,
  * `delete` and `clear`, which can be used interchangeably between all adapters. Some adapters
