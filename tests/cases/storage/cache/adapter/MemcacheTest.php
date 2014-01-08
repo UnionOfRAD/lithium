@@ -106,6 +106,18 @@ class MemcacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testWriteNoExpiry() {
+		$adapter = new Memcache(array('expiry' => null));
+
+		$keys = array('key1' => 'data1');
+		$expiry = null;
+		$closure = $adapter->write($keys, $expiry);
+		$closure($adapter, compact('keys', 'expiry'));
+
+		$result = (boolean) $this->_conn->get('key1');
+		$this->assertTrue($result);
+	}
+
 	public function testWriteExpiryExpires() {
 		$keys = array('key1' => 'data1');
 		$expiry = '+5 seconds';

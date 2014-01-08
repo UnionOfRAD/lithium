@@ -130,6 +130,18 @@ class XCacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testWriteNoExpiry() {
+		$adapter = new XCache(array('expiry' => null));
+
+		$keys = array('key1' => 'data1');
+		$expiry = null;
+		$closure = $adapter->write($keys, $expiry);
+		$closure($adapter, compact('keys', 'expiry'));
+
+		$result = xcache_isset('key1');
+		$this->assertTrue($result);
+	}
+
 	public function testWriteExpiryExpires() {
 		$keys = array('key1' => 'data1');
 		$expiry = '+5 seconds';

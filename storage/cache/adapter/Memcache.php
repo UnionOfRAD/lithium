@@ -154,7 +154,7 @@ class Memcache extends \lithium\core\Object {
 		$expiry = ($expiry) ?: $this->_config['expiry'];
 
 		return function($self, $params) use (&$connection, $expiry) {
-			$expires = is_int($expiry) ? $expiry + time() : strtotime($expiry);
+			$expires = $expiry ? (is_int($expiry) ? $expiry + time() : strtotime($expiry)) : 0;
 
 			if (count($params['keys']) > 1) {
 				return $connection->setMulti($params['keys'], $expires);

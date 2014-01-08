@@ -96,6 +96,17 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testWriteNoExpiry() {
+		$apc = new Apc(array('expiry' => null));
+		$keys = array('key1' => 'data1');
+		$expiry = null;
+		$closure = $apc->write($keys, $expiry);
+		$closure($apc, compact('keys', 'expiry'));
+
+		$result = apc_exists('key1');
+		$this->assertTrue($result);
+	}
+
 	/**
 	 * Tests that an item can be written to the cache using
 	 * `strtotime` syntax.

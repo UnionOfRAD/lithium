@@ -71,7 +71,7 @@ class XCache extends \lithium\core\Object {
 		$expiry = $expiry ?: $this->_config['expiry'];
 
 		return function($self, $params) use ($expiry) {
-			$ttl = is_int($expiry) ? $expiry : strtotime($expiry) - time();
+			$ttl = $expiry ? (is_int($expiry) ? $expiry : strtotime($expiry) - time()) : 0;
 
 			foreach ($params['keys'] as $key => $value) {
 				if (!xcache_set($key, $value, $ttl)) {

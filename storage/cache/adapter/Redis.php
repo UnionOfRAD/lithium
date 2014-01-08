@@ -147,7 +147,7 @@ class Redis extends \lithium\core\Object {
 		$expiry = $expiry ?: $this->_config['expiry'];
 
 		return function($self, $params) use (&$connection, $expiry) {
-			$ttl = is_int($expiry) ? $expiry : strtotime($expiry) - time();
+			$ttl = $expiry ? (is_int($expiry) ? $expiry : strtotime($expiry) - time()) : null;
 
 			if (count($params['keys']) > 1) {
 				if ($ttl) {

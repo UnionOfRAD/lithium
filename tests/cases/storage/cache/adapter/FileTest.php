@@ -134,6 +134,23 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertFileNotExists(Libraries::get(true, 'resources') . "/tmp/cache/{$key}");
 	}
 
+	public function testWriteNoExpiry() {
+		$adapter = new File(array('expiry' => null));
+		$keys = array('key1' => 'data1');
+		$expiry = null;
+		$closure = $adapter->write($keys, $expiry);
+		$closure($adapter, compact('keys', 'expiry'));
+
+		$file = Libraries::get(true, 'resources') . '/tmp/cache/key1';
+
+		$expected = "{:expiry:0}\ndata1";
+		$result = file_get_contents($file);
+		$this->assertEqual($expected, $result);
+
+		$closure = $adapter->delete(array('key1'));
+		$closure($adapter, array('keys' => array('key1')));
+	}
+
 	public function testWriteExpiryExpires() {
 		$now = time();
 
