@@ -94,7 +94,7 @@ if ($app) {
 		if (!file_exists($path = "{$app}/config/{$file}")) {
 			continue;
 		}
-		if (preg_match("/^define\([\"']LITHIUM_LIBRARY_PATH[\"']/m", file_get_contents($path))) {
+		if (preg_match("/^\s*define\([\"']LITHIUM_LIBRARY_PATH[\"']/m", file_get_contents($path))) {
 			include "{$app}/config/bootstrap.php";
 			exit($run());
 		}
