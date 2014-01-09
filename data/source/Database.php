@@ -391,6 +391,8 @@ abstract class Database extends \lithium\data\Source {
 	 * @return mixed value with converted type
 	 */
 	public function value($value, array $schema = array()) {
+		$schema += array('default' => null, 'null' => false);
+
 		if (is_array($value)) {
 			foreach ($value as $key => $val) {
 				$value[$key] = $this->value($val, isset($schema[$key]) ? $schema[$key] : $schema);
@@ -402,13 +404,8 @@ abstract class Database extends \lithium\data\Source {
 			return $value->scalar;
 		}
 
-		if ($value === null) {
-			return 'NULL';
-		}
-
 		$type = isset($schema['type']) ? $schema['type'] : $this->_introspectType($value);
 		$column = isset($this->_columns[$type]) ? $this->_columns[$type] : null;
-
 		return $this->_cast($type, $value, $column, $schema);
 	}
 
@@ -423,16 +420,23 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function _cast($type, $value, $column, $schema = array()) {
 		$column += array('formatter' => null, 'format' => null);
-		$schema += array('default' => null, 'null' => false);
 
+		if ($value === null) {
+			return 'NULL';
+		}
 		if (is_object($value)) {
 			return $value;
 		}
-		if ($formatter = $column['formatter']) {
-			$format = $column['format'];
-			return $format ? $formatter($format, $value) : $formatter($value);
+		if (!$formatter = $column['formatter']) {
+			return $this->connection->quote($value);
 		}
-		return $this->connection->quote($value);
+		if (!$format = $column['format']) {
+			return $formatter($value);
+		}
+		if (($value = $formatter($format, $value)) === false) {
+			$value = $formatter($format, $schema['default']);
+		}
+		return $value !== false ? $value : 'NULL';
 	}
 
 	/**
@@ -452,6 +456,8 @@ abstract class Database extends \lithium\data\Source {
 		$datetime = $timestamp = $date = $time = function($format, $value) use ($self) {
 			if ($format && (($time = strtotime($value)) !== false)) {
 				$value = date($format, $time);
+			} else {
+				return false;
 			}
 			return $self->connection->quote($value);
 		};
