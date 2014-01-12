@@ -262,7 +262,11 @@ class Request extends \lithium\net\http\Request {
 			$this->data = $this->body(null, array('decode' => true, 'encode' => false));
 		}
 		$this->body = $this->data;
-		$this->data = Set::merge((array) $this->data, $this->_parseFiles());
+		$this->data = (array) $this->data;
+
+		if (!empty($_FILES)) {
+			$this->data = Set::merge($this->data, $this->_parseFiles());
+		}
 	}
 
 	/**
@@ -739,41 +743,38 @@ class Request extends \lithium\net\http\Request {
 	 * @return array
 	 */
 	protected function _parseFiles() {
-		if (!empty($_FILES)) {
-			$result = array();
+		$result = array();
 
-			$normalize = function($key, $value) use ($result, &$normalize){
-				foreach ($value as $param => $content) {
-					foreach ($content as $num => $val) {
-						if (is_numeric($num)) {
-							$result[$key][$num][$param] = $val;
-							continue;
-						}
-						if (is_array($val)) {
-							foreach ($val as $next => $one) {
-								$result[$key][$num][$next][$param] = $one;
-							}
-							continue;
-						}
+		$normalize = function($key, $value) use ($result, &$normalize){
+			foreach ($value as $param => $content) {
+				foreach ($content as $num => $val) {
+					if (is_numeric($num)) {
 						$result[$key][$num][$param] = $val;
-					}
-				}
-				return $result;
-			};
-			foreach ($_FILES as $key => $value) {
-				if (isset($value['name'])) {
-					if (is_string($value['name'])) {
-						$result[$key] = $value;
 						continue;
 					}
-					if (is_array($value['name'])) {
-						$result += $normalize($key, $value);
+					if (is_array($val)) {
+						foreach ($val as $next => $one) {
+							$result[$key][$num][$next][$param] = $one;
+						}
+						continue;
 					}
+					$result[$key][$num][$param] = $val;
 				}
 			}
 			return $result;
+		};
+		foreach ($_FILES as $key => $value) {
+			if (isset($value['name'])) {
+				if (is_string($value['name'])) {
+					$result[$key] = $value;
+					continue;
+				}
+				if (is_array($value['name'])) {
+					$result += $normalize($key, $value);
+				}
+			}
 		}
-		return array();
+		return $result;
 	}
 }
 
