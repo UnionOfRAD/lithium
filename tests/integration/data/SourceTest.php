@@ -11,6 +11,7 @@ namespace lithium\tests\integration\data;
 use lithium\tests\fixture\model\gallery\Images;
 use lithium\tests\fixture\model\gallery\Galleries;
 use li3_fixtures\test\Fixtures;
+use Exception;
 
 class SourceTest extends \lithium\tests\integration\data\Base {
 
@@ -250,6 +251,51 @@ class SourceTest extends \lithium\tests\integration\data\Base {
 		foreach (Galleries::all() as $galleries) {
 			$this->assertTrue($galleries->delete());
 		}
+	}
+
+	public function testSerializingEntity() {
+		Fixtures::save('db');
+
+		$data = Images::find('first');
+		$this->skipIf(!$data, 'Fixtures not applied/available.');
+
+		$result = true;
+		try {
+			$data = serialize($data);
+			$data = unserialize($data);
+		} catch (Exception $e) {
+			$result = false;
+			$data = array();
+		}
+		$this->assertTrue($result);
+
+		$expected = 'Amiga 1200';
+		$result = $data->title;
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSerializingCollection() {
+		Fixtures::save('db');
+
+		$data = Images::find('all');
+		$this->skipIf(!$data, 'Fixtures not applied/available.');
+
+		$result = true;
+		try {
+			$data = serialize($data);
+			$data = unserialize($data);
+		} catch (Exception $e) {
+			$result = false;
+			$data = array();
+		}
+		$this->assertTrue($result);
+
+		$expected = 'Amiga 1200';
+		foreach ($data as $item) {
+			$result = $item->title;
+			break;
+		}
+		$this->assertEqual($expected, $result);
 	}
 }
 

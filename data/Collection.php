@@ -15,8 +15,14 @@ use Closure;
  * context-specific features for working with sets of data persisted by a backend data store. This
  * is a general abstraction that operates on arbitrary sets of data from either relational or
  * non-relational data stores.
+ *
+ * Instances of `lithium\data\Collection` or any subclass of it may be serialized. This
+ * operation however isn't lossless. The documentation of the `serialize()` method has
+ * more information on the limitations.
+ *
+ * @see lithium\data\Collection::serialize()
  */
-abstract class Collection extends \lithium\util\Collection {
+abstract class Collection extends \lithium\util\Collection implements \Serializable {
 
 	/**
 	 * A reference to this object's parent `Document` object.
@@ -604,6 +610,51 @@ abstract class Collection extends \lithium\util\Collection {
 	 */
 	public function __destruct() {
 		$this->close();
+	}
+
+	/**
+	 * Prepares, enables and executes serialization of the object.
+	 *
+	 * Note: because of the limitations outlined below custom
+	 * handlers are ignored with serialized objects.
+	 *
+	 * Pulls all results to entirely populate `_data` and closes the object
+	 * freeing the associated result resource. This allows for skipping
+	 * the `_result` property which may hold unserializable `PDOStatement`s.
+	 *
+	 * Properties that hold anonymous functions are also skipped. Some of these
+	 * can almost be reconstructed (`_handlers`) others cannot (`_methodFilters`).
+	 *
+	 * @return string Serialized properties of the object.
+	 */
+	public function serialize() {
+		$this->offsetGet(null);
+		static::__destruct();
+
+		$vars = get_object_vars($this);
+		unset($vars['_result']);
+		unset($vars['_handlers']);
+		unset($vars['_methodFilters']);
+
+		return serialize($vars);
+	}
+
+	/**
+	 * Prepares, enables and executes unserialization of the object.
+	 *
+	 * Restores state of the object including pulled results. Tries
+	 * to restore `_handlers` by calling into `_init()`.
+	 *
+	 * @param string $data Serialized properties of the object.
+	 * @return void
+	 */
+	public function unserialize($data) {
+		$vars = unserialize($data);
+		parent::_init();
+
+		foreach ($vars as $key => $value) {
+			$this->{$key} = $value;
+		}
 	}
 
 	/**
