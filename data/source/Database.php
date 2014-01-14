@@ -336,9 +336,7 @@ abstract class Database extends \lithium\data\Source {
 	 *         database adapter subclass.
 	 */
 	public function name($name) {
-		$open  = reset($this->_quotes);
-		$close = next($this->_quotes);
-
+		list($open, $close) = $this->_quotes;
 		list($first, $second) = $this->_splitFieldname($name);
 		if ($first) {
 			return "{$open}{$first}{$close}.{$open}{$second}{$close}";
@@ -1096,8 +1094,7 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	protected function _fieldsQuote($alias, $field) {
-		$open = $this->_quotes[0];
-		$close = $this->_quotes[1];
+		list($open, $close) = $this->_quotes;
 		$aliasing = preg_split("/\s+as\s+/i", $field);
 		if (isset($aliasing[1])) {
 			list($aliasname, $fieldname) = $this->_splitFieldname($aliasing[0]);
