@@ -116,6 +116,14 @@ abstract class Database extends \lithium\data\Source {
 	protected $_strategies = array();
 
 	/**
+	 * Holds cached names.
+	 *
+	 * @see lithium\data\source\Database::name();
+	 * @var array
+	 */
+	protected $_cachedNames = array();
+
+	/**
 	 * Getter/Setter for the connection's encoding
 	 * Abstract. Must be defined by child class.
 	 *
@@ -338,16 +346,21 @@ abstract class Database extends \lithium\data\Source {
 	 *         database adapter subclass.
 	 */
 	public function name($name) {
+		if (isset($this->_cachedNames[$name])) {
+			return $this->_cachedNames[$name];
+		}
+
 		list($open, $close) = $this->_quotes;
 		list($first, $second) = $this->_splitFieldname($name);
 
 		if ($first) {
-			return "{$open}{$first}{$close}.{$open}{$second}{$close}";
+			$result = "{$open}{$first}{$close}.{$open}{$second}{$close}";
+		} elseif (preg_match('/^[a-z0-9_-]+$/iS', $name)) {
+			$result = "{$open}{$name}{$close}";
+		} else {
+			$result = $name;
 		}
-		if (preg_match('/^[a-z0-9_-]+$/iS', $name)) {
-			return "{$open}{$name}{$close}";
-		}
-		return $name;
+		return $this->_cachedNames[$name] = $result;
 	}
 
 	/**
