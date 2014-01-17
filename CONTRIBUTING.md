@@ -10,4 +10,4 @@ Here's what you need to stick to in order to have the best chance of getting you
  * **Maintainability**: code should pass existing tests, have adequate test coverage and should conform to our coding standards & QA guidelines
  * **Comprehensibility**: code should be concise and expressive, and should be accompanied by new documentation as appropriate, or updates to existing docs
 
-Please see the full documentation over at the [contribution guidelines](http://lithify.me/docs/manual/appendices/contributing.wiki) at [lithify.me](http://lithify.me/)
+Please see the full documentation over at the [contribution guidelines](http://li3.me/docs/manual/appendices/contributing.wiki) at [li3.me](http://li3.me/)
