@@ -200,12 +200,13 @@ class File extends \lithium\storage\cache\Adapter {
 		$base = new RecursiveDirectoryIterator($this->_config['path']);
 		$iterator = new RecursiveIteratorIterator($base);
 
+		$result = true;
 		foreach ($iterator as $file) {
 			if ($file->isFile()) {
-				unlink($file->getPathName());
+				$result = unlink($file->getPathName()) && $result;
 			}
 		}
-		return true;
+		return $result;
 	}
 }
 
