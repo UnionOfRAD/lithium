@@ -188,9 +188,13 @@ class File extends \lithium\storage\cache\Adapter {
 	}
 
 	/**
-	 * Clears user-space cache.
+	 * Clears entire cache by flushing it. Please note
+	 * that a scope - in case one is set - is *not* honored.
 	 *
-	 * @return mixed True on successful clear, false otherwise.
+	 * The operation will continue to remove keys even if removing
+	 * one single key fails, clearing thoroughly as possible.
+	 *
+	 * @return boolean `true` on successful clearing, `false` if failed partially or entirely.
 	 */
 	public function clear() {
 		$base = new RecursiveDirectoryIterator($this->_config['path']);

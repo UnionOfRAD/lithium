@@ -275,9 +275,13 @@ class Redis extends \lithium\storage\cache\Adapter {
 	}
 
 	/**
-	 * Clears user-space cache
+	 * Clears entire database by flushing it. All cache keys using the
+	 * configuration but *without* honoring the scope are removed.
 	 *
-	 * @return mixed True on successful clear, false otherwise
+	 * The behavior and result when removing a single key
+	 * during this process fails is unknown.
+	 *
+	 * @return boolean `true` on successful clearing, `false` otherwise.
 	 */
 	public function clear() {
 		return $this->connection->flushdb();

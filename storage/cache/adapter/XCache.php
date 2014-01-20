@@ -205,15 +205,17 @@ class XCache extends \lithium\storage\cache\Adapter {
 	}
 
 	/**
-	 * Clears user-space cache.
+	 * Clears entire user-space cache by flushing it. All cache keys
+	 * using the configuration but *without* honoring the scope are removed.
 	 *
-	 * This method requires valid XCache admin credentials to be set when the
-	 * adapter was configured, due to the use of the xcache_clear_cache admin method.
+	 * This method requires valid XCache admin credentials to be set when the adapter
+	 * was configured, due to the use of the xcache_clear_cache admin method. If the
+	 * `xcache.admin.enable_auth` ini setting is set to `Off`, no credentials required.
 	 *
-	 * If the xcache.admin.enable_auth ini setting is set to "Off", no credentials
-	 * required.
+	 * The behavior and result when removing a single key
+	 * during this process fails is unknown.
 	 *
-	 * @return mixed True on successful clear, false otherwise.
+	 * @return boolean `true` on successful clearing, `false` otherwise.
 	 */
 	public function clear() {
 		$admin = (ini_get('xcache.admin.enable_auth') === "On");

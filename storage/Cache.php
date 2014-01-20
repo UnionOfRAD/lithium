@@ -387,10 +387,11 @@ class Cache extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Remove all cache keys from specified configuration.
+	 * Clears entire cache by flushing it. All cache keys - *without* honoring
+	 * a configured scope - from the specified configuration are removed.
 	 *
-	 * @param string $name The cache configuration to be cleared
-	 * @return boolean True on successful clearing, false otherwise
+	 * @param string $name The cache configuration to be cleared.
+	 * @return boolean `true` on successful clearing, `false` if failed partially or entirely.
 	 */
 	public static function clear($name) {
 		$settings = static::config();
