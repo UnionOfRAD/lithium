@@ -61,6 +61,14 @@ abstract class Source extends \lithium\core\Object {
 	protected $_isConnected = false;
 
 	/**
+	 * Holds cached methods.
+	 *
+	 * @see lithium\data\Source::methods();
+	 * @var array
+	 */
+	protected $_cachedMethods = array();
+
+	/**
 	 * Constructor. Sets defaults and returns object.
 	 *
 	 * Options defined:
@@ -223,6 +231,7 @@ abstract class Source extends \lithium\core\Object {
 	 */
 	abstract public function delete($query, array $options = array());
 
+
 	/**
 	 * Returns the list of methods which format values imported from `Query` objects. Should be
 	 * overridden in subclasses.
@@ -231,7 +240,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @return array
 	 */
 	public function methods() {
-		return get_class_methods($this);
+		return $this->_cachedMethods ?: ($this->_cachedMethods = get_class_methods($this));
 	}
 
 	/**

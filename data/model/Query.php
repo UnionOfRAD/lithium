@@ -271,6 +271,7 @@ class Query extends \lithium\core\Object {
 		}
 		$this->_config['model'] = $model;
 		$this->_config['source'] = $this->_config['source'] ?: $model::meta('source');
+
 		return $this;
 	}
 
