@@ -456,7 +456,7 @@ class Form extends \lithium\template\Helper {
 			return $this->_fields($name, $options);
 		}
 		$method = __FUNCTION__;
-		if($options['type'] && !empty($this->_config['field-' . $options['type']])) {
+		if(isset($options['type']) && !empty($this->_config['field-' . $options['type']])) {
 			$method = 'field-' . $options['type'];
 		}
 		list(, $options, $template) = $this->_defaults($method, $name, $options);
