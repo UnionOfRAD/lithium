@@ -433,8 +433,9 @@ class MongoDb extends \lithium\data\Source {
 		$method = null;
 
 		switch (true) {
-			case  (is_array($data['file']) && array_keys($data['file']) == $uploadKeys):
-				if (!$data['file']['error'] && is_uploaded_file($data['file']['tmp_name'])) {
+			case (is_array($data['file']) && array_keys($data['file']) == $uploadKeys):
+				if (!$data['file']['error']
+				(file_exists($data['file']['tmp_name']) || is_uploaded_file($data['file']['tmp_name']))){
 					$method = 'storeFile';
 					$file = $data['file']['tmp_name'];
 					$data['filename'] = $data['file']['name'];
