@@ -386,10 +386,12 @@ class Cache extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Perform garbage collection on specified cache configuration.
+	 * Perform garbage collection on specified cache configuration. All invalidated cache
+	 * keys - *without* honoring a configured scope - from the specified configuration are
+	 * removed.
 	 *
-	 * @param string $name The cache configuration to be cleaned
-	 * @return boolean True on successful clean, false otherwise
+	 * @param string $name The cache configuration to be cleaned.
+	 * @return boolean `true` on successful cleaning, `false` if failed partially or entirely.
 	 */
 	public static function clean($name) {
 		$settings = static::config();
