@@ -9,8 +9,7 @@
 namespace lithium\storage\cache\adapter;
 
 use SplFileInfo;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
+use DirectoryIterator;
 use lithium\core\Libraries;
 use lithium\storage\Cache;
 use Closure;
@@ -197,11 +196,8 @@ class File extends \lithium\storage\cache\Adapter {
 	 * @return boolean `true` on successful clearing, `false` if failed partially or entirely.
 	 */
 	public function clear() {
-		$base = new RecursiveDirectoryIterator($this->_config['path']);
-		$iterator = new RecursiveIteratorIterator($base);
-
 		$result = true;
-		foreach ($iterator as $file) {
+		foreach (new DirectoryIterator($this->_config['path']) as $file) {
 			if ($file->isFile()) {
 				$result = unlink($file->getPathName()) && $result;
 			}
