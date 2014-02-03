@@ -204,6 +204,34 @@ class File extends \lithium\storage\cache\Adapter {
 		}
 		return $result;
 	}
+
+	/**
+	 * Cleans entire cache running garbage collection on it. Please
+	 * note that a scope - in case one is set - is *not* honored.
+	 *
+	 * The operation will continue to remove keys even if removing
+	 * one single key fails, cleaning thoroughly as possible.
+	 *
+	 * @return boolean `true` on successful cleaning, `false` if failed partially or entirely.
+	 */
+	public function clean() {
+		$result = true;
+		foreach (new DirectoryIterator($this->_config['path']) as $file) {
+			if (!$file->isFile()) {
+				continue;
+			}
+			$data = file_get_contents($p = $file->getPathName());
+
+			if (!preg_match('/^\{\:expiry\:(\d+)\}\\n/', $data, $matches)) {
+				continue;
+			}
+			if ($matches[1] > time()) {
+				continue;
+			}
+			$result = file_exists($p) && unlink($p) && $result;
+		}
+		return $result;
+	}
 }
 
 ?>

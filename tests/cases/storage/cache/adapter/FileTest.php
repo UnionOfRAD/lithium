@@ -424,6 +424,24 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testClean() {
+		$time = time() - 10;
+		$path = Libraries::get(true, 'resources') . "/tmp/cache/key_to_clean";
+		file_put_contents($path, "{:expiry:$time}\ndata");
+
+		$result = $this->File->clean();
+		$this->assertTrue($result);
+		$this->assertFileNotExists($path);
+
+		$time = time() + 10;
+		$path = Libraries::get(true, 'resources') . "/tmp/cache/key_not_to_clean";
+		file_put_contents($path, "{:expiry:$time}\ndata");
+
+		$result = $this->File->clean();
+		$this->assertTrue($result);
+		$this->assertFileExists($path);
+	}
+
 	public function testIncrement() {
 		$key = 'key_to_increment';
 		$result = $this->File->increment($key);
