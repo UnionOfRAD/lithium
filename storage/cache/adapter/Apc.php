@@ -12,32 +12,30 @@ use Closure;
 use lithium\storage\Cache;
 
 /**
- * An Alternative PHP Cache (APC) cache adapter implementation.
+ * An Alternative PHP Cache (APC) cache adapter implementation leveraging the user-
+ * space caching features (not the opcode caching features) of the cache.
  *
- * The APC cache adapter is meant to be used through the `Cache` interface,
- * which abstracts away key generation, adapter instantiation and filter
- * implementation.
+ * This adapter requires `pecl/apc` or `pecl/apcu` to be installed. The extension
+ * and user-space caching must be enabled according to the extension documention.
  *
- * A simple configuration of this adapter can be accomplished in `config/bootstrap/cache.php`
- * as follows:
+ * This adapter natively handles multi-key reads/writes/deletes, natively
+ * provides serialization features and supports atomic increment/decrement
+ * operations as well as clearing the entire user-space cache.
+ *
+ * Cached item persistence is not guaranteed. Infrequently used items will
+ * be evicted from the cache when there is no room to store new ones.
+ *
+ * A simple configuration can be accomplished as follows:
  *
  * {{{
  * Cache::config(array(
- *     'cache-config-name' => array('adapter' => 'Apc')
+ *     'default' => array('adapter' => 'Apc')
  * ));
  * }}}
  *
- * This APC adapter provides basic support for `write`, `read`, `delete`
- * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system. Additionally,
- * This adapter defines several methods that are _not_ implemented in other
- * adapters, and are thus non-portable - see the documentation for `Cache`
- * as to how these methods should be accessed.
- *
- * This adapter natively supports multi-key `write`, `read` and `delete` operations.
- *
- * Learn more about APC in the [PHP APC manual](http://php.net/manual/en/book.apc.php).
- *
+ * @link http://pecl.php.net/package/APCu
+ * @link http://pecl.php.net/package/APC
+ * @link http://php.net/manual/en/book.apc.php
  * @see lithium\storage\Cache::key()
  */
 class Apc extends \lithium\storage\cache\Adapter {
@@ -153,7 +151,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * Determines if the APC extension has been installed and
 	 * if the userspace cache is available.
 	 *
-	 * @return boolean `true` if enabled, `false` otherwise
+	 * @return boolean `true` if enabled, `false` otherwise.
 	 */
 	public static function enabled() {
 		$loaded = extension_loaded('apc');

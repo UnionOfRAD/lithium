@@ -12,20 +12,22 @@ use Closure;
 use lithium\storage\Cache;
 
 /**
- * An XCache opcode cache adapter implementation.
+ * An XCache cache adapter implementation leveraging the user-
+ * space caching features (not the opcode caching features).
  *
- * The XCache adapter is meant to be used through the `Cache` interface,
- * which abstracts away key generation, adapter instantiation and filter
- * implementation.
+ * This adapter requires the `xcache` extensionto be installed. The extension
+ * and user-space caching must be enabled according to the extension documention.
  *
- * A simple configuration of this adapter can be accomplished in `config/bootstrap/cache.php`
- * as follows:
+ * This adapter natively handles multi-key reads/writes/deletes, natively
+ * provides serialization features and supports atomic increment/decrement
+ * operations as well as clearing the entire user-space cache.
  *
+ * Cached item persistence is not guaranteed. Infrequently used items will
+ * be evicted from the cache when there is no room to store new ones.
+
  * {{{
- * use lithium\storage\Cache;
- *
  * Cache::config(array(
- *     'cache-config-name' => array(
+ *     'default' => array(
  *         'adapter' => 'XCache',
  *         'username' => 'user',
  *         'password' => 'pass'
@@ -34,15 +36,10 @@ use lithium\storage\Cache;
  * }}}
  *
  * Note that the `username` and `password` configuration fields are only required if
- * you wish to use `XCache::clear()` - all other methods do not require XCache administrator
- * credentials.
+ * you wish to use `XCache::clear()` - all other methods do not require XCache
+ * administrator credentials.
  *
- * This XCache adapter provides basic support for `write`, `read`, `delete`
- * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system.
- *
- * This adapter synthetically supports multi-key `write`, `read` and `delete` operations.
- *
+ * @link http://xcache.lighttpd.net/
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\cache\adapter
  */
@@ -215,7 +212,7 @@ class XCache extends \lithium\storage\cache\Adapter {
 	 * Determines if the XCache extension has been installed and
 	 * if the userspace cache is available.
 	 *
-	 * @return boolean True if enabled, false otherwise.
+	 * @return boolean `true` if enabled, `false` otherwise.
 	 */
 	public static function enabled() {
 		return extension_loaded('xcache');

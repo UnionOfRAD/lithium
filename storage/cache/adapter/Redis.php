@@ -13,41 +13,41 @@ use Redis as RedisCore;
 use Closure;
 
 /**
- * A Redis (phpredis) cache adapter implementation.
+ * A Redis cache adapter implementation using `phpredis`.
  *
- * This adapter uses the `phpredis` PHP extension, which can be found here:
- * https://github.com/nicolasff/phpredis
+ * This adapter does not aim to provide a full implementation of the Redis API, but rather
+ * only a subset of its features that are useful in the context of a semi-persistent cache.
  *
- * The Redis cache adapter is meant to be used through the `Cache` interface,
- * which abstracts away key generation, adapter instantiation and filter
- * implementation. This adapter does not aim to provide a full implementation of the
- * Redis API, but rather only a subset of its features that are useful in the context of a
- * semi-persistent cache.
+ * This adapter depends on the `phpredis` PHP extension and on a running
+ * instance of Redis server being available.
  *
- * A simple configuration of this adapter can be accomplished in `config/bootstrap/cache.php`
- * as follows:
+ * This adapter natively handles atomic multi-key reads/writes/deletes and supports atomic
+ * increment/decrement operations as well as clearing the entire cache.
+ *
+ * Serialization of values is not handled natively, the `Serializer` strategy must be used
+ * if you plan to store non-scalar values or need to keep type on values.
+ *
+ * Full cached item persistence is not guaranteed it depends on the how the Redis server
+ * is acutally configured and accessed.
+ *
+ * A simple configuration can be accomplished as follows:
  *
  * {{{
  * Cache::config(array(
  *     'cache-config-name' => array(
  *         'adapter' => 'Redis',
- *         'host' => '127.0.0.1:6379'
+ *         'host' => '127.0.0.1:6379',
+ *         'strategies => array('Serializer')
  *     )
  * ));
  * }}}
  *
- * The 'host' key accepts a string argument in the format of ip:port where the Redis
- * server can be found.
+ * The `'host'` key accepts a string argument in the format of ip:port where
+ * the Redis server can be found.
  *
- * This Redis adapter provides basic support for `write`, `read`, `delete`
- * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system.
- *
- * This adapter natively supports multi-key `write`, `read` and `delete` operations.
- *
+ * @link https://github.com/nicolasff/phpredis
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\Cache::adapter()
- * @link https://github.com/nicolasff/phpredis GitHub: PhpRedis Extension
  */
 class Redis extends \lithium\storage\cache\Adapter {
 
@@ -277,7 +277,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Determines if the Redis extension has been installed and
-	 * that there is a redis-server available
+	 * that there is a Redis server available.
 	 *
 	 * @return boolean Returns `true` if the Redis extension is enabled, `false` otherwise.
 	 */

@@ -14,34 +14,35 @@ use lithium\storage\Cache;
 use Closure;
 
 /**
- * A Memcache (libmemcached) cache adapter implementation. Requires
- * [pecl/memcached](http://pecl.php.net/package/memcached).
+ * Memcache (libmemcached) cache adapter implementation using `pecl/memcached`.
  *
- * The `Memcache` cache adapter is meant to be used through the `Cache` interface,
- * which abstracts away key generation, adapter instantiation and filter
- * implementation.
+ * This adapter requires `pecl/memcached` to be installed. The extension
+ * must be enabled according to the extension documention and a running
+ * memcached server instance must be available.
  *
- * A simple configuration of this adapter can be accomplished in `config/bootstrap/cache.php`
- * as follows:
+ * This adapter natively handles multi-key reads/writes/deletes, natively
+ * provides serialization features and supports atomic increment/decrement
+ * operations as well as clearing the entire cache.
+ *
+ * Cached item persistence is not guaranteed. Infrequently used items will
+ * be evicted from the cache when there is no room to store new ones.
+ *
+ * A simple configuration can be accomplished as follows:
  *
  * {{{
  * Cache::config(array(
- *     'cache-config-name' => array(
+ *     'default' => array(
  *         'adapter' => 'Memcached',
  *         'host' => '127.0.0.1:11211'
  *     )
  * ));
  * }}}
  *
- * The `'host'` key accepts entries in multiple formats, depending on the number of Memcache servers
- * you are connecting to. See the `__construct()` method for more information.
+ * The `'host'` key accepts entries in multiple formats, depending on the number of
+ * Memcache servers you are connecting to. See the `__construct()` method for more
+ * information.
  *
- * This Memcache adapter provides basic support for `write`, `read`, `delete`
- * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system.
- *
- * This adapter natively supports multi-key `write` and `read` operations.
- *
+ * @link http://pecl.php.net/package/memcached
  * @see lithium\storage\cache\adapter\Memcache::__construct()
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\Cache::adapter()

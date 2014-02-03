@@ -37,25 +37,21 @@ namespace lithium\storage;
  * );
  * }}}
  *
- * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`,
- * `delete` and `clear`, which can be used _interchangeably between all adapters_.
+ * Cache adapters differ in the functionality they provide and how the provide it. To see
+ * if an adapter meets your requirement and for more information on the specifics
+ * (i.e. atomicity of operations), consult the documentation the adapter first.
  *
- * Some adapters however have additional capabilities or differ in their behavior.
- * The following few points outline where those adapters may differ.
+ * All adapters will provide `write`, `read` and `delete` functionality. On top of that
+ * adapters may provide `increment`/`decrement` and `clear` functionality as well as
+ * direct access to additional methods. Which allows for a very wide range of flexibility
+ * at the cost of portability.
  *
- *  1. Functionality for increment/decrement may not always be provided (e.g. `File`).
- *
- *  2. Additional methods may be provided, it's always possible to call them directly.
- *     This allows a very wide range of flexibility, at the cost of portability.
- *
- *     {{{
- *     Cache::adapter('default')->methodName($argument);
- *     }}}
- *
- *  3. Real persistence or storage as specified by expiration time for cached items
- *     may not be guaranteed (e.g. `Memcache`).
+ * {{{
+ * Cache::adapter('default')->methodName($argument);
+ * }}}
  *
  * @see lithium\core\Adaptable
+ * @see lithium\storage\cache\Adapter
  * @see lithium\storage\cache\adapter
  */
 class Cache extends \lithium\core\Adaptable {
@@ -306,7 +302,7 @@ class Cache extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Performs an atomic increment operation on specified numeric cache item
+	 * Performs a increment operation on specified numeric cache item
 	 * from the given cache configuration.
 	 *
 	 * @param string $name
@@ -338,7 +334,7 @@ class Cache extends \lithium\core\Adaptable {
 	}
 
 	/**
-	 * Performs an atomic decrement operation on specified numeric cache item
+	 * Performs a decrement operation on specified numeric cache item
 	 * from the given cache configuration.
 	 *
 	 * @param string $name
@@ -372,8 +368,6 @@ class Cache extends \lithium\core\Adaptable {
 	/**
 	 * Perform garbage collection on specified cache configuration.
 	 *
-	 * This method is not filterable.
-	 *
 	 * @param string $name The cache configuration to be cleaned
 	 * @return boolean True on successful clean, false otherwise
 	 */
@@ -384,8 +378,6 @@ class Cache extends \lithium\core\Adaptable {
 
 	/**
 	 * Remove all cache keys from specified configuration.
-	 *
-	 * This method is non-filterable.
 	 *
 	 * @param string $name The cache configuration to be cleared
 	 * @return boolean True on successful clearing, false otherwise

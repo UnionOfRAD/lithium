@@ -10,14 +10,32 @@ namespace lithium\storage\cache;
 
 /**
  * This is the foundation class for all cache adapters.
+ *
+ * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`,
+ * and `delete`, which can always be _used interchangeably_ between and must be implemented by all
+ * adapters.
+ *
+ * Functionality for `clear`, `clean`, `increment` and `decrement` may or may not be implemented
+ * by an adapter. Calling a method that is not implemented will simply return `false`.
+ *
+ * An adapter may provide access to additional methods. It's always possible to call them directly.
+ * This allows a very wide range of flexibility, at the cost of portability.
+ *
+ * {{{
+ * Cache::adapter('default')->methodName($argument);
+ * }}}
+ *
+ * It is not guaranteed that all operations are atomic, but adapters will try to perform atomic
+ * operations wherever possible. If you rely on atomicity of operations you must choose
+ * an appropriate adapter that explitcly supports these.
+ *
+ * Adapters may handle serialization and/or multi-keys natively others only synthetically.
  */
 abstract class Adapter extends \lithium\core\Object {
 
 	/**
 	 * Write values to the cache. All items to be cached will receive an
 	 * expiration time of `$expiry`.
-	 *
-	 * Note that this is not an atomic operation when using multiple keys.
 	 *
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
@@ -30,8 +48,6 @@ abstract class Adapter extends \lithium\core\Object {
 	 * Read values from the cache. Will attempt to return an array of data
 	 * containing key/value pairs of the requested data.
 	 *
-	 * Note that this is not an atomic operation when using multiple keys.
-	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
 	 * @return Closure Function returning cached values keyed by cache keys
 	 *                 on successful read, keys which could not be read will
@@ -42,15 +58,13 @@ abstract class Adapter extends \lithium\core\Object {
 	/**
 	 * Will attempt to remove specified keys from the user space cache.
 	 *
-	 * Note that this is not an atomic operation when using multiple keys.
-	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
 	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
 	 */
 	abstract public function delete(array $keys);
 
 	/**
-	 * Performs an atomic decrement operation on specified numeric cache item.
+	 * Performs a decrement operation on specified numeric cache item.
 	 *
 	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
@@ -61,7 +75,7 @@ abstract class Adapter extends \lithium\core\Object {
 	}
 
 	/**
-	 * Performs an atomic increment operation on specified numeric cache item.
+	 * Performs a increment operation on specified numeric cache item.
 	 *
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.

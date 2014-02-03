@@ -14,18 +14,25 @@ use lithium\storage\Cache;
 /**
  * A minimal in-memory cache.
  *
- * This Memory adapter provides basic support for `write`, `read`, `delete`
- * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system.
+ * This cache adapter is best suited for generic memoization of data, and should not be used
+ * for for anything that must persist longer than the current request cycle.
  *
- * This cache adapter does not implement any expiry-based cache invalidation
- * logic, as the cached data will only persist for the lifetime of the current request.
+ * This adapter has no external dependencies. Operations in read/write/delete are atomic
+ * for single-keys only. Operations increment/decrement are atomic and clearing the cache
+ * is supported.
  *
- * As a result, this cache adapter is best suited for generic memoization of data, and
- * should not be used for for anything that must persist longer than the current
- * request cycle.
+ * Real persistence of cached items is *not* provided. Mulit-key operations and serialization
+ * are not natively supported. However serialization will seldomly be needed. This cache adapter
+ * does not implement any expiry-based cache invalidation logic, as the cached data will only
+ * persist for the lifetime of the current request.
+  *
+ * A simple configuration can be accomplished as follows:
  *
- * This adapter synthetically supports multi-key `write`, `read` and `delete` operations.
+ * {{{
+ * Cache::config(array(
+ *     'default' => array('adapter' => 'Memory')
+ * ));
+ * }}}
  */
 class Memory extends \lithium\storage\cache\Adapter {
 
@@ -52,8 +59,6 @@ class Memory extends \lithium\storage\cache\Adapter {
 	 * Read values from the cache. Will attempt to return an array of data
 	 * containing key/value pairs of the requested data.
 	 *
-	 * Note that this is not an atomic operation when using multiple keys.
-	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
 	 * @return Closure Function returning cached values keyed by cache keys
 	 *                 on successful read, keys which could not be read will
@@ -77,8 +82,6 @@ class Memory extends \lithium\storage\cache\Adapter {
 	/**
 	 * Write values to the cache.
 	 *
-	 * Note that this is not an atomic operation when using multiple keys.
-	 *
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param mixed $data The value to be cached.
 	 * @param null|string $expiry Unused.
@@ -97,8 +100,6 @@ class Memory extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Will attempt to remove specified keys from the user space cache.
-	 *
-	 * Note that this is not an atomic operation when using multiple keys.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
 	 * @return Closure Function returning `true` on successful delete, `false` otherwise.

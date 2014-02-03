@@ -18,20 +18,30 @@ use Closure;
 /**
  * A minimal file-based cache.
  *
- * This File adapter provides basic support for `write`, `read`, `delete`
- * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system. The File adapter
- * is a very simple cache, and should only be used for prototyping or for specifically
- * caching _files_. For more general caching needs, please consider using a more
- * appropriate cache adapter.
+ * The File adapter is a very simple cache, and should only be used for prototyping
+ * or for specifically caching _files_. For more general caching needs, please consider
+ * using a more appropriate cache adapter.
  *
- * This adapter does *not* provide increment/decrement functionality. For such
- * functionality, please use a more appropriate cache adapter.
+ * This adapter has no external dependencies. Operations in read/write/delete are atomic
+ * for single-keys only. Clearing the cache is supported. Real persistence of cached items
+ * is provided.
  *
- * This adapter synthetically supports multi-key `write`, `read` and `delete` operations.
+ * This adapter does *not* provided increment/decrement functionality and also can't handle
+ * serialization natively.
+ *
+ * A simple configuration can be accomplished as follows:
+ *
+ * {{{
+ * Cache::config(array(
+ *     'default' => array(
+ *         'adapter' => 'File',
+ *         'strategies => array('Serializer')
+ *      )
+ * ));
+ * }}}
  *
  * The path that the cached files will be written to defaults to
- * `<app>/resources/tmp/cache`, but is user-configurable on cache configuration.
+ * `<app>/resources/tmp/cache`, but is user-configurable.
  *
  * Note that the cache expiration time is stored within the first few bytes
  * of the cached data, and is transparently added and/or removed when values
@@ -66,8 +76,6 @@ class File extends \lithium\storage\cache\Adapter {
 	 * Write values to the cache. All items to be cached will receive an
 	 * expiration time of `$expiry`.
 	 *
-	 * Note that this is not an atomic operation when using multiple keys.
-	 *
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
@@ -99,8 +107,6 @@ class File extends \lithium\storage\cache\Adapter {
 	/**
 	 * Read values from the cache. Will attempt to return an array of data
 	 * containing key/value pairs of the requested data.
-	 *
-	 * Note that this is not an atomic operation when using multiple keys.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
 	 * @return Closure Function returning cached values keyed by cache keys
@@ -136,8 +142,6 @@ class File extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Will attempt to remove specified keys from the user space cache.
-	 *
-	 * Note that this is not an atomic operation when using multiple keys.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
 	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
