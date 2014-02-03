@@ -13,7 +13,8 @@ use PDOStatement;
 use PDOException;
 
 /**
- * This class is a wrapper around the MySQL result returned and can be used to iterate over it.
+ * This class is a wrapper around the database result
+ * returned and can be used to iterate over it.
  *
  * It also provides a simple caching mechanism which stores the result after the first load.
  * You are then free to iterate over the result back and forth through the provided methods
