@@ -27,7 +27,7 @@ use lithium\storage\Cache;
  *
  * This adapter synthetically supports multi-key `write`, `read` and `delete` operations.
  */
-class Memory extends \lithium\core\Object {
+class Memory extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Array used to store cached data by this adapter
@@ -161,24 +161,6 @@ class Memory extends \lithium\core\Object {
 			unset($this->_cache[$key]);
 		}
 		return true;
-	}
-
-	/**
-	 * This adapter is always enabled, as it has no external dependencies.
-	 *
-	 * @return boolean True
-	 */
-	public static function enabled() {
-		return true;
-	}
-
-	/**
-	 * Garbage collection (GC) is not enabled for this adapter
-	 *
-	 * @return boolean False
-	 */
-	public function clean() {
-		return false;
 	}
 }
 

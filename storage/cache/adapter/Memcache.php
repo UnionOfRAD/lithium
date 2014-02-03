@@ -46,7 +46,7 @@ use Closure;
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\Cache::adapter()
  */
-class Memcache extends \lithium\core\Object {
+class Memcache extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * The default port used to connect to Memcache servers, if none is specified.

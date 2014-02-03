@@ -39,7 +39,7 @@ use Closure;
  *
  * @see lithium\storage\cache\adapter
  */
-class File extends \lithium\core\Object {
+class File extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Class constructor.
@@ -161,36 +161,6 @@ class File extends \lithium\core\Object {
 	}
 
 	/**
-	 * The File adapter does not provide any facilities for atomic incrementing
-	 * of cache items. If you need this functionality, please use a cache adapter
-	 * which provides native support for atomic increment.
-	 *
-	 * This method is not implemented, and will simply return false.
-	 *
-	 * @param string $key Key of numeric cache item to increment
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return boolean False - this method is not implemented
-	 */
-	public function increment($key, $offset = 1) {
-		return false;
-	}
-
-	/**
-	 * The File adapter does not provide any facilities for atomic decrementing
-	 * of cache items. If you need this functionality, please use a cache adapter
-	 * which provides native support for atomic decrement.
-	 *
-	 * This method is not implemented, and will simply return false.
-	 *
-	 * @param string $key Key of numeric cache item to decrement
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return boolean False - this method is not implemented
-	 */
-	public function decrement($key, $offset = 1) {
-		return false;
-	}
-
-	/**
 	 * Clears user-space cache.
 	 *
 	 * @return mixed True on successful clear, false otherwise.
@@ -204,15 +174,6 @@ class File extends \lithium\core\Object {
 				unlink($file->getPathName());
 			}
 		}
-		return true;
-	}
-
-	/**
-	 * Implements cache adapter support-detection interface.
-	 *
-	 * @return boolean Always returns `true`.
-	 */
-	public static function enabled() {
 		return true;
 	}
 }

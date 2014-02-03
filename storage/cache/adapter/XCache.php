@@ -46,7 +46,7 @@ use lithium\storage\Cache;
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\cache\adapter
  */
-class XCache extends \lithium\core\Object {
+class XCache extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Class constructor.

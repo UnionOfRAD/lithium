@@ -40,7 +40,7 @@ use lithium\storage\Cache;
  *
  * @see lithium\storage\Cache::key()
  */
-class Apc extends \lithium\core\Object {
+class Apc extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Class constructor.
