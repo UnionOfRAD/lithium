@@ -63,7 +63,6 @@ class File extends \lithium\storage\cache\Adapter {
 	 *          to `+1 hour`.
 	 *        - `'path'` _string_: Path where cached entries live, defaults to
 	 *          `Libraries::get(true, 'resources') . '/tmp/cache'`.
-
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

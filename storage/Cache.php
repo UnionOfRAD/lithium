@@ -70,12 +70,11 @@ class Cache extends \lithium\core\Adaptable {
 	 * Can be used for expiry parameters or configuration options to
 	 * specify that a cached item should persist as long and expire as
 	 * late as possible.
-	 *
 	 */
 	const PERSIST = 0;
 
 	/**
-	 * Stores configurations for cache adapters
+	 * Stores configurations for cache adapters.
 	 *
 	 * @var array
 	 */
@@ -140,9 +139,10 @@ class Cache extends \lithium\core\Adaptable {
 	 *                       set, then the default cache expiration time set with the cache adapter
 	 *                       configuration will be used. To persist an item use `Cache::PERSIST`.
 	 * @param mixed $options Options for the method and strategies.
-	 *              - `'strategies'`: Additional strategies to use.
-	 *              - `'conditions'`: A function or item that must return or evaluate to
-	 *                                `true` in order to continue write operation.
+	 *              - `'strategies'` _boolean_: Indicates if strategies should be used,
+	 *                 defaults to `true`.
+	 *              - `'conditions'` _mixed_: A function or item that must return or
+	 *                evaluate to `true` in order to continue write operation.
 	 * @return boolean `true` on successful cache write, `false` otherwise. When writing
 	 *                 multiple items and an error occurs writing any of the items the
 	 *                 whole operation fails and this method will return `false`.
@@ -207,9 +207,10 @@ class Cache extends \lithium\core\Adaptable {
 	 *                   for multikey-reads.
 	 * @param mixed $options Options for the method and strategies.
 	 *              - `'write'`: Allows for read-through caching see description for usage.
-	 *              - `'strategies'`: Additional strategies to use.
-	 *              - `'conditions'`: A function or item that must return or evaluate to
-	 *                                `true` in order to continue read operation.
+	 *              - `'strategies'` _boolean_: Indicates if strategies should be used,
+	 *                 defaults to `true`.
+	 *              - `'conditions'` _mixed_: A function or item that must return or
+	 *                evaluate to `true` in order to continue write operation.
 	 * @return mixed For single-key reads will return the result if the cache
 	 *               key has been found otherwise returns `null`. When reading
 	 *               multiple keys a results array is returned mapping keys to
@@ -276,9 +277,8 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $name The cache configuration to delete from.
 	 * @param mixed $key Key to be deleted or an array of keys to delete.
 	 * @param mixed $options Options for the method and strategies.
-	 *              - `'strategies'`: Additional strategies to use.
-	 *              - `'conditions'`: A function or item that must return or evaluate to
-	 *                                `true` in order to continue delete operation.
+	 *              - `'conditions'` _mixed_: A function or item that must return or
+	 *                evaluate to `true` in order to continue write operation.
 	 * @return boolean `true` on successful cache delete, `false` otherwise. When deleting
 	 *                 multiple items and an error occurs deleting any of the items the
 	 *                 whole operation fails and this method will return `false`.

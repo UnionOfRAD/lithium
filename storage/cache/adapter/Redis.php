@@ -27,7 +27,7 @@ use Closure;
  *
  * Serialization of values is not handled natively, the `Serializer` strategy must be used
  * if you plan to store non-scalar values or need to keep type on values. Full cached item
- * persistence is not guaranteed it depends on the how the Redis server is acutally configured
+ * persistence is not guaranteed it depends on the how the Redis server is actually configured
  * and accessed.
  *
  * A simple configuration can be accomplished as follows:
