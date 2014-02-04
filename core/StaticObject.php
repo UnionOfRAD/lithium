@@ -95,9 +95,9 @@ class StaticObject {
 	/**
 	 * Will determine if a method can be called.
 	 *
-	 * @param  string  $method     Method name.
-	 * @param  bool    $internal   Interal call or not.
-	 * @return bool
+	 * @param string $method Method name.
+	 * @param boolean $internal nteral call or not.
+	 * @return boolean
 	 */
 	public static function respondsTo($method, $internal = false) {
 		return Inspector::isCallable(get_called_class(), $method, $internal);

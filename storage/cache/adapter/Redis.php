@@ -122,25 +122,27 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 *
 	 * {{{Cache::adapter('redis')->keys('*');}}}
 	 *
-	 * @link https://github.com/nicolasff/phpredis GitHub: PhpRedis Extension
-	 * @param string $method Name of the method to call
-	 * @param array $params Parameter list to use when calling $method
-	 * @return mixed Returns the result of the method call
+	 * @link https://github.com/nicolasff/phpredis
+	 * @param string $method Name of the method to call.
+	 * @param array $params Parameter list to use when calling $method.
+	 * @return mixed Returns the result of the method call.
 	 */
 	public function __call($method, $params = array()) {
 		return call_user_func_array(array(&$this->connection, $method), $params);
 	}
 
 	/**
-	 * Custom check to determine if our given magic methods can be responded to.
+	 * Determine if our given magic methods can be responded to.
 	 *
-	 * @param  string  $method     Method name.
-	 * @param  bool    $internal   Interal call or not.
-	 * @return bool
+	 * @param string $method Method name.
+	 * @param boolean $internal Interal call or not.
+	 * @return boolean
 	 */
-	public function respondsTo($method, $internal = 0) {
-		$parentRespondsTo = parent::respondsTo($method, $internal);
-		return $parentRespondsTo || is_callable(array($this->connection, $method));
+	public function respondsTo($method, $internal = false) {
+		if (parent::respondsTo($method, $internal)) {
+			return true;
+		}
+		return is_callable(array($this->connection, $method));
 	}
 
 	/**

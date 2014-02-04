@@ -210,9 +210,9 @@ class Object {
 	/**
 	 * Will determine if a method can be called.
 	 *
-	 * @param  string  $method     Method name.
-	 * @param  bool    $internal   Interal call or not.
-	 * @return bool
+	 * @param string $method Method name.
+	 * @param boolean $internal Interal call or not.
+	 * @return boolean
 	 */
 	public function respondsTo($method, $internal = false) {
 		return Inspector::isCallable($this, $method, $internal);
