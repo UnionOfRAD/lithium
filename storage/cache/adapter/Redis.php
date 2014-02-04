@@ -23,13 +23,12 @@ use Closure;
  *
  * This adapter natively handles atomic multi-key reads/writes/deletes and supports atomic
  * increment/decrement operations as well as clearing the entire cache. Scope support is
- * natively available.
+ * natively available. Delegation of method calls to the connection object is available.
  *
  * Serialization of values is not handled natively, the `Serializer` strategy must be used
- * if you plan to store non-scalar values or need to keep type on values.
- *
- * Full cached item persistence is not guaranteed it depends on the how the Redis server
- * is acutally configured and accessed.
+ * if you plan to store non-scalar values or need to keep type on values. Full cached item
+ * persistence is not guaranteed it depends on the how the Redis server is acutally configured
+ * and accessed.
  *
  * A simple configuration can be accomplished as follows:
  *
@@ -111,13 +110,12 @@ class Redis extends \lithium\storage\cache\Adapter {
 	}
 
 	/**
-	 * Dispatches a not-found method to the Redis connection object.
+	 * Dispatches a not-found method to the connection object. That way, one can
+	 * easily use a custom method on the adapter. If you want to know, what methods
+	 * are available, have a look at the documentation of phpredis.
 	 *
-	 * That way, one can easily use a custom method on that redis adapter like that:
+	 * {{{Cache::adapter('redis')->methodName($argument);}}}
 	 *
-	 * {{{Cache::adapter('named-of-redis-config')->methodName($argument);}}}
-	 *
-	 * If you want to know, what methods are available, have a look at the readme of phprdis.
 	 * One use-case might be to query possible keys, e.g.
 	 *
 	 * {{{Cache::adapter('redis')->keys('*');}}}
