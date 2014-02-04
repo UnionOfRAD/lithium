@@ -65,26 +65,30 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	public $connection = null;
 
 	/**
-	 * Object constructor. Instantiates the `Memcached` object, adds appropriate servers to the
+	 * Class constructor. Instantiates the `Memcached` object, adds appropriate servers to the
 	 * pool, and configures any optional settings passed (see the `_init()` method). When adding
 	 * servers, the following formats are valid for the `'host'` key:
 	 *
-	 * - `'127.0.0.1'`: Configure the adapter to connect to one Memcache server on the default port.
-	 * - `'127.0.0.1:11222'`: Configure the adapter to connect to one Memcache server on a custom
-	 *   port.
-	 * - `array('167.221.1.5:11222' => 200, '167.221.1.6')`: Connect to one server on a
-	 *   custom port with a high selection weight, and a second server on the default port with the
-	 *   default selection weight.
+	 *   - `'127.0.0.1'`
+	 *      Configure the adapter to connect to one Memcache server on the default port.
+	 *
+	 *   - `'127.0.0.1:11222'`
+	 *      Configure the adapter to connect to one Memcache server on a custom port.
+	 *
+	 *   - `array('167.221.1.5:11222' => 200, '167.221.1.6')`
+	 *      Connect to one server on a custom port with a high selection weight, and
+	 *      a second server on the default port with the default selection weight.
 	 *
 	 * @see lithium\storage\Cache::config()
-	 * @param array $config Configuration parameters for this cache adapter.
-	 *              These settings are indexed by name and queryable through
-	 *              `Cache::config('name')`. The available options are as follows:
-	 *              - `'scope'` : Scope which will prefix keys; per default not set.
-	 *              - `'expiry'` _mixed_: The default expiration time for cache values, if no value
-	 *                is otherwise set. See the `$expiry` parameter of `Memcache::write()`.
-	 *              - `'host'` _mixed_: Specifies one or more Memcache servers to connect to, with
-	 *                optional server selection weights. See above for example values.
+	 * @param array $config Configuration for this cache adapter. These settings are queryable
+	 *        through `Cache::config('name')`. The available options are as follows:
+	 *        - `'scope'` _string_: Scope which will prefix keys; per default not set.
+	 *        - `'expiry'` _mixed_: The default expiration time for cache values, if no value
+	 *          is otherwise set. Can be either a `strtotime()` compatible tring or TTL in
+	 *          seconds. To indicate items should not expire use `Cache::PERSIST`. Defaults
+	 *          to `+1 hour`.
+	 *        - `'host'` _mixed_: Specifies one or more Memcache servers to connect to, with
+	 *          optional server selection weights. See above for example values.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

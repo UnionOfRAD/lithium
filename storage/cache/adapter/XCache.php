@@ -52,12 +52,13 @@ class XCache extends \lithium\storage\cache\Adapter {
 	 * Class constructor.
 	 *
 	 * @see lithium\storage\Cache::config()
-	 * @param array $config Configuration parameters for this cache adapter. These settings are
-	 *        indexed by name and queryable through `Cache::config('name')`.
-	 *        The defaults are:
-	 *        - 'scope' : Scope which will prefix keys; per default not set.
-	 *        - 'expiry' : Default expiry time used if none is explicitly set when calling
-	 *          `Cache::write()`.
+	 * @param array $config Configuration for this cache adapter. These settings are queryable
+	 *        through `Cache::config('name')`. The available options are as follows:
+	 *        - `'scope'` _string_: Scope which will prefix keys; per default not set.
+	 *        - `'expiry'` _mixed_: The default expiration time for cache values, if no value
+	 *          is otherwise set. Can be either a `strtotime()` compatible tring or TTL in
+	 *          seconds. To indicate items should not expire use `Cache::PERSIST`. Defaults
+	 *          to `+1 hour`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

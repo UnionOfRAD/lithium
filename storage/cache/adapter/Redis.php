@@ -59,22 +59,20 @@ class Redis extends \lithium\storage\cache\Adapter {
 	public $connection;
 
 	/**
-	 * Object constructor
-	 *
-	 * Instantiates the `Redis` object and connects it to the configured server.
+	 * Class constructor. Instantiates the `Redis` object and connects it to the configured server.
 	 *
 	 * @todo Implement configurable & optional authentication
 	 * @see lithium\storage\Cache::config()
 	 * @see lithium\storage\cache\adapter\Redis::write()
-	 * @param array $config Configuration parameters for this cache adapter.
-	 *        These settings are indexed by name and queryable through `Cache::config('name')`. The
-	 *        available settings for this adapter are as follows:
+	 * @param array $config Configuration for this cache adapter. These settings are queryable
+	 *        through `Cache::config('name')`. The available options are as follows:
+	 *        - `'scope'` _string_: Scope which will prefix keys; per default not set.
+	 *        - `'expiry'` _mixed_: The default expiration time for cache values, if no value
+	 *          is otherwise set. Can be either a `strtotime()` compatible tring or TTL in
+	 *          seconds. To indicate items should not expire use `Cache::PERSIST`. Defaults
+	 *          to `+1 hour`.
 	 *        - `'host'` _string_: A string in the form of `'host:port'` indicating the Redis server
 	 *          to connect to. Defaults to `'127.0.0.1:6379'`.
-	 *        - `'scope'` : Scope which will prefix keys; per default not set.
-	 *        - `'expiry'` _mixed_: Default expiration for cache values written through this
-	 *          adapter. Defaults to `'+1 hour'`. For acceptable values, see the `$expiry` parameter
-	 *          of `Redis::write()`.
 	 *        - `'persistent'` _boolean_: Indicates whether the adapter should use a persistent
 	 *          connection when attempting to connect to the Redis server. If `true`, it will
 	 *          attempt to reuse an existing connection when connecting, and the connection will
