@@ -263,6 +263,19 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
+	public function testReadWithScope() {
+		$adapter = new Apc(array('scope' => 'primary'));
+
+		apc_store('primary:key1', 'test1', 60);
+		apc_store('key1', 'test2', 60);
+
+		$keys = array('key1');
+		$expected = array('key1' => 'test1');
+		$result = $adapter->read($keys);
+		$result = $result($adapter, compact('keys'));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testWriteAndReadNull() {
 		$expiry = '+1 minute';
 		$keys = array(
@@ -308,6 +321,22 @@ class ApcTest extends \lithium\test\Unit {
 		$expected = $keys;
 		$result = $this->Apc->read(array_keys($keys));
 		$this->assertEqual($expected, $result($this->Apc, array('keys' => array_keys($keys))));
+	}
+
+	public function testWriteWithScope() {
+		$adapter = new Apc(array('scope' => 'primary'));
+
+		$keys = array('key1' => 'test1');
+		$expiry = '+1 minute';
+		$result = $adapter->write($keys, $expiry);
+		$result($adapter, compact('keys', 'expiry'));
+
+		$expected = 'test1';
+		$result = apc_fetch('primary:key1');
+		$this->assertEqual($expected, $result);
+
+		$result = apc_fetch('key1');
+		$this->assertFalse($result);
 	}
 
 	public function testDelete() {
@@ -358,6 +387,24 @@ class ApcTest extends \lithium\test\Unit {
 
 		$params = compact('keys');
 		$result = $closure($this->Apc, $params);
+		$this->assertFalse($result);
+	}
+
+	public function testDeleteWithScope() {
+		$adapter = new Apc(array('scope' => 'primary'));
+
+		apc_store('primary:key1', 'test1', 60);
+		apc_store('key1', 'test2', 60);
+
+		$keys = array('key1');
+		$expected = array('key1' => 'test1');
+		$result = $adapter->delete($keys);
+		$result($adapter, compact('keys'));
+
+		$result = apc_exists('key1');
+		$this->assertTrue($result);
+
+		$result = apc_exists('primary:key1');
 		$this->assertFalse($result);
 	}
 
@@ -452,6 +499,24 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testDecrementWithScope() {
+		$adapter = new Apc(array('scope' => 'primary'));
+
+		apc_store('primary:key1', 1, 60);
+		apc_store('key1', 1, 60);
+
+		$result = $adapter->decrement('key1');
+		$result($adapter, array('key' => 'key1'));
+
+		$expected = 1;
+		$result = apc_fetch('key1');
+		$this->assertEqual($expected, $result);
+
+		$expected = 0;
+		$result = apc_fetch('primary:key1');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testIncrement() {
 		$key = 'increment';
 		$value = 10;
@@ -491,6 +556,24 @@ class ApcTest extends \lithium\test\Unit {
 
 		$result = apc_delete($key);
 		$this->assertTrue($result);
+	}
+
+	public function testIncrementWithScope() {
+		$adapter = new Apc(array('scope' => 'primary'));
+
+		apc_store('primary:key1', 1, 60);
+		apc_store('key1', 1, 60);
+
+		$result = $adapter->increment('key1');
+		$result($adapter, array('key' => 'key1'));
+
+		$expected = 1;
+		$result = apc_fetch('key1');
+		$this->assertEqual($expected, $result);
+
+		$expected = 2;
+		$result = apc_fetch('primary:key1');
+		$this->assertEqual($expected, $result);
 	}
 }
 

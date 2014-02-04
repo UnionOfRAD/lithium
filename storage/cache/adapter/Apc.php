@@ -23,7 +23,8 @@ use lithium\storage\Cache;
  * operations as well as clearing the entire user-space cache.
  *
  * Cached item persistence is not guaranteed. Infrequently used items will
- * be evicted from the cache when there is no room to store new ones.
+ * be evicted from the cache when there is no room to store new ones. Scope
+ * is available but not natively.
  *
  * A simple configuration can be accomplished as follows:
  *
@@ -43,11 +44,17 @@ class Apc extends \lithium\storage\cache\Adapter {
 	/**
 	 * Class constructor.
 	 *
-	 * @param array $config
+	 * @see lithium\storage\Cache::config()
+	 * @param array $config Configuration parameters for this cache adapter. These settings are
+	 *        indexed by name and queryable through `Cache::config('name')`.
+	 *        The defaults are:
+	 *        - 'scope' : Scope which will prefix keys; per default not set.
+	 *        - 'expiry' : Default expiry time used if none is explicitly set when calling
+	 *          `Cache::write()`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'prefix' => '',
+			'scope' => null,
 			'expiry' => '+1 hour'
 		);
 		parent::__construct($config + $defaults);
@@ -64,14 +71,20 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 */
 	public function write(array $keys, $expiry = null) {
 		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
+		$scope = $this->_config['scope'];
 
-		return function($self, $params) use ($expiry) {
+		return function($self, $params) use ($expiry, $scope) {
 			if (!$expiry || $expiry === Cache::PERSIST) {
 				$ttl = 0;
 			} elseif (is_int($expiry)) {
 				$ttl = $expiry;
 			} else {
 				$ttl = strtotime($expiry) - time();
+			}
+			if ($scope) {
+				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
+					$scope, $params['keys']
+				));
 			}
 			return apc_store($params['keys'], null, $ttl) === array();
 		};
@@ -87,8 +100,20 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 *                 not be included in the results array.
 	 */
 	public function read(array $keys) {
-		return function($self, $params) {
-			return apc_fetch($params['keys']);
+		$scope = $this->_config['scope'];
+
+		return function($self, $params) use ($scope) {
+			if ($scope) {
+				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
+					$scope, $params['keys']
+				));
+			}
+			$results = apc_fetch($params['keys']);
+
+			if ($scope) {
+				$results = $self->invokeMethod('_removeScopePrefix', array($scope, $results));
+			}
+			return $results;
 		};
 	}
 
@@ -99,7 +124,14 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
 	 */
 	public function delete(array $keys) {
-		return function($self, $params) {
+		$scope = $this->_config['scope'];
+
+		return function($self, $params) use ($scope) {
+			if ($scope) {
+				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
+					$scope, $params['keys']
+				));
+			}
 			return apc_delete($params['keys']) === array();
 		};
 	}
@@ -116,8 +148,10 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * @return Closure Function returning item's new value on successful decrement, else `false`
 	 */
 	public function decrement($key, $offset = 1) {
-		return function($self, $params) use ($offset) {
-			return apc_dec($params['key'], $offset);
+		$scope = $this->_config['scope'];
+
+		return function($self, $params) use ($offset, $scope) {
+			return apc_dec($scope ? "{$scope}:{$params['key']}" : $params['key'], $offset);
 		};
 	}
 
@@ -133,8 +167,10 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * @return Closure Function returning item's new value on successful increment, else `false`
 	 */
 	public function increment($key, $offset = 1) {
-		return function($self, $params) use ($offset) {
-			return apc_inc($params['key'], $offset);
+		$scope = $this->_config['scope'];
+
+		return function($self, $params) use ($offset, $scope) {
+			return apc_inc($scope ? "{$scope}:{$params['key']}" : $params['key'], $offset);
 		};
 	}
 

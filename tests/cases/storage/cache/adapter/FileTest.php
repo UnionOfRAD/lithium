@@ -211,6 +211,27 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testWriteWithScope() {
+		$now = time();
+
+		$adapter = new File(array('scope' => 'primary'));
+
+		$time = $now + 5;
+		$expiry = 5;
+
+		$keys = array(
+			'key1' => 'test1'
+		);
+		$result = $adapter->write($keys, $expiry);
+		$result($adapter, compact('keys', 'expiry'));
+
+		$file = Libraries::get(true, 'resources') . '/tmp/cache/primary_key1';
+
+		$expected = "{:expiry:{$time}}\ntest1";
+		$result = file_get_contents($file);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testRead() {
 		$key = 'key';
 		$keys = array($key);
@@ -288,6 +309,26 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertIdentical($expected, $result);
 	}
 
+	public function testReadWithScope() {
+		$adapter = new File(array('scope' => 'primary'));
+		$time = time() + 60;
+
+		$keys = array(
+			'primary_key1' => 'test1',
+			'key1' => 'test2'
+		);
+		foreach ($keys as $key => $data) {
+			$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
+			file_put_contents($path, "{:expiry:{$time}}\n{$data}");
+		}
+
+		$keys = array('key1');
+		$expected = array('key1' => 'test1');
+		$result = $adapter->read($keys);
+		$result = $result($adapter, compact('keys'));
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testWriteAndReadNull() {
 		$expiry = '+1 minute';
 		$keys = array(
@@ -341,6 +382,32 @@ class FileTest extends \lithium\test\Unit {
 		$keys = array($key);
 		$params = compact('keys');
 		$this->assertFalse($closure($this->File, $params));
+	}
+
+	public function testDeleteWithScope() {
+		$adapter = new File(array('scope' => 'primary'));
+		$time = time() + 60;
+
+		$keys = array(
+			'primary_key1' => 'test1',
+			'key1' => 'test2'
+		);
+		foreach ($keys as $key => $data) {
+			$path = Libraries::get(true, 'resources') . "/tmp/cache/{$key}";
+			file_put_contents($path, "{:expiry:{$time}}\n{$data}");
+		}
+
+		$keys = array('key1');
+		$result = $adapter->delete($keys);
+		$result($adapter, compact('keys'));
+
+		$file = Libraries::get(true, 'resources') . "/tmp/cache/key1";
+		$result = file_exists($file);
+		$this->assertTrue($result);
+
+		$file = Libraries::get(true, 'resources') . "/tmp/cache/primary_key1";
+		$result = file_exists($file);
+		$this->assertFalse($result);
 	}
 
 	public function testClear() {

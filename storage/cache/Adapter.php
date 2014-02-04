@@ -115,6 +115,46 @@ abstract class Adapter extends \lithium\core\Object {
 	public static function enabled() {
 		return true;
 	}
+
+	/**
+	 * Adds scope prefix to keys using separator.
+	 *
+	 * @param string $scope Scope to use when prefixing.
+	 * @param array $keys Array of keys either with or without mapping to values.
+	 * @param string $separator String to use when separating scope from key.
+	 * @return array Prefixed keys array.
+	 */
+	protected function _addScopePrefix($scope, array $keys, $separator = ':') {
+		$results = array();
+		$isMapped = !is_int(key($keys));
+
+		foreach ($keys as $key => $value) {
+			if ($isMapped) {
+				$results["{$scope}{$separator}{$key}"] = $value;
+			} else {
+				$results[$key] = "{$scope}{$separator}{$value}";
+			}
+		}
+		return $results;
+	}
+
+	/**
+	 * Removes scope prefix from keys.
+	 *
+	 * @param string $scope Scope initially used when prefixing.
+	 * @param array $keys Array of keys mapping to values.
+	 * @param string $separator Separator used when prefix keys initially.
+	 * @return array Keys array with prefix removed from each key.
+	 */
+	protected function _removeScopePrefix($scope, array $data, $separator = ':') {
+		$results = array();
+		$prefix = strlen("{$scope}{$separator}");
+
+		foreach ($data as $key => $value) {
+			$results[substr($key, $prefix)] = $value;
+		}
+		return $results;
+	}
 }
 
 ?>

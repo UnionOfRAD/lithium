@@ -27,7 +27,7 @@ use Closure;
  * is provided.
  *
  * This adapter does *not* provided increment/decrement functionality and also can't handle
- * serialization natively.
+ * serialization natively. Scope support is available but not natively.
  *
  * A simple configuration can be accomplished as follows:
  *
@@ -60,13 +60,14 @@ class File extends \lithium\storage\cache\Adapter {
 	 *        The defaults are:
 	 *        - 'path' : Path where cached entries live, for example
 	 *          `Libraries::get(true, 'resources') . '/tmp/cache'`.
+	 *        - 'scope' : Scope which will prefix keys; per default not set.
 	 *        - 'expiry' : Default expiry time used if none is explicitly set when calling
 	 *          `Cache::write()`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'path' => Libraries::get(true, 'resources') . '/tmp/cache',
-			'prefix' => '',
+			'scope' => null,
 			'expiry' => '+1 hour'
 		);
 		parent::__construct($config + $defaults);
@@ -84,14 +85,20 @@ class File extends \lithium\storage\cache\Adapter {
 	public function write(array $keys, $expiry = null) {
 		$path = $this->_config['path'];
 		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
+		$scope = $this->_config['scope'];
 
-		return function($self, $params) use (&$path, $expiry) {
+		return function($self, $params) use (&$path, $expiry, $scope) {
 			if (!$expiry || $expiry === Cache::PERSIST) {
 				$expires = 0;
 			} elseif (is_int($expiry)) {
 				$expires = $expiry + time();
 			} else {
 				$expires = strtotime($expiry);
+			}
+			if ($scope) {
+				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
+					$scope, $params['keys'], '_'
+				));
 			}
 			foreach ($params['keys'] as $key => $value) {
 				$data = "{:expiry:{$expires}}\n{$value}";
@@ -115,8 +122,14 @@ class File extends \lithium\storage\cache\Adapter {
 	 */
 	public function read(array $keys) {
 		$path = $this->_config['path'];
+		$scope = $this->_config['scope'];
 
-		return function($self, $params) use (&$path) {
+		return function($self, $params) use (&$path, $scope) {
+			if ($scope) {
+				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
+					$scope, $params['keys'], '_'
+				));
+			}
 			$results = array();
 
 			foreach ($params['keys'] as $key) {
@@ -136,6 +149,10 @@ class File extends \lithium\storage\cache\Adapter {
 				}
 				$results[$key] = preg_replace('/^\{\:expiry\:\d+\}\\n/', '', $data, 1);
 			}
+
+			if ($scope) {
+				$results = $self->invokeMethod('_removeScopePrefix', array($scope, $results, '_'));
+			}
 			return $results;
 		};
 	}
@@ -148,8 +165,14 @@ class File extends \lithium\storage\cache\Adapter {
 	 */
 	public function delete(array $keys) {
 		$path = $this->_config['path'];
+		$scope = $this->_config['scope'];
 
-		return function($self, $params) use (&$path) {
+		return function($self, $params) use (&$path, $scope) {
+			if ($scope) {
+				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
+					$scope, $params['keys'], '_'
+				));
+			}
 			foreach ($params['keys'] as $key) {
 				$file = new SplFileInfo($p = "{$path}/{$key}");
 

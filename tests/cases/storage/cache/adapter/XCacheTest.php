@@ -214,6 +214,22 @@ class XCacheTest extends \lithium\test\Unit {
 		$closure($this->XCache, compact('keys', 'expiry'));
 	}
 
+	public function testWriteWithScope() {
+		$adapter = new XCache(array('scope' => 'primary'));
+
+		$keys = array('key1' => 'test1');
+		$expiry = '+1 minute';
+		$result = $adapter->write($keys, $expiry);
+		$result($adapter, compact('keys', 'expiry'));
+
+		$expected = 'test1';
+		$result = xcache_get('primary:key1');
+		$this->assertEqual($expected, $result);
+
+		$result = xcache_get('key1');
+		$this->assertNull($result);
+	}
+
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
@@ -262,6 +278,19 @@ class XCacheTest extends \lithium\test\Unit {
 		$expected = array();
 		$result = $closure($this->XCache, compact('keys'));
 		$this->assertIdentical($expected, $result);
+	}
+
+	public function testReadWithScope() {
+		$adapter = new XCache(array('scope' => 'primary'));
+
+		xcache_set('primary:key1', 'test1', 60);
+		xcache_set('key1', 'test2', 60);
+
+		$keys = array('key1');
+		$expected = array('key1' => 'test1');
+		$result = $adapter->read($keys);
+		$result = $result($adapter, compact('keys'));
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testReadMulti() {
@@ -355,6 +384,24 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$params = compact('keys');
 		$result = $closure($this->XCache, $params);
+		$this->assertFalse($result);
+	}
+
+	public function testDeleteWithScope() {
+		$adapter = new XCache(array('scope' => 'primary'));
+
+		xcache_set('primary:key1', 'test1', 60);
+		xcache_set('key1', 'test2', 60);
+
+		$keys = array('key1');
+		$expected = array('key1' => 'test1');
+		$result = $adapter->delete($keys);
+		$result($adapter, compact('keys'));
+
+		$result = xcache_isset('key1');
+		$this->assertTrue($result);
+
+		$result = xcache_isset('primary:key1');
 		$this->assertFalse($result);
 	}
 
@@ -467,6 +514,24 @@ class XCacheTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 	}
 
+	public function testDecrementWithScope() {
+		$adapter = new XCache(array('scope' => 'primary'));
+
+		xcache_set('primary:key1', 1, 60);
+		xcache_set('key1', 1, 60);
+
+		$result = $adapter->decrement('key1');
+		$result($adapter, array('key' => 'key1'));
+
+		$expected = 1;
+		$result = xcache_get('key1');
+		$this->assertEqual($expected, $result);
+
+		$expected = 0;
+		$result = xcache_get('primary:key1');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testIncrement() {
 		$time = strtotime('+1 minute') - time();
 		$key = 'increment';
@@ -517,6 +582,24 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$result = xcache_unset($key);
 		$this->assertTrue($result);
+	}
+
+	public function testIncrementWithScope() {
+		$adapter = new XCache(array('scope' => 'primary'));
+
+		xcache_set('primary:key1', 1, 60);
+		xcache_set('key1', 1, 60);
+
+		$result = $adapter->increment('key1');
+		$result($adapter, array('key' => 'key1'));
+
+		$expected = 1;
+		$result = xcache_get('key1');
+		$this->assertEqual($expected, $result);
+
+		$expected = 2;
+		$result = xcache_get('primary:key1');
+		$this->assertEqual($expected, $result);
 	}
 }
 
