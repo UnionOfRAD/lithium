@@ -60,23 +60,19 @@ class Memory extends \lithium\storage\cache\Adapter {
 	 * containing key/value pairs of the requested data.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning cached values keyed by cache keys
-	 *                 on successful read, keys which could not be read will
-	 *                 not be included in the results array.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
 	 */
 	public function read(array $keys) {
-		$cache =& $this->_cache;
+		$results = array();
 
-		return function($self, $params) use (&$cache) {
-			$results = array();
-
-			foreach ($params['keys'] as $key) {
-				if (array_key_exists($key, $cache)) {
-					$results[$key] = $cache[$key];
-				}
+		foreach ($keys as $key) {
+			if (array_key_exists($key, $this->_cache)) {
+				$results[$key] = $this->_cache[$key];
 			}
-			return $results;
-		};
+		}
+		return $results;
 	}
 
 	/**
@@ -85,69 +81,51 @@ class Memory extends \lithium\storage\cache\Adapter {
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param mixed $data The value to be cached.
 	 * @param null|string $expiry Unused.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
-		$cache =& $this->_cache;
-
-		return function($self, $params) use (&$cache) {
-			foreach ($params['keys'] as $key => &$value) {
-				$cache[$key] = $value;
-			}
-			return true;
-		};
+		foreach ($keys as $key => &$value) {
+			$this->_cache[$key] = $value;
+		}
+		return true;
 	}
 
 	/**
 	 * Will attempt to remove specified keys from the user space cache.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete(array $keys) {
-		$cache =& $this->_cache;
-
-		return function($self, $params) use (&$cache) {
-			foreach ($params['keys'] as $key) {
-				if (!isset($cache[$key])) {
-					return false;
-				}
-				unset($cache[$key]);
+		foreach ($keys as $key) {
+			if (!isset($this->_cache[$key])) {
+				return false;
 			}
-			return true;
-		};
+			unset($this->_cache[$key]);
+		}
+		return true;
 	}
 
 	/**
 	 * Performs a decrement operation on specified numeric cache item.
 	 *
 	 * @param string $key Key of numeric cache item to decrement.
-	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return Closure Function returning item's new value on successful decrement,
-	 *         `false` otherwise.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		$cache =& $this->_cache;
-
-		return function($self, $params) use (&$cache, $offset) {
-			return $cache[$params['key']] -= 1;
-		};
+		return $this->_cache[$key] -= 1;
 	}
 
 	/**
 	 * Performs an increment operation on specified numeric cache item.
 	 *
-	 * @param string $key Key of numeric cache item to increment.
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return Closure Function returning item's new value on successful increment,
-	 *         `false` otherwise.
+	 * @param string $key Key of numeric cache item to increment
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		$cache =& $this->_cache;
-
-		return function($self, $params) use (&$cache, $offset) {
-			return $cache[$params['key']] += 1;
-		};
+		return $this->_cache[$key] += 1;
 	}
 
 	/**

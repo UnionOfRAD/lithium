@@ -174,9 +174,11 @@ class Cache extends \lithium\core\Adaptable {
 				));
 			}
 		}
-		$method = static::adapter($name)->write($keys, $expiry);
 		$params = compact('keys', 'expiry');
-		return static::_filter(__FUNCTION__, $params, $method, $settings[$name]['filters']);
+
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
+			return $self::adapter($name)->write($params['keys'], $params['expiry']);
+		}, $settings[$name]['filters']);
 	}
 
 	/**
@@ -232,11 +234,11 @@ class Cache extends \lithium\core\Adaptable {
 		} else {
 			$keys = array($key);
 		}
-
-		$method = static::adapter($name)->read($keys);
 		$params = compact('keys');
-		$filters = $settings[$name]['filters'];
-		$results = static::_filter(__FUNCTION__, $params, $method, $filters);
+
+		$results = static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
+			return $self::adapter($name)->read($params['keys']);
+		}, $settings[$name]['filters']);
 
 		if ($write = $options['write']) {
 			$write = is_callable($write) ? $write() : $write;
@@ -281,10 +283,6 @@ class Cache extends \lithium\core\Adaptable {
 	 *                 multiple items and an error occurs deleting any of the items the
 	 *                 whole operation fails and this method will return `false`.
 	 * @filter This method may be filtered.
-	 * @fixme Support for delete strategies should be removed in future
-	 *        versions as cache strategies don't make any use of them and
-	 *        the lack of use cases for manipulating the cache key on delete
-	 *        can be doubted.
 	 */
 	public static function delete($name, $key, array $options = array()) {
 		$options += array('conditions' => null, 'strategies' => true);
@@ -304,17 +302,9 @@ class Cache extends \lithium\core\Adaptable {
 		} else {
 			$keys = array($key);
 		}
-		$method = static::adapter($name)->delete($keys);
-		$filters = $settings[$name]['filters'];
-
-		if ($options['strategies']) {
-			foreach ($keys as &$key) {
-				$key = static::applyStrategies(__FUNCTION__, $name, $key, array(
-					'key' => $key, 'class' => __CLASS__
-				));
-			}
-		}
-		return static::_filter(__FUNCTION__, compact('keys'), $method, $filters);
+		return static::_filter(__FUNCTION__, compact('keys'), function($self, $params) use ($name) {
+			return $self::adapter($name)->delete($params['keys']);
+		}, $settings[$name]['filters']);
 	}
 
 	/**
@@ -344,11 +334,11 @@ class Cache extends \lithium\core\Adaptable {
 		}
 
 		$key = static::key($key);
-		$method = static::adapter($name)->increment($key, $offset);
 		$params = compact('key', 'offset');
-		$filters = $settings[$name]['filters'];
 
-		return static::_filter(__FUNCTION__, $params, $method, $filters);
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
+			return $self::adapter($name)->increment($params['key'], $params['offset']);
+		}, $settings[$name]['filters']);
 	}
 
 	/**
@@ -378,11 +368,11 @@ class Cache extends \lithium\core\Adaptable {
 		}
 
 		$key = static::key($key);
-		$method = static::adapter($name)->decrement($key, $offset);
 		$params = compact('key', 'offset');
-		$filters = $settings[$name]['filters'];
 
-		return static::_filter(__FUNCTION__, $params, $method, $filters);
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
+			return $self::adapter($name)->decrement($params['key'], $params['offset']);
+		}, $settings[$name]['filters']);
 	}
 
 	/**

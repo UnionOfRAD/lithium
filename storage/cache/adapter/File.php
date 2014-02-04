@@ -81,35 +81,29 @@ class File extends \lithium\storage\cache\Adapter {
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
-		$path = $this->_config['path'];
 		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
-		$scope = $this->_config['scope'];
 
-		return function($self, $params) use (&$path, $expiry, $scope) {
-			if (!$expiry || $expiry === Cache::PERSIST) {
-				$expires = 0;
-			} elseif (is_int($expiry)) {
-				$expires = $expiry + time();
-			} else {
-				$expires = strtotime($expiry);
-			}
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys'], '_'
-				));
-			}
-			foreach ($params['keys'] as $key => $value) {
-				$data = "{:expiry:{$expires}}\n{$value}";
+		if (!$expiry || $expiry === Cache::PERSIST) {
+			$expires = 0;
+		} elseif (is_int($expiry)) {
+			$expires = $expiry + time();
+		} else {
+			$expires = strtotime($expiry);
+		}
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys, '_');
+		}
+		foreach ($keys as $key => $value) {
+			$data = "{:expiry:{$expires}}\n{$value}";
 
-				if (!file_put_contents("{$path}/{$key}", $data)) {
-					return false;
-				}
+			if (!file_put_contents("{$this->_config['path']}/{$key}", $data)) {
+				return false;
 			}
-			return true;
-		};
+		}
+		return true;
 	}
 
 	/**
@@ -117,75 +111,61 @@ class File extends \lithium\storage\cache\Adapter {
 	 * containing key/value pairs of the requested data.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning cached values keyed by cache keys
-	 *                 on successful read, keys which could not be read will
-	 *                 not be included in the results array.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
 	 */
 	public function read(array $keys) {
-		$path = $this->_config['path'];
-		$scope = $this->_config['scope'];
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys, '_');
+		}
+		$results = array();
 
-		return function($self, $params) use (&$path, $scope) {
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys'], '_'
-				));
+		foreach ($keys as $key) {
+			$file = new SplFileInfo($p = "{$this->_config['path']}/{$key}");
+
+			if (!$file->isFile() || !$file->isReadable()) {
+				continue;
 			}
-			$results = array();
+			$data = file_get_contents($p);
 
-			foreach ($params['keys'] as $key) {
-				$file = new SplFileInfo($p = "{$path}/{$key}");
+			preg_match('/^\{\:expiry\:(\d+)\}\\n/', $data, $matches);
+			$expiry = $matches[1];
 
-				if (!$file->isFile() || !$file->isReadable()) {
-					continue;
-				}
-				$data = file_get_contents($p);
-
-				preg_match('/^\{\:expiry\:(\d+)\}\\n/', $data, $matches);
-				$expiry = $matches[1];
-
-				if ($expiry < time() && $expiry != 0) {
-					file_exists($p) && unlink($p);
-					continue;
-				}
-				$results[$key] = preg_replace('/^\{\:expiry\:\d+\}\\n/', '', $data, 1);
+			if ($expiry < time() && $expiry != 0) {
+				file_exists($p) && unlink($p);
+				continue;
 			}
+			$results[$key] = preg_replace('/^\{\:expiry\:\d+\}\\n/', '', $data, 1);
+		}
 
-			if ($scope) {
-				$results = $self->invokeMethod('_removeScopePrefix', array($scope, $results, '_'));
-			}
-			return $results;
-		};
+		if ($this->_config['scope']) {
+			$results = $this->_removeScopePrefix($this->_config['scope'], $results, '_');
+		}
+		return $results;
 	}
 
 	/**
 	 * Will attempt to remove specified keys from the user space cache.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete(array $keys) {
-		$path = $this->_config['path'];
-		$scope = $this->_config['scope'];
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys, '_');
+		}
+		foreach ($keys as $key) {
+			$file = new SplFileInfo($p = "{$this->_config['path']}/{$key}");
 
-		return function($self, $params) use (&$path, $scope) {
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys'], '_'
-				));
+			if (!$file->isFile() || !$file->isReadable()) {
+				return false;
 			}
-			foreach ($params['keys'] as $key) {
-				$file = new SplFileInfo($p = "{$path}/{$key}");
-
-				if (!$file->isFile() || !$file->isReadable()) {
-					return false;
-				}
-				if (!file_exists($p) || !unlink($p)) {
-					return false;
-				}
+			if (!file_exists($p) || !unlink($p)) {
+				return false;
 			}
-			return true;
-		};
+		}
+		return true;
 	}
 
 	/**

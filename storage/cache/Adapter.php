@@ -40,7 +40,7 @@ abstract class Adapter extends \lithium\core\Object {
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
 	abstract public function write(array $keys, $expiry = null);
 
@@ -49,9 +49,9 @@ abstract class Adapter extends \lithium\core\Object {
 	 * containing key/value pairs of the requested data.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning cached values keyed by cache keys
-	 *                 on successful read, keys which could not be read will
-	 *                 not be included in the results array.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
 	 */
 	abstract public function read(array $keys);
 
@@ -59,27 +59,27 @@ abstract class Adapter extends \lithium\core\Object {
 	 * Will attempt to remove specified keys from the user space cache.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
 	abstract public function delete(array $keys);
 
 	/**
 	 * Performs a decrement operation on specified numeric cache item.
 	 *
-	 * @param string $key Key of numeric cache item to decrement
-	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return Closure Function returning item's new value on successful decrement, else `false`
+	 * @param string $key Key of numeric cache item to decrement.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
 		return false;
 	}
 
 	/**
-	 * Performs a increment operation on specified numeric cache item.
+	 * Performs an increment operation on specified numeric cache item.
 	 *
 	 * @param string $key Key of numeric cache item to increment
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return Closure Function returning item's new value on successful increment, else `false`
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
 		return false;

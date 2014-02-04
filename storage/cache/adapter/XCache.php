@@ -77,32 +77,27 @@ class XCache extends \lithium\storage\cache\Adapter {
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
 		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
-		$scope = $this->_config['scope'];
 
-		return function($self, $params) use ($expiry, $scope) {
-			if (!$expiry || $expiry === Cache::PERSIST) {
-				$ttl = 0;
-			} elseif (is_int($expiry)) {
-				$ttl = $expiry;
-			} else {
-				$ttl = strtotime($expiry) - time();
+		if (!$expiry || $expiry === Cache::PERSIST) {
+			$ttl = 0;
+		} elseif (is_int($expiry)) {
+			$ttl = $expiry;
+		} else {
+			$ttl = strtotime($expiry) - time();
+		}
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		foreach ($keys as $key => $value) {
+			if (!xcache_set($key, $value, $ttl)) {
+				return false;
 			}
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys']
-				));
-			}
-			foreach ($params['keys'] as $key => $value) {
-				if (!xcache_set($key, $value, $ttl)) {
-					return false;
-				}
-			}
-			return true;
-		};
+		}
+		return true;
 	}
 
 	/**
@@ -112,34 +107,28 @@ class XCache extends \lithium\storage\cache\Adapter {
 	 * Note that this is not an atomic operation when using multiple keys.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning cached values keyed by cache keys
-	 *                 on successful read, keys which could not be read will
-	 *                 not be included in the results array.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
 	 */
 	public function read(array $keys) {
-		$scope = $this->_config['scope'];
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		$results = array();
 
-		return function($self, $params) use ($scope) {
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys']
-				));
-			}
-			$results = array();
+		foreach ($keys as $key) {
+			$result = xcache_get($key);
 
-			foreach ($params['keys'] as $key) {
-				$result = xcache_get($key);
-
-				if ($result === null && !xcache_isset($key)) {
-					continue;
-				}
-				$results[$key] = $result;
+			if ($result === null && !xcache_isset($key)) {
+				continue;
 			}
-			if ($scope) {
-				$results = $self->invokeMethod('_removeScopePrefix', array($scope, $results));
-			}
-			return $results;
-		};
+			$results[$key] = $result;
+		}
+		if ($this->_config['scope']) {
+			$results = $this->_removeScopePrefix($this->_config['scope'], $results);
+		}
+		return $results;
 	}
 
 	/**
@@ -148,24 +137,18 @@ class XCache extends \lithium\storage\cache\Adapter {
 	 * Note that this is not an atomic operation when using multiple keys.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete(array $keys) {
-		$scope = $this->_config['scope'];
-
-		return function($self, $params) use ($scope) {
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys']
-				));
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		foreach ($keys as $key) {
+			if (!xcache_unset($key)) {
+				return false;
 			}
-			foreach ($params['keys'] as $key) {
-				if (!xcache_unset($key)) {
-					return false;
-				}
-			}
-			return true;
-		};
+		}
+		return true;
 	}
 
 	/**
@@ -175,16 +158,14 @@ class XCache extends \lithium\storage\cache\Adapter {
 	 * If the item's value is not numeric, it is treated as if the value were 0.
 	 * It is possible to decrement a value into the negative integers.
 	 *
-	 * @param string $key Key of numeric cache item to decrement
-	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return Closure Function returning item's new value on successful decrement, else `false`
+	 * @param string $key Key of numeric cache item to decrement.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		$scope = $this->_config['scope'];
-
-		return function($self, $params) use ($offset, $scope) {
-			return xcache_dec($scope ? "{$scope}:{$params['key']}" : $params['key'], $offset);
-		};
+		return xcache_dec(
+			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
+		);
 	}
 
 	/**
@@ -194,15 +175,13 @@ class XCache extends \lithium\storage\cache\Adapter {
 	 * If the item's value is not numeric, it is treated as if the value were 0.
 	 *
 	 * @param string $key Key of numeric cache item to increment
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return Closure Function returning item's new value on successful increment, else `false`
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		$scope = $this->_config['scope'];
-
-		return function($self, $params) use ($offset, $scope) {
-			return xcache_inc($scope ? "{$scope}:{$params['key']}" : $params['key'], $offset);
-		};
+		return xcache_inc(
+			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
+		);
 	}
 
 	/**

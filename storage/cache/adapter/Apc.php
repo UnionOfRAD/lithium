@@ -68,27 +68,22 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
 		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
-		$scope = $this->_config['scope'];
 
-		return function($self, $params) use ($expiry, $scope) {
-			if (!$expiry || $expiry === Cache::PERSIST) {
-				$ttl = 0;
-			} elseif (is_int($expiry)) {
-				$ttl = $expiry;
-			} else {
-				$ttl = strtotime($expiry) - time();
-			}
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys']
-				));
-			}
-			return apc_store($params['keys'], null, $ttl) === array();
-		};
+		if (!$expiry || $expiry === Cache::PERSIST) {
+			$ttl = 0;
+		} elseif (is_int($expiry)) {
+			$ttl = $expiry;
+		} else {
+			$ttl = strtotime($expiry) - time();
+		}
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		return apc_store($keys, null, $ttl) === array();
 	}
 
 	/**
@@ -96,45 +91,33 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * containing key/value pairs of the requested data.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning cached values keyed by cache keys
-	 *                 on successful read, keys which could not be read will
-	 *                 not be included in the results array.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
 	 */
 	public function read(array $keys) {
-		$scope = $this->_config['scope'];
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		$results = apc_fetch($keys);
 
-		return function($self, $params) use ($scope) {
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys']
-				));
-			}
-			$results = apc_fetch($params['keys']);
-
-			if ($scope) {
-				$results = $self->invokeMethod('_removeScopePrefix', array($scope, $results));
-			}
-			return $results;
-		};
+		if ($this->_config['scope']) {
+			$results = $this->_removeScopePrefix($this->_config['scope'], $results);
+		}
+		return $results;
 	}
 
 	/**
 	 * Will attempt to remove specified keys from the user space cache.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete(array $keys) {
-		$scope = $this->_config['scope'];
-
-		return function($self, $params) use ($scope) {
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys']
-				));
-			}
-			return apc_delete($params['keys']) === array();
-		};
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		return apc_delete($keys) === array();
 	}
 
 	/**
@@ -144,16 +127,14 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * If the item's value is not numeric, the decrement operation has no effect
 	 * on the key - it retains it's original non-integer value.
 	 *
-	 * @param string $key Key of numeric cache item to decrement
-	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return Closure Function returning item's new value on successful decrement, else `false`
+	 * @param string $key Key of numeric cache item to decrement.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		$scope = $this->_config['scope'];
-
-		return function($self, $params) use ($offset, $scope) {
-			return apc_dec($scope ? "{$scope}:{$params['key']}" : $params['key'], $offset);
-		};
+		return apc_dec(
+			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
+		);
 	}
 
 	/**
@@ -164,15 +145,13 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * on the key - it retains it's original non-integer value.
 	 *
 	 * @param string $key Key of numeric cache item to increment
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return Closure Function returning item's new value on successful increment, else `false`
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		$scope = $this->_config['scope'];
-
-		return function($self, $params) use ($offset, $scope) {
-			return apc_inc($scope ? "{$scope}:{$params['key']}" : $params['key'], $offset);
-		};
+		return apc_inc(
+			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
+		);
 	}
 
 	/**
