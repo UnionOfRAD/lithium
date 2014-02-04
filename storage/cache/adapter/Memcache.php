@@ -189,31 +189,25 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
-		$connection =& $this->connection;
 		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
-		$scope = $this->_config['scope'];
 
-		return function($self, $params) use (&$connection, $expiry, $scope) {
-			if (!$expiry || $expiry === Cache::PERSIST) {
-				$expires = 0;
-			} elseif (is_int($expiry)) {
-				$expires = $expiry + time();
-			} else {
-				$expires = strtotime($expiry);
-			}
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys']
-				));
-			}
-			if (count($params['keys']) > 1) {
-				return $connection->setMulti($params['keys'], $expires);
-			}
-			return $connection->set(key($params['keys']), current($params['keys']), $expires);
-		};
+		if (!$expiry || $expiry === Cache::PERSIST) {
+			$expires = 0;
+		} elseif (is_int($expiry)) {
+			$expires = $expiry + time();
+		} else {
+			$expires = strtotime($expiry);
+		}
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		if (count($keys) > 1) {
+			return $this->connection->setMulti($keys, $expires);
+		}
+		return $this->connection->set(key($keys), current($keys), $expires);
 	}
 
 	/**
@@ -221,63 +215,48 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * containing key/value pairs of the requested data.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning cached values keyed by cache keys
-	 *                 on successful read, keys which could not be read will
-	 *                 not be included in the results array.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
 	 */
 	public function read(array $keys) {
-		$connection =& $this->connection;
-		$scope = $this->_config['scope'];
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
 
-		return function($self, $params) use (&$connection, $scope) {
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys']
-				));
+		if (count($keys) > 1) {
+			if (!$results = $this->connection->getMulti($keys)) {
+				return array();
 			}
+		} else {
+			$result = $this->connection->get($key = current($keys));
 
-			if (count($params['keys']) > 1) {
-				if (!$results = $connection->getMulti($params['keys'])) {
-					return array();
-				}
-			} else {
-				$result = $connection->get($key = current($params['keys']));
-
-				if ($result === false && $connection->getResultCode() === Memcached::RES_NOTFOUND) {
-					return array();
-				}
-				$results = array($key => $result);
+			if ($result === false && $this->connection->getResultCode() === Memcached::RES_NOTFOUND) {
+				return array();
 			}
+			$results = array($key => $result);
+		}
 
-			if ($scope) {
-				$results = $self->invokeMethod('_removeScopePrefix', array($scope, $results));
-			}
-			return $results;
-		};
+		if ($this->_config['scope']) {
+			$results = $this->_removeScopePrefix($this->_config['scope'], $results);
+		}
+		return $results;
 	}
 
 	/**
 	 * Will attempt to remove specified keys from the user space cache.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete(array $keys) {
-		$connection =& $this->connection;
-		$scope = $this->_config['scope'];
-
-		return function($self, $params) use (&$connection, $scope) {
-			if ($scope) {
-				$params['keys'] = $self->invokeMethod('_addScopePrefix', array(
-					$scope, $params['keys']
-				));
-			}
-
-			if (count($params['keys']) > 1) {
-				return $connection->deleteMulti($params['keys']);
-			}
-			return $connection->delete(current($params['keys']));
-		};
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		if (count($keys) > 1) {
+			return $this->connection->deleteMulti($keys);
+		}
+		return $this->connection->delete(current($keys));
 	}
 
 	/**
@@ -286,21 +265,16 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * Note that, as per the Memcached specification:
 	 * "If the item's value is not numeric, it is treated as if the value were 0.
 	 * If the operation would decrease the value below 0, the new value will be 0."
-	 * (see http://www.php.net/manual/memcached.decrement.php)
 	 *
-	 * @param string $key Key of numeric cache item to decrement
-	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return Closure Function returning item's new value on successful decrement, else `false`
+	 * @link http://www.php.net/manual/memcached.decrement.php
+	 * @param string $key Key of numeric cache item to decrement.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		$connection =& $this->connection;
-		$scope = $this->_config['scope'];
-
-		return function($self, $params) use (&$connection, $offset, $scope) {
-			return $connection->decrement(
-				$scope ? "{$scope}:{$params['key']}" : $params['key'], $offset
-			);
-		};
+		return $this->connection->decrement(
+			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
+		);
 	}
 
 	/**
@@ -308,21 +282,16 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 *
 	 * Note that, as per the Memcached specification:
 	 * "If the item's value is not numeric, it is treated as if the value were 0."
-	 * (see http://www.php.net/manual/memcached.decrement.php)
 	 *
+	 * @link http://www.php.net/manual/memcached.decrement.php
 	 * @param string $key Key of numeric cache item to increment
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return Closure Function returning item's new value on successful increment, else `false`
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		$connection =& $this->connection;
-		$scope = $this->_config['scope'];
-
-		return function($self, $params) use (&$connection, $offset, $scope) {
-			return $connection->increment(
-				$scope ? "{$scope}:{$params['key']}" : $params['key'], $offset
-			);
-		};
+		return $this->connection->increment(
+			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
+		);
 	}
 
 	/**

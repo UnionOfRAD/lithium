@@ -174,9 +174,11 @@ class Cache extends \lithium\core\Adaptable {
 				));
 			}
 		}
-		$method = static::adapter($name)->write($keys, $expiry);
 		$params = compact('keys', 'expiry');
-		return static::_filter(__FUNCTION__, $params, $method, $settings[$name]['filters']);
+
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
+			return $self::adapter($name)->write($params['keys'], $params['expiry']);
+		}, $settings[$name]['filters']);
 	}
 
 	/**
@@ -232,11 +234,11 @@ class Cache extends \lithium\core\Adaptable {
 		} else {
 			$keys = array($key);
 		}
-
-		$method = static::adapter($name)->read($keys);
 		$params = compact('keys');
-		$filters = $settings[$name]['filters'];
-		$results = static::_filter(__FUNCTION__, $params, $method, $filters);
+
+		$results = static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
+			return $self::adapter($name)->read($params['keys']);
+		}, $settings[$name]['filters']);
 
 		if ($write = $options['write']) {
 			$write = is_callable($write) ? $write() : $write;
@@ -300,11 +302,9 @@ class Cache extends \lithium\core\Adaptable {
 		} else {
 			$keys = array($key);
 		}
-
-		$method = static::adapter($name)->delete($keys);
-		$filters = $settings[$name]['filters'];
-
-		return static::_filter(__FUNCTION__, compact('keys'), $method, $filters);
+		return static::_filter(__FUNCTION__, compact('keys'), function($self, $params) use ($name) {
+			return $self::adapter($name)->delete($params['keys']);
+		}, $settings[$name]['filters']);
 	}
 
 	/**
@@ -334,11 +334,11 @@ class Cache extends \lithium\core\Adaptable {
 		}
 
 		$key = static::key($key);
-		$method = static::adapter($name)->increment($key, $offset);
 		$params = compact('key', 'offset');
-		$filters = $settings[$name]['filters'];
 
-		return static::_filter(__FUNCTION__, $params, $method, $filters);
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
+			return $self::adapter($name)->increment($params['key'], $params['offset']);
+		}, $settings[$name]['filters']);
 	}
 
 	/**
@@ -368,11 +368,11 @@ class Cache extends \lithium\core\Adaptable {
 		}
 
 		$key = static::key($key);
-		$method = static::adapter($name)->decrement($key, $offset);
 		$params = compact('key', 'offset');
-		$filters = $settings[$name]['filters'];
 
-		return static::_filter(__FUNCTION__, $params, $method, $filters);
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
+			return $self::adapter($name)->decrement($params['key'], $params['offset']);
+		}, $settings[$name]['filters']);
 	}
 
 	/**

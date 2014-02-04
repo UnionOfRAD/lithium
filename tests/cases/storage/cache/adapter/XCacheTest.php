@@ -54,11 +54,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
-		$closure = $this->XCache->write($keys, $expiry);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys', 'expiry');
-		$result = $closure($this->XCache, $params);
+		$result = $this->XCache->write($keys, $expiry);
 		$this->assertTrue($result);
 
 		$expected = $data;
@@ -74,11 +70,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$expiry = '+1 minute';
 		$time = strtotime($expiry);
 
-		$closure = $this->XCache->write($keys, $expiry);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys', 'expiry');
-		$result = $closure($this->XCache, $params);
+		$result = $this->XCache->write($keys, $expiry);
 		$this->assertTrue($result);
 
 		$expected = $data;
@@ -96,8 +88,7 @@ class XCacheTest extends \lithium\test\Unit {
 			'key2' => 'data2',
 			'key3' => 'data3'
 		);
-		$closure = $this->XCache->write($keys, $expiry);
-		$result = $closure($this->XCache, compact('keys', 'expiry'));
+		$result = $this->XCache->write($keys, $expiry);
 		$this->assertTrue($result);
 
 		foreach ($keys as $key => $data) {
@@ -116,11 +107,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$keys = array($key => $data);
 		$time = strtotime('+5 seconds');
 
-		$closure = $xCache->write($keys);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys');
-		$result = $closure($xCache, $params);
+		$result = $xCache->write($keys);
 		$this->assertTrue($result);
 
 		$expected = $data;
@@ -137,8 +124,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$adapter = new XCache(array('expiry' => null));
 		$expiry = null;
 
-		$closure = $adapter->write($keys, $expiry);
-		$result = $closure($adapter, compact('keys', 'expiry'));
+		$result = $adapter->write($keys, $expiry);
 		$this->assertTrue($result);
 
 		$result = xcache_isset('key1');
@@ -149,8 +135,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$adapter = new XCache(array('expiry' => Cache::PERSIST));
 		$expiry = Cache::PERSIST;
 
-		$closure = $adapter->write($keys, $expiry);
-		$result = $closure($adapter, compact('keys', 'expiry'));
+		$result = $adapter->write($keys, $expiry);
 		$this->assertTrue($result);
 
 		$result = xcache_isset('key1');
@@ -161,8 +146,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$adapter = new XCache();
 		$expiry = Cache::PERSIST;
 
-		$closure = $adapter->write($keys, $expiry);
-		$result = $closure($adapter, compact('keys', 'expiry'));
+		$result = $adapter->write($keys, $expiry);
 		$this->assertTrue($result);
 
 		$result = xcache_isset('key1');
@@ -180,8 +164,7 @@ class XCacheTest extends \lithium\test\Unit {
 	public function testWriteExpiryExpires() {
 		$keys = array('key1' => 'data1');
 		$expiry = '+5 seconds';
-		$closure = $this->XCache->write($keys, $expiry);
-		$closure($this->XCache, compact('keys', 'expiry'));
+		$this->XCache->write($keys, $expiry);
 
 		$result = xcache_isset('key1');
 		$this->assertTrue($result);
@@ -200,8 +183,7 @@ class XCacheTest extends \lithium\test\Unit {
 	public function testWriteExpiryTtl() {
 		$keys = array('key1' => 'data1');
 		$expiry = 5;
-		$closure = $this->XCache->write($keys, $expiry);
-		$closure($this->XCache, compact('keys', 'expiry'));
+		$this->XCache->write($keys, $expiry);
 
 		$result = xcache_isset('key1');
 		$this->assertTrue($result);
@@ -210,8 +192,7 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$keys = array('key1' => 'data1');
 		$expiry = 1;
-		$closure = $this->XCache->write($keys, $expiry);
-		$closure($this->XCache, compact('keys', 'expiry'));
+		$this->XCache->write($keys, $expiry);
 	}
 
 	public function testWriteWithScope() {
@@ -219,8 +200,7 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$keys = array('key1' => 'test1');
 		$expiry = '+1 minute';
-		$result = $adapter->write($keys, $expiry);
-		$result($adapter, compact('keys', 'expiry'));
+		$adapter->write($keys, $expiry);
 
 		$expected = 'test1';
 		$result = xcache_get('primary:key1');
@@ -239,12 +219,8 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->XCache->read($keys);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys');
-		$result = $closure($this->XCache, $params);
 		$expected = array($key => $data);
+		$result = $this->XCache->read($keys);
 		$this->assertEqual($expected, $result);
 
 		$result = xcache_unset($key);
@@ -258,12 +234,8 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->XCache->read($keys);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys');
-		$result = $closure($this->XCache, $params);
 		$expected = array($key => $data);
+		$result = $this->XCache->read($keys);
 		$this->assertEqual($expected, $result);
 
 		$result = xcache_unset($key);
@@ -273,10 +245,9 @@ class XCacheTest extends \lithium\test\Unit {
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
 		$keys = array($key);
-		$closure = $this->XCache->read($keys);
 
 		$expected = array();
-		$result = $closure($this->XCache, compact('keys'));
+		$result = $this->XCache->read($keys);
 		$this->assertIdentical($expected, $result);
 	}
 
@@ -289,7 +260,6 @@ class XCacheTest extends \lithium\test\Unit {
 		$keys = array('key1');
 		$expected = array('key1' => 'test1');
 		$result = $adapter->read($keys);
-		$result = $result($adapter, compact('keys'));
 		$this->assertEqual($expected, $result);
 	}
 
@@ -313,8 +283,7 @@ class XCacheTest extends \lithium\test\Unit {
 			'key2',
 			'key3'
 		);
-		$closure = $this->XCache->read($keys);
-		$result = $closure($this->XCache, compact('keys'));
+		$result = $this->XCache->read($keys);
 		$this->assertEqual($expected, $result);
 
 		foreach ($keys as $key) {
@@ -328,11 +297,11 @@ class XCacheTest extends \lithium\test\Unit {
 			'key1' => null
 		);
 		$result = $this->XCache->write($keys);
-		$this->assertTrue($result($this->XCache, compact('keys', 'expiry')));
+		$this->assertTrue($result);
 
 		$expected = $keys;
 		$result = $this->XCache->read(array_keys($keys));
-		$this->assertEqual($expected, $result($this->XCache, array('keys' => array_keys($keys))));
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testWriteAndReadNullMulti() {
@@ -342,18 +311,18 @@ class XCacheTest extends \lithium\test\Unit {
 			'key2' => 'data2'
 		);
 		$result = $this->XCache->write($keys);
-		$this->assertTrue($result($this->XCache, compact('keys', 'expiry')));
+		$this->assertTrue($result);
 
 		$expected = $keys;
 		$result = $this->XCache->read(array_keys($keys));
-		$this->assertEqual($expected, $result($this->XCache, array('keys' => array_keys($keys))));
+		$this->assertEqual($expected, $result);
 
 		$keys = array(
 			'key1' => null,
 			'key2' => null
 		);
 		$result = $this->XCache->write($keys);
-		$this->assertTrue($result($this->XCache, compact('keys', 'expiry')));
+		$this->assertTrue($result);
 	}
 
 	public function testDelete() {
@@ -365,11 +334,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_set($key, $data, 60);
 		$this->assertTrue($result);
 
-		$closure = $this->XCache->delete($keys);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys');
-		$result = $closure($this->XCache, $params);
+		$result = $this->XCache->delete($keys);
 		$this->assertTrue($result);
 	}
 
@@ -379,11 +344,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$keys = array($key);
 		$time = strtotime('+1 minute');
 
-		$closure = $this->XCache->delete($keys);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys');
-		$result = $closure($this->XCache, $params);
+		$result = $this->XCache->delete($keys);
 		$this->assertFalse($result);
 	}
 
@@ -396,7 +357,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$keys = array('key1');
 		$expected = array('key1' => 'test1');
 		$result = $adapter->delete($keys);
-		$result($adapter, compact('keys'));
+		$this->assertEual($expected, $result);
 
 		$result = xcache_isset('key1');
 		$this->assertTrue($result);
@@ -412,11 +373,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
-		$closure = $this->XCache->write($keys, $expiry);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys', 'expiry');
-		$result = $closure($this->XCache, $params);
+		$result = $this->XCache->write($keys, $expiry);
 		$this->assertTrue($result);
 
 		$expected = $data;
@@ -425,19 +382,11 @@ class XCacheTest extends \lithium\test\Unit {
 
 		$keys = array($key);
 
-		$closure = $this->XCache->read($keys);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys');
-		$result = $closure($this->XCache, $params, null);
 		$expected = array($key => $data);
+		$result = $this->XCache->read($keys);
 		$this->assertEqual($expected, $result);
 
-		$closure = $this->XCache->delete($keys);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('keys');
-		$result = $closure($this->XCache, $params);
+		$result = $this->XCache->delete($keys);
 		$this->assertTrue($result);
 	}
 
@@ -470,11 +419,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_set($key, $value, $time);
 		$this->assertTrue($result);
 
-		$closure = $this->XCache->decrement($key);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
+		$result = $this->XCache->decrement($key);
 		$this->assertEqual($value - 1, $result);
 
 		$result = xcache_get($key);
@@ -492,20 +437,12 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_set($key, $value, $time);
 		$this->assertTrue($result);
 
-		$closure = $this->XCache->decrement($key);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
+		$this->XCache->decrement($key);
 
 		$result = xcache_get($key);
 		$this->assertEqual(-1, $result);
 
-		$closure = $this->XCache->decrement($key);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
+		$this->XCache->decrement($key);
 
 		$result = xcache_get($key);
 		$this->assertEqual(-2, $result);
@@ -520,8 +457,7 @@ class XCacheTest extends \lithium\test\Unit {
 		xcache_set('primary:key1', 1, 60);
 		xcache_set('key1', 1, 60);
 
-		$result = $adapter->decrement('key1');
-		$result($adapter, array('key' => 'key1'));
+		$adapter->decrement('key1');
 
 		$expected = 1;
 		$result = xcache_get('key1');
@@ -540,11 +476,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_set($key, $value, $time);
 		$this->assertTrue($result);
 
-		$closure = $this->XCache->increment($key);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
+		$result = $this->XCache->increment($key);
 		$this->assertEqual($value + 1, $result);
 
 		$result = xcache_get($key);
@@ -562,20 +494,12 @@ class XCacheTest extends \lithium\test\Unit {
 		$result = xcache_set($key, $value, $time);
 		$this->assertTrue($result);
 
-		$closure = $this->XCache->increment($key);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
+		$this->XCache->increment($key);
 
 		$result = xcache_get($key);
 		$this->assertEqual(1, $result);
 
-		$closure = $this->XCache->increment($key);
-		$this->assertInternalType('callable', $closure);
-
-		$params = compact('key');
-		$result = $closure($this->XCache, $params, null);
+		$this->XCache->increment($key);
 
 		$result = xcache_get($key);
 		$this->assertEqual(2, $result);
@@ -590,8 +514,7 @@ class XCacheTest extends \lithium\test\Unit {
 		xcache_set('primary:key1', 1, 60);
 		xcache_set('key1', 1, 60);
 
-		$result = $adapter->increment('key1');
-		$result($adapter, array('key' => 'key1'));
+		$adapter->increment('key1');
 
 		$expected = 1;
 		$result = xcache_get('key1');

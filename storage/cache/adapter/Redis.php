@@ -148,44 +148,40 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
 	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write(array $keys, $expiry = null) {
-		$connection =& $this->connection;
 		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
 
-		return function($self, $params) use (&$connection, $expiry) {
-			if (!$expiry || $expiry === Cache::PERSIST) {
-				$ttl = null;
-			} elseif (is_int($expiry)) {
-				$ttl = $expiry;
-			} else {
-				$ttl = strtotime($expiry) - time();
+		if (!$expiry || $expiry === Cache::PERSIST) {
+			$ttl = null;
+		} elseif (is_int($expiry)) {
+			$ttl = $expiry;
+		} else {
+			$ttl = strtotime($expiry) - time();
+		}
+
+		if (count($keys) > 1) {
+			if (!$ttl) {
+				return $this->connection->mset($keys);
 			}
+			$transaction = $this->connection->multi();
 
-			if (count($params['keys']) > 1) {
-				if ($ttl) {
-					$transaction = $connection->multi();
-
-					foreach ($params['keys'] as $key => $value) {
-						if (!$connection->setex($key, $ttl, $value)) {
-							$transaction->discard();
-							return false;
-						}
-					}
-					return $transaction->exec() === array_fill(0, count($params['keys']), true);
+			foreach ($keys as $key => $value) {
+				if (!$this->connection->setex($key, $ttl, $value)) {
+					$transaction->discard();
+					return false;
 				}
-				return $connection->mset($params['keys']) ;
-			} else {
-				$key = key($params['keys']);
-				$value = current($params['keys']);
-
-				if ($ttl) {
-					return $connection->setex($key, $ttl, $value);
-				}
-				return $connection->set($key, $value);
 			}
-		};
+			return $transaction->exec() === array_fill(0, count($keys), true);
+		}
+		$key = key($keys);
+		$value = current($keys);
+
+		if (!$ttl) {
+			return $this->connection->set($key, $value);
+		}
+		return $this->connection->setex($key, $ttl, $value);
 	}
 
 	/**
@@ -193,45 +189,37 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 * containing key/value pairs of the requested data.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning cached values keyed by cache keys
-	 *                 on successful read, keys which could not be read will
-	 *                 not be included in the results array.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
 	 */
 	public function read(array $keys) {
-		$connection =& $this->connection;
+		if (count($keys) > 1) {
+			$results = array();
+			$data = $this->connection->mGet($keys);
 
-		return function($self, $params) use (&$connection) {
-			if (count($params['keys']) > 1) {
-				$results = array();
-				$data = $connection->mGet($params['keys']);
+			foreach ($data as $key => $item) {
+				$key = $keys[$key];
 
-				foreach ($data as $key => $item) {
-					$key = $params['keys'][$key];
-
-					if ($item === false && !$connection->exists($key)) {
-						continue;
-					}
-					$results[$key] = $item;
+				if ($item === false && !$connection->exists($key)) {
+					continue;
 				}
-				return $results;
+				$results[$key] = $item;
 			}
-			$result = $connection->get($key = current($params['keys']));
-			return $result === false ? array() : array($key => $result);
-		};
+			return $results;
+		}
+		$result = $this->connection->get($key = current($keys));
+		return $result === false ? array() : array($key => $result);
 	}
 
 	/**
 	 * Will attempt to remove specified keys from the user space cache.
 	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
-	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete(array $keys) {
-		$connection =& $this->connection;
-
-		return function($self, $params) use (&$connection) {
-			return (boolean) $connection->delete($params['keys']);
-		};
+		return (boolean) $this->connection->delete($keys);
 	}
 
 	/**
@@ -241,16 +229,12 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 * operation will have no effect whatsoever. Redis chooses to not typecast values
 	 * to integers when performing an atomic decrement operation.
 	 *
-	 * @param string $key Key of numeric cache item to decrement
-	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return Closure Function returning item's new value on successful decrement, else `false`
+	 * @param string $key Key of numeric cache item to decrement.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		$connection =& $this->connection;
-
-		return function($self, $params) use (&$connection, $offset) {
-			return $connection->decr($params['key'], $offset);
-		};
+		return $this->connection->decr($key, $offset);
 	}
 
 	/**
@@ -261,15 +245,11 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 * to integers when performing an atomic increment operation.
 	 *
 	 * @param string $key Key of numeric cache item to increment
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return Closure Function returning item's new value on successful increment, else `false`
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		$connection =& $this->connection;
-
-		return function($self, $params) use (&$connection, $offset) {
-			return $connection->incr($params['key'], $offset);
-		};
+		return $this->connection->incr($key, $offset);
 	}
 
 	/**
