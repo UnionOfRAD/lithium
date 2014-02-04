@@ -603,6 +603,16 @@ class MemcacheTest extends \lithium\test\Unit {
 		$result = $this->_conn->get('primary:key1');
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testRespondsTo() {
+		$this->assertTrue($this->memcache->respondsTo('touch'));
+		$this->assertFalse($this->memcache->respondsTo('foobarbaz'));
+	}
+
+	public function testRespondsToParentCall() {
+		$this->assertTrue($this->memcache->respondsTo('applyFilter'));
+		$this->assertFalse($this->memcache->respondsTo('fooBarBaz'));
+	}
 }
 
 ?>
