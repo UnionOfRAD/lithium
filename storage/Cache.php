@@ -281,10 +281,6 @@ class Cache extends \lithium\core\Adaptable {
 	 *                 multiple items and an error occurs deleting any of the items the
 	 *                 whole operation fails and this method will return `false`.
 	 * @filter This method may be filtered.
-	 * @fixme Support for delete strategies should be removed in future
-	 *        versions as cache strategies don't make any use of them and
-	 *        the lack of use cases for manipulating the cache key on delete
-	 *        can be doubted.
 	 */
 	public static function delete($name, $key, array $options = array()) {
 		$options += array('conditions' => null, 'strategies' => true);
@@ -304,16 +300,10 @@ class Cache extends \lithium\core\Adaptable {
 		} else {
 			$keys = array($key);
 		}
+
 		$method = static::adapter($name)->delete($keys);
 		$filters = $settings[$name]['filters'];
 
-		if ($options['strategies']) {
-			foreach ($keys as &$key) {
-				$key = static::applyStrategies(__FUNCTION__, $name, $key, array(
-					'key' => $key, 'class' => __CLASS__
-				));
-			}
-		}
 		return static::_filter(__FUNCTION__, compact('keys'), $method, $filters);
 	}
 
