@@ -357,7 +357,7 @@ class XCacheTest extends \lithium\test\Unit {
 		$keys = array('key1');
 		$expected = array('key1' => 'test1');
 		$result = $adapter->delete($keys);
-		$this->assertEual($expected, $result);
+		$this->assertEqual($expected, $result);
 
 		$result = xcache_isset('key1');
 		$this->assertTrue($result);
