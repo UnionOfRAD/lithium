@@ -679,7 +679,12 @@ class Set {
 	/**
 	 * Normalizes a string or array list.
 	 *
-	 * @param mixed $list List to normalize.
+	 * {{{
+	 * Set::normalize('foo,bar'); // returns array('foo' => null, 'bar' => null);
+	 * Set::normalize(array('foo', 'bar' => 'baz'); // returns array('foo' => null, 'bar' => 'baz');
+	 * }}}
+	 *
+	 * @param string|array $list List to normalize.
 	 * @param boolean $assoc If `true`, `$list` will be converted to an associative array.
 	 * @param string $sep If `$list` is a string, it will be split into an array with `$sep`.
 	 * @param boolean $trim If `true`, separated strings will be trimmed.
