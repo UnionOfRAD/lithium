@@ -49,12 +49,14 @@ class Inspector {
 	);
 
 	/**
-	 * Will determine if a method can be called.
+	 * Determines if a given method can be called on an object/class.
 	 *
-	 * @param  string|object $class      Class to inspect.
-	 * @param  string        $method     Method name.
-	 * @param  bool          $internal   Interal call or not.
-	 * @return bool True if the method can be called or false otherwise.
+	 * @param string|object $class Class or instance to inspect.
+	 * @param string $method Name of the method.
+	 * @param boolean $internal Should be `true` if you want to check from inside the
+	 *                class/object. When `false` will also check for public visibility,
+	 *                defaults to `false`.
+	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public static function isCallable($object, $method, $internal = false) {
 		$methodExists = method_exists($object, $method);
