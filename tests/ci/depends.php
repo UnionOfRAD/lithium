@@ -50,7 +50,7 @@ class PhpExtensions {
 		}
 		static::_ini(array(
 			'opcache.enable=1',
-			'opache.enable_cli=1'
+			'opcache.enable_cli=1'
 		));
 	}
 
