@@ -12,7 +12,8 @@ foreach (explode(' ', getenv('PHP_EXT')) ?: array() as $extension) {
 }
 
 /**
- * Class to install native PHP extensions mainly for preparing test runs.
+ * Class to install native PHP extensions mainly for preparing test runs
+ * in continuous integration environments like Travis CI.
  */
 class PhpExtensions {
 
@@ -115,12 +116,20 @@ class PhpExtensions {
 	 * @param array $data INI settings to add.
 	 * @return void
 	 */
-	protected static function _ini($data) {
+	protected static function _ini(array $data) {
 		foreach ($data as $ini) {
 			static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
 		}
 	}
 
+	/**
+	 * Installs a package from pecl.
+	 *
+	 * @param string $name The name of the package to install.
+	 * @param string|null $forceVersion Optionally a specific version string, if not provided
+	 *                    will install the latest available package version..
+	 * @return void
+	 */
 	protected static function _pecl($name, $forceVersion = null) {
 		echo "=> installing from pecl\n";
 
@@ -132,7 +141,15 @@ class PhpExtensions {
 		echo "=> installed from pecl\n";
 	}
 
-	protected static function _build($data) {
+	/**
+	 * Builds a given item from source, by first retrieving
+	 * the source tarball then phpize'ing and making it.
+	 *
+	 * @param array $data An array with information about remote source location and special
+	 *              arguments that should be passed to `configure`.
+	 * @return void
+	 */
+	protected static function _build(array $data) {
 		echo "=> building\n";
 
 		static::_system(sprintf('wget %s > /dev/null 2>&1', $data['url']));
