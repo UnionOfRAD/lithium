@@ -24,11 +24,16 @@ php:
   - 5.3
   - 5.4
   - 5.5
+  - 5.6
 
 matrix:
   exclude:
     - php: 5.5
       env: PHP_EXT=apc
+    - php: 5.6
+      env: PHP_EXT=apc
+    - php: 5.6
+      env: PHP_EXT=xcache
 
 before_script:
   - php tests/ci/depends.php
