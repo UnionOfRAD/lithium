@@ -42,6 +42,7 @@ before_script:
   - cd ci
   - cp ../libraries/lithium/tests/ci/config/libraries.php config/libraries.php
   - cp ../libraries/lithium/tests/ci/config/bootstrap.php config/bootstrap.php
+  - php -i
 
 script:
   # Run all tests.
