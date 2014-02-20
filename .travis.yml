@@ -34,6 +34,8 @@ matrix:
       env: PHP_EXT=apc
     - php: 5.6
       env: PHP_EXT=xcache
+  # Mark build as failed as soon as one job failed.
+  fast_finish: true
 
 before_script:
   - php tests/ci/depends.php
