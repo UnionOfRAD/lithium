@@ -62,6 +62,48 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertTrue($file::enabled());
 	}
 
+	public function testSanitzeKeys() {
+		$result = $this->File->key(array('posts for bjœrn'));
+		$expected = array('posts_for_bj_rn_fdf03955');
+		$this->assertEqual($expected, $result);
+
+		$result = $this->File->key(array('posts-for-bjoern'));
+		$expected = array('posts-for-bjoern');
+		$this->assertEqual($expected, $result);
+
+		$result = $this->File->key(array('posts for Helgi Þorbjörnsson'));
+		$expected = array('posts_for_Helgi__orbj_rnsson_c7f8433a');
+		$this->assertEqual($expected, $result);
+
+		$result = $this->File->key(array('libraries.cache'));
+		$expected = array('libraries_cache_38235880');
+		$this->assertEqual($expected, $result);
+
+		$key = 'post_';
+		for ($i = 0; $i <= 127; $i++) {
+			$key .= chr($i);
+		}
+		$result = $this->File->key(array($key));
+		$expected  = 'post______________________________________________-__0123456789_______ABCDEF';
+		$expected .= 'GHIJKLMNOPQRSTUVWXYZ______abcdefghijklmnopqrstuvwxyz______38676d3e';
+		$expected = array($expected);
+		$this->assertEqual($expected, $result);
+
+		$key = str_repeat('0', 300);
+		$result = $this->File->key(array($key));
+		$expected = array(str_repeat('0', 246) . '_9e1830ed');
+		$this->assertEqual($expected, $result);
+		$this->assertTrue(strlen($result[0]) <= 255);
+
+		$adapter = new File(array('scope' => 'foo'));
+
+		$key = str_repeat('0', 300);
+		$result = $adapter->key(array($key));
+		$expected = array(str_repeat('0', 246 - strlen('_foo')) . '_9e1830ed');
+		$this->assertEqual($expected, $result);
+		$this->assertTrue(strlen($result[0]) <= 255);
+	}
+
 	public function testWrite() {
 		$key = 'key';
 		$data = 'data';

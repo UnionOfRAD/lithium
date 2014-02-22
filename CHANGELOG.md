@@ -19,7 +19,18 @@
   Please note that records/documents - fetched using this strategy - cannot be
   further constrained by conditions.
 
+- `Cache::key()` learned to generate safe per adapter cache keys. The method was
+   all in all made more flexible and feature rich as it added support for reusable
+   and key mutating generator functions as well as support for key generation
+   by passing any form of data.
+
 ### Changed
+
+- The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 
+  these methods supported callables as keys has been removed. Keys can now be of scalar 
+  type only.
+
+- `Cache::key()` now requires a cache configuration name as it's first argument.
 
 ### Deprecated
 
