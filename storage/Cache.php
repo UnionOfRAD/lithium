@@ -151,7 +151,6 @@ class Cache extends \lithium\core\Adaptable {
 	 */
 	public static function write($name, $key, $data = null, $expiry = null, array $options = array()) {
 		$options += array('conditions' => null, 'strategies' => true);
-		$settings = static::config();
 
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
@@ -181,7 +180,7 @@ class Cache extends \lithium\core\Adaptable {
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
 			return $adapter->write($params['keys'], $params['expiry']);
-		}, $settings[$name]['filters']);
+		});
 	}
 
 	/**
@@ -223,7 +222,6 @@ class Cache extends \lithium\core\Adaptable {
 	 */
 	public static function read($name, $key, array $options = array()) {
 		$options += array('conditions' => null, 'strategies' => true, 'write' => null);
-		$settings = static::config();
 
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
@@ -244,7 +242,7 @@ class Cache extends \lithium\core\Adaptable {
 
 		$results = static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
 			return $adapter->read($params['keys']);
-		}, $settings[$name]['filters']);
+		});
 
 		if ($write = $options['write']) {
 			$write = is_callable($write) ? $write() : $write;
@@ -291,7 +289,6 @@ class Cache extends \lithium\core\Adaptable {
 	 */
 	public static function delete($name, $key, array $options = array()) {
 		$options += array('conditions' => null, 'strategies' => true);
-		$settings = static::config();
 
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
@@ -312,7 +309,7 @@ class Cache extends \lithium\core\Adaptable {
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
 			return $adapter->delete($params['keys']);
-		}, $settings[$name]['filters']);
+		});
 	}
 
 	/**
@@ -330,7 +327,6 @@ class Cache extends \lithium\core\Adaptable {
 	 */
 	public static function increment($name, $key, $offset = 1, array $options = array()) {
 		$options += array('conditions' => null);
-		$settings = static::config();
 
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
@@ -345,7 +341,7 @@ class Cache extends \lithium\core\Adaptable {
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
 			return $adapter->increment($params['key'], $params['offset']);
-		}, $settings[$name]['filters']);
+		});
 	}
 
 	/**
@@ -363,7 +359,6 @@ class Cache extends \lithium\core\Adaptable {
 	 */
 	public static function decrement($name, $key, $offset = 1, array $options = array()) {
 		$options += array('conditions' => null);
-		$settings = static::config();
 
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
@@ -378,7 +373,7 @@ class Cache extends \lithium\core\Adaptable {
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
 			return $adapter->decrement($params['key'], $params['offset']);
-		}, $settings[$name]['filters']);
+		});
 	}
 
 	/**
