@@ -246,7 +246,7 @@ class Cache extends \lithium\core\Adaptable {
 			list($expiry, $value) = each($write);
 			$value = is_callable($value) ? $value() : $value;
 
-			foreach ($params['keys'] as $key) {
+			foreach ($keys as $key) {
 				if (isset($results[$key])) {
 					continue;
 				}
