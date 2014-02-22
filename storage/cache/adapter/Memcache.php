@@ -100,6 +100,30 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	}
 
 	/**
+	 * Generates safe cache keys.
+	 *
+	 * As per the protocol no control characters or whitespace is allowed
+	 * in the key name. There's also a limit of max. 250 characters which is
+	 * checked and enforced here. The limit is actually lowered to 250 minus
+	 * the length of an crc32b hash minus separator (241) minus scope length
+	 * minus separator (241 - x).
+	 *
+	 * @param array $keys The original keys.
+	 * @return array Keys modified and safe to use with adapter.
+	 */
+	public function key(array $keys) {
+		$length = 241 - ($this->_config['scope'] ? strlen($this->_config['scope']) + 1 : 0);
+
+		return array_map(
+			function($key) use ($length) {
+				$result = substr(preg_replace('/[[:cntrl:]\s]/u', '_', $key), 0, $length);
+				return $key !== $result ? $result . '_' . hash('crc32b', $key) : $result;
+			},
+			$keys
+		);
+	}
+
+	/**
 	 * Handles the actual `Memcached` connection and server connection
 	 * adding for the adapter constructor and sets prefix using the scope
 	 * if provided.

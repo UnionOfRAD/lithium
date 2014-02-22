@@ -34,6 +34,16 @@ namespace lithium\storage\cache;
 abstract class Adapter extends \lithium\core\Object {
 
 	/**
+	 * Generates safe cache keys.
+	 *
+	 * @param array $keys The original keys.
+	 * @return array Keys modified and safe to use with adapter.
+	 */
+	public function key(array $keys) {
+		return $keys;
+	}
+
+	/**
 	 * Write values to the cache. All items to be cached will receive an
 	 * expiration time of `$expiry`.
 	 *

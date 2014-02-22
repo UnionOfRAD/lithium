@@ -96,16 +96,85 @@ class Cache extends \lithium\core\Adaptable {
 	protected static $_strategies = 'strategy.storage.cache';
 
 	/**
-	 * Generates the cache key.
+	 * Generates one or multiple safe cache keys optionally adding a suffix
+	 * with a hash over the provided data. The hash value is generated in
+	 * an optimized way dependending on the type of data.
 	 *
-	 * @param mixed $key A string (or lambda/closure that evaluates to a string)
-	 *                    that will be used as the cache key.
-	 * @param array $data If a lambda/closure is used as a key and requires arguments,
-	 *                    pass them in here.
-	 * @return string The generated cache key.
+	 * Simple usage (in this case noop):
+	 * {{{
+	 * Cache::key('default', 'post');
+	 * // returns `'post'`
+	 *
+	 * Cache::key('default', array('posts', 'banners'));
+	 * // returns `array('posts', 'banners')`
+	 *
+	 * Cache::key('default', array('posts' => 'foo', 'banners' => 'bar));
+	 * // returns `array('posts' => 'foo', 'banners' => 'bar')`
+	 * }}}
+	 *
+	 * Make a key safe to use with adapter (exact result depends
+	 * on key constraints enforced by the selected adapter:
+	 * {{{
+	 * Cache::key('default', 'posts for bjœrn');
+	 * // returns `'posts_for_bj_rn_fdf03955'`
+	 *
+	 * Cache::key('default', 'posts for Helgi Þorbjörnsson');
+	 * // returns `'posts_for_Helgi__orbj_rnsson_c7f8433a'`
+	 * }}}
+	 *
+	 * Using additional scalar or non-scalar data to generate key:
+	 * {{{
+	 * Cache::key('default', 'post', 2);
+	 * // returns `'post_1ad5be0d'`
+	 *
+	 * Cache::key('default', 'post', array(2, 'json'));
+	 * // returns `'post_723f0e19'`
+	 *
+	 * Cache::key('default', array('posts', 'banners'), 'json');
+	 * // returns `array('posts_6b072545', 'banners_6b072545')`
+	 *
+	 * Cache::key('default', array('posts' => 'foo', 'banners' => 'bar'), 'json');
+	 * // returns `array('posts_38ec40e5' => 'foo', 'banners_38ec40e5' => 'bar')`
+	 * }}}
+	 *
+	 * Or with a resuable key generator function:
+	 * {{{
+	 * $posts[0] = array('id' => 1);
+	 * $posts[1] = array('id' => 2);
+	 *
+	 * $key = function($data) { return 'post_' . $data['id']};
+	 *
+	 * Cache::key('default', $key, $post[0]); // returns `'post_1'`
+	 * Cache::key('default', $key, $post[1]); // returns `'post_2'`
+	 * }}}
+	 *
+	 * @param string $name Configuration to be used for generating key/s. Currently unused.
+	 * @param mixed $key String or an array of strings that will be used as the cache key/s.
+	 *              Also accepts associative arrays where the key part will be modified, but
+	 *              the value left untouched. Also accepts a key generator function that
+	 *              is passed $data and must return a string that will be used as the key.
+	 * @param mixed $data Additional data to use when generating key. Can be any kind of type except
+	 *              a resource. The method will calculate a hash of the data and append that to
+	 *              the key/s. When $key is a function the data is passed to it instead.
+	 * @return string|array The generated cache key/s.
 	 */
-	public static function key($key, $data = array()) {
-		return is_object($key) ? $key($data) : $key;
+	public static function key($name, $key, $data = null) {
+		$adapter = static::adapter($name);
+
+		if (is_callable($key)) {
+			return current($adapter->key(array($key($data))));
+		}
+		$keys = ($isMulti = is_array($key)) ? $key : array($key);
+		$keys = ($hasData = !is_integer(key($keys))) ? array_keys($keys) : $keys;
+
+		if ($data !== null) {
+			$data = hash('crc32b', is_scalar($data) ? $data : serialize($data));
+			$keys = array_map(function($key) use ($data) { return $key .= "_{$data}"; }, $keys);
+		}
+		$keys = $adapter->key($keys);
+		$keys = $hasData ? array_combine($keys, array_values((array) $key)) : $keys;
+
+		return $isMulti ? $keys : current($keys);
 	}
 
 	/**
@@ -160,7 +229,6 @@ class Cache extends \lithium\core\Adaptable {
 		} catch (ConfigException $e) {
 			return false;
 		}
-		$key = static::key($key, $data);
 
 		if (is_array($key)) {
 			$keys = $key;
@@ -231,7 +299,6 @@ class Cache extends \lithium\core\Adaptable {
 		} catch (ConfigException $e) {
 			return false;
 		}
-		$key = static::key($key);
 
 		if ($isMulti = is_array($key)) {
 			$keys = $key;
@@ -298,7 +365,6 @@ class Cache extends \lithium\core\Adaptable {
 		} catch (ConfigException $e) {
 			return false;
 		}
-		$key = static::key($key);
 
 		if (is_array($key)) {
 			$keys = $key;
@@ -336,7 +402,6 @@ class Cache extends \lithium\core\Adaptable {
 		} catch (ConfigException $e) {
 			return false;
 		}
-		$key = static::key($key);
 		$params = compact('key', 'offset');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
@@ -368,7 +433,6 @@ class Cache extends \lithium\core\Adaptable {
 		} catch (ConfigException $e) {
 			return false;
 		}
-		$key = static::key($key);
 		$params = compact('key', 'offset');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {

@@ -33,6 +33,26 @@ class CacheTest extends \lithium\test\Integration {
 		return ($directory->isDir() && $directory->isReadable() && $directory->isWritable());
 	}
 
+	public function testFileAdapterSanitzeKey() {
+		Cache::config(array('default' => array('adapter' => 'File')));
+
+		$result = Cache::key('default', 'posts for bjœrn');
+		$expected = 'posts_for_bj_rn_fdf03955';
+		$this->assertEqual($expected, $result);
+
+		$result = Cache::key('default', 'posts-for-bjoern');
+		$expected = 'posts-for-bjoern';
+		$this->assertEqual($expected, $result);
+
+		$result = Cache::key('default', 'posts for Helgi Þorbjörnsson');
+		$expected = 'posts_for_Helgi__orbj_rnsson_c7f8433a';
+		$this->assertEqual($expected, $result);
+
+		$result = Cache::key('default', array('posts for bjœrn'));
+		$expected = array('posts_for_bj_rn_fdf03955');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testFileAdapterCacheConfig() {
 		$result = Cache::config();
 		$this->assertEmpty($result);
