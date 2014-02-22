@@ -8,6 +8,8 @@
 
 namespace lithium\storage;
 
+use lithium\core\ConfigException;
+
 /**
  * The `Cache` static class provides a consistent interface to configure and utilize the different
  * cache adapters included with Lithium, as well as your own adapters.
@@ -152,10 +154,12 @@ class Cache extends \lithium\core\Adaptable {
 		$options += array('conditions' => null, 'strategies' => true);
 		$settings = static::config();
 
-		if (!isset($settings[$name])) {
+		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-		if (is_callable($options['conditions']) && !$options['conditions']()) {
+		try {
+			$adapter = static::adapter($name);
+		} catch (ConfigException $e) {
 			return false;
 		}
 		$key = static::key($key, $data);
@@ -176,8 +180,8 @@ class Cache extends \lithium\core\Adaptable {
 		}
 		$params = compact('keys', 'expiry');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
-			return $self::adapter($name)->write($params['keys'], $params['expiry']);
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+			return $adapter->write($params['keys'], $params['expiry']);
 		}, $settings[$name]['filters']);
 	}
 
@@ -222,10 +226,12 @@ class Cache extends \lithium\core\Adaptable {
 		$options += array('conditions' => null, 'strategies' => true, 'write' => null);
 		$settings = static::config();
 
-		if (!isset($settings[$name])) {
+		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-		if (is_callable($options['conditions']) && !$options['conditions']()) {
+		try {
+			$adapter = static::adapter($name);
+		} catch (ConfigException $e) {
 			return false;
 		}
 		$key = static::key($key);
@@ -237,8 +243,8 @@ class Cache extends \lithium\core\Adaptable {
 		}
 		$params = compact('keys');
 
-		$results = static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
-			return $self::adapter($name)->read($params['keys']);
+		$results = static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+			return $adapter->read($params['keys']);
 		}, $settings[$name]['filters']);
 
 		if ($write = $options['write']) {
@@ -288,13 +294,14 @@ class Cache extends \lithium\core\Adaptable {
 		$options += array('conditions' => null, 'strategies' => true);
 		$settings = static::config();
 
-		if (!isset($settings[$name])) {
-			return false;
-		}
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-
+		try {
+			$adapter = static::adapter($name);
+		} catch (ConfigException $e) {
+			return false;
+		}
 		$key = static::key($key);
 
 		if ($isMulti = is_array($key)) {
@@ -302,8 +309,10 @@ class Cache extends \lithium\core\Adaptable {
 		} else {
 			$keys = array($key);
 		}
-		return static::_filter(__FUNCTION__, compact('keys'), function($self, $params) use ($name) {
-			return $self::adapter($name)->delete($params['keys']);
+		$params = compact('keys');
+
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+			return $adapter->delete($params['keys']);
 		}, $settings[$name]['filters']);
 	}
 
@@ -324,20 +333,19 @@ class Cache extends \lithium\core\Adaptable {
 		$options += array('conditions' => null);
 		$settings = static::config();
 
-		if (!isset($settings[$name])) {
+		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-		$conditions = $options['conditions'];
-
-		if (is_callable($conditions) && !$conditions()) {
+		try {
+			$adapter = static::adapter($name);
+		} catch (ConfigException $e) {
 			return false;
 		}
-
 		$key = static::key($key);
 		$params = compact('key', 'offset');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
-			return $self::adapter($name)->increment($params['key'], $params['offset']);
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+			return $adapter->increment($params['key'], $params['offset']);
 		}, $settings[$name]['filters']);
 	}
 
@@ -358,20 +366,19 @@ class Cache extends \lithium\core\Adaptable {
 		$options += array('conditions' => null);
 		$settings = static::config();
 
-		if (!isset($settings[$name])) {
+		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-		$conditions = $options['conditions'];
-
-		if (is_callable($conditions) && !$conditions()) {
+		try {
+			$adapter = static::adapter($name);
+		} catch (ConfigException $e) {
 			return false;
 		}
-
 		$key = static::key($key);
 		$params = compact('key', 'offset');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($name) {
-			return $self::adapter($name)->decrement($params['key'], $params['offset']);
+		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+			return $adapter->decrement($params['key'], $params['offset']);
 		}, $settings[$name]['filters']);
 	}
 
@@ -384,8 +391,11 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return boolean `true` on successful cleaning, `false` if failed partially or entirely.
 	 */
 	public static function clean($name) {
-		$settings = static::config();
-		return (isset($settings[$name])) ? static::adapter($name)->clean() : false;
+		try {
+			return static::adapter($name)->clean();
+		} catch (ConfigException $e) {
+			return false;
+		}
 	}
 
 	/**
@@ -396,8 +406,11 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return boolean `true` on successful clearing, `false` if failed partially or entirely.
 	 */
 	public static function clear($name) {
-		$settings = static::config();
-		return (isset($settings[$name])) ? static::adapter($name)->clear() : false;
+		try {
+			return static::adapter($name)->clear();
+		} catch (ConfigException $e) {
+			return false;
+		}
 	}
 }
 
