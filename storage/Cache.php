@@ -311,7 +311,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * Performs a increment operation on specified numeric cache item
 	 * from the given cache configuration.
 	 *
-	 * @param string $name
+	 * @param string $name Name of the cache configuration to use.
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
 	 * @param array $options Options for this method.
@@ -345,7 +345,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * Performs a decrement operation on specified numeric cache item
 	 * from the given cache configuration.
 	 *
-	 * @param string $name
+	 * @param string $name Name of the cache configuration to use.
 	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
 	 * @param array $options Options for this method.
