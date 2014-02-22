@@ -138,7 +138,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *                       denoting the seconds until the item expires (TTL). If no expiry time is
 	 *                       set, then the default cache expiration time set with the cache adapter
 	 *                       configuration will be used. To persist an item use `Cache::PERSIST`.
-	 * @param mixed $options Options for the method and strategies.
+	 * @param array $options Options for the method and strategies.
 	 *              - `'strategies'` _boolean_: Indicates if strategies should be used,
 	 *                 defaults to `true`.
 	 *              - `'conditions'` _mixed_: A function or item that must return or
@@ -205,7 +205,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $name Configuration to be used for reading.
 	 * @param mixed $key Key to uniquely identify the cache entry or an array of keys
 	 *                   for multikey-reads.
-	 * @param mixed $options Options for the method and strategies.
+	 * @param array $options Options for the method and strategies.
 	 *              - `'write'`: Allows for read-through caching see description for usage.
 	 *              - `'strategies'` _boolean_: Indicates if strategies should be used,
 	 *                 defaults to `true`.
@@ -276,7 +276,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * @param string $name The cache configuration to delete from.
 	 * @param mixed $key Key to be deleted or an array of keys to delete.
-	 * @param mixed $options Options for the method and strategies.
+	 * @param array $options Options for the method and strategies.
 	 *              - `'conditions'` _mixed_: A function or item that must return or
 	 *                evaluate to `true` in order to continue write operation.
 	 * @return boolean `true` on successful cache delete, `false` otherwise. When deleting
@@ -314,7 +314,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $name
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @param mixed $options Options for this method.
+	 * @param array $options Options for this method.
 	 *              - `'conditions'`: A function or item that must return or evaluate to
 	 *                                `true` in order to continue operation.
 	 * @return mixed Item's new value on successful increment, false otherwise.
@@ -348,7 +348,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param string $name
 	 * @param string $key Key of numeric cache item to decrement
 	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @param mixed $options Options for this method.
+	 * @param array $options Options for this method.
 	 *              - `'conditions'`: A function or item that must return or evaluate to
 	 *                                `true` in order to continue operation.
 	 * @return mixed Item's new value on successful decrement, false otherwise.
