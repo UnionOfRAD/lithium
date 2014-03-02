@@ -530,7 +530,7 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 *  _Please note that Lithium does not ship with a default XML handler, but one can be
 	 * configured easily._
 	 *
-	 * @see lithium\data\Collection::toArray()
+	 * @see lithium\util\Collection::toArray()
 	 * @see lithium\util\Collection::formats()
 	 * @see lithium\util\Collection::$_formats
 	 * @param string $format By default the only supported value is `'array'`. However, additional
@@ -540,9 +540,10 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 *          collection should be exported. Defaults to `false`, which uses the standard iterator
 	 *          interfaces. This is useful for exporting record sets, where records are lazy-loaded,
 	 *          and the collection must be iterated in order to fetch all objects.
-	 *        - `'indexed'` _boolean_: Allows to control how converted data is keyed. When set
+	 *        - `'indexed'` _boolean|null_: Allows to control how converted data is keyed. When set
 	 *          to `true` will force indexed conversion of the collection (the default) even if the
-	 *          collection has a parent. When `false` will convert without indexing.
+	 *          collection has a parent. When `false` will convert without indexing. Provide `null`
+	 *          as a value to this option to only index when the collection has no parent.
 	 * @return mixed The object converted to the value specified in `$format`; usually an array or
 	 *         string.
 	 */
