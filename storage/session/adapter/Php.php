@@ -25,22 +25,34 @@ use Closure;
 class Php extends \lithium\core\Object {
 
 	/**
-	 * Default ini settings for this session adapter.
+	 * Default ini settings for this session adapter. Will disabl cookie lifetime,
+	 * set cookies to HTTP only and the cache_limiter to `'nocache'`.
 	 *
-	 * @var array Keys are session ini settings, with the `session.` namespace.
+	 * @link http://php.net/session.configuration.php
+	 * @link http://php.net/session.configuration.php#ini.session.cookie-lifetime
+	 * @link http://php.net/session.configuration.php#ini.session.cookie-httponly
+	 * @link http://php.net/session.configuration.php#ini.session.cache-limiter
+	 * @var array Configuration options matching the pattern `'session.*'` are session
+	 *      ini settings. Please consult the PHP documentation for further information.
 	 */
 	protected $_defaults = array(
 		'session.cookie_lifetime' => '0',
-		'session.cookie_httponly' => true
+		'session.cookie_httponly' => true,
+		'session.cache_limiter' => 'nocache'
 	);
 
 	/**
-	 * Class constructor.
+	 * Class constructor. Takes care of setting appropriate configurations for this object. Also
+	 * sets session ini settings.
 	 *
-	 * Takes care of setting appropriate configurations for this object.
+	 * @see lithium\storage\session\adapter\Php::$_defaults
+	 * @param array $config Configuration options matching the pattern `'session.*'` are interpreted
+	 *              as session ini settings. Please consult the PHP documentation for further
+	 *              information.
+	 *              A few ini settings are set by default here and will overwrite those from
+	 *              your php.ini. To disable sending a cache limiter set `'session.cache_limiter'`
+	 *              to `false`.
 	 *
-	 * @param array $config Unified constructor configuration parameters. You can set
-	 *        the `session.*` PHP ini settings here as key/value pairs.
 	 */
 	public function __construct(array $config = array()) {
 		if (empty($config['session.name'])) {
@@ -82,7 +94,7 @@ class Php extends \lithium\core\Object {
 		if ($this->isStarted()) {
 			return true;
 		}
-		session_cache_limiter('nocache');
+		session_cache_limiter();
 		return session_start();
 	}
 
