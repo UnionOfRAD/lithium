@@ -496,8 +496,11 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	/**
 	 * Converts the data in the record set to a different format, i.e. an array.
 	 *
-	 * @param string $format currently only `array`
-	 * @param array $options
+	 * @param string $format Currently only `array`.
+	 * @param array $options Options for converting:
+	 *        - `'indexed'` _boolean_: Allows to control how converted data of nested collections
+	 *          is keyed. When set to `true` will force indexed conversion of nested collection
+	 *          data. By default `false` which will only index the root level.
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
