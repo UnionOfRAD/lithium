@@ -20,7 +20,6 @@ use Closure;
  * This adapter provides basic support for `write`, `read` and `delete`
  * session handling, as well as allowing these three methods to be filtered as
  * per the Lithium filtering system.
- *
  */
 class Php extends \lithium\core\Object {
 
@@ -65,7 +64,6 @@ class Php extends \lithium\core\Object {
 	 * Initialization of the session.
 	 *
 	 * @todo Split up into an _initialize() and a _start().
-	 * @return void
 	 */
 	protected function _init() {
 		if ($this->isStarted()) {
@@ -79,7 +77,7 @@ class Php extends \lithium\core\Object {
 				continue;
 			}
 			if (ini_set($key, $value) === false) {
-				throw new ConfigException("Could not initialize the session.");
+				throw new ConfigException('Could not initialize the session.');
 			}
 		}
 	}
@@ -87,8 +85,8 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Starts the session.
 	 *
-	 * @return boolean True if session successfully started (or has already been started),
-	 *         false otherwise.
+	 * @return boolean `true` if session successfully started
+	 *         (or has already been started), `false` otherwise.
 	 */
 	protected function _start() {
 		if ($this->isStarted()) {
@@ -101,12 +99,12 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Obtain the status of the session.
 	 *
-	 * @return boolean True if a session is currently started, False otherwise. If PHP5.4
-	 *                 then we know, if PHP5.3 then we cannot tell for sure if a session
+	 * @return boolean True if a session is currently started, False otherwise. If PHP 5.4
+	 *                 then we know, if PHP 5.3 then we cannot tell for sure if a session
 	 *                 has been closed.
 	 */
 	public function isStarted() {
-		if (function_exists("session_status")) {
+		if (function_exists('session_status')) {
 			return session_status() === PHP_SESSION_ACTIVE;
 		}
 		return isset($_SESSION) && session_id();
@@ -134,7 +132,7 @@ class Php extends \lithium\core\Object {
 	 */
 	public function check($key, array $options = array()) {
 		if (!$this->isStarted() && !$this->_start()) {
-			throw new RuntimeException("Could not start session.");
+			throw new RuntimeException('Could not start session.');
 		}
 		return function($self, $params) {
 			return Set::check($_SESSION, $params['key']);
@@ -151,7 +149,7 @@ class Php extends \lithium\core\Object {
 	 */
 	public function read($key = null, array $options = array()) {
 		if (!$this->isStarted() && !$this->_start()) {
-			throw new RuntimeException("Could not start session.");
+			throw new RuntimeException('Could not start session.');
 		}
 		return function($self, $params) {
 			$key = $params['key'];
@@ -182,7 +180,7 @@ class Php extends \lithium\core\Object {
 	 */
 	public function write($key, $value, array $options = array()) {
 		if (!$this->isStarted() && !$this->_start()) {
-			throw new RuntimeException("Could not start session.");
+			throw new RuntimeException('Could not start session.');
 		}
 		$class = __CLASS__;
 
@@ -196,14 +194,14 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Delete value from the session
 	 *
-	 * @param string $key The key to be deleted
+	 * @param string $key The key to be deleted.
 	 * @param array $options Options array. Not used for this adapter method.
-	 * @return Closure Function returning boolean `true` if the key no longer exists
-	 *         in the session, `false` otherwise
+	 * @return Closure Function returning boolean `true` if the key no longer
+	 *         exists in the session, `false` otherwise
 	 */
 	public function delete($key, array $options = array()) {
 		if (!$this->isStarted() && !$this->_start()) {
-			throw new RuntimeException("Could not start session.");
+			throw new RuntimeException('Could not start session.');
 		}
 		$class = __CLASS__;
 
@@ -217,12 +215,12 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Clears all keys from the session.
 	 *
-	 * @param array $options Options array. Not used fro this adapter method.
+	 * @param array $options Options array. Not used for this adapter method.
 	 * @return Closure Function returning boolean `true` on successful clear, `false` otherwise.
 	 */
 	public function clear(array $options = array()) {
 		if (!$this->isStarted() && !$this->_start()) {
-			throw new RuntimeException("Could not start session.");
+			throw new RuntimeException('Could not start session.');
 		}
 
 		return function($self, $params) {
@@ -233,11 +231,11 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Determines if PHP sessions are enabled.
 	 *
-	 * @return boolean Returns `true` if enabled (PHP session functionality can be disabled
-	 *         completely), `false` otherwise.
+	 * @return boolean Returns `true` if enabled (PHP session functionality
+	 *         can be disabled completely), `false` otherwise.
 	 */
 	public static function enabled() {
-		if (function_exists("session_status")) {
+		if (function_exists('session_status')) {
 			return session_status() !== PHP_SESSION_DISABLED;
 		}
 		return in_array('session', get_loaded_extensions());
@@ -246,10 +244,10 @@ class Php extends \lithium\core\Object {
 	/**
 	 * Overwrites session keys and values.
 	 *
-	 * @param array $old Reference to the array that needs to be overwritten. Will usually
-	 *        be `$_SESSION`.
+	 * @param array $old Reference to the array that needs to be
+	 *              overwritten. Will usually be `$_SESSION`.
 	 * @param array $new The data that should overwrite the keys/values in `$old`.
-	 * @return boolean Always `true`
+	 * @return boolean Always `true`.
 	 */
 	public function overwrite(&$old, $new) {
 		if (!empty($old)) {
