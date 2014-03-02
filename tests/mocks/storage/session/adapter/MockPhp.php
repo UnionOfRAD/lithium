@@ -9,7 +9,7 @@ class MockPhp extends \lithium\storage\session\adapter\Php {
 	 *
 	 * @return boolean false.
 	 */
-	public static function isStarted() {
+	public function isStarted() {
 		return false;
 	}
 
@@ -18,7 +18,7 @@ class MockPhp extends \lithium\storage\session\adapter\Php {
 	 *
 	 * @return boolean false.
 	 */
-	protected static function _start() {
+	protected function _start() {
 		return false;
 	}
 }

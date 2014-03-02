@@ -56,7 +56,7 @@ class Php extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
-		if (static::isStarted()) {
+		if ($this->isStarted()) {
 			return true;
 		}
 		$config = $this->_config;
@@ -78,8 +78,8 @@ class Php extends \lithium\core\Object {
 	 * @return boolean True if session successfully started (or has already been started),
 	 *         false otherwise.
 	 */
-	protected static function _start() {
-		if (static::isStarted()) {
+	protected function _start() {
+		if ($this->isStarted()) {
 			return true;
 		}
 		session_cache_limiter('nocache');
@@ -93,7 +93,7 @@ class Php extends \lithium\core\Object {
 	 *                 then we know, if PHP5.3 then we cannot tell for sure if a session
 	 *                 has been closed.
 	 */
-	public static function isStarted() {
+	public function isStarted() {
 		if (function_exists("session_status")) {
 			return session_status() === PHP_SESSION_ACTIVE;
 		}
@@ -106,7 +106,7 @@ class Php extends \lithium\core\Object {
 	 * @param string $key Optional. If specified, sets the session ID to the value of `$key`.
 	 * @return mixed Session ID, or `null` if the session has not been started.
 	 */
-	public static function key($key = null) {
+	public function key($key = null) {
 		if ($key !== null) {
 			return session_id($key);
 		}
@@ -120,8 +120,8 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return Closure Function returning boolean `true` if the key exists, `false` otherwise.
 	 */
-	public static function check($key, array $options = array()) {
-		if (!static::isStarted() && !static::_start()) {
+	public function check($key, array $options = array()) {
+		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params) {
@@ -137,8 +137,8 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return Closure Function returning data in the session if successful, `false` otherwise.
 	 */
-	public static function read($key = null, array $options = array()) {
-		if (!static::isStarted() && !static::_start()) {
+	public function read($key = null, array $options = array()) {
+		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		return function($self, $params) {
@@ -168,8 +168,8 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public static function write($key, $value, array $options = array()) {
-		if (!static::isStarted() && !static::_start()) {
+	public function write($key, $value, array $options = array()) {
+		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		$class = __CLASS__;
@@ -189,8 +189,8 @@ class Php extends \lithium\core\Object {
 	 * @return Closure Function returning boolean `true` if the key no longer exists
 	 *         in the session, `false` otherwise
 	 */
-	public static function delete($key, array $options = array()) {
-		if (!static::isStarted() && !static::_start()) {
+	public function delete($key, array $options = array()) {
+		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException("Could not start session.");
 		}
 		$class = __CLASS__;
@@ -209,7 +209,7 @@ class Php extends \lithium\core\Object {
 	 * @return Closure Function returning boolean `true` on successful clear, `false` otherwise.
 	 */
 	public function clear(array $options = array()) {
-		if (!static::isStarted() && !static::_start()) {
+		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException("Could not start session.");
 		}
 
@@ -239,7 +239,7 @@ class Php extends \lithium\core\Object {
 	 * @param array $new The data that should overwrite the keys/values in `$old`.
 	 * @return boolean Always `true`
 	 */
-	public static function overwrite(&$old, $new) {
+	public function overwrite(&$old, $new) {
 		if (!empty($old)) {
 			foreach ($old as $key => $value) {
 				if (!isset($new[$key])) {
