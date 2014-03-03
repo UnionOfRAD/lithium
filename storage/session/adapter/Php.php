@@ -134,7 +134,7 @@ class Php extends \lithium\core\Object {
 		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException('Could not start session.');
 		}
-		return function($self, $params) {
+		return function($class, $params) {
 			return Set::check($_SESSION, $params['key']);
 		};
 	}
@@ -182,7 +182,8 @@ class Php extends \lithium\core\Object {
 		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException('Could not start session.');
 		}
-		return function($self, $params) {
+		$self = $this;
+		return function($class, $params) use ($self) {
 			return $self->overwrite(
 				$_SESSION, Set::insert($_SESSION, $params['key'], $params['value'])
 			);
@@ -201,7 +202,8 @@ class Php extends \lithium\core\Object {
 		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException('Could not start session.');
 		}
-		return function($self, $params) {
+		$self = $this;
+		return function($class, $params) use ($self) {
 			$key = $params['key'];
 			$self->overwrite($_SESSION, Set::remove($_SESSION, $key));
 			return !Set::check($_SESSION, $key);
@@ -218,7 +220,7 @@ class Php extends \lithium\core\Object {
 		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException('Could not start session.');
 		}
-		return function($self, $params) {
+		return function($class, $params) {
 			return session_destroy();
 		};
 	}
