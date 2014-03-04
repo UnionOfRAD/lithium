@@ -84,7 +84,7 @@ class Request extends \lithium\core\Object {
 	 */
 	protected function _init() {
 		$this->_env += (array) $_SERVER + (array) $_ENV;
-		$this->_env['working'] = getcwd() ?: null;
+		$this->_env['working'] = str_replace('\\', '/', getcwd()) ?: null;
 		$argv = (array) $this->env('argv');
 		$this->_env['script'] = array_shift($argv);
 		$this->_env['PLATFORM'] = 'CLI';
