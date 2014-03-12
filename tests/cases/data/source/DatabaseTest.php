@@ -145,6 +145,33 @@ class DatabaseTest extends \lithium\test\Unit {
 
 		$result = $this->_db->value('now', array('type' => 'time'));
 		$this->assertPattern("/^'\d{2}:\d{2}:\d{2}'/", $result);
+
+		$result = $this->_db->value('', array('type' => 'date'));
+		$this->assertIdentical('NULL', $result);
+
+		$result = $this->_db->value('', array('type' => 'time'));
+		$this->assertIdentical('NULL', $result);
+
+		$result = $this->_db->value('', array('type' => 'timestamp'));
+		$this->assertIdentical('NULL', $result);
+
+		$result = $this->_db->value('', array('type' => 'datetime'));
+		$this->assertIdentical('NULL', $result);
+
+		$result = $this->_db->value('', array(
+			'type' => 'date', 'default' => '2012-05-25'
+		));
+		$this->assertIdentical("'2012-05-25'", $result);
+
+		$result = $this->_db->value('', array(
+			'type' => 'time', 'default' => '08:00:00'
+		));
+		$this->assertIdentical("'08:00:00'", $result);
+
+		$result = $this->_db->value('', array(
+			'type' => 'timestamp', 'default' => 'now'
+		));
+		$this->assertPattern("/^'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'/", $result);
 	}
 
 	public function testValueByIntrospect() {

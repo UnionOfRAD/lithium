@@ -297,9 +297,11 @@ class Relationship extends \lithium\core\Object {
 			},
 			static::LINK_KEY => function($object, $relationship, $options) {
 				$model = $relationship->to();
-				$query = $relationship->query($object);
+				if (!$query = $relationship->query($object)) {
+					return;
+				}
 				$method = ($relationship->type() === "hasMany") ? 'all' : 'first';
-				return $model::$method(Set::merge($query, $options));
+				return $model::$method(Set::merge((array) $query, (array) $options));
 			},
 			static::LINK_KEY_LIST  => function($object, $relationship, $options) {
 				$model = $relationship->to();

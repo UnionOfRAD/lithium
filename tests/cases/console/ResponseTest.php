@@ -77,7 +77,12 @@ class ResponseTest extends \lithium\test\Unit {
 		$response = new Response(array('output' => fopen($this->streams['output'], 'w+')));
 		$response->styles(array('heading' => "\033[1;36m"));
 		$response->output('{:heading}ok');
-		$this->assertEqual("\033[1;36mok", file_get_contents($this->streams['output']));
+
+		$expected = "\033[1;36mok";
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			$expected = 'ok';
+		}
+		$this->assertEqual($expected, file_get_contents($this->streams['output']));
 	}
 
 	public function testError() {

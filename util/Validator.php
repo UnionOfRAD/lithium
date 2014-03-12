@@ -136,7 +136,7 @@ use Closure;
  * UTF-8 encoded input in mind. A default PHP binary and an enabled Lithium
  * g11n bootstrap will make these rules work correctly in any case. Should you
  * ever experience odd behavior following paragraph with implementation
- * details might help you to track to the cause.
+ * details might help you to track down the cause.
  *
  * The rules `alphaNumeric` and `money` rely on additional functionality of
  * PCRE to validate UTF-8 encoded strings. As no PCRE feature detection is
@@ -552,7 +552,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * 	- `$value` _mixed_: This is the actual value to be validated (as in the above example).
 	 * 	- `$format` _string_: Often, validation rules come in multiple "formats", for example:
 	 * 	  postal codes, which vary by country or region. Defining multiple formats allows you to
-	 * 	  retian flexibility in how you validate data. In cases where a user's country of origin
+	 * 	  retain flexibility in how you validate data. In cases where a user's country of origin
 	 * 	  is known, the appropriate validation rule may be selected. In cases where it is not
 	 * 	  known, the value of `$format` may be `'any'`, which should pass if any format matches.
 	 * 	  In cases where validation rule formats are not mutually exclusive, the value may be
@@ -658,14 +658,11 @@ class Validator extends \lithium\core\StaticObject {
 				$regexPassed = (is_string($check) && preg_match($check, $value));
 				$closurePassed = (is_object($check) && $check($value, $format, $options));
 
-				if (!$options['all'] && ($regexPassed || $closurePassed)) {
+				if ($regexPassed || $closurePassed) {
 					return true;
 				}
-				if ($options['all'] && (!$regexPassed && !$closurePassed)) {
-					return false;
-				}
 			}
-			return $options['all'];
+			return false;
 		};
 	}
 }

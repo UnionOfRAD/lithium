@@ -8,45 +8,48 @@
 
 namespace lithium\storage\cache\adapter;
 
+use lithium\storage\Cache;
 use Redis as RedisCore;
 use Closure;
 
 /**
- * A Redis (phpredis) cache adapter implementation.
+ * A Redis cache adapter implementation using `phpredis`.
  *
- * This adapter uses the `phpredis` PHP extension, which can be found here:
- * https://github.com/nicolasff/phpredis
+ * This adapter does not aim to provide a full implementation of the Redis API, but rather
+ * only a subset of its features that are useful in the context of a semi-persistent cache.
  *
- * The Redis cache adapter is meant to be used through the `Cache` interface,
- * which abstracts away key generation, adapter instantiation and filter
- * implementation. This adapter does not aim to provide a full implementation of the
- * Redis API, but rather only a subset of its features that are useful in the context of a
- * semi-persistent cache.
+ * This adapter depends on the `phpredis` PHP extension and on a running
+ * instance of Redis server being available.
  *
- * A simple configuration of this adapter can be accomplished in `config/bootstrap/cache.php`
- * as follows:
+ * This adapter natively handles atomic multi-key reads/writes/deletes and supports atomic
+ * increment/decrement operations as well as clearing the entire cache. Scope support is
+ * natively available. Delegation of method calls to the connection object is available.
+ *
+ * Serialization of values is not handled natively, the `Serializer` strategy must be used
+ * if you plan to store non-scalar values or need to keep type on values. Full cached item
+ * persistence is not guaranteed it depends on the how the Redis server is actually configured
+ * and accessed.
+ *
+ * A simple configuration can be accomplished as follows:
  *
  * {{{
  * Cache::config(array(
  *     'cache-config-name' => array(
  *         'adapter' => 'Redis',
- *         'host' => '127.0.0.1:6379'
+ *         'host' => '127.0.0.1:6379',
+ *         'strategies => array('Serializer')
  *     )
  * ));
  * }}}
  *
- * The 'host' key accepts a string argument in the format of ip:port where the Redis
- * server can be found.
+ * The `'host'` key accepts a string argument in the format of ip:port where
+ * the Redis server can be found.
  *
- * This Redis adapter provides basic support for `write`, `read`, `delete`
- * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system.
- *
+ * @link https://github.com/nicolasff/phpredis
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\Cache::adapter()
- * @link https://github.com/nicolasff/phpredis GitHub: PhpRedis Extension
  */
-class Redis extends \lithium\core\Object {
+class Redis extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Redis object instance used by this adapter.
@@ -56,21 +59,20 @@ class Redis extends \lithium\core\Object {
 	public $connection;
 
 	/**
-	 * Object constructor
-	 *
-	 * Instantiates the `Redis` object and connects it to the configured server.
+	 * Class constructor. Instantiates the `Redis` object and connects it to the configured server.
 	 *
 	 * @todo Implement configurable & optional authentication
 	 * @see lithium\storage\Cache::config()
-	 * @see lithium\storage\cache\adapter\Redis::_ttl()
-	 * @param array $config Configuration parameters for this cache adapter.
-	 *        These settings are indexed by name and queryable through `Cache::config('name')`. The
-	 *        available settings for this adapter are as follows:
+	 * @see lithium\storage\cache\adapter\Redis::write()
+	 * @param array $config Configuration for this cache adapter. These settings are queryable
+	 *        through `Cache::config('name')`. The available options are as follows:
+	 *        - `'scope'` _string_: Scope which will prefix keys; per default not set.
+	 *        - `'expiry'` _mixed_: The default expiration time for cache values, if no value
+	 *          is otherwise set. Can be either a `strtotime()` compatible tring or TTL in
+	 *          seconds. To indicate items should not expire use `Cache::PERSIST`. Defaults
+	 *          to `+1 hour`.
 	 *        - `'host'` _string_: A string in the form of `'host:port'` indicating the Redis server
 	 *          to connect to. Defaults to `'127.0.0.1:6379'`.
-	 *        - `'expiry'` _mixed_: Default expiration for cache values written through this
-	 *          adapter. Defaults to `'+1 hour'`. For acceptable values, see the `$expiry` parameter
-	 *          of `Redis::_ttl()`.
 	 *        - `'persistent'` _boolean_: Indicates whether the adapter should use a persistent
 	 *          connection when attempting to connect to the Redis server. If `true`, it will
 	 *          attempt to reuse an existing connection when connecting, and the connection will
@@ -79,6 +81,7 @@ class Redis extends \lithium\core\Object {
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'host' => '127.0.0.1:6379',
+			'scope' => null,
 			'expiry' => '+1 hour',
 			'persistent' => false
 		);
@@ -86,7 +89,8 @@ class Redis extends \lithium\core\Object {
 	}
 
 	/**
-	 * Initialize the Redis connection object and connect to the Redis server.
+	 * Initialize the Redis connection object, connect to the Redis server and sets
+	 * prefix using the scope if provided.
 	 *
 	 * @return void
 	 */
@@ -97,122 +101,125 @@ class Redis extends \lithium\core\Object {
 		list($ip, $port) = explode(':', $this->_config['host']);
 		$method = $this->_config['persistent'] ? 'pconnect' : 'connect';
 		$this->connection->{$method}($ip, $port);
+
+		if ($this->_config['scope']) {
+			$this->connection->setOption(RedisCore::OPT_PREFIX, "{$this->_config['scope']}:");
+		}
 	}
 
 	/**
-	 * Dispatches a not-found method to the Redis connection object.
+	 * Dispatches a not-found method to the connection object. That way, one can
+	 * easily use a custom method on the adapter. If you want to know, what methods
+	 * are available, have a look at the documentation of phpredis.
 	 *
-	 * That way, one can easily use a custom method on that redis adapter like that:
+	 * {{{Cache::adapter('redis')->methodName($argument);}}}
 	 *
-	 * {{{Cache::adapter('named-of-redis-config')->methodName($argument);}}}
-	 *
-	 * If you want to know, what methods are available, have a look at the readme of phprdis.
 	 * One use-case might be to query possible keys, e.g.
 	 *
 	 * {{{Cache::adapter('redis')->keys('*');}}}
 	 *
-	 * @link https://github.com/nicolasff/phpredis GitHub: PhpRedis Extension
-	 * @param string $method Name of the method to call
-	 * @param array $params Parameter list to use when calling $method
-	 * @return mixed Returns the result of the method call
+	 * @link https://github.com/nicolasff/phpredis
+	 * @param string $method Name of the method to call.
+	 * @param array $params Parameter list to use when calling $method.
+	 * @return mixed Returns the result of the method call.
 	 */
 	public function __call($method, $params = array()) {
 		return call_user_func_array(array(&$this->connection, $method), $params);
 	}
 
 	/**
-	 * Custom check to determine if our given magic methods can be responded to.
+	 * Determine if our given magic methods can be responded to.
 	 *
-	 * @param  string  $method     Method name.
-	 * @param  bool    $internal   Interal call or not.
-	 * @return bool
+	 * @param string $method Method name.
+	 * @param boolean $internal Interal call or not.
+	 * @return boolean
 	 */
-	public function respondsTo($method, $internal = 0) {
-		$parentRespondsTo = parent::respondsTo($method, $internal);
-		return $parentRespondsTo || is_callable(array($this->connection, $method));
+	public function respondsTo($method, $internal = false) {
+		if (parent::respondsTo($method, $internal)) {
+			return true;
+		}
+		return is_callable(array($this->connection, $method));
 	}
 
 	/**
-	 * Sets expiration time for cache keys
+	 * Write values to the cache. All items to be cached will receive an
+	 * expiration time of `$expiry`.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @param mixed $expiry A `strtotime()`-compatible string indicating when the cached item
-	 *              should expire, or a Unix timestamp.
-	 * @return boolean Returns `true` if expiry could be set for the given key, `false` otherwise.
+	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
+	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
+	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
-	protected function _ttl($key, $expiry) {
-		return $this->connection->expireAt($key, is_int($expiry) ? $expiry : strtotime($expiry));
-	}
+	public function write(array $keys, $expiry = null) {
+		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
 
-	/**
-	 * Write value(s) to the cache
-	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @param mixed $value The value to be cached
-	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
-	 *        then the default cache expiration time set with the cache configuration will be used.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
-	 */
-	public function write($key, $value = null, $expiry = null) {
-		$connection =& $this->connection;
-		$expiry = ($expiry) ?: $this->_config['expiry'];
-		$_self =& $this;
+		if (!$expiry || $expiry === Cache::PERSIST) {
+			$ttl = null;
+		} elseif (is_int($expiry)) {
+			$ttl = $expiry;
+		} else {
+			$ttl = strtotime($expiry) - time();
+		}
 
-		return function($self, $params) use (&$_self, &$connection, $expiry) {
-			if (is_array($params['key'])) {
-				$expiry = $params['data'];
+		if (count($keys) > 1) {
+			if (!$ttl) {
+				return $this->connection->mset($keys);
+			}
+			$transaction = $this->connection->multi();
 
-				if ($connection->mset($params['key'])) {
-					$ttl = array();
-
-					if ($expiry) {
-						foreach ($params['key'] as $k => $v) {
-							$ttl[$k] = $_self->invokeMethod('_ttl', array($k, $expiry));
-						}
-					}
-					return $ttl;
+			foreach ($keys as $key => $value) {
+				if (!$this->connection->setex($key, $ttl, $value)) {
+					$transaction->discard();
+					return false;
 				}
 			}
-			if ($result = $connection->set($params['key'], $params['data'])) {
-				if ($expiry) {
-					return $_self->invokeMethod('_ttl', array($params['key'], $expiry));
+			return $transaction->exec() === array_fill(0, count($keys), true);
+		}
+		$key = key($keys);
+		$value = current($keys);
+
+		if (!$ttl) {
+			return $this->connection->set($key, $value);
+		}
+		return $this->connection->setex($key, $ttl, $value);
+	}
+
+	/**
+	 * Read values from the cache. Will attempt to return an array of data
+	 * containing key/value pairs of the requested data.
+	 *
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
+	 */
+	public function read(array $keys) {
+		if (count($keys) > 1) {
+			$results = array();
+			$data = $this->connection->mGet($keys);
+
+			foreach ($data as $key => $item) {
+				$key = $keys[$key];
+
+				if ($item === false && !$connection->exists($key)) {
+					continue;
 				}
-				return $result;
+				$results[$key] = $item;
 			}
-		};
+			return $results;
+		}
+		$result = $this->connection->get($key = current($keys));
+		return $result === false ? array() : array($key => $result);
 	}
 
 	/**
-	 * Read value(s) from the cache
+	 * Will attempt to remove specified keys from the user space cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return Closure Function returning cached value if successful, `false` otherwise
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
-	public function read($key) {
-		$connection =& $this->connection;
-
-		return function($self, $params) use (&$connection) {
-			$key = $params['key'];
-
-			if (is_array($key)) {
-				return $connection->getMultiple($key);
-			}
-			return $connection->get($key);
-		};
-	}
-
-	/**
-	 * Delete value from the cache
-	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise
-	 */
-	public function delete($key) {
-		$connection =& $this->connection;
-
-		return function($self, $params) use (&$connection) {
-			return (boolean) $connection->delete($params['key']);
-		};
+	public function delete(array $keys) {
+		return (boolean) $this->connection->delete($keys);
 	}
 
 	/**
@@ -222,16 +229,12 @@ class Redis extends \lithium\core\Object {
 	 * operation will have no effect whatsoever. Redis chooses to not typecast values
 	 * to integers when performing an atomic decrement operation.
 	 *
-	 * @param string $key Key of numeric cache item to decrement
-	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return Closure Function returning item's new value on successful decrement, else `false`
+	 * @param string $key Key of numeric cache item to decrement.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		$connection =& $this->connection;
-
-		return function($self, $params) use (&$connection, $offset) {
-			return $connection->decr($params['key'], $offset);
-		};
+		return $this->connection->decr($key, $offset);
 	}
 
 	/**
@@ -242,21 +245,21 @@ class Redis extends \lithium\core\Object {
 	 * to integers when performing an atomic increment operation.
 	 *
 	 * @param string $key Key of numeric cache item to increment
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return Closure Function returning item's new value on successful increment, else `false`
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		$connection =& $this->connection;
-
-		return function($self, $params) use (&$connection, $offset) {
-			return $connection->incr($params['key'], $offset);
-		};
+		return $this->connection->incr($key, $offset);
 	}
 
 	/**
-	 * Clears user-space cache
+	 * Clears entire database by flushing it. All cache keys using the
+	 * configuration but *without* honoring the scope are removed.
 	 *
-	 * @return mixed True on successful clear, false otherwise
+	 * The behavior and result when removing a single key
+	 * during this process fails is unknown.
+	 *
+	 * @return boolean `true` on successful clearing, `false` otherwise.
 	 */
 	public function clear() {
 		return $this->connection->flushdb();
@@ -264,7 +267,7 @@ class Redis extends \lithium\core\Object {
 
 	/**
 	 * Determines if the Redis extension has been installed and
-	 * that there is a redis-server available
+	 * that there is a Redis server available.
 	 *
 	 * @return boolean Returns `true` if the Redis extension is enabled, `false` otherwise.
 	 */

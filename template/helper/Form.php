@@ -455,7 +455,11 @@ class Form extends \lithium\template\Helper {
 		if (is_array($name)) {
 			return $this->_fields($name, $options);
 		}
-		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+		$method = __FUNCTION__;
+		if(isset($options['type']) && !empty($this->_config['field-' . $options['type']])) {
+			$method = 'field-' . $options['type'];
+		}
+		list(, $options, $template) = $this->_defaults($method, $name, $options);
 		$defaults = array(
 			'label' => null,
 			'type' => isset($options['list']) ? 'select' : 'text',

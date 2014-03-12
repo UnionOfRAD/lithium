@@ -8,109 +8,127 @@
 
 namespace lithium\storage\cache\adapter;
 
+if (!class_exists('\lithium\storage\cache\Adapter')) {
+	$message  = 'The file (`' . __FILE__  . '`) has probably been included directly within ';
+	$message .= 'the bootstrap process. Due to its dependencies it should be (auto-)loaded ';
+	$message .= 'i.e. through the `Libraries` class exclusively. Please update your app\'s ';
+	$message .= 'bootstrap to the most recent version or remove the line where this file was ';
+	$message .= 'originally included.';
+	trigger_error($message, E_USER_DEPRECATED);
+
+	require_once LITHIUM_LIBRARY_PATH . '/lithium/storage/cache/Adapter.php';
+}
+
 use Closure;
+use lithium\storage\Cache;
 
 /**
- * An Alternative PHP Cache (APC) cache adapter implementation.
+ * An Alternative PHP Cache (APC) cache adapter implementation leveraging the user-
+ * space caching features (not the opcode caching features) of the cache.
  *
- * The APC cache adapter is meant to be used through the `Cache` interface,
- * which abstracts away key generation, adapter instantiation and filter
- * implementation.
+ * This adapter requires `pecl/apc` or `pecl/apcu` to be installed. The extension
+ * and user-space caching must be enabled according to the extension documention.
  *
- * A simple configuration of this adapter can be accomplished in `config/bootstrap/cache.php`
- * as follows:
+ * This adapter natively handles multi-key reads/writes/deletes, natively
+ * provides serialization features and supports atomic increment/decrement
+ * operations as well as clearing the entire user-space cache.
+ *
+ * Cached item persistence is not guaranteed. Infrequently used items will
+ * be evicted from the cache when there is no room to store new ones. Scope
+ * is available but not natively.
+ *
+ * A simple configuration can be accomplished as follows:
  *
  * {{{
  * Cache::config(array(
- *     'cache-config-name' => array('adapter' => 'Apc')
+ *     'default' => array('adapter' => 'Apc')
  * ));
  * }}}
  *
- * This APC adapter provides basic support for `write`, `read`, `delete`
- * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system. Additionally,
- * This adapter defines several methods that are _not_ implemented in other
- * adapters, and are thus non-portable - see the documentation for `Cache`
- * as to how these methods should be accessed.
- *
- * This adapter supports multi-key `write`, `read` and `delete` operations.
- *
- * Learn more about APC in the [PHP APC manual](http://php.net/manual/en/book.apc.php).
- *
+ * @link http://pecl.php.net/package/APCu
+ * @link http://pecl.php.net/package/APC
+ * @link http://php.net/manual/en/book.apc.php
  * @see lithium\storage\Cache::key()
  */
-class Apc extends \lithium\core\Object {
+class Apc extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Class constructor.
 	 *
-	 * @param array $config
+	 * @see lithium\storage\Cache::config()
+	 * @param array $config Configuration for this cache adapter. These settings are queryable
+	 *        through `Cache::config('name')`. The available options are as follows:
+	 *        - `'scope'` _string_: Scope which will prefix keys; per default not set.
+	 *        - `'expiry'` _mixed_: The default expiration time for cache values, if no value
+	 *          is otherwise set. Can be either a `strtotime()` compatible tring or TTL in
+	 *          seconds. To indicate items should not expire use `Cache::PERSIST`. Defaults
+	 *          to `+1 hour`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'prefix' => '',
+			'scope' => null,
 			'expiry' => '+1 hour'
 		);
 		parent::__construct($config + $defaults);
 	}
 
 	/**
-	 * Write value(s) to the cache.
+	 * Write values to the cache. All items to be cached will receive an
+	 * expiration time of `$expiry`.
 	 *
-	 * This adapter method supports multi-key write. By specifying `$key` as an
-	 * associative array of key/value pairs, `$data` is ignored and all keys that
-	 * are cached will receive an expiration time of `$expiry`.
-	 *
-	 * @param string|array $key The key to uniquely identify the cached item.
-	 * @param mixed $data The value to be cached.
-	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
-	 *        then the default cache expiration time set with the cache configuration will be used.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
+	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
+	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $data, $expiry = null) {
-		$expiry = ($expiry) ?: $this->_config['expiry'];
+	public function write(array $keys, $expiry = null) {
+		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
 
-		return function($self, $params) use ($expiry) {
-			$cachetime = (is_int($expiry) ? $expiry : strtotime($expiry)) - time();
-			$key = $params['key'];
-
-			if (is_array($key)) {
-				return apc_store($key, $cachetime);
-			}
-			return apc_store($params['key'], $params['data'], $cachetime);
-		};
+		if (!$expiry || $expiry === Cache::PERSIST) {
+			$ttl = 0;
+		} elseif (is_int($expiry)) {
+			$ttl = $expiry;
+		} else {
+			$ttl = strtotime($expiry) - time();
+		}
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		return apc_store($keys, null, $ttl) === array();
 	}
 
 	/**
-	 * Read value(s) from the cache.
-	 *
-	 * This adapter method supports multi-key reads. By specifying `$key` as an
-	 * array of key names, this adapter will attempt to return an array of data
+	 * Read values from the cache. Will attempt to return an array of data
 	 * containing key/value pairs of the requested data.
 	 *
-	 * @param string|array $key The key to uniquely identify the cached item.
-	 * @return Closure Function returning cached value on successful read, `false` otherwise.
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
 	 */
-	public function read($key) {
-		return function($self, $params) {
-			return apc_fetch($params['key']);
-		};
+	public function read(array $keys) {
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		$results = apc_fetch($keys);
+
+		if ($this->_config['scope']) {
+			$results = $this->_removeScopePrefix($this->_config['scope'], $results);
+		}
+		return $results;
 	}
 
 	/**
-	 * Delete value from the cache.
+	 * Will attempt to remove specified keys from the user space cache.
 	 *
-	 * This adapter method supports multi-key deletes. By specifynig `$key` as an
-	 * array of key names, this adapter method will attempt to remove these keys
-	 * from the user space cache.
-	 *
-	 * @param string|array $key The key to uniquely identify the cached item.
-	 * @return Closure Function returning `true` on successful delete, `false` otherwise.
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
-	public function delete($key) {
-		return function($self, $params) {
-			return apc_delete($params['key']);
-		};
+	public function delete(array $keys) {
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		return apc_delete($keys) === array();
 	}
 
 	/**
@@ -120,14 +138,14 @@ class Apc extends \lithium\core\Object {
 	 * If the item's value is not numeric, the decrement operation has no effect
 	 * on the key - it retains it's original non-integer value.
 	 *
-	 * @param string $key Key of numeric cache item to decrement
-	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return Closure Function returning item's new value on successful decrement, else `false`
+	 * @param string $key Key of numeric cache item to decrement.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		return function($self, $params) use ($offset) {
-			return apc_dec($params['key'], $offset);
-		};
+		return apc_dec(
+			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
+		);
 	}
 
 	/**
@@ -138,19 +156,23 @@ class Apc extends \lithium\core\Object {
 	 * on the key - it retains it's original non-integer value.
 	 *
 	 * @param string $key Key of numeric cache item to increment
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return Closure Function returning item's new value on successful increment, else `false`
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		return function($self, $params) use ($offset) {
-			return apc_inc($params['key'], $offset);
-		};
+		return apc_inc(
+			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
+		);
 	}
 
 	/**
-	 * Clears user-space cache
+	 * Clears entire user-space cache by flushing it. All cache keys
+	 * using the configuration but *without* honoring the scope are removed.
 	 *
-	 * @return mixed True on successful clear, false otherwise
+	 * The behavior and result when removing a single key
+	 * during this process fails is unknown.
+	 *
+	 * @return boolean `true` on successful clearing, `false` otherwise.
 	 */
 	public function clear() {
 		return apc_clear_cache('user');
@@ -160,7 +182,7 @@ class Apc extends \lithium\core\Object {
 	 * Determines if the APC extension has been installed and
 	 * if the userspace cache is available.
 	 *
-	 * @return boolean `true` if enabled, `false` otherwise
+	 * @return boolean `true` if enabled, `false` otherwise.
 	 */
 	public static function enabled() {
 		$loaded = extension_loaded('apc');

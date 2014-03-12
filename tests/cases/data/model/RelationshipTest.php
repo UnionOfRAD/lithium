@@ -9,8 +9,8 @@
 namespace lithium\tests\cases\data\model;
 
 use lithium\data\Connections;
-use lithium\tests\mocks\data\model\MockDatabase;
 use lithium\data\model\Relationship;
+use lithium\tests\mocks\data\model\MockDatabase;
 use lithium\tests\mocks\data\model\MockGallery;
 use lithium\tests\mocks\data\model\MockImage;
 

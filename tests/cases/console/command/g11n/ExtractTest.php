@@ -50,9 +50,12 @@ class ExtractTest extends \lithium\test\Unit {
 		rewind($this->command->request->input);
 	}
 
+	/**
+	 * Added realpath() to fix issues when lithium is linked in to the app's libraries directory.
+	 */
 	public function testInit() {
 		$command = new Extract();
-		$this->assertEqual(realpath(Libraries::get(true, 'path')), $command->source);
+		$this->assertEqual(realpath(Libraries::get(true, 'path')), realpath($command->source));
 		$this->assertEqual(Libraries::get(true, 'resources') . '/g11n', $command->destination);
 	}
 
@@ -119,6 +122,233 @@ EOD;
 		$this->assertPattern($expected, $result);
 
 		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:2#';
+		$this->assertPattern($expected, $result);
+
+		$result = $this->command->response->error;
+		$this->assertEmpty($result);
+	}
+
+	public function testContextsMultiple() {
+		$file = "{$this->_path}/source/a.html.php";
+		$data = <<<EOD
+<h2>Balls</h2>
+<?=\$t('Ball', array('context' => 'Spherical object')); ?>
+<?=\$t('Ball', array('context' => 'Social gathering')); ?>
+<?=\$t('Ball'); ?>
+EOD;
+		file_put_contents($file, $data);
+
+		$configs = Catalog::config();
+		$configKey1 = key($configs);
+		next($configs);
+		$configKey2 = key($configs);
+		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$result = $this->command->run();
+		$expected = 0;
+		$this->assertIdentical($expected, $result);
+
+		$expected = '/.*Yielded 3 item.*/';
+		$result = $this->command->response->output;
+		$this->assertPattern($expected, $result);
+
+		$file = "{$this->_path}/destination/message_default.pot";
+		$this->assertFileExists($file);
+
+		$result = file_get_contents($file);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:2';
+		$expected .= "\n";
+		$expected .= 'msgctxt "Spherical object"';
+		$expected .= "\n";
+		$expected .= 'msgid "Ball"#';
+		$this->assertPattern($expected, $result);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:3';
+		$expected .= "\n";
+		$expected .= 'msgctxt "Social gathering"';
+		$expected .= "\n";
+		$expected .= 'msgid "Ball"#';
+		$this->assertPattern($expected, $result);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:4';
+		$expected .= "\n";
+		$expected .= 'msgid "Ball"#';
+		$this->assertPattern($expected, $result);
+
+		$result = $this->command->response->error;
+		$this->assertEmpty($result);
+	}
+
+	public function testContextsWithMultipleOccurences() {
+		$file = "{$this->_path}/source/a.html.php";
+		$data = <<<EOD
+<h2>Balls</h2>
+<?=\$t('Ball', array('context' => 'Spherical object')); ?>
+<?=\$t('Ball', array('context' => 'Social gathering')); ?>
+<?=\$t('Ball'); ?>
+<?=\$t('Ball', array('context' => 'Social gathering')); ?>
+EOD;
+		file_put_contents($file, $data);
+
+		$configs = Catalog::config();
+		$configKey1 = key($configs);
+		next($configs);
+		$configKey2 = key($configs);
+		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$result = $this->command->run();
+		$expected = 0;
+		$this->assertIdentical($expected, $result);
+
+		$expected = '/.*Yielded 3 item.*/';
+		$result = $this->command->response->output;
+		$this->assertPattern($expected, $result);
+
+		$file = "{$this->_path}/destination/message_default.pot";
+		$this->assertFileExists($file);
+
+		$result = file_get_contents($file);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:3';
+		$expected .= "\n";
+		$expected .= '.*/tmp/tests/source(/|\\\\)a.html.php:5';
+		$expected .= "\n";
+		$expected .= 'msgctxt "Social gathering"';
+		$expected .= "\n";
+		$expected .= 'msgid "Ball"#';
+		$this->assertPattern($expected, $result);
+
+		$result = $this->command->response->error;
+		$this->assertEmpty($result);
+	}
+
+	public function testContextsWithOtherParams() {
+		$file = "{$this->_path}/source/a.html.php";
+		$data = <<<EOD
+<?=\$t('Ball', array('context' => 'Social gathering', 'foo' => 'bar')); ?>
+<?=\$t('Ball', array('foo' => 123, 'bar' => baz(), 'context' => 'Spherical object')); ?>
+EOD;
+		file_put_contents($file, $data);
+
+		$configs = Catalog::config();
+		$configKey1 = key($configs);
+		next($configs);
+		$configKey2 = key($configs);
+		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$result = $this->command->run();
+		$expected = 0;
+		$this->assertIdentical($expected, $result);
+
+		$expected = '/.*Yielded 2 item.*/';
+		$result = $this->command->response->output;
+		$this->assertPattern($expected, $result);
+
+		$file = "{$this->_path}/destination/message_default.pot";
+		$this->assertFileExists($file);
+
+		$result = file_get_contents($file);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:1';
+		$expected .= "\n";
+		$expected .= 'msgctxt "Social gathering"';
+		$expected .= "\n";
+		$expected .= 'msgid "Ball"#';
+		$this->assertPattern($expected, $result);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:2';
+		$expected .= "\n";
+		$expected .= 'msgctxt "Spherical object"';
+		$expected .= "\n";
+		$expected .= 'msgid "Ball"#';
+		$this->assertPattern($expected, $result);
+
+		$result = $this->command->response->error;
+		$this->assertEmpty($result);
+	}
+
+	public function testContextsWithAmbiguousContextTokens() {
+		$file = "{$this->_path}/source/a.html.php";
+		$data = <<<EOD
+<?=\$t('Ball', array('context', 'foo' => 'context', 'context' => 'Spherical object')); ?>
+<?=\$t('Ball', array('foo' => \$t('context'), 'context' => 'Social gathering')); ?>
+EOD;
+		file_put_contents($file, $data);
+
+		$configs = Catalog::config();
+		$configKey1 = key($configs);
+		next($configs);
+		$configKey2 = key($configs);
+		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$result = $this->command->run();
+		$expected = 0;
+		$this->assertIdentical($expected, $result);
+
+		$file = "{$this->_path}/destination/message_default.pot";
+		$this->assertFileExists($file);
+
+		$result = file_get_contents($file);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:1';
+		$expected .= "\n";
+		$expected .= 'msgctxt "Spherical object"';
+		$expected .= "\n";
+		$expected .= 'msgid "Ball"#';
+		$this->assertPattern($expected, $result);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:2';
+		$expected .= "\n";
+		$expected .= 'msgctxt "Social gathering"';
+		$expected .= "\n";
+		$expected .= 'msgid "Ball"#';
+		$this->assertPattern($expected, $result);
+
+		$result = $this->command->response->error;
+		$this->assertEmpty($result);
+	}
+
+	public function testContextsNested() {
+		$file = "{$this->_path}/source/a.html.php";
+		$data = <<<EOD
+<?=\$t('Robin, {:a}', array('a' => \$t('Michael, {:b}', array('b' => \$t('Bruce', array('context' => 'Lee')), 'context' => 'Jackson')), 'context' => 'Hood')); ?>
+EOD;
+		file_put_contents($file, $data);
+
+		$configs = Catalog::config();
+		$configKey1 = key($configs);
+		next($configs);
+		$configKey2 = key($configs);
+		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$result = $this->command->run();
+		$expected = 0;
+		$this->assertIdentical($expected, $result);
+
+		$expected = '/.*Yielded 3 item.*/';
+		$result = $this->command->response->output;
+		$this->assertPattern($expected, $result);
+
+		$file = "{$this->_path}/destination/message_default.pot";
+		$this->assertFileExists($file);
+
+		$result = file_get_contents($file);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:1';
+		$expected .= "\n";
+		$expected .= 'msgctxt "Hood"';
+		$expected .= "\n";
+		$expected .= 'msgid "Robin, {:a}"#';
+		$this->assertPattern($expected, $result);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:1';
+		$expected .= "\n";
+		$expected .= 'msgctxt "Jackson"';
+		$expected .= "\n";
+		$expected .= 'msgid "Michael, {:b}"#';
+		$this->assertPattern($expected, $result);
+
+		$expected = '#/tmp/tests/source(/|\\\\)a.html.php:1';
+		$expected .= "\n";
+		$expected .= 'msgctxt "Lee"';
+		$expected .= "\n";
+		$expected .= 'msgid "Bruce"#';
 		$this->assertPattern($expected, $result);
 
 		$result = $this->command->response->error;

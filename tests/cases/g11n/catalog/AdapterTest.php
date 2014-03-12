@@ -370,6 +370,79 @@ class AdapterTest extends \lithium\test\Unit {
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testMergeWithContexts() {
+		$item = array(
+			'id' => 'test',
+			'ids' => array('singular' => 'a')
+		);
+		$data = $this->adapter->merge(array(), $item);
+
+		$item = array(
+			'id' => 'test',
+			'ids' => array('singular' => 'X', 'plural' => 'b')
+		);
+		$data = $this->adapter->merge($data, $item);
+
+		$item = array(
+			'id' => 'test',
+			'ids' => array('singular' => 'a'),
+			'context' => 'A'
+		);
+		$data = $this->adapter->merge($data, $item);
+
+		$item = array(
+			'id' => 'test',
+			'ids' => array('singular' => 'X', 'plural' => 'b'),
+			'context' => 'A'
+		);
+		$data = $this->adapter->merge($data, $item);
+
+		$item = array(
+			'id' => 'test',
+			'ids' => array('singular' => 'a'),
+			'context' => 'B'
+		);
+		$data = $this->adapter->merge($data, $item);
+
+		$item = array(
+			'id' => 'test',
+			'ids' => array('singular' => 'X', 'plural' => 'b'),
+			'context' => 'B'
+		);
+		$data = $this->adapter->merge($data, $item);
+
+		$expected = array(
+			'test' => array(
+				'id' => 'test',
+				'ids' => array('singular' => 'X', 'plural' => 'b'),
+				'translated' => null,
+				'flags' => array(),
+				'comments' => array(),
+				'occurrences' => array()
+			),
+			'test|A' => array(
+				'id' => 'test',
+				'ids' => array('singular' => 'X', 'plural' => 'b'),
+				'translated' => null,
+				'flags' => array(),
+				'comments' => array(),
+				'occurrences' => array(),
+				'context' => 'A'
+			),
+			'test|B' => array(
+				'id' => 'test',
+				'ids' => array('singular' => 'X', 'plural' => 'b'),
+				'translated' => null,
+				'flags' => array(),
+				'comments' => array(),
+				'occurrences' => array(),
+				'context' => 'B'
+			)
+		);
+		$result = $this->adapter->merge($data, $item);
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

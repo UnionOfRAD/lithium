@@ -9,22 +9,28 @@
 namespace lithium\storage\cache\adapter;
 
 use Closure;
+use lithium\storage\Cache;
 
 /**
- * An XCache opcode cache adapter implementation.
+ * An XCache cache adapter implementation leveraging the user-
+ * space caching features (not the opcode caching features).
  *
- * The XCache adapter is meant to be used through the `Cache` interface,
- * which abstracts away key generation, adapter instantiation and filter
- * implementation.
+ * This adapter requires the `xcache` extensionto be installed. The extension
+ * and user-space caching must be enabled according to the extension documention.
  *
- * A simple configuration of this adapter can be accomplished in `config/bootstrap/cache.php`
- * as follows:
+ * This adapter natively handles multi-key reads/writes/deletes, natively
+ * provides serialization features and supports atomic increment/decrement
+ * operations as well as clearing the entire user-space cache.
+ *
+ * Cached item persistence is not guaranteed. Infrequently used items will
+ * be evicted from the cache when there is no room to store new ones. Scope
+ * support is available but not natively.
+ *
+ * A simple configuration can be accomplished as follows:
  *
  * {{{
- * use lithium\storage\Cache;
- *
  * Cache::config(array(
- *     'cache-config-name' => array(
+ *     'default' => array(
  *         'adapter' => 'XCache',
  *         'username' => 'user',
  *         'password' => 'pass'
@@ -33,69 +39,116 @@ use Closure;
  * }}}
  *
  * Note that the `username` and `password` configuration fields are only required if
- * you wish to use `XCache::clear()` - all other methods do not require XCache administrator
- * credentials.
+ * you wish to use `XCache::clear()` - all other methods do not require XCache
+ * administrator credentials.
  *
- * This XCache adapter provides basic support for `write`, `read`, `delete`
- * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system.
- *
- * This adapter does *not* allow multi-key operations for any methods.
- *
+ * @link http://xcache.lighttpd.net/
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\cache\adapter
  */
-class XCache extends \lithium\core\Object {
+class XCache extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Class constructor.
 	 *
-	 * @param array $config
+	 * @see lithium\storage\Cache::config()
+	 * @param array $config Configuration for this cache adapter. These settings are queryable
+	 *        through `Cache::config('name')`. The available options are as follows:
+	 *        - `'scope'` _string_: Scope which will prefix keys; per default not set.
+	 *        - `'expiry'` _mixed_: The default expiration time for cache values, if no value
+	 *          is otherwise set. Can be either a `strtotime()` compatible tring or TTL in
+	 *          seconds. To indicate items should not expire use `Cache::PERSIST`. Defaults
+	 *          to `+1 hour`.
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('prefix' => '', 'expiry' => '+1 hour');
+		$defaults = array(
+			'scope' => null,
+			'expiry' => '+1 hour'
+		);
 		parent::__construct($config + $defaults);
 	}
 
 	/**
-	 * Write value(s) to the cache
+	 * Write values to the cache. All items to be cached will receive an
+	 * expiration time of `$expiry`.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @param mixed $data The value to be cached
-	 * @param null|string $expiry A strtotime() compatible cache time. If no expiry time is set,
-	 *        then the default cache expiration time set with the cache configuration will be used.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * Note that this is not an atomic operation when using multiple keys.
+	 *
+	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
+	 * @param string|integer $expiry A `strtotime()` compatible cache time or TTL in seconds.
+	 *                       To persist an item use `\lithium\storage\Cache::PERSIST`.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $data, $expiry = null) {
-		$expiry = ($expiry) ?: $this->_config['expiry'];
+	public function write(array $keys, $expiry = null) {
+		$expiry = $expiry || $expiry === Cache::PERSIST ? $expiry : $this->_config['expiry'];
 
-		return function($self, $params) use ($expiry) {
-			return xcache_set($params['key'], $params['data'], strtotime($expiry) - time());
-		};
+		if (!$expiry || $expiry === Cache::PERSIST) {
+			$ttl = 0;
+		} elseif (is_int($expiry)) {
+			$ttl = $expiry;
+		} else {
+			$ttl = strtotime($expiry) - time();
+		}
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		foreach ($keys as $key => $value) {
+			if (!xcache_set($key, $value, $ttl)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
-	 * Read value(s) from the cache
+	 * Read values from the cache. Will attempt to return an array of data
+	 * containing key/value pairs of the requested data.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return Closure Function returning cached value if successful, `false` otherwise
+	 * Note that this is not an atomic operation when using multiple keys.
+	 *
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
 	 */
-	public function read($key) {
-		return function($self, $params) {
-			return xcache_get($params['key']);
-		};
+	public function read(array $keys) {
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		$results = array();
+
+		foreach ($keys as $key) {
+			$result = xcache_get($key);
+
+			if ($result === null && !xcache_isset($key)) {
+				continue;
+			}
+			$results[$key] = $result;
+		}
+		if ($this->_config['scope']) {
+			$results = $this->_removeScopePrefix($this->_config['scope'], $results);
+		}
+		return $results;
 	}
 
 	/**
-	 * Delete value from the cache
+	 * Will attempt to remove specified keys from the user space cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item
-	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise
+	 * Note that this is not an atomic operation when using multiple keys.
+	 *
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
-	public function delete($key) {
-		return function($self, $params) {
-			return xcache_unset($params['key']);
-		};
+	public function delete(array $keys) {
+		if ($this->_config['scope']) {
+			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
+		}
+		foreach ($keys as $key) {
+			if (!xcache_unset($key)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -105,14 +158,14 @@ class XCache extends \lithium\core\Object {
 	 * If the item's value is not numeric, it is treated as if the value were 0.
 	 * It is possible to decrement a value into the negative integers.
 	 *
-	 * @param string $key Key of numeric cache item to decrement
-	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return Closure Function returning item's new value on successful decrement, else `false`
+	 * @param string $key Key of numeric cache item to decrement.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		return function($self, $params) use ($offset) {
-			return xcache_dec($params['key'], $offset);
-		};
+		return xcache_dec(
+			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
+		);
 	}
 
 	/**
@@ -122,26 +175,27 @@ class XCache extends \lithium\core\Object {
 	 * If the item's value is not numeric, it is treated as if the value were 0.
 	 *
 	 * @param string $key Key of numeric cache item to increment
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return Closure Function returning item's new value on successful increment, else `false`
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		return function($self, $params) use ($offset) {
-			extract($params);
-			return xcache_inc($params['key'], $offset);
-		};
+		return xcache_inc(
+			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
+		);
 	}
 
 	/**
-	 * Clears user-space cache.
+	 * Clears entire user-space cache by flushing it. All cache keys
+	 * using the configuration but *without* honoring the scope are removed.
 	 *
-	 * This method requires valid XCache admin credentials to be set when the
-	 * adapter was configured, due to the use of the xcache_clear_cache admin method.
+	 * This method requires valid XCache admin credentials to be set when the adapter
+	 * was configured, due to the use of the xcache_clear_cache admin method. If the
+	 * `xcache.admin.enable_auth` ini setting is set to `Off`, no credentials required.
 	 *
-	 * If the xcache.admin.enable_auth ini setting is set to "Off", no credentials
-	 * required.
+	 * The behavior and result when removing a single key
+	 * during this process fails is unknown.
 	 *
-	 * @return mixed True on successful clear, false otherwise.
+	 * @return boolean `true` on successful clearing, `false` otherwise.
 	 */
 	public function clear() {
 		$admin = (ini_get('xcache.admin.enable_auth') === "On");
@@ -178,7 +232,7 @@ class XCache extends \lithium\core\Object {
 	 * Determines if the XCache extension has been installed and
 	 * if the userspace cache is available.
 	 *
-	 * @return boolean True if enabled, false otherwise.
+	 * @return boolean `true` if enabled, `false` otherwise.
 	 */
 	public static function enabled() {
 		return extension_loaded('xcache');

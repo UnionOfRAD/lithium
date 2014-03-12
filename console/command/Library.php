@@ -42,7 +42,7 @@ class Library extends \lithium\console\Command {
 	 *
 	 * @var string
 	 */
-	public $server = 'lab.lithify.me';
+	public $server = 'lab.li3.me';
 
 	/**
 	 * The port for the server.

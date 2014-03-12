@@ -90,6 +90,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	public function testBadConnection() {
 		$db = new MongoDb(array('host' => null, 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
+		$this->expectException('/getaddrinfo failed/');
 		$this->assertFalse($db->connect());
 		$this->assertTrue($db->disconnect());
 	}
@@ -571,9 +572,40 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual(array('_id' => 'group'), $result->key());
 	}
 
+	public function testRelationshipGenerationWithPluralNamingConvention() {
+		$from = 'lithium\tests\mocks\data\MockComments';
+		$to = 'lithium\tests\mocks\data\MockPosts';
+
+		$from::config(array(
+			'meta' => array('connection' => 'mockconn', 'key' => '_id'),
+			'schema' => new Schema(array('fields' => array('mockPost' => 'id')))
+		));
+		$to::config(array(
+			'meta' => array('connection' => 'mockconn', 'key' => '_id'),
+			'schema' => new Schema(array('fields' => array('mockComments' => 'id')))
+		));
+
+		$result = $this->_db->relationship($from, 'belongsTo', 'MockPosts');
+
+		$expected = compact('to', 'from') + array(
+			'name' => 'MockPosts',
+			'type' => 'belongsTo',
+			'key' => array(
+				'mockPost' => '_id'
+			),
+			'link' => 'key',
+			'fields' => true,
+			'fieldName' => 'mockPost',
+			'constraints' => array(),
+			'init' => true
+		);
+		$this->assertEqual($expected, $result->data());
+	}
+
 	public function testCreateNoConnectionException() {
 		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
+		$this->expectException('/getaddrinfo failed/');
 		$result = $db->create(null);
 	}
 

@@ -76,7 +76,6 @@ class Integration extends \lithium\test\Unit {
 		restore_error_handler();
 		return !$failed;
 	}
-
 }
 
 ?>

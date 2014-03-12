@@ -995,6 +995,15 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertNotEmpty($result);
 	}
 
+	/**
+	 * Verifies that if validating with _any_, any format for
+	 * a rule will match. See issue #888 for more information.
+	 */
+	public function testCheckAny() {
+		$this->assertTrue(Validator::isCreditCard('4242424242424242', 'visa'));
+		$this->assertTrue(Validator::isCreditCard('4242424242424242'));
+	}
+
 	public function testCheckMultipleHasErrors() {
 		$rules = array(
 			'title' => 'please enter a title',
@@ -1211,7 +1220,6 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::respondsTo('isCreditCard'));
 		$this->assertFalse(Validator::respondsTo('isFoobar'));
 	}
-
 }
 
 ?>

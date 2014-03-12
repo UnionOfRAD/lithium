@@ -63,10 +63,10 @@ class LibraryTest extends \lithium\test\Unit {
 	}
 
 	public function testConfigServer() {
-		$result = $this->library->config('server', 'lab.lithify.me');
+		$result = $this->library->config('server', 'lab.li3.me');
 		$this->assertNotEmpty($result);
 
-		$expected = array('servers' => array('lab.lithify.me' => true));
+		$expected = array('servers' => array('lab.li3.me' => true));
 		$result = json_decode(file_get_contents($this->testConf), true);
 		$this->assertEqual($expected, $result);
 
@@ -77,7 +77,7 @@ class LibraryTest extends \lithium\test\Unit {
 		));
 
 		$expected = array('servers' => array(
-			'lab.lithify.me' => true
+			'lab.li3.me' => true
 		));
 		$result = $this->library->config();
 		$this->assertEqual($expected, $result);
@@ -470,13 +470,13 @@ class LibraryTest extends \lithium\test\Unit {
 
 		$expected = <<<EOD
 --------------------------------------------------------------------------------
-lab.lithify.me > li3_lab
+lab.li3.me > li3_lab
 --------------------------------------------------------------------------------
 the li3 plugin client/server
 Version: 1.0
 Created: 2009-11-30
 --------------------------------------------------------------------------------
-lab.lithify.me > library_test_plugin
+lab.li3.me > library_test_plugin
 --------------------------------------------------------------------------------
 an li3 plugin example
 Version: 1.0

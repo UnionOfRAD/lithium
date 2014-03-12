@@ -1,6 +1,6 @@
 #### You asked for a better framework. Here it is.
 
-Lithium is the fast, flexible and most RAD development framework for PHP 5.3 and up.
+Lithium is fast, flexible and the most RAD development framework for PHP 5.3 and up.
 
 ##### A framework of firsts
 
@@ -14,7 +14,7 @@ Lithium is the first framework to give you the best of both worlds, without comp
 
 #### Technology
 
-Lithium takes full advantage of the latest PHP 5.3 features, including namespaces, late static binding and closures. Lithium's innovative [method filter system](http://lithify.me/docs/lithium/util/collection/Filters) makes extensive use of closures and anonymous functions to allow application developers to "wrap" framework method calls, intercepting parameters before, and return values after.
+Lithium takes full advantage of the latest PHP 5.3 features, including namespaces, late static binding and closures. Lithium's innovative [method filter system](http://li3.me/docs/lithium/util/collection/Filters) makes extensive use of closures and anonymous functions to allow application developers to "wrap" framework method calls, intercepting parameters before, and return values after.
 
 Lithium also complies with the PHP 5.3 namespacing standard, allowing you to easily integrate other PHP 5.3 standard libraries and frameworks with Lithium applications, and vice-versa.
 

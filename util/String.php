@@ -217,6 +217,10 @@ class String {
 	 * ); // returns 'My name is Bob and I am 65 years old.'
 	 * }}}
 	 *
+	 * Please note that optimization have applied to this method and parts of the code
+	 * may look like it can refactored or removed but in fact this is part of the applied
+	 * optimization. Please check the history for this section of code before refactoring
+	 *
 	 * @param string $str A string containing variable place-holders.
 	 * @param array $data A key, value array where each key stands for a place-holder variable
 	 *                     name to be replaced with value.
@@ -232,7 +236,6 @@ class String {
 	 *          (defaults to `'/(?<!\\)\:%s/'`. Please note that this option takes precedence over
 	 *          all other options except `'clean'`.
 	 * @return string
-	 * @todo Optimize this
 	 */
 	public static function insert($str, array $data, array $options = array()) {
 		$defaults = array(
@@ -259,14 +262,15 @@ class String {
 			$replace = array();
 
 			foreach ($data as $key => $value) {
-				$value = (is_array($value) || $value instanceof Closure) ? '' : $value;
+				if (!is_scalar($value)) {
+					$object = $value;
+					$value  = '';
 
-				try {
-					if (is_object($value) && method_exists($value, '__toString')) {
-						$value = (string) $value;
+					if (is_object($object) && method_exists($object, '__toString')) {
+						try {
+							$value = (string) $object;
+						} catch (Exception $e) {}
 					}
-				} catch (Exception $e) {
-					$value = '';
 				}
 				$replace["{$options['before']}{$key}{$options['after']}"] = $value;
 			}

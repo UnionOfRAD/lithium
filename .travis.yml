@@ -4,34 +4,92 @@ services:
   - mongodb
   - memcache
   - couchdb
+  - redis
 
 env:
-  - OPCODE_CACHE=apc;DB=mysql
-  - OPCODE_CACHE=apc;DB=pgsql
-  - OPCODE_CACHE=apc;DB=sqlite
-  - OPCODE_CACHE=apc;DB=mongodb
-  - OPCODE_CACHE=apc;DB=couchdb
+  # Run one build with as many enabled and compatible extensions as possible.
+  # Keep in-sync with potential partial excludes in the `matrix` section.
+  - PHP_EXT="memcached redis"
+  # Test compatiblity with opcode caches in isolation.
+  - PHP_EXT=apc
+  - PHP_EXT=xcache
+  - PHP_EXT=opcache
+  # Test each database in isolation.
+  - DB=mysql
+  - DB=pgsql
+  - DB=sqlite
+  - DB=mongodb PHP_EXT=mongo
+  - DB=couchdb
 
 php:
   - 5.3
   - 5.4
   - 5.5
+  - 5.6
+  - hhvm
+
+matrix:
+  exclude:
+    - php: 5.5
+      env: PHP_EXT=apc
+    - php: 5.6
+      env: PHP_EXT=apc
+    - php: 5.6
+      env: PHP_EXT=xcache
+    # HHVM doesn't bundle xcache, pgsql, mongo, pgsql extensions yet.
+    # See https://github.com/facebook/hhvm/wiki/Extensions
+    - php: hhvm
+      env: PHP_EXT=opcache
+    - php: hhvm
+      env: PHP_EXT=xcache
+    - php: hhvm
+      env: DB=pgsql
+    - php: hhvm
+      env: DB=mongodb PHP_EXT=mongo
+    # Partially excluding redis, see include where we add back memcached.
+    # Must be kept in sync with relevant line in `env` section.
+    - php: hhvm
+      env: PHP_EXT="memcached redis"
+    # The following builds have been excluded to reduce noise until we make
+    # progress with HHVM compatibility. The items below can then be removed.
+    - php: hhvm
+      env: DB=couchdb
+    - php: hhvm
+      env: DB=sqlite
+    - php: hhvm
+      env: PHP_EXT=apc
+  include:
+    - php: hhvm
+      env: PHP_EXT="memcached"
+  allow_failures:
+    # We aim for full HHVM compatibilty while on the way
+    # to reach the goal we tolerate failures. Still it is
+    # useful to test against HHVM to see if we make progress.
+    # Remove this line when all tests are green with HHVM.
+    - php: hhvm
+  # Mark build as failed as soon as one job failed.
+  fast_finish: true
 
 before_script:
-  - php tests/ci/depends.php $OPCODE_CACHE
-  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database lithium_test;'; fi"
-  - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'create database lithium_test;' -U postgres; fi"
+  - php tests/ci/depends.php
+  - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database lithium_test; create database lithium_test_alternative;'; fi"
+  - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'create database lithium_test;' -U postgres; psql -c 'create database lithium_test_alternative;' -U postgres; fi"
   - cd ..
   - mkdir libraries
   - mv lithium libraries
-  - git clone --branch=master --depth=100 --quiet git://github.com/UnionOfRAD/li3_fixtures.git libraries/li3_fixtures
+  - git clone --branch=master --depth=1 --quiet git://github.com/UnionOfRAD/li3_fixtures.git libraries/li3_fixtures
   - mkdir -p ci/config
   - cd ci
   - cp ../libraries/lithium/tests/ci/config/libraries.php config/libraries.php
-  - cp ../libraries/lithium/tests/ci/config/bootstrap.$DB.php config/bootstrap.php
+  - cp ../libraries/lithium/tests/ci/config/bootstrap.php config/bootstrap.php
 
 script:
-  - ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases && ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration
+  # Run all tests.
+  - sh -c "if [ '$DB' = '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases; fi"
+  - sh -c "if [ '$DB' = '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration; fi"
+  # Run just the database related tests.
+  - sh -c "if [ '$DB' != '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases/data; fi"
+  - sh -c "if [ '$DB' != '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration/data; fi"
 
 notifications:
-    irc: "irc.freenode.org#li3-core"
+  email: false

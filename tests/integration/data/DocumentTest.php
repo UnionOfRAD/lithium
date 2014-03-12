@@ -29,6 +29,18 @@ class DocumentTest extends \lithium\tests\integration\data\Base {
 		Galleries::reset();
 	}
 
+	/**
+	 * Tests that a successful find on an empty collection doesn't error out
+	 * when using count on the resulting collection returned. See issue #1042.
+	 */
+	public function testFindOnEmptyCollection() {
+		$result = Galleries::find('all');
+
+		$expected = 0;
+		$result = $result->count();
+		$this->assertIdentical($expected, $result);
+	}
+
 	public function testUpdateWithNewArray() {
 		$new = Galleries::create(array('name' => 'Poneys', 'active' => true));
 

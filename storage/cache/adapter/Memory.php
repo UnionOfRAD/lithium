@@ -9,22 +9,32 @@
 namespace lithium\storage\cache\adapter;
 
 use Closure;
+use lithium\storage\Cache;
 
 /**
  * A minimal in-memory cache.
  *
- * This Memory adapter provides basic support for `write`, `read`, `delete`
- * and `clear` cache functionality, as well as allowing the first four
- * methods to be filtered as per the Lithium filtering system.
+ * This cache adapter is best suited for generic memoization of data, and should not be used
+ * for for anything that must persist longer than the current request cycle.
  *
- * This cache adapter does not implement any expiry-based cache invalidation
- * logic, as the cached data will only persist for the lifetime of the current request.
+ * This adapter has no external dependencies. Operations in read/write/delete are atomic
+ * for single-keys only. Operations increment/decrement are atomic and clearing the cache
+ * is supported.
  *
- * As a result, this cache adapter is best suited for generic memoization of data, and
- * should not be used for for anything that must persist longer than the current
- * request cycle.
+ * Real persistence of cached items is *not* provided. Mulit-key operations and serialization
+ * are not natively supported. However serialization will seldomly be needed. This cache adapter
+ * does not implement any expiry-based cache invalidation logic, as the cached data will only
+ * persist for the lifetime of the current request.
+  *
+ * A simple configuration can be accomplished as follows:
+ *
+ * {{{
+ * Cache::config(array(
+ *     'default' => array('adapter' => 'Memory')
+ * ));
+ * }}}
  */
-class Memory extends \lithium\core\Object {
+class Memory extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Array used to store cached data by this adapter
@@ -46,143 +56,104 @@ class Memory extends \lithium\core\Object {
 	}
 
 	/**
-	 * Read value(s) from the cache
+	 * Read values from the cache. Will attempt to return an array of data
+	 * containing key/value pairs of the requested data.
 	 *
-	 * Note: When using an array of keys in $key for multi-read,
-	 * note that this is not an atomic operation.
-	 *
-	 * @param string $key The key to uniquely identify the cached item.
-	 * @return Closure Function returning cached value if successful, `false` otherwise.
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return array Cached values keyed by cache keys on successful read,
+	 *               keys which could not be read will not be included in
+	 *               the results array.
 	 */
-	public function read($key) {
-		$cache =& $this->_cache;
+	public function read(array $keys) {
+		$results = array();
 
-		return function($self, $params) use (&$cache) {
-			extract($params);
-
-			if (is_array($key)) {
-				$results = array();
-
-				foreach ($key as $k) {
-					if (isset($cache[$k])) {
-						$results[$k] = $cache[$k];
-					}
-				}
-				return $results;
+		foreach ($keys as $key) {
+			if (array_key_exists($key, $this->_cache)) {
+				$results[$key] = $this->_cache[$key];
 			}
-			return isset($cache[$key]) ? $cache[$key] : null;
-		};
+		}
+		return $results;
 	}
 
 	/**
-	 * Write value(s) to the cache.
+	 * Write values to the cache.
 	 *
-	 * Note: When using an array of keys => values in $key for multi-write,
-	 * note that this is not an atomic operation.
-	 *
-	 * @param string $key The key to uniquely identify the cached item.
+	 * @param array $keys Key/value pairs with keys to uniquely identify the to-be-cached item.
 	 * @param mixed $data The value to be cached.
-	 * @param string $expiry A strtotime() compatible cache time.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @param null|string $expiry Unused.
+	 * @return boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $data, $expiry) {
-		$cache =& $this->_cache;
-
-		return function($self, $params) use (&$cache) {
-			extract($params);
-
-			if (is_array($key)) {
-				foreach ($key as $k => &$v) {
-					$cache[$k] = $v;
-				}
-				return true;
-			}
-			return (boolean) ($cache[$key] = $data);
-		};
+	public function write(array $keys, $expiry = null) {
+		foreach ($keys as $key => &$value) {
+			$this->_cache[$key] = $value;
+		}
+		return true;
 	}
 
 	/**
-	 * Delete value from the cache
+	 * Will attempt to remove specified keys from the user space cache.
 	 *
-	 * @param string $key The key to uniquely identify the cached item.
-	 * @return Closure Function returning boolean `true` on successful delete, `false` otherwise.
+	 * @param array $keys Keys to uniquely identify the cached items.
+	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
-	public function delete($key) {
-		$cache =& $this->_cache;
-
-		return function($self, $params) use (&$cache) {
-			extract($params);
-			if (isset($cache[$key])) {
-				unset($cache[$key]);
-				return true;
-			} else {
+	public function delete(array $keys) {
+		foreach ($keys as $key) {
+			if (!isset($this->_cache[$key])) {
 				return false;
 			}
-		};
-	}
-
-	/**
-	 * Performs a decrement operation on specified numeric cache item.
-	 *
-	 * @param string $key Key of numeric cache item to decrement.
-	 * @param integer $offset Offset to decrement - defaults to 1.
-	 * @return Closure Function returning item's new value on successful decrement,
-	 *         `false` otherwise.
-	 */
-	public function decrement($key, $offset = 1) {
-		$cache =& $this->_cache;
-
-		return function($self, $params) use (&$cache, $offset) {
-			extract($params);
-			return $cache[$key] -= 1;
-		};
-	}
-
-	/**
-	 * Performs an increment operation on specified numeric cache item.
-	 *
-	 * @param string $key Key of numeric cache item to increment.
-	 * @param integer $offset Offset to increment - defaults to 1.
-	 * @return Closure Function returning item's new value on successful increment,
-	 *         `false` otherwise.
-	 */
-	public function increment($key, $offset = 1) {
-		$cache =& $this->_cache;
-
-		return function($self, $params) use (&$cache, $offset) {
-			extract($params);
-			return $cache[$key] += 1;
-		};
-	}
-
-	/**
-	 * Clears user-space cache
-	 *
-	 * @return mixed True on successful clear, false otherwise.
-	 */
-	public function clear() {
-		foreach ($this->_cache as $key => &$value) {
 			unset($this->_cache[$key]);
 		}
 		return true;
 	}
 
 	/**
-	 * This adapter is always enabled, as it has no external dependencies.
+	 * Performs a decrement operation on specified numeric cache item.
 	 *
-	 * @return boolean True
+	 * @param string $key Key of numeric cache item to decrement.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer The item's new value on successful decrement, else `false`.
 	 */
-	public static function enabled() {
-		return true;
+	public function decrement($key, $offset = 1) {
+		return $this->_cache[$key] -= 1;
 	}
 
 	/**
-	 * Garbage collection (GC) is not enabled for this adapter
+	 * Performs an increment operation on specified numeric cache item.
 	 *
-	 * @return boolean False
+	 * @param string $key Key of numeric cache item to increment
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer The item's new value on successful increment, else `false`.
 	 */
-	public function clean() {
-		return false;
+	public function increment($key, $offset = 1) {
+		return $this->_cache[$key] += 1;
+	}
+
+	/**
+	 * Clears entire cache by flushing it. All cache keys using the
+	 * configuration but *without* honoring the scope are removed.
+	 *
+	 * The operation will continue to remove keys even if removing
+	 * one single key fails, clearing thoroughly as possible. In any case
+	 * this method will return `true`.
+	 *
+	 * @return boolean Always returns `true`.
+	 */
+
+	/**
+	 * Clears entire cache by flushing it. All cache keys using the
+	 * configuration but *without* honoring the scope are removed.
+	 *
+	 * The operation will continue to remove keys even if removing
+	 * one single key fails, clearing thoroughly as possible. In any case
+	 * this method will return `true`.
+	 *
+	 * @return boolean Always returns `true`.
+	 */
+	public function clear() {
+		foreach ($this->_cache as $key => &$value) {
+			unset($this->_cache[$key]);
+		}
+		return true;
 	}
 }
 

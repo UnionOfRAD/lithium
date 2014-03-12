@@ -76,7 +76,8 @@ class FileTest extends \lithium\test\Unit {
 		$template = $file->template('template', array(
 			'controller' => 'pages', 'template' => 'home', 'type' => 'html'
 		));
-		$this->assertPattern('/template_views_pages_home\.html_[0-9]+/', $template);
+		$pattern = '/template_pages_home\.html_[0-9a-f]+/';
+		$this->assertPattern($pattern, $template);
 
 		$file = new File(array('compile' => false, 'paths' => array(
 			'template' => '{:library}/views/{:controller}/{:template}.{:type}.php'

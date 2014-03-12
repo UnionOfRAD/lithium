@@ -665,7 +665,7 @@ class ModelTest extends \lithium\test\Unit {
 		$result = $post->errors();
 		$this->assertNotEmpty($result);
 
-		$post->email = 'contact@lithify.me';
+		$post->email = 'contact@li3.me';
 		$result = $post->validates();
 		$this->assertTrue($result);
 		$result = $post->errors();
@@ -835,6 +835,72 @@ class ModelTest extends \lithium\test\Unit {
 		);
 		$result = $post->errors();
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testWhitelistWhenLockedUsingCreateForData() {
+		MockPost::config(array(
+			'schema' => $this->_altSchema,
+			'meta' => array(
+				'locked' => true,
+				'connection' => 'mocksource'
+			)
+		));
+
+		$data = array('title' => 'New post', 'foo' => 'bar');
+		$record = MockPost::create($data);
+
+		$expected = array('title' => 'New post');
+		$result = $record->save();
+		$this->assertEqual($expected, $result['query']->data());
+
+		$data = array('foo' => 'bar');
+		$record = MockPost::create($data);
+
+		$expected = array();
+		$result = $record->save();
+		$this->assertEqual($expected, $result['query']->data());
+	}
+
+	public function testWhitelistWhenLockedUsingSaveForData() {
+		MockPost::config(array(
+			'schema' => $this->_altSchema,
+			'meta' => array(
+				'locked' => true,
+				'connection' => 'mocksource'
+			)
+		));
+
+		$data = array('title' => 'New post', 'foo' => 'bar');
+		$record = MockPost::create();
+
+		$expected = array('title' => 'New post');
+		$result = $record->save($data);
+		$this->assertEqual($expected, $result['query']->data());
+
+		$data = array('foo' => 'bar');
+		$record = MockPost::create();
+
+		$expected = array();
+		$result = $record->save($data);
+		$this->assertEqual($expected, $result['query']->data());
+	}
+
+	public function testWhitelistWhenLockedUsingCreateWithValidAndSaveForInvalidData() {
+		MockPost::config(array(
+			'schema' => $this->_altSchema,
+			'meta' => array(
+				'locked' => true,
+				'connection' => 'mocksource'
+			)
+		));
+
+		$data = array('title' => 'New post');
+		$record = MockPost::create($data);
+
+		$expected = array('title' => 'New post');
+		$data = array('foo' => 'bar');
+		$result = $record->save($data);
+		$this->assertEqual($expected, $result['query']->data());
 	}
 
 	public function testImplicitKeyFind() {

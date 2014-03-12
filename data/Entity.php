@@ -21,9 +21,14 @@ use lithium\analysis\Inspector;
  * The `Entity` class can also be used as a base class for your own custom data objects, and is the
  * basis for generating forms with the `Form` helper.
  *
+ * Instances of `lithium\data\Entity` or any subclass of it may be serialized. This
+ * operation however isn't lossless. The documentation of the `serialize()` method has
+ * more information on the limitations.
+ *
  * @see lithium\template\helper\Form
+ * @see lithium\data\Entity::serialize()
  */
-class Entity extends \lithium\core\Object {
+class Entity extends \lithium\core\Object implements \Serializable {
 
 	/**
 	 * Fully-namespaced class name of model that this record is bound to. Instance methods declared
@@ -273,6 +278,15 @@ class Entity extends \lithium\core\Object {
 		return $this->_model;
 	}
 
+	/**
+	 * Returns the parent object of this object, if any.
+	 *
+	 * @return object Returns the object that contains this object, or `null`.
+	 */
+	public function parent() {
+		return $this->_parent;
+	}
+
 	public function schema($field = null) {
 		$schema = null;
 
@@ -482,8 +496,11 @@ class Entity extends \lithium\core\Object {
 	/**
 	 * Converts the data in the record set to a different format, i.e. an array.
 	 *
-	 * @param string $format currently only `array`
-	 * @param array $options
+	 * @param string $format Currently only `array`.
+	 * @param array $options Options for converting:
+	 *        - `'indexed'` _boolean_: Allows to control how converted data of nested collections
+	 *          is keyed. When set to `true` will force indexed conversion of nested collection
+	 *          data. By default `false` which will only index the root level.
 	 * @return mixed
 	 */
 	public function to($format, array $options = array()) {
@@ -517,6 +534,46 @@ class Entity extends \lithium\core\Object {
 	 */
 	public function __toString() {
 		return (string) $this->__call('title', array());
+	}
+
+	/**
+	 * Prepares, enables and executes serialization of the object.
+	 *
+	 * Note: because of the limitations outlined below custom handlers
+	 * and schema are ignored with serialized objects.
+	 *
+	 * Properties that hold anonymous functions are also skipped. Some of these
+	 * can almost be reconstructed (`_handlers`) others cannot (`_methodFilters`
+	 * and `schema`).
+	 *
+	 * @return string Serialized properties of the object.
+	 */
+	public function serialize() {
+		$vars = get_object_vars($this);
+		unset($vars['_schema']);
+		unset($vars['_config']['schema']);
+		unset($vars['_handlers']);
+		unset($vars['_methodFilters']);
+
+		return serialize($vars);
+	}
+
+	/**
+	 * Prepares, enables and executes unserialization of the object.
+	 *
+	 * Restores state of the object including pulled results. Tries
+	 * to restore `_handlers` by calling into `_init()`.
+	 *
+	 * @param string $data Serialized properties of the object.
+	 * @return void
+	 */
+	public function unserialize($data) {
+		$data = unserialize($data);
+		static::_init();
+
+		foreach ($data as $key => $value) {
+			$this->{$key} = $value;
+		}
 	}
 }
 

@@ -462,6 +462,10 @@ class QueryTest extends \lithium\test\Unit {
 
 		$query = new Query(compact('data') + array('whitelist' => array('foo', 'bar')));
 		$this->assertEqual(array('foo' => 1, 'bar' => 2), $query->data());
+
+		$data = array('baz' => 3);
+		$query = new Query(compact('data') + array('whitelist' => array('foo', 'bar')));
+		$this->assertIdentical(array(), $query->data());
 	}
 
 	/**

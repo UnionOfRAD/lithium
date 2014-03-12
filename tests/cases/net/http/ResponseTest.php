@@ -152,7 +152,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'Content-Type: text/plain;charset=UTF8',
 			'Set-Cookie: doctor=who; Path=/tardis; HttpOnly',
 			'Set-Cookie: test=foo%20bar; Expires=Tue, 15-Jan-2013 21:47:38 GMT; Secure',
-			'Set-Cookie: test=foo%2Bbin; Path=/test; Domain=lithify.me',
+			'Set-Cookie: test=foo%2Bbin; Path=/test; Domain=li3.me',
 			'',
 			'Test!'
 		));
@@ -160,7 +160,7 @@ class ResponseTest extends \lithium\test\Unit {
 			'doctor' => array('value' => 'who', 'path' => '/tardis', 'httponly' => true),
 			'test' => array(
 				array('value' => 'foo bar', 'expires' => 1358286458, 'secure' => true),
-				array('value' => 'foo+bin', 'path' => '/test', 'domain' => 'lithify.me')
+				array('value' => 'foo+bin', 'path' => '/test', 'domain' => 'li3.me')
 			)
 		);
 
@@ -515,12 +515,12 @@ class ResponseTest extends \lithium\test\Unit {
 	public function testSetCookies() {
 		$expected = array(
 			'foo' => array('value' => 'bar'),
-			'bin' => array('value' => 'baz', 'path' => '/app', 'domain' => 'lithify.me', 'httponly' => true)
+			'bin' => array('value' => 'baz', 'path' => '/app', 'domain' => 'li3.me', 'httponly' => true)
 		);
 		$response = new Response();
 		$response->cookies('foo', 'bar');
 		$response->cookies('bin', array(
-			'value' => 'baz', 'path' => '/app', 'domain' => 'lithify.me', 'httponly' => true
+			'value' => 'baz', 'path' => '/app', 'domain' => 'li3.me', 'httponly' => true
 		));
 
 		$result = $response->cookies;
@@ -529,7 +529,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$response = new Response();
 		$response->cookies('foo', 'bar');
 		$response->cookies(array(
-			'bin' => array('value' => 'baz', 'path' => '/app', 'domain' => 'lithify.me', 'httponly' => true)
+			'bin' => array('value' => 'baz', 'path' => '/app', 'domain' => 'li3.me', 'httponly' => true)
 		));
 		$result = $response->cookies;
 		$this->assertEqual($expected, $result);
@@ -537,7 +537,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$response = new Response();
 		$response->cookies(array(
 			'foo' => 'bar',
-			'bin' => array('value' => 'baz', 'path' => '/app', 'domain' => 'lithify.me', 'httponly' => true)
+			'bin' => array('value' => 'baz', 'path' => '/app', 'domain' => 'li3.me', 'httponly' => true)
 		));
 		$result = $response->cookies;
 		$this->assertEqual($expected, $result);
@@ -549,7 +549,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$result = $response->cookies('foo');
 		$this->assertEqual($expected, $result);
 
-		$expected = array('value' => 'baz', 'path' => '/app', 'domain' => 'lithify.me', 'httponly' => true);
+		$expected = array('value' => 'baz', 'path' => '/app', 'domain' => 'li3.me', 'httponly' => true);
 		$result = $response->cookies('bin');
 		$this->assertEqual($expected, $result);
 
