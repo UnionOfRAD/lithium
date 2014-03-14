@@ -87,13 +87,16 @@ class Response extends \lithium\net\http\Message {
 		423 => 'Locked',
 		424 => 'Method Failure',
 		428 => 'Precondition Required',
+		429 => 'Too Many Requests',
+		431 => 'Request Header Fields Too Large',
 		451 => 'Unavailable For Legal Reasons',
 		500 => 'Internal Server Error',
 		501 => 'Not Implemented',
 		502 => 'Bad Gateway',
 		503 => 'Service Unavailable',
 		504 => 'Gateway Time-out',
-		507 => 'Insufficient Storage'
+		507 => 'Insufficient Storage',
+		511 => 'Network Authentication Required'
 	);
 
 	/**
