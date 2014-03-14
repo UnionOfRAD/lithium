@@ -22,7 +22,7 @@ class RequestTest extends \lithium\test\Unit {
 			'input' => Libraries::get(true, 'resources') . '/tmp/tests/input.txt'
 		);
 
-		$this->_backup['cwd'] = getcwd();
+		$this->_backup['cwd'] = str_replace('\\', '/', getcwd()) ?: null;
 		$this->_backup['_SERVER'] = $_SERVER;
 		$_SERVER['argv'] = array();
 	}
@@ -47,7 +47,7 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->env();
 		$this->assertNotEmpty($result);
 
-		$expected = getcwd();
+		$expected = $this->_backup['cwd'];
 		$result = $result['working'];
 		$this->assertEqual($expected, $result);
 	}
@@ -59,7 +59,7 @@ class RequestTest extends \lithium\test\Unit {
 		chdir(Libraries::get(true, 'resources') . '/tmp/tests');
 		$request = new Request();
 
-		$expected = realpath(Libraries::get(true, 'resources') . '/tmp/tests');
+		$expected = str_replace('\\', '/', realpath(Libraries::get(true, 'resources') . '/tmp/tests'));
 		$result = $request->env('working');
 		$this->assertEqual($expected, $result);
 	}

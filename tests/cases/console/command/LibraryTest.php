@@ -237,7 +237,7 @@ class LibraryTest extends \lithium\test\Unit {
 
 		$this->assertFileExists($this->_testPath . '/new');
 
-		$path = realpath($this->_testPath);
+		$path = str_replace('\\', '/', realpath($this->_testPath));
 		$lithium = Libraries::get('lithium', 'path');
 		$tplPath = realpath($lithium . '/console/command/create/template');
 		$filePath = $tplPath . DIRECTORY_SEPARATOR . "app.phar.gz";
