@@ -68,6 +68,27 @@ class RedisTest extends \lithium\test\Unit {
 		$this->assertTrue($redis->connection instanceof RedisCore);
 	}
 
+	public function testHostPort() {
+		$this->assertNotException('RedisException', function() {
+			$redis = new Redis();
+			$redis->info();
+		});
+
+		$this->assertNotException('RedisException', function() {
+			$redis = new Redis(array('host' => '127.0.0.1'));
+			$redis->info();
+		});
+	}
+
+	public function testHostSocket() {
+		$socketExists = file_exists('/tmp/redis.sock');
+		$this->skipIf(!$socketExists, 'Redis is not listening on socket');
+		$this->assertNotException('RedisException', function() {
+			$redis = new Redis(array('host' => '/tmp/redis.sock'));
+			$redis->info();
+		});
+	}
+
 	public function testSimpleWrite() {
 		$key = 'key';
 		$data = 'value';
