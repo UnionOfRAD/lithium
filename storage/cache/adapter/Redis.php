@@ -52,6 +52,11 @@ use Closure;
 class Redis extends \lithium\storage\cache\Adapter {
 
 	/**
+	 * The default port used to connect to Redis servers, if none is specified.
+	 */
+	const CONN_DEFAULT_PORT = 6379;
+
+	/**
 	 * Redis object instance used by this adapter.
 	 *
 	 * @var object Redis object
@@ -98,9 +103,13 @@ class Redis extends \lithium\storage\cache\Adapter {
 		if (!$this->connection) {
 			$this->connection = new RedisCore();
 		}
-		list($ip, $port) = explode(':', $this->_config['host']);
+		list($address, $port) = $this->_formatHost($this->_config['host']);
 		$method = $this->_config['persistent'] ? 'pconnect' : 'connect';
-		$this->connection->{$method}($ip, $port);
+		if ($port) {
+			$this->connection->{$method}($address, $port);
+		} else {
+			$this->connection->{$method}($address);
+		}
 
 		if ($this->_config['scope']) {
 			$this->connection->setOption(RedisCore::OPT_PREFIX, "{$this->_config['scope']}:");
@@ -139,6 +148,22 @@ class Redis extends \lithium\storage\cache\Adapter {
 			return true;
 		}
 		return is_callable(array($this->connection, $method));
+	}
+
+	/**
+	 * Formats standard `'host:port'` or `'/path/to/socket'` strings
+	 *
+	 * @param mixed $host A host string in `'host:port'` or `'/path/to/socket'` format
+	 * @return array Returns an array of `Redis` connection definitions.
+	 */
+	protected function _formatHost($host) {
+		if (strpos($host, ':') > 0) {
+			list($address, $port) = explode(':', $host);
+		} else {
+			$address = $host;
+			$port = strpos($host, '/') === 0 ? null : self::CONN_DEFAULT_PORT;
+		}
+		return array($address, $port);
 	}
 
 	/**
