@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2013, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2014, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -192,7 +192,7 @@ class Request extends \lithium\net\http\Message {
 		$cookies = $this->cookies;
 		$invalid = str_split(",; \+\t\r\n\013\014");
 		$replace = array_map('rawurlencode', $invalid);
-		
+
 		foreach($cookies as $key => &$value) {
 			if (!is_scalar($value)) {
 				$message = "Non-scalar value cannot be rendered for cookie `{$key}`";
