@@ -33,6 +33,14 @@ class MockMongoConnection {
 		return array();
 	}
 
+	public function getConnections() {
+		return array(array(
+			'hash' => 'localhost:27017;-;X;56052',
+			'server' => array(),
+			'connection' => array()
+		));
+	}
+
 	public function insert(array &$data, array $options = array()) {
 		$data['_id'] = new MongoId();
 		return $this->_record(__FUNCTION__, compact('data', 'options'));
@@ -41,7 +49,8 @@ class MockMongoConnection {
 	protected function _record($type, array $data = array()) {
 		$collection = $this->_collection;
 		$this->queries[] = compact('type', 'collection') + $data;
-		return array_pop($this->results);
+		$result = array_pop($this->results);
+		return $result === null ? false : $result;
 	}
 
 	public function update($conditions, $update, $options) {

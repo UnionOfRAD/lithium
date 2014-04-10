@@ -69,7 +69,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->_db = new MongoDb($this->_testConfig);
 		$this->_db->server = new MockMongoConnection();
 		$this->_db->connection = new MockMongoConnection();
-		$this->_db->server->connected = true;
 
 		Connections::add('mockconn', array('object' => $this->_db));
 		MockMongoPost::config(array('meta' => array('key' => '_id', 'connection' => 'mockconn')));
@@ -252,7 +251,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->_db->connection->resultSets = array(array('ok' => true));
 
 		$data = array('title' => 'Test Post');
-		$options = array('safe' => false, 'fsync' => false);
+		$options = array('w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false);
 		$this->_query->data($data);
 		$this->assertTrue($this->_db->create($this->_query));
 		$this->assertEqual(compact('data', 'options'), end($this->_db->connection->queries));
@@ -273,7 +272,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->_db->connection->resultSets = array(array('ok' => true));
 
 		$data = array('title' => 'Test Post');
-		$options = array('safe' => false, 'fsync' => false);
+		$options = array('w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false);
 		$this->_query->data($data);
 		$this->assertTrue($this->_db->create($this->_query));
 		$this->_query->data(null);
@@ -307,7 +306,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$expected = compact('data') + array(
 			'collection' => 'posts',
 			'type' => 'insert',
-			'options' => array('safe' => false, 'fsync' => false)
+			'options' => array('w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false)
 		);
 		$this->assertEqual($expected, $result);
 
@@ -341,7 +340,7 @@ class MongoDbTest extends \lithium\test\Unit {
 			'conditions' => array('_id' => '4f188fb17675ab167900010e'),
 			'update' => array('$set' => array('title' => 'New Post Title')),
 			'options' => array(
-				'upsert' => false, 'multiple' => true, 'safe' => false, 'fsync' => false
+				'upsert' => false, 'multiple' => true, 'w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false
 			)
 		);
 
@@ -400,7 +399,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$expected = compact('conditions') + array(
 			'type' => 'remove',
 			'collection' => 'posts',
-			'options' => array('justOne' => false, 'safe' => false, 'fsync' => false)
+			'options' => array('justOne' => false, 'w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false)
 		);
 		$this->assertEqual($expected, array_pop($this->_db->connection->queries));
 	}
@@ -449,7 +448,8 @@ class MongoDbTest extends \lithium\test\Unit {
 			'whitelist' => null,
 			'callbacks' => true,
 			'locked' => false,
-			'safe' => false,
+			'w' => 1,
+			'wTimeoutMS' => 10000,
 			'fsync' => false
 		);
 		$baseInsert = array(
@@ -650,7 +650,7 @@ class MongoDbTest extends \lithium\test\Unit {
 			'data' => array('initial' => 'one', 'values' => 'two', '_id' => $document->_id),
 			'options' => array(
 				'validate' => true, 'events' => 'create', 'whitelist' => null, 'callbacks' => true,
-				'locked' => false, 'safe' => false, 'fsync' => false
+				'locked' => false, 'w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false
 			)
 		);
 		$this->assertEqual($expected, $result);
@@ -668,7 +668,7 @@ class MongoDbTest extends \lithium\test\Unit {
 			'options' => array(
 				'validate' => true, 'events' => 'update', 'whitelist' => null,
 				'callbacks' => true, 'locked' => false, 'upsert' => false, 'multiple' => true,
-				'safe' => false, 'fsync' => false
+				'w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false
 			)
 		);
 		$this->assertEqual($expected, $result);
@@ -840,57 +840,57 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testDefaultSafeOptions() {
-		$this->_db = new MongoDb($this->_testConfig + array('safe' => true));
+		$this->_db = new MongoDb($this->_testConfig + array('w' => 1, 'wTimeoutMS' => 10000));
 		$this->_db->server = new MockMongoConnection();
 		$this->_db->connection = new MockCallable();
 		$this->_db->connection->custom = new MockCallable();
-		$this->_db->server->connected = true;
 
 		$query = new Query(array('type' => 'read', 'source' => 'custom'));
 		$this->_db->create($query);
 		$result = $this->_db->connection->custom->call;
-		$expected = array(null, array('safe' => true, 'fsync' => false));
+		$expected = array(null, array('w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false));
 		$this->assertEqual('insert', $result['method']);
 		$this->assertEqual($expected, $result['params']);
 
 		$query = new Query(array('type' => 'read', 'source' => 'custom'));
 		$this->_db->update($query);
 		$result = $this->_db->connection->custom->call;
-		$expected = array('upsert' => false, 'multiple' => true, 'safe' => true, 'fsync' => false);
+		$expected = array('upsert' => false, 'multiple' => true, 'w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false);
 		$this->assertEqual('update', $result['method']);
 		$this->assertEqual($expected, $result['params'][2]);
 
 		$query = new Query(array('type' => 'read', 'source' => 'custom'));
 		$this->_db->delete($query);
 		$result = $this->_db->connection->custom->call;
-		$expected = array('justOne' => false, 'safe' => true, 'fsync' => false);
+		$expected = array('justOne' => false, 'w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false);
 		$this->assertEqual('remove', $result['method']);
 		$this->assertEqual($expected, $result['params'][1]);
 
-		$this->_db = new MongoDb($this->_testConfig + array('safe' => false));
+		$this->_db = new MongoDb($this->_testConfig + array('w' => 1, 'wTimeoutMS' => 10000));
 		$this->_db->server = new MockMongoConnection();
 		$this->_db->connection = new MockCallable();
 		$this->_db->connection->custom = new MockCallable();
-		$this->_db->server->connected = true;
 
 		$query = new Query(array('type' => 'read', 'source' => 'custom'));
 		$this->_db->create($query);
 		$result = $this->_db->connection->custom->call;
-		$expected = array(null, array('safe' => false, 'fsync' => false));
+		$expected = array(null, array('w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false));
 		$this->assertEqual('insert', $result['method']);
 		$this->assertEqual($expected, $result['params']);
 
 		$query = new Query(array('type' => 'read', 'source' => 'custom'));
 		$this->_db->update($query);
 		$result = $this->_db->connection->custom->call;
-		$expected = array('upsert' => false, 'multiple' => true, 'safe' => false, 'fsync' => false);
+		$expected = array(
+			'upsert' => false, 'multiple' => true, 'w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false
+		);
 		$this->assertEqual('update', $result['method']);
 		$this->assertEqual($expected, $result['params'][2]);
 
 		$query = new Query(array('type' => 'read', 'source' => 'custom'));
 		$this->_db->delete($query);
 		$result = $this->_db->connection->custom->call;
-		$expected = array('justOne' => false, 'safe' => false, 'fsync' => false);
+		$expected = array('justOne' => false, 'w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false);
 		$this->assertEqual('remove', $result['method']);
 		$this->assertEqual($expected, $result['params'][1]);
 	}
@@ -922,7 +922,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$db = new MongoDb($this->_testConfig + array('gridPrefix' => 'custom'));
 		$db->server = new MockMongoConnection();
 		$db->connection = new MockMongoConnection();
-		$db->server->connected = true;
 		Connections::add('temp', array('object' => $db));
 		MockMongoPost::config(array('meta' => array('source' => 'fs.files', 'connection' => 'temp')));
 
@@ -945,7 +944,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$db = new MongoDb($this->_testConfig + array('gridPrefix' => 'custom'));
 		$db->server = new MockMongoConnection();
 		$db->connection = new MockMongoConnection();
-		$db->server->connected = true;
 		Connections::add('temp', array('object' => $db));
 		MockMongoPost::config(array('meta' => array('source' => 'fs.files', 'connection' => 'temp')));
 		$db->connection->results = array($result);
@@ -965,7 +963,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		$db = new MongoDb($this->_testConfig + array('gridPrefix' => 'custom'));
 		$db->server = new MockMongoConnection();
 		$db->connection = new MockMongoConnection();
-		$db->server->connected = true;
 		Connections::add('temp', array('object' => $db));
 		MockMongoPost::config(array('meta' => array('source' => 'fs.files', 'connection' => 'temp')));
 

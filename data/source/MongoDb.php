@@ -65,7 +65,7 @@ class MongoDb extends \lithium\data\Source {
 		'schema'       => 'lithium\data\source\mongo_db\Schema',
 		'exporter'     => 'lithium\data\source\mongo_db\Exporter',
 		'relationship' => 'lithium\data\model\Relationship',
-		'server'       => 'Mongo'
+		'server'       => 'MongoClient'
 	);
 
 	/**
@@ -162,7 +162,8 @@ class MongoDb extends \lithium\data\Source {
 			'replicaSet' => false,
 			'schema'     => null,
 			'gridPrefix' => 'fs',
-			'safe'       => false,
+			'w'          => 1,
+			'wTimeoutMS' => 10000,
 			'readPreference' => null,
 			'autoConnect' => false
 		);
@@ -288,7 +289,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean True
 	 */
 	public function disconnect() {
-		if ($this->server && $this->server->connected) {
+		if ($this->server && $this->server->getConnections()) {
 			$this->_isConnected = false;
 			unset($this->connection, $this->server);
 		}
@@ -393,7 +394,11 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function create($query, array $options = array()) {
 		$_config = $this->_config;
-		$defaults = array('safe' => $_config['safe'], 'fsync' => false);
+		$defaults = array(
+			'w' => $_config['w'],
+			'wTimeoutMS' => $_config['wTimeoutMS'],
+			'fsync' => false
+		);
 		$options += $defaults;
 		$this->_checkConnection();
 
@@ -413,6 +418,7 @@ class MongoDb extends \lithium\data\Source {
 				$data['create']['_id'] = $self->invokeMethod('_saveFile', array($data['create']));
 			} else {
 				$result = $self->connection->{$source}->insert($data['create'], $options);
+				$result = $self->invokeMethod('_ok', array($result));
 			}
 
 			if ($result === true || isset($result['ok']) && (boolean) $result['ok'] === true) {
@@ -527,7 +533,8 @@ class MongoDb extends \lithium\data\Source {
 		$defaults = array(
 			'upsert' => false,
 			'multiple' => true,
-			'safe' => $_config['safe'],
+			'w' => $_config['w'],
+			'wTimeoutMS' => $_config['wTimeoutMS'],
 			'fsync' => false
 		);
 		$options += $defaults;
@@ -555,7 +562,8 @@ class MongoDb extends \lithium\data\Source {
 			if ($options['multiple'] && !preg_grep('/^\$/', array_keys($update))) {
 				$update = array('$set' => $update);
 			}
-			if ($self->connection->{$source}->update($args['conditions'], $update, $options)) {
+			$result = $self->connection->{$source}->update($args['conditions'], $update, $options);
+			if ($self->invokeMethod('_ok', array($result))) {
 				$query->entity() ? $query->entity()->sync() : null;
 				return true;
 			}
@@ -574,7 +582,11 @@ class MongoDb extends \lithium\data\Source {
 	public function delete($query, array $options = array()) {
 		$this->_checkConnection();
 		$_config = $this->_config;
-		$defaults = array('justOne' => false, 'safe' => $_config['safe'], 'fsync' => false);
+		$defaults = array('justOne' => false,
+			'w' => $_config['w'],
+			'wTimeoutMS' => $_config['wTimeoutMS'],
+			'fsync' => false
+		);
 		$options = array_intersect_key($options + $defaults, $defaults);
 		$params = compact('query', 'options');
 
@@ -589,6 +601,7 @@ class MongoDb extends \lithium\data\Source {
 				$result = $self->invokeMethod('_deleteFile', array($conditions));
 			} else {
 				$result = $self->connection->{$args['source']}->remove($conditions, $options);
+				$result = $self->invokeMethod('_ok', array($result));
 			}
 			if ($result && $query->entity()) {
 				$query->entity()->sync(null, array(), array('dematerialize' => true));
@@ -598,12 +611,25 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	protected function _deleteFile($conditions, $options = array()) {
-		$defaults = array('safe' => true);
+		$_config = $this->_config;
+		$defaults = array('w' => $_config['w'], 'wTimeoutMS' => $_config['wTimeoutMS']);
 		$options += $defaults;
 		$prefix = $this->_config['gridPrefix'];
 		return $this->connection->getGridFS($prefix)->remove($conditions, $options);
 	}
 
+	/**
+	 * Parse a `MongoCollection::<insert|update|delete>()` response and
+	 * return `true` on success.
+	 *
+	 * @return boolean
+	 */
+	protected function _ok($result) {
+		if (is_bool($result)) {
+			return $result;
+		}
+		return !isset($result['err']) || $result['err'] === null;
+	}
 	/**
 	 * Executes calculation-related queries, such as those required for `count`.
 	 *
