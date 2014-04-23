@@ -27,7 +27,12 @@ class Result extends \lithium\data\source\Result {
 	 */
 	protected function _fetchFromResource() {
 		if ($this->_resource && $this->_resource->hasNext()) {
-			$result = $this->_resource->getNext();
+			try{
+		            $result = $this->_resource->getNext();
+		        }
+			catch (\Exception $e){
+		            return false;
+		        }
 			$isFile = ($result instanceof MongoGridFSFile);
 			$result = $isFile ? array('file' => $result) + $result->file : $result;
 			$this->_key = $this->_iterator;
