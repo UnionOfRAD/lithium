@@ -148,6 +148,13 @@ class MemoryTest extends \lithium\test\Unit {
 		$this->assertEqual($data + 1, $result);
 	}
 
+	public function testIncrementNotExistent() {
+		$key = 'incremental_not_existent';
+
+		$result = $this->Memory->increment($key);
+		$this->assertFalse($result);
+	}
+
 	public function testDecrement() {
 		$key = 'decrement';
 		$data = 5;
@@ -160,6 +167,13 @@ class MemoryTest extends \lithium\test\Unit {
 
 		$result = $this->Memory->decrement($key);
 		$this->assertEqual($data - 1, $result);
+	}
+
+	public function testDecrementNotExistent() {
+		$key = 'decrement_not_existent';
+
+		$result = $this->Memory->decrement($key);
+		$this->assertFalse($result);
 	}
 
 	public function testReadKeyThatDoesNotExist() {
