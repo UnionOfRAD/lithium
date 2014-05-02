@@ -417,16 +417,78 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertFileExists($path);
 	}
 
-	public function testIncrement() {
-		$key = 'key_to_increment';
-		$result = $this->File->increment($key);
-		$this->assertEqual(false, $result);
+	public function testDecrement() {
+		$key = __FUNCTION__;
+
+		$result = $this->File->write(array($key => 5));
+		$this->assertTrue($result);
+
+		$expected = 4;
+		$result = $this->File->decrement($key);
+		$this->assertEqual($expected, $result);
+
+		$expected = array($key => 4);
+		$result = $this->File->read(array($key));
+		$this->assertEqual($expected, $result);
 	}
 
-	public function testDecrement() {
-		$key = 'key_to_decrement';
+	public function testDecrementNotExistent() {
+		$key = __FUNCTION__;
+
 		$result = $this->File->decrement($key);
-		$this->assertEqual(false, $result);
+		$this->assertFalse($result);
+	}
+
+	public function testDecrementWithScope() {
+		$adapter = new File(array('scope' => 'primary'));
+
+		$this->File->write(array('primary_key1' => 5));
+		$this->File->write(array('key1' => 10));
+
+		$expected = 4;
+		$result = $adapter->decrement('key1');
+		$this->assertEqual($expected, $result);
+
+		$expected = array('key1' => 4);
+		$result = $adapter->read(array('key1'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testIncrement() {
+		$key = __FUNCTION__;
+
+		$result = $this->File->write(array($key => 5));
+		$this->assertTrue($result);
+
+		$expected = 6;
+		$result = $this->File->increment($key);
+		$this->assertEqual($expected, $result);
+
+		$expected = array($key => 6);
+		$result = $this->File->read(array($key));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testIncrementNotExistent() {
+		$key = __FUNCTION__;
+
+		$result = $this->File->increment($key);
+		$this->assertFalse($result);
+	}
+
+	public function testIncrementWithScope() {
+		$adapter = new File(array('scope' => 'primary'));
+
+		$this->File->write(array('primary_key1' => 5));
+		$this->File->write(array('key1' => 10));
+
+		$expected = 6;
+		$result = $adapter->increment('key1');
+		$this->assertEqual($expected, $result);
+
+		$expected = array('key1' => 6);
+		$result = $adapter->read(array('key1'));
+		$this->assertEqual($expected, $result);
 	}
 }
 
