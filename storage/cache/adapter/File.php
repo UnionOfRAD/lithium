@@ -95,9 +95,7 @@ class File extends \lithium\storage\cache\Adapter {
 			$keys = $this->_addScopePrefix($this->_config['scope'], $keys, '_');
 		}
 		foreach ($keys as $key => $value) {
-			$data = "{:expiry:{$expires}}\n{$value}";
-
-			if (!file_put_contents("{$this->_config['path']}/{$key}", $data)) {
+			if (!$this->_write($key, $value, $expires)) {
 				return false;
 			}
 		}
@@ -120,23 +118,15 @@ class File extends \lithium\storage\cache\Adapter {
 		$results = array();
 
 		foreach ($keys as $key) {
-			$file = new SplFileInfo($p = "{$this->_config['path']}/{$key}");
-
-			if (!$file->isFile() || !$file->isReadable()) {
+			if (!$item = $this->_read($key)) {
 				continue;
 			}
-			$data = file_get_contents($p);
-
-			preg_match('/^\{\:expiry\:(\d+)\}\\n/', $data, $matches);
-			$expiry = $matches[1];
-
-			if ($expiry < time() && $expiry != 0) {
-				file_exists($p) && unlink($p);
+			if ($item['expiry'] < time() && $item['expiry'] != 0) {
+				$this->_delete($key);
 				continue;
 			}
-			$results[$key] = preg_replace('/^\{\:expiry\:\d+\}\\n/', '', $data, 1);
+			$results[$key] = $item['value'];
 		}
-
 		if ($this->_config['scope']) {
 			$results = $this->_removeScopePrefix($this->_config['scope'], $results, '_');
 		}
@@ -154,12 +144,7 @@ class File extends \lithium\storage\cache\Adapter {
 			$keys = $this->_addScopePrefix($this->_config['scope'], $keys, '_');
 		}
 		foreach ($keys as $key) {
-			$file = new SplFileInfo($p = "{$this->_config['path']}/{$key}");
-
-			if (!$file->isFile() || !$file->isReadable()) {
-				return false;
-			}
-			if (!file_exists($p) || !unlink($p)) {
+			if (!$this->_delete($key)) {
 				return false;
 			}
 		}
@@ -212,9 +197,10 @@ class File extends \lithium\storage\cache\Adapter {
 	public function clear() {
 		$result = true;
 		foreach (new DirectoryIterator($this->_config['path']) as $file) {
-			if ($file->isFile()) {
-				$result = unlink($file->getPathName()) && $result;
+			if (!$file->isFile()) {
+				continue;
 			}
+			$result = $this->_delete($file->getBasename()) && $result;
 		}
 		return $result;
 	}
@@ -234,17 +220,82 @@ class File extends \lithium\storage\cache\Adapter {
 			if (!$file->isFile()) {
 				continue;
 			}
-			$data = file_get_contents($p = $file->getPathName());
-
-			if (!preg_match('/^\{\:expiry\:(\d+)\}\\n/', $data, $matches)) {
+			if (!$item = $this->_read($key = $file->getBasename())) {
 				continue;
 			}
-			if ($matches[1] > time()) {
+			if ($item['expiry'] > time()) {
 				continue;
 			}
-			$result = file_exists($p) && unlink($p) && $result;
+			$result = $this->_delete($key) && $result;
 		}
 		return $result;
+	}
+
+	/**
+	 * Compiles value to format and writes file.
+	 *
+	 * @see lithium\storage\cache\adapter\File::write()
+	 * @param string $key Key to uniquely identify the cached item.
+	 * @param mixed $value Value to store under given key.
+	 * @param integer $expires UNIX timestamp after which the item is invalid.
+	 * @return boolean `true` on success, `false` otherwise.
+	 */
+	protected function _write($key, $value, $expires) {
+		return file_put_contents(
+			"{$this->_config['path']}/{$key}",
+			$this->_compile($key, $value, $expires)
+		);
+	}
+
+	/**
+	 * Reads from file, parses its format and returns its expiry and value.
+	 *
+	 * @see lithium\storage\cache\adapter\File::read()
+	 * @param string $key Key to uniquely identify the cached item.
+	 * @return array|boolean Array with `expiry` and `value` or `false` otherwise.
+	 */
+	protected function _read($key) {
+		$path = "{$this->_config['path']}/{$key}";
+
+		if (!is_file($path) || !is_readable($path)) {
+			return false;
+		}
+		return $this->_parse(file_get_contents($path));
+	}
+
+	/**
+	 * Deletes a file using the corresponding cached item key.
+	 *
+	 * @see lithium\storage\cache\adapter\File::delete()
+	 * @param string $key Key to uniquely identify the cached item.
+	 * @return boolean `true` on success, `false` otherwise.
+	 */
+	protected function _delete($key) {
+		$path = "{$this->_config['path']}/{$key}";
+		return is_readable($path) && is_file($path) && unlink($path);
+	}
+
+	/**
+	 * Compiles value to format.
+	 *
+	 * @param string $key Key to uniquely identify the cached items.
+	 * @param mixed $value Value to store under given key.
+	 * @param integer $expires UNIX timestamp after which the item is invalid.
+	 * @return string The compiled data string.
+	 */
+	protected function _compile($key, $value, $expires) {
+		return "{:expiry:{$expires}}\n{$value}";
+	}
+
+	/**
+	 * Parses value from format.
+	 *
+	 * @param string $data Compiled data string.
+	 * @return array Array with `expiry` and `value`.
+	 */
+	protected function _parse($data) {
+		preg_match('/^\{\:expiry\:(\d+)\}\\n(.*)/sS', $data, $matches);
+		return array('expiry' => $matches[1], 'value' => $matches[2]);
 	}
 }
 
