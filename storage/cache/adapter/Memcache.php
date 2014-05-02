@@ -269,7 +269,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * @link http://www.php.net/manual/memcached.decrement.php
 	 * @param string $key Key of numeric cache item to decrement.
 	 * @param integer $offset Offset to decrement - defaults to `1`.
-	 * @return integer The item's new value on successful decrement, else `false`.
+	 * @return integer|boolean The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
 		return $this->connection->decrement(
@@ -284,9 +284,9 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * "If the item's value is not numeric, it is treated as if the value were 0."
 	 *
 	 * @link http://www.php.net/manual/memcached.decrement.php
-	 * @param string $key Key of numeric cache item to increment
+	 * @param string $key Key of numeric cache item to increment.
 	 * @param integer $offset Offset to increment - defaults to `1`.
-	 * @return integer The item's new value on successful increment, else `false`.
+	 * @return integer|boolean The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
 		return $this->connection->increment(

@@ -325,7 +325,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param array $options Options for this method.
 	 *              - `'conditions'`: A function or item that must return or evaluate to
 	 *                                `true` in order to continue operation.
-	 * @return mixed Item's new value on successful increment, false otherwise.
+	 * @return integer|boolean Item's new value on successful increment, false otherwise.
 	 * @filter This method may be filtered.
 	 */
 	public static function increment($name, $key, $offset = 1, array $options = array()) {
@@ -358,7 +358,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param array $options Options for this method.
 	 *              - `'conditions'`: A function or item that must return or evaluate to
 	 *                                `true` in order to continue operation.
-	 * @return mixed Item's new value on successful decrement, false otherwise.
+	 * @return integer|boolean Item's new value on successful decrement, false otherwise.
 	 * @filter This method may be filtered.
 	 */
 	public static function decrement($name, $key, $offset = 1, array $options = array()) {

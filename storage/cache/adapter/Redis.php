@@ -256,7 +256,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 *
 	 * @param string $key Key of numeric cache item to decrement.
 	 * @param integer $offset Offset to decrement - defaults to `1`.
-	 * @return integer The item's new value on successful decrement, else `false`.
+	 * @return integer|boolean The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
 		return $this->connection->decr($key, $offset);
@@ -269,9 +269,9 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 * operation will have no effect whatsoever. Redis chooses to not typecast values
 	 * to integers when performing an atomic increment operation.
 	 *
-	 * @param string $key Key of numeric cache item to increment
+	 * @param string $key Key of numeric cache item to increment.
 	 * @param integer $offset Offset to increment - defaults to `1`.
-	 * @return integer The item's new value on successful increment, else `false`.
+	 * @return integer|boolean The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
 		return $this->connection->incr($key, $offset);
