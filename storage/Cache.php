@@ -53,10 +53,9 @@ use lithium\core\ConfigException;
  * if an adapter meets your requirement and for more information on the specifics
  * (i.e. atomicity of operations), consult the documentation the adapter first.
  *
- * All adapters will provide `write`, `read` and `delete` functionality. On top of that
- * adapters may provide `increment`/`decrement` and `clear` functionality as well as
- * direct access to additional methods. Which allows for a very wide range of flexibility
- * at the cost of portability.
+ * All adapters will provide `write`, `read`, `delete` and `increment`/`decrement` functionality. On
+ * top of that adapters may provide `clean` and `clear` functionality as well as direct access to
+ * additional methods. Which allows for a very wide range of flexibility at the cost of portability.
  *
  * {{{
  * Cache::adapter('default')->methodName($argument);

@@ -12,11 +12,11 @@ namespace lithium\storage\cache;
  * This is the foundation class for all cache adapters.
  *
  * Each adapter provides a consistent interface for the basic cache operations of `write`, `read`,
- * and `delete`, which can always be _used interchangeably_ between and must be implemented by all
- * adapters.
+ * `delete`, `increment` and `decrement`  which can always be _used interchangeably_ between and
+ * must be implemented by all adapters.
  *
- * Functionality for `clear`, `clean`, `increment` and `decrement` may or may not be implemented
- * by an adapter. Calling a method that is not implemented will simply return `false`.
+ * Functionality for `clear`, `clean`  may or may not be implemented by an adapter. Calling a
+ * method that is not implemented will simply return `false`.
  *
  * An adapter may provide access to additional methods. It's always possible to call them directly.
  * This allows a very wide range of flexibility, at the cost of portability.
@@ -68,22 +68,18 @@ abstract class Adapter extends \lithium\core\Object {
 	 *
 	 * @param string $key Key of numeric cache item to decrement.
 	 * @param integer $offset Offset to decrement - defaults to `1`.
-	 * @return integer The item's new value on successful decrement, else `false`.
+	 * @return integer|boolean The item's new value on successful decrement, else `false`.
 	 */
-	public function decrement($key, $offset = 1) {
-		return false;
-	}
+	abstract public function decrement($key, $offset = 1);
 
 	/**
 	 * Performs an increment operation on specified numeric cache item.
 	 *
-	 * @param string $key Key of numeric cache item to increment
+	 * @param string $key Key of numeric cache item to increment.
 	 * @param integer $offset Offset to increment - defaults to `1`.
-	 * @return integer The item's new value on successful increment, else `false`.
+	 * @return integer|boolean The item's new value on successful increment, else `false`.
 	 */
-	public function increment($key, $offset = 1) {
-		return false;
-	}
+	abstract public function increment($key, $offset = 1);
 
 	/**
 	 * Clears entire cache by flushing it. All cache keys using the
