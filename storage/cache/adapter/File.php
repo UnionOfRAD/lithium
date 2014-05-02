@@ -152,37 +152,43 @@ class File extends \lithium\storage\cache\Adapter {
 	}
 
 	/**
-	 * Performs a decrement operation on specified numeric cache item.
+	 * Performs a decrement operation on a specified numeric cache item.
 	 *
 	 * @param string $key Key of numeric cache item to decrement.
 	 * @param integer $offset Offset to decrement - defaults to `1`.
 	 * @return integer|boolean The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		if (!$results = $this->read(array($key))) {
+		if ($this->_config['scope']) {
+			$key = "{$this->_config['scope']}_{$key}";
+		}
+		if (!$result = $this->_read($key)) {
 			return false;
 		}
-		if (!$this->write(array($key => ($value = current($results) - $offset)))) {
+		if (!$this->_write($key, $result['value'] -= $offset, $result['expiry'])) {
 			return false;
 		}
-		return $value;
+		return $result['value'];
 	}
 
 	/**
-	 * Performs an increment operation on specified numeric cache item.
+	 * Performs an increment operation on a specified numeric cache item.
 	 *
 	 * @param string $key Key of numeric cache item to increment
 	 * @param integer $offset Offset to increment - defaults to `1`.
 	 * @return integer|boolean The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		if (!$results = $this->read(array($key))) {
+		if ($this->_config['scope']) {
+			$key = "{$this->_config['scope']}_{$key}";
+		}
+		if (!$result = $this->_read($key)) {
 			return false;
 		}
-		if (!$this->write(array($key => ($value = current($results) + $offset)))) {
+		if (!$this->_write($key, $result['value'] += $offset, $result['expiry'])) {
 			return false;
 		}
-		return $value;
+		return $result['value'];
 	}
 
 	/**
