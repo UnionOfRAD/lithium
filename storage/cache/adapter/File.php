@@ -106,6 +106,8 @@ class File extends \lithium\storage\cache\Adapter {
 	 * Read values from the cache. Will attempt to return an array of data
 	 * containing key/value pairs of the requested data.
 	 *
+	 * Invalidates and cleans up expired items on-the-fly when found.
+	 *
 	 * @param array $keys Keys to uniquely identify the cached items.
 	 * @return array Cached values keyed by cache keys on successful read,
 	 *               keys which could not be read will not be included in
