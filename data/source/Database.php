@@ -1649,12 +1649,11 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Create a database-native schema
 	 *
-	 * @param string $name A table name.
+	 * @param string $source A table name.
 	 * @param object $schema A `Schema` instance.
 	 * @return boolean `true` on success, `true` otherwise
 	 */
 	public function createSchema($source, $schema) {
-
 		if (!$schema instanceof $this->_classes['schema']) {
 			throw new InvalidArgumentException("Passed schema is not a valid `{$class}` instance.");
 		}
@@ -1733,9 +1732,9 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Drop a table
+	 * Drops a table.
 	 *
-	 * @param string $name The table name to drop.
+	 * @param string $source The table name to drop.
 	 * @param boolean $soft With "soft dropping", the function will retrun `true` even if the
 	 *                table doesn't exists.
 	 * @return boolean `true` on success, `false` otherwise
