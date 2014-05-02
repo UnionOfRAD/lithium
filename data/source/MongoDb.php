@@ -558,7 +558,9 @@ class MongoDb extends \lithium\data\Source {
 				$args['data']['_id'] = $self->invokeMethod('_saveFile', array($data['update']));
 			}
 			$update = $query->entity() ? $_exp::toCommand($data) : $data;
-
+			if (empty($update)) {
+				return true;
+			}
 			if ($options['multiple'] && !preg_grep('/^\$/', array_keys($update))) {
 				$update = array('$set' => $update);
 			}
