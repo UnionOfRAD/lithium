@@ -1712,7 +1712,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @param type $joiner The join character
 	 * @return string The SQL constraints
 	 */
-	protected function _buildconstraints(array $constraints, $schema = null, $joiner = ' ', $primary = false) {
+	protected function _buildConstraints(array $constraints, $schema = null, $joiner = ' ', $primary = false) {
 		$result = '';
 		foreach ($constraints as $constraint) {
 			if (isset($constraint['type'])) {
