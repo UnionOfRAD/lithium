@@ -21,13 +21,12 @@ use Closure;
  * memcached server instance must be available.
  *
  * This adapter natively handles multi-key reads/writes/deletes, natively
- * provides serialization features and supports atomic increment/decrement
- * operations as well as clearing the entire cache. Delegation of method calls
- * to the connection object is available.
+ * provides serialization and key scoping features and supports atomic
+ * increment/decrement operations as well as clearing the entire cache.
+ * Delegation of method calls to the connection object is available.
  *
  * Cached item persistence is not guaranteed. Infrequently used items will
- * be evicted from the cache when there is no room to store new ones. Scope
- * support is available but not natively.
+ * be evicted from the cache when there is no room to store new ones.
  *
  * A simple configuration can be accomplished as follows:
  *
@@ -100,8 +99,9 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	}
 
 	/**
-	 * Handles the actual `Memcached` connection and server connection adding for the adapter
-	 * constructor.
+	 * Handles the actual `Memcached` connection and server connection
+	 * adding for the adapter constructor and sets prefix using the scope
+	 * if provided.
 	 *
 	 * @return void
 	 */
@@ -114,6 +114,10 @@ class Memcache extends \lithium\storage\cache\Adapter {
 			return;
 		}
 		$this->connection->addServers($this->_formatHostList($this->_config['host']));
+
+		if ($this->_config['scope']) {
+			$this->connection->setOption(Memcached::OPT_PREFIX_KEY, "{$this->_config['scope']}:");
+		}
 	}
 
 	/**
@@ -203,9 +207,6 @@ class Memcache extends \lithium\storage\cache\Adapter {
 		} else {
 			$expires = strtotime($expiry);
 		}
-		if ($this->_config['scope']) {
-			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
-		}
 		if (count($keys) > 1) {
 			return $this->connection->setMulti($keys, $expires);
 		}
@@ -222,10 +223,6 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 *               the results array.
 	 */
 	public function read(array $keys) {
-		if ($this->_config['scope']) {
-			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
-		}
-
 		if (count($keys) > 1) {
 			if (!$results = $this->connection->getMulti($keys)) {
 				return array();
@@ -238,10 +235,6 @@ class Memcache extends \lithium\storage\cache\Adapter {
 			}
 			$results = array($key => $result);
 		}
-
-		if ($this->_config['scope']) {
-			$results = $this->_removeScopePrefix($this->_config['scope'], $results);
-		}
 		return $results;
 	}
 
@@ -252,9 +245,6 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * @return boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete(array $keys) {
-		if ($this->_config['scope']) {
-			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
-		}
 		if (count($keys) > 1) {
 			return $this->connection->deleteMulti($keys);
 		}
@@ -274,9 +264,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * @return integer|boolean The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		return $this->connection->decrement(
-			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
-		);
+		return $this->connection->decrement($key, $offset);
 	}
 
 	/**
@@ -291,9 +279,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * @return integer|boolean The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		return $this->connection->increment(
-			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
-		);
+		return $this->connection->increment($key, $offset);
 	}
 
 	/**
