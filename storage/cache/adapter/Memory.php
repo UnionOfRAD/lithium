@@ -114,6 +114,9 @@ class Memory extends \lithium\storage\cache\Adapter {
 	 * @return integer|boolean The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
+		if (!array_key_exists($key, $this->_cache)) {
+			return false;
+		}
 		return $this->_cache[$key] -= 1;
 	}
 
@@ -125,6 +128,9 @@ class Memory extends \lithium\storage\cache\Adapter {
 	 * @return integer|boolean The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
+		if (!array_key_exists($key, $this->_cache)) {
+			return false;
+		}
 		return $this->_cache[$key] += 1;
 	}
 
