@@ -89,7 +89,6 @@ class MongoDbTest extends \lithium\test\Unit {
 	public function testBadConnection() {
 		$db = new MongoDb(array('host' => null, 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
-		$this->expectException('/getaddrinfo failed/');
 		$this->assertFalse($db->connect());
 		$this->assertTrue($db->disconnect());
 	}
@@ -605,7 +604,6 @@ class MongoDbTest extends \lithium\test\Unit {
 	public function testCreateNoConnectionException() {
 		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
 		$this->expectException('Could not connect to the database.');
-		$this->expectException('/getaddrinfo failed/');
 		$result = $db->create(null);
 	}
 
@@ -852,7 +850,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual('insert', $result['method']);
 		$this->assertEqual($expected, $result['params']);
 
-		$query = new Query(array('type' => 'read', 'source' => 'custom'));
+		$query = new Query(array('type' => 'read', 'source' => 'custom', 'data' => array('something')));
 		$this->_db->update($query);
 		$result = $this->_db->connection->custom->call;
 		$expected = array('upsert' => false, 'multiple' => true, 'w' => 1, 'wTimeoutMS' => 10000, 'fsync' => false);
@@ -878,7 +876,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual('insert', $result['method']);
 		$this->assertEqual($expected, $result['params']);
 
-		$query = new Query(array('type' => 'read', 'source' => 'custom'));
+		$query = new Query(array('type' => 'read', 'source' => 'custom', 'data' => array('something')));
 		$this->_db->update($query);
 		$result = $this->_db->connection->custom->call;
 		$expected = array(
