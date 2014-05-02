@@ -23,10 +23,9 @@ use Closure;
  *
  * This adapter has no external dependencies. Operations in read/write/delete are atomic
  * for single-keys only. Clearing the cache is supported. Real persistence of cached items
- * is provided.
+ * is provided. Increment/decrement functionality is provided but only in a non-atomic way.
  *
- * This adapter does *not* provided increment/decrement functionality and also can't handle
- * serialization natively. Scope support is available but not natively.
+ * This can't handle serialization natively. Scope support is available but not natively.
  *
  * A simple configuration can be accomplished as follows:
  *
@@ -165,6 +164,40 @@ class File extends \lithium\storage\cache\Adapter {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Performs a decrement operation on specified numeric cache item.
+	 *
+	 * @param string $key Key of numeric cache item to decrement.
+	 * @param integer $offset Offset to decrement - defaults to `1`.
+	 * @return integer|boolean The item's new value on successful decrement, else `false`.
+	 */
+	public function decrement($key, $offset = 1) {
+		if (!$results = $this->read(array($key))) {
+			return false;
+		}
+		if (!$this->write(array($key => ($value = current($results) - $offset)))) {
+			return false;
+		}
+		return $value;
+	}
+
+	/**
+	 * Performs an increment operation on specified numeric cache item.
+	 *
+	 * @param string $key Key of numeric cache item to increment
+	 * @param integer $offset Offset to increment - defaults to `1`.
+	 * @return integer|boolean The item's new value on successful increment, else `false`.
+	 */
+	public function increment($key, $offset = 1) {
+		if (!$results = $this->read(array($key))) {
+			return false;
+		}
+		if (!$this->write(array($key => ($value = current($results) + $offset)))) {
+			return false;
+		}
+		return $value;
 	}
 
 	/**
