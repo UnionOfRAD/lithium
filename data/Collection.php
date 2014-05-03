@@ -280,7 +280,7 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	public function rewind() {
 		$this->_started = true;
 		reset($this->_data);
-		$this->_valid = !empty($this->_data) || !is_null($this->_populate());
+		$this->_valid = !empty($this->_data) || $this->_populate() !== null;
 		return current($this->_data);
 	}
 
@@ -339,9 +339,10 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 			$this->rewind();
 		}
 		next($this->_data);
-		$this->_valid = !(key($this->_data) === null);
+		$this->_valid = key($this->_data) !== null;
+
 		if (!$this->_valid) {
-			$this->_valid = !is_null($this->_populate());
+			$this->_valid = $this->_populate() !== null;
 		}
 		return current($this->_data);
 	}

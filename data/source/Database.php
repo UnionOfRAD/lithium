@@ -955,7 +955,7 @@ abstract class Database extends \lithium\data\Source {
 				if (is_numeric($key)) {
 					return $this->value($value);
 				}
-			case is_scalar($value) || is_null($value):
+			case is_scalar($value) || $value === null:
 				if ($context && ($context->type() === 'read') && ($alias = $context->alias())) {
 					$key = $this->_aliasing($key, $alias);
 				}

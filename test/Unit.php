@@ -1882,7 +1882,7 @@ class Unit extends \lithium\core\Object {
 	 * @return bool
 	 */
 	public function assertNotNull($actual, $message = '{:message}') {
-		return $this->assert(!is_null($actual), $message, array(
+		return $this->assert($actual !== null, $message, array(
 			'expected' => null,
 			'actual' => gettype($actual)
 		));

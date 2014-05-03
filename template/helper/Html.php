@@ -151,7 +151,7 @@ class Html extends \lithium\template\Helper {
 			return $this->_metaLink($type, $url, $options);
 		}
 
-		$url = is_null($url) ? $title : $url;
+		$url = $url === null ? $title : $url;
 		return $this->_render(__METHOD__, 'link', compact('title', 'url', 'options'), $scope);
 	}
 

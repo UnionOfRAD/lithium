@@ -412,7 +412,7 @@ class Set {
 		$options += $defaults;
 		$result = array();
 
-		if (!is_null($options['path'])) {
+		if ($options['path'] !== null) {
 			$options['path'] .= $options['separator'];
 		}
 		foreach ($data as $key => $val) {
@@ -773,7 +773,7 @@ class Set {
 			$stack = array();
 			foreach ((array) $results as $k => $r) {
 				$id = $k;
-				if (!is_null($key)) {
+				if ($key !== null) {
 					$id = $key;
 				}
 				if (is_array($r)) {

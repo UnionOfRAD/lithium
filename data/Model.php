@@ -1030,7 +1030,7 @@ class Model extends \lithium\core\StaticObject {
 		if ($methods === array()) {
 			return static::$_instanceMethods[$class] = array();
 		}
-		if (!is_null($methods)) {
+		if ($methods !== null) {
 			static::$_instanceMethods[$class] = $methods + static::$_instanceMethods[$class];
 		}
 		return static::$_instanceMethods[$class];

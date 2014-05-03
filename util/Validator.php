@@ -306,11 +306,11 @@ class Validator extends \lithium\core\StaticObject {
 					return false;
 				}
 				switch (true) {
-					case (!is_null($options['upper']) && !is_null($options['lower'])):
+					case ($options['upper'] !== null && $options['lower'] !== null):
 						return ($value >= $options['lower'] && $value <= $options['upper']);
-					case (!is_null($options['upper'])):
+					case ($options['upper'] !== null):
 						return ($value <= $options['upper']);
-					case (!is_null($options['lower'])):
+					case ($options['lower'] !== null):
 						return ($value >= $options['lower']);
 				}
 				return is_finite($value);

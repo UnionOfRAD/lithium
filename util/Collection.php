@@ -152,7 +152,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 		if ($format === false) {
 			return static::$_formats = array('array' => 'lithium\util\Collection::toArray');
 		}
-		if ((is_null($handler)) && class_exists($format)) {
+		if ($handler === null && class_exists($format)) {
 			return static::$_formats[] = $format;
 		}
 		return static::$_formats[$format] = $handler;
@@ -418,7 +418,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The value which was set.
 	 */
 	public function offsetSet($offset, $value) {
-		if (is_null($offset)) {
+		if ($offset === null) {
 			return $this->_data[] = $value;
 		}
 		return $this->_data[$offset] = $value;

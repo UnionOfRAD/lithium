@@ -134,7 +134,7 @@ class Parser extends \lithium\core\StaticObject {
 		};
 
 		$capture = function($token) use (&$matches, &$patternMatch, $tokens, $breaks, $options) {
-			if (is_null($token)) {
+			if ($token === null) {
 				$matches = $patternMatch = array();
 				return false;
 			}

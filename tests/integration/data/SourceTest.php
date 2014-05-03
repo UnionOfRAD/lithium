@@ -131,7 +131,7 @@ class SourceTest extends \lithium\tests\integration\data\Base {
 		$result = Galleries::find('first', array('fields' => array('name')));
 		$this->assertNotInternalType('null', $result);
 
-		$this->skipIf(is_null($result), 'No result returned to test');
+		$this->skipIf($result === null, 'No result returned to test');
 		$result = $result->data();
 		$this->assertEqual($expected['name'], $result['name']);
 

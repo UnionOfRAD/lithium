@@ -190,7 +190,7 @@ class Profiler extends \lithium\test\Filter {
 	 * @return mixed
 	 */
 	public function check($name, $value = null) {
-		if (is_null($value) && !is_array($name)) {
+		if ($value === null && !is_array($name)) {
 			return isset(static::$_metrics[$name]) ? static::$_metrics[$name] : null;
 		}
 

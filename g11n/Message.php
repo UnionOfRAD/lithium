@@ -195,7 +195,7 @@ class Message extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, $params, function($self, $params) use (&$cache) {
 			extract($params);
 
-			if (isset($options['context']) && !is_null($options['context'])) {
+			if (isset($options['context']) && $options['context'] !== null) {
 				$context = $options['context'];
 				$id = "{$id}|{$context}";
 			}
