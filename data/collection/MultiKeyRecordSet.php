@@ -95,6 +95,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 			while ($record = $this->_populate()) {
 				$curKey = $model::key($record);
 				$keySet = $offsetKey == $curKey;
+
 				if (!is_null($offset) && $keySet) {
 					return $record;
 				}
