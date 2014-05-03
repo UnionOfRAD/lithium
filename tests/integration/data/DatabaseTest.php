@@ -15,6 +15,7 @@ use lithium\tests\fixture\model\gallery\Images;
 use lithium\tests\fixture\model\gallery\Galleries;
 use lithium\util\String;
 use li3_fixtures\test\Fixtures;
+use lithium\data\Schema;
 
 class DatabaseTest extends \lithium\tests\integration\data\Base {
 
@@ -346,6 +347,33 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$this->assertEqual($expected, $result);
 
 		Fixtures::clear('db_alternative');
+	}
+
+	/**
+	 * Tests if the `value()` and `_cast()` methods work correctly
+	 * when a schema is hardcoded.
+	 *
+	 * @link https://github.com/UnionOfRAD/lithium/issues/1003
+	 */
+	public function testValueWithHardcodedSchema() {
+		Galleries::config(array(
+			'schema' => new Schema(array(
+				'fields' => array(
+					'id' => array('type' => 'id'),
+					'name' => array('type' => 'string', 'length' => 50),
+					'active' => array('type' => 'boolean', 'default' => true),
+					'created' => array('type' => 'datetime'),
+					'modified' => array('type' => 'datetime')
+				)
+			))
+		));
+		$results = Galleries::find('all', array(
+			'conditions' => array(
+				'name' => 'Foo Gallery'
+			),
+			'order' => array('id' => 'DESC')
+		));
+		$this->assertEqual(1, $results->count());
 	}
 }
 
