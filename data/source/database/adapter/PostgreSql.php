@@ -488,10 +488,11 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Helper for `DatabaseSchema::_column()`
+	 * Helper for `Database::column()`.
 	 *
-	 * @param array $field A field array
-	 * @return string SQL column string
+	 * @see lithium\data\Database::column()
+	 * @param array $field A field array.
+	 * @return string SQL column string.
 	 */
 	protected function _buildColumn($field) {
 		extract($field);

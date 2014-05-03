@@ -1570,12 +1570,12 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Build a SQL column/table meta
+	 * Build a SQL column/table meta.
 	 *
-	 * @param string $type The type of the meta to build (possible values: 'table' or 'column')
-	 * @param string $name The name of the meta to build
-	 * @param mixed $value The value used for building the meta
-	 * @return string The SQL meta string
+	 * @param string $type The type of the meta to build (possible values: `'table'` or `'column'`).
+	 * @param string $name The name of the meta to build.
+	 * @param mixed $value The value used for building the meta.
+	 * @return string The SQL meta string.
 	 */
 	protected function _meta($type, $name, $value) {
 		$meta = isset($this->_metas[$type][$name]) ? $this->_metas[$type][$name] : null;

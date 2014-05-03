@@ -378,14 +378,14 @@ class Command extends \lithium\core\Object {
 	/**
 	 * Handles the response that is sent to the stream.
 	 *
-	 * @param string $type the stream either output or error
-	 * @param string $string the message to render
-	 * @param integer|string|array $options
-	 *        integer as the number of new lines.
-	 *        string as the style
-	 *        array as :
-	 *        - nl : number of new lines to add at the end
-	 *        - style : the style name to wrap around the
+	 * @param string $type The stream either output or error.
+	 * @param string $string The message to render.
+	 * @param integer|string|array $options When passed an integer is used as the number
+	 *                             of new lines, when passed a string it is interpreted as
+	 *                             style to use otherwise when an array following options are
+	 *                             available:
+	 *                             - `'nl'` _integer_: number of new lines to add at the end.
+	 *                             - `'style'` _string_: the style name to wrap around the.
 	 * @return void
 	 */
 	protected function _response($type, $string, $options) {

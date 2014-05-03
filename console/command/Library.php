@@ -288,6 +288,7 @@ class Library extends \lithium\console\Command {
 	 *
 	 * @param string $extracted contains the path to the extracted archive.
 	 * @param array $options Valid options are:
+	 *        - `'namespace'`: Namespace used for extracted libraries.
 	 *        - `'replacements'`: an array of string replacements indexed by filename.
 	 *          It's also possible to use glob-style wildcards in the filename such
 	 *          as `*` or `*.php` or `resources/g11n/*`.  If the filename starts
