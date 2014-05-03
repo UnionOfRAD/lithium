@@ -363,6 +363,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 */
 	protected function _buildColumn($field) {
 		extract($field);
+
 		if ($type === 'float' && $precision) {
 			$use = 'numeric';
 		}

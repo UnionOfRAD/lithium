@@ -301,23 +301,24 @@ class Library extends \lithium\console\Command {
 	 *          both set to the extracted library's namespace.
 	 * @return boolean
 	 */
-	protected function _replaceAfterExtract($extracted, $options = array()) {
-		$namespace = $this->namespace;
-		$library = $namespace;
-		$data = compact('namespace', 'library');
-		$replacements = array();
-		extract($options);
+	protected function _replaceAfterExtract($extracted, array $options = array()) {
+		$options += array(
+			'namespace' => $this->namespace,
+			'replacements' => array(),
+			'data' => array(
+				'namespace' => $this->namespace,
+				'library' => $this->namespace
+			)
+		);
 
-		if (empty($replacements)) {
-			$replacements = array(
-				'config/bootstrap/libraries.php' => array(
-					"Libraries::add('app'" => "Libraries::add('{:namespace}'"
-				),
-				'*.php' => array(
-					"namespace app\\" => "namespace {:namespace}\\"
-				)
-			);
-		}
+		$replacements = $options['replacements'] ?: array(
+			'config/bootstrap/libraries.php' => array(
+				"Libraries::add('app'" => "Libraries::add('{:namespace}'"
+			),
+			'*.php' => array(
+				"namespace app\\" => "namespace {:namespace}\\"
+			)
+		);
 
 		if (dirname(LITHIUM_APP_PATH) . '/libraries' !== $this->lithiumLibraryPath) {
 			$pathinfo = pathinfo($this->lithiumLibraryPath);
@@ -339,8 +340,8 @@ class Library extends \lithium\console\Command {
 		foreach ($replacements as $filename => $definitions) {
 			foreach ($definitions as $search => $replace) {
 				unset($definitions[$search]);
-				$search = String::insert($search, $data);
-				$replace = String::insert($replace, $data);
+				$search = String::insert($search, $options['data']);
+				$replace = String::insert($replace, $options['data']);
 				$definitions[$search] = $replace;
 			}
 			$paths = $this->_wildcardPaths($filename, $extracted);

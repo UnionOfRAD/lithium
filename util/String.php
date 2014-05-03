@@ -393,8 +393,7 @@ class String {
 	 * @return array Returns an array of tokens.
 	 */
 	public static function tokenize($data, array $options = array()) {
-		$defaults = array('separator' => ',', 'leftBound' => '(', 'rightBound' => ')');
-		extract($options + $defaults);
+		$options += array('separator' => ',', 'leftBound' => '(', 'rightBound' => ')');
 
 		if (!$data || is_array($data)) {
 			return $data;
@@ -410,9 +409,9 @@ class String {
 		while ($offset <= $length) {
 			$tmpOffset = -1;
 			$offsets = array(
-				strpos($data, $separator, $offset),
-				strpos($data, $leftBound, $offset),
-				strpos($data, $rightBound, $offset)
+				strpos($data, $options['separator'], $offset),
+				strpos($data, $options['leftBound'], $offset),
+				strpos($data, $options['rightBound'], $offset)
 			);
 
 			for ($i = 0; $i < 3; $i++) {
@@ -428,25 +427,25 @@ class String {
 			}
 			$buffer .= substr($data, $offset, ($tmpOffset - $offset));
 
-			if ($data[$tmpOffset] === $separator && $depth === 0) {
+			if ($data[$tmpOffset] === $options['separator'] && $depth === 0) {
 				$results[] = $buffer;
 				$buffer = '';
 			} else {
 				$buffer .= $data{$tmpOffset};
 			}
 
-			if ($leftBound !== $rightBound) {
-				if ($data[$tmpOffset] === $leftBound) {
+			if ($options['leftBound'] !== $options['rightBound']) {
+				if ($data[$tmpOffset] === $options['leftBound']) {
 					$depth++;
 				}
-				if ($data[$tmpOffset] === $rightBound) {
+				if ($data[$tmpOffset] === $options['rightBound']) {
 					$depth--;
 				}
 				$offset = ++$tmpOffset;
 				continue;
 			}
 
-			if ($data[$tmpOffset] === $leftBound) {
+			if ($data[$tmpOffset] === $options['leftBound']) {
 				($open) ? $depth-- : $depth++;
 				$open = !$open;
 			}

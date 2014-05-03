@@ -409,13 +409,11 @@ class Command extends \lithium\core\Object {
 			}
 			return;
 		}
-		extract($options);
-
-		if ($style !== null && !$this->plain) {
-			$string = "{:{$style}}{$string}{:end}";
+		if ($options['style'] !== null && !$this->plain) {
+			$string = "{:{$options['style']}}{$string}{:end}";
 		}
-		if ($nl) {
-			$string = $string . $this->nl($nl);
+		if ($options['nl']) {
+			$string = $string . $this->nl($options['nl']);
 		}
 		return $this->response->{$type}($string);
 	}

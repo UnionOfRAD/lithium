@@ -27,8 +27,7 @@ class MockComment extends \lithium\data\Model {
 		$self = static::_object();
 
 		$filter = function($self, $params) {
-			extract($params);
-			$query = new Query(array('type' => 'read') + $options);
+			$query = new Query(array('type' => 'read') + $params['options']);
 
 			return new RecordSet(array(
 				'query'    => $query,

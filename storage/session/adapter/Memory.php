@@ -69,12 +69,10 @@ class Memory extends \lithium\core\Object {
 		$session = $this->_session;
 
 		return function($self, $params) use ($session) {
-			extract($params);
-
-			if (!$key) {
+			if (!$params['key']) {
 				return $session;
 			}
-			return isset($session[$key]) ? $session[$key] : null;
+			return isset($session[$params['key']]) ? $session[$params['key']] : null;
 		};
 	}
 
@@ -90,8 +88,7 @@ class Memory extends \lithium\core\Object {
 		$session =& $this->_session;
 
 		return function($self, $params) use (&$session) {
-			extract($params);
-			return (boolean) ($session[$key] = $value);
+			return (boolean) ($session[$params['key']] = $params['value']);
 		};
 	}
 
@@ -106,9 +103,8 @@ class Memory extends \lithium\core\Object {
 		$session =& $this->_session;
 
 		return function($self, $params) use (&$session) {
-			extract($params);
-			unset($session[$key]);
-			return !isset($session[$key]);
+			unset($session[$params['key']]);
+			return !isset($session[$params['key']]);
 		};
 	}
 

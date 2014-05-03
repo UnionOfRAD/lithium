@@ -1579,16 +1579,16 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function _meta($type, $name, $value) {
 		$meta = isset($this->_metas[$type][$name]) ? $this->_metas[$type][$name] : null;
+
 		if (!$meta || (isset($meta['options']) && !in_array($value, $meta['options']))) {
 			return;
 		}
 		$meta += array('keyword' => '', 'escape' => false, 'join' => ' ');
-		extract($meta);
-		if ($escape === true) {
+
+		if ($meta['escape'] === true) {
 			$value = $this->value($value, array('type' => 'string'));
 		}
-		$result = $keyword . $join . $value;
-		return $result !== ' ' ? $result : '';
+		return ($result = "{$meta['keyword']}{$meta['join']}{$value}") !== ' ' ? $result : '';
 	}
 
 	/**
@@ -1761,18 +1761,14 @@ abstract class Database extends \lithium\data\Source {
 		if (!isset($field['type'])) {
 			$field['type'] = 'string';
 		}
-
 		if (!isset($field['name'])) {
 			throw new InvalidArgumentException("Column name not defined.");
 		}
-
 		if (!isset($this->_columns[$field['type']])) {
 			throw new UnexpectedValueException("Column type `{$field['type']}` does not exist.");
 		}
 
-		$field += $this->_columns[$field['type']];
-
-		$field += array(
+		$field += $this->_columns[$field['type']] + array(
 			'name' => null,
 			'type' => null,
 			'length' => null,
