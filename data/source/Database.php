@@ -408,13 +408,14 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Cast a value according to a column type, used by `Database::value()`
+	 * Cast a value according to a column type, used by `Database::value()`.
 	 *
 	 * @see lithium\data\source\Database::value()
-	 * @param string $type Name of the column type
-	 * @param string $value Value to cast
-	 * @param array $column The column definition
-	 * @return mixed Casted value
+	 * @param string $type Name of the column type.
+	 * @param string $value Value to cast.
+	 * @param array $column The column definition.
+	 * @param array $schema Formatted array from `lithium\data\source\Database::schema()`.
+	 * @return mixed Casted value.
 	 */
 	protected function _cast($type, $value, $column, $schema = array()) {
 		$column += array('formatter' => null, 'format' => null);
