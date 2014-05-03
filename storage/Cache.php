@@ -53,10 +53,9 @@ use lithium\core\ConfigException;
  * if an adapter meets your requirement and for more information on the specifics
  * (i.e. atomicity of operations), consult the documentation the adapter first.
  *
- * All adapters will provide `write`, `read` and `delete` functionality. On top of that
- * adapters may provide `increment`/`decrement` and `clear` functionality as well as
- * direct access to additional methods. Which allows for a very wide range of flexibility
- * at the cost of portability.
+ * All adapters will provide `write`, `read`, `delete` and `increment`/`decrement` functionality. On
+ * top of that adapters may provide `clean` and `clear` functionality as well as direct access to
+ * additional methods. Which allows for a very wide range of flexibility at the cost of portability.
  *
  * {{{
  * Cache::adapter('default')->methodName($argument);
@@ -326,7 +325,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param array $options Options for this method.
 	 *              - `'conditions'`: A function or item that must return or evaluate to
 	 *                                `true` in order to continue operation.
-	 * @return mixed Item's new value on successful increment, false otherwise.
+	 * @return integer|boolean Item's new value on successful increment, false otherwise.
 	 * @filter This method may be filtered.
 	 */
 	public static function increment($name, $key, $offset = 1, array $options = array()) {
@@ -359,7 +358,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @param array $options Options for this method.
 	 *              - `'conditions'`: A function or item that must return or evaluate to
 	 *                                `true` in order to continue operation.
-	 * @return mixed Item's new value on successful decrement, false otherwise.
+	 * @return integer|boolean Item's new value on successful decrement, false otherwise.
 	 * @filter This method may be filtered.
 	 */
 	public static function decrement($name, $key, $offset = 1, array $options = array()) {
