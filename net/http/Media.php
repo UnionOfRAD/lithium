@@ -685,7 +685,9 @@ class Media extends \lithium\core\StaticObject {
 			$handler = array_filter($handler, $filter) + $handlers['default'] + $defaults;
 
 			if (isset($types[$type])) {
-				$header = current((array) $types[$type]);
+				$mimeTypes = (array) $types[$type];
+
+				$header  = current($mimeTypes);
 				$header .= $response->encoding ? "; charset={$response->encoding}" : '';
 				$response->headers('Content-Type', $header);
 			}
