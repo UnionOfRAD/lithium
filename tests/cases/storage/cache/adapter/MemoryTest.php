@@ -146,6 +146,9 @@ class MemoryTest extends \lithium\test\Unit {
 
 		$result = $this->Memory->increment($key);
 		$this->assertEqual($data + 1, $result);
+
+		$result = $this->Memory->increment($key, 2);
+		$this->assertEqual($data + 3, $result);
 	}
 
 	public function testIncrementNotExistent() {
@@ -167,6 +170,9 @@ class MemoryTest extends \lithium\test\Unit {
 
 		$result = $this->Memory->decrement($key);
 		$this->assertEqual($data - 1, $result);
+
+		$result = $this->Memory->decrement($key, 2);
+		$this->assertEqual($data - 3, $result);
 	}
 
 	public function testDecrementNotExistent() {

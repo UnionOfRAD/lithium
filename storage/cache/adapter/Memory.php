@@ -117,7 +117,7 @@ class Memory extends \lithium\storage\cache\Adapter {
 		if (!array_key_exists($key, $this->_cache)) {
 			return false;
 		}
-		return $this->_cache[$key] -= 1;
+		return $this->_cache[$key] -= $offset;
 	}
 
 	/**
@@ -131,7 +131,7 @@ class Memory extends \lithium\storage\cache\Adapter {
 		if (!array_key_exists($key, $this->_cache)) {
 			return false;
 		}
-		return $this->_cache[$key] += 1;
+		return $this->_cache[$key] += $offset;
 	}
 
 	/**
