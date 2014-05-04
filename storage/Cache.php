@@ -145,6 +145,15 @@ class Cache extends \lithium\core\Adaptable {
 	 * Cache::key('default', $key, $post[1]); // returns `'post:2'`
 	 * }}}
 	 *
+	 * This example shows a key mutating generator function:
+	 * {{{
+	 * $base = 'post';
+	 * $key  = function($id) use (&base) { return $base .= ":{$id}"; };
+	 *
+	 * Cache::key('default', $key, 1); // returns `'post:1'`
+	 * Cache::key('default', $key, 2); // returns `'post:1:2'`
+	 * }}}
+	 *
 	 * @param string $name Configuration to be used for generating key/s. Currently unused.
 	 * @param mixed $key String or an array of strings that will be used as the cache key/s.
 	 *              Also accepts associative arrays where the key part will be modified, but
