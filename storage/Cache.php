@@ -122,16 +122,16 @@ class Cache extends \lithium\core\Adaptable {
 	 * Using additional scalar or non-scalar data to generate key:
 	 * {{{
 	 * Cache::key('default', 'post', 2);
-	 * // returns `'post_1ad5be0d'`
+	 * // returns `'post:1ad5be0d'`
 	 *
 	 * Cache::key('default', 'post', array(2, 'json'));
-	 * // returns `'post_723f0e19'`
+	 * // returns `'post:723f0e19'`
 	 *
 	 * Cache::key('default', array('posts', 'banners'), 'json');
-	 * // returns `array('posts_6b072545', 'banners_6b072545')`
+	 * // returns `array('posts:6b072545', 'banners:6b072545')`
 	 *
 	 * Cache::key('default', array('posts' => 'foo', 'banners' => 'bar'), 'json');
-	 * // returns `array('posts_38ec40e5' => 'foo', 'banners_38ec40e5' => 'bar')`
+	 * // returns `array('posts:38ec40e5' => 'foo', 'banners:38ec40e5' => 'bar')`
 	 * }}}
 	 *
 	 * Or with a resuable key generator function:
@@ -139,10 +139,10 @@ class Cache extends \lithium\core\Adaptable {
 	 * $posts[0] = array('id' => 1);
 	 * $posts[1] = array('id' => 2);
 	 *
-	 * $key = function($data) { return 'post_' . $data['id']};
+	 * $key = function($data) { return 'post:' . $data['id']};
 	 *
-	 * Cache::key('default', $key, $post[0]); // returns `'post_1'`
-	 * Cache::key('default', $key, $post[1]); // returns `'post_2'`
+	 * Cache::key('default', $key, $post[0]); // returns `'post:1'`
+	 * Cache::key('default', $key, $post[1]); // returns `'post:2'`
 	 * }}}
 	 *
 	 * @param string $name Configuration to be used for generating key/s. Currently unused.
@@ -166,7 +166,7 @@ class Cache extends \lithium\core\Adaptable {
 
 		if ($data !== null) {
 			$data = hash('crc32b', is_scalar($data) ? $data : serialize($data));
-			$keys = array_map(function($key) use ($data) { return $key .= "_{$data}"; }, $keys);
+			$keys = array_map(function($key) use ($data) { return $key .= ":{$data}"; }, $keys);
 		}
 		$keys = $adapter->key($keys);
 		$keys = $hasData ? array_combine($keys, array_values((array) $key)) : $keys;

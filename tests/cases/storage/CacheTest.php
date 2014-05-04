@@ -87,24 +87,24 @@ class CacheTest extends \lithium\test\Unit {
 		Cache::config(array('default' => array('adapter' => 'Memory')));
 
 		$result = Cache::key('default', 'post', 2);
-		$expected = 'post_1ad5be0d';
+		$expected = 'post:1ad5be0d';
 		$this->assertIdentical($expected, $result);
 
 		$result = Cache::key('default', 'post', array(2, 'json'));
-		$expected = 'post_723f0e19';
+		$expected = 'post:723f0e19';
 		$this->assertIdentical($expected, $result);
 
 		$result = Cache::key('default', array('posts', 'banners'), 'json');
 		$expected = array(
-			'posts_6b072545',
-			'banners_6b072545'
+			'posts:6b072545',
+			'banners:6b072545'
 		);
 		$this->assertIdentical($expected, $result);
 
 		$result = Cache::key('default', array('posts' => 'foo', 'banners' => 'bar'), 'json');
 		$expected = array(
-			'posts_6b072545' => 'foo',
-			'banners_6b072545' => 'bar'
+			'posts:6b072545' => 'foo',
+			'banners:6b072545' => 'bar'
 		);
 		$this->assertIdentical($expected, $result);
 	}
@@ -131,11 +131,11 @@ class CacheTest extends \lithium\test\Unit {
 		$key = function($data = array()) {
 			$defaults = array('foo' => 'foo', 'bar' => 'bar');
 			$data += $defaults;
-			return 'composed_key_with_' . $data['foo'] . '_' . $data['bar'];
+			return 'composed_key_with:' . $data['foo'] . ':' . $data['bar'];
 		};
 
 		$result = Cache::key('default', $key, array('foo' => 'boo', 'bar' => 'far'));
-		$expected = 'composed_key_with_boo_far';
+		$expected = 'composed_key_with:boo:far';
 		$this->assertIdentical($expected, $result);
 	}
 
