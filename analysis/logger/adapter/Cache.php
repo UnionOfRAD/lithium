@@ -47,7 +47,15 @@ class Cache extends \lithium\core\Object {
 	/**
 	 * Class constructor.
 	 *
-	 * @param array $config
+	 * @see lithium\util\String
+	 * @param array $config Possible configuration options are:
+	 *              - `'config'`: The name of the cache configuration to use; defaults to none.
+	 *              - `'expiry'`: Defines when the logged item should expire, by default will
+	 *                try to expire as late as possible.
+	 *              - `'key'`: Either a pattern where priority and timestamp will be inserted
+	 *                or a closure wich must return a key to store the message under and
+	 *                which gets passed a params array as first and only argument; defaults
+	 *                to `'log_{:priority}_{:timestamp}'`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
