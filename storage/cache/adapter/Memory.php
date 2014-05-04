@@ -144,17 +144,6 @@ class Memory extends \lithium\storage\cache\Adapter {
 	 *
 	 * @return boolean Always returns `true`.
 	 */
-
-	/**
-	 * Clears entire cache by flushing it. All cache keys using the
-	 * configuration but *without* honoring the scope are removed.
-	 *
-	 * The operation will continue to remove keys even if removing
-	 * one single key fails, clearing thoroughly as possible. In any case
-	 * this method will return `true`.
-	 *
-	 * @return boolean Always returns `true`.
-	 */
 	public function clear() {
 		foreach ($this->_cache as $key => &$value) {
 			unset($this->_cache[$key]);
