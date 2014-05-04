@@ -45,7 +45,7 @@ class CacheTest extends \lithium\test\Unit {
 	public function testConstruct() {
 		$expected = array(
 			'config' => "cachelog",
-			'expiry' => "+999 days",
+			'expiry' => CacheStorage::PERSIST,
 			'key' => "cachelog_testkey",
 			'init' => true
 		);

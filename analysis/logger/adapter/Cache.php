@@ -58,9 +58,11 @@ class Cache extends \lithium\core\Object {
 	 *                to `'log_{:priority}_{:timestamp}'`.
 	 */
 	public function __construct(array $config = array()) {
+		$cache = $this->_classes['cache'];
+
 		$defaults = array(
 			'config' => null,
-			'expiry' => '+999 days',
+			'expiry' => $cache::PERSIST,
 			'key' => 'log_{:priority}_{:timestamp}'
 		);
 		parent::__construct($config + $defaults);
