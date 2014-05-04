@@ -154,7 +154,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * Cache::key('default', $key, 2); // returns `'post:1:2'`
 	 * }}}
 	 *
-	 * @param string $name Configuration to be used for generating key/s. Currently unused.
+	 * @param string $name Configuration to be used for generating key/s.
 	 * @param mixed $key String or an array of strings that will be used as the cache key/s.
 	 *              Also accepts associative arrays where the key part will be modified, but
 	 *              the value left untouched. Also accepts a key generator function that
