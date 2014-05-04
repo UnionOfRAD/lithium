@@ -115,9 +115,6 @@ class Cache extends \lithium\core\Adaptable {
 	 * Make a key safe to use with adapter (exact result depends
 	 * on key constraints enforced by the selected adapter:
 	 * {{{
-	 * Cache::key('default', 'posts for bjœrn');
-	 * // returns `'posts_for_bj_rn_fdf03955'`
-	 *
 	 * Cache::key('default', 'posts for Helgi Þorbjörnsson');
 	 * // returns `'posts_for_Helgi__orbj_rnsson_c7f8433a'`
 	 * }}}
