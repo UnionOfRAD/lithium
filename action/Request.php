@@ -218,7 +218,7 @@ class Request extends \lithium\net\http\Request {
 		$this->headers('Content-Length', $this->env('CONTENT_LENGTH'));
 
 		foreach ($this->_env as $name => $value) {
-			if (substr($name, 0, 5) == 'HTTP_') {
+			if ($name[0] === 'H' && strpos($name, 'HTTP_') === 0) {
 				$name = str_replace('_', ' ', substr($name, 5));
 				$name = str_replace(' ', '-', ucwords(strtolower($name)));
 				$this->headers($name, $value);
