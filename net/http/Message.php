@@ -90,16 +90,78 @@ class Message extends \lithium\net\Message {
 	}
 
 	/**
-	 * Add a header to rendered output, or return a single header or full header list.
+	 * Adds, gets or removes one or multiple headers at the same time.
 	 *
-	 * @param string $key A header name, a full header line (`'Key: Value'`), or an array of headers
-	 *        to set in `key => value` form.
-	 * @param string $value A value to set if `$key` is a string. If `null`, returns the value of the
-	 *        header corresponding to `$key`. If `false`, it unsets the header corresponding to `$key`.
-	 * @param boolean $replace Whether to override or add alongside any existing header with the same
-	 *        name.
-	 * @return mixed The value of a single header, or an array of compiled headers in the form
-	 *         `'Key: Value'`.
+	 * Header names are not normalized and their casing left untouched. When
+	 * headers are retrieved no sorting takes place. This behavior is inline
+	 * with the specification which states header names should be treated in
+	 * a case-insensitive way. Sorting is suggested but not required.
+	 *
+	 * {{{
+	 * // Get single or multiple headers.
+	 * $request->headers('Content-Type'); // returns 'text/plain'
+	 * $request->headers(); // returns array('Content-Type: text/plain', ... )
+	 *
+	 * // Set single or multiple headers.
+	 * $request->headers('Content-Type', 'text/plain');
+	 * $request->headers(array('Content-Type' => 'text/plain', ...));
+	 *
+	 * // Alternatively use full header line.
+	 * $request->headers('Content-Type: text/plain');
+	 * $request->headers(array('Content-Type: text/plain', ...));
+	 *
+	 * // Removing single or multiple headers.
+	 * $request->headers('Content-Type', false);
+	 * $request->headers(array('Content-Type' => false, ...));
+	 * }}}
+	 *
+	 * Certain header fields support multiple values. These can be separated by
+	 * comma or alternatively the header repeated for each value in the list.
+	 *
+	 * When explicitly adding a value to an already existing header (that is when
+	 * $replace is `false`) an array with those values is kept/created internally.
+	 * Later when retrieving headers the header will be repeated for each value.
+	 *
+	 * Note: Multiple headers of the same name are only valid if the values of
+	 * that header can be separated by comma as defined in section 4.2 of RFC2616.
+	 *
+	 * {{{
+	 * // Replace single or multiple headers
+	 * $request->headers('Cache-Control', 'no-store');
+	 * $request->headers(array('Cache-Control' => 'public'));
+	 * $request->headers('Cache-Control');
+	 * // returns array('Cache-Control: public')
+	 *
+	 * // Merging with existing array headers.
+	 * // Note that new elements are just appended and no sorting takes place.
+	 * $request->headers('Cache-Control', 'no-store');
+	 * $request->headers('Cache-Control', 'no-cache', false);
+	 * $request->headers('Cache-Control');
+	 * // returns array('Cache-Control: no-store', 'Cache-Control: no-cache')
+	 *
+	 * $request->headers('Cache-Control', 'no-store');
+	 * $request->headers('Cache-Control', array('no-cache'), false);
+	 * $request->headers('Cache-Control');
+	 * // returns array('Cache-Control: no-store', 'Cache-Control: no-cache')
+	 *
+	 * $request->headers('Cache-Control', 'max-age=0');
+	 * $request->headers('Cache-Control', 'no-store, no-cache');
+	 * $request->headers('Cache-Control');
+	 * // returns array('Cache-Control: max-age=0', 'Cache-Control: no-store, no-cache')
+	 * }}}
+	 *
+	 * @link http://www.ietf.org/rfc/rfc2616.txt Section 4.2 Message Headers
+	 * @param string|array $key A header name, a full header line (`'<key>: <value>'`), or an array
+	 *                      of headers to set in `key => value` form.
+	 * @param string|null|boolean $value A value to set if `$key` is a string. If `null`, returns
+	 *                            the value of the header corresponding to `$key`. If `false`,
+	 *                            it unsets the header corresponding to `$key`.
+	 * @param boolean $replace Whether to override or add alongside any existing header with
+	 *                the same name.
+	 * @return string|array When called with just $key provided, the value of a single header. When
+	 *         calling the method without any arguments, an array of compiled headers in the
+	 *         form `array('<key>: <value>', ...)` is returned. For convience the latter also
+	 *         happens when setting one or multiple headers.
 	 */
 	public function headers($key = null, $value = null, $replace = true) {
 		if (!is_string($key)) {
