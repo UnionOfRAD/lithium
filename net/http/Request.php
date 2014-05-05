@@ -113,13 +113,16 @@ class Request extends \lithium\net\http\Message {
 			'url' => function($req, $options) {
 				$options['port'] = $options['port'] ? ":{$options['port']}" : '';
 				$options['path'] = str_replace('//', '/', $options['path']);
+
 				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
 			},
 			'context' => function($req, $options, $defaults) {
+				$req->headers($options['headers']);
+
 				return array('http' => array_diff_key($options, $defaults) + array(
 					'content' => $req->body(),
 					'method' => $options['method'],
-					'header' => $req->headers($options['headers']),
+					'header' => $req->headers(),
 					'protocol_version' => $options['version'],
 					'ignore_errors' => $options['ignore_errors'],
 					'follow_location' => $options['follow_location'],
@@ -131,6 +134,7 @@ class Request extends \lithium\net\http\Message {
 				$body = $req->body();
 				$path = str_replace('//', '/', $options['path']) . $options['query'];
 				$status = "{$options['method']} {$path} {$req->protocol}";
+
 				return join("\r\n", array($status, join("\r\n", $req->headers()), "", $body));
 			}
 		);

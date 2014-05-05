@@ -157,12 +157,30 @@ class Message extends \lithium\net\Message {
 	 *                            it unsets the header corresponding to `$key`.
 	 * @param boolean $replace Whether to override or add alongside any existing header with
 	 *                the same name.
-	 * @return string|array When called with just $key provided, the value of a single header. When
-	 *         calling the method without any arguments, an array of compiled headers in the
-	 *         form `array('<key>: <value>', ...)` is returned. For convience the latter also
-	 *         happens when setting one or multiple headers.
+	 * @return string|array|void When called with just $key provided, the value of a single header.
+	 *         When calling the method without any arguments, an array of compiled headers in the
+	 *         form `array('<key>: <value>', ...)` is returned. All set and replace operations
+	 *         return no value for performance reasons.
 	 */
 	public function headers($key = null, $value = null, $replace = true) {
+		if ($key === null && $value === null) {
+			$headers = array();
+
+			foreach ($this->headers as $key => $value) {
+				if (is_scalar($value)) {
+					$headers[] = "{$key}: {$value}";
+					continue;
+				}
+				foreach ($value as $val) {
+					$headers[] = "{$key}: {$val}";
+				}
+			}
+			return $headers;
+		}
+		if (is_string($key) && $value === null && strpos($key, ':') === false) {
+			return isset($this->headers[$key]) ? $this->headers[$key] : null;
+		}
+
 		if (!is_string($key)) {
 			$replace = ($value === false) ? $value : $replace;
 
@@ -178,8 +196,6 @@ class Message extends \lithium\net\Message {
 				if (preg_match('/(.*?):(.+)/', $key, $match)) {
 					$this->headers($match[1], trim($match[2]), $replace);
 				}
-			} elseif ($value === null) {
-				return isset($this->headers[$key]) ? $this->headers[$key] : null;
 			} elseif ($value === false) {
 				unset($this->headers[$key]);
 			} elseif (!$replace && isset($this->headers[$key]) && $value != $this->headers[$key]) {
@@ -194,18 +210,6 @@ class Message extends \lithium\net\Message {
 				$this->headers[$key] = $value;
 			}
 		}
-		$headers = array();
-
-		foreach ($this->headers as $key => $value) {
-			if (is_scalar($value)) {
-				$headers[] = "{$key}: {$value}";
-				continue;
-			}
-			foreach ($value as $val) {
-				$headers[] = "{$key}: {$val}";
-			}
-		}
-		return $headers;
 	}
 
 	/**
