@@ -181,7 +181,26 @@ class Message extends \lithium\net\Message {
 			return isset($this->headers[$key]) ? $this->headers[$key] : null;
 		}
 
-		if (!is_string($key)) {
+		if (is_string($key)) {
+			if (strpos($key, ':') !== false && preg_match('/(.*?):(.+)/', $key, $match)) {
+				$key = $match[1];
+				$value = trim($match[2]);
+			} elseif ($value === false) {
+				unset($this->headers[$key]);
+				return;
+			}
+			if ($replace || !isset($this->headers[$key])) {
+				$this->headers[$key] = $value;
+			} elseif ($value !== $this->headers[$key]) {
+				$this->headers[$key] = (array) $this->headers[$key];
+
+				if (is_string($value)) {
+					$this->headers[$key][] = $value;
+				} else {
+					$this->headers[$key] = array_merge($this->headers[$key], $value);
+				}
+			}
+		} else {
 			$replace = ($value === false) ? $value : $replace;
 
 			foreach ((array) $key as $header => $value) {
@@ -190,24 +209,6 @@ class Message extends \lithium\net\Message {
 					continue;
 				}
 				$this->headers($value, null, $replace);
-			}
-		} elseif ($key) {
-			if (strpos($key, ':') !== false) {
-				if (preg_match('/(.*?):(.+)/', $key, $match)) {
-					$this->headers($match[1], trim($match[2]), $replace);
-				}
-			} elseif ($value === false) {
-				unset($this->headers[$key]);
-			} elseif (!$replace && isset($this->headers[$key]) && $value != $this->headers[$key]) {
-				$this->headers[$key] = (array) $this->headers[$key];
-
-				if (is_string($value)) {
-					$this->headers[$key][] = $value;
-				} else {
-					$this->headers[$key] = array_merge($this->headers[$key], $value);
-				}
-			} else {
-				$this->headers[$key] = $value;
 			}
 		}
 	}
