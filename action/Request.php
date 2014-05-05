@@ -145,6 +145,8 @@ class Request extends \lithium\net\http\Request {
 	 * Adds config values to the public properties when a new object is created, pulling
 	 * request data from superglobals if `globals` is set to `true`.
 	 *
+	 * Normalizes casing of request headers.
+	 *
 	 * @param array $config Configuration options : default values are:
 	 *        - `'base'` _string_: null
 	 *        - `'url'` _string_: null
