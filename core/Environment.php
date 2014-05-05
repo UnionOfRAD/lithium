@@ -188,7 +188,7 @@ class Environment {
 		}
 		static::$_detector = function($request) use ($detect) {
 			if ($request->env || $request->command == 'test') {
-				return ($request->env) ? $request->env : 'test';
+				return $request->env ?: 'test';
 			}
 			$host = method_exists($request, 'get') ? $request->get('http:host') : '.console';
 
