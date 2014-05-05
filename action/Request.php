@@ -203,10 +203,9 @@ class Request extends \lithium\net\http\Request {
 		}
 		if ($config['protocol'] && strpos($config['protocol'], '/')) {
 			list($scheme, $version) = explode('/', $config['protocol']);
-			$https = ($this->env('HTTPS') ? 's' : '');
-			$scheme = strtolower($scheme) . $https;
+
 			if (!isset($config['scheme'])) {
-				$config['scheme'] = $scheme;
+				$config['scheme'] = strtolower($scheme) . ($this->env('HTTPS') ? 's' : '');
 			}
 			if (!isset($config['version'])) {
 				$config['version'] = $version;
