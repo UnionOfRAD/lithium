@@ -103,11 +103,11 @@ class Request extends \lithium\net\http\Message {
 			'Connection' => 'Close',
 			'User-Agent' => 'Mozilla/5.0'
 		);
-		if ($type = $this->_config['type']) {
-			$this->type($type);
+		foreach (array('type', 'headers', 'cookies') as $field) {
+			if ($value = $this->_config[$field]) {
+				$this->{$field}($value);
+			}
 		}
-		$this->headers($this->_config['headers']);
-		$this->cookies($this->_config['cookies']);
 
 		$this->_formats += array(
 			'url' => function($req, $options) {
