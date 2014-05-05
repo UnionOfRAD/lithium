@@ -177,7 +177,7 @@ class Message extends \lithium\net\Message {
 			}
 			return $headers;
 		}
-		if (is_string($key) && $value === null && strpos($key, ':') === false) {
+		if ($value === null && is_string($key) && strpos($key, ':') === false) {
 			return isset($this->headers[$key]) ? $this->headers[$key] : null;
 		}
 
