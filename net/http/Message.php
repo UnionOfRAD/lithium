@@ -129,24 +129,23 @@ class Message extends \lithium\net\Message {
 	 * // Replace single or multiple headers
 	 * $request->headers('Cache-Control', 'no-store');
 	 * $request->headers(array('Cache-Control' => 'public'));
-	 * $request->headers('Cache-Control');
-	 * // returns array('Cache-Control: public')
+	 * $request->headers('Cache-Control'); // returns 'public'
 	 *
 	 * // Merging with existing array headers.
 	 * // Note that new elements are just appended and no sorting takes place.
 	 * $request->headers('Cache-Control', 'no-store');
 	 * $request->headers('Cache-Control', 'no-cache', false);
-	 * $request->headers('Cache-Control');
+	 * $request->headers();
 	 * // returns array('Cache-Control: no-store', 'Cache-Control: no-cache')
 	 *
 	 * $request->headers('Cache-Control', 'no-store');
 	 * $request->headers('Cache-Control', array('no-cache'), false);
-	 * $request->headers('Cache-Control');
+	 * $request->headers();
 	 * // returns array('Cache-Control: no-store', 'Cache-Control: no-cache')
 	 *
 	 * $request->headers('Cache-Control', 'max-age=0');
 	 * $request->headers('Cache-Control', 'no-store, no-cache');
-	 * $request->headers('Cache-Control');
+	 * $request->headers();
 	 * // returns array('Cache-Control: max-age=0', 'Cache-Control: no-store, no-cache')
 	 * }}}
 	 *
