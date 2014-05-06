@@ -338,10 +338,14 @@ abstract class Database extends \lithium\data\Source {
 	public function name($name) {
 		list($open, $close) = $this->_quotes;
 		list($first, $second) = $this->_splitFieldname($name);
+
 		if ($first) {
 			return "{$open}{$first}{$close}.{$open}{$second}{$close}";
 		}
-		return preg_match('/^[a-z0-9_-]+$/i', $name) ? "{$open}{$name}{$close}" : $name;
+		if (preg_match('/^[a-z0-9_-]+$/iS', $name)) {
+			return "{$open}{$name}{$close}";
+		}
+		return $name;
 	}
 
 	/**
@@ -352,10 +356,10 @@ abstract class Database extends \lithium\data\Source {
 	 *         and the field name as second value.
 	 */
 	protected function _splitFieldname($field) {
-		if (is_string($field)) {
-			if (preg_match('/^[a-z0-9_-]+\.([a-z 0-9_-]+|\*)$/i', $field)) {
-				return explode('.', $field, 2);
-			}
+		$regex = '/^[a-z0-9_-]+\.([a-z 0-9_-]+|\*)$/iS';
+
+		if (strpos($field, '.') !== false && preg_match($regex, $field)) {
+			return explode('.', $field, 2);
 		}
 		return array(null, $field);
 	}
@@ -371,11 +375,11 @@ abstract class Database extends \lithium\data\Source {
 	 *       e.g. Foos.bar and Bars.bar will both return bar.
 	 */
 	protected function _fieldName($field) {
-		if (is_string($field)) {
-			if (preg_match('/^[a-z0-9_-]+\.[a-z0-9_-]+$/i', $field)) {
-				list($first, $second) = explode('.', $field, 2);
-				return $second;
-			}
+		$regex = '/^[a-z0-9_-]+\.[a-z0-9_-]+$/iS';
+
+		if (strpos($field, '.') !== false && preg_match($regex, $field)) {
+			list($first, $second) = explode('.', $field, 2);
+			return $second;
 		}
 		return $field;
 	}
