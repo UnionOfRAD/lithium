@@ -122,7 +122,7 @@ class Response extends \lithium\net\http\Response {
 		}
 		$expires = is_int($expires) ? $expires : strtotime($expires);
 
-		return $this->headers(array(
+		$this->headers(array(
 			'Expires' => gmdate('D, d M Y H:i:s', $expires) . ' GMT',
 			'Cache-Control' => 'max-age=' . ($expires - time()),
 			'Pragma' => 'cache'
