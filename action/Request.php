@@ -245,7 +245,7 @@ class Request extends \lithium\net\http\Request {
 		}
 		$this->_detectors['mobile'][1] = $mobile;
 
-		$this->data = $this->_config['data'];
+		$this->data = (array) $this->_config['data'];
 		if (isset($this->data['_method'])) {
 			$this->_computed['HTTP_X_HTTP_METHOD_OVERRIDE'] = strtoupper($this->data['_method']);
 			unset($this->data['_method']);
@@ -263,7 +263,6 @@ class Request extends \lithium\net\http\Request {
 			$this->data = $this->body(null, array('decode' => true, 'encode' => false));
 		}
 		$this->body = $this->data;
-		$this->data = (array) $this->data;
 
 		if (!empty($_FILES)) {
 			$this->data = Set::merge($this->data, $this->_parseFiles());
