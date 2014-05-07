@@ -75,9 +75,9 @@ class Response extends \lithium\net\http\Response {
 	 */
 	protected function _init() {
 		parent::_init();
+		$router = $this->_classes['router'];
 
 		if ($this->_config['location']) {
-			$router = $this->_classes['router'];
 			$location = $router::match($this->_config['location'], $this->_config['request']);
 			$this->headers('Location', $location);
 		}
@@ -164,6 +164,7 @@ class Response extends \lithium\net\http\Response {
 	 */
 	public function render() {
 		$code = null;
+
 		if (isset($this->headers['location']) || isset($this->headers['Location'])) {
 			if ($this->status['code'] === 200) {
 				$this->status(302);

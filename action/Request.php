@@ -219,6 +219,7 @@ class Request extends \lithium\net\http\Request {
 		}
 		$this->_base = $this->_base($config['base']);
 		$this->url = $this->_url($config['url']);
+
 		parent::__construct($config);
 
 		$this->headers('Content-Type', $this->env('CONTENT_TYPE'));
@@ -238,6 +239,7 @@ class Request extends \lithium\net\http\Request {
 	 */
 	protected function _init() {
 		parent::_init();
+
 		$mobile = array(
 			'iPhone', 'MIDP', 'AvantGo', 'BlackBerry', 'J2ME', 'Opera Mini', 'DoCoMo', 'NetFront',
 			'Nokia', 'PalmOS', 'PalmSource', 'portalmmm', 'Plucker', 'ReqwirelessWeb', 'iPod',
@@ -249,6 +251,7 @@ class Request extends \lithium\net\http\Request {
 		$this->_detectors['mobile'][1] = $mobile;
 
 		$this->data = (array) $this->_config['data'];
+
 		if (isset($this->data['_method'])) {
 			$this->_computed['HTTP_X_HTTP_METHOD_OVERRIDE'] = strtoupper($this->data['_method']);
 			unset($this->data['_method']);

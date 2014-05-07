@@ -289,6 +289,7 @@ class Query extends \lithium\core\Object {
 		$conditions = (array) $conditions;
 		$this->_config['conditions'] = (array) $this->_config['conditions'];
 		$this->_config['conditions'] = array_merge($this->_config['conditions'], $conditions);
+
 		return $this;
 	}
 
@@ -305,6 +306,7 @@ class Query extends \lithium\core\Object {
 		$having = (array) $having;
 		$this->_config['having'] = (array) $this->_config['having'];
 		$this->_config['having'] = array_merge($this->_config['having'], $having);
+
 		return $this;
 	}
 
@@ -557,7 +559,6 @@ class Query extends \lithium\core\Object {
 		} else {
 			$keys =& $this->_config;
 		}
-
 		list($copy, $apply) = Set::slice($keys, $source->methods());
 
 		if (isset($keys['with'])) {
@@ -567,7 +568,6 @@ class Query extends \lithium\core\Object {
 		foreach ($apply as $item => $value) {
 			$results[$item] = $source->{$item}($this->{$item}(), $this);
 		}
-
 		foreach ($copy as $item => $value) {
 			$results[$item] = $this->_config[$item];
 		}
@@ -575,7 +575,6 @@ class Query extends \lithium\core\Object {
 		if (array_key_exists('data', $keys)) {
 			$results['data'] = $this->_exportData();
 		}
-
 		if (array_key_exists('source', $keys)) {
 			$results['source'] = $source->name($results['source']);
 		}
@@ -583,7 +582,6 @@ class Query extends \lithium\core\Object {
 		if (!isset($results['fields'])) {
 			return $results;
 		}
-
 		$created = array('fields', 'values');
 
 		if (is_array($results['fields']) && array_keys($results['fields']) == $created) {
@@ -781,6 +779,7 @@ class Query extends \lithium\core\Object {
 
 	/**
 	 * Get/set sub queries for the query.
+	 *
 	 * The getter must be called after an export since the sub queries are built
 	 * during the export according the export's `mode` option and the query `with` option.
 	 *
