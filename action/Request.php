@@ -145,6 +145,8 @@ class Request extends \lithium\net\http\Request {
 	 * Adds config values to the public properties when a new object is created, pulling
 	 * request data from superglobals if `globals` is set to `true`.
 	 *
+	 * Normalizes casing of request headers.
+	 *
 	 * @param array $config Configuration options : default values are:
 	 *        - `'base'` _string_: null
 	 *        - `'url'` _string_: null
@@ -201,10 +203,9 @@ class Request extends \lithium\net\http\Request {
 		}
 		if ($config['protocol'] && strpos($config['protocol'], '/')) {
 			list($scheme, $version) = explode('/', $config['protocol']);
-			$https = ($this->env('HTTPS') ? 's' : '');
-			$scheme = strtolower($scheme) . $https;
+
 			if (!isset($config['scheme'])) {
-				$config['scheme'] = $scheme;
+				$config['scheme'] = strtolower($scheme) . ($this->env('HTTPS') ? 's' : '');
 			}
 			if (!isset($config['version'])) {
 				$config['version'] = $version;
@@ -218,7 +219,7 @@ class Request extends \lithium\net\http\Request {
 		$this->headers('Content-Length', $this->env('CONTENT_LENGTH'));
 
 		foreach ($this->_env as $name => $value) {
-			if (substr($name, 0, 5) == 'HTTP_') {
+			if ($name[0] === 'H' && strpos($name, 'HTTP_') === 0) {
 				$name = str_replace('_', ' ', substr($name, 5));
 				$name = str_replace(' ', '-', ucwords(strtolower($name)));
 				$this->headers($name, $value);

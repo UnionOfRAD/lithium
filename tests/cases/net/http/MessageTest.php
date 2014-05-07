@@ -19,49 +19,56 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testHeaderKey() {
+		$this->message->headers('Host: localhost:80');
 		$expected = array('Host: localhost:80');
-		$result = $this->message->headers('Host: localhost:80');
+		$result = $this->message->headers();
 		$this->assertEqual($expected, $result);
 
+		$this->message->headers('Host');
 		$expected = 'localhost:80';
 		$result = $this->message->headers('Host');
 		$this->assertEqual($expected, $result);
 
-		$result = $this->message->headers('Host', false);
+		$this->message->headers('Host', false);
+		$result = $this->message->headers();
 		$this->assertEmpty($result);
 	}
 
 	public function testHeaderKeyValue() {
+		$this->message->headers('Connection', 'Close');
 		$expected = array('Connection: Close');
-		$result = $this->message->headers('Connection', 'Close');
+		$result = $this->message->headers();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testHeaderArrayValue() {
+		$this->message->headers(array('User-Agent: Mozilla/5.0'));
 		$expected = array('User-Agent: Mozilla/5.0');
-		$result = $this->message->headers(array('User-Agent: Mozilla/5.0'));
+		$result = $this->message->headers();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testHeaderArrayKeyValue() {
+		$this->message->headers(array('Cache-Control' => 'no-cache'));
 		$expected = array('Cache-Control: no-cache');
-		$result = $this->message->headers(array('Cache-Control' => 'no-cache'));
+		$result = $this->message->headers();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMultiValueHeader() {
-		$expected = array(
-			'Cache-Control: no-store, no-cache, must-revalidate',
-			'Cache-Control: post-check=0, pre-check=0',
-			'Cache-Control: max-age=0'
-		);
-		$result = $this->message->headers(array(
+		$this->message->headers(array(
 			'Cache-Control' => array(
 				'no-store, no-cache, must-revalidate',
 				'post-check=0, pre-check=0',
 				'max-age=0'
 			)
 		));
+		$expected = array(
+			'Cache-Control: no-store, no-cache, must-revalidate',
+			'Cache-Control: post-check=0, pre-check=0',
+			'Cache-Control: max-age=0'
+		);
+		$result = $this->message->headers();
 		$this->assertEqual($expected, $result);
 	}
 

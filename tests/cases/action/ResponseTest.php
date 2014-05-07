@@ -92,7 +92,9 @@ class ResponseTest extends \lithium\test\Unit {
 
 		$this->response->body = 'Created';
 		$this->response->status(201);
-		$result = $this->response->cache(false);
+		$this->response->cache(false);
+
+		$result = $this->response->headers();
 
 		$expected = array(
 			'Expires: Mon, 26 Jul 1997 05:00:00 GMT',
