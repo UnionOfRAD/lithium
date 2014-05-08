@@ -81,11 +81,31 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testReturnStringIfNoBufferAndEmptyBody() {
+	public function testReturnJsonIfNoBufferAndEmptyBody() {
 		$this->message->type("json");
 		$result = $this->message->body("", array('encode' => true));
-		$this->assertIdentical("", $result);
+		$this->assertIdentical('[""]', $result);
+	}
 
+	public function testReturnMergedJsonWithEmptyBody() {
+		$this->message->type("json");
+		$result = $this->message->body("", array('encode' => true));
+		$this->assertIdentical('[""]', $result);
+
+		$result = $this->message->body("", array('encode' => true));
+		$this->assertIdentical('["",""]', $result);
+	}
+
+	public function testReturnMergedJson() {
+		$this->message->type("json");
+		$result = $this->message->body(array("myvar1" => "val1"), array('encode' => true));
+		$this->assertIdentical('{"myvar1":"val1"}', $result);
+
+		$result = $this->message->body(array("myvar2" => "val2"), array('encode' => true));
+		$this->assertIdentical('{"myvar1":"val1","myvar2":"val2"}', $result);
+	}
+
+	public function testReturnJsonIfNoBufferAndArrayBody() {
 		$this->message->type("json");
 		$result = $this->message->body(array(""), array('encode' => true));
 		$this->assertIdentical('[""]', $result);
@@ -95,6 +115,24 @@ class MessageTest extends \lithium\test\Unit {
 		$this->message->type("json");
 		$result = $this->message->body(array("myvar" => ""), array('encode' => true));
 		$this->assertIdentical('{"myvar":""}', $result);
+	}
+
+	public function testEmptyEncodeInJson() {
+		$this->message->type("json");
+		$result = $this->message->body(array(), array('encode' => true));
+		$this->assertIdentical("[]", $result);
+	}
+
+	public function testEmptyJsonDecode() {
+		$this->message->type("json");
+		$result = $this->message->body("{}", array('decode' => true));
+		$this->assertIdentical(array(), $result);
+	}
+
+	public function testEmptyJsonArrayDecode() {
+		$this->message->type("json");
+		$result = $this->message->body("[]", array('decode' => true));
+		$this->assertIdentical(array(), $result);
 	}
 }
 
