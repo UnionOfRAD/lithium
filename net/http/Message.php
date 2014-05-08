@@ -267,14 +267,9 @@ class Message extends \lithium\net\Message {
 		$default = array('buffer' => null, 'encode' => false, 'decode' => false);
 		$options += $default;
 
-		if (!empty($data)) {
-			$this->body = array_merge((array) $this->body, (array) $data);
-		}
+		$this->body = array_merge((array) $this->body, (array) $data);
 		$body = $this->body;
 
-		if (empty($options['buffer']) && empty($body)) {
-			return "";
-		}
 		if ($options['encode']) {
 			$body = $this->_encode($body);
 		}
@@ -297,7 +292,8 @@ class Message extends \lithium\net\Message {
 		$media = $this->_classes['media'];
 
 		if ($type = $media::type($this->_type)) {
-			$body = $media::encode($this->_type, $body) ?: $body;
+			$encoded = $media::encode($this->_type, $body);
+			$body = $encoded !== null ? $encoded : $body;
 		}
 		return $body;
 	}
@@ -313,7 +309,8 @@ class Message extends \lithium\net\Message {
 		$media = $this->_classes['media'];
 
 		if ($type = $media::type($this->_type)) {
-			return $media::decode($this->_type, $body) ?: $body;
+			$decoded = $media::decode($this->_type, $body);
+			$body = $decoded !== null ? $decoded : $body;
 		}
 		return $body;
 	}
