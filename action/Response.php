@@ -81,22 +81,6 @@ class Response extends \lithium\net\http\Response {
 	}
 
 	/**
-	 * Expands on `\net\http\Message::headers()` with some magic conversions for shorthand headers.
-	 *
-	 * @param string|array $key
-	 * @param mixed $value
-	 * @param boolean $replace
-	 * @return mixed
-	 */
-	public function headers($key = null, $value = null, $replace = true) {
-		if ($key === 'download' || $key === 'Download') {
-			$key = 'Content-Disposition';
-			$value = 'attachment; filename="' . $value . '"';
-		}
-		return parent::headers($key, $value, $replace);
-	}
-
-	/**
 	 * Controls how or whether the client browser and web proxies should cache this response.
 	 *
 	 * @param mixed $expires This can be a Unix timestamp indicating when the page expires, or a
@@ -207,6 +191,28 @@ class Response extends \lithium\net\http\Response {
 		foreach ((array) $headers as $header) {
 			$code ? header($header, false, $code) : header($header, false);
 		}
+	}
+
+	/**
+	 * Expands on `\net\http\Message::headers()` with some magic conversions for shorthand headers.
+	 *
+	 * @deprecated This method will be removed in a future version.
+	 * @param string|array $key
+	 * @param smixed $value
+	 * @param boolean $replace
+	 * @return mixed
+	 */
+	public function headers($key = null, $value = null, $replace = true) {
+		if ($key === 'download' || $key === 'Download') {
+			$message  = "Shorthand header `Download` with `<FILENAME>` has been deprecated ";
+			$message .= "because it's too magic. Please use `Content-Disposition` ";
+			$message .= "with `attachment; filename=\"<FILENAME>\"` instead.";
+			trigger_error($message, E_USER_DEPRECATED);
+
+			$key = 'Content-Disposition';
+			$value = 'attachment; filename="' . $value . '"';
+		}
+		return parent::headers($key, $value, $replace);
 	}
 }
 
