@@ -145,8 +145,20 @@ class Response extends \lithium\net\http\Response {
 	}
 
 	/**
-	 * Render a response by writing headers and output. Output is echoed in chunks because of an
-	 * issue where `echo` time increases exponentially on long message bodies.
+	 * Render a response by writing headers and output. Output is echoed in
+	 * chunks because of an issue where `echo` time increases exponentially
+	 * on long message bodies.
+	 *
+	 * Reponses which have a `Location` header set are indicating a
+	 * redirect, will get their status code automatically adjusted to `302`
+	 * (Found/Moved Temporarily) in case the status code before was `200`
+	 * (OK). This is to allow easy redirects by setting just the `Location`
+	 * header and is assumed to be the original intent of the user.
+	 *
+	 * On responses with status codes `204` (No Content) and `302` (Found)
+	 * a message body - even if one is set - will never be send. These
+	 * status codes either don't have a message body as per their nature or
+	 * they are ignored and can thus be omitted for  performance reasons.
 	 *
 	 * @return void
 	 */
