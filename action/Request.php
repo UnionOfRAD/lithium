@@ -85,9 +85,10 @@ class Request extends \lithium\net\http\Request {
 	protected $_env = array();
 
 	/**
-	 * If POST / PUT data is coming from an input stream (rather than `$_POST`), this specified
-	 * where to read it from.
+	 * If POST, PUT or PATCH data is coming from an input stream (rather than `$_POST`),
+	 * this specified where to read it from.
 	 *
+	 * @see lithium\action\Request::_init()
 	 * @var stream
 	 */
 	protected $_stream = null;
@@ -165,6 +166,9 @@ class Request extends \lithium\net\http\Request {
 	 *        - `'auth'` _mixed_: null
 	 *        - `'body'` _mixed_: null
 	 *        - `'data'` _array_: array()
+	 *        - `'stream'` _resource_: Stream to read from in order to get the message
+	 *          body when method is POST, PUT or PATCH and data is empty. When not provided
+	 *          `php://input` will be used for reading.
 	 *        - `'env'` _array_: array()
 	 *        - `'globals'` _boolean_: Use global variables for populating
 	 *          the request's environment data; defaults to `true`.
@@ -176,6 +180,7 @@ class Request extends \lithium\net\http\Request {
 			'env' => array(),
 			'query' => array(),
 			'data' => array(),
+			'stream' => null,
 			'globals' => true
 		);
 		$config += $defaults;
