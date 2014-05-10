@@ -92,7 +92,7 @@ class Response extends \lithium\net\http\Response {
 	 * @return mixed
 	 */
 	public function headers($key = null, $value = null, $replace = true) {
-		if (is_string($key) && strtolower($key) == 'download') {
+		if ($key === 'download' || $key === 'Download') {
 			$key = 'Content-Disposition';
 			$value = 'attachment; filename="' . $value . '"';
 		}
