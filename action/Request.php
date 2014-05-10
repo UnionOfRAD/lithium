@@ -166,7 +166,8 @@ class Request extends \lithium\net\http\Request {
 	 *        - `'body'` _mixed_: null
 	 *        - `'data'` _array_: array()
 	 *        - `'env'` _array_: array()
-	 *        - `'globals'` _boolean_: true
+	 *        - `'globals'` _boolean_: Use global variables for populating
+	 *          the request's environment data; defaults to `true`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
