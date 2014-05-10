@@ -268,7 +268,7 @@ class Request extends \lithium\net\http\Request {
 		$this->body = $this->data;
 
 		if (!empty($_FILES)) {
-			$this->data = Set::merge($this->data, $this->_parseFiles());
+			$this->data = Set::merge($this->data, $this->_parseFiles($_FILES));
 		}
 	}
 
@@ -748,7 +748,7 @@ class Request extends \lithium\net\http\Request {
 	 *
 	 * @return array
 	 */
-	protected function _parseFiles() {
+	protected function _parseFiles($data) {
 		$result = array();
 
 		$normalize = function($key, $value) use ($result, &$normalize){
@@ -769,7 +769,7 @@ class Request extends \lithium\net\http\Request {
 			}
 			return $result;
 		};
-		foreach ($_FILES as $key => $value) {
+		foreach ($data as $key => $value) {
 			if (isset($value['name'])) {
 				if (is_string($value['name'])) {
 					$result[$key] = $value;
