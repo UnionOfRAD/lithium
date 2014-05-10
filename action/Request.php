@@ -230,9 +230,6 @@ class Request extends \lithium\net\http\Request {
 
 	/**
 	 * Initialize request object
-	 *
-	 * Defines an artificial `'PLATFORM'` environment variable as either `'IIS'`, `'CGI'` or `null`
-	 * to allow checking for the SAPI in a normalized way.
 	 */
 	protected function _init() {
 		parent::_init();
@@ -300,6 +297,9 @@ class Request extends \lithium\net\http\Request {
 	/**
 	 * Queries PHP's environment settings, and provides an abstraction for standardizing expected
 	 * environment values across varying platforms, as well as specify custom environment flags.
+	 *
+	 * Defines an artificial `'PLATFORM'` environment variable as either `'IIS'`, `'CGI'`
+	 * or `null` to allow checking for the SAPI in a normalized way.
 	 *
 	 * @param string $key The environment variable required.
 	 * @return string The requested variables value.
