@@ -164,9 +164,7 @@ class Response extends \lithium\net\http\Response {
 		if ($this->status['code'] === 302 || $this->status['code'] === 204) {
 			return;
 		}
-		$chunked = $this->body(null, $this->_config);
-
-		foreach ($chunked as $chunk) {
+		foreach ($this->body(null, $this->_config) as $chunk) {
 			echo $chunk;
 		}
 	}

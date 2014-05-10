@@ -252,8 +252,8 @@ class Request extends \lithium\net\http\Request {
 			unset($this->data['_method']);
 		}
 		$type = $this->type($this->_config['type'] ?: $this->env('CONTENT_TYPE'));
-		$this->method = $method = strtoupper($this->env('REQUEST_METHOD'));
-		$hasBody = in_array($method, array('POST', 'PUT', 'PATCH'));
+		$this->method = strtoupper($this->env('REQUEST_METHOD'));
+		$hasBody = in_array($this->method, array('POST', 'PUT', 'PATCH'));
 
 		if (!$this->body && $hasBody && $type !== 'html') {
 			$this->_stream = $this->_stream ?: fopen('php://input', 'r');
