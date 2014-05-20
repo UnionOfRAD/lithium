@@ -442,12 +442,12 @@ class Request extends \lithium\net\http\Request {
 	 * Returns information about the type of content that the client is requesting.
 	 *
 	 * @see lithium\net\http\Media::negotiate()
-	 * @param $type mixed If not specified, returns the media type name that the client prefers,
-	 *        using content negotiation. If a media type name (string) is passed, returns `true` or
-	 *        `false`, indicating whether or not that type is accepted by the client at all.
-	 *        If `true`, returns the raw content types from the `Accept` header, parsed into an array
-	 *        and sorted by client preference.
-	 * @return string Returns a simple type name if the type is registered (i.e. `'json'`), or
+	 * @param boolean|string $type If not specified, returns the media type name that the client
+	 *        prefers, using content negotiation. If a media type name (string) is passed, returns
+	 *        `true` or `false`, indicating whether or not that type is accepted by the client at
+	 *        all. If `true`, returns the raw content types from the `Accept` header, parsed into
+	 *        an array and sorted by client preference.
+	 * @return mixed Returns a simple type name if the type is registered (i.e. `'json'`), or
 	 *         a fully-qualified content-type if not (i.e. `'image/jpeg'`), or a boolean or array,
 	 *         depending on the value of `$type`.
 	 */
