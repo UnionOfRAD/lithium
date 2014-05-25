@@ -9,6 +9,7 @@
 namespace lithium\data\source\mongo_db;
 
 use MongoGridFSFile;
+use Exception;
 
 class Result extends \lithium\data\source\Result {
 
@@ -30,7 +31,7 @@ class Result extends \lithium\data\source\Result {
 			try{
 		            $result = $this->_resource->getNext();
 		        }
-			catch (\Exception $e){
+			catch (Exception $e){
 		            return false;
 		        }
 			$isFile = ($result instanceof MongoGridFSFile);
