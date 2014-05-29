@@ -509,12 +509,21 @@ class DocumentTest extends \lithium\test\Unit {
 	public function testIsset() {
 		$doc = new Document(array('data' => array(
 			'title' => 'Post',
-			'content' => 'Lorem Ipsum'
+			'content' => 'Lorem Ipsum',
+			'extra' => array(
+				'foo' => 'bar'
+			)
 		)));
 
 		$this->assertTrue(isset($doc->title));
 		$this->assertTrue(isset($doc->content));
 		$this->assertFalse(isset($doc->body));
+
+		$key = 'extra.foo';
+		$this->assertTrue(isset($doc->{$key}));
+
+		$key = 'extra.baz';
+		$this->assertFalse(isset($doc->{$key}));
 	}
 
 	public function testData() {
