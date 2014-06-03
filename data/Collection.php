@@ -470,7 +470,7 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 		if (!$this->closed()) {
 			while ($this->next()) {}
 		}
-		return parent::reduce($filter);
+		return parent::reduce($filter, $initial);
 	}
 
 	/**
