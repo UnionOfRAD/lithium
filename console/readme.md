@@ -1,3 +1,4 @@
+# console
 
 The console package contains a set of classes required to route and dispatch
 incoming console requests. Moreover it contains the console front-controller
@@ -17,7 +18,7 @@ complete access to your application. This is especially useful to reuse
 existing logic in an application's model when creating a command to be run as
 i.e. a cron-job.
 
-### Invoking the front-controller
+## Invoking the front-controller
 
 You invoke the console front-controller through one of the wrappers
 provided, as shown below. The examples shown are relative to the root directory
@@ -34,7 +35,7 @@ However it is recommended you add the path containing the wrapper to the paths
 searched by your system. This is `$PATH` for *nix and `%PATH%` for Windows.
 
 
-#### A: Configuring your $PATH on *nix
+### A: Configuring your $PATH on *nix
 
 This is almost always achievable on a per-user basis through the user's
 `.profile` (Users running Bash may prefer `.bash_profile`). The file is located
@@ -58,16 +59,16 @@ symlink the wrapper into one of the paths found in the `$PATH` environment
 variable or create an alias. If you choose an alias, you can make it permanent
 by adding the alias command to the `.bashrc` file in your home directory.
 
-{{{
+```
 $ cd /path/to/a/directory/in/your/path
 $ ln -s /path/to/libraries/lithium/console .
 }}}
 
-{{{
+```
 alias li3='/path/to/lithium/libraries/lithium/console/li3'
 }}}
 
-#### B: Configuring your %PATH% on Windows
+### B: Configuring your %PATH% on Windows
 
 Please note that if you're on Windows you must also add the PHP directory to
 the `%PATH%` environment variable. As we are going to edit that variable for adding
@@ -79,7 +80,7 @@ the location of the `li3.bat` wrapper anyway, we can kill two birds with one sto
  - Double click the _PATH_ entry in order to edit it.
  - Add `;C:\path\to\php;C:\path\to\libraries\lithium\console` to the end of the value.
 
-#### Finishing up
+### Finishing up
 
 Now that you've made the wrapper available as `li3` or `li3.bat` respectively,
 you should be able to use it from the command-line simply by executing `li3` or
@@ -91,7 +92,7 @@ $ li3
 $ li3.bat
 }}}
 
-### Built-in commands
+## Built-in commands
 
 Using the commands which come with lithium is easy. Invoke the wrapper without
 any arguments to get a list of all available commands. Get a description about
@@ -104,7 +105,7 @@ $ li3 help create
 $ li3 help g11n
 }}}
 
-### Creating custom commands
+## Creating custom commands
 
 Creating your own commands is very easy. A few fundamentals:
 
@@ -146,7 +147,7 @@ The public method `run()` is called on your command instance every time your
 command has been requested to run. From this method you can add your own command
 logic.
 
-#### Parsing options and arguments
+### Parsing options and arguments
 
 Parsing options and arguments to commands should be simple. In fact, the
 parsing is already done for you.

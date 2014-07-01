@@ -1,4 +1,6 @@
-#### Special syntax
+# template
+
+## Special syntax
 
 Views have a special syntax for outputting escaped text. The standard way to
 output escaped text in your views from Lithium is as follows: {{{
@@ -43,7 +45,7 @@ An example would be something like: {{{
  - [Introduction to PHP streams](http://www.php.net/intro.stream)
  - [Stream examples](http://www.php.net/stream.examples)
 
-#### Using helpers
+## Using helpers
 
 Helpers are lazy-loaded by the current renderer. To use a helper, you can
 reference it by its name like this: {{{
@@ -64,7 +66,7 @@ performance impact.
  - [ Form helper](template/helper/Form)
  - [ Helper base class](template/Helper)
 
-#### Creating custom helpers
+## Creating custom helpers
 
 You can also create your own custom helper very easily by extending the `Helper` base class, and
 placing your helper in the correct namespace. By default, helpers belong in the
@@ -94,7 +96,7 @@ You can then use your helper in templates as follows:
 Your custom helper will then be auto-loaded into the templating engine from your application or a
 plugin.
 
-#### Extending core helpers
+## Extending core helpers
 
 Because your application and plugins have a higher order-of-precedence than the Lithium core,
 classes like helpers can be extended and replaced seamlessly, without any changes to your templates.
@@ -119,7 +121,7 @@ Your custom `Form` helper will now be invoked in all instances where `$this->for
 template. For more information on the load order of classes, see
 [the `locate()` method of the `Libraries` class](core/Libraries::locate)
 
-#### Rendering elements
+## Rendering elements
 
 Elements are reusable view snippets that you can use in several views and layouts.
 You can reference it like so:
