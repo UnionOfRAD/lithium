@@ -495,7 +495,7 @@ class Media extends \lithium\core\StaticObject {
 					$index = 0;
 					if (is_array($host)) {
 						$hash = substr(hexdec(md5($path)), 0, 10);
-						$index = ((int) $hash) % count($host);
+						$index = ((integer) $hash) % count($host);
 						if (is_array($defaults['scheme'])) {
 							$host = $defaults['scheme'][$index] . $host[$index];
 						} else {
