@@ -12,31 +12,31 @@ namespace lithium\test;
  * Mocker chain is used to aid in assertion of method calls.
  *
  * Asserting if `method1` was not called
- * {{{
+ * ```
  * $mock = new \lithium\tests\mocks\test\mockStdClass\Mock();
  * $this->assertFalse(Mocker::chain($mock)->called('method1')->success());
- * }}}
+ * ```
  *
  * Asserting if `method1` was called 2 times
- * {{{
+ * ```
  * $mock = new \lithium\tests\mocks\test\mockStdClass\Mock();
  * $this->assertTrue(Mocker::chain($mock)->called('method1')->eq(2)->success());
- * }}}
+ * ```
  *
  * Asserting if `method2` was called after `method1`
- * {{{
+ * ```
  * $mock = new \lithium\tests\mocks\test\mockStdClass\Mock();
  * $this->assertTrue(Mocker::chain($mock)->called('method1')->called('method2')->success());
- * }}}
+ * ```
  *
  * Asserting if `method2` was called after `method1`, and `method2` had specific arguments.
- * {{{
+ * ```
  * $mock = new \lithium\tests\mocks\test\mockStdClass\Mock();
  * $this->assertTrue(Mocker::chain($mock)
  * 	->called('method1')
  * 	->called('method2')->with('foo', 'bar')
  * 		->success());
- * }}}
+ * ```
  */
 class MockerChain extends \lithium\core\Object {
 

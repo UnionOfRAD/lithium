@@ -17,7 +17,8 @@ use lithium\util\Inflector;
  * the helper can pre-fill form input values, render error messages, and introspect column types.
  *
  * For example, assuming you have created a `Posts` model in your application:
- * {{{// In controller code:
+ * ```
+ * // In controller code:
  * use app\models\Posts;
  * $post = Posts::find(1);
  * return compact('post');
@@ -27,7 +28,7 @@ use lithium\util\Inflector;
  * <?=$this->form->text('title'); // Echoes an <input /> element, pre-filled with $post's title ?>
  * <?=$this->form->submit('Update'); // Echoes a submit button with the title 'Update' ?>
  * <?=$this->form->end(); // Echoes a </form> tag & unbinds the form ?>
- * }}}
+ * ```
  */
 class Form extends \lithium\template\Helper {
 
@@ -74,20 +75,20 @@ class Form extends \lithium\template\Helper {
 	 * For example, if all text input fields should be wrapped in `<span />` tags, you can configure
 	 * the template string mappings per the following:
 	 *
-	 * {{{
+	 * ```
 	 * $this->form->config(array('templates' => array(
 	 * 	'text' => '<span><input type="text" name="{:name}"{:options} /></span>'
 	 * )));
-	 * }}}
+	 * ```
 	 *
 	 * Alternatively, you can re-map one type as another. This is useful if, for example, you
 	 * include your own helper with custom form template strings which do not match the default
 	 * template string names.
 	 *
-	 * {{{
+	 * ```
 	 * // Renders all password fields as text fields
 	 * $this->form->config(array('templates' => array('password' => 'text')));
-	 * }}}
+	 * ```
 	 *
 	 * @var array
 	 * @see lithium\template\helper\Form::config()
@@ -200,9 +201,9 @@ class Form extends \lithium\template\Helper {
 	 * To force all `<label />` elements to have a default `class` attribute value of `"foo"`,
 	 * simply do the following:
 	 *
-	 * {{{
+	 * ```
 	 * $this->form->config(array('label' => array('class' => 'foo')));
-	 * }}}
+	 * ```
 	 *
 	 * Note that this can be overridden on a case-by-case basis, and when overriding, values are
 	 * not merged or combined. Therefore, if you wanted a particular `<label />` to have both `foo`
@@ -213,11 +214,11 @@ class Form extends \lithium\template\Helper {
 	 * `'<input type="checkbox" name="{:name}"{:options} />'`. However, suppose you implemented your
 	 * own custom UI elements, and you wanted to change the markup used, you could do the following:
 	 *
-	 * {{{
+	 * ```
 	 * $this->form->config(array('templates' => array(
 	 * 	'checkbox' => '<div id="{:name}" class="ui-checkbox-element"{:options}></div>'
 	 * )));
-	 * }}}
+	 * ```
 	 *
 	 * Now, for any calls to `$this->form->checkbox()`, your custom markup template will be applied.
 	 * This works for any `Form` method that renders HTML elements.
@@ -386,7 +387,7 @@ class Form extends \lithium\template\Helper {
 	 * Implements alternative input types as method calls against `Form` helper. Enables the
 	 * generation of HTML5 input types and other custom input types:
 	 *
-	 * {{{ embed:lithium\tests\cases\template\helper\FormTest::testCustomInputTypes(1-2) }}}
+	 * ``` embed:lithium\tests\cases\template\helper\FormTest::testCustomInputTypes(1-2) ```
 	 *
 	 * @param string $type The method called, which represents the `type` attribute of the
 	 *        `<input />` tag.
@@ -420,12 +421,12 @@ class Form extends \lithium\template\Helper {
 	 * Generates a form field with a label, input, and error message (if applicable), all contained
 	 * within a wrapping element.
 	 *
-	 * {{{
+	 * ```
 	 *  echo $this->form->field('name');
 	 *  echo $this->form->field('present', array('type' => 'checkbox'));
 	 *  echo $this->form->field(array('email' => 'Enter a valid email'));
 	 *  echo $this->form->field(array('name','email','phone'), array('div' => false));
-	 * }}}
+	 * ```
 	 *
 	 * @param mixed $name The name of the field to render. If the form was bound to an object
 	 *        passed in `create()`, `$name` should be the name of a field in that object.
@@ -579,13 +580,14 @@ class Form extends \lithium\template\Helper {
 	 * Generates a `<select />` list using the `$list` parameter for the `<option />` tags. The
 	 * default selection will be set to the value of `$options['value']`, if specified.
 	 *
-	 * For example: {{{
+	 * For example:
+	 * ```
 	 * $this->form->select('colors', array(1 => 'red', 2 => 'green', 3 => 'blue'), array(
 	 * 	'id' => 'Colors', 'value' => 2
 	 * ));
 	 * // Renders a '<select />' list with options 'red', 'green' and 'blue', with the 'green'
 	 * // option as the selection
-	 * }}}
+	 * ```
 	 *
 	 * @param string $name The `name` attribute of the `<select />` element.
 	 * @param array $list An associative array of key/value pairs, which will be used to render the

@@ -23,7 +23,7 @@ use lithium\core\ConfigException;
  *
  * A simple example configuration:
  *
- * {{{
+ * ```
  * Cache::config(array(
  *     'local' => array(
  *         'adapter' => 'Apc'
@@ -37,17 +37,17 @@ use lithium\core\ConfigException;
  *         'strategies => array('Serializer')
  *     )
  * );
- * }}}
+ * ```
  *
  * Adapter configurations can be scoped, adapters will then handle the
  * namespacing of the keys transparently for you:
  *
- * {{{
+ * ```
  * Cache::config(array(
  *     'primary'   => array('adapter' => 'Apc', 'scope' => 'primary'),
  *     'secondary' => array('adapter' => 'Apc', 'scope' => 'secondary')
  * );
- * }}}
+ * ```
  *
  * Cache adapters differ in the functionality they provide and how the provide it. To see
  * if an adapter meets your requirement and for more information on the specifics
@@ -57,9 +57,9 @@ use lithium\core\ConfigException;
  * top of that adapters may provide `clean` and `clear` functionality as well as direct access to
  * additional methods. Which allows for a very wide range of flexibility at the cost of portability.
  *
- * {{{
+ * ```
  * Cache::adapter('default')->methodName($argument);
- * }}}
+ * ```
  *
  * @see lithium\core\Adaptable
  * @see lithium\storage\cache\Adapter
@@ -115,21 +115,21 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * This method has two valid syntaxes depending on if you're storing
 	 * data using a single key or multiple keys as outlined below.
-	 * {{{
+	 * ```
 	 * // To write data to a single-key use the following syntax.
 	 * Cache::write('default', 'foo', 'bar', '+1 minute');
 	 *
 	 * // For multi-key writes the $data parameter's role becomes
 	 * // the one of the $expiry parameter.
 	 * Cache::write('default', array('foo' => 'bar', ... ), '+1 minute');
-	 * }}}
+	 * ```
 	 *
 	 * These two calls are synonymical and demonstrate the two
 	 * possible ways to specify the expiration time.
-	 * {{{
+	 * ```
 	 * Cache::write('default', 'foo', 'bar', '+1 minute');
 	 * Cache::write('default', 'foo', 'bar', 60);
-	 * }}}
+	 * ```
 	 *
 	 * @param string $name Configuration to be used for writing.
 	 * @param mixed $key Key to uniquely identify the cache entry or an array of key/value pairs
@@ -190,7 +190,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * Read-through caching can be used by passing expiry and the to-be-cached value
 	 * in the `write` option. Following three ways to achieve this.
-	 * {{{
+	 * ```
 	 * Cache::read('default', 'foo', array(
 	 *	'write' => array('+5 days' => 'bar')
 	 * )); // returns `'bar'`
@@ -202,7 +202,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * Cache::read('default', 'foo', array(
 	 *	'write' => function() { return array('+5 days' => 'bar'); }
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * @param string $name Configuration to be used for reading.
 	 * @param mixed $key Key to uniquely identify the cache entry or an array of keys

@@ -60,21 +60,21 @@ class Message extends \lithium\core\StaticObject {
 	 * and into it's correct plural form.
 	 *
 	 * Usage:
-	 * {{{
+	 * ```
 	 * Message::translate('Mind the gap.');
 	 * Message::translate('house', array('count' => 23));
-	 * }}}
+	 * ```
 	 *
 	 * `String::insert()`-style placeholders may be used within the message
 	 * and replacements provided directly within the `options`  argument.
 	 *
 	 * Example:
-	 * {{{
+	 * ```
 	 * Message::translate('I can see {:count} bike.');
 	 * Message::translate('This painting is {:color}.', array(
 	 * 	'color' => Message::translate('silver'),
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\util\String::insert()
 	 * @param string $id The id to use when looking up the translation.
@@ -126,18 +126,18 @@ class Message extends \lithium\core\StaticObject {
 	 * `Media::_handle()` or be used in other places where needed.
 	 *
 	 * Usage:
-	 * {{{
+	 * ```
 	 * 	$t('bike');
 	 * 	$tn('bike', 'bikes', 3);
-	 * }}}
+	 * ```
 	 *
 	 * Using in a method:
-	 * {{{
+	 * ```
 	 * 	public function index() {
 	 * 		extract(Message::aliases());
 	 * 		$notice = $t('look');
 	 * 	}
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\net\http\Media::_handle()
 	 * @return array Named aliases (`'t'` and `'tn'`) for translation functions.

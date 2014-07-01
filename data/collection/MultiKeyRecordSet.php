@@ -14,9 +14,9 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 * An array containing each record's unique key. This allows, for example, lookups of records
 	 * with composite keys, i.e.:
 	 *
-	 * {{{
+	 * ```
 	 * $payment = $records[array('client_id' => 42, 'invoice_id' => 21)];
-	 * }}}
+	 * ```
 	 *
 	 * @var array
 	 */

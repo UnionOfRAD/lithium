@@ -103,14 +103,15 @@ class Object {
 	 * constructor provides. Additionally, this method iterates over the `$_autoConfig` property
 	 * to automatically assign configuration settings to their corresponding properties.
 	 *
-	 * For example, given the following: {{{
+	 * For example, given the following:
+	 * ```
 	 * class Bar extends \lithium\core\Object {
 	 * 	protected $_autoConfig = array('foo');
 	 * 	protected $_foo;
 	 * }
 	 *
 	 * $instance = new Bar(array('foo' => 'value'));
-	 * }}}
+	 * ```
 	 *
 	 * The `$_foo` property of `$instance` would automatically be set to `'value'`. If `$_foo` was
 	 * an array, `$_autoConfig` could be set to `array('foo' => 'merge')`, and the constructor value

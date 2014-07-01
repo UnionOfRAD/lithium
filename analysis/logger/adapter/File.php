@@ -16,14 +16,14 @@ use Closure;
  * A simple log adapter that writes messages to files. By default, messages are written to
  * `resources/tmp/logs/<type>.log`, where `<type>` is the log message priority level.
  *
- * {{{
+ * ```
  * use lithium\analysis\Logger;
  *
  * Logger::config(array(
  * 	'simple' => array('adapter' => 'File')
  * ));
  * Logger::write('debug', 'Something happened!');
- * }}}
+ * ```
  *
  * This will cause the message and the timestamp of the log event to be written to
  * `resources/tmp/logs/debug.log`. For available configuration options for this adapter, see

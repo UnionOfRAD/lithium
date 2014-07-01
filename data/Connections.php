@@ -46,7 +46,7 @@ class Connections extends \lithium\core\Adaptable {
 	 * Add connection configurations to your app in `config/bootstrap/connections.php`
 	 *
 	 * For example:
-	 * {{{
+	 * ```
 	 * Connections::add('default', array(
 	 *     'type' => 'database',
 	 *     'adapter' => 'MySql',
@@ -55,21 +55,21 @@ class Connections extends \lithium\core\Adaptable {
 	 *     'password' => '',
 	 *     'database' => 'my_blog'
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * or
 	 *
-	 * {{{
+	 * ```
 	 * Connections::add('couch', array(
 	 * 	'type' => 'http', 'adapter' => 'CouchDb', 'host' => '127.0.0.1', 'port' => 5984
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * or
 	 *
-	 * {{{
+	 * ```
 	 * Connections::add('mongo', array('type' => 'MongoDb', 'database' => 'my_app'));
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\data\Model::$_meta
 	 * @param string $name The name by which this connection is referenced. Use this name to
@@ -121,7 +121,7 @@ class Connections extends \lithium\core\Adaptable {
 	 * Read the configuration or access the connections you have set up.
 	 *
 	 * Usage:
-	 * {{{
+	 * ```
 	 * // Gets the names of all available configurations
 	 * $configurations = Connections::get();
 	 *
@@ -135,7 +135,7 @@ class Connections extends \lithium\core\Adaptable {
 	 * // Gets the connection object, but only if it has already been built.
 	 * // Otherwise returns null.
 	 * $dbConnection = Connections::get('db', array('autoCreate' => false));
-	 * }}}
+	 * ```
 	 *
 	 * @param string $name The name of the connection to get, as defined in the first parameter of
 	 *        `add()`, when the connection was initially created.

@@ -14,9 +14,10 @@ use lithium\core\Libraries;
 use Closure;
 
 /**
- * The `Growl` logger implements support for the [ Growl](http://growl.info/) notification system
- * for Mac OS X. Writing to this logger will display small, customizable status messages on the
- * screen.
+ * The `Growl` logger implements support for the Growl notification system for Mac OS X.
+ * Writing to this logger will display small, customizable status messages on the screen.
+ *
+ * @link http://growl.info
  */
 class Growl extends \lithium\core\Object {
 

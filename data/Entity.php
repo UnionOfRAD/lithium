@@ -200,9 +200,9 @@ class Entity extends \lithium\core\Object implements \Serializable {
 
 	/**
 	 * Magic method that allows calling of model methods on this record instance, i.e.:
-	 * {{{
+	 * ```
 	 * $record->validates();
-	 * }}}
+	 * ```
 	 *
 	 * @param string $method Method name caught by `__call()`.
 	 * @param array $params Arguments given to the above `$method` call.
@@ -243,9 +243,9 @@ class Entity extends \lithium\core\Object implements \Serializable {
 
 	/**
 	 * Allows several properties to be assigned at once, i.e.:
-	 * {{{
+	 * ```
 	 * $record->set(array('title' => 'Lorem Ipsum', 'value' => 42));
-	 * }}}
+	 * ```
 	 *
 	 * @param array $data An associative array of fields and values to assign to this `Entity`
 	 *        instance.

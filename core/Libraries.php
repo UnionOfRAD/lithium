@@ -173,9 +173,9 @@ class Libraries {
 	 * organization of built-in class types.
 	 *
 	 * For example, in a queuing application, you can define a class type called `'job'`:
-	 * {{{
+	 * ```
 	 * Libraries::paths(array('job' => '{:library}\extensions\job\{:name}'));
-	 * }}}
+	 * ```
 	 *
 	 * Then, any classes you add to the `extensions/job` directory in your application will be
 	 * automatically detected when calling `Libraries::locate('job')`. Additionally, any matching
@@ -185,18 +185,18 @@ class Libraries {
 	 * Supposing you wanted to have the option of further organizing jobs by class type (some jobs
 	 * are related to updating caches, others to sending notifications, etc.), you can specify
 	 * multiple paths per class type, with varying levels of specificity:
-	 * {{{
+	 * ```
 	 * Libraries::paths(array('job' => array(
 	 * 	'{:library}\extensions\job\{:class}\{:name}',
 	 * 	'{:library}\extensions\job\{:name}'
 	 * )));
-	 * }}}
+	 * ```
 	 *
 	 * This allows you to, for example, have two different classes called `Cleanup`. One may be
 	 * located in `app\extensions\job\Cleanup`, while the other is in
-	 * `app\extensions\job\cache\Cleanup`. Calling: {{{Libraries::locate('job');}}} will find
-	 * both classes, while {{{Libraries::locate('job.cache');}}} will only find the second. You can
-	 * also find individual jobs by name: {{{Libraries::locate('job', 'Cleanup');}}}
+	 * `app\extensions\job\cache\Cleanup`. Calling: ```Libraries::locate('job');``` will find
+	 * both classes, while ```Libraries::locate('job.cache');``` will only find the second. You can
+	 * also find individual jobs by name: ```Libraries::locate('job', 'Cleanup');```
 	 *
 	 * See `Libraries::locate()` for more information on using built-in and user-defined paths to
 	 * look up classes.
@@ -204,16 +204,19 @@ class Libraries {
 	 * In addition to adding custom class types, `paths()` allows you to redefine the naming and
 	 * organization of existing types. For example, if you wished to reference your model classes
 	 * as `app\models\PostModel` instead of `app\models\Post`, you can do the following:
-	 * {{{Libraries::paths(array('models' => '{:library}\models\{:name}Model'));}}} Note, however,
-	 * that this is a destructive, not an additive operation, and will replace any existing paths
-	 * defined for that type. If you wish to add a search path for an existing type, you must do
-	 * the following:
-	 * {{{
+	 * ```
+	 * Libraries::paths(array('models' => '{:library}\models\{:name}Model'));
+	 * ```
+	 *
+	 * Note, however, that this is a destructive, not an additive operation, and will
+	 * replace any existing paths defined for that type. If you wish to add a search path
+	 * for an existing type, you must do the following:
+	 * ```
 	 * $existing = Libraries::paths('controllers');
 	 * Libraries::paths(array('controller' => array_merge(
 	 * 	array('{:library}\extensions\controllers\{:name}Controller'), (array) $existing
 	 * )));
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\core\Libraries::locate()
 	 * @see lithium\core\Libraries::$_paths
@@ -342,20 +345,20 @@ class Libraries {
 	 * Allows library information to be retrieved in various ways, including:
 	 *
 	 * By name:
-	 * {{{ embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(1-1) }}}
+	 * ``` embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(1-1) ```
 	 *
 	 * With no parameters, to return all configuration for all libraries:
-	 * {{{ embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(22-22) }}}
+	 * ``` embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(22-22) ```
 	 *
 	 * By list of names with a key to extract:
-	 * {{{ embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(34-34) }}}
+	 * ``` embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(34-34) ```
 	 *
 	 * With no name, and a key to extract, to return a key/value array, where the library name is
 	 * the key, and the `$key` value is the value:
-	 * {{{ embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(37-37) }}}
+	 * ``` embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(37-37) ```
 	 *
 	 * By containing class name:
-	 * {{{ embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(45-45) }}}
+	 * ``` embed:lithium\tests\cases\core\LibrariesTest::testLibraryConfigAccess(45-45) ```
 	 *
 	 * @param mixed $name Either the name of a library added in `Libraries::add()`, an array of
 	 *              library names, or a fully-namespaced class name (see usage examples above).
@@ -733,7 +736,9 @@ class Libraries {
 	 * precedence. For example, this will find the first model called `File` in any plugin or class
 	 * library loaded into an application, including the application itself.
 	 *
-	 * {{{Libraries::locate('models', 'File');}}}
+	 * ```
+	 * Libraries::locate('models', 'File');
+	 * ```
 	 *
 	 * Order of precedence is usually based on the order in which the library was registered (via
 	 * `Libraries::add()`), unless the library was registered with the `'defer'` option set to
@@ -746,7 +751,9 @@ class Libraries {
 	 * If `$name` is not specified, `locate()` returns an array with all classes of the specified
 	 * type which can be found. By default, `locate()` searches all registered libraries.
 	 *
-	 * {{{Libraries::locate('models');}}}
+	 * ```
+	 * Libraries::locate('models');
+	 * ```
 	 *
 	 * For example, the above will return an array of all model classes in all registered plugins
 	 * and libraries (including the app itself).

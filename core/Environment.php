@@ -17,17 +17,17 @@ use lithium\util\Set;
  * While those three environments are the most common, you can create any arbitrary environment
  * with any set of configuration, for example:
  *
- * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testSetAndGetCurrentEnvironment(1-3)}}}
+ * ``` embed:lithium\tests\cases\core\EnvironmentTest::testSetAndGetCurrentEnvironment(1-3)```
  *
  * You can then retrieve the configurations using the key name. The correct configuration is
  * returned, automatically accounting for the current environment:
  *
- * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testSetAndGetCurrentEnvironment(15-15)}}}
+ * ``` embed:lithium\tests\cases\core\EnvironmentTest::testSetAndGetCurrentEnvironment(15-15)```
  *
  * `Environment` also works with subclasses of `Adaptable`, allowing you to maintain separate
  * configurations for database servers, cache adapters, and other environment-specific classes, for
  * example:
- * {{{
+ * ```
  * Connections::add('default', array(
  * 	'production' => array(
  * 		'type'     => 'database',
@@ -46,29 +46,29 @@ use lithium\util\Set;
  * 		'database' => 'app'
  * 	)
  * ));
- * }}}
+ * ```
  *
  * This allows the database connection named `'default'` to be connected to a local database in
  * development, and a production database in production. You can define environment-specific
  * configurations for caching, logging, even session storage, i.e.:
- * {{{
+ * ```
  * Cache::config(array(
  * 	'userData' => array(
  * 		'development' => array('adapter' => 'File'),
  * 		'production' => array('adapter' => 'Memcache')
  * 	)
  * ));
- * }}}
+ * ```
  *
  * When the cache configuration is accessed in the application's code, the correct configuration is
  * automatically used:
- * {{{
+ * ```
  * $user = User::find($request->id);
  * Cache::write('userData', "User.{$request->id}", $user->data(), '+5 days');
- * }}}
+ * ```
  *
- * In this configuration, the above example will automatically send cache writes to the file system
- * during local development, and to a [ memcache](http://memcached.org/) server in production.
+ * In this configuration, the above example will automatically send cache writes to the file
+ * system during local development, and to a memcache server in production.
  *
  * When writing classes that connect to other external resources, you can automatically take
  * advantage of environment-specific configurations by extending `Adaptable` and implementing
@@ -78,6 +78,7 @@ use lithium\util\Set;
  * you by automatically detecting which environment your application is running in. For additional
  * information, see the documentation for `Environment::is()`.
  *
+ * @link http://memcached.org
  * @see lithium\core\Adaptable
  */
 class Environment {
@@ -148,7 +149,7 @@ class Environment {
 	 * is assumed to be `'production'`), you can define your own detection rule set easily using a
 	 * closure that accepts an instance of the `Request` object, and returns the name of the correct
 	 * environment, as in the following example:
-	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testCustomDetector(1-9) }}}
+	 * ``` embed:lithium\tests\cases\core\EnvironmentTest::testCustomDetector(1-9) ```
 	 *
 	 * In the above example, the user-specified closure takes in a `Request` object, and using the
 	 * server data which it encapsulates, returns the correct environment name as a string.
@@ -160,7 +161,7 @@ class Environment {
 	 * each key is an environment, and each value is either an array of valid host names, or a
 	 * regular expression used to match a valid host name.
 	 *
-	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testDetectionWithArrayMap(1-5) }}}
+	 * ``` embed:lithium\tests\cases\core\EnvironmentTest::testDetectionWithArrayMap(1-5) ```
 	 *
 	 * In this example, a regular expression is being used to match local domains
 	 * (i.e. `localhost`), as well as the built-in `.console` domain, for console requests. Note
@@ -255,26 +256,26 @@ class Environment {
 	 * Creates, modifies or switches to an existing environment configuration. To create a new
 	 * configuration, or to update an existing configuration, pass an environment name and an array
 	 * that defines its configuration:
-	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testModifyEnvironmentConfig(1-1) }}}
+	 * ``` embed:lithium\tests\cases\core\EnvironmentTest::testModifyEnvironmentConfig(1-1) ```
 	 *
 	 * You can then add to an existing configuration by calling the `set()` method again with the
 	 * same environment name:
-	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testModifyEnvironmentConfig(6-6) }}}
+	 * ``` embed:lithium\tests\cases\core\EnvironmentTest::testModifyEnvironmentConfig(6-6) ```
 	 *
 	 * The settings for the environment will then be the aggregate of all `set()` calls:
-	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testModifyEnvironmentConfig(7-7) }}}
+	 * ``` embed:lithium\tests\cases\core\EnvironmentTest::testModifyEnvironmentConfig(7-7) ```
 	 *
 	 * By passing an array to `$env`, you can assign the same configuration to multiple
 	 * environments:
-	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testSetMultipleEnvironments(5-7) }}}
+	 * ``` embed:lithium\tests\cases\core\EnvironmentTest::testSetMultipleEnvironments(5-7) ```
 	 *
 	 * The `set()` method can also be called to manually set which environment to operate in:
-	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testSetAndGetCurrentEnvironment(5-5) }}}
+	 * ``` embed:lithium\tests\cases\core\EnvironmentTest::testSetAndGetCurrentEnvironment(5-5) ```
 	 *
 	 * Finally, `set()` can accept a `Request` object, to automatically detect the correct
 	 * environment.
 	 *
-	 * {{{ embed:lithium\tests\cases\core\EnvironmentTest::testEnvironmentDetection(9-10) }}}
+	 * ``` embed:lithium\tests\cases\core\EnvironmentTest::testEnvironmentDetection(9-10) ```
 	 *
 	 * For more information on defining custom rules to automatically detect your application's
 	 * environment, see the documentation for `Environment::is()`.

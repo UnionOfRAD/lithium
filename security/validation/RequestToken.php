@@ -24,16 +24,16 @@ use lithium\util\Set;
  *
  * ### Example
  *
- * {{{
+ * ```
  * // views/comments/add.html.php:
  * // ...
  * <?=$this->form->create($object); ?>
  * 	<?=$this->security->requestToken(); ?>
  * 	// Other fields...
  * <?=$this->form->end(); ?>
- * }}}
+ * ```
  *
- * {{{
+ * ```
  * // controllers/CommentsController.php:
  * public function add() {
  * 	if ($this->request->data && !RequestToken::check($this->request)) {
@@ -44,7 +44,7 @@ use lithium\util\Set;
  * 	}
  * 	// Handle a normal request...
  * }
- * }}}
+ * ```
  *
  * @link http://shiflett.org/articles/cross-site-request-forgeries Cross-Site Request Forgeries
  * @see lithium\template\helper\Security::requestToken()
@@ -135,19 +135,19 @@ class RequestToken {
 	 *
 	 * For example, the following two controller code samples are equivalent:
 	 *
-	 * {{{
+	 * ```
 	 * $key = $this->request->data['security']['token'];
 	 *
 	 * if (!RequestToken::check($key)) {
 	 * 	// Handle invalid request...
 	 * }
-	 * }}}
+	 * ```
 	 *
-	 * {{{
+	 * ```
 	 * if (!RequestToken::check($this->request)) {
 	 * 	// Handle invalid request...
 	 * }
-	 * }}}
+	 * ```
 	 *
 	 * @param mixed $key Either the actual key as a string, or a `Request` object containing the
 	 *              key.

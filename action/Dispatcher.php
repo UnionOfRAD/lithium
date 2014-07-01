@@ -65,7 +65,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * set a rule named 'action' with a value array containing a callback that uses
 	 * `lithium\util\Inflector` to camelize the action:
 	 *
-	 * {{{
+	 * ```
 	 * use lithium\action\Dispatcher;
 	 * use lithium\util\Inflector;
 	 *
@@ -74,18 +74,18 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * 		return Inflector::camelize(strtolower($params['action']), false);
 	 * 	})
 	 * )));
-	 * }}}
+	 * ```
 	 *
 	 * The rules can be a callback as well:
 	 *
-	 * {{{
+	 * ```
 	 * Dispatcher::config(array('rules' => function($params) {
 	 * 	if (isset($params['admin'])) {
 	 * 		return array('special' => array('action' => 'special_{:action}'));
 	 * 	}
 	 * 	return array();
 	 * }));
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\action\Dispatcher::config()
 	 * @see lithium\util\String::insert()

@@ -147,10 +147,10 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 *
 	 * Part of `ArrayAccess`.
 	 *
-	 * {{{
+	 * ```
 	 * isset($file['bar']);
 	 * $file->offsetExists('bar');
-	 * }}}
+	 * ```
 	 *
 	 * @param  string  $offset Key / variable name to check.
 	 * @return boolean Returns `true` if the value is set, otherwise `false`.
@@ -164,10 +164,10 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 *
 	 * Part of `ArrayAccess`.
 	 *
-	 * {{{
+	 * ```
 	 * $file['bar'];
 	 * $file->offsetGet('bar');
-	 * }}}
+	 * ```
 	 *
 	 * @param  string $offset Key / variable name to check.
 	 * @return mixed
@@ -181,10 +181,10 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 *
 	 * Part of `ArrayAccess`.
 	 *
-	 * {{{
+	 * ```
 	 * $file['bar'] = 'baz';
 	 * $file->offsetSet('bar', 'baz');
-	 * }}}
+	 * ```
 	 *
 	 * @param  string $offset Key / variable name to check.
 	 * @param  mixed  $value  Value you wish to set to `$offset`.
@@ -199,10 +199,10 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 *
 	 * Part of `ArrayAccess`.
 	 *
-	 * {{{
+	 * ```
 	 * unset($file['bar']);
 	 * $file->offsetUnset('bar');
-	 * }}}
+	 * ```
 	 *
 	 * @param  string $offset Key / variable name to check.
 	 * @return void

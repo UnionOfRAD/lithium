@@ -39,11 +39,11 @@ use lithium\storage\Cache;
  *
  * A simple configuration can be accomplished as follows:
  *
- * {{{
+ * ```
  * Cache::config(array(
  *     'default' => array('adapter' => 'Apc')
  * ));
- * }}}
+ * ```
  *
  * @link http://pecl.php.net/package/APCu
  * @link http://pecl.php.net/package/APC

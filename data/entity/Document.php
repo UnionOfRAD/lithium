@@ -16,8 +16,7 @@ use UnexpectedValueException;
  * organizing collections of entities from document-oriented databases such as CouchDB or MongoDB.
  * A `Document` object's fields can represent a collection of both simple and complex data types,
  * as well as other `Document` objects. Given the following data (document) structure:
- *
- * {{{
+ * ```
  * {
  * 	_id: 12345.
  * 	name: 'Acme, Inc.',
@@ -27,15 +26,16 @@ use UnexpectedValueException;
  * 		'Moe': { email: 'moe@acme.com' }
  * 	}
  * }
- * }}}
+ * ```
  *
  * You can query the object as follows:
- *
- * {{{$acme = Company::find(12345);}}}
+ * ```
+ * $acme = Company::find(12345);
+ * ```
  *
  * This returns a `Document` object, populated with the raw representation of the data.
- *
- * {{{print_r($acme->to('array'));
+ * ```
+ * print_r($acme->to('array'));
  *
  * // Yields:
  * //	array(
@@ -46,17 +46,20 @@ use UnexpectedValueException;
  * //		'Curly' => array('email' => 'curly@acme.com'),
  * //		'Moe' => array('email' => 'moe@acme.com')
  * //	)
- * //)}}}
+ * //)
+ * ```
  *
  * As with other database objects, a `Document` exposes its fields as object properties, like so:
- *
- * {{{echo $acme->name; // echoes 'Acme, Inc.'}}}
+ * ```
+ * echo $acme->name; // echoes 'Acme, Inc.'
+ * ```
  *
  * However, accessing a field containing a data set will return that data set wrapped in a
  * sub-`Document` object., i.e.:
- *
- * {{{$employees = $acme->employees;
- * // returns a Document object with the data in 'employees'}}}
+ * ```
+ * $employees = $acme->employees;
+ * // returns a Document object with the data in 'employees'
+ * ```
  */
 class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 
@@ -283,11 +286,11 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	/**
 	 * PHP magic method used when unset() is called on a `Document` instance.
 	 * Use case for this would be when you wish to edit a document and remove a field, ie.:
-	 * {{{
+	 * ```
 	 * $doc = Post::find($id);
 	 * unset($doc->fieldName);
 	 * $doc->save();
-	 * }}}
+	 * ```
 	 *
 	 * @param string $name The name of the field to remove.
 	 * @return void
@@ -307,9 +310,9 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * Allows several properties to be assigned at once.
 	 *
 	 * For example:
-	 * {{{
+	 * ```
 	 * $doc->set(array('title' => 'Lorem Ipsum', 'value' => 42));
-	 * }}}
+	 * ```
 	 *
 	 * @param array $data An associative array of fields and values to assign to the `Document`.
 	 * @param array $options

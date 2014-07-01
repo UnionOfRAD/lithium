@@ -21,14 +21,14 @@ use lithium\net\http\MediaException;
  *
  * Using the `Media` class, you can globally configure input and output of different types of
  * content, i.e.:
- * {{{ embed:lithium\tests\cases\net\http\MediaTest::testCustomEncodeHandler(4-12) }}}
+ * ``` embed:lithium\tests\cases\net\http\MediaTest::testCustomEncodeHandler(4-12) ```
  *
  * You may then render CSV content from anywhere in your application. For example, in a controller
  * you may do the following:
  *
- * {{{
+ * ```
  * 	$this->render(array('csv' => Post::find('all')));
- * }}}
+ * ```
  */
 class Media extends \lithium\core\StaticObject {
 
@@ -130,21 +130,21 @@ class Media extends \lithium\core\StaticObject {
 	 * retrieves information about a type that has been defined.
 	 *
 	 * Examples:
-	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(1-2) }}}
+	 * ``` embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(1-2) ```
 	 *
-	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(19-23) }}}
+	 * ``` embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(19-23) ```
 	 *
-	 * {{{ embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(43-44) }}}
+	 * ``` embed:lithium\tests\cases\net\http\MediaTest::testMediaTypes(43-44) ```
 	 *
 	 * Alternatively, can be used to detect the type name of a registered content type:
-	 * {{{
+	 * ```
 	 * Media::type('application/json'); // returns 'json'
 	 * Media::type('application/javascript'); // returns 'javascript'
 	 * Media::type('text/javascript'); // also returns 'javascript'
 	 *
 	 * Media::type('text/html'); // returns 'html'
 	 * Media::type('application/xhtml+xml'); // also returns 'html'
-	 * }}}
+	 * ```
 	 *
 	 * #### Content negotiation
 	 *
@@ -152,9 +152,9 @@ class Media extends \lithium\core\StaticObject {
 	 * enough. For example, if you wish to serve a different set of templates to mobile web
 	 * browsers, you'd still want those templates served as HTML. You might add something like this:
 	 *
-	 * {{{
+	 * ```
 	 * Media::type('mobile', array('application/xhtml+xml', 'text/html'));
-	 * }}}
+	 * ```
 	 *
 	 * However, this would cause _all_ requests for HTML content to be interpreted as
 	 * `'mobile'`-type requests. Instead, we can use _content negotiation_ to granularly specify how
@@ -169,19 +169,18 @@ class Media extends \lithium\core\StaticObject {
 	 * object. Each assertion (array key) can be one of three different things:
 	 *
 	 * - `'type'` _boolean_: In the default routing, some routes have `{:type}` keys, which are
-	 *   designed to match file extensions in URLs. These values act as overrides for the HTTP
-	 *   `Accept` header, allowing different formats to be served with the same content type. For
-	 *    example, if you're serving [ JSONP](http://en.wikipedia.org/wiki/JSON#JSONP), you'll want
-	 *    to serve it with the same content-type as JavaScript (since it is JavaScript), but you
-	 *    probably won't want to use the same template(s) or other settings. Therefore, when serving
-	 *    JSONP content, you can specify that the extension defined in the type must be present in
-	 *    the URL:
-	 *  {{{
+	 *   designed to match file extensions in URLs. These values act as overrides for the
+	 *   HTTP `Accept` header, allowing different formats to be served with the same content
+	 *   type. For example, if you're serving JSONP, you'll want to serve it with the same
+	 *   content-type as JavaScript (since it is JavaScript), but you probably won't want to
+	 *   use the same template(s) or other settings. Therefore, when serving JSONP content, you
+	 *   can specify that the extension defined in the type must be present in the URL:
+	 *  ```
 	 *  Media::type('jsonp', array('text/html'), array(
 	 *  	// template settings...
 	 *  	'conditions' => array('type' => true)
 	 *  ));
-	 *  }}}
+	 *  ```
 	 *  Then, JSONP content will only ever be served when the request URL ends in `.jsonp`.
 	 *
 	 * - `'<prefix>:<key>'` _string_: This type of assertion can be used to match against arbitrary
@@ -196,6 +195,7 @@ class Media extends \lithium\core\StaticObject {
 	 *   iPhone requests only. See `lithium\action\Request::detect()` for more information on adding
 	 *   detectors.
 	 *
+	 * @link http://en.wikipedia.org/wiki/JSON#JSONP
 	 * @see lithium\net\http\Media::$_types
 	 * @see lithium\net\http\Media::$_handlers
 	 * @see lithium\net\http\Media::negotiate()
@@ -1004,23 +1004,23 @@ class Media extends \lithium\core\StaticObject {
 	 * Attach a scope to a mount point.
 	 *
 	 * Example:
-	 * {{{
+	 * ```
 	 * Media::attach('app', array(
 	 *     'path' => '/var/www/website/app/webroot/extradir',
 	 *     'prefix' => 'extradir'
 	 * ));
-	 * }}}
+	 * ```
 	 *
-	 * {{{
+	 * ```
 	 * Media::attach('cdn', array(
 	 *     'absolute' => true,
 	 *     'path' => null,
 	 *     'host' => 'http://my.cdn.com',
 	 *     'prefix' => 'project1/assets'
 	 * ));
-	 * }}}
+	 * ```
 	 *
-	 * {{{
+	 * ```
 	 * Media::attach('cdn', array(
 	 *     'absolute' => true,
 	 *     'path' => null,
@@ -1028,9 +1028,9 @@ class Media extends \lithium\core\StaticObject {
 	 *     'scheme' => array('http://', 'https://'),
 	 *     'prefix' => 'project1/assets',
 	 * ));
-	 * }}}
+	 * ```
 	 *
-	 * {{{
+	 * ```
 	 * Media::attach('cdn', array(
 	 *     'absolute' => true,
 	 *     'path' => null,
@@ -1038,7 +1038,7 @@ class Media extends \lithium\core\StaticObject {
 	 *     'scheme' => 'http://',
 	 *     'prefix' => 'project1/assets',
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * @param  string $name The name of the media you wish to attach.
 	 * @param  array  $config Asset configuration options for the given scope.

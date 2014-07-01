@@ -21,7 +21,7 @@ use UnexpectedValueException;
  * levels. When a log message is written, all adapters that are configured to accept the priority
  * level with which the message was written will receive the message.
  *
- * {{{
+ * ```
  * Logger::config(array(
  * 	'default' => array('adapter' => 'Syslog'),
  * 	'badnews' => array(
@@ -29,17 +29,19 @@ use UnexpectedValueException;
  * 		'priority' => array('emergency', 'alert', 'critical', 'error')
  * 	)
  * ));
- * }}}
+ * ```
  *
  * In the above configuration, all messages will be written to the system log (`syslogd`), but only
  * messages with the priority `error` or higher will be logged to a file. Messages can then be
  * written to the log(s) using the `write()` method:
- *
- * {{{ Logger::write('alert', 'This is an alert-level message that will be logged in 2 places'); }}}
+ * ```
+ * Logger::write('alert', 'This is an alert-level message that will be logged in 2 places');
+ * ```
  *
  * Messages can also be written using the log priority as a method name:
- *
- * {{{ Logger::alert('This is an alert-level message that will be logged in 2 places'); }}}
+ * ```
+ * Logger::alert('This is an alert-level message that will be logged in 2 places');
+ * ```
  *
  * This works identically to the above. The message priority levels which `Logger` supports are as
  * follows: `emergency`, `alert`, `critical`, `error`, `warning`, `notice`, `info` and `debug`.
@@ -124,10 +126,10 @@ class Logger extends \lithium\core\Adaptable {
 	/**
 	 * Acts as a proxy for the `write()` method, allowing log message priority names to be called as
 	 * methods, i.e.:
-	 * {{{
+	 * ```
 	 * Logger::emergency('Something bad happened.');
 	 * // This is equivalent to Logger::write('emergency', 'Something bad happened')
-	 * }}}
+	 * ```
 	 *
 	 * @param string $priority The name of the method called on the `Logger` class. This should map
 	 *               to a log type.

@@ -206,9 +206,9 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 * Allows several properties to be assigned at once.
 	 *
 	 * For example:
-	 * {{{
+	 * ```
 	 * $collection->set(array('title' => 'Lorem Ipsum', 'value' => 42));
-	 * }}}
+	 * ```
 	 *
 	 * @param $values An associative array of fields and values to assign to the `Collection`.
 	 * @return void
@@ -523,10 +523,10 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 * array conversion, but other formats may be registered.
 	 *
 	 * Once the appropriate handlers are registered, a `Collection` instance can be converted into
-	 * any handler-supported format, i.e.: {{{
+	 * any handler-supported format, i.e.: ```
 	 * $collection->to('json'); // returns a JSON string
 	 * $collection->to('xml'); // returns an XML string
-	 * }}}
+	 * ```
 	 *
 	 *  _Please note that Lithium does not ship with a default XML handler, but one can be
 	 * configured easily._

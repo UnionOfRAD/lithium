@@ -21,10 +21,10 @@ class Route extends \lithium\console\Command {
 	 * Override the default 'development' environment.
 	 *
 	 * For example:
-	 * {{{
+	 * ```
 	 * li3 route --env=production
 	 * li3 route show /foo --env=test
-	 * }}}
+	 * ```
 	 *
 	 * @var string
 	 */
@@ -66,21 +66,21 @@ class Route extends \lithium\console\Command {
 	 * alias for the `show()` method.
 	 *
 	 * Example:
-	 * {{{
+	 * ```
 	 * li3 route
 	 * li3 route all
-	 * }}}
+	 * ```
 	 *
 	 * Will return an output similar to:
 	 *
-	 * {{{
+	 * ```
 	 * Template                        	Params
 	 * --------                        	------
 	 * /                               	{"controller":"pages","action":"view"}
 	 * /pages/{:args}                  	{"controller":"pages","action":"view"}
 	 * /{:slug:[\w\-]+}                	{"controller":"posts","action":"show"}
 	 * /{:controller}/{:action}/{:args}	{"action":"index"}
-	 * }}}
+	 * ```
 	 *
 	 * @return void
 	 */
@@ -100,21 +100,21 @@ class Route extends \lithium\console\Command {
 	 * method.
 	 *
 	 * Examples:
-	 * {{{
+	 * ```
 	 * 1: li3 route show /foo
 	 * 2: li3 route show post /foo/bar/1
 	 * 3: li3 route show /test
 	 * 4: li3 route show /test --env=production
-	 * }}}
+	 * ```
 	 *
 	 * Will return outputs similar to:
 	 *
-	 * {{{
+	 * ```
 	 * 1: {"controller":"foo","action":"index"	}
 	 * 2: {"controller":"foo","action":"bar","args":["1"]}
 	 * 3: {"controller":"lithium\\test\\Controller","action":"index"}
 	 * 4: {"controller":"test","action":"index"}
-	 * }}}
+	 * ```
 	 *
 	 * @return void
 	 */

@@ -96,7 +96,7 @@ class Request extends \lithium\net\http\Request {
 	/**
 	 * Options used to detect features of the request, using `is()`. For example:
 	 *
-	 * {{{ embed:lithium\tests\cases\action\RequestTest::testRequestTypeIsMobile(4-4) }}}
+	 * ``` embed:lithium\tests\cases\action\RequestTest::testRequestTypeIsMobile(4-4) ```
 	 *
 	 *
 	 * Custom detectors can be added using `detect()`.
@@ -626,7 +626,7 @@ class Request extends \lithium\net\http\Request {
 	 * `Request` object instance as a parameter.
 	 *
 	 * For example, to detect whether a request is from an iPhone, you can do the following:
-	 * {{{ embed:lithium\tests\cases\action\RequestTest::testDetect(11-12) }}}
+	 * ``` embed:lithium\tests\cases\action\RequestTest::testDetect(11-12) ```
 	 *
 	 * @see lithium\action\Request::is()
 	 * @param string $flag The name of the detector check. Used in subsequent calls to `Request::is()`.

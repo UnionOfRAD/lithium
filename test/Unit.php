@@ -119,12 +119,12 @@ class Unit extends \lithium\core\Object {
 	 * testing.
 	 *
 	 * For example:
-	 * {{{
+	 * ```
 	 * public function skip() {
 	 *     $connection = Connections::get('test', array('config' => true));
 	 *     $this->skipIf(!$connection, 'Test database is unavailable.');
 	 * }
-	 * }}}
+	 * ```
 	 */
 	public function skip() {}
 
@@ -332,11 +332,11 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that the result is strictly `true`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertTrue(true, 'Boolean true'); // succeeds
 	 * $this->assertTrue('false', 'String has content'); // fails
 	 * $this->assertTrue(10, 'Non-Zero value'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param mixed $result
@@ -351,11 +351,11 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that the result strictly is `false`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertFalse(false, 'Boolean false'); // succeeds
 	 * $this->assertFalse('', 'String is empty'); // fails
 	 * $this->assertFalse(0, 'Zero value'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param mixed $result
@@ -383,10 +383,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that the result is *not* strictly `null`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertNotNull(1); // succeeds
 	 * $this->assertNotNull(null); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param mixed $result
@@ -403,7 +403,7 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that given result is empty.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertEmpty(''); // succeeds
 	 * $this->assertEmpty(0); // succeeds
 	 * $this->assertEmpty(0.0); // succeeds
@@ -412,7 +412,7 @@ class Unit extends \lithium\core\Object {
 	 * $this->assertEmpty(false); // succeeds
 	 * $this->assertEmpty(array()); // succeeds
 	 * $this->assertEmpty(1); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @link http://php.net/empty
 	 * @see lithium\test\Unit::assert()
@@ -430,10 +430,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that given result is *not* empty.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertNotEmpty(1); // succeeds
 	 * $this->assertNotEmpty(array()); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @link http://php.net/empty
 	 * @see lithium\test\Unit::assert()
@@ -576,10 +576,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that given value matches the `sprintf` format.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertStringMatchesFormat('%d', '10'); // succeeds
 	 * $this->assertStringMatchesFormat('%d', '10.555'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @link http://php.net/sprintf
 	 * @link http://php.net/sscanf
@@ -597,10 +597,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that given value does *not* matche the `sprintf` format.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertStringNotMatchesFormat('%d', '10.555'); // succeeds
 	 * $this->assertStringNotMatchesFormat('%d', '10'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @link http://php.net/sprintf
 	 * @link http://php.net/sscanf
@@ -618,10 +618,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert given result string has given suffix.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertStringEndsWith('bar', 'foobar'); // succeeds
 	 * $this->assertStringEndsWith('foo', 'foobar'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @param string $expected The suffix to check for.
 	 * @param string $actual
@@ -638,10 +638,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert given result string has given prefix.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertStringStartsWith('foo', 'foobar'); // succeeds
 	 * $this->assertStringStartsWith('bar', 'foobar'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @param string $expected The prefix to check for.
 	 * @param string $actual
@@ -661,12 +661,12 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * Checks for an input tag with a name attribute (contains any non-empty value) and an id
 	 * attribute that contains 'my-input':
-	 * {{{
+	 * ```
 	 *     array('input' => array('name', 'id' => 'my-input'))
-	 * }}}
+	 * ```
 	 *
 	 * Checks for two p elements with some text in them:
-	 * {{{
+	 * ```
 	 * array(
 	 *     array('p' => true),
 	 *     'textA',
@@ -675,16 +675,16 @@ class Unit extends \lithium\core\Object {
 	 *     'textB',
 	 *     '/p'
 	 * )
-	 * }}}
+	 * ```
 	 *
 	 * You can also specify a pattern expression as part of the attribute values, or the tag
 	 * being defined, if you prepend the value with preg: and enclose it with slashes, like so:
-	 * {{{
+	 * ```
 	 * array(
 	 *     array('input' => array('name', 'id' => 'preg:/FieldName\d+/')),
 	 *     'preg:/My\s+field/'
 	 * )
-	 * }}}
+	 * ```
 	 *
 	 * Important: This function is very forgiving about whitespace and also accepts any
 	 * permutation of attribute order. It will also allow whitespaces between specified tags.
@@ -907,10 +907,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that the passed result array has expected number of elements.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertCount(1, array('foo')); // succeeds
 	 * $this->assertCount(2, array('foo', 'bar', 'bar')); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param integer $expected
@@ -928,10 +928,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that the passed result array has *not* the expected number of elements.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertNotCount(2, array('foo', 'bar', 'bar')); // succeeds
 	 * $this->assertNotCount(1, array('foo')); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param integer $expected
@@ -949,10 +949,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that the result array has given key.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertArrayHasKey('bar', array('bar' => 'baz')); // succeeds
 	 * $this->assertArrayHasKey('foo', array('bar' => 'baz')); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param mixed $expected
@@ -976,10 +976,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that the result array does *not* have given key.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertArrayNotHasKey('foo', array('bar' => 'baz')); // succeeds
 	 * $this->assertArrayNotHasKey('bar', array('bar' => 'baz')); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param mixed $expected
@@ -1003,10 +1003,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$haystack` contains `$needle` as a value.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertContains('foo', array('foo', 'bar', 'baz')); // succeeds
 	 * $this->assertContains(4, array(1,2,3)); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param string $needle   The needle you are looking for.
@@ -1038,10 +1038,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$haystack` does *not* contain `$needle` as a value.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertNotContains(4, array(1,2,3)); // succeeds
 	 * $this->assertNotContains('foo', array('foo', 'bar', 'baz')); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param string $needle   The needle you are looking for.
@@ -1073,10 +1073,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$haystack` does only contain item of given type.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertContainsOnly('integer', array(1,2,3)); // succeeds
 	 * $this->assertContainsOnly('integer', array('foo', 'bar', 'baz')); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::$_internalTypes
 	 * @see lithium\test\Unit::assert()
@@ -1104,10 +1104,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$haystack` hasn't any items of given type.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertNotContainsOnly('integer', array('foo', 'bar', 'baz')); // succeeds
 	 * $this->assertNotContainsOnly('integer', array(1,2,3)); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::$_internalTypes
 	 * @see lithium\test\Unit::assert()
@@ -1135,10 +1135,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$haystack` contains only instances of given class.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertContainsOnlyInstancesOf('stdClass', array(new \stdClass)); // succeeds
 	 * $this->assertContainsOnlyInstancesOf('stdClass', array(new \lithium\test\Unit)); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param string $class
@@ -1163,10 +1163,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$expected` is greater than `$actual`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertGreaterThan(5, 3); // succeeds
 	 * $this->assertGreaterThan(3, 5); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param float|integer $expected
@@ -1184,10 +1184,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$expected` is greater than or equal to `$actual`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertGreaterThanOrEqual(5, 5); // succeeds
 	 * $this->assertGreaterThanOrEqual(3, 5); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param float|integer $expected
@@ -1205,10 +1205,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$expected` is less than `$actual`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertLessThan(3, 5); // succeeds
 	 * $this->assertLessThan(5, 3); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param float|integer $expected
@@ -1226,10 +1226,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$expected` is less than or equal to `$actual`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertLessThanOrEqual(5, 5); // succeeds
 	 * $this->assertLessThanOrEqual(5, 3); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param float|integer $expected
@@ -1247,10 +1247,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$actual` is an instance of `$expected`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertInstanceOf('stdClass', new stdClass); // succeeds
 	 * $this->assertInstanceOf('ReflectionClass', new stdClass); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param string $expected Fully namespaced expected class.
@@ -1268,10 +1268,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$actual` is *not* an instance of `$expected`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertNotInstanceOf('ReflectionClass', new stdClass); // succeeds
 	 * $this->assertNotInstanceOf('stdClass', new stdClass); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param string $expected Fully namespaced expected class.
@@ -1289,10 +1289,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$actual` is of given type.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertInternalType('string', 'foobar'); // succeeds
 	 * $this->assertInternalType('integer', 'foobar'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::$_internalTypes
 	 * @see lithium\test\Unit::assert()
@@ -1312,10 +1312,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$actual` is *not* of given type.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertNotInternalType('integer', 'foobar'); // succeeds
 	 * $this->assertNotInternalType('string', 'foobar'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::$_internalTypes
 	 * @see lithium\test\Unit::assert()
@@ -1335,10 +1335,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that the file contents of `$expected` are equal to the contents of `$actual`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertFileEquals('/tmp/foo.txt', '/tmp/foo.txt'); // succeeds
 	 * $this->assertFileEquals('/tmp/foo.txt', '/tmp/bar.txt'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param string $expected Absolute path to the expected file.
@@ -1355,10 +1355,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that the file contents of `$expected` are *not* equal to the contents of `$actual`.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertFileNotEquals('/tmp/foo.txt', '/tmp/bar.txt'); // succeeds
 	 * $this->assertFileNotEquals('/tmp/foo.txt', '/tmp/foo.txt'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param string $expected Absolute path to the expected file.
@@ -1375,10 +1375,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that a file exists.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertFileExists(__FILE__); // succeeds
 	 * $this->assertFileExists('/tmp/bar.txt'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param string $actual Absolute path to the actual file.
@@ -1395,10 +1395,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that a file does *not* exist.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertFileNotExists('/tmp/bar.txt'); // succeeds
 	 * $this->assertFileNotExists(__FILE__); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param string $actual Absolute path to the actual file.
@@ -1415,10 +1415,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that a class has a given attribute.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertClassHasAttribute('__construct', 'ReflectionClass'); // succeeds
 	 * $this->assertClassHasAttribute('name', 'ReflectionClass'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @see lithium\test\Unit::assertObjectHasAttribute()
@@ -1442,10 +1442,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that a class does *not* have a given attribute.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertClassNotHasAttribute('name', 'ReflectionClass'); // succeeds
 	 * $this->assertClassNotHasAttribute('__construct', 'ReflectionClass'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @see lithium\test\Unit::assertObjectHasAttribute()
@@ -1469,10 +1469,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that a class does have a given _static_ attribute.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertClassHasStaticAttribute('_methodFilters', '\lithium\core\StaticObject'); // succeeds
 	 * $this->assertClassHasStaticAttribute('foobar', '\lithium\core\StaticObject'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param mixed $attributeName
@@ -1500,10 +1500,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that a class does *not* have a given _static_ attribute.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertClassNotHasStaticAttribute('foobar', '\lithium\core\StaticObject'); // succeeds
 	 * $this->assertClassNotHasStaticAttribute('_methodFilters', '\lithium\core\StaticObject'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param mixed $attributeName
@@ -1531,10 +1531,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$object` has given attribute.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertObjectHasAttribute('__construct', 'ReflectionClass'); // succeeds
 	 * $this->assertObjectHasAttribute('name', 'ReflectionClass'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @throws InvalidArgumentException When $object is not an object.
@@ -1557,10 +1557,10 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Assert that `$object` does *not* have given attribute.
 	 *
-	 * {{{
+	 * ```
 	 * $this->assertObjectNotHasAttribute('name', 'ReflectionClass'); // succeeds
 	 * $this->assertObjectNotHasAttribute('__construct', 'ReflectionClass'); // fails
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @throws InvalidArgumentException When $object is not an object.

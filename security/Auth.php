@@ -28,7 +28,7 @@ use lithium\core\ConfigException;
  * the session adapter. This prevents a possible password hash to be leaked in a cookie (for
  * example). You can also be very specific on what you want to store in the session:
  *
- * {{{
+ * ```
  * Auth::config(array(
  *   'default' => array(
  *      'session' => array(
@@ -36,7 +36,7 @@ use lithium\core\ConfigException;
  *      )
  *   )
  * ));
- * }}}
+ * ```
  *
  * You can also pass an optional `persist` param to the `check` method to override this default.
  *

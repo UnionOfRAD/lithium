@@ -92,7 +92,7 @@ class Message extends \lithium\net\Message {
 	 * with the specification which states header names should be treated in
 	 * a case-insensitive way. Sorting is suggested but not required.
 	 *
-	 * {{{
+	 * ```
 	 * // Get single or multiple headers.
 	 * $request->headers('Content-Type'); // returns 'text/plain'
 	 * $request->headers(); // returns array('Content-Type: text/plain', ... )
@@ -108,7 +108,7 @@ class Message extends \lithium\net\Message {
 	 * // Removing single or multiple headers.
 	 * $request->headers('Content-Type', false);
 	 * $request->headers(array('Content-Type' => false, ...));
-	 * }}}
+	 * ```
 	 *
 	 * Certain header fields support multiple values. These can be separated by
 	 * comma or alternatively the header repeated for each value in the list.
@@ -120,7 +120,7 @@ class Message extends \lithium\net\Message {
 	 * Note: Multiple headers of the same name are only valid if the values of
 	 * that header can be separated by comma as defined in section 4.2 of RFC2616.
 	 *
-	 * {{{
+	 * ```
 	 * // Replace single or multiple headers
 	 * $request->headers('Cache-Control', 'no-store');
 	 * $request->headers(array('Cache-Control' => 'public'));
@@ -142,7 +142,7 @@ class Message extends \lithium\net\Message {
 	 * $request->headers('Cache-Control', 'no-store, no-cache');
 	 * $request->headers();
 	 * // returns array('Cache-Control: max-age=0', 'Cache-Control: no-store, no-cache')
-	 * }}}
+	 * ```
 	 *
 	 * @link http://www.ietf.org/rfc/rfc2616.txt Section 4.2 Message Headers
 	 * @param string|array $key A header name, a full header line (`'<key>: <value>'`), or an array

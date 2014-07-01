@@ -28,10 +28,10 @@ class Test extends \lithium\console\Command {
 	 * List of filters to apply before/during/after test run, separated by commas.
 	 *
 	 * For example:
-	 * {{{
+	 * ```
 	 * lithium test lithium/tests/cases/core/ObjectTest.php --filters=Coverage
 	 * lithium test lithium/tests/cases/core/ObjectTest.php --filters=Coverage,Profiler
-	 * }}}
+	 * ```
 	 *
 	 * @var string Name of a filter or a comma separated list of filter names. Builtin filters:
 	 *      - `Affected`:   Adds tests to the run affected by the classes covered by current tests.
@@ -182,32 +182,32 @@ class Test extends \lithium\console\Command {
 	 * Runs tests given a path to a directory or file containing tests. The path to the
 	 * test(s) may be absolute or relative to the current working directory.
 	 *
-	 * {{{
+	 * ```
 	 * li3 test lithium/tests/cases/core/ObjectTest.php
 	 * li3 test lithium/tests/cases/core
-	 * }}}
+	 * ```
 	 *
 	 * If you are in the working directory of an application or plugin and wish to run all tests,
 	 * simply execute the following:
 	 *
-	 * {{{
+	 * ```
 	 * li3 test tests/cases
-	 * }}}
+	 * ```
 	 *
 	 * If you are in the working directory of an application and wish to run a plugin, execute one
 	 * of the following:
 	 *
-	 * {{{
+	 * ```
 	 * li3 test libraries/<plugin>/tests/cases
 	 * li3 test <plugin>/tests/cases
-	 * }}}
+	 * ```
 	 *
 	 *
 	 * This will run `<library>/tests/cases/<package>/<class>Test.php`:
 	 *
-	 * {{{
+	 * ```
 	 * li3 test <library>/<package>/<class>.php
-	 * }}}
+	 * ```
 	 *
 	 * @param string $path Absolute or relative path to tests or a file which
 	 *                     corresponding test should be run.
@@ -268,13 +268,13 @@ class Test extends \lithium\console\Command {
 	 *
 	 * This method can be thought of the reverse of `Libraries::path()`.
 	 *
-	 * {{{
+	 * ```
 	 * lithium/tests/cases/core/ObjectTest.php -> lithium\tests\cases\core\ObjectTest
 	 * lithium/tests/cases/core                -> lithium\tests\cases\core
 	 * lithium/core/Object.php                 -> lithium\core\Object
 	 * lithium/core/                           -> lithium\core
 	 * lithium/core                            -> lithium\core
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\core\Libraries::path()
 	 * @param string $path The directory of or file path to one or more classes.

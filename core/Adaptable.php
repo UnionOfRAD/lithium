@@ -35,13 +35,13 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * default options for each.
 	 *
 	 * Example:
-	 * {{{
+	 * ```
 	 * array(
 	 *  'production' => array(),
 	 *  'development' => array(),
 	 *  'test' => array()
 	 * )
-	 * }}}
+	 * ```
 	 *
 	 * @var object `Collection` of configurations, indexed by name.
 	 */

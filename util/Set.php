@@ -59,7 +59,7 @@ class Set {
 	 * Checks if a particular path is set in an array. Tests by key name, or dot-delimited key
 	 * name, i.e.:
 	 *
-	 * {{{ embed:lithium\tests\cases\util\SetTest::testCheck(1-4) }}}
+	 * ``` embed:lithium\tests\cases\util\SetTest::testCheck(1-4) ```
 	 *
 	 * @param mixed $data Data to check on.
 	 * @param mixed $path A dot-delimited string.
@@ -679,10 +679,10 @@ class Set {
 	/**
 	 * Normalizes a string or array list.
 	 *
-	 * {{{
+	 * ```
 	 * Set::normalize('foo,bar'); // returns array('foo' => null, 'bar' => null);
 	 * Set::normalize(array('foo', 'bar' => 'baz'); // returns array('foo' => null, 'bar' => 'baz');
-	 * }}}
+	 * ```
 	 *
 	 * @param string|array $list List to normalize.
 	 * @param boolean $assoc If `true`, `$list` will be converted to an associative array.
@@ -806,7 +806,7 @@ class Set {
 	 *
 	 * Usage examples:
 	 *
-	 * {{{ embed:lithium\tests\cases\util\SetTest::testSetSlice(1-4) }}}
+	 * ``` embed:lithium\tests\cases\util\SetTest::testSetSlice(1-4) ```
 	 *
 	 * @param array $subject Array that gets split apart
 	 * @param array|string $keys An array of keys or a single key as string

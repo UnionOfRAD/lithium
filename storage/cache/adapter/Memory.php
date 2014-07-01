@@ -28,11 +28,11 @@ use lithium\storage\Cache;
   *
  * A simple configuration can be accomplished as follows:
  *
- * {{{
+ * ```
  * Cache::config(array(
  *     'default' => array('adapter' => 'Memory')
  * ));
- * }}}
+ * ```
  */
 class Memory extends \lithium\storage\cache\Adapter {
 

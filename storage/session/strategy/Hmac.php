@@ -19,12 +19,12 @@ use lithium\util\String;
  *
  * Example configuration:
  *
- * {{{
+ * ```
  * Session::config(array('default' => array(
  *    'adapter' => 'Cookie',
  *    'strategies' => array('Hmac' => array('secret' => 'foobar'))
  * )));
- * }}}
+ * ```
  *
  * This will configure the `HMAC` strategy to be used for all `Session` operations with the
  * `default` named configuration. A hash-based message authentication code (HMAC) will be

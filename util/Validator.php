@@ -21,20 +21,20 @@ use Closure;
  * parameter to the `rule()` method or accessed directly via the `is[RuleName]()` method name
  * convention:
  *
- * {{{
+ * ```
  * use lithium\util\Validator;
  *
  * // The following are equivalent:
  * Validator::rule('email', 'foo@example.com');  // true
  * Validator::isEmail('foo-at-example.com');     // false
- * }}}
+ * ```
  *
  * Data can also be validated against multiple rules, each having their own associated error
  * message. The rule structure is array-based and hierarchical based on rule names and
  * messages. Responses match the keys present in the `$data` parameter of `check()` up with an array
  * of rules which they violate.
  *
- * {{{ embed:lithium\tests\cases\util\ValidatorTest::testCheckMultipleHasFirstError(1-15) }}}
+ * ``` embed:lithium\tests\cases\util\ValidatorTest::testCheckMultipleHasFirstError(1-15) ```
  *
  * See the `check()` method for more information an multi-value datasets. Custom validation rules
  * can also be added to `Validator` at runtime. These can either take the form of regular expression
@@ -521,24 +521,24 @@ class Validator extends \lithium\core\StaticObject {
 	 * validation rules created are automatically callable as validation methods.
 	 *
 	 * For example:
-	 * {{{
+	 * ```
 	 * Validator::add('zeroToNine', '/^[0-9]$/');
 	 * $isValid = Validator::isZeroToNine("5"); // true
 	 * $isValid = Validator::isZeroToNine("20"); // false
-	 * }}}
+	 * ```
 	 *
 	 * Alternatively, the first parameter may be an array of rules expressed as key/value pairs,
 	 * as in the following:
-	 * {{{
+	 * ```
 	 * Validator::add(array(
 	 * 	'zeroToNine' => '/^[0-9]$/',
 	 * 	'tenToNineteen' => '/^1[0-9]$/',
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * In addition to regular expressions, validation rules can also be defined as full anonymous
 	 * functions:
-	 * {{{
+	 * ```
 	 * use app\models\Account;
 	 *
 	 * Validator::add('accountActive', function($value) {
@@ -548,7 +548,7 @@ class Validator extends \lithium\core\StaticObject {
 	 *
 	 * $testAccount = Account::create(array('is_active' => false));
 	 * Validator::isAccountActive($testAccount); // returns false
-	 * }}}
+	 * ```
 	 *
 	 * These functions can take up to 3 parameters:
 	 * 	- `$value` _mixed_: This is the actual value to be validated (as in the above example).

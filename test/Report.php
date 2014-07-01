@@ -23,7 +23,7 @@ use lithium\core\ClassNotFoundException;
  *
  * Example usage, for built-in HTML format:
  *
- * {{{
+ * ```
  * $report = new Report(array(
  *     'title' => 'Test Report Title',
  *     'group' => new Group(array('data' => array('lithium\tests\cases\net\http\MediaTest'))),
@@ -37,12 +37,12 @@ use lithium\core\ClassNotFoundException;
  *
  * // Get test results:
  * $report->results
- * }}}
+ * ```
  *
  * You may also choose to filter the results of the test runs to obtain additional information.
  * For example, say you wish to calculate the cyclomatic complexity of the classes you are testing:
  *
- * {{{
+ * ```
  * $report = new Report(array(
  *     'title' => 'Test Report Title',
  *     'group' => new Group(array('data' => array('lithium\tests\cases\net\http\MediaTest'))),
@@ -53,7 +53,7 @@ use lithium\core\ClassNotFoundException;
  *
  * // Get test results, including filter results:
  * $report->results
- * }}}
+ * ```
  *
  * @see lithium\test\Group
  * @see lithium\test\filter

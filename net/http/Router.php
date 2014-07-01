@@ -21,7 +21,7 @@ use Closure;
  * `myapp\controllers\SessionsController::add()`, you could set up a route like the following in
  * `config/routes.php`:
  *
- * {{{
+ * ```
  * use lithium\net\http\Router;
  *
  * Router::connect('/login', array('controller' => 'Sessions', 'action' => 'add'));
@@ -29,7 +29,7 @@ use Closure;
  * // -- or --
  *
  * Router::connect('/login', 'Sessions::add');
- * }}}
+ * ```
  *
  * Not only would that correctly route all requests for `/login` to `SessionsController::add()`, but
  * any time the framework generated a route with matching parameters, `Router` would return the
@@ -183,7 +183,7 @@ class Router extends \lithium\core\StaticObject {
 	 * parameters when parsing URLs. For example, the following would match a `posts/index` url
 	 * to a `PostsController::indexAction()` method.
 	 *
-	 * {{{
+	 * ```
 	 * use litthium\util\Inflector;
 	 *
 	 * Router::modifiers(array(
@@ -194,7 +194,7 @@ class Router extends \lithium\core\StaticObject {
 	 *         return Inflector::camelize($value) . 'Action';
 	 *     }
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * _Note_: Because modifiers are copied to `Route` objects on an individual basis, make sure
 	 * you append your custom modifiers _before_ connecting new routes.
@@ -225,14 +225,14 @@ class Router extends \lithium\core\StaticObject {
 	 * parameters when generating URLs. For example, for controller/action parameters to be dashed
 	 * instead of underscored or camelBacked, you could do the following:
 	 *
-	 * {{{
+	 * ```
 	 * use lithium\util\Inflector;
 	 *
 	 * Router::formatters(array(
 	 *     'controller' => function($value) { return Inflector::slug($value); },
 	 *     'action' => function($value) { return Inflector::slug($value); }
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * _Note_: Because formatters are copied to `Route` objects on an individual basis, make sure
 	 * you append custom formatters _before_ connecting new routes.
@@ -309,40 +309,41 @@ class Router extends \lithium\core\StaticObject {
 	 * Attempts to match an array of route parameters (i.e. `'controller'`, `'action'`, etc.)
 	 * against a connected `Route` object. For example, given the following route:
 	 *
-	 * {{{
+	 * ```
 	 * Router::connect('/login', array('controller' => 'users', 'action' => 'login'));
-	 * }}}
+	 * ```
 	 *
 	 * This will match:
-	 * {{{
+	 * ```
 	 * $url = Router::match(array('controller' => 'users', 'action' => 'login'));
 	 * // returns /login
-	 * }}}
+	 * ```
 	 *
 	 * For URLs templates with no insert parameters (i.e. elements like `{:id}` that are replaced
 	 * with a value), all parameters must match exactly as they appear in the route parameters.
 	 *
 	 * Alternatively to using a full array, you can specify routes using a more compact syntax. The
 	 * above example can be written as:
-	 *
-	 * {{{ $url = Router::match('Users::login'); // still returns /login }}}
+	 * ```
+	 * $url = Router::match('Users::login'); // still returns /login
+	 * ```
 	 *
 	 * You can combine this with more complicated routes; for example:
-	 * {{{
+	 * ```
 	 * Router::connect('/posts/{:id:\d+}', array('controller' => 'posts', 'action' => 'view'));
-	 * }}}
+	 * ```
 	 *
 	 * This will match:
-	 * {{{
+	 * ```
 	 * $url = Router::match(array('controller' => 'posts', 'action' => 'view', 'id' => '1138'));
 	 * // returns /posts/1138
-	 * }}}
+	 * ```
 	 *
 	 * Again, you can specify the same URL with a more compact syntax, as in the following:
-	 * {{{
+	 * ```
 	 * $url = Router::match(array('Posts::view', 'id' => '1138'));
 	 * // again, returns /posts/1138
-	 * }}}
+	 * ```
 	 *
 	 * You can use either syntax anywhere a URL is accepted, i.e.
 	 * `lithium\action\Controller::redirect()`, or `lithium\template\helper\Html::link()`.
@@ -540,7 +541,7 @@ class Router extends \lithium\core\StaticObject {
 	 *
 	 * For example:
 	 *
-	 * {{{ embed:lithium\tests\cases\net\http\RouterTest::testParameterPersistence(1-10) }}}
+	 * ``` embed:lithium\tests\cases\net\http\RouterTest::testParameterPersistence(1-10) ```
 	 *
 	 * @see lithium\action\Request::$persist
 	 * @param array $url The parameters that define the URL to be matched.
@@ -664,33 +665,33 @@ class Router extends \lithium\core\StaticObject {
 	 * Attach a scope to a mount point.
 	 *
 	 * Example 1:
-	 * {{{
+	 * ```
 	 * Router::attach('app', array(
 	 *     'absolute' => true,
 	 *     'host' => 'localhost',
 	 *     'scheme' => 'http://',
 	 *     'prefix' => 'web/tests'
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * Example 2:
-	 * {{{
+	 * ```
 	 * Router::attach('app', array(
 	 *     'absolute' => true,
 	 *     'host' => '{:subdomain:[a-z]+}.{:hostname}.{:tld}',
 	 *     'scheme' => '{:scheme:https://}',
 	 *     'prefix' => ''
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * Attach the variables to populate for the app scope.
-	 * {{{
+	 * ```
 	 * Router::attach('app', null, array(
 	 *     'subdomain' => 'www',
 	 *     'hostname' => 'li3',
 	 *     'tld' => 'me'
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * @param string Name of the scope.
 	 * @param mixed Settings of the mount point or `null` for setting only variables to populate.
@@ -722,22 +723,22 @@ class Router extends \lithium\core\StaticObject {
 	 * Returns an attached mount point configuration.
 	 *
 	 * Example:
-	 * {{{
+	 * ```
 	 * Router::attach('app', array(
 	 *     'absolute' => true,
 	 *     'host' => '{:subdomain:[a-z]+}.{:hostname}.{:tld}',
 	 *     'scheme' => '{:scheme:https://}',
 	 *     'prefix' => ''
 	 * ));
-	 * }}}
+	 * ```
 	 *
-	 * {{{
+	 * ```
 	 * $result = Router::attached('app', array(
 	 *     'subdomain' => 'app',
 	 *     'hostname' => 'blog',
 	 *     'tld' => 'co.uk'
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * Will give the following array in `$result`:
 	 *

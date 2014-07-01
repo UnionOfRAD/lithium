@@ -22,7 +22,7 @@ use lithium\core\Libraries;
  * the standard gettext directory structure with a few slight adjustments to the way
  * templates are being named.
  *
- * {{{
+ * ```
  * resources/g11n/po
  * ├── <locale>
  * |   ├── LC_MESSAGES
@@ -40,7 +40,7 @@ use lithium\core\Libraries;
  * ├── validation_default.pot
  * ├── validation_<scope>.pot
  * └── ...
- * }}}
+ * ```
  *
  * @see lithium\g11n\Locale
  * @link http://php.net/setlocale PHP Manual: setlocale()

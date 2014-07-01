@@ -29,24 +29,24 @@ use Closure;
  * ### Registering Mocker
  * To enable the autoloading of mocks you simply need to make a simple method
  * call.
- * {{{
+ * ```
  * use lithium\core\Environment;
  * use lithium\test\Mocker;
  * if (!Environment::is('production')) {
  *   Mocker::register();
  * }
- * }}}
+ * ```
  *
  * You can also enable autoloading inside the setup of a unit test class. This
  * method can be called redundantly.
- * {{{
+ * ```
  * use lithium\test\Mocker;
  * class MockerTest extends \lithium\test\Unit {
  *   public function setUp() {
  *     Mocker::register();
  *   }
  * }
- * }}}
+ * ```
  *
  * ### Usage and Examples
  * Using Mocker is the fun magical part, it's autoloaded so simply call the
@@ -54,26 +54,26 @@ use Closure;
  * detect you want to autoload it, and create it for you. Now you can filter
  * any method.
  *
- * {{{
+ * ```
  * use lithium\console\dispatcher\Mock as DispatcherMock;
  * $dispatcher = new DispatcherMock();
  * $dispatcher->applyFilter('config', function($self, $params, $chain) {
  * 	return array();
  * });
  * $results = $dispatcher->config();
- * }}}
- * {{{
+ * ```
+ * ```
  * use lithium\analysis\parser\Mock as ParserMock;
  * $code = 'echo "foobar";';
  * ParserMock::applyFilter('config', function($self, $params, $chain) {
  *   return array();
  * });
  * $tokens = ParserMock::tokenize($code, array('wrap' => true));
- * }}}
+ * ```
  *
  * Mocker also gives the ability, if used correctly, to stub build in php
  * function calls. Consider the following example.
- * {{{
+ * ```
  * namespace app\extensions;
  *
  * class AwesomeFileEditor {
@@ -91,8 +91,8 @@ use Closure;
  *   }
  *
  * }
- * }}}
- * {{{
+ * ```
+ * ```
  * namespace app\tests\cases\extensions;
  *
  * use lithium\test\Mocker;
@@ -126,7 +126,7 @@ use Closure;
  *   }
  *
  * }
- * }}}
+ * ```
  *
  * ## How does Mocking classes work?
  * This section isn't necessary to read, but can help others better understand
@@ -142,7 +142,7 @@ use Closure;
  * I'll walk you through the steps I did in order to figure out how `Mocker`
  * should work. The goal here is to mock class `Person`.
  *
- * {{{
+ * ```
  * class Person {
  *   public function speak() {
  *     $this->_openMouth();
@@ -152,7 +152,7 @@ use Closure;
  *     return $this->mouth = 'open';
  *   }
  * }
- * }}}
+ * ```
  *
  * In order to make the `speak()` method filterable we'll need to create a class
  * called `MockPerson` and we'll make its `speak()` method filterable, however
@@ -160,7 +160,7 @@ use Closure;
  * function you cannot call `parent`, so `MockPerson` will also need an instance
  * of `Person`.
  *
- * {{{
+ * ```
  * class MockPerson extends Person {
  *   public $person;
  *   public function speak() {
@@ -171,7 +171,7 @@ use Closure;
  *     };
  *   }
  * }
- * }}}
+ * ```
  *
  * You might stop here and call it a day, but what about filtering protected
  * methods? For example you might want to make sure `_openMouth()` does not
@@ -182,13 +182,13 @@ use Closure;
  * methods. So let's make a class `DelegatePerson` that simply extends `Person`
  * and makes `_openMouth()` public.
  *
- * {{{
+ * ```
  * class DelegatePerson extends Person {
  *   public function _openMouth() {
  *     parent::_openMouth();
  *   }
  * }
- * }}}
+ * ```
  *
  * Now we simply pass `DelegatePerson` to `MockPerson` and all methods are now
  * filterable.

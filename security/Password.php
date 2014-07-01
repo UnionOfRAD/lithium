@@ -48,7 +48,7 @@ class Password {
 	 *
 	 * Usage:
 	 *
-	 * {{{
+	 * ```
 	 * // Hash a password before storing it:
 	 * $hashed  = Password::hash($password);
 	 *
@@ -67,7 +67,7 @@ class Password {
 	 * $hashed2 = Password::hash($password, $salt2); // Slow
 	 * $check1  = Password::check($password, $hashed1); // True
 	 * $check2  = Password::check($password, $hashed2); // True
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\security\Password::check()
 	 * @see lithium\security\Password::salt()

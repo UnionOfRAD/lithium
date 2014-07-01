@@ -76,10 +76,10 @@ class String {
 	 * Generates random bytes for use in UUIDs and password salts, using
 	 * (when available) a cryptographically strong random number generator.
 	 *
-	 * {{{
+	 * ```
 	 * $bits = String::random(8); // 64 bits
 	 * $hex = bin2hex($bits); // [0-9a-f]+
-	 * }}}
+	 * ```
 	 *
 	 * Optionally base64-encodes the resulting random string per the following:
 	 *
@@ -213,12 +213,12 @@ class String {
 	 * in the `$data` array corresponds to a variable placeholder name in `$str`.
 	 *
 	 * Usage:
-	 * {{{
+	 * ```
 	 * String::insert(
 	 *     'My name is {:name} and I am {:age} years old.',
 	 *     array('name' => 'Bob', 'age' => '65')
 	 * ); // returns 'My name is Bob and I am 65 years old.'
-	 * }}}
+	 * ```
 	 *
 	 * Please note that optimization have applied to this method and parts of the code
 	 * may look like it can refactored or removed but in fact this is part of the applied

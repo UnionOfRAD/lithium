@@ -61,10 +61,10 @@ class Locale extends \lithium\core\StaticObject {
 	 * Magic method enabling `language`, `script`, `territory` and `variant`
 	 * methods to parse and retrieve individual tags from a locale.
 	 *
-	 * {{{
+	 * ```
 	 *     Locale::language('en_US'); // returns 'en'
 	 *     Locale::territory('en_US'); // returns 'US'
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\g11n\Locale::$_tags
 	 * @see lithium\g11n\Locale::decompose()
@@ -154,13 +154,13 @@ class Locale extends \lithium\core\StaticObject {
 	 * Cascades a locale.
 	 *
 	 * Usage:
-	 * {{{
+	 * ```
 	 * Locale::cascade('en_US');
 	 * // returns array('en_US', 'en', 'root')
 	 *
 	 * Locale::cascade('zh_Hans_HK_REVISED');
 	 * // returns array('zh_Hans_HK_REVISED', 'zh_Hans_HK', 'zh_Hans', 'zh', 'root')
-	 * }}}
+	 * ```
 	 *
 	 * @link http://www.unicode.org/reports/tr35/tr35-13.html#Locale_Inheritance
 	 * @param string $locale A locale in an arbitrary form (i.e. `'en_US'` or `'EN-US'`).

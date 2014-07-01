@@ -30,14 +30,14 @@ use Closure;
  *
  * A simple configuration can be accomplished as follows:
  *
- * {{{
+ * ```
  * Cache::config(array(
  *     'default' => array(
  *         'adapter' => 'Memcached',
  *         'host' => '127.0.0.1:11211'
  *     )
  * ));
- * }}}
+ * ```
  *
  * The `'host'` key accepts entries in multiple formats, depending on the number of
  * Memcache servers you are connecting to. See the `__construct()` method for more
@@ -125,7 +125,9 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * easily use a custom method on the adapter. If you want to know, what methods
 	 * are available, have a look at the documentation of memcached.
 	 *
-	 * {{{Cache::adapter('memcache')->methodName($argument);}}}
+	 * ```
+	 * Cache::adapter('memcache')->methodName($argument);
+	 * ```
 	 *
 	 * @link http://php.net/manual/en/class.memcached.php
 	 * @param string $method Name of the method to call.

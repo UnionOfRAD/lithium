@@ -31,7 +31,7 @@ use BadMethodCallException;
  * placed in the `models` directory. i.e. a posts model would be `model/Posts.php`.
  *
  * Examples:
- * {{{
+ * ```
  * // Return all 'post' records
  * Posts::find('all');
  * Posts::all();
@@ -47,7 +47,7 @@ use BadMethodCallException;
  * // With conditions
  * Posts::find('count', array('conditions' => array('published' => true)));
  * Posts::count(array('published' => true));
- * }}}
+ * ```
  *
  * The actual objects returned from `find()` calls will depend on the type of data source in use.
  * MongoDB, for example, will return results as a `Document` (as will CouchDB), while MySQL will
@@ -61,14 +61,14 @@ use BadMethodCallException;
  * then be acted upon.
  *
  * Example:
- * {{{
+ * ```
  * $post = Posts::create();
  * $post->author = 'Robert';
  * $post->title = 'Newest Post!';
  * $post->content = 'Lithium rocks. That is all.';
  *
  * $post->save();
- * }}}
+ * ```
  *
  * @see lithium\data\entity\Record
  * @see lithium\data\entity\Document
@@ -82,7 +82,7 @@ class Model extends \lithium\core\StaticObject {
 	 * Criteria for data validation.
 	 *
 	 * Example usage:
-	 * {{{
+	 * ```
 	 * public $validates = array(
 	 *     'title' => 'please enter a title',
 	 *     'email' => array(
@@ -90,7 +90,7 @@ class Model extends \lithium\core\StaticObject {
 	 *         array('email', 'message' => 'Email is not valid.'),
 	 *     )
 	 * );
-	 * }}}
+	 * ```
 	 *
 	 * @var array
 	 */
@@ -231,19 +231,19 @@ class Model extends \lithium\core\StaticObject {
 	 * yourself.
 	 *
 	 * Example:
-	 * {{{
+	 * ```
 	 * protected $_schema = array(
 	 *     '_id'  => array('type' => 'id'), // required for Mongo
 	 *     'name' => array('type' => 'string', 'default' => 'Moe', 'null' => false),
 	 *     'sign' => array('type' => 'string', 'default' => 'bar', 'null' => false),
 	 *     'age'  => array('type' => 'integer', 'default' => 0, 'null' => false)
 	 * );
-	 * }}}
+	 * ```
 	 *
 	 * For MongoDB specifically, you can also implement a callback in your database connection
 	 * configuration that fetches and returns the schema data, as in the following:
 	 *
-	 * {{{
+	 * ```
 	 * // config/bootstrap/connections.php:
 	 * Connections::add('default', array(
 	 *  'type' => 'MongoDb',
@@ -254,7 +254,7 @@ class Model extends \lithium\core\StaticObject {
 	 *      return $result ? $result['data'] : array();
 	 *  }
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * This example defines an optional MongoDB convention in which the schema for each individual
 	 * collection is stored in a "schemas" collection, where each document contains the name of
@@ -264,7 +264,7 @@ class Model extends \lithium\core\StaticObject {
 	 * When defining `'$_schema'` where the data source is MongoDB, the types map to database
 	 * types as follows:
 	 *
-	 * {{{
+	 * ```
 	 *  id      => MongoId
 	 *  date    => MongoDate
 	 *  regex   => MongoRegex
@@ -273,7 +273,7 @@ class Model extends \lithium\core\StaticObject {
 	 *  boolean => boolean
 	 *  code    => MongoCode
 	 *  binary  => MongoBinData
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\data\source\MongoDb::$_schema
 	 * @var array
@@ -590,7 +590,7 @@ class Model extends \lithium\core\StaticObject {
 	 * The `find` method allows you to retrieve data from the connected data source.
 	 *
 	 * Examples:
-	 * {{{
+	 * ```
 	 * Posts::find('all'); // returns all records
 	 * Posts::find('count'); // returns a count of all records
 	 *
@@ -598,7 +598,7 @@ class Model extends \lithium\core\StaticObject {
 	 * Posts::find('all', array(
 	 *     'conditions' => array('author' => "Bob"), 'limit' => 10
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\data\Model::$_finders
 	 * @param string $type The find type, which is looked up in `Model::$_finders`. By default it
@@ -962,11 +962,11 @@ class Model extends \lithium\core\StaticObject {
 	 * Instantiates a new record or document object, initialized with any data passed in. For
 	 * example:
 	 *
-	 * {{{
+	 * ```
 	 * $post = Posts::create(array('title' => 'New post'));
 	 * echo $post->title; // echoes 'New post'
 	 * $success = $post->save();
-	 * }}}
+	 * ```
 	 *
 	 * Note that while this method creates a new object, there is no effect on the database until
 	 * the `save()` method is called.
@@ -974,11 +974,11 @@ class Model extends \lithium\core\StaticObject {
 	 * In addition, this method can be used to simulate loading a pre-existing object from the
 	 * database, without actually querying the database:
 	 *
-	 * {{{
+	 * ```
 	 * $post = Posts::create(array('id' => $id, 'moreData' => 'foo'), array('exists' => true));
 	 * $post->title = 'New title';
 	 * $success = $post->save();
-	 * }}}
+	 * ```
 	 *
 	 * This will create an update query against the object with an ID matching `$id`. Also note that
 	 * only the `title` field will be updated.
@@ -1009,13 +1009,13 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Getter and setter for custom instance methods. This is used in `Entity::__call()`.
 	 *
-	 * {{{
+	 * ```
 	 * Model::instanceMethods(array(
 	 *     'methodName' => array('Class', 'method'),
 	 *     'anotherMethod' => array($object, 'method'),
 	 *     'closureCallback' => function($entity) {}
 	 * ));
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\data\Entity::__call()
 	 * @param array $methods
@@ -1041,36 +1041,36 @@ class Model extends \lithium\core\StaticObject {
 	 * document in the database that corresponds to `$entity`.
 	 *
 	 * For example, to create a new record or document:
-	 * {{{
+	 * ```
 	 * $post = Posts::create(); // Creates a new object, which doesn't exist in the database yet
 	 * $post->title = "My post";
 	 * $success = $post->save();
-	 * }}}
+	 * ```
 	 *
 	 * It is also used to update existing database objects, as in the following:
-	 * {{{
+	 * ```
 	 * $post = Posts::first($id);
 	 * $post->title = "Revised title";
 	 * $success = $post->save();
-	 * }}}
+	 * ```
 	 *
 	 * By default, an object's data will be checked against the validation rules of the model it is
 	 * bound to. Any validation errors that result can then be accessed through the `errors()`
 	 * method.
 	 *
-	 * {{{
+	 * ```
 	 * if (!$post->save($someData)) {
 	 *     return array('errors' => $post->errors());
 	 * }
-	 * }}}
+	 * ```
 	 *
 	 * To override the validation checks and save anyway, you can pass the `'validate'` option:
 	 *
-	 * {{{
+	 * ```
 	 * $post->title = "We Don't Need No Stinkin' Validation";
 	 * $post->body = "I know what I'm doing.";
 	 * $post->save(null, array('validate' => false));
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\data\Model::$validates
 	 * @see lithium\data\Model::validates()
@@ -1165,10 +1165,10 @@ class Model extends \lithium\core\StaticObject {
 	 * @see lithium\data\Entity::errors()
 	 * @param string $entity Model entity to validate. Typically either a `Record` or `Document`
 	 *        object. In the following example:
-	 *        {{{
+	 *        ```
 	 *            $post = Posts::create($data);
 	 *            $success = $post->validates();
-	 *        }}}
+	 *        ```
 	 *        The `$entity` parameter is equal to the `$post` object instance.
 	 * @param array $options Available options:
 	 *        - `'rules'` _array_: If specified, this array will _replace_ the default

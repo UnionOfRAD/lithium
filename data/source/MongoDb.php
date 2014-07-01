@@ -25,10 +25,10 @@ use Exception;
  * (i.e. arrays) including other `Document` objects.
  *
  * After installing MongoDB, you can connect to it as follows:
- * {{{
+ * ```
  * // config/bootstrap/connections.php:
  * Connections::add('default', array('type' => 'MongoDb', 'database' => 'myDb'));
- * }}}
+ * ```
  *
  * By default, it will attempt to connect to a Mongo instance running on `localhost` on port
  * 27017. See `__construct()` for details on the accepted configuration settings.
@@ -342,9 +342,10 @@ class MongoDb extends \lithium\data\Source {
 	 * more here: http://php.net/manual/class.mongo.php
 	 *
 	 * For example (assuming this instance is stored in `Connections` as `'mongo'`):
-	 * {{{// Manually repairs a MongoDB instance
+	 * ```
+	 * // Manually repairs a MongoDB instance
 	 * Connections::get('mongo')->repairDB($db); // returns null
-	 * }}}
+	 * ```
 	 *
 	 * @param string $method The name of native method to call. See the link above for available
 	 *        class methods.

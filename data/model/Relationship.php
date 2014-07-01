@@ -67,7 +67,7 @@ class Relationship extends \lithium\core\Object {
 	 *        - `'name'` _string_: The name of the relationship in the context of the
 	 *          originating model. For example, a `Posts` model might define a relationship to
 	 *          a `Users` model like so:
-	 *          {{{ public $hasMany = array('Author' => array('to' => 'Users')); }}}
+	 *          `public $hasMany = array('Author' => array('to' => 'Users'));`
 	 *          In this case, the relationship is bound to the `Users` model, but `'Author'` would
 	 *          be the relationship name. This is the name with which the relationship is
 	 *          referenced in the originating model.

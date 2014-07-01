@@ -21,9 +21,9 @@ namespace lithium\storage\cache;
  * An adapter may provide access to additional methods. It's always possible to call them directly.
  * This allows a very wide range of flexibility, at the cost of portability.
  *
- * {{{
+ * ```
  * Cache::adapter('default')->methodName($argument);
- * }}}
+ * ```
  *
  * It is not guaranteed that all operations are atomic, but adapters will try to perform atomic
  * operations wherever possible. If you rely on atomicity of operations you must choose

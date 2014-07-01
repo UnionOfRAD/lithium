@@ -30,7 +30,7 @@ use lithium\core\ClassNotFoundException;
  * accepts an array of field names to use when looking up a user. An example configuration,
  * including a custom model class and lookup fields might look like the following:
  *
- * {{{
+ * ```
  * Auth::config(array(
  * 	'customer' => array(
  * 		'adapter' => 'Form',
@@ -38,7 +38,7 @@ use lithium\core\ClassNotFoundException;
  * 		'fields' => array('email', 'password')
  * 	)
  * ));
- * }}}
+ * ```
  *
  * If the field names present in the form match the fields used in the database lookup, the above
  * will suffice. If, however, the form fields must be matched to different database field names,
@@ -46,7 +46,7 @@ use lithium\core\ClassNotFoundException;
  * field names. Suppose, for example, user authentication information in a MongoDB database is
  * nested within a sub-object called `login`. The adapter could be configured as follows:
  *
- * {{{
+ * ```
  * Auth::config(array(
  * 	'customer' => array(
  * 		'adapter' => 'Form',
@@ -55,7 +55,7 @@ use lithium\core\ClassNotFoundException;
  * 		'scope' => array('active' => true)
  * 	)
  * ));
- * }}}
+ * ```
  *
  * Note that any additional fields may be specified which should be included in the query. For
  * example, if a user must select a group when logging in, you may override the `'fields'` key with
@@ -75,7 +75,7 @@ use lithium\core\ClassNotFoundException;
  * For example, if you're doing simple password hashing against a legacy application, you can
  * configure the adapter as follows:
  *
- * {{{
+ * ```
  * Auth::config(array(
  * 	'default' => array(
  * 		'adapter' => 'Form',
@@ -83,7 +83,7 @@ use lithium\core\ClassNotFoundException;
  * 		'validators' => array('password' => false)
  * 	)
  * ));
- * }}}
+ * ```
  *
  * This applies the default system hash (SHA 512) against the password prior to using it in the
  * query, and overrides `'validators'` to disable the default crypto-based query validation that
@@ -93,7 +93,7 @@ use lithium\core\ClassNotFoundException;
  * used to specify the filter must match the key side of the `'fields'` assignment. Additionally,
  * specifying a filter with no key allows the entire data array to be filtered, as in the following:
  *
- * {{{
+ * ```
  * Auth::config(array(
  * 	'default' => array(
  * 		'adapter' => 'Form',
@@ -103,7 +103,7 @@ use lithium\core\ClassNotFoundException;
  * 		})
  * 	)
  * ));
- * }}}
+ * ```
  *
  * For more information, see the `_filters()` method or the `$_filters` property.
  *
@@ -114,7 +114,7 @@ use lithium\core\ClassNotFoundException;
  * hash function which operates in constant time to validate passwords. Configuring this validator
  * manually would work as follows:
  *
- * {{{
+ * ```
  * use lithium\security\Password;
  *
  * Auth::config(array(
@@ -127,7 +127,7 @@ use lithium\core\ClassNotFoundException;
  * 		)
  * 	)
  * ));
- * }}}
+ * ```
  *
  * As with filters, each validator can be defined as any PHP callable, and must be keyed using the
  * name of the form field submitted (if form and database field names do not match). If a validator
@@ -161,14 +161,14 @@ class Form extends \lithium\core\Object {
 	 * For example, if you had a form field name `username`, which mapped to a database field named
 	 * username, you could use the following in the `'fields'` configuration:
 	 *
-	 * {{{ embed:lithium\tests\cases\security\auth\adapter\FormTest::testMixedFieldMapping(3-3) }}}
+	 * ``` embed:lithium\tests\cases\security\auth\adapter\FormTest::testMixedFieldMapping(3-3) ```
 	 *
 	 * This is especially relevant for document databases, where you may want to map a form field to
 	 * a nested document field:
 	 *
-	 * {{{
+	 * ```
 	 * 'fields' => array('username' => 'login.username', 'password'),
-	 * }}}
+	 * ```
 	 *
 	 * @var array
 	 */
@@ -192,7 +192,7 @@ class Form extends \lithium\core\Object {
 	 * Optionally, you can specify a callback with no key, which will receive (and can modify) the
 	 * entire credentials array before the query is executed, as in the following example:
 	 *
-	 * {{{
+	 * ```
 	 * 	Auth::config(array(
 	 * 		'members' => array(
 	 * 			'adapter' => 'Form',
@@ -208,7 +208,7 @@ class Form extends \lithium\core\Object {
 	 * 			})
 	 * 		)
 	 * 	));
-	 * }}}
+	 * ```
 	 *
 	 * @see lithium\security\auth\adapter\Form::$_fields
 	 * @var array

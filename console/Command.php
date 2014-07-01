@@ -17,10 +17,10 @@ use lithium\console\command\Help;
  * The `run` method is automatically called if it exists. Otherwise, if a method does not exist
  * the `Help` command will be run.
  *
- * {{{
+ * ```
  * $ li3 example
  * $ li3 example --format=json
- * }}}
+ * ```
  *
  */
 class Command extends \lithium\core\Object {
@@ -246,11 +246,11 @@ class Command extends \lithium\core\Object {
 	 *
 	 * Given the text `'Lithium'` this generates following output:
 	 *
-	 * {{{
+	 * ```
 	 * -------
 	 * Lithium
 	 * -------
-	 * }}}
+	 * ```
 	 *
 	 * @param string $text The heading text.
 	 * @param integer $line The length of the line. Defaults to the length of text.
@@ -274,7 +274,7 @@ class Command extends \lithium\core\Object {
 	 *
 	 * Example Usage:
 	 *
-	 * {{{
+	 * ```
 	 * $output = array(
 	 *     array('Name', 'Age'),
 	 *     array('----', '---'),
@@ -283,16 +283,16 @@ class Command extends \lithium\core\Object {
 	 *     $output[] = array($user->name, $user->age);
 	 * }
 	 * $this->columns($output);
-	 * }}}
+	 * ```
 	 *
 	 * Would render something similar to:
 	 *
-	 * {{{
+	 * ```
 	 * Name       Age
 	 * ----       ---
 	 * Jane Doe   22
 	 * Foo Bar    18
-	 * }}}
+	 * ```
 	 *
 	 * This method also calculates the needed space between the columns. All option params given
 	 * also get passed down to the `out()` method, which allow custom formatting. Passing something

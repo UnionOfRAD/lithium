@@ -9,15 +9,15 @@
 namespace lithium\analysis\logger\adapter;
 
 /**
- * The `FirePhp` log adapter allows you to log messages to [ FirePHP](http://www.firephp.org/).
+ * The `FirePhp` log adapter allows you to log messages to FirePHP.
  *
  * This allows you to inspect native PHP values and objects inside the FireBug console.
  *
  * Because this adapter interacts directly with the `Response` object, some additional code is
- * required to use it. The simplest way to achieve this is to add a filter to the `Dispatcher`. For
- * example, the following can be placed in a bootstrap file:
+ * required to use it. The simplest way to achieve this is to add a filter to the `Dispatcher`.
+ * For example, the following can be placed in a bootstrap file:
  *
- * {{{
+ * ```
  * use lithium\action\Dispatcher;
  * use lithium\analysis\Logger;
  *
@@ -31,7 +31,7 @@ namespace lithium\analysis\logger\adapter;
  * 	}
  * 	return $chain->next($self, $params, $chain);
  * });
- * }}}
+ * ```
  *
  * This will cause the message and other debug settings added to the header of the
  * response, where FirePHP is able to locate and print it accordingly. As this adapter
@@ -40,7 +40,7 @@ namespace lithium\analysis\logger\adapter;
  *
  * Now, in you can use the logger in your application code (like controllers, views and models).
  *
- * {{{
+ * ```
  * class PagesController extends \lithium\action\Controller {
  * 	public function view() {
  * 		//...
@@ -48,7 +48,7 @@ namespace lithium\analysis\logger\adapter;
  * 		//...
  * 	}
  * }
- * }}}
+ * ```
  *
  * Because this adapter also has a queue implemented, it is possible to log messages even when the
  * `Response` object is not yet generated. When it gets generated (and bound), all queued messages
@@ -59,10 +59,10 @@ namespace lithium\analysis\logger\adapter;
  * every message that is passed will be encoded via `json_encode()`, so check out this built-in
  * method for more information on how your message will be encoded.
  *
- * {{{
+ * ```
  * Logger::debug(array('debug' => 'me'));
  * Logger::debug(new \lithium\action\Response());
- * }}}
+ * ```
  *
  * @see lithium\action\Response
  * @see lithium\net\http\Message::headers()

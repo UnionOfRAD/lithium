@@ -40,20 +40,20 @@ use lithium\template\TemplateException;
  *
  * A simple example, using the `Simple` renderer/loader for string templates:
  *
- * {{{
+ * ```
  * $view = new View(array('loader' => 'Simple', 'renderer' => 'Simple'));
  * echo $view->render('element', array('name' => "Robert"), array('element' => 'Hello, {:name}!'));
  *
  * // Output:
  * "Hello, Robert!";
- * }}}
+ * ```
  *
  *  _Note_: This is easily adapted for XML templating.
  *
  * Another example, this time of something that could be used in an application
  * error handler:
  *
- * {{{
+ * ```
  * $view = new View(array(
  *     'paths' => array(
  *         'template' => '{:library}/views/errors/{:template}.{:type}.php',
@@ -65,7 +65,7 @@ use lithium\template\TemplateException;
  *     'template' => '404',
  *     'layout' => 'error'
  * ));
- * }}}
+ * ```
  *
  * To learn more about processes and process steps, see the `$_processes` and `$_steps` properties,
  * respectively.

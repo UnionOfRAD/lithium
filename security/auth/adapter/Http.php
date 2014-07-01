@@ -13,26 +13,26 @@ use lithium\core\Libraries;
 /**
  * The `Http` adapter provides basic and digest authentication based on the HTTP protocol.
  * By default, the adapter uses Http Digest based authentication.
- * {{{
+ * ```
  * Auth::config(array('name' => array('adapter' => 'Http', 'users' => array('gwoo' => 'li3'))))
- * }}}
+ * ```
  *
  * To use Basic authentication, set the `method` to basic.
- * {{{
+ * ```
  * Auth::config(array('name' => array(
  *     'adapter' => 'Http', 'users' => array('gwoo' => 'li3'),
  *     'method' => 'basic'
  * )))
- * }}}
+ * ```
  *
  * When running PHP as a CGI/FCGI PHP doesn't automatically parse the authorization
  * header into `PHP_AUTH_*` headers. Lithium will work arround this issue by looking for
  * a `HTTP_AUTHORIZATION` header instead. When using PHP as a CGI/FCGI in combination
  * with Apache you must additionally add the following rewrite rule to your configuration
  * in order to make the header available so Lithium can pick it up:
- * {{{
+ * ```
  * RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
- * }}}
+ * ```
  *
  * @link http://tools.ietf.org/html/rfc2068#section-14.8
  * @see lithium\action\Request

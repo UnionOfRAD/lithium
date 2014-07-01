@@ -60,11 +60,11 @@ class Catalog extends \lithium\core\Adaptable {
 	 * or a scope to use.
 	 *
 	 * Usage:
-	 * {{{
+	 * ```
 	 * Catalog::read(true, 'message', 'zh');
 	 * Catalog::read('default', 'message', 'zh');
 	 * Catalog::read('default', 'validation.postalCode', 'en_US');
-	 * }}}
+	 * ```
 	 *
 	 * @param mixed $name Provide a single configuration name as a string or multiple ones as
 	 *        an array which will be used to read from. Pass `true` to use all configurations.
@@ -110,12 +110,12 @@ class Catalog extends \lithium\core\Adaptable {
 	 * Writes data.
 	 *
 	 * Usage:
-	 * {{{
+	 * ```
 	 * $data = array(
 	 * 	'color' => '色'
 	 * );
 	 * Catalog::write('runtime', 'message', 'ja', $data);
-	 * }}}
+	 * ```
 	 *
 	 * @param string $name Provide a configuration name to use for writing.
 	 * @param string $category A (dot-delimited) category.

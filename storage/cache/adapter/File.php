@@ -29,14 +29,14 @@ use Closure;
  *
  * A simple configuration can be accomplished as follows:
  *
- * {{{
+ * ```
  * Cache::config(array(
  *     'default' => array(
  *         'adapter' => 'File',
  *         'strategies => array('Serializer')
  *      )
  * ));
- * }}}
+ * ```
  *
  * The path that the cached files will be written to defaults to
  * `<app>/resources/tmp/cache`, but is user-configurable.

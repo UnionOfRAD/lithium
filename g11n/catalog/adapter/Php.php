@@ -17,20 +17,20 @@ use lithium\core\ConfigException;
  * An example PHP file must contain a `return` statement which returns an array if the
  * the file is included.
  *
- * {{{
+ * ```
  * <?php
  * return array(
  * 	'postalCode' => '\d+',
  * 	'phone' => '\d+\-\d+'
  * );
  * ?>
- * }}}
+ * ```
  *
  * The adapter works with a directory structure below. The example shows the structure
  * for the directory as given by the `'path'` configuration setting. It is similar to
  * the one used by the the `Gettext` adapter.
  *
- * {{{
+ * ```
  * resources/g11n/php
  * ├── <locale>
  * |   ├── message
@@ -46,7 +46,7 @@ use lithium\core\ConfigException;
  * ├── validation_default.php
  * ├── validation_<scope>.php
  * └── ...
- * }}}
+ * ```
  *
  * @see lithium\g11n\catalog\adapter\Gettext
  */

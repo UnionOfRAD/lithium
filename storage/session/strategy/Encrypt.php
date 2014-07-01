@@ -19,12 +19,12 @@ use lithium\core\ConfigException;
  *
  * Example configuration:
  *
- * {{{
+ * ```
  * Session::config(array('default' => array(
  *    'adapter' => 'Cookie',
  *    'strategies' => array('Encrypt' => array('secret' => 'f00bar$l1thium'))
  * )));
- * }}}
+ * ```
  *
  * By default, this strategy uses the AES algorithm in the CBC mode. This means that an
  * initialization vector has to be generated and transported with the payload data. This
@@ -32,7 +32,7 @@ use lithium\core\ConfigException;
  * an initialization vector but is not recommended to use as it's insecure). You can override this
  * defaults by passing a different `cipher` and/or `mode` to the config like this:
  *
- * {{{
+ * ```
  * Session::config(array('default' => array(
  *     'adapter' => 'Cookie',
  *     'strategies' => array('Encrypt' => array(
@@ -41,7 +41,7 @@ use lithium\core\ConfigException;
  *         'secret' => 'f00bar$l1thium'
  *     ))
  * )));
- * }}}
+ * ```
  *
  * Please keep in mind that it is generally not a good idea to store sensitive information in
  * cookies (or generally on the client side) and this class is no exception to the rule. It allows

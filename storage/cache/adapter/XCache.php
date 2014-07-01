@@ -28,7 +28,7 @@ use lithium\storage\Cache;
  *
  * A simple configuration can be accomplished as follows:
  *
- * {{{
+ * ```
  * Cache::config(array(
  *     'default' => array(
  *         'adapter' => 'XCache',
@@ -36,7 +36,7 @@ use lithium\storage\Cache;
  *         'password' => 'pass'
  *     )
  * ));
- * }}}
+ * ```
  *
  * Note that the `username` and `password` configuration fields are only required if
  * you wish to use `XCache::clear()` - all other methods do not require XCache

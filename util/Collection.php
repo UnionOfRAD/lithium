@@ -15,7 +15,7 @@ namespace lithium\util;
  * Collection objects can act very much like arrays. This is especially evident in creating new
  * objects, or by converting Collection into an actual array:
  *
- * {{{
+ * ```
  * $coll = new Collection();
  * $coll[] = 'foo';
  * // $coll[0] --> 'foo'
@@ -24,12 +24,10 @@ namespace lithium\util;
  * // $coll[0] --> 'foo'
  *
  * $array = $coll->to('array');
- * }}}
+ * ```
  *
  * Apart from array-like data access, Collections allow for filtering and iteration methods:
- *
- * {{{
- *
+ * ```
  * $coll = new Collection(array('data' => array(0, 1, 2, 3, 4)));
  *
  * $coll->first();   // 0
@@ -39,7 +37,7 @@ namespace lithium\util;
  * $coll->next();    // 3
  * $coll->prev();    // 2
  * $coll->rewind();  // 0
- * }}}
+ * ```
  *
  * The primary purpose of the `Collection` class is to enable simple, efficient access to groups
  * of similar objects, and to perform operations against these objects using anonymous functions.
@@ -49,7 +47,7 @@ namespace lithium\util;
  * one or more.
  *
  * The `Collection` class also supports dispatching methods against a set of objects, if the method
- * is supported by all objects. For example: {{{
+ * is supported by all objects. For example: ```
  * class Task {
  * 	public function run($when) {
  * 		// Do some work
@@ -69,7 +67,7 @@ namespace lithium\util;
  *
  * // Alternatively, the method can be called natively, with the same result:
  * $result = $tasks->run('now');
- * }}}
+ * ```
  *
  * @link http://us.php.net/manual/en/class.arrayaccess.php PHP Manual: ArrayAccess Interface
  * @link http://us.php.net/manual/en/class.iterator.php PHP Manual: Iterator Interface
@@ -110,14 +108,14 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * This can be accomplished in two ways. First, format handlers may be registered on a
 	 * case-by-case basis, as in the following:
 	 *
-	 * {{{
+	 * ```
 	 * Collection::formats('json', function($collection, $options) {
 	 * 	return json_encode($collection->to('array'));
 	 * });
 	 *
 	 * // You can also implement the above as a static class method, and register it as follows:
 	 * Collection::formats('json', '\my\custom\Formatter::toJson');
-	 * }}}
+	 * ```
 	 *
 	 * Alternatively, you can implement a class that can handle several formats. This class must
 	 * implement two static methods:
@@ -127,9 +125,9 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * - A `to()` method, which handles the actual conversion.
 	 *
 	 * Once a class implements these methods, it may be registered per the following:
-	 * {{{
+	 * ```
 	 * Collection::formats('\lithium\net\http\Media');
-	 * }}}
+	 * ```
 	 *
 	 * For reference on how to implement these methods, see the `Media` class.
 	 *
@@ -228,11 +226,12 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * property `Collection::$_formats`. The `Collection` class comes with built-in support for
 	 * array conversion, but other formats may be registered.
 	 *
-	 * Once the appropriate handlers are registered, a `Collection` instance can be converted into
-	 * any handler-supported format, i.e.: {{{
+	 * Once the appropriate handlers are registered, a `Collection` instance can be
+	 * converted into any handler-supported format, i.e.:
+	 * ```
 	 * $collection->to('json'); // returns a JSON string
 	 * $collection->to('xml'); // returns an XML string
-	 * }}}
+	 * ```
 	 *
 	 *  _Please note that Lithium does not ship with a default XML handler, but one can be
 	 * configured easily._

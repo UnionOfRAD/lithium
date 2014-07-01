@@ -16,20 +16,22 @@ namespace lithium\net\http;
  * Typically, `Route` objects are created and handled through the `lithium\net\http\Router` class,
  * as follows:
  *
- * {{{// This instantiates a Route object behind the scenes, and adds it to Router's collection:
+ * ```
+ * // This instantiates a Route object behind the scenes, and adds it to Router's collection:
  * Router::connect("/{:controller}/{:action}");
  *
  * // This matches a set of parameters against all Route objects contained in Router, and if a match
  * // is found, returns a string URL with parameters inserted into the URL pattern:
  * Router::match(array("controller" => "users", "action" => "login")); // returns "/users/login"
- * }}}
+ * ```
  *
  * For more advanced routing, however, you can directly instantiate a `Route` object, a subclass,
  * or any class that implements `parse()` and `match()` (see the documentation for each individual
  * method) and configure it manually -- if, for example, you want the route to match different
  * incoming URLs than it generates.
  *
- * {{{$route = new Route(array(
+ * ```
+ * $route = new Route(array(
  *        'template' => '/users/{:user}',
  *        'pattern' => '@^/u(?:sers)?(?:/(?P<user>[^\/]+))$@',
  *        'params' => array('controller' => 'users', 'action' => 'index'),
@@ -39,7 +41,7 @@ namespace lithium\net\http;
  *        'options' => array('compile' => false, 'wrap' => false)
  * ));
  * Router::connect($route); // this will match '/users/<username>' or '/u/<username>'.
- * }}}
+ * ```
  *
  * For additional information on the `'options'` constructor key, see
  * `lithium\net\http\Route::compile()`. To learn more about Lithium's routing system, see

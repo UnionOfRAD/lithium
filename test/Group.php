@@ -19,18 +19,18 @@ use lithium\util\Collection;
  * Tests are added to this group either on `construct` by passing a fully-namespaced test class
  * or namespace string-based path, e.g.
  *
- * {{{
+ * ```
  * $group = new Group(array('data' => array(
  *     'data\ModelTest',
  *     new \lithium\tests\cases\core\ObjectTest()
  * )));
- * }}}
+ * ```
  *
  * Or they can be added programmatically:
  *
- * {{{
+ * ```
  * $group->add('data\ModelTest');
- * }}}
+ * ```
  */
 class Group extends \lithium\util\Collection {
 

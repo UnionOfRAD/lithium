@@ -314,19 +314,19 @@ class Query extends \lithium\core\Object {
 	 * Set, get or reset fields option for query.
 	 *
 	 * Usage:
-	 * {{{
+	 * ```
 	 * // to add a field
 	 * $query->fields('created');
-	 * }}}
-	 * {{{
+	 * ```
+	 * ```
 	 * // to add several fields
 	 * $query->fields(array('title','body','modified'));
-	 * }}}
-	 * {{{
+	 * ```
+	 * ```
 	 * // to reset fields to none
 	 * $query->fields(false);
 	 * // should be followed by a 2nd call to fields with required fields
-	 * }}}
+	 * ```
 	 *
 	 * @param mixed $fields string, array or `false`
 	 * @param boolean $overwrite If `true`, existing fields will be removed before adding `$fields`.

@@ -60,20 +60,20 @@ class Security extends \lithium\template\Helper {
 	 * Binds the `Security` helper to the `Form` helper to create a signature used to secure form
 	 * fields against tampering.
 	 *
-	 * {{{
+	 * ```
 	 * // view:
 	 * <?php $this->security->sign(); ?>
 	 * <?=$this->form->create(...); ?>
 	 * 	// Form fields...
 	 * <?=$this->form->end(); ?>
-	 * }}}
+	 * ```
 	 *
-	 * {{{
+	 * ```
 	 * // controller:
 	 * if ($this->request->is('post') && !FormSignature::check($this->request)) {
 	 * 	// The key didn't match, meaning the request has been tampered with.
 	 * }
-	 * }}}
+	 * ```
 	 *
 	 * Calling this method before a form is created adds two additional options to the `$options`
 	 * parameter in all form inputs:

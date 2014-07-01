@@ -15,10 +15,10 @@ use Closure;
  * event-driven communication between classes without tight coupling and without depending on a
  * centralized publish/subscribe system.
  *
- * In Lithium itself, when creating a method that can be filtered, a method is implemented as a
- * [ closure](http://us2.php.net/manual/en/functions.anonymous.php) and is passed to either
- * `Object::_filter()` or `StaticObject::_filter()`. Each object internally maintains its own list
- * of filters, which are applied in these methods and passed to `Filters::run()`.
+ * In Lithium itself, when creating a method that can be filtered, a method is implemented as
+ * a closure and is passed to either `Object::_filter()` or `StaticObject::_filter()`. Each
+ * object internally maintains its own list of filters, which are applied in these methods and
+ * passed to `Filters::run()`.
  *
  * When implementing a custom filter system outside of Lithium, you can create your own list of
  * filters, and pass it to `$options['data']` in the `run()` method.
@@ -38,7 +38,7 @@ use Closure;
  * instance of the `Filters` class).  At the bottom of `$chain` is the method itself.  This is why
  * most filters contain a line that looks like this:
  *
- * {{{return $chain->next($self, $params, $chain);}}}
+ * ```return $chain->next($self, $params, $chain);```
  *
  * This passes control to the next filter in the chain, and finally, to the method itself.  This
  * allows you to interact with the return value as well as the parameters.
@@ -46,7 +46,7 @@ use Closure;
  * Within the framework, you can call `applyFilter()` on any object (static or instantiated) and
  * pass the name of the method you would like to filter, along with the filter itself. For example:
  *
- * {{{use lithium\action\Dispatcher;
+ * ```use lithium\action\Dispatcher;
  *
  * Dispatcher::applyFilter('run', function($self, $params, $chain) {
  * 	// Custom pre-dispatch logic goes here
@@ -56,12 +56,13 @@ use Closure;
  * 	// and can be modified as appropriate
  * 	// ...
  * 	return $response;
- * });}}}
+ * });```
  *
  * The logic in the closure will now be executed on every call to `Dispatcher::run()`, and
  * `$response` will always be modified by any custom logic present before being returned from
  * `run()`.
  *
+ * @link http://php.net/manual/en/functions.anonymous.php
  * @see lithium\util\collection\Filters::run()
  * @see lithium\core\Object::_filter()
  * @see lithium\core\StaticObject::_filter()
