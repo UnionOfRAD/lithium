@@ -119,6 +119,12 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testEmptyEncodeInJson() {
 		$this->message->type("json");
+		$result = $this->message->body(null, array('encode' => true));
+		$this->assertIdentical("", $result);
+	}
+
+	public function testEmptyArrayEncodeInJson() {
+		$this->message->type("json");
 		$result = $this->message->body(array(), array('encode' => true));
 		$this->assertIdentical("[]", $result);
 	}
