@@ -776,7 +776,9 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	protected function _conditions(array $conditions, $model, $schema, $context) {
 		$ops = $this->_operators;
-		$castOpts = array('first' => true, 'database' => $this, 'wrap' => false);
+		$castOpts = array(
+			'first' => true, 'database' => $this, 'wrap' => false, 'asContent' => true
+		);
 
 		$cast = function($key, $value) use (&$schema, &$castOpts) {
 			return $schema ? $schema->cast(null, $key, $value, $castOpts) : $value;
