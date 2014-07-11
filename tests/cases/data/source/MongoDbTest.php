@@ -243,6 +243,33 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testConditionsWithSchema() {
+		$schema = new Schema(array('fields' => array(
+			'_id' => array('type' => 'id'),
+			'tags' => array('type' => 'string', 'array' => true),
+			'users' => array('type' => 'id', 'array' => true)
+		)));
+
+		$query = new Query(array('schema' => $schema, 'type' => 'read'));
+
+		$id = new MongoId();
+		$userId = new MongoId();
+
+		$conditions = array(
+			'_id' => (string) $id,
+			'tags' => 'yellow',
+			'users' => (string) $userId
+		);
+		$result = $this->_db->conditions($conditions, $query);
+
+		$expected = array(
+			'_id' => $id,
+			'tags' => 'yellow',
+			'users' => $userId
+		);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testReadNoConditions() {
 		$this->_db->connect();
 		$connection = $this->_db->connection;

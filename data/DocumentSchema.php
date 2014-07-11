@@ -28,6 +28,7 @@ class DocumentSchema extends \lithium\data\Schema {
 			'pathKey' => null,
 			'model' => null,
 			'wrap' => true,
+			'asContent' => false,
 			'first' => false
 		);
 		$options += $defaults;
@@ -46,14 +47,19 @@ class DocumentSchema extends \lithium\data\Schema {
 		if ($data instanceof $classes['set'] || $data instanceof $classes['entity']) {
 			return $data;
 		}
-		if (is_object($data) && !$this->is('array', $pathKey)) {
+		if (is_object($data) && !$this->is('array', $pathKey) && !$options['asContent']) {
 			return $data;
 		}
 		return $this->_castArray($object, $data, $pathKey, $options, $defaults);
 	}
 
 	protected function _castArray($object, $val, $pathKey, $options, $defaults) {
-		$isArray = $this->is('array', $pathKey) && (!$object instanceof $this->_classes['set']);
+		$isArray = (
+			$this->is('array', $pathKey) &&
+			!$options['asContent'] &&
+			(!$object instanceof $this->_classes['set'])
+		);
+
 		$isObject = ($this->type($pathKey) === 'object');
 		$valIsArray = is_array($val);
 		$numericArray = false;
