@@ -267,9 +267,14 @@ class Message extends \lithium\net\Message {
 		$default = array('buffer' => null, 'encode' => false, 'decode' => false);
 		$options += $default;
 
-		$this->body = array_merge((array) $this->body, (array) $data);
+		if ($data !== null) {
+			$this->body = array_merge((array) $this->body, (array) $data);
+		}
 		$body = $this->body;
 
+		if (empty($options['buffer']) && $body === null) {
+			return "";
+		}
 		if ($options['encode']) {
 			$body = $this->_encode($body);
 		}
