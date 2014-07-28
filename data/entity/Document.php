@@ -274,6 +274,10 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @return boolean True if the field specified in `$name` exists, false otherwise.
 	 */
 	public function __isset($name) {
+		if (strpos($name, '.')) {
+			return $this->_getNested($name) !== null;
+		}
+
 		return isset($this->_updated[$name]);
 	}
 
