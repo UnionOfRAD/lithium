@@ -1504,6 +1504,35 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual(array('key1' => 'val1', 'key3' => array('foo' => 'bar')), $removed);
 		$this->assertEqual(array('key2' => 'val2'), $kept);
 	}
+
+	public function testGet() {
+		$data = array(
+			'comments' => array(
+				array(
+					'id' => 1,
+					'text' => 'Comment 1',
+				),
+				array(
+					'id' => 2,
+					'text' => 'Comment 2',
+				)
+			)
+		);
+
+		$result = Set::get($data, 'comments.0.id');
+		$expected = 1;
+		$this->assertEqual($expected, $result);
+
+		$result = Set::get($data, 'comments.1.text');
+		$expected = 'Comment 2';
+		$this->assertEqual($expected, $result);
+
+		$result = Set::get($data, '');
+		$this->assertEqual($data, $result);
+
+		$result = Set::get($data, 'undefined.path');
+		$this->assertNull($result);
+	}
 }
 
 ?>
