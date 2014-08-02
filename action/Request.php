@@ -171,7 +171,7 @@ class Request extends \lithium\net\http\Request {
 	 *          `php://input` will be used for reading.
 	 *        - `'env'` _array_: array()
 	 *        - `'globals'` _boolean_: Use global variables for populating
-	 *          the request's environment data; defaults to `true`.
+	 *          the request's environment and data; defaults to `true`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -185,7 +185,7 @@ class Request extends \lithium\net\http\Request {
 		);
 		$config += $defaults;
 
-		if ($config['globals'] === true) {
+		if ($config['globals']) {
 			if (isset($_SERVER)) {
 				$config['env'] += $_SERVER;
 			}
@@ -235,7 +235,13 @@ class Request extends \lithium\net\http\Request {
 	}
 
 	/**
-	 * Initialize request object
+	 * Initializes request object by setting up mobile detectors, determining method and
+	 * populating the data property either by using i.e. form data or reading from STDIN in
+	 * case binary data is streamed. Will merge any files posted in forms with parsed data.
+	 *
+	 * Note that only beginning with PHP 5.6 STDIN can be opened/read and closed more than once.
+	 *
+	 * @see lithium\action\Request::_parseFiles
 	 */
 	protected function _init() {
 		parent::_init();
@@ -270,7 +276,7 @@ class Request extends \lithium\net\http\Request {
 		}
 		$this->body = $this->data;
 
-		if (!empty($_FILES)) {
+		if ($this->_config['globals'] && !empty($_FILES)) {
 			$this->data = Set::merge($this->data, $this->_parseFiles($_FILES));
 		}
 	}
@@ -747,9 +753,10 @@ class Request extends \lithium\net\http\Request {
 	}
 
 	/**
-	 * Normalize the data in $_FILES
+	 * Normalizes the data from the `$_FILES` superglobal.
 	 *
-	 * @return array
+	 * @param array $data Data as formatted in the `$_FILES` superglobal.
+	 * @return array Normalized data.
 	 */
 	protected function _parseFiles($data) {
 		$result = array();
