@@ -183,6 +183,22 @@ abstract class Renderer extends \lithium\core\Object {
 	/**
 	 * Sets the default output handlers for string template inputs.
 	 *
+	 * The default handlers available are:
+	 * - `url`: Allows generating escaped and routed URLs using `Router::match()`. Note that
+	 *          all falsey values, which includes an empty array, will result in `'/'` being
+	 *          returned. For empty arrays this behavior is slightly different from using
+	 *          `Router::match()` directly.
+	 * - `path`: Generates an asset path.
+	 * - `options`: Converts a set of parameters to HTML attributes into a string.
+	 * - `title`: Returns the escaped title.
+	 * - `value`: Returns an escaped value.
+	 * - `scripts`: Returns a markup string of styles from context.
+	 * - `styles`: Returns a markup string of scripts from context.
+	 * - `head`
+	 *
+	 * @see lithium\net\http\Router::match()
+	 * @see lithium\net\http\Media::asset()
+	 * @see lithium\template\Helper::_attributes()
 	 * @return void
 	 */
 	protected function _init() {

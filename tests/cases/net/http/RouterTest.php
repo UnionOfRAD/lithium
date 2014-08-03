@@ -361,6 +361,15 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertIdentical($base . '/login', $result);
 	}
 
+	public function testEmptyUrlMatching() {
+		$result = Router::match('');
+		$expected = '/';
+		$this->assertIdentical($expected, $result);
+
+		$this->expectException('/No parameter match found for URL/');
+		Router::match(array());
+	}
+
 	/**
 	 * Tests getting routes using `Router::get()`, and checking to see if the routes returned match
 	 * the routes connected.

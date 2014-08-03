@@ -262,6 +262,10 @@ class RendererTest extends \lithium\test\Unit {
 		$absolute = $this->subject->url('Posts::foo', array('absolute' => true));
 		$this->assertEqual('http://foo.local/posts/foo', $absolute);
 
+		$this->assertEqual('/', $this->subject->url(array()));
+		$this->assertEqual('/', $this->subject->url(''));
+		$this->assertEqual('/', $this->subject->url(null));
+
 		$this->assertEmpty(trim($this->subject->scripts()));
 		$this->assertEqual('foobar', trim($this->subject->scripts('foobar')));
 		$this->assertEqual('foobar', trim($this->subject->scripts()));
