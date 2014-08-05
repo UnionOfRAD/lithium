@@ -280,6 +280,11 @@ class Route extends \lithium\core\Object {
 		if (!$options = $this->_matchKeys($options)) {
 			return false;
 		}
+		foreach ($options as $key => $value) {
+			if (isset($this->_config['formatters'][$key])) {
+				$options[$key] = $this->_config['formatters'][$key]($value);
+			}
+		}
 		foreach ($this->_subPatterns as $key => $pattern) {
 			if (isset($options[$key]) && !preg_match("/^{$pattern}$/", $options[$key])) {
 				return false;
@@ -384,9 +389,6 @@ class Route extends \lithium\core\Object {
 					$template = rtrim(substr($template, 0, $len), '/');
 					continue;
 				}
-			}
-			if (isset($this->_config['formatters'][$key])) {
-				$value = $this->_config['formatters'][$key]($value);
 			}
 			if ($value === null) {
 				$template = str_replace("/{$rpl}", '', $template);
