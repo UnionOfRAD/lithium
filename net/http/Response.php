@@ -102,21 +102,21 @@ class Response extends \lithium\net\http\Message {
 	/**
 	 * Adds config values to the public properties when a new object is created.
 	 *
-	 * @param array $config Configuration options : default value
-	 *        - `'protocol'` _string_: null
-	 *        - `'version'` _string_: '1.1'
-	 *        - `'headers'` _array_: array()
-	 *        - `'body'` _mixed_: null
+	 * @see lithium\net\http\Message::__construct()
+	 * @see lithium\net\Message::__construct()
+	 * @param array $config The available configuration options are the following. Further
+	 *        options are inherited from the parent classes.
 	 *        - `'message'` _string_: null
 	 *        - `'status'` _mixed_: null
 	 *        - `'type'` _string_: null
+	 *        - `'cookies'` _array_: Defaults to `array()`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'message' => null,
 			'status' => null,
 			'type' => null,
-			'cookies' => null
+			'cookies' => array()
 		);
 		parent::__construct($config + $defaults);
 

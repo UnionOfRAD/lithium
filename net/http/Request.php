@@ -60,25 +60,19 @@ class Request extends \lithium\net\http\Message {
 	/**
 	 * Adds config values to the public properties when a new object is created.
 	 *
-	 * @param array $config Configuration options : default value
-	 *        - `'protocol'` _string_: null
-	 *        - `'version'` _string_: '1.1'
-	 *        - `'method'` _string_: 'GET'
-	 *        - `'scheme'` _string_: 'http'
-	 *        - `'host'` _string_: 'localhost'
-	 *        - `'port'` _integer_: null
-	 *        - `'username'` _string_: null
-	 *        - `'password'` _string_: null
-	 *        - `'path'` _string_: null
-	 *        - `'query'` _array_: array()
-	 *        - `'headers'` _array_: array()
-	 *        - `'cookies'` _array_: array()
-	 *        - `'type'` _string_: null
-	 *        - `'auth'` _mixed_: null
-	 *        - `'body'` _mixed_: null
-	 *        - `'proxy'` _string_: null
-	 *        - `'ignoreErrors'` _boolean_: true
-	 *        - `'followLocation'` _boolean_: true
+	 * @see lithium\net\http\Message::__construct()
+	 * @see lithium\net\Message::__construct()
+	 * @param array $config The available configuration options are the following. Further
+	 *        options are inherited from the parent classes.
+	 *        - `'method'` _string_: Defaults to `'GET'`.
+	 *        - `'path'` _string_: Defaults to `null`.
+	 *        - `'query'` _array_: Defaults to `array()`.
+	 *        - `'cookies'` _array_: Defaults to `array()`.
+	 *        - `'type'` _string_: Defaults to `null`.
+	 *        - `'auth'` _mixed_: Defaults to `null`.
+	 *        - `'proxy'` _string_: Defaults to `null`.
+	 *        - `'ignoreErrors'` _boolean_: Defaults to `true`.
+	 *        - `'followLocation'` _boolean_: Defaults to `true`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

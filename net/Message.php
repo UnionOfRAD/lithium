@@ -71,7 +71,7 @@ class Message extends \lithium\core\Object {
 	/**
 	 * Adds config values to the public properties when a new object is created.
 	 *
-	 * @param array $config Configuration options : default value
+	 * @param array $config The available configuration options are the following.
 	 *        - `'scheme'` _string_: 'tcp'
 	 *        - `'host'` _string_: 'localhost'
 	 *        - `'port'` _integer_: null

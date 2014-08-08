@@ -148,28 +148,19 @@ class Request extends \lithium\net\http\Request {
 	 *
 	 * Normalizes casing of request headers.
 	 *
-	 * @param array $config Configuration options : default values are:
-	 *        - `'base'` _string_: null
-	 *        - `'url'` _string_: null
-	 *        - `'protocol'` _string_: null
-	 *        - `'version'` _string_: '1.1'
-	 *        - `'method'` _string_: 'GET'
-	 *        - `'scheme'` _string_: 'http'
-	 *        - `'host'` _string_: 'localhost'
-	 *        - `'port'` _integer_: null
-	 *        - `'username'` _string_: null
-	 *        - `'password'` _string_: null
-	 *        - `'path'` _string_: null
-	 *        - `'query'` _array_: array()
-	 *        - `'headers'` _array_: array()
-	 *        - `'type'` _string_: null
-	 *        - `'auth'` _mixed_: null
-	 *        - `'body'` _mixed_: null
-	 *        - `'data'` _array_: array()
+	 * @see lithium\net\http\Request::__construct()
+	 * @see lithium\net\http\Message::__construct()
+	 * @see lithium\net\Message::__construct()
+	 * @param array $config The available configuration options are the following. Further
+	 *        options are inherited from the parent classes.
+	 *        - `'base'` _string_: Defaults to `null`.
+	 *        - `'url'` _string_: Defaults to `null`.
+	 *        - `'data'` _array_: Additional data to use when initializing
+	 *          the request. Defaults to `array()`.
 	 *        - `'stream'` _resource_: Stream to read from in order to get the message
 	 *          body when method is POST, PUT or PATCH and data is empty. When not provided
 	 *          `php://input` will be used for reading.
-	 *        - `'env'` _array_: array()
+	 *        - `'env'` _array_: Defaults to `array()`.
 	 *        - `'globals'` _boolean_: Use global variables for populating
 	 *          the request's environment and data; defaults to `true`.
 	 */
@@ -178,10 +169,10 @@ class Request extends \lithium\net\http\Request {
 			'base' => null,
 			'url' => null,
 			'env' => array(),
-			'query' => array(),
 			'data' => array(),
 			'stream' => null,
-			'globals' => true
+			'globals' => true,
+			'query' => array()
 		);
 		$config += $defaults;
 
@@ -241,7 +232,7 @@ class Request extends \lithium\net\http\Request {
 	 *
 	 * Note that only beginning with PHP 5.6 STDIN can be opened/read and closed more than once.
 	 *
-	 * @see lithium\action\Request::_parseFiles
+	 * @see lithium\action\Request::_parseFiles()
 	 */
 	protected function _init() {
 		parent::_init();
