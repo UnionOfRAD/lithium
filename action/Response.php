@@ -184,9 +184,9 @@ class Response extends \lithium\net\http\Response {
 
 	/**
 	 * Casts the Response object to a string.  This doesn't actually return a string, but does
-	 * a direct render and returns null.
+	 * a direct render and returns an empty string.
 	 *
-	 * @return string An empty string.
+	 * @return string Just an empty string to satify requirements of this magic method.
 	 */
 	public function __toString() {
 		$this->render();
