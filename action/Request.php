@@ -213,8 +213,10 @@ class Request extends \lithium\net\http\Request {
 
 		parent::__construct($config);
 
-		$this->headers('Content-Type', $this->env('CONTENT_TYPE'));
-		$this->headers('Content-Length', $this->env('CONTENT_LENGTH'));
+		$this->headers(array(
+			'Content-Type' => $this->env('CONTENT_TYPE'),
+			'Content-Length' => $this->env('CONTENT_LENGTH')
+		));
 
 		foreach ($this->_env as $name => $value) {
 			if ($name[0] === 'H' && strpos($name, 'HTTP_') === 0) {
