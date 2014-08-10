@@ -106,9 +106,9 @@ class Response extends \lithium\net\http\Message {
 	 * @see lithium\net\Message::__construct()
 	 * @param array $config The available configuration options are the following. Further
 	 *        options are inherited from the parent classes.
-	 *        - `'message'` _string_: null
-	 *        - `'status'` _mixed_: null
-	 *        - `'type'` _string_: null
+	 *        - `'message'` _string_: Defaults to `null`.
+	 *        - `'status'` _mixed_: Defaults to `null`.
+	 *        - `'type'` _string_: Defaults to `null`.
 	 *        - `'cookies'` _array_: Defaults to `array()`.
 	 */
 	public function __construct(array $config = array()) {

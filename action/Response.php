@@ -44,18 +44,15 @@ class Response extends \lithium\net\http\Response {
 	 * also include default values for `Response::body()` when called from `Response::render()`.
 	 *
 	 * @see lithium\net\http\Message::body()
-	 * @param array $config Configuration options : default value
-	 *        - `'protocol'` _string_: null
-	 *        - `'version'` _string_: '1.1'
-	 *        - `'headers'` _array_: array()
-	 *        - `'body'` _mixed_: null
-	 *        - `'message'` _string_: null
-	 *        - `'status'` _mixed_: null
-	 *        - `'type'` _string_: null
-	 *        - `'buffer'` _integer_: null
-	 *        - `'decode'` _boolean_: null
-	 *        - `'location'` _mixed_: null
-	 *        - `'request'` _object_: null
+	 * @see lithium\net\http\Response::__construct()
+	 * @see lithium\net\http\Message::__construct()
+	 * @see lithium\net\Message::__construct()
+	 * @param array $config The available configuration options are the following. Further
+	 *        options are inherited from the parent classes.
+	 *        - `'buffer'` _integer_: Defaults to `null`
+	 *        - `'decode'` _boolean_: Defaults to `null`.
+	 *        - `'location'` _array|string|void_: Defaults to `null`.
+	 *        - `'request'` _object_: Defaults to `null`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

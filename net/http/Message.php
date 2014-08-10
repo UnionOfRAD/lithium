@@ -62,7 +62,6 @@ class Message extends \lithium\net\Message {
 	 *        - `'version'` _string_: Defaults to `'1.1'`.
 	 *        - `'scheme'` _string_: Overridden and defaulting to `'http'`.
 	 *        - `'headers'` _array_: Defaults to `array()`.
-	 *        - `'body'` _mixed_: Defaults to `null`.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
