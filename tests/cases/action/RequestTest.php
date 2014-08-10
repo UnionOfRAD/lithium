@@ -590,6 +590,39 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertTrue(isset($request->action));
 	}
 
+	public function testDataStreamWithDrain() {
+		$stream = fopen('php://temp', 'r+');
+		fwrite($stream, '{ "foo": "bar" }');
+		rewind($stream);
+
+		$request = new Request(compact('stream') + array(
+			'env' => array(
+				'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+				'REQUEST_METHOD' => 'POST'
+			)
+		));
+		$expected = array('foo' => 'bar');
+		$this->assertEqual($expected, $request->data);
+	}
+
+	public function testDataStreamNoDrain() {
+		$stream = fopen('php://temp', 'r+');
+		fwrite($stream, '{ "foo": "bar" }');
+		rewind($stream);
+
+		$request = new Request(compact('stream') + array(
+			'drain' => false,
+			'env' => array(
+				'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+				'REQUEST_METHOD' => 'POST'
+			)
+		));
+		$this->assertEmpty($request->body);
+		$this->assertEmpty($request->data);
+
+		fclose($stream);
+	}
+
 	public function testSingleFileNormalization() {
 		$_FILES = array(
 			'file' => array(
@@ -1060,15 +1093,18 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testAutomaticContentDecoding() {
+	public function testStreamAutomaticContentDecoding() {
 		foreach (array('POST', 'PUT', 'PATCH') as $method) {
 			$stream = fopen('php://temp', 'r+');
 			fwrite($stream, '{ "foo": "bar" }');
 			rewind($stream);
-			$request = new Request(compact('stream') + array('env' => array(
-				'CONTENT_TYPE' => 'application/json; charset=UTF-8',
-				'REQUEST_METHOD' => $method
-			)));
+
+			$request = new Request(compact('stream') + array(
+				'env' => array(
+					'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+					'REQUEST_METHOD' => $method
+				)
+			));
 			$this->assertEqual(array('foo' => 'bar'), $request->data);
 		}
 
@@ -1076,12 +1112,36 @@ class RequestTest extends \lithium\test\Unit {
 			$stream = fopen('php://temp', 'r+');
 			fwrite($stream, '{ "foo": "bar" }');
 			rewind($stream);
-			$request = new Request(compact('stream') + array('env' => array(
-				'CONTENT_TYPE' => 'application/json; charset=UTF-8',
-				'REQUEST_METHOD' => $method
-			)));
+
+			$request = new Request(compact('stream') + array(
+				'env' => array(
+					'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+					'REQUEST_METHOD' => $method
+				)
+			));
+			$this->assertEmpty($request->data);
+
+			fclose($stream);
+		}
+	}
+
+	public function testStreamNoAutomaticContentDecodingNoDrain() {
+		$stream = fopen('php://temp', 'r+');
+		fwrite($stream, '{ "foo": "bar" }');
+
+		foreach (array('POST', 'PUT', 'PATCH') as $method) {
+			rewind($stream);
+
+			$request = new Request(compact('stream') + array(
+				'drain' => false,
+				'env' => array(
+					'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+					'REQUEST_METHOD' => $method
+				)
+			));
 			$this->assertEmpty($request->data);
 		}
+		fclose($stream);
 	}
 
 	public function testRequestTypeFromHeader() {
