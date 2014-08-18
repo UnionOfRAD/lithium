@@ -113,7 +113,7 @@ class View extends \lithium\core\Object {
 	/**
 	 * Object responsible for rendering output.
 	 *
-	 * @var objet Renderer object.
+	 * @var object Renderer object.
 	 */
 	protected $_renderer = null;
 
