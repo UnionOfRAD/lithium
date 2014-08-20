@@ -385,7 +385,7 @@ class HtmlTest extends \lithium\test\Unit {
 		);
 		$this->assertTags($result, $expected);
 
-		$this->assertNulL($this->html->script(array('foo', 'bar'), array('inline' => false)));
+		$this->assertNull($this->html->script(array('foo', 'bar'), array('inline' => false)));
 		$result = $this->context->scripts();
 		$this->assertTags($result, $expected);
 	}
