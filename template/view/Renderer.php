@@ -230,13 +230,13 @@ abstract class Renderer extends \lithium\core\Object {
 			'title'   => 'escape',
 			'value'   => 'escape',
 			'scripts' => function($scripts) use (&$ctx) {
-				return "\n\t" . join("\n\t", $ctx['scripts']) . "\n";
+				return "\n\t" . join("\n\t", array_unique($ctx['scripts'])) . "\n";
 			},
 			'styles' => function($styles) use (&$ctx) {
-				return "\n\t" . join("\n\t", $ctx['styles']) . "\n";
+				return "\n\t" . join("\n\t", array_unique($ctx['styles'])) . "\n";
 			},
 			'head' => function($head) use (&$ctx) {
-				return "\n\t" . join("\n\t", $ctx['head']) . "\n";
+				return "\n\t" . join("\n\t", array_unique($ctx['head'])) . "\n";
 			}
 		);
 		unset($this->_config['view']);

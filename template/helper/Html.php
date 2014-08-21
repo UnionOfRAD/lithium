@@ -177,6 +177,7 @@ class Html extends \lithium\template\Helper {
 		list($scope, $options) = $this->_options($defaults, $options);
 
 		if (is_array($path)) {
+			$path = array_unique($path);
 			foreach ($path as $i => $item) {
 				$path[$i] = $this->script($item, $scope);
 			}
@@ -222,6 +223,7 @@ class Html extends \lithium\template\Helper {
 		list($scope, $options) = $this->_options($defaults, $options);
 
 		if (is_array($path)) {
+			$path = array_unique($path);
 			foreach ($path as $i => $item) {
 				$path[$i] = $this->style($item, $scope);
 			}
