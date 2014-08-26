@@ -336,6 +336,13 @@ class Route extends \lithium\core\Object {
 	protected function _matchKeys($options) {
 		$args = array('args' => 'args');
 
+		$scope = array();
+		if (!empty($options['scope'])) {
+			$scope = (array)$options['scope'] + array('params' => array());
+			$scope = array_flip($scope['params']);
+		}
+		unset($options['scope']);
+
 		if (array_intersect_key($options, $this->_match) != $this->_match) {
 			return false;
 		}
@@ -344,7 +351,7 @@ class Route extends \lithium\core\Object {
 				return false;
 			}
 		} else {
-			if (array_diff_key(array_diff_key($options, $this->_match), $this->_keys) !== array()) {
+			if (array_diff_key($options, $this->_match + $this->_keys + $scope)) {
 				return false;
 			}
 		}

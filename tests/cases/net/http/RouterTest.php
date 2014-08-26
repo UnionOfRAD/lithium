@@ -1900,6 +1900,25 @@ class RouterTest extends \lithium\test\Unit {
 		));
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testMatchWithAbsoluteScope() {
+		Router::attach('app', array(
+			'absolute' => true,
+			'host' => '{:domain}',
+		));
+
+		Router::scope('app', function(){
+			Router::connect('/hello', 'Posts::index');
+		});
+
+		$request = new Request(array('url' => '/hello', 'base' => ''));
+		$result = Router::process($request);
+
+		$expected = 'http://' . $result->params['domain'] . '/hello';
+		$result = Router::match($result->params, $request);
+
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

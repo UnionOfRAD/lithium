@@ -380,7 +380,7 @@ class Router extends \lithium\core\StaticObject {
 		$scope = $options['scope'];
 		if (isset(static::$_configurations[$scope])) {
 			foreach (static::$_configurations[$scope] as $route) {
-				if (!$match = $route->match($url, $context)) {
+				if (!$match = $route->match($url + array('scope' => static::attached($scope)), $context)) {
 					continue;
 				}
 				if ($route->canContinue()) {
@@ -456,7 +456,7 @@ class Router extends \lithium\core\StaticObject {
 
 			$base = isset($config['base']) ? '/' . $config['base'] : $defaults['base'];
 			$base = $base . ($config['prefix'] ? '/' . $config['prefix'] : '');
-			$config['base'] = $config['absolute'] ? '/' . trim($base, '/') : rtrim($base, '/');
+			$config['base'] = rtrim($config['absolute'] ? '/' . trim($base, '/') : $base, '/');
 			$defaults = $config + $defaults;
 		}
 		return $options + $defaults;
