@@ -188,6 +188,9 @@ class String {
 	/**
 	 * Compares two strings in constant time to prevent timing attacks.
 	 *
+	 * To successfully mitigate timing attacks and not leak the actual length of the left
+	 * string, it is important that _both provided strings have the same length_.
+	 *
 	 * @link http://codahale.com/a-lesson-in-timing-attacks/ More about timing attacks.
 	 * @param string $left The left side of the comparison.
 	 * @param string $right The right side of the comparison.
