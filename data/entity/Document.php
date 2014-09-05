@@ -277,7 +277,6 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		if (strpos($name, '.')) {
 			return $this->_getNested($name) !== null;
 		}
-
 		return isset($this->_updated[$name]);
 	}
 
@@ -295,6 +294,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 */
 	public function __unset($name) {
 		$parts = explode('.', $name, 2);
+
 		if (isset($parts[1])) {
 			unset($this->{$parts[0]}[$parts[1]]);
 		} else {
