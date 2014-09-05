@@ -466,7 +466,19 @@ class StringTest extends \lithium\test\Unit {
 	public function testCompare() {
 		$this->assertTrue(String::compare('Foo', 'Foo'));
 		$this->assertFalse(String::compare('Foo', 'foo'));
+		$this->assertFalse(String::compare('Foo', 'Bar'));
+
+		$this->assertTrue(String::compare('', ''));
+		$this->assertFalse(String::compare('', '0'));
+		$this->assertFalse(String::compare('0', ''));
+
+		$this->assertTrue(String::compare(null, null));
+		$this->assertTrue(String::compare(null, ''));
+		$this->assertTrue(String::compare('', null));
+
+		$this->assertTrue(String::compare('1', '1'));
 		$this->assertFalse(String::compare('1', 1));
+		$this->assertFalse(String::compare(1, '1'));
 	}
 
 	/**
