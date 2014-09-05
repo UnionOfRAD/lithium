@@ -111,10 +111,7 @@ class Hmac extends \lithium\core\Object {
 		if (!isset($currentData['__signature'])) {
 			throw new MissingSignatureException('HMAC signature not found.');
 		}
-		$currentSignature = $currentData['__signature'];
-		$signature = static::_signature($currentData);
-
-		if (!String::compare($signature, $currentSignature)) {
+		if (!String::compare($currentData['__signature'], static::_signature($currentData))) {
 			$message = "Possible data tampering: HMAC signature does not match data.";
 			throw new RuntimeException($message);
 		}
