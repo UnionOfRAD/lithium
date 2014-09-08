@@ -182,6 +182,8 @@ abstract class Database extends \lithium\data\Source {
 	 * Initializer. Initializes properties like `Database::$_strategies` because
 	 * closures cannot be created within the class definition.
 	 *
+	 * @see lithium\data\source\Database::$_columns
+	 * @see lithium\data\source\Database::$_strings
 	 * @see lithium\data\source\Database::$_strategies
 	 */
 	protected function _init() {
