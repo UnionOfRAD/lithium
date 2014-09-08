@@ -10,7 +10,7 @@ namespace lithium\tests\cases\data\collection;
 
 use lithium\data\collection\RecordSet;
 use lithium\tests\mocks\data\collection\MockRecordSet;
-use lithium\tests\mocks\data\model\mock_database\MockResult;
+use lithium\tests\mocks\data\model\database\MockResult;
 use lithium\tests\mocks\data\MockPostObject;
 use lithium\util\Collection;
 

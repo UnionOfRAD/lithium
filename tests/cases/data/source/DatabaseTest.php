@@ -16,7 +16,7 @@ use lithium\tests\mocks\data\model\MockDatabasePost;
 use lithium\tests\mocks\data\model\MockDatabaseComment;
 use lithium\tests\mocks\data\model\MockDatabaseTagging;
 use lithium\tests\mocks\data\model\MockDatabasePostRevision;
-use lithium\tests\mocks\data\model\mock_database\MockResult;
+use lithium\tests\mocks\data\model\database\MockResult;
 use lithium\tests\mocks\data\model\MockGallery;
 use lithium\tests\mocks\data\model\MockImage;
 use lithium\tests\mocks\data\model\MockImageTag;

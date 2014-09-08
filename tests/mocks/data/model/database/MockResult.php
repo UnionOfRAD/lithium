@@ -6,7 +6,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\mocks\data\model\mock_database;
+namespace lithium\tests\mocks\data\model\database;
 
 class MockResult extends \lithium\data\source\Result {
 
