@@ -169,7 +169,7 @@ class Cache extends \lithium\core\Adaptable {
 			$keys = array($key => $data);
 		}
 
-		if ($options['strategies']) {
+		if ($options['strategies'] && isset($options['strategies'][0])) {
 			foreach ($keys as $key => &$value) {
 				$value = static::applyStrategies(__FUNCTION__, $name, $value, array(
 					'key' => $key, 'class' => __CLASS__
