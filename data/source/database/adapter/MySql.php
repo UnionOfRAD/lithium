@@ -39,6 +39,7 @@ class MySql extends \lithium\data\source\Database {
 		'binary' => array('use' => 'blob'),
 		'boolean' => array('use' => 'tinyint', 'length' => 1)
 	);
+
 	/**
 	 * Meta atrribute syntax
 	 * By default `'escape'` is false and 'join' is `' '`
@@ -111,6 +112,22 @@ class MySql extends \lithium\data\source\Database {
 	public function __construct(array $config = array()) {
 		$defaults = array('host' => 'localhost:3306', 'encoding' => null);
 		parent::__construct($config + $defaults);
+	}
+
+	/**
+	 * Initializer. Adds MySQL-specific operators to `$_operators`.
+	 *
+	 * @see lithium\data\source\database\adapter\MySql::$_operators
+	 * @see lithium\data\source\Database::$_operators
+	 */
+	protected function _init() {
+		parent::_init();
+
+		$this->_operators += array(
+			'REGEXP' => array(),
+			'NOT REGEXP' => array(),
+			'SOUNDS LIKE' => array()
+		);
 	}
 
 	/**
