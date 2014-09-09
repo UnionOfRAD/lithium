@@ -1084,14 +1084,14 @@ class Model extends \lithium\core\StaticObject {
 	 * @param array $options Options:
 	 *        - `'callbacks'` _boolean_: If `false`, all callbacks will be disabled before
 	 *           executing. Defaults to `true`.
-	 *        - `'validate'` _mixed_: If `false`, validation will be skipped, and the record will
-	 *          be immediately saved. Defaults to `true`. May also be specified as an array, in
-	 *          which case it will replace the default validation rules specified in the
-	 *         `$validates` property of the model.
-	 *        - `'events'` _mixed_: A string or array defining one or more validation _events_.
-	 *          Events are different contexts in which data events can occur, and correspond to the
-	 *          optional `'on'` key in validation rules. They will be passed to the validates()
-	 *          method if `'validate'` is not `false`.
+	 *        - `'validate'` _boolean|array_: If `false`, validation will be skipped, and the
+	 *          record will be immediately saved. Defaults to `true`. May also be specified as
+	 *          an array, in which case it will replace the default validation rules specified
+	 *          in the `$validates` property of the model.
+	 *        - `'events'` _string|array_: A string or array defining one or more validation
+	 *          _events_. Events are different contexts in which data events can occur, and
+	 *          correspond to the optional `'on'` key in validation rules. They will be passed
+	 *          to the validates() method if `'validate'` is not `false`.
 	 *        - `'whitelist'` _array_: An array of fields that are allowed to be saved to this
 	 *          record.
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
