@@ -21,19 +21,20 @@ use RecursiveIteratorIterator;
 use Closure;
 
 /**
- * This is the base class for all test cases. Test are performed using an assertion method. If the
- * assertion is correct, the test passes, otherwise it fails. Most assertions take an expected
- * result, a received result, and a message (to describe the failure) as parameters.
+ * This is the base class for all test cases. Test are performed using an assertion method.
+ * If the assertion is correct, the test passes, otherwise it fails. Most assertions take an
+ * expected result, a received result, and a message (to describe the failure) as parameters.
  *
- * Unit tests are used to check a small unit of functionality, such as if a
- * method returns an expected result for a known input, or whether an adapter
- * can successfully open a connection.
+ * Unit tests are used to check a small unit of functionality, such as if a method returns an
+ * expected result for a known input, or whether an adapter can successfully open a connection.
  *
  * Available assertions are (see `assert<assertion-name>` methods for details): Equal, False,
  * Identical, NoPattern, NotEqual, Null, Pattern, Tags, True.
  *
  * If an assertion is expected to produce an exception, the `expectException` method should be
  * called before it.
+ *
+ * @see lithium\test\Unit::assertException()
  */
 class Unit extends \lithium\core\Object {
 
@@ -99,14 +100,14 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Setup method run before every test method. override in subclasses
+	 * Setup method run before every test method. Override in subclasses.
 	 *
 	 * @return void
 	 */
 	public function setUp() {}
 
 	/**
-	 * Teardown method run after every test method. override in subclasses
+	 * Teardown method run after every test method. Override in subclasses.
 	 *
 	 * @return void
 	 */
@@ -119,10 +120,8 @@ class Unit extends \lithium\core\Object {
 	 * For example:
 	 * {{{
 	 * public function skip() {
-	 *     $this->_dbConfig = Connections::get('default', array('config' => true));
-	 *     $hasDb = (isset($this->_dbConfig['adapter']) && $this->_dbConfig['adapter'] == 'MySql');
-	 *     $message = 'Test database is either unavailable, or not using a MySQL adapter';
-	 *     $this->skipIf(!$hasDb, $message);
+	 *     $connection = Connections::get('test', array('config' => true));
+	 *     $this->skipIf(!$connection, 'Test database is unavailable.');
 	 * }
 	 * }}}
 	 */
@@ -131,9 +130,9 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Skips test(s) if the condition is met.
 	 *
-	 * When used within a subclass' `skip` method, all tests are ignored if the condition is met,
-	 * otherwise processing continues as normal.
-	 * For other methods, only the remainder of the method is skipped, when the condition is met.
+	 * When used within a subclass' `skip` method, all tests are ignored if the condition is
+	 * met, otherwise processing continues as normal. For other methods, only the remainder of
+	 * the method is skipped, when the condition is met.
 	 *
 	 * @throws Exception
 	 * @param boolean $condition
@@ -156,13 +155,22 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Return test methods to run
+	 * Return test methods to run.
 	 *
 	 * @return array
 	 */
 	public function methods() {
 		static $methods;
 		return $methods ?: $methods = array_values(preg_grep('/^test/', get_class_methods($this)));
+	}
+
+	/**
+	 * Returns the current results.
+	 *
+	 * @return array The Results... currently.
+	 */
+	public function results() {
+		return $this->_results;
 	}
 
 	/**
@@ -218,6 +226,7 @@ class Unit extends \lithium\core\Object {
 	 *        then it will be converted to '{:message}'. Use '{:message}' in the string and it
 	 *        will use the `$data` to format the message with `String::insert()`.
 	 * @param array $data
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assert($expression, $message = false, $data = array()) {
 		if (!is_string($message)) {
@@ -253,7 +262,7 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Generates a failed test with the passed message.
+	 * Generates a failed test with the given message.
 	 *
 	 * @param string $message
 	 */
@@ -262,34 +271,14 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Fixes some issues regarding the used EOL character(s).
-	 *
-	 * On linux EOL is LF, on Windows it is normally CRLF, but the latter may depend also
-	 * on the git config core.autocrlf setting. As some tests use heredoc style (<<<) to
-	 * specify multiline expectations, this EOL issue may cause tests to fail only because
-	 * of a difference in EOL's used.
-	 *
-	 * in assertEqual, assertNotEqual, assertPattern and assertNotPattern this function is
-	 * called to get rid of any EOL differences.
-	 *
-	 * @param mixed $expected
-	 * @param mixed $result
-	 */
-	protected function _normalizeLineEndings($expected, $result) {
-		if (is_string($expected) && is_string($result)) {
-			$expected = preg_replace('/\r\n/', "\n", $expected);
-			$result = preg_replace('/\r\n/', "\n", $result);
-		}
-		return array($expected, $result);
-	}
-
-	/**
-	 * Checks that the actual result is equal, but not neccessarily identical, to the expected
+	 * Assert that the actual result is equal, but not neccessarily identical, to the expected
 	 * result.
 	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param mixed $expected
 	 * @param mixed $result
 	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertEqual($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
@@ -298,11 +287,13 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Checks that the actual result and the expected result are not equal to each other.
+	 * Assert that the actual result and the expected result are *not* equal to each other.
 	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param mixed $expected
 	 * @param mixed $result
 	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNotEqual($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
@@ -310,11 +301,14 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Checks that the actual result and the expected result are identical.
+	 * Assert that the actual result and the expected result are identical using a strict
+	 * comparison.
 	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param mixed $expected
 	 * @param mixed $result
 	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertIdentical($expected, $result, $message = '{:message}') {
 		$data = ($expected !== $result) ? $this->_compare('identical', $expected, $result) : null;
@@ -322,34 +316,32 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Checks that the actual result and the expected result are identical.
+	 * Assert that the actual result and the expected result are *not* identical using a strict
+	 * comparison.
 	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param mixed $expected
 	 * @param mixed $result
 	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNotIdentical($expected, $result, $message = '{:message}') {
 		return $this->assert($expected !== $result, $message, compact('expected', 'result'));
 	}
 
 	/**
-	 * Checks that the result evaluates to true.
+	 * Assert that the result is strictly `true`.
 	 *
-	 * For example:
 	 * {{{
-	 * $this->assertTrue('false', 'String has content');
+	 * $this->assertTrue(true, 'Boolean true'); // succeeds
+	 * $this->assertTrue('false', 'String has content'); // fails
+	 * $this->assertTrue(10, 'Non-Zero value'); // fails
 	 * }}}
-	 * {{{
-	 * $this->assertTrue(10, 'Non-Zero value');
-	 * }}}
-	 * {{{
-	 * $this->assertTrue(true, 'Boolean true');
-	 * }}}
-	 * all evaluate to true.
 	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param mixed $result
 	 * @param string $message
-	 * @return boolean
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertTrue($result, $message = '{:message}') {
 		$expected = true;
@@ -357,25 +349,18 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Checks that the result evaluates to false.
-	 *
-	 * For example:
-	 * {{{
-	 * $this->assertFalse('', 'String is empty');
-	 * }}}
+	 * Assert that the result strictly is `false`.
 	 *
 	 * {{{
-	 * $this->assertFalse(0, 'Zero value');
+	 * $this->assertFalse(false, 'Boolean false'); // succeeds
+	 * $this->assertFalse('', 'String is empty'); // fails
+	 * $this->assertFalse(0, 'Zero value'); // fails
 	 * }}}
 	 *
-	 * {{{
-	 * $this->assertFalse(false, 'Boolean false');
-	 * }}}
-	 * all evaluate to false.
-	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param mixed $result
 	 * @param string $message
-	 * @return boolean
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertFalse($result, $message = '{:message}') {
 		$expected = false;
@@ -383,11 +368,12 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Checks if the result is null.
+	 * Assert that the result is strictly `null`.
 	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param mixed $result
 	 * @param string $message
-	 * @return boolean
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNull($result, $message = '{:message}') {
 		$expected = null;
@@ -395,12 +381,191 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Checks that the regular expression `$expected` is not matched in the result.
+	 * Assert that the result is *not* strictly `null`.
 	 *
+	 * {{{
+	 * $this->assertNotNull(1); // succeeds
+	 * $this->assertNotNull(null); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param mixed $result
+	 * @param string $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertNotNull($actual, $message = '{:message}') {
+		return $this->assert($actual !== null, $message, array(
+			'expected' => null,
+			'actual' => gettype($actual)
+		));
+	}
+
+	/**
+	 * Assert that given result is empty.
+	 *
+	 * {{{
+	 * $this->assertEmpty(''); // succeeds
+	 * $this->assertEmpty(0); // succeeds
+	 * $this->assertEmpty(0.0); // succeeds
+	 * $this->assertEmpty('0'); // succeeds
+	 * $this->assertEmpty(null); // succeeds
+	 * $this->assertEmpty(false); // succeeds
+	 * $this->assertEmpty(array()); // succeeds
+	 * $this->assertEmpty(1); // fails
+	 * }}}
+	 *
+	 * @link http://php.net/empty
+	 * @see lithium\test\Unit::assert()
+	 * @param string $actual
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertEmpty($actual, $message = '{:message}') {
+		return $this->assert(empty($actual), $message, array(
+			'expected' => $actual,
+			'result' => empty($actual)
+		));
+	}
+
+	/**
+	 * Assert that given result is *not* empty.
+	 *
+	 * {{{
+	 * $this->assertNotEmpty(1); // succeeds
+	 * $this->assertNotEmpty(array()); // fails
+	 * }}}
+	 *
+	 * @link http://php.net/empty
+	 * @see lithium\test\Unit::assert()
+	 * @param string $actual
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertNotEmpty($actual, $message = '{:message}') {
+		return $this->assert(!empty($actual), $message, array(
+			'expected' => $actual,
+			'result' => !empty($actual)
+		));
+	}
+
+	/**
+	 * Used before a call to `assert*()` if you expect the test assertion to generate an exception
+	 * or PHP error.  If no error or exception is thrown, a test failure will be reported.  Can
+	 * be called multiple times per assertion, if more than one error is expected.
+	 *
+	 * @param mixed $message A string indicating what the error text is expected to be.  This can
+	 *              be an exact string, a /-delimited regular expression, or true, indicating that
+	 *              any error text is acceptable.
+	 * @return void
+	 */
+	public function expectException($message = true) {
+		$this->_expected[] = $message;
+	}
+
+	/**
+	 * Assert that the code passed in a closure throws an exception matching the passed expected
+	 * exception.
+	 *
+	 * The value passed to `exepected` is either an exception class name or the expected message.
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param mixed $expected A string indicating what the error text is expected to be.  This can
+	 *              be an exact string, a /-delimited regular expression, or true, indicating that
+	 *              any error text is acceptable.
+	 * @param Closure $closure A closure containing the code that should throw the exception.
+	 * @param string $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertException($expected, $closure, $message = '{:message}') {
+		try {
+			$closure();
+			$message = sprintf('An exception "%s" was expected but not thrown.', $expected);
+			return $this->assert(false, $message, compact('expected', 'result'));
+		} catch (Exception $e) {
+			$class = get_class($e);
+			$eMessage = $e->getMessage();
+
+			if (get_class($e) === $expected) {
+				$result = $class;
+				return $this->assert(true, $message, compact('expected', 'result'));
+			}
+			if ($eMessage === $expected) {
+				$result = $eMessage;
+				return $this->assert(true, $message, compact('expected', 'result'));
+			}
+			if (Validator::isRegex($expected) && preg_match($expected, $eMessage)) {
+				$result = $eMessage;
+				return $this->assert(true, $message, compact('expected', 'result'));
+			}
+
+			$message = sprintf(
+				'Exception "%s" was expected. Exception "%s" with message "%s" was thrown instead.',
+				$expected, get_class($e), $eMessage
+			);
+			return $this->assert(false, $message);
+		}
+	}
+
+	/**
+	 * Assert that the code passed in a closure does not throw an exception matching the passed
+	 * expected exception.
+	 *
+	 * The value passed to `exepected` is either an exception class name or the expected message.
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param mixed $expected A string indicating what the error text is not expected to be. This
+	 *              can be an exact string, a /-delimited regular expression, or true, indicating
+	 *              that any error text is acceptable.
+	 * @param closure $closure A closure containing the code that should throw the exception.
+	 * @param string $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertNotException($expected, $closure, $message = '{:message}') {
+		try {
+			$closure();
+		} catch (Exception $e) {
+			$class = get_class($e);
+			$eMessage = $e->getMessage();
+			if (is_a($e, $expected)) {
+				$result = $class;
+				return $this->assert(false, $message, compact('expected', 'result'));
+			}
+			if ($eMessage === $expected) {
+				$result = $eMessage;
+				return $this->assert(false, $message, compact('expected', 'result'));
+			}
+			if (Validator::isRegex($expected) && preg_match($expected, $eMessage)) {
+				$result = $eMessage;
+				return $this->assert(false, $message, compact('expected', 'result'));
+			}
+		}
+		$message = sprintf('Exception "%s" was not expected.', $expected);
+		return $this->assert(true, $message, compact('expected', 'result'));
+	}
+
+	/**
+	 * Assert that the regular expression `$expected` is matched in the result.
+	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param mixed $expected
 	 * @param mixed $result
 	 * @param string $message
-	 * @return boolean
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertPattern($expected, $result, $message = '{:message}') {
+		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
+		$params = compact('expected', 'result');
+		return $this->assert(!!preg_match($expected, $result), $message, $params);
+	}
+
+	/**
+	 * Assert that the regular expression `$expected` is *not* matched in the result.
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param mixed $expected
+	 * @param mixed $result
+	 * @param string $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNotPattern($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
@@ -409,17 +574,85 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Checks that the regular expression `$expected` is matched in the result.
+	 * Assert that given value matches the `sprintf` format.
 	 *
-	 * @param mixed $expected
-	 * @param mixed $result
-	 * @param string $message
-	 * @return boolean
+	 * {{{
+	 * $this->assertStringMatchesFormat('%d', '10'); // succeeds
+	 * $this->assertStringMatchesFormat('%d', '10.555'); // fails
+	 * }}}
+	 *
+	 * @link http://php.net/sprintf
+	 * @link http://php.net/sscanf
+	 * @see lithium\test\Unit::assert()
+	 * @param string $expected Expected format using sscanf's format.
+	 * @param string $actual
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
-	public function assertPattern($expected, $result, $message = '{:message}') {
-		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
-		$params = compact('expected', 'result');
-		return $this->assert(!!preg_match($expected, $result), $message, $params);
+	public function assertStringMatchesFormat($expected, $actual, $message = '{:message}') {
+		$result = sscanf($actual, $expected);
+		return $this->assert($result[0] == $actual, $message, compact('expected', 'result'));
+	}
+
+	/**
+	 * Assert that given value does *not* matche the `sprintf` format.
+	 *
+	 * {{{
+	 * $this->assertStringNotMatchesFormat('%d', '10.555'); // succeeds
+	 * $this->assertStringNotMatchesFormat('%d', '10'); // fails
+	 * }}}
+	 *
+	 * @link http://php.net/sprintf
+	 * @link http://php.net/sscanf
+	 * @see lithium\test\Unit::assert()
+	 * @param string $expected Expected format using sscanf's format.
+	 * @param string $actual
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertStringNotMatchesFormat($expected, $actual, $message = '{:message}') {
+		$result = sscanf($actual, $expected);
+		return $this->assert($result[0] != $actual, $message, compact('expected', 'result'));
+	}
+
+	/**
+	 * Assert given result string has given suffix.
+	 *
+	 * {{{
+	 * $this->assertStringEndsWith('bar', 'foobar'); // succeeds
+	 * $this->assertStringEndsWith('foo', 'foobar'); // fails
+	 * }}}
+	 *
+	 * @param string $expected The suffix to check for.
+	 * @param string $actual
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertStringEndsWith($expected, $actual, $message = '{:message}') {
+		return $this->assert(preg_match("/$expected$/", $actual, $matches) === 1, $message, array(
+			'expected' => $expected,
+			'result' => $actual
+		));
+	}
+
+	/**
+	 * Assert given result string has given prefix.
+	 *
+	 * {{{
+	 * $this->assertStringStartsWith('foo', 'foobar'); // succeeds
+	 * $this->assertStringStartsWith('bar', 'foobar'); // fails
+	 * }}}
+	 *
+	 * @param string $expected The prefix to check for.
+	 * @param string $actual
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertStringStartsWith($expected, $actual, $message = '{:message}') {
+		return $this->assert(preg_match("/^$expected/", $actual, $matches) === 1, $message, array(
+			'expected' => $expected,
+			'result' => $actual
+		));
 	}
 
 	/**
@@ -456,9 +689,10 @@ class Unit extends \lithium\core\Object {
 	 * Important: This function is very forgiving about whitespace and also accepts any
 	 * permutation of attribute order. It will also allow whitespaces between specified tags.
 	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param string $string An HTML/XHTML/XML string
 	 * @param array $expected An array, see above
-	 * @return boolean
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertTags($string, $expected) {
 		$regex = array();
@@ -582,85 +816,6 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Assert that the code passed in a closure throws an exception matching the passed expected
-	 * exception.
-	 *
-	 * The value passed to `exepected` is either an exception class name or the expected message.
-	 *
-	 * @param mixed $expected A string indicating what the error text is expected to be.  This can
-	 *              be an exact string, a /-delimited regular expression, or true, indicating that
-	 *              any error text is acceptable.
-	 * @param Closure $closure A closure containing the code that should throw the exception.
-	 * @param string $message
-	 * @return boolean
-	 */
-	public function assertException($expected, $closure, $message = '{:message}') {
-		try {
-			$closure();
-			$message = sprintf('An exception "%s" was expected but not thrown.', $expected);
-			return $this->assert(false, $message, compact('expected', 'result'));
-		} catch (Exception $e) {
-			$class = get_class($e);
-			$eMessage = $e->getMessage();
-
-			if (get_class($e) === $expected) {
-				$result = $class;
-				return $this->assert(true, $message, compact('expected', 'result'));
-			}
-			if ($eMessage === $expected) {
-				$result = $eMessage;
-				return $this->assert(true, $message, compact('expected', 'result'));
-			}
-			if (Validator::isRegex($expected) && preg_match($expected, $eMessage)) {
-				$result = $eMessage;
-				return $this->assert(true, $message, compact('expected', 'result'));
-			}
-
-			$message = sprintf(
-				'Exception "%s" was expected. Exception "%s" with message "%s" was thrown instead.',
-				$expected, get_class($e), $eMessage
-			);
-			return $this->assert(false, $message);
-		}
-	}
-
-	/**
-	 * Assert that the code passed in a closure does not throw an exception matching the passed
-	 * expected exception.
-	 *
-	 * The value passed to `exepected` is either an exception class name or the expected message.
-	 *
-	 * @param mixed $expected A string indicating what the error text is not expected to be. This
-	 *              can be an exact string, a /-delimited regular expression, or true, indicating
-	 *              that any error text is acceptable.
-	 * @param closure $closure A closure containing the code that should throw the exception.
-	 * @param string $message
-	 * @return boolean
-	 */
-	public function assertNotException($expected, $closure, $message = '{:message}') {
-		try {
-			$closure();
-		} catch (Exception $e) {
-			$class = get_class($e);
-			$eMessage = $e->getMessage();
-			if (is_a($e, $expected)) {
-				$result = $class;
-				return $this->assert(false, $message, compact('expected', 'result'));
-			}
-			if ($eMessage === $expected) {
-				$result = $eMessage;
-				return $this->assert(false, $message, compact('expected', 'result'));
-			}
-			if (Validator::isRegex($expected) && preg_match($expected, $eMessage)) {
-				$result = $eMessage;
-				return $this->assert(false, $message, compact('expected', 'result'));
-			}
-		}
-		$message = sprintf('Exception "%s" was not expected.', $expected);
-		return $this->assert(true, $message, compact('expected', 'result'));
-	}
-
-	/**
 	 * Assert Cookie data is properly set in headers.
 	 *
 	 * The value passed to `exepected` is an array of the cookie data, with at least the key and
@@ -671,9 +826,10 @@ class Unit extends \lithium\core\Object {
 	 * 	- `name`: optionally specify the cookie name
 	 * 	- `expires`: optionally assert a specific expire time
 	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param array $expected
 	 * @param array $headers When empty, value of `headers_list()` is used.
-	 * @return boolean
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertCookie($expected, $headers = null) {
 		$matched = $this->_cookieMatch($expected, $headers);
@@ -695,9 +851,10 @@ class Unit extends \lithium\core\Object {
 	 * 	- `name`: optionally specify the cookie name
 	 * 	- `expires`: optionally assert a specific expire time
 	 *
+	 * @see lithium\test\Unit::assert()
 	 * @param array $expected
 	 * @param array $headers When empty, value of `headers_list()` is used.
-	 * @return boolean
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNoCookie($expected, $headers = null) {
 		$matched = $this->_cookieMatch($expected, $headers);
@@ -714,7 +871,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @param array $expected
 	 * @param array $headers When empty, value of `headers_list()` will be used.
-	 * @return boolean True if cookie is found, false otherwise.
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	protected function _cookieMatch($expected, $headers) {
 		$defaults = array('path' => '/', 'name' => '[\w.-]+');
@@ -748,17 +905,679 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Used before a call to `assert*()` if you expect the test assertion to generate an exception
-	 * or PHP error.  If no error or exception is thrown, a test failure will be reported.  Can
-	 * be called multiple times per assertion, if more than one error is expected.
+	 * Assert that the passed result array has expected number of elements.
 	 *
-	 * @param mixed $message A string indicating what the error text is expected to be.  This can
-	 *              be an exact string, a /-delimited regular expression, or true, indicating that
-	 *              any error text is acceptable.
-	 * @return void
+	 * {{{
+	 * $this->assertCount(1, array('foo')); // succeeds
+	 * $this->assertCount(2, array('foo', 'bar', 'bar')); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param integer $expected
+	 * @param array $array
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
-	public function expectException($message = true) {
-		$this->_expected[] = $message;
+	public function assertCount($expected, $array, $message = '{:message}') {
+		return $this->assert($expected === ($result = count($array)), $message, array(
+			'expected' => $expected,
+			'result' => $result
+		));
+	}
+
+	/**
+	 * Assert that the passed result array has *not* the expected number of elements.
+	 *
+	 * {{{
+	 * $this->assertNotCount(2, array('foo', 'bar', 'bar')); // succeeds
+	 * $this->assertNotCount(1, array('foo')); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param integer $expected
+	 * @param array $array
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertNotCount($expected, $array, $message = '{:message}') {
+		return $this->assert($expected !== ($result = count($array)), $message, array(
+			'expected' => $expected,
+			'result' => $result
+		));
+	}
+
+	/**
+	 * Assert that the result array has given key.
+	 *
+	 * {{{
+	 * $this->assertArrayHasKey('bar', array('bar' => 'baz')); // succeeds
+	 * $this->assertArrayHasKey('foo', array('bar' => 'baz')); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param mixed $expected
+	 * @param array $array
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertArrayHasKey($key, $array, $message = '{:message}') {
+		if (is_object($array) && $array instanceof \ArrayAccess) {
+			$result = isset($array[$key]);
+		} else {
+			$result = array_key_exists($key, $array);
+		}
+
+		return $this->assert($result, $message, array(
+			'expected' => $key,
+			'result' => $array
+		));
+	}
+
+	/**
+	 * Assert that the result array does *not* have given key.
+	 *
+	 * {{{
+	 * $this->assertArrayNotHasKey('foo', array('bar' => 'baz')); // succeeds
+	 * $this->assertArrayNotHasKey('bar', array('bar' => 'baz')); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param mixed $expected
+	 * @param array $array
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertArrayNotHasKey($key, $array, $message = '{:message}') {
+		if (is_object($array) && $array instanceof \ArrayAccess) {
+			$result = isset($array[$key]);
+		} else {
+			$result = array_key_exists($key, $array);
+		}
+
+		return $this->assert(!$result, $message, array(
+			'expected' => $key,
+			'result' => $array
+		));
+	}
+
+	/**
+	 * Assert that `$haystack` contains `$needle` as a value.
+	 *
+	 * {{{
+	 * $this->assertContains('foo', array('foo', 'bar', 'baz')); // succeeds
+	 * $this->assertContains(4, array(1,2,3)); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param string $needle   The needle you are looking for.
+	 * @param mixed $haystack An array, iterable object, or string.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertContains($needle, $haystack, $message = '{:message}') {
+		if (is_string($haystack)) {
+			return $this->assert(strpos($haystack, $needle) !== false, $message, array(
+				'expected' => $needle,
+				'result' => $haystack
+			));
+		}
+		foreach ($haystack as $key => $value) {
+			if ($value === $needle) {
+				return $this->assert(true, $message, array(
+					'expected' => $needle,
+					'result' => $haystack
+				));
+			}
+		}
+		return $this->assert(false, $message, array(
+			'expected' => $needle,
+			'result' => $haystack
+		));
+	}
+
+	/**
+	 * Assert that `$haystack` does *not* contain `$needle` as a value.
+	 *
+	 * {{{
+	 * $this->assertNotContains(4, array(1,2,3)); // succeeds
+	 * $this->assertNotContains('foo', array('foo', 'bar', 'baz')); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param string $needle   The needle you are looking for.
+	 * @param miexed $haystack Array or iterable object or a string.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertNotContains($needle, $haystack, $message = '{:message}') {
+		if (is_string($haystack)) {
+			return $this->assert(strpos($haystack, $needle) === false, $message, array(
+				'expected' => $needle,
+				'result' => $haystack
+			));
+		}
+		foreach ($haystack as $key => $value) {
+			if ($value === $needle) {
+				return $this->assert(false, $message, array(
+					'expected' => $needle,
+					'result' => $haystack
+				));
+			}
+		}
+		return $this->assert(true, $message, array(
+			'expected' => $needle,
+			'result' => $haystack
+		));
+	}
+
+	/**
+	 * Assert that `$haystack` does only contain item of given type.
+	 *
+	 * {{{
+	 * $this->assertContainsOnly('integer', array(1,2,3)); // succeeds
+	 * $this->assertContainsOnly('integer', array('foo', 'bar', 'baz')); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::$_internalTypes
+	 * @see lithium\test\Unit::assert()
+	 * @param string $type
+	 * @param array|object $haystack Array or iterable object.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertContainsOnly($type, $haystack, $message = '{:message}') {
+		$method = self::$_internalTypes[$type];
+		foreach ($haystack as $key => $value) {
+			if (!$method($value)) {
+				return $this->assert(false, $message, array(
+					'expected' => $type,
+					'result' => $haystack
+				));
+			}
+		}
+		return $this->assert(true, $message, array(
+			'expected' => $type,
+			'result' => $haystack
+		));
+	}
+
+	/**
+	 * Assert that `$haystack` hasn't any items of given type.
+	 *
+	 * {{{
+	 * $this->assertNotContainsOnly('integer', array('foo', 'bar', 'baz')); // succeeds
+	 * $this->assertNotContainsOnly('integer', array(1,2,3)); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::$_internalTypes
+	 * @see lithium\test\Unit::assert()
+	 * @param string $type
+	 * @param array|object $haystack Array or iterable object.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertNotContainsOnly($type, $haystack, $message = '{:message}') {
+		$method = self::$_internalTypes[$type];
+		foreach ($haystack as $key => $value) {
+			if (!$method($value)) {
+				return $this->assert(true, $message, array(
+					'expected' => $type,
+					'result' => $haystack
+				));
+			}
+		}
+		return $this->assert(false, $message, array(
+			'expected' => $type,
+			'result' => $haystack
+		));
+	}
+
+	/**
+	 * Assert that `$haystack` contains only instances of given class.
+	 *
+	 * {{{
+	 * $this->assertContainsOnlyInstancesOf('stdClass', array(new \stdClass)); // succeeds
+	 * $this->assertContainsOnlyInstancesOf('stdClass', array(new \lithium\test\Unit)); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param string $class
+	 * @param array|object $haystack Array or iterable object.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertContainsOnlyInstancesOf($class, $haystack, $message = '{:message}') {
+		$result = array();
+		foreach ($haystack as $key => &$value) {
+			if (!is_a($value, $class)) {
+				$result[$key] =& $value;
+				break;
+			}
+		}
+		return $this->assert(empty($result), $message, array(
+			'expected' => $class,
+			'result' => $result
+		));
+	}
+
+	/**
+	 * Assert that `$expected` is greater than `$actual`.
+	 *
+	 * {{{
+	 * $this->assertGreaterThan(5, 3); // succeeds
+	 * $this->assertGreaterThan(3, 5); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param float|integer $expected
+	 * @param float|integer $actual
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertGreaterThan($expected, $actual, $message = '{:message}') {
+		return $this->assert($expected > $actual, $message, array(
+			'expected' => $expected,
+			'result' => $actual
+		));
+	}
+
+	/**
+	 * Assert that `$expected` is greater than or equal to `$actual`.
+	 *
+	 * {{{
+	 * $this->assertGreaterThanOrEqual(5, 5); // succeeds
+	 * $this->assertGreaterThanOrEqual(3, 5); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param float|integer $expected
+	 * @param float|integer $actual
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertGreaterThanOrEqual($expected, $actual, $message = '{:message}') {
+		return $this->assert($expected >= $actual, $message, array(
+			'expected' => $expected,
+			'result' => $actual
+		));
+	}
+
+	/**
+	 * Assert that `$expected` is less than `$actual`.
+	 *
+	 * {{{
+	 * $this->assertLessThan(3, 5); // succeeds
+	 * $this->assertLessThan(5, 3); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param float|integer $expected
+	 * @param float|integer $actual
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertLessThan($expected, $actual, $message = '{:message}') {
+		return $this->assert($expected < $actual, $message, array(
+			'expected' => $expected,
+			'result' => $actual
+		));
+	}
+
+	/**
+	 * Assert that `$expected` is less than or equal to `$actual`.
+	 *
+	 * {{{
+	 * $this->assertLessThanOrEqual(5, 5); // succeeds
+	 * $this->assertLessThanOrEqual(5, 3); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param float|integer $expected
+	 * @param float|integer $actual
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertLessThanOrEqual($expected, $actual, $message = '{:message}') {
+		return $this->assert($expected <= $actual, $message, array(
+			'expected' => $expected,
+			'result' => $actual
+		));
+	}
+
+	/**
+	 * Assert that `$actual` is an instance of `$expected`.
+	 *
+	 * {{{
+	 * $this->assertInstanceOf('stdClass', new stdClass); // succeeds
+	 * $this->assertInstanceOf('ReflectionClass', new stdClass); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param string $expected Fully namespaced expected class.
+	 * @param object $actual Object you are testing.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertInstanceOf($expected, $actual, $message = '{:message}') {
+		return $this->assert(is_a($actual, $expected), $message, array(
+			'expected' => $expected,
+			'result' => get_class($actual)
+		));
+	}
+
+	/**
+	 * Assert that `$actual` is *not* an instance of `$expected`.
+	 *
+	 * {{{
+	 * $this->assertNotInstanceOf('ReflectionClass', new stdClass); // succeeds
+	 * $this->assertNotInstanceOf('stdClass', new stdClass); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param string $expected Fully namespaced expected class.
+	 * @param object $actual Object you are testing.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertNotInstanceOf($expected, $actual, $message = '{:message}') {
+		return $this->assert(!is_a($actual, $expected), $message, array(
+			'expected' => $expected,
+			'result' => is_object($actual) ? get_class($actual) : gettype($actual),
+		));
+	}
+
+	/**
+	 * Assert that `$actual` is of given type.
+	 *
+	 * {{{
+	 * $this->assertInternalType('string', 'foobar'); // succeeds
+	 * $this->assertInternalType('integer', 'foobar'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::$_internalTypes
+	 * @see lithium\test\Unit::assert()
+	 * @param string $expected Internal type.
+	 * @param object $actual Object you are testing.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertInternalType($expected, $actual, $message = '{:message}') {
+		$method = self::$_internalTypes[$expected];
+		return $this->assert($method($actual), $message, array(
+			'expected' => $expected,
+			'result' => gettype($actual)
+		));
+	}
+
+	/**
+	 * Assert that `$actual` is *not* of given type.
+	 *
+	 * {{{
+	 * $this->assertNotInternalType('integer', 'foobar'); // succeeds
+	 * $this->assertNotInternalType('string', 'foobar'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::$_internalTypes
+	 * @see lithium\test\Unit::assert()
+	 * @param string $expected Internal type.
+	 * @param object $actual Object you are testing.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertNotInternalType($expected, $actual, $message = '{:message}') {
+		$method = self::$_internalTypes[$expected];
+		return $this->assert(!$method($actual), $message, array(
+			'expected' => $expected,
+			'result' => gettype($actual)
+		));
+	}
+
+	/**
+	 * Assert that the file contents of `$expected` are equal to the contents of `$actual`.
+	 *
+	 * {{{
+	 * $this->assertFileEquals('/tmp/foo.txt', '/tmp/foo.txt'); // succeeds
+	 * $this->assertFileEquals('/tmp/foo.txt', '/tmp/bar.txt'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param string $expected Absolute path to the expected file.
+	 * @param string $actual Absolute path to the actual file.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertFileEquals($expected, $actual, $message = '{:message}') {
+		$expected = md5_file($expected);
+		$result = md5_file($actual);
+		return $this->assert($expected === $result, $message, compact('expected', 'result'));
+	}
+
+	/**
+	 * Assert that the file contents of `$expected` are *not* equal to the contents of `$actual`.
+	 *
+	 * {{{
+	 * $this->assertFileNotEquals('/tmp/foo.txt', '/tmp/bar.txt'); // succeeds
+	 * $this->assertFileNotEquals('/tmp/foo.txt', '/tmp/foo.txt'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param string $expected Absolute path to the expected file.
+	 * @param string $actual Absolute path to the actual file.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertFileNotEquals($expected, $actual, $message = '{:message}') {
+		$expected = md5_file($expected);
+		$result = md5_file($actual);
+		return $this->assert($expected !== $result, $message, compact('expected', 'result'));
+	}
+
+	/**
+	 * Assert that a file exists.
+	 *
+	 * {{{
+	 * $this->assertFileExists(__FILE__); // succeeds
+	 * $this->assertFileExists('/tmp/bar.txt'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param string $actual Absolute path to the actual file.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertFileExists($actual, $message = '{:message}') {
+		return $this->assert(file_exists($actual), $message, array(
+			'expected' => $actual,
+			'result' => file_exists($actual)
+		));
+	}
+
+	/**
+	 * Assert that a file does *not* exist.
+	 *
+	 * {{{
+	 * $this->assertFileNotExists('/tmp/bar.txt'); // succeeds
+	 * $this->assertFileNotExists(__FILE__); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param string $actual Absolute path to the actual file.
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertFileNotExists($actual, $message = '{:message}') {
+		return $this->assert(!file_exists($actual), $message, array(
+			'expected' => $actual,
+			'result' => !file_exists($actual)
+		));
+	}
+
+	/**
+	 * Assert that a class has a given attribute.
+	 *
+	 * {{{
+	 * $this->assertClassHasAttribute('__construct', 'ReflectionClass'); // succeeds
+	 * $this->assertClassHasAttribute('name', 'ReflectionClass'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @see lithium\test\Unit::assertObjectHasAttribute()
+	 * @throws InvalidArgumentException When $class does not exist.
+	 * @param mixed $attributeName
+	 * @param string $class
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertClassHasAttribute($attributeName, $class, $message = '{:message}') {
+		if (!is_string($class)) {
+			throw new InvalidArgumentException('Argument $class must be a string');
+		}
+		$object = new ReflectionClass($class);
+		return $this->assert($object->hasProperty($attributeName), $message, array(
+			'expected' => $attributeName,
+			'result' => $object->getProperties()
+		));
+	}
+
+	/**
+	 * Assert that a class does *not* have a given attribute.
+	 *
+	 * {{{
+	 * $this->assertClassNotHasAttribute('name', 'ReflectionClass'); // succeeds
+	 * $this->assertClassNotHasAttribute('__construct', 'ReflectionClass'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @see lithium\test\Unit::assertObjectHasAttribute()
+	 * @throws InvalidArgumentException When $class does not exist.
+	 * @param mixed $attributeName
+	 * @param string $class
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertClassNotHasAttribute($attributeName, $class, $message = '{:message}') {
+		if (!is_string($class)) {
+			throw new InvalidArgumentException('Argument $class must be a string.');
+		}
+		$object = new ReflectionClass($class);
+		return $this->assert(!$object->hasProperty($attributeName), $message, array(
+			'expected' => $attributeName,
+			'result' => $object->getProperties()
+		));
+	}
+
+	/**
+	 * Assert that a class does have a given _static_ attribute.
+	 *
+	 * {{{
+	 * $this->assertClassHasStaticAttribute('_methodFilters', '\lithium\core\StaticObject'); // succeeds
+	 * $this->assertClassHasStaticAttribute('foobar', '\lithium\core\StaticObject'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param mixed $attributeName
+	 * @param string $class
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertClassHasStaticAttribute($attributeName, $class, $message = '{:message}') {
+		$object = new ReflectionClass($class);
+
+		if ($object->hasProperty($attributeName)) {
+			$attribute = $object->getProperty($attributeName);
+
+			return $this->assert($attribute->isStatic(), $message, array(
+				'expected' => $attributeName,
+				'result' => $object->getProperties()
+			));
+		}
+		return $this->assert(false, $message, array(
+			'expected' => $attributeName,
+			'result' => $object->getProperties()
+		));
+	}
+
+	/**
+	 * Assert that a class does *not* have a given _static_ attribute.
+	 *
+	 * {{{
+	 * $this->assertClassNotHasStaticAttribute('foobar', '\lithium\core\StaticObject'); // succeeds
+	 * $this->assertClassNotHasStaticAttribute('_methodFilters', '\lithium\core\StaticObject'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @param mixed $attributeName
+	 * @param string $class
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertClassNotHasStaticAttribute($attrName, $class, $message = '{:message}') {
+		$object = new ReflectionClass($class);
+
+		if ($object->hasProperty($attrName)) {
+			$attribute = $object->getProperty($attrName);
+
+			return $this->assert(!$attribute->isStatic(), $message, array(
+				'expected' => $attrName,
+				'result' => $object->getProperties()
+			));
+		}
+		return $this->assert(true, $message, array(
+			'expected' => $attrName,
+			'result' => $object->getProperties()
+		));
+	}
+
+	/**
+	 * Assert that `$object` has given attribute.
+	 *
+	 * {{{
+	 * $this->assertObjectHasAttribute('__construct', 'ReflectionClass'); // succeeds
+	 * $this->assertObjectHasAttribute('name', 'ReflectionClass'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @throws InvalidArgumentException When $object is not an object.
+	 * @param string $attributeName
+	 * @param string $object
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertObjectHasAttribute($attributeName, $object, $message = '{:message}') {
+		if (!is_object($object)) {
+			throw new InvalidArgumentException('Second argument $object must be an object.');
+		}
+		$object = new ReflectionClass($object);
+		return $this->assert($object->hasProperty($attributeName), $message, array(
+			'expected' => $attributeName,
+			'result' => $object->getProperties()
+		));
+	}
+
+	/**
+	 * Assert that `$object` does *not* have given attribute.
+	 *
+	 * {{{
+	 * $this->assertObjectNotHasAttribute('name', 'ReflectionClass'); // succeeds
+	 * $this->assertObjectNotHasAttribute('__construct', 'ReflectionClass'); // fails
+	 * }}}
+	 *
+	 * @see lithium\test\Unit::assert()
+	 * @throws InvalidArgumentException When $object is not an object.
+	 * @param string $attributeName
+	 * @param string $object
+	 * @param string|boolean $message
+	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
+	 */
+	public function assertObjectNotHasAttribute($attributeName, $object, $message = '{:message}') {
+		if (!is_object($object)) {
+			throw new InvalidArgumentException('Second argument $object must be an object');
+		}
+		$object = new ReflectionClass($object);
+		return $this->assert(!$object->hasProperty($attributeName), $message, array(
+			'expected' => $attributeName,
+			'result' => $object->getProperties()
+		));
 	}
 
 	/**
@@ -1134,910 +1953,27 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Returns the current results
+	 * Fixes some issues regarding the used EOL character(s).
 	 *
-	 * @return array The Results, currently
+	 * On linux EOL is LF, on Windows it is normally CRLF, but the latter may depend also
+	 * on the git config core.autocrlf setting. As some tests use heredoc style (<<<) to
+	 * specify multiline expectations, this EOL issue may cause tests to fail only because
+	 * of a difference in EOL's used.
+	 *
+	 * in `assertEqual`, `assertNotEqual`,`` assertPattern` and `assertNotPattern` this
+	 * function is called to get rid of any EOL differences.
+	 *
+	 * @param mixed $expected
+	 * @param mixed $result
+	 * @return array Array with the normalized elements i.e. `array($expected, $result)`.
 	 */
-	public function results() {
-		return $this->_results;
-	}
-
-	/**
-	 * Will mark the test `true` if `$count` and `count($arr)` are equal.
-	 *
-	 * {{{
-	 * $this->assertCount(1, array('foo'));
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertCount(2, array('foo', 'bar', 'bar'));
-	 * }}}
-	 *
-	 * @param  int    $expected Expected count
-	 * @param  array  $array    Result
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertCount($expected, $array, $message = '{:message}') {
-		return $this->assert($expected === ($result = count($array)), $message, array(
-			'expected' => $expected,
-			'result' => $result,
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$count` and `count($arr)` are not equal.
-	 *
-	 * {{{
-	 * $this->assertNotCount(2, array('foo', 'bar', 'bar'));
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertNotCount(1, array('foo'));
-	 * }}}
-	 *
-	 * @param  int    $expected Expected count
-	 * @param  array  $array    Result
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertNotCount($expected, $array, $message = '{:message}') {
-		return $this->assert($expected !== ($result = count($array)), $message, array(
-			'expected' => $expected,
-			'result' => $result,
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$array` has key `$expected`.
-	 *
-	 * {{{
-	 * $this->assertArrayHasKey('foo', array('bar' => 'baz'));
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertArrayHasKey('bar', array('bar' => 'baz'));
-	 * }}}
-	 *
-	 * @param  string $key      Key you are looking for
-	 * @param  array  $array    Array to search through
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertArrayHasKey($key, $array, $message = '{:message}') {
-		if (is_object($array) && $array instanceof \ArrayAccess) {
-			$result = isset($array[$key]);
-		} else {
-			$result = array_key_exists($key, $array);
+	protected function _normalizeLineEndings($expected, $result) {
+		if (is_string($expected) && is_string($result)) {
+			$expected = preg_replace('/\r\n/', "\n", $expected);
+			$result = preg_replace('/\r\n/', "\n", $result);
 		}
-
-		return $this->assert($result, $message, array(
-			'expected' => $key,
-			'result' => $array
-		));
+		return array($expected, $result);
 	}
-
-	/**
-	 * Will mark the test `true` if `$array` does not have key `$expected`.
-	 *
-	 * {{{
-	 * $this->assertArrayNotHasKey('foo', array('bar' => 'baz'));
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertArrayNotHasKey('bar', array('bar' => 'baz'));
-	 * }}}
-	 *
-	 * @param  int    $key      Expected count
-	 * @param  array  $array    Array to search through
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertArrayNotHasKey($key, $array, $message = '{:message}') {
-		if (is_object($array) && $array instanceof \ArrayAccess) {
-			$result = isset($array[$key]);
-		} else {
-			$result = array_key_exists($key, $array);
-		}
-
-		return $this->assert(!$result, $message, array(
-			'expected' => $key,
-			'result' => $array
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$class` has an attribute `$attributeName`.
-	 *
-	 * {{{
-	 * $this->assertClassHasAttribute('name', 'ReflectionClass');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertClassHasAttribute('__construct', 'ReflectionClass');
-	 * }}}
-	 *
-	 * @see    lithium\test\Unit::assertObjectHasAttribute()
-	 * @throws InvalidArgumentException When $class does not exist
-	 * @throws ReflectionException      If the given class does not exist
-	 * @param  string $attributeName    Attribute you wish to look for
-	 * @param  string $class            Class name
-	 * @param  string $message          optional
-	 * @return bool
-	 */
-	public function assertClassHasAttribute($attributeName, $class, $message = '{:message}') {
-		if (!is_string($class)) {
-			throw new InvalidArgumentException('Argument $class must be a string');
-		}
-		$object = new ReflectionClass($class);
-		return $this->assert($object->hasProperty($attributeName), $message, array(
-			'expected' => $attributeName,
-			'result' => $object->getProperties()
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$class` has an attribute `$attributeName`.
-	 *
-	 * {{{
-	 * $this->assertClassNotHasAttribute('__construct', 'ReflectionClass');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertClassNotHasAttribute('name', 'ReflectionClass');
-	 * }}}
-	 *
-	 * @see    lithium\test\Unit::assertObjectNotHasAttribute()
-	 * @throws InvalidArgumentException When $class does not exist
-	 * @throws ReflectionException      If the given class does not exist
-	 * @param  string $attributeName    Attribute you wish to look for
-	 * @param  string $class            Class name
-	 * @param  string $message          optional
-	 * @return bool
-	 */
-	public function assertClassNotHasAttribute($attributeName, $class, $message = '{:message}') {
-		if (!is_string($class)) {
-			throw new InvalidArgumentException('Argument $class must be a string.');
-		}
-		$object = new ReflectionClass($class);
-		return $this->assert(!$object->hasProperty($attributeName), $message, array(
-			'expected' => $attributeName,
-			'result' => $object->getProperties()
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$class` has a static property `$attributeName`.
-	 *
-	 * {{{
-	 * $this->assertClassHasStaticAttribute('foobar', '\lithium\core\StaticObject');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertClassHasStaticAttribute('_methodFilters', '\lithium\core\StaticObject');
-	 * }}}
-	 *
-	 * @throws ReflectionException If the given class does not exist
-	 * @param  string        $attributeName Attribute you wish to look for
-	 * @param  string|object $class         Class name or object
-	 * @param  string        $message       optional
-	 * @return bool
-	 */
-	public function assertClassHasStaticAttribute($attributeName, $class, $message = '{:message}') {
-		$object = new ReflectionClass($class);
-		if ($object->hasProperty($attributeName)) {
-			$attribute = $object->getProperty($attributeName);
-			return $this->assert($attribute->isStatic(), $message, array(
-				'expected' => $attributeName,
-				'result' => $object->getProperties()
-			));
-		}
-		return $this->assert(false, $message, array(
-			'expected' => $attributeName,
-			'result' => $object->getProperties()
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$class` does not have a static property `$attrName`.
-	 *
-	 * {{{
-	 * $this->assertClassNotHasStaticAttribute('_methodFilters', '\lithium\core\StaticObject');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertClassNotHasStaticAttribute('foobar', '\lithium\core\StaticObject')
-	 * }}}
-	 *
-	 * @throws ReflectionException If the given class does not exist
-	 * @param  string        $attrName  Attribute you wish to look for
-	 * @param  string|object $class     Class name or object
-	 * @param  string        $message   optional
-	 * @return bool
-	 */
-	public function assertClassNotHasStaticAttribute($attrName, $class, $message = '{:message}') {
-		$object = new ReflectionClass($class);
-		if ($object->hasProperty($attrName)) {
-			$attribute = $object->getProperty($attrName);
-			return $this->assert(!$attribute->isStatic(), $message, array(
-				'expected' => $attrName,
-				'result' => $object->getProperties()
-			));
-		}
-		return $this->assert(true, $message, array(
-			'expected' => $attrName,
-			'result' => $object->getProperties()
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$haystack` contains `$needle` as a value.
-	 *
-	 * {{{
-	 * $this->assertContains('foo', array('foo', 'bar', 'baz'));
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertContains(4, array(1,2,3));
-	 * }}}
-	 *
-	 * @param  string $needle   The needle you are looking for
-	 * @param  mixed  $haystack An array, iterable object, or string
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertContains($needle, $haystack, $message = '{:message}') {
-		if (is_string($haystack)) {
-			return $this->assert(strpos($haystack, $needle) !== false, $message, array(
-				'expected' => $needle,
-				'result' => $haystack
-			));
-		}
-		foreach ($haystack as $key => $value) {
-			if ($value === $needle) {
-				return $this->assert(true, $message, array(
-					'expected' => $needle,
-					'result' => $haystack
-				));
-			}
-		}
-		return $this->assert(false, $message, array(
-			'expected' => $needle,
-			'result' => $haystack
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$haystack` does not contain `$needle` as a value.
-	 *
-	 * {{{
-	 * $this->assertNotContains(4, array(1,2,3));
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertNotContains('foo', array('foo', 'bar', 'baz'));
-	 * }}}
-	 *
-	 * @param  string $needle   Needle you are looking for
-	 * @param  mixed  $haystack Array, iterable object, or string
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertNotContains($needle, $haystack, $message = '{:message}') {
-		if (is_string($haystack)) {
-			return $this->assert(strpos($haystack, $needle) === false, $message, array(
-				'expected' => $needle,
-				'result' => $haystack
-			));
-		}
-		foreach ($haystack as $key => $value) {
-			if ($value === $needle) {
-				return $this->assert(false, $message, array(
-					'expected' => $needle,
-					'result' => $haystack
-				));
-			}
-		}
-		return $this->assert(true, $message, array(
-			'expected' => $needle,
-			'result' => $haystack
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$haystack` contains only items of `$type`.
-	 *
-	 * {{{
-	 * $this->assertContainsOnly('int', array(1,2,3));
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertContainsOnly('int', array('foo', 'bar', 'baz'));
-	 * }}}
-	 *
-	 * @param  string $type     Data type to check for
-	 * @param  mixed  $haystack Array or iterable object
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertContainsOnly($type, $haystack, $message = '{:message}') {
-		$method = self::$_internalTypes[$type];
-		foreach ($haystack as $key => $value) {
-			if (!$method($value)) {
-				return $this->assert(false, $message, array(
-					'expected' => $type,
-					'result' => $haystack
-				));
-			}
-		}
-		return $this->assert(true, $message, array(
-			'expected' => $type,
-			'result' => $haystack
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$haystack` does not have any of `$type`.
-	 *
-	 * {{{
-	 * $this->assertNotContainsOnly('int', array('foo', 'bar', 'baz'));
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertNotContainsOnly('int', array(1,2,3));
-	 * }}}
-	 *
-	 * @param  string $type     Data type to check for
-	 * @param  mixed  $haystack Array or iterable object
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertNotContainsOnly($type, $haystack, $message = '{:message}') {
-		$method = self::$_internalTypes[$type];
-		foreach ($haystack as $key => $value) {
-			if (!$method($value)) {
-				return $this->assert(true, $message, array(
-					'expected' => $type,
-					'result' => $haystack
-				));
-			}
-		}
-		return $this->assert(false, $message, array(
-			'expected' => $type,
-			'result' => $haystack
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$haystack` contains only items of `$type`.
-	 *
-	 * {{{
-	 * $this->assertContainsOnlyInstancesOf('stdClass', array(new \stdClass));
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertContainsOnlyInstancesOf('stdClass', array(new \lithium\test\Unit));
-	 * }}}
-	 *
-	 * @param  string $class    Fully namespaced class name
-	 * @param  mixed  $haystack Array or iterable object
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertContainsOnlyInstancesOf($class, $haystack, $message = '{:message}') {
-		$result = array();
-		foreach ($haystack as $key => &$value) {
-			if (!is_a($value, $class)) {
-				$result[$key] =& $value;
-				break;
-			}
-		}
-		return $this->assert(empty($result), $message, array(
-			'expected' => $class,
-			'result' => $result
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$actual` is empty.
-	 *
-	 * {{{
-	 * $this->assertEmpty(1);
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertEmpty(array());
-	 * }}}
-	 *
-	 * @param  string $actual   Variable to check
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertEmpty($actual, $message = '{:message}') {
-		return $this->assert(empty($actual), $message, array(
-			'expected' => $actual,
-			'result' => empty($actual)
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$actual` is not empty.
-	 *
-	 * {{{
-	 * $this->assertNotEmpty(array());
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertNotEmpty(1);
-	 * }}}
-	 *
-	 * @param  string $actual   Variable to check
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertNotEmpty($actual, $message = '{:message}') {
-		return $this->assert(!empty($actual), $message, array(
-			'expected' => $actual,
-			'result' => !empty($actual)
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if the contents of `$expected` are equal to the
-	 * contents of `$actual`.
-	 *
-	 * {{{
-	 * $file1 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md';
-	 * $file2 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md.copy';
-	 * $this->assertFileEquals($file1, $file2);
-	 * }}}
-	 *
-	 * {{{
-	 * $file1 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md';
-	 * $file2 = Libraries::get(true, 'path') . '/tests/mocks/md/file_2.md';
-	 * $this->assertFileEquals($file1, $file2);
-	 * }}}
-	 *
-	 * @param  string $expected Path to the expected file
-	 * @param  string $actual   Path to the actual file
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertFileEquals($expected, $actual, $message = '{:message}') {
-		$expected = md5_file($expected);
-		$result = md5_file($actual);
-		return $this->assert($expected === $result, $message, compact('expected', 'result'));
-	}
-
-	/**
-	 * Will mark the test `true` if the contents of `$expected` are not equal to
-	 * the contents of `$actual`.
-	 *
-	 * {{{
-	 * $file1 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md';
-	 * $file2 = Libraries::get(true, 'path') . '/tests/mocks/md/file_2.md';
-	 * $this->assertFileNotEquals($file1, $file2);
-	 * }}}
-	 *
-	 * {{{
-	 * $file1 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md';
-	 * $file2 = Libraries::get(true, 'path') . '/tests/mocks/md/file_1.md.copy';
-	 * $this->assertFileNotEquals($file1, $file2);
-	 * }}}
-	 *
-	 * @param  string $expected Path to the expected file
-	 * @param  string $actual   Path to the actual file
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertFileNotEquals($expected, $actual, $message = '{:message}') {
-		$expected = md5_file($expected);
-		$result = md5_file($actual);
-		return $this->assert($expected !== $result, $message, compact('expected', 'result'));
-	}
-
-	/**
-	 * Will mark the test `true` if the file `$actual` exists.
-	 *
-	 * {{{
-	 * $this->assertFileExists(Libraries::get(true, 'path') . '/readme.md');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertFileExists(Libraries::get(true, 'path') . '/does/not/exist.txt');
-	 * }}}
-	 *
-	 * @param  string $actual   Path to the file you are asserting
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertFileExists($actual, $message = '{:message}') {
-		return $this->assert(file_exists($actual), $message, array(
-			'expected' => $actual,
-			'result' => file_exists($actual)
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if the file `$actual` does not exist.
-	 *
-	 * {{{
-	 * $this->assertFileNotExists(Libraries::get(true, 'path') . '/does/not/exist.txt');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertFileNotExists(Libraries::get(true, 'path') . '/readme.md');
-	 * }}}
-	 *
-	 * @param  string $actual   Path to the file you are asserting
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertFileNotExists($actual, $message = '{:message}') {
-		return $this->assert(!file_exists($actual), $message, array(
-			'expected' => $actual,
-			'result' => !file_exists($actual)
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$expected` greater than `$actual`.
-	 *
-	 * {{{
-	 * $this->assertGreaterThan(5, 3);
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertGreaterThan(3, 5);
-	 * }}}
-	 *
-	 * @param  float|int $expected
-	 * @param  float|int $actual
-	 * @param  string    $message  optional
-	 * @return bool
-	 */
-	public function assertGreaterThan($expected, $actual, $message = '{:message}') {
-		return $this->assert($expected > $actual, $message, array(
-			'expected' => $expected,
-			'result' => $actual
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$expected` great than or equal to `$actual`.
-	 *
-	 * {{{
-	 * $this->assertGreaterThanOrEqual(5, 5);
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertGreaterThanOrEqual(3, 5);
-	 * }}}
-	 *
-	 * @param  float|int $expected
-	 * @param  float|int $actual
-	 * @param  string    $message  optional
-	 * @return bool
-	 */
-	public function assertGreaterThanOrEqual($expected, $actual, $message = '{:message}') {
-		return $this->assert($expected >= $actual, $message, array(
-			'expected' => $expected,
-			'result' => $actual
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$expected` less than `$actual`.
-	 *
-	 * {{{
-	 * $this->assertLessThan(3, 5);
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertLessThan(5, 3);
-	 * }}}
-	 *
-	 * @param  float|int $expected
-	 * @param  float|int $actual
-	 * @param  string    $message  optional
-	 * @return bool
-	 */
-	public function assertLessThan($expected, $actual, $message = '{:message}') {
-		return $this->assert($expected < $actual, $message, array(
-			'expected' => $expected,
-			'result' => $actual
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$expected` is less than or equal to `$actual`.
-	 *
-	 * {{{
-	 * $this->assertLessThanOrEqual(5, 5);
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertLessThanOrEqual(5, 3);
-	 * }}}
-	 *
-	 * @param  float|int $expected
-	 * @param  float|int $actual
-	 * @param  string    $message  optional
-	 * @return bool
-	 */
-	public function assertLessThanOrEqual($expected, $actual, $message = '{:message}') {
-		return $this->assert($expected <= $actual, $message, array(
-			'expected' => $expected,
-			'result' => $actual
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$actual` is a `$expected`.
-	 *
-	 * {{{
-	 * $this->assertInstanceOf('stdClass', new stdClass);
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertInstanceOf('ReflectionClass', new stdClass);
-	 * }}}
-	 *
-	 * @param  string $expected Fully namespaced expected class
-	 * @param  object $actual   Object you are testing
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertInstanceOf($expected, $actual, $message = '{:message}') {
-		return $this->assert(is_a($actual, $expected), $message, array(
-			'expected' => $expected,
-			'result' => get_class($actual)
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$actual` is not a `$expected`.
-	 *
-	 * {{{
-	 * $this->assertNotInstanceOf('ReflectionClass', new stdClass);
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertNotInstanceOf('stdClass', new stdClass);
-	 * }}}
-	 *
-	 * @param  string $expected Fully namespaced expected class
-	 * @param  object $actual   Object you are testing
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertNotInstanceOf($expected, $actual, $message = '{:message}') {
-		return $this->assert(!is_a($actual, $expected), $message, array(
-			'expected' => $expected,
-			'result' => is_object($actual) ? get_class($actual) : gettype($actual),
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$actual` if of type $expected.
-	 *
-	 * {{{
-	 * $this->assertInternalType('string', 'foobar');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertInternalType('int', 'foobar');
-	 * }}}
-	 *
-	 * @param  string $expected Internal data type
-	 * @param  object $actual   Object you are testing
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertInternalType($expected, $actual, $message = '{:message}') {
-		$method = self::$_internalTypes[$expected];
-		return $this->assert($method($actual), $message, array(
-			'expected' => $expected,
-			'result' => gettype($actual)
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$actual` if not of type $expected.
-	 *
-	 * {{{
-	 * $this->assertNotInternalType('int', 'foobar');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertNotInternalType('string', 'foobar');
-	 * }}}
-	 *
-	 * @param  string $expected Internal data type
-	 * @param  object $actual   Object you are testing
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertNotInternalType($expected, $actual, $message = '{:message}') {
-		$method = self::$_internalTypes[$expected];
-		return $this->assert(!$method($actual), $message, array(
-			'expected' => $expected,
-			'result' => gettype($actual)
-		));
-	}
-
-	/**
-	 * Will mark the test as true if `$actual` is not null.
-	 *
-	 * {{{
-	 * $this->assertNotNull(1);
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertNotNull(null);
-	 * }}}
-	 *
-	 * @param  object $actual   Variable you are testing
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertNotNull($actual, $message = '{:message}') {
-		return $this->assert($actual !== null, $message, array(
-			'expected' => null,
-			'actual' => gettype($actual)
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$object` has an attribute `$attributeName`.
-	 *
-	 * {{{
-	 * $this->assertObjectHasAttribute('name', 'ReflectionClass');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertObjectHasAttribute('__construct', 'ReflectionClass');
-	 * }}}
-	 *
-	 * @see    lithium\test\Unit::assertClassHasAttribute()
-	 * @throws InvalidArgumentException When $object is not an object
-	 * @param  string $attributeName    Attribute you wish to look for
-	 * @param  string $object           Object to assert
-	 * @param  string $message          optional
-	 * @return bool
-	 */
-	public function assertObjectHasAttribute($attributeName, $object, $message = '{:message}') {
-		if (!is_object($object)) {
-			throw new InvalidArgumentException('Second argument $object must be an object.');
-		}
-		$object = new ReflectionClass($object);
-		return $this->assert($object->hasProperty($attributeName), $message, array(
-			'expected' => $attributeName,
-			'result' => $object->getProperties()
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if `$object` has an attribute `$attributeName`.
-	 *
-	 * {{{
-	 * $this->assertObjectNotHasAttribute('__construct', 'ReflectionClass');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertObjectNotHasAttribute('name', 'ReflectionClass');
-	 * }}}
-	 *
-	 * @see    lithium\test\Unit::assertClassHasNotAttribute()
-	 * @throws InvalidArgumentException When $object is not an object
-	 * @param  string $attributeName    Attribute you wish to look for
-	 * @param  string $object           Object to assert
-	 * @param  string $message          optional
-	 * @return bool
-	 */
-	public function assertObjectNotHasAttribute($attributeName, $object, $message = '{:message}') {
-		if (!is_object($object)) {
-			throw new InvalidArgumentException('Second argument $object must be an object');
-		}
-		$object = new ReflectionClass($object);
-		return $this->assert(!$object->hasProperty($attributeName), $message, array(
-			'expected' => $attributeName,
-			'result' => $object->getProperties()
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if $actual matches $expected using `sprintf` format.
-	 *
-	 * {{{
-	 * $this->assertStringMatchesFormat('%d', '10')
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertStringMatchesFormat('%d', '10.555')
-	 * }}}
-	 *
-	 * @link   http://php.net/sprintf
-	 * @link   http://php.net/sscanf
-	 * @param  string $expected Expected format using sscanf's format
-	 * @param  string $actual   Value to compare against
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertStringMatchesFormat($expected, $actual, $message = '{:message}') {
-		$result = sscanf($actual, $expected);
-		return $this->assert($result[0] == $actual, $message, compact('expected', 'result'));
-	}
-
-	/**
-	 * Will mark the test `true` if $actual doesn't match $expected using `sprintf` format.
-	 *
-	 * {{{
-	 * $this->assertStringNotMatchesFormat('%d', '10.555')
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertStringNotMatchesFormat('%d', '10')
-	 * }}}
-	 *
-	 * @link   http://php.net/sprintf
-	 * @link   http://php.net/sscanf
-	 * @param  string $expected Expected format using sscanf's format
-	 * @param  string $actual   Value to test against
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertStringNotMatchesFormat($expected, $actual, $message = '{:message}') {
-		$result = sscanf($actual, $expected);
-		return $this->assert($result[0] != $actual, $message, compact('expected', 'result'));
-	}
-
-	/**
-	 * Will mark the test `true` if $actual ends with `$expected`.
-	 *
-	 * {{{
-	 * $this->assertStringEndsWith('bar', 'foobar');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertStringEndsWith('foo', 'foobar');
-	 * }}}
-	 *
-	 * @param  string $expected The suffix to check for
-	 * @param  string $actual   Value to test against
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertStringEndsWith($expected, $actual, $message = '{:message}') {
-		return $this->assert(preg_match("/$expected$/", $actual, $matches) === 1, $message, array(
-			'expected' => $expected,
-			'result' => $actual
-		));
-	}
-
-	/**
-	 * Will mark the test `true` if $actual starts with `$expected`.
-	 *
-	 * {{{
-	 * $this->assertStringStartsWith('foo', 'foobar');
-	 * }}}
-	 *
-	 * {{{
-	 * $this->assertStringStartsWith('bar', 'foobar');
-	 * }}}
-	 *
-	 * @param  string $expected Prefix to check for
-	 * @param  string $actual   Value to test against
-	 * @param  string $message  optional
-	 * @return bool
-	 */
-	public function assertStringStartsWith($expected, $actual, $message = '{:message}') {
-		return $this->assert(preg_match("/^$expected/", $actual, $matches) === 1, $message, array(
-			'expected' => $expected,
-			'result' => $actual
-		));
-	}
-
 }
 
 ?>
