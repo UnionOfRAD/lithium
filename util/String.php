@@ -194,15 +194,13 @@ class String {
 	 * @return boolean Returns a boolean indicating whether the two strings are equal.
 	 */
 	public static function compare($left, $right) {
-		$result = true;
-
 		if (($length = strlen($left)) != strlen($right)) {
 			return false;
 		}
-		for ($i = 0; $i < $length; $i++) {
-			$result = $result && ($left[$i] === $right[$i]);
+		for ($i = 0, $result = 0; $i < $length; $i++) {
+			$result |= ord($left[$i]) ^ ord($right[$i]);
 		}
-		return $result;
+		return $result === 0;
 	}
 
 	/**
