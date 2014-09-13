@@ -247,8 +247,8 @@ class CouchDb extends \lithium\data\source\Http {
 			$query = $params['query'];
 			$options = $params['options'];
 			$params = $query->export($self);
-			extract($params, EXTR_OVERWRITE);
-			list($_path, $conditions) = (array) $conditions;
+
+			list($_path, $conditions) = (array) $params['conditions'];
 			$model = $query->model();
 
 			if (empty($_path)) {
@@ -256,7 +256,7 @@ class CouchDb extends \lithium\data\source\Http {
 				$conditions['include_docs'] = 'true';
 			}
 			$path = "{$config['database']}/{$_path}";
-			$args = (array) $conditions + (array) $limit + (array) $order;
+			$args = (array) $conditions + (array) $params['limit'] + (array) $params['order'];
 			$result = $conn->get($path, $args);
 			$result = is_string($result) ? json_decode($result, true) : $result;
 			$data = $stats = array();
@@ -294,8 +294,8 @@ class CouchDb extends \lithium\data\source\Http {
 			$query = $params['query'];
 			$options = $params['options'];
 			$params = $query->export($self);
-			extract($params, EXTR_OVERWRITE);
-			list($_path, $conditions) = (array) $conditions;
+
+			list($_path, $conditions) = (array) $params['conditions'];
 			$data = $query->data();
 
 			foreach (array('id', 'rev') as $key) {
