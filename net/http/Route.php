@@ -194,7 +194,7 @@ class Route extends \lithium\core\Object {
 		if (!$this->_config['continue'] && !preg_match('@{:action:.*?}@', $this->_template)) {
 			$this->_params += array('action' => 'index');
 		}
-		if (!$this->_config['pattern']) {
+		if (!$this->_pattern) {
 			$this->compile();
 		}
 		if ($isKey = isset($this->_keys['controller']) || isset($this->_params['controller'])) {

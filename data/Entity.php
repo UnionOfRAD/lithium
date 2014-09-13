@@ -126,7 +126,6 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * @var array
 	 */
 	protected $_autoConfig = array(
-		'classes' => 'merge',
 		'parent',
 		'schema',
 		'data',
