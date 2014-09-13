@@ -358,10 +358,10 @@ abstract class Database extends \lithium\data\Source {
 	 *         and the field name as second value.
 	 */
 	protected function _splitFieldname($field) {
-		$regex = '/^[a-z0-9_-]+\.([a-z 0-9_-]+|\*)$/iS';
+		$regex = '/^([a-z0-9_-]+)\.([a-z 0-9_-]+|\*)$/iS';
 
-		if (strpos($field, '.') !== false && preg_match($regex, $field)) {
-			return explode('.', $field, 2);
+		if (strpos($field, '.') !== false && preg_match($regex, $field, $matches)) {
+			return array($matches[1], $matches[2]);
 		}
 		return array(null, $field);
 	}
