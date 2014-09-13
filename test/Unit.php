@@ -516,7 +516,7 @@ class Unit extends \lithium\core\Object {
 	 * @param mixed $expected A string indicating what the error text is not expected to be. This
 	 *              can be an exact string, a /-delimited regular expression, or true, indicating
 	 *              that any error text is acceptable.
-	 * @param closure $closure A closure containing the code that should throw the exception.
+	 * @param Closure $closure A closure containing the code that should throw the exception.
 	 * @param string $message
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */

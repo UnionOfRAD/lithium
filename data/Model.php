@@ -1121,7 +1121,7 @@ class Model extends \lithium\core\StaticObject {
 			}
 			if ($rules = $options['validate']) {
 				$events = $options['events'];
-				$validateOpts = is_array($rules) ? compact('rules','events') : compact('events');
+				$validateOpts = is_array($rules) ? compact('rules', 'events') : compact('events');
 
 				if (!$entity->validates($validateOpts)) {
 					return false;
@@ -1130,10 +1130,11 @@ class Model extends \lithium\core\StaticObject {
 			if (($whitelist = $options['whitelist']) || $options['locked']) {
 				$whitelist = $whitelist ?: array_keys($_schema->fields());
 			}
-
 			$type = $entity->exists() ? 'update' : 'create';
-			$queryOpts = compact('type', 'whitelist', 'entity') + $options + $_meta;
-			$query = $self::invokeMethod('_instance', array('query', $queryOpts));
+
+			$query = $self::invokeMethod('_instance', array(
+				'query', compact('type', 'whitelist', 'entity') + $options + $_meta
+			));
 			return $self::connection()->{$type}($query, $options);
 		};
 

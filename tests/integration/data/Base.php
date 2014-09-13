@@ -23,10 +23,10 @@ class Base extends \lithium\test\Integration {
 		$this->_dbConfig = Connections::get($connection, array('config' => true));
 		$db = $this->_db = Connections::get($connection);
 
-		$this->skipIf(!$db, "The `'{$connection}' connection is not correctly configured`.");
+		$this->skipIf(!$db, "The `{$connection}` connection is not correctly configured.");
 		$this->skipIf(!$db::enabled(), 'Extension is not loaded.');
 
-		$this->skipIf(!$db->isConnected($options), "No {$connection} connection available.");
+		$this->skipIf(!$db->isConnected($options), "No `{$connection}` connection available.");
 	}
 
 	public function with($adapters) {
