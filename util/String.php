@@ -192,8 +192,8 @@ class String {
 	 * string, it is important that _both provided strings have the same length_ and that
 	 * the _user-supplied string is passed as a second parameter_ rather than first.
 	 *
-	 * This function has the same signature and behavior as the native
-	 * `hash_equals()` function.
+	 * This function has the same signature and behavior as the native `hash_equals()` function
+	 * and will use that function if available (PHP >= 5.6).
 	 *
 	 * An E_USER_WARNING will be emitted when either of the supplied parameters is not a string.
 	 *
@@ -204,6 +204,9 @@ class String {
 	 * @return boolean Returns a boolean indicating whether the two strings are equal.
 	 */
 	public static function compare($known, $user) {
+		if (function_exists('hash_equals')) {
+			return hash_equals($known, $user);
+		}
 		if (!is_string($known) || !is_string($user)) {
 			trigger_error('Expected `$known` & `$user` parameters to be strings.', E_USER_WARNING);
 			return false;
