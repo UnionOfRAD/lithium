@@ -9,6 +9,7 @@
 namespace lithium\test;
 
 use Exception;
+use ErrorException;
 use ReflectionClass;
 use InvalidArgumentException;
 use lithium\util\String;
@@ -176,18 +177,29 @@ class Unit extends \lithium\core\Object {
 	/**
 	 * Runs the test methods in this test case, with the given options.
 	 *
-	 * @param array $options The options to use when running the test.	Available options are:
-	 *             - 'methods': An arbitrary array of method names to execute. If
+	 * Installs a temporary error handler that will convert regular errors to
+	 * exceptions in order to make both errors and exceptions be handled
+	 * in a unified way.
+	 *
+	 * @param array $options The options to use when running the test. Available options are:
+	 *             - `'methods'`: An arbitrary array of method names to execute. If
 	 *                unspecified, all methods starting with 'test' are run.
-	 *             - 'reporter': A closure which gets called after each test result,
+	 *             - `'reporter'`: A closure which gets called after each test result,
 	 *                which may modify the results presented.
+	 *             - `'handler'`: A closure which gets registered as the temporary error handler.
 	 * @return array
 	 */
 	public function run(array $options = array()) {
-		$defaults = array('methods' => array(), 'reporter' => null, 'handler' => null);
+		$defaults = array(
+			'methods' => $this->methods(),
+			'reporter' => $this->_reporter,
+			'handler' =>  function($code, $message, $file = null, $line = null) {
+				throw new ErrorException($message, 0, $code, $file, $line);
+			}
+		);
 		$options += $defaults;
 		$this->_results = array();
-		$self = $this;
+		$this->_reporter = $options['reporter'];
 
 		try {
 			$this->skip();
@@ -196,20 +208,8 @@ class Unit extends \lithium\core\Object {
 			return $this->_results;
 		}
 
-		$h = function($code, $message, $file, $line = 0, $context = array()) use ($self) {
-			$trace = debug_backtrace();
-			$trace = array_slice($trace, 1, count($trace));
-			$self->invokeMethod('_reportException', array(
-				compact('code', 'message', 'file', 'line', 'trace', 'context')
-			));
-		};
-		$options['handler'] = $options['handler'] ?: $h;
 		set_error_handler($options['handler']);
-
-		$methods = $options['methods'] ?: $this->methods();
-		$this->_reporter = $options['reporter'] ?: $this->_reporter;
-
-		foreach ($methods as $method) {
+		foreach ($options['methods'] as $method) {
 			if ($this->_runTestMethod($method, $options) === false) {
 				break;
 			}
