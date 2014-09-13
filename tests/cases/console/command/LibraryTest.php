@@ -324,16 +324,13 @@ class LibraryTest extends \lithium\test\Unit {
 		umask(0);
 		mkdir($path, 655);
 		umask(100);
-		$this->expectException('/Permission denied/');
 
-		$result = $this->library->formulate($path);
-		$this->assertFalse($result);
+		$library = $this->library;
+		$this->assertException('/Permission denied/', function() use ($path, $library) {
+			$library->formulate($path);
+		});
 
 		$this->assertFileNotExists($path . '/config/library_test_plugin.json');
-
-		$expected = '/Formula for library_test_no_plugin not created/';
-		$result = $this->library->response->error;
-		$this->assertPattern($expected, $result);
 
 		umask(0);
 		rmdir($path);

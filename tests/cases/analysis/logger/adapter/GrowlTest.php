@@ -44,7 +44,6 @@ class GrowlTest extends \lithium\test\Unit {
 			'title' => 'Lithium log',
 			'port' => 0
 		));
-		$this->expectException('/^Growl connection failed/');
 		$this->expectException('/Failed to parse address/');
 
 		$message = 'info: Test message.';
@@ -60,7 +59,6 @@ class GrowlTest extends \lithium\test\Unit {
 			'port' => 0,
 			'registered' => true
 		));
-		$this->expectException('/^Growl connection failed/');
 		$this->expectException('/Failed to parse address/');
 
 		$message = 'info: Test message.';

@@ -84,6 +84,8 @@ class GettextTest extends \lithium\test\Unit {
 
 		$result = $this->adapter->read('messageTemplate', 'root', null);
 		$this->assertNull($result);
+
+		chmod("{$this->_path}/message_default.pot", 0666);
 	}
 
 	public function testReadPoSingleItem() {
