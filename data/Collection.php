@@ -523,7 +523,8 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 * array conversion, but other formats may be registered.
 	 *
 	 * Once the appropriate handlers are registered, a `Collection` instance can be converted into
-	 * any handler-supported format, i.e.: ```
+	 * any handler-supported format, i.e.:
+	 * ```
 	 * $collection->to('json'); // returns a JSON string
 	 * $collection->to('xml'); // returns an XML string
 	 * ```

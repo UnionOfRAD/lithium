@@ -194,9 +194,9 @@ class Libraries {
 	 *
 	 * This allows you to, for example, have two different classes called `Cleanup`. One may be
 	 * located in `app\extensions\job\Cleanup`, while the other is in
-	 * `app\extensions\job\cache\Cleanup`. Calling: ```Libraries::locate('job');``` will find
-	 * both classes, while ```Libraries::locate('job.cache');``` will only find the second. You can
-	 * also find individual jobs by name: ```Libraries::locate('job', 'Cleanup');```
+	 * `app\extensions\job\cache\Cleanup`. Calling: `Libraries::locate('job');` will find
+	 * both classes, while `Libraries::locate('job.cache');` will only find the second. You can
+	 * also find individual jobs by name: `Libraries::locate('job', 'Cleanup');`
 	 *
 	 * See `Libraries::locate()` for more information on using built-in and user-defined paths to
 	 * look up classes.

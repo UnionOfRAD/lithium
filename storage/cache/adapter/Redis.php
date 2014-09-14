@@ -121,11 +121,15 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 * easily use a custom method on the adapter. If you want to know, what methods
 	 * are available, have a look at the documentation of phpredis.
 	 *
-	 * ```Cache::adapter('redis')->methodName($argument);```
+	 * ```
+	 * Cache::adapter('redis')->methodName($argument);
+	 * ```
 	 *
 	 * One use-case might be to query possible keys, e.g.
 	 *
-	 * ```Cache::adapter('redis')->keys('*');```
+	 * ```
+	 * Cache::adapter('redis')->keys('*');
+	 * ```
 	 *
 	 * @link https://github.com/nicolasff/phpredis
 	 * @param string $method Name of the method to call.

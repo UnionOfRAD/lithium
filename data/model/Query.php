@@ -317,12 +317,10 @@ class Query extends \lithium\core\Object {
 	 * ```
 	 * // to add a field
 	 * $query->fields('created');
-	 * ```
-	 * ```
+	 *
 	 * // to add several fields
 	 * $query->fields(array('title','body','modified'));
-	 * ```
-	 * ```
+	 *
 	 * // to reset fields to none
 	 * $query->fields(false);
 	 * // should be followed by a 2nd call to fields with required fields

@@ -28,7 +28,7 @@ class Test extends \lithium\console\Command {
 	 * List of filters to apply before/during/after test run, separated by commas.
 	 *
 	 * For example:
-	 * ```
+	 * ```sh
 	 * lithium test lithium/tests/cases/core/ObjectTest.php --filters=Coverage
 	 * lithium test lithium/tests/cases/core/ObjectTest.php --filters=Coverage,Profiler
 	 * ```
@@ -182,7 +182,7 @@ class Test extends \lithium\console\Command {
 	 * Runs tests given a path to a directory or file containing tests. The path to the
 	 * test(s) may be absolute or relative to the current working directory.
 	 *
-	 * ```
+	 * ```sh
 	 * li3 test lithium/tests/cases/core/ObjectTest.php
 	 * li3 test lithium/tests/cases/core
 	 * ```
@@ -190,14 +190,14 @@ class Test extends \lithium\console\Command {
 	 * If you are in the working directory of an application or plugin and wish to run all tests,
 	 * simply execute the following:
 	 *
-	 * ```
+	 * ```sh
 	 * li3 test tests/cases
 	 * ```
 	 *
 	 * If you are in the working directory of an application and wish to run a plugin, execute one
 	 * of the following:
 	 *
-	 * ```
+	 * ```sh
 	 * li3 test libraries/<plugin>/tests/cases
 	 * li3 test <plugin>/tests/cases
 	 * ```
@@ -205,7 +205,7 @@ class Test extends \lithium\console\Command {
 	 *
 	 * This will run `<library>/tests/cases/<package>/<class>Test.php`:
 	 *
-	 * ```
+	 * ```sh
 	 * li3 test <library>/<package>/<class>.php
 	 * ```
 	 *

@@ -16,7 +16,8 @@ use UnexpectedValueException;
  * organizing collections of entities from document-oriented databases such as CouchDB or MongoDB.
  * A `Document` object's fields can represent a collection of both simple and complex data types,
  * as well as other `Document` objects. Given the following data (document) structure:
- * ```
+ *
+ * ```json
  * {
  * 	_id: 12345.
  * 	name: 'Acme, Inc.',

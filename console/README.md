@@ -26,9 +26,9 @@ of a standard Lithium  distribution. The first is for users on a *nix command
 line the second for users on a Windows system. Please note that the preceding
 `$` in examples always indicates things that you enter on the command line.
 
-```
-$ libraries/lithium/console/li3
-$ libraries/lithium/console/li3.bat
+```sh
+libraries/lithium/console/li3
+libraries/lithium/console/li3.bat
 ```
 
 However it is recommended you add the path containing the wrapper to the paths
@@ -42,15 +42,15 @@ This is almost always achievable on a per-user basis through the user's
 in your home directory.  Open the file and add the following line, assuming the
 `li3` wrapper exists in `/path/to/libraries/lithium/console`.
 
-```
+```sh
 export PATH+=:/path/to/libraries/lithium/console
 ```
 
 Once you've followed these steps, save your modified the file and reload your environment settings
 by sourcing the modified profile through the following command.
 
-```
-$ source ~/.profile
+```sh
+source ~/.profile
 ```
 
 If you are unable, or don't wish, to modify your `$PATH` there are two other
@@ -59,12 +59,12 @@ symlink the wrapper into one of the paths found in the `$PATH` environment
 variable or create an alias. If you choose an alias, you can make it permanent
 by adding the alias command to the `.bashrc` file in your home directory.
 
-```
-$ cd /path/to/a/directory/in/your/path
-$ ln -s /path/to/libraries/lithium/console .
+```sh
+cd /path/to/a/directory/in/your/path
+ln -s /path/to/libraries/lithium/console .
 ```
 
-```
+```sh
 alias li3='/path/to/lithium/libraries/lithium/console/li3'
 ```
 
@@ -87,9 +87,9 @@ you should be able to use it from the command-line simply by executing `li3` or
 `li3.bat`. Invoking the wrapper like that (without arguments) should give you a
 list of available commands.
 
-```
-$ li3
-$ li3.bat
+```sh
+li3
+li3.bat
 ```
 
 ## Built-in commands
@@ -99,10 +99,10 @@ any arguments to get a list of all available commands. Get a description about
 each command and the options and arguments it accepts or may require by using
 the `help` command.
 
-```
-$ li3 help
-$ li3 help create
-$ li3 help g11n
+```sh
+li3 help
+li3 help create
+li3 help g11n
 ```
 
 ## Creating custom commands
@@ -114,9 +114,7 @@ Creating your own commands is very easy. A few fundamentals:
 
 Here's an example command:
 
-```
-<?php
-
+```php
 namespace app\extensions\command;
 
 class HelloWorld extends \lithium\console\Command {
@@ -126,8 +124,6 @@ class HelloWorld extends \lithium\console\Command {
 		$this->out('Hello, World!');
 	}
 }
-
-?>
 ```
 
 If you would like to try this command, create an application or use an existing
@@ -135,8 +131,8 @@ application, place the command into the application's `extensions/commands`
 directory and save it as `HelloWorld.php`. After doing so open a shell and
 change directory to your application's directory and run the following command:
 
-```
-$ li3 hello_world
+```sh
+li3 hello_world
 ```
 
 Although it's probably obvious, when this command runs it will output a nice
@@ -161,9 +157,7 @@ Arguments are passed directly to the invoked method.
 
 Let's look at an example, going back to the `hello_world` command from earlier:
 
-```
-<?php
-
+```php
 namespace app\extensions\command;
 
 class HelloWorld extends \lithium\console\Command {
@@ -175,8 +169,6 @@ class HelloWorld extends \lithium\console\Command {
 		$this->out('Hello, ' . ($this->recipient ?: 'World') . '!');
 	}
 }
-
-?>
 ```
 
 Notice the additional property `$recipient`? Great! Now when `--recipient` is
@@ -185,8 +177,8 @@ instance will be set to whatever was passed into the command at runtime.
 
 Try it out with the following command:
 
-```
-$ li3 hello_world --recipient=AwesomeGuy
+```sh
+li3 hello_world --recipient=AwesomeGuy
 ```
 
 You should get a special greeting from our good old `hello_world` command.

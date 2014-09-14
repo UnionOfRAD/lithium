@@ -17,9 +17,9 @@ use lithium\console\command\Help;
  * The `run` method is automatically called if it exists. Otherwise, if a method does not exist
  * the `Help` command will be run.
  *
- * ```
- * $ li3 example
- * $ li3 example --format=json
+ * ```sh
+ * li3 example
+ * li3 example --format=json
  * ```
  *
  */

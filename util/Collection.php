@@ -47,7 +47,8 @@ namespace lithium\util;
  * one or more.
  *
  * The `Collection` class also supports dispatching methods against a set of objects, if the method
- * is supported by all objects. For example: ```
+ * is supported by all objects. For example:
+ * ```
  * class Task {
  * 	public function run($when) {
  * 		// Do some work

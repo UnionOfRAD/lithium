@@ -21,7 +21,7 @@ class Route extends \lithium\console\Command {
 	 * Override the default 'development' environment.
 	 *
 	 * For example:
-	 * ```
+	 * ```sh
 	 * li3 route --env=production
 	 * li3 route show /foo --env=test
 	 * ```
@@ -66,7 +66,7 @@ class Route extends \lithium\console\Command {
 	 * alias for the `show()` method.
 	 *
 	 * Example:
-	 * ```
+	 * ```sh
 	 * li3 route
 	 * li3 route all
 	 * ```

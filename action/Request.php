@@ -98,7 +98,6 @@ class Request extends \lithium\net\http\Request {
 	 *
 	 * ``` embed:lithium\tests\cases\action\RequestTest::testRequestTypeIsMobile(4-4) ```
 	 *
-	 *
 	 * Custom detectors can be added using `detect()`.
 	 *
 	 * @see lithium\action\Request::is()
