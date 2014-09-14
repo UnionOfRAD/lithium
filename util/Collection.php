@@ -70,9 +70,9 @@ namespace lithium\util;
  * $result = $tasks->run('now');
  * ```
  *
- * @link http://us.php.net/manual/en/class.arrayaccess.php PHP Manual: ArrayAccess Interface
- * @link http://us.php.net/manual/en/class.iterator.php PHP Manual: Iterator Interface
- * @link http://us.php.net/manual/en/class.countable.php PHP Manual: Countable Interface
+ * @link http://php.net/class.arrayaccess.php PHP Manual: ArrayAccess Interface
+ * @link http://php.net/class.iterator.php PHP Manual: Iterator Interface
+ * @link http://php.net/class.countable.php PHP Manual: Countable Interface
  */
 class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator, \Countable {
 

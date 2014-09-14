@@ -126,7 +126,7 @@ class Password {
 	 * consisting in random sequences of alpha numeric characters, use
 	 * `lithium\util\String::random()` instead.
 	 *
-	 * @link http://php.net/manual/en/function.crypt.php
+	 * @link http://php.net/function.crypt.php
 	 * @link http://www.postgresql.org/docs/9.0/static/pgcrypto.html
 	 * @see lithium\security\Password::hash()
 	 * @see lithium\security\Password::check()

@@ -152,9 +152,9 @@ class String {
 	 * Uses PHP's hashing functions to create a hash of the string provided, using the options
 	 * specified. The default hash algorithm is SHA-512.
 	 *
-	 * @link http://php.net/manual/en/function.hash.php PHP Manual: `hash()`
-	 * @link http://php.net/manual/en/function.hash-hmac.php PHP Manual: `hash_hmac()`
-	 * @link http://php.net/manual/en/function.hash-algos.php PHP Manual: `hash_algos()`
+	 * @link http://php.net/function.hash.php PHP Manual: `hash()`
+	 * @link http://php.net/function.hash-hmac.php PHP Manual: `hash_hmac()`
+	 * @link http://php.net/function.hash-algos.php PHP Manual: `hash_algos()`
 	 * @param string $string The string to hash.
 	 * @param array $options Supported options:
 	 *        - `'type'` _string_: Any valid hashing algorithm. See the `hash_algos()` function to

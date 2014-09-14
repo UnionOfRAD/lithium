@@ -18,7 +18,7 @@ class Base64 extends \lithium\core\Object {
 	 *
 	 * Base64-encodes the passed data.
 	 *
-	 * @link http://php.net/manual/en/function.base64-encode.php PHP Manual: base64_encode()
+	 * @link http://php.net/function.base64-encode.php PHP Manual: base64_encode()
 	 * @param mixed $data The data to be serialized.
 	 * @return string Serialized data.
 	 */
@@ -31,7 +31,7 @@ class Base64 extends \lithium\core\Object {
 	 *
 	 * Unserializes the passed data.
 	 *
-	 * @link http://php.net/manual/en/function.base64-decode.php PHP Manual: base64_decode()
+	 * @link http://php.net/function.base64-decode.php PHP Manual: base64_decode()
 	 * @param string $data Serialized data.
 	 * @return mixed Result of unserialization.
 	 */

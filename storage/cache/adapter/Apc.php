@@ -47,7 +47,7 @@ use lithium\storage\Cache;
  *
  * @link http://pecl.php.net/package/APCu
  * @link http://pecl.php.net/package/APC
- * @link http://php.net/manual/en/book.apc.php
+ * @link http://php.net/book.apc.php
  * @see lithium\storage\Cache::key()
  */
 class Apc extends \lithium\storage\cache\Adapter {

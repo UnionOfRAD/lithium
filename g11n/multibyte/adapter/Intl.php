@@ -17,7 +17,7 @@ namespace lithium\g11n\multibyte\adapter;
  * returns `null` or `false` when input string contains badly formed UTF-8
  * sequences.
  *
- * @link http://php.net/manual/en/book.intl.php
+ * @link http://php.net/book.intl.php
  */
 class Intl extends \lithium\core\Object {
 
@@ -33,7 +33,7 @@ class Intl extends \lithium\core\Object {
 	/**
 	 * Here used as a multibyte enabled equivalent of `strlen()`.
 	 *
-	 * @link http://php.net/manual/en/function.grapheme-strlen.php
+	 * @link http://php.net/function.grapheme-strlen.php
 	 * @param string $string
 	 * @return integer|void
 	 */
@@ -44,7 +44,7 @@ class Intl extends \lithium\core\Object {
 	/**
 	 * Here used as a multibyte enabled equivalent of `strpos()`.
 	 *
-	 * @link http://php.net/manual/en/function.grapheme-strpos.php
+	 * @link http://php.net/function.grapheme-strpos.php
 	 * @param string $haystack
 	 * @param string $needle
 	 * @param integer $offset
@@ -57,7 +57,7 @@ class Intl extends \lithium\core\Object {
 	/**
 	 * Here used as a multibyte enabled equivalent of `strrpos()`.
 	 *
-	 * @link http://php.net/manual/en/function.grapheme-strpos.php
+	 * @link http://php.net/function.grapheme-strpos.php
 	 * @param string $haystack
 	 * @param string $needle
 	 * @return integer|boolean
@@ -69,7 +69,7 @@ class Intl extends \lithium\core\Object {
 	/**
 	 * Here used as a multibyte enabled equivalent of `substr()`.
 	 *
-	 * @link http://php.net/manual/en/function.grapheme-substr.php
+	 * @link http://php.net/function.grapheme-substr.php
 	 * @param string $string
 	 * @param integer $start
 	 * @param integer $length

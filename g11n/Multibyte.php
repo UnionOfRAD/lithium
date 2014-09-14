@@ -96,7 +96,7 @@ class Multibyte extends \lithium\core\Adaptable {
 	/**
 	 * Gets the string length. Multibyte enabled version of `strlen()`.
 	 *
-	 * @link http://php.net/manual/en/function.strlen.php
+	 * @link http://php.net/function.strlen.php
 	 * @param string $string The string being measured for length.
 	 * @param array $options Allows for selecting the adapter to use via the
 	 *               `name` options. Will use the `'default'` adapter by default.
@@ -115,7 +115,7 @@ class Multibyte extends \lithium\core\Adaptable {
 	 * Not all adapters must support interpreting - thus applying - passed
 	 * numeric values as ordinal values of a character.
 	 *
-	 * @link http://php.net/manual/en/function.strpos.php
+	 * @link http://php.net/function.strpos.php
 	 * @param string $haystack The string being checked.
 	 * @param string $needle The string to find in the haystack.
 	 * @param integer $offset If specified, search will start this number of
@@ -142,7 +142,7 @@ class Multibyte extends \lithium\core\Adaptable {
 	 * doesn't support an offset as `strpos()` does - this constitutes the
 	 * lowest common denominator here.
 	 *
-	 * @link http://php.net/manual/en/function.strrpos.php
+	 * @link http://php.net/function.strrpos.php
 	 * @param string $haystack The string being checked.
 	 * @param string $needle The string to find in the haystack.
 	 * @param array $options Allows for selecting the adapter to use via the
@@ -161,7 +161,7 @@ class Multibyte extends \lithium\core\Adaptable {
 	 * Returns the portion of string specified by the start and length parameters.
 	 * Multibyte enabled version of `substr()`.
 	 *
-	 * @link http://php.net/manual/en/function.substr.php
+	 * @link http://php.net/function.substr.php
 	 * @param string $string The string to extract the substring from.
 	 * @param integer $start Position of first character in string (offset).
 	 * @param integer $length Maximum numbers of characters to use from string.

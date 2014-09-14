@@ -16,7 +16,7 @@ use lithium\core\NetworkException;
  * This stream adapter provides the required method implementations of the abstract `Socket` class
  * for the `open()`, `close()`, `read()`, `write()`, `timeout()` `eof()` and `encoding()` methods.
  *
- * @link http://www.php.net/manual/en/book.stream.php PHP Manual: Streams
+ * @link http://php.net/book.stream.php PHP Manual: Streams
  * @see lithium\net\socket\Stream
  */
 class Stream extends \lithium\net\Socket {
@@ -122,7 +122,7 @@ class Stream extends \lithium\net\Socket {
 	/**
 	 * Set timeout period on a stream.
 	 *
-	 * @link http://www.php.net/manual/en/function.stream-set-timeout.php
+	 * @link http://php.net/function.stream-set-timeout.php
 	 *       PHP Manual: stream_set_timeout()
 	 * @param integer $time The timeout value in seconds.
 	 * @return void
@@ -139,7 +139,7 @@ class Stream extends \lithium\net\Socket {
 	 *
 	 * Note: This function only exists in PHP 6. For PHP < 6, this method will return void.
 	 *
-	 * @link http://www.php.net/manual/en/function.stream-encoding.php stream_encoding()
+	 * @link http://php.net/function.stream-encoding.php stream_encoding()
 	 * @param string $charset
 	 * @return mixed Returns `null` if `stream_encoding()` function does not exist, boolean
 	 *         result of `stream_encoding()` otherwise.

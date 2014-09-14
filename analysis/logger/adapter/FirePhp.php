@@ -68,7 +68,7 @@ namespace lithium\analysis\logger\adapter;
  * @see lithium\net\http\Message::headers()
  * @link http://www.firephp.org/ FirePHP
  * @link http://www.firephp.org/Wiki/Reference/Protocol FirePHP Protocol Reference
- * @link http://php.net/manual/en/function.json-encode.php PHP Manual: `json_encode()`
+ * @link http://php.net/function.json-encode.php PHP Manual: `json_encode()`
  */
 class FirePhp extends \lithium\core\Object {
 

@@ -116,7 +116,7 @@ use Closure;
  * - `url`: Checks that a value is a valid URL according to
  *   [RFC 2395](http://www.faqs.org/rfcs/rfc2396.html). Uses PHP's filter API, and accepts any
  *   options accepted for
- *   [the validation URL filter](http://www.php.net/manual/en/filter.filters.validate.php).
+ *   [the validation URL filter](http://php.net/filter.filters.validate.php).
  *
  * - `luhn`: Checks that a value is a valid credit card number according to the
  *   [Luhn algorithm](http://en.wikipedia.org/wiki/Luhn_algorithm). (See also: the `creditCard`

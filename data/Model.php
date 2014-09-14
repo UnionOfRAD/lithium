@@ -513,7 +513,7 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 * @see lithium\data\Model::find()
 	 * @see lithium\data\Model::$_meta
-	 * @link http://php.net/manual/en/language.oop5.overloading.php PHP Manual: Overloading
+	 * @link http://php.net/language.oop5.overloading.php PHP Manual: Overloading
 	 * @throws BadMethodCallException On unhandled call, will throw an exception.
 	 * @param string $method Method name caught by `__callStatic()`.
 	 * @param array $params Arguments given to the above `$method` call.

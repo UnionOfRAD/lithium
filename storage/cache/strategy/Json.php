@@ -18,7 +18,7 @@ class Json extends \lithium\core\Object {
 	 *
 	 * Encodes the passed data from an array to JSON format.
 	 *
-	 * @link http://php.net/manual/en/function.json-encode.php PHP Manual: json_encode()
+	 * @link http://php.net/function.json-encode.php PHP Manual: json_encode()
 	 * @param mixed $data The data to be encoded.
 	 * @return string The encoded  data.
 	 */
@@ -31,7 +31,7 @@ class Json extends \lithium\core\Object {
 	 *
 	 * Decodes JSON data and returns an array or object structure.
 	 *
-	 * @link http://php.net/manual/en/function.json-decode.php PHP Manual: json_decode()
+	 * @link http://php.net/function.json-decode.php PHP Manual: json_decode()
 	 * @param string $data Serialized data.
 	 * @return mixed Result of unserialization.
 	 */

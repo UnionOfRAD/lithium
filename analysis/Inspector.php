@@ -418,7 +418,7 @@ class Inspector {
 	 *          to `true`.
 	 * @return array An array of the name of the parent classes of the passed `$class` parameter,
 	 *         or `false` on error.
-	 * @link http://php.net/manual/en/function.class-parents.php PHP Manual: `class_parents()`.
+	 * @link http://php.net/function.class-parents.php PHP Manual: `class_parents()`.
 	 */
 	public static function parents($class, array $options = array()) {
 		$defaults = array('autoLoad' => false);

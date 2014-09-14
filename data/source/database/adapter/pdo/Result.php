@@ -23,8 +23,8 @@ use PDOException;
  * On initialization, it needs a `PDOStatement` to operate on. You are then free to use all
  * methods provided by the `Iterator` interface.
  *
- * @link http://php.net/manual/de/class.pdostatement.php The PDOStatement class.
- * @link http://php.net/manual/de/class.iterator.php The Iterator interface.
+ * @link http://php.net/class.pdostatement.php The PDOStatement class.
+ * @link http://php.net/class.iterator.php The Iterator interface.
  */
 class Result extends \lithium\data\source\Result {
 

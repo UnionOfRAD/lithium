@@ -159,7 +159,7 @@ class ValidatorTest extends \lithium\test\Unit {
 	/**
 	 * Tests the regular expression validation for various regex delimiters
 	 *
-	 * @link http://www.php.net/manual/en/regexp.reference.delimiters.php Regex Delimiters
+	 * @link http://php.net/regexp.reference.delimiters.php Regex Delimiters
 	 */
 	public function testIsRegex() {
 		$this->assertTrue(Validator::isRegex('/^123$/'));

@@ -20,7 +20,7 @@ use lithium\net\http\Message;
  * is not the case, you must either recompile PHP with the proper configuration flags to enable
  * curl, or you may use the `Stream` adapter that is also included with the Lithium core.
  *
- * @link http://www.php.net/manual/en/curl.installation.php
+ * @link http://php.net/curl.installation.php
  * @see lithium\net\socket\Stream
  */
 class Curl extends \lithium\net\Socket {
@@ -30,7 +30,7 @@ class Curl extends \lithium\net\Socket {
 	 * `read` and `write` operations. These options should be set by
 	 * using the `set` method.
 	 *
-	 * @link http://www.php.net/manual/en/function.curl-setopt.php PHP Manual: curl_setopt()
+	 * @link http://php.net/function.curl-setopt.php PHP Manual: curl_setopt()
 	 * @see lithium\net\socket\Curl::set()
 	 * @var array
 	 */
@@ -117,7 +117,7 @@ class Curl extends \lithium\net\Socket {
 	 * Reads data from the curl connection.
 	 * The `read` method will utilize the curl options that have been set.
 	 *
-	 * @link http://php.net/manual/en/function.curl-exec.php PHP Manual: curl_exec()
+	 * @link http://php.net/function.curl-exec.php PHP Manual: curl_exec()
 	 * @return mixed Boolean false if the resource handle is unavailable, and the result
 	 *         of `curl_exec` otherwise.
 	 */
@@ -192,7 +192,7 @@ class Curl extends \lithium\net\Socket {
 	/**
 	 * Sets the options to be used in subsequent curl requests.
 	 *
-	 * @link http://www.php.net/manual/en/curl.constants.php PHP Manual: cURL Constants
+	 * @link http://php.net/curl.constants.php PHP Manual: cURL Constants
 	 * @param array $flags If $values is an array, $flags will be used as the
 	 *        keys to an associative array of curl options. If $values is not set,
 	 *        then $flags will be used as the associative array.

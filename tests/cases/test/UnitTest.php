@@ -517,7 +517,7 @@ class UnitTest extends \lithium\test\Unit {
 	 * With a fresh PHP environment this might throw an exception:
 	 * `strtotime(): It is not safe to rely on the system's timezone settings. You are
 	 * *required* to use the date.timezone setting or the date_default_timezone_set() function.`
-	 * See also http://www.php.net/manual/en/function.date-default-timezone-get.php
+	 * See also http://php.net/function.date-default-timezone-get.php
 	 */
 	public function testAssertCookie() {
 		$expected = array(

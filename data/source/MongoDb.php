@@ -122,14 +122,14 @@ class MongoDb extends \lithium\data\Source {
 	 *
 	 * @see lithium\data\Connections::add()
 	 * @see lithium\data\source\MongoDb::$_schema
-	 * @link http://php.net/manual/en/mongo.construct.php PHP Manual: Mongo::__construct()
+	 * @link http://php.net/mongo.construct.php PHP Manual: Mongo::__construct()
 	 * @param array $config All information required to connect to the database, including:
 	 *        - `'database'` _string_: The name of the database to connect to. Defaults to `null`.
 	 *        - `'host'` _string_: The IP or machine name where Mongo is running, followed by a
 	 *           colon, and the port number. Defaults to `'localhost:27017'`.
 	 *        - `'persistent'` _mixed_: Determines a persistent connection to attach to. See the
 	 *           `$options` parameter of
-	 *            [`Mongo::__construct()`](http://www.php.net/manual/en/mongo.construct.php) for
+	 *            [`Mongo::__construct()`](http://php.net/mongo.construct.php) for
 	 *            more information. Defaults to `false`, meaning no persistent connection is made.
 	 *        - `'timeout'` _integer_: The number of milliseconds a connection attempt will wait
 	 *          before timing out and throwing an exception. Defaults to `100`.
@@ -237,7 +237,7 @@ class MongoDb extends \lithium\data\Source {
 	 * database connection.
 	 *
 	 * @see lithium\data\source\MongoDb::__construct()
-	 * @link http://php.net/manual/en/mongo.construct.php PHP Manual: Mongo::__construct()
+	 * @link http://php.net/mongo.construct.php PHP Manual: Mongo::__construct()
 	 * @return boolean Returns `true` the connection attempt was successful, otherwise `false`.
 	 */
 	public function connect() {

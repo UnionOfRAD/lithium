@@ -66,7 +66,7 @@ use Closure;
  * `$response` will always be modified by any custom logic present before being returned from
  * `run()`.
  *
- * @link http://php.net/manual/en/functions.anonymous.php
+ * @link http://php.net/functions.anonymous.php
  * @see lithium\util\collection\Filters::run()
  * @see lithium\core\Object::_filter()
  * @see lithium\core\StaticObject::_filter()

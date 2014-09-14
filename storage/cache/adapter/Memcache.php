@@ -43,7 +43,7 @@ use Closure;
  * Memcache servers you are connecting to. See the `__construct()` method for more
  * information.
  *
- * @link http://php.net/manual/en/class.memcached.php
+ * @link http://php.net/class.memcached.php
  * @link http://pecl.php.net/package/memcached
  * @see lithium\storage\cache\adapter\Memcache::__construct()
  * @see lithium\storage\Cache::key()
@@ -129,7 +129,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * Cache::adapter('memcache')->methodName($argument);
 	 * ```
 	 *
-	 * @link http://php.net/manual/en/class.memcached.php
+	 * @link http://php.net/class.memcached.php
 	 * @param string $method Name of the method to call.
 	 * @param array $params Parameter list to use when calling $method.
 	 * @return mixed Returns the result of the method call.
@@ -260,7 +260,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * "If the item's value is not numeric, it is treated as if the value were 0.
 	 * If the operation would decrease the value below 0, the new value will be 0."
 	 *
-	 * @link http://www.php.net/manual/memcached.decrement.php
+	 * @link http://php.net/manual/memcached.decrement.php
 	 * @param string $key Key of numeric cache item to decrement.
 	 * @param integer $offset Offset to decrement - defaults to `1`.
 	 * @return integer|boolean The item's new value on successful decrement, else `false`.
@@ -275,7 +275,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * Note that, as per the Memcached specification:
 	 * "If the item's value is not numeric, it is treated as if the value were 0."
 	 *
-	 * @link http://www.php.net/manual/memcached.decrement.php
+	 * @link http://php.net/manual/memcached.decrement.php
 	 * @param string $key Key of numeric cache item to increment.
 	 * @param integer $offset Offset to increment - defaults to `1`.
 	 * @return integer|boolean The item's new value on successful increment, else `false`.
