@@ -288,7 +288,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @param callback $filter Callback to use for filtering.
 	 * @param array $options The available options are:
 	 *        - `'collect'`: If `true`, the results will be returned wrapped in a new
-	 *          `Collection` object or subclass.
+	 *          `Collection` object or subclass. Defaults to `true`.
 	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
 	 *         `$options` argument, then an instance of this class will be returned.
 	 */

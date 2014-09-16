@@ -41,8 +41,9 @@ class MySql extends \lithium\data\source\Database {
 	);
 
 	/**
-	 * Meta atrribute syntax
-	 * By default `'escape'` is false and 'join' is `' '`
+	 * Meta atrribute syntax.
+	 *
+	 * By default `'escape'` is false and 'join' is `' '`.
 	 *
 	 * @var array
 	 */
@@ -59,6 +60,7 @@ class MySql extends \lithium\data\source\Database {
 			'tablespace' => array('keyword' => 'TABLESPACE')
 		)
 	);
+
 	/**
 	 * Column contraints
 	 *
@@ -77,6 +79,7 @@ class MySql extends \lithium\data\source\Database {
 		),
 		'check' => array('template' => 'CHECK ({:expr})')
 	);
+
 	/**
 	 * Pair of opening and closing quote characters used for quoting identifiers in queries.
 	 *
@@ -333,7 +336,7 @@ class MySql extends \lithium\data\source\Database {
 
 			try {
 				$resource = $conn->query($sql);
-			} catch(PDOException $e) {
+			} catch (PDOException $e) {
 				$self->invokeMethod('_error', array($sql));
 			};
 			return $self->invokeMethod('_instance', array('result', compact('resource')));

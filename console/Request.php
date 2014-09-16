@@ -9,7 +9,7 @@
 namespace lithium\console;
 
 /**
- * The `Request` class represents a console request and holds information about it's
+ * The `Request` class represents a console request and holds information about its
  * environment as well as passed arguments.
  *
  * @see lithium\console\Dispatcher

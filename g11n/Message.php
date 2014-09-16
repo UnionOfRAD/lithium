@@ -15,8 +15,8 @@ use lithium\g11n\Catalog;
 /**
  * The `Message` class is concerned with an aspect of globalizing static message strings
  * throughout the framework and applications.  When referring to message globalization the
- * phrase of ""translating a message" is widely used. This leads to the assumption that it's
- * a single step process whereas it' a multi step one. A short description of each step is
+ * phrase of "translating a message" is widely used. This leads to the assumption that it's
+ * a single step process whereas it's a multi step one. A short description of each step is
  * given here in order to help understanding the purpose of this class through the context
  * of the process as a whole.
  *
@@ -57,7 +57,7 @@ class Message extends \lithium\core\StaticObject {
 
 	/**
 	 * Translates a message according to the current or provided locale
-	 * and into it's correct plural form.
+	 * and into its correct plural form.
 	 *
 	 * Usage:
 	 * ```
@@ -127,16 +127,16 @@ class Message extends \lithium\core\StaticObject {
 	 *
 	 * Usage:
 	 * ```
-	 * 	$t('bike');
-	 * 	$tn('bike', 'bikes', 3);
+	 * $t('bike');
+	 * $tn('bike', 'bikes', 3);
 	 * ```
 	 *
 	 * Using in a method:
 	 * ```
-	 * 	public function index() {
-	 * 		extract(Message::aliases());
-	 * 		$notice = $t('look');
-	 * 	}
+	 * public function index() {
+	 * 	extract(Message::aliases());
+	 * 	$notice = $t('look');
+	 * }
 	 * ```
 	 *
 	 * @see lithium\net\http\Media::_handle()

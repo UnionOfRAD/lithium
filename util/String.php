@@ -283,6 +283,7 @@ class String {
 
 		if (strpos($str, '?') !== false && isset($data[0])) {
 			$offset = 0;
+
 			while (($pos = strpos($str, '?', $offset)) !== false) {
 				$val = array_shift($data);
 				$offset = $pos + strlen($val);
@@ -292,14 +293,13 @@ class String {
 		}
 
 		foreach ($data as $key => $value) {
-			$hashVal = crc32($key);
-			$key = sprintf($format, preg_quote($key, '/'));
-
-			if (!$key) {
+			if (!$key = sprintf($format, preg_quote($key, '/'))) {
 				continue;
 			}
-			$str = preg_replace($key, $hashVal, $str);
-			$str = str_replace($hashVal, $value, $str);
+			$hash = crc32($key);
+
+			$str = preg_replace($key, $hash, $str);
+			$str = str_replace($hash, $value, $str);
 		}
 
 		if (!isset($options['format']) && isset($options['before'])) {
@@ -319,23 +319,31 @@ class String {
 	 *        - `'andText'`: (defaults to `true`).
 	 *        - `'before'`: characters marking the start of targeted substring.
 	 *        - `'clean'`: `true` or an array of clean options:
-	 *        - `'gap'`: Regular expression matching gaps.
-	 *        - `'method'`: Either `'text'` or `'html'` (defaults to `'text'`).
-	 *        - `'replacement'`: String to use for cleaned substrings (defaults to `''`).
-	 *        - `'word'`: Regular expression matching words.
+	 *          - `'gap'`: Regular expression matching gaps.
+	 *          - `'method'`: Either `'text'` or `'html'` (defaults to `'text'`).
+	 *          - `'replacement'`: String to use for cleaned substrings (defaults to `''`).
+	 *          - `'word'`: Regular expression matching words.
 	 * @return string The cleaned string.
 	 */
 	public static function clean($str, array $options = array()) {
 		if (!$options['clean']) {
 			return $str;
 		}
-		$clean = $options['clean'];
-		$clean = ($clean === true) ? array('method' => 'text') : $clean;
-		$clean = (!is_array($clean)) ? array('method' => $options['clean']) : $clean;
+		if (is_array($options['clean'])) {
+			$clean = $options['clean'];
+		} else {
+			$clean = array(
+				'method' => is_bool($options['clean']) ? 'text' : $options['clean']
+			);
+		}
 
 		switch ($clean['method']) {
 			case 'html':
-				$clean += array('word' => '[\w,.]+', 'andText' => true, 'replacement' => '');
+				$clean += array(
+					'word' => '[\w,.]+',
+					'andText' => true,
+					'replacement' => ''
+				);
 				$kleenex = sprintf(
 					'/[\s]*[a-z]+=(")(%s%s%s[\s]*)+\\1/i',
 					preg_quote($options['before'], '/'),
@@ -345,13 +353,16 @@ class String {
 				$str = preg_replace($kleenex, $clean['replacement'], $str);
 
 				if ($clean['andText']) {
-					$options['clean'] = array('method' => 'text');
-					$str = static::clean($str, $options);
+					return static::clean($str, array(
+						'clean' => array('method' => 'text')
+					) + $options);
 				}
 			break;
 			case 'text':
 				$clean += array(
-					'word' => '[\w,.]+', 'gap' => '[\s]*(?:(?:and|or|,)[\s]*)?', 'replacement' => ''
+					'word' => '[\w,.]+',
+					'gap' => '[\s]*(?:(?:and|or|,)[\s]*)?',
+					'replacement' => ''
 				);
 				$before = preg_quote($options['before'], '/');
 				$after = preg_quote($options['after'], '/');

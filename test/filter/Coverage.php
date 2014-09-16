@@ -202,7 +202,7 @@ class Coverage extends \lithium\test\Filter {
 	 * aggregate line coverage density per file.
 	 *
 	 * @param array $runs An array containing multiple runs of raw XDebug coverage data, where
-	 *              each array key is a file name, and it's value is XDebug's coverage
+	 *              each array key is a file name, and its value is XDebug's coverage
 	 *              data for that file.
 	 * @param array $classMap An optional map with class names as array keys and corresponding file
 	 *              names as values. Used to filter the returned results, and will cause the array

@@ -136,7 +136,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 *
 	 * Note that, as per the APC specification:
 	 * If the item's value is not numeric, the decrement operation has no effect
-	 * on the key - it retains it's original non-integer value.
+	 * on the key - it retains its original non-integer value.
 	 *
 	 * @param string $key Key of numeric cache item to decrement.
 	 * @param integer $offset Offset to decrement - defaults to `1`.
@@ -153,7 +153,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 *
 	 * Note that, as per the APC specification:
 	 * If the item's value is not numeric, the increment operation has no effect
-	 * on the key - it retains it's original non-integer value.
+	 * on the key - it retains its original non-integer value.
 	 *
 	 * @param string $key Key of numeric cache item to increment.
 	 * @param integer $offset Offset to increment - defaults to `1`.

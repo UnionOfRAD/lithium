@@ -618,6 +618,7 @@ class Query extends \lithium\core\Object {
 	 */
 	protected function _exportData() {
 		$data = $this->_entity ? $this->_entity->export() : $this->_data;
+
 		if (!$list = $this->_config['whitelist']) {
 			return $data;
 		}

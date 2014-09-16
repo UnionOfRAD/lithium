@@ -608,6 +608,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function &_queryExport($query) {
 		$data = $query->export($this);
+
 		if ($query->limit() && ($model = $query->model())) {
 			foreach ($query->relationships() as $relation) {
 				if ($relation['type'] === 'hasMany') {
@@ -750,8 +751,8 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function methods() {
 		$result = parent::methods();
-		$key = array_search('schema', $result);
-		unset($result[$key]);
+		unset($result[array_search('schema', $result)]);
+
 		return $result;
 	}
 

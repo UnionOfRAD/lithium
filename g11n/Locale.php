@@ -33,7 +33,7 @@ use lithium\console\Request as ConsoleRequest;
  *  - `language` The spoken language, here represented by an ISO 639-1 code,
  *    where not available ISO 639-3 and ISO 639-5 codes are allowed too) tag.
  *    The tag should  be lower-cased and is required.
- *  - `Script` The tag should have it's first character capitalized, all others
+ *  - `Script` The tag should have its first character capitalized, all others
  *    lower-cased. The tag is optional.
  *  - `TERRITORY` A geographical area, here represented by an ISO 3166-1 code.
  *     Should be all upper-cased and is optional.
@@ -137,7 +137,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * Returns a locale in its canonical form with tags formatted properly.
 	 *
 	 * @param string $locale A locale in an arbitrary form (i.e. `'ZH-HANS-HK_REVISED'`).
-	 * @return string A locale in it's canonical form (i.e. `'zh_Hans_HK_REVISED'`).
+	 * @return string A locale in its canonical form (i.e. `'zh_Hans_HK_REVISED'`).
 	 */
 	public static function canonicalize($locale) {
 		$tags = static::decompose($locale);
@@ -199,7 +199,7 @@ class Locale extends \lithium\core\StaticObject {
 	 *
 	 * @link http://www.ietf.org/rfc/rfc4647.txt
 	 * @param array $locales Locales to match against `$locale`.
-	 * @param string $locale A locale in it's canonical form (i.e. `'zh_Hans_HK_REVISED'`).
+	 * @param string $locale A locale in its canonical form (i.e. `'zh_Hans_HK_REVISED'`).
 	 * @return string The matched locale.
 	 */
 	public static function lookup($locales, $locale) {
@@ -232,7 +232,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * @see lithium\g11n\Locale::lookup()
 	 * @param object|array $request An action or console request object or an array of locales.
 	 * @param array $available A list of locales to negotiate the preferred locale with.
-	 * @return string The preferred locale in it's canonical form (i.e. `'fr_CA'`).
+	 * @return string The preferred locale in its canonical form (i.e. `'fr_CA'`).
 	 * @todo Rewrite this to remove hard-coded class names.
 	 */
 	public static function preferred($request, $available = null) {
