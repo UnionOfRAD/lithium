@@ -1125,6 +1125,53 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual('MockPost', MockComment::relations('mock_post')->name());
 		$this->assertNull(MockPost::relations('undefined'));
 	}
+
+	public function testValidateWithRequiredFalse(){
+		$post = MockPost::create(array(
+			'title' => 'post title',
+		));
+		$post->validates(array('rules' => array(
+			'title' => 'A custom message here for empty titles.',
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty.', 'required' => false)
+			)
+		)));
+		$this->assertEmpty($post->errors());
+	}
+
+	public function testValidateWithRequiredTrue(){
+		$post = MockPost::create(array(
+			'title' => 'post title',
+		));
+		$post->sync(1);
+		$post->validates(array('rules' => array(
+			'title' => 'A custom message here for empty titles.',
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty.', 'required' => true)	
+			)
+		)));
+		$this->assertNotEmpty($post->errors());
+	}
+
+	public function testValidateWithRequiredNull(){
+		$validates = array(
+			'title' => 'A custom message here for empty titles.',
+			'email' => array(
+				array('notEmpty', 'message' => 'email is empty.', 'required' => null)
+			)
+		);
+
+		$post = MockPost::create(array(
+			'title' => 'post title',
+		));
+
+		$post->validates(array('rules' => $validates));
+		$this->assertNotEmpty($post->errors());
+
+		$post->sync(1);
+		$post->validates(array('rules' => $validates));
+		$this->assertEmpty($post->errors());
+	}
 }
 
 ?>

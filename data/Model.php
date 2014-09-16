@@ -1181,6 +1181,12 @@ class Model extends \lithium\core\StaticObject {
 	 *          Using this parameter, you can set up custom events in your rules as well, such
 	 *          as `'on' => 'login'`. Note that when defining validation rules, the `'on'` key
 	 *          can also be an array of multiple events.
+	 *        - `'required`' _mixed_: Represents whether the value is required to be present
+	 *          in `$values`. If `'required'` is set to `true`, the validation rule will be
+	 *          checked. if `'required'` is set to 'false' , the validation rule will be skipped
+	 *          if the corresponding key is not present. If don't set `'required'` or set this
+	 *          to `null`, the validation rule will be skipped if the corresponding key is not
+	 *          present in update and will be checked in insert. Defaults is set to `null`.
 	 * @return boolean Returns `true` if all validation rules on all fields succeed, otherwise
 	 *         `false`. After validation, the messages for any validation failures are assigned to
 	 *         the entity, and accessible through the `errors()` method of the entity object.
@@ -1190,9 +1196,14 @@ class Model extends \lithium\core\StaticObject {
 		$defaults = array(
 			'rules' => $this->validates,
 			'events' => $entity->exists() ? 'update' : 'create',
-			'model' => get_called_class()
+			'model' => get_called_class(),
+			'required' => null,
 		);
 		$options += $defaults;
+
+		if ($options['required'] === null) {
+			$options['required'] = !$entity->exists();
+		}
 		$self = static::_object();
 		$validator = $self->_classes['validator'];
 		$entity->errors(false);
