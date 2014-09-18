@@ -1331,6 +1331,15 @@ abstract class Database extends \lithium\data\Source {
 		if ($entity = $context->entity()) {
 			$export = $entity->export();
 			$increment = $export['increment'];
+			array_map(function($key) use (&$data, $export){
+				if (!empty($data[$key]) && $export['data'][$key] === $data[$key]) {
+					unset($data[$key]);
+				}
+			}, array_keys($export['data']));
+			if (!$data) {
+				$model = $context->model();
+				$data = $model::key($context->data());
+			}
 		}
 
 		foreach ($data as $field => $value) {
