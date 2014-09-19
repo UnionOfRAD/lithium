@@ -335,6 +335,23 @@ class String {
 		}
 
 		switch ($clean['method']) {
+			case 'text':
+				$clean += array(
+					'word' => '[\w,.]+',
+					'gap' => '[\s]*(?:(?:and|or|,)[\s]*)?',
+					'replacement' => ''
+				);
+				$before = preg_quote($options['before'], '/');
+				$after = preg_quote($options['after'], '/');
+
+				$kleenex = sprintf(
+					'/(%s%s%s%s|%s%s%s%s|%s%s%s%s%s)/',
+					$before, $clean['word'], $after, $clean['gap'],
+					$clean['gap'], $before, $clean['word'], $after,
+					$clean['gap'], $before, $clean['word'], $after, $clean['gap']
+				);
+				$str = preg_replace($kleenex, $clean['replacement'], $str);
+			break;
 			case 'html':
 				$clean += array(
 					'word' => '[\w,.]+',
@@ -354,23 +371,6 @@ class String {
 						'clean' => array('method' => 'text')
 					) + $options);
 				}
-			break;
-			case 'text':
-				$clean += array(
-					'word' => '[\w,.]+',
-					'gap' => '[\s]*(?:(?:and|or|,)[\s]*)?',
-					'replacement' => ''
-				);
-				$before = preg_quote($options['before'], '/');
-				$after = preg_quote($options['after'], '/');
-
-				$kleenex = sprintf(
-					'/(%s%s%s%s|%s%s%s%s|%s%s%s%s%s)/',
-					$before, $clean['word'], $after, $clean['gap'],
-					$clean['gap'], $before, $clean['word'], $after,
-					$clean['gap'], $before, $clean['word'], $after, $clean['gap']
-				);
-				$str = preg_replace($kleenex, $clean['replacement'], $str);
 			break;
 		}
 		return $str;
