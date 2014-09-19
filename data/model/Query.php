@@ -199,31 +199,26 @@ class Query extends \lithium\core\Object {
 		parent::_init();
 
 		foreach ($this->_initializers as $key) {
-			$val = $this->_config[$key];
-			if ($val !== null) {
-				$this->_config[$key] = is_array($val) ? array() : null;
-				$this->{$key}($val);
+			if (($value = $this->_config[$key]) !== null) {
+				$this->_config[$key] = is_array($value) ? array() : null;
+				$this->{$key}($value);
 			}
 		}
 		if ($list = $this->_config['whitelist']) {
 			$this->_config['whitelist'] = array_combine($list, $list);
 		}
-
 		if ($this->_entity && !$this->_config['model']) {
 			$this->model($this->_entity->model());
 		}
-
 		if ($this->_config['with']) {
 			if (!$model = $this->model()) {
 				throw new ConfigException("The `'with'` option needs a valid binded model.");
 			}
 			$this->_config['with'] = Set::normalize($this->_config['with']);
 		}
-
 		if ($model = $this->model()) {
 			$this->alias($this->_config['alias'] ?: $model::meta('name'));
 		}
-
 		$this->fields($this->_config['fields']);
 
 		unset($this->_config['entity'], $this->_config['init']);
@@ -287,10 +282,9 @@ class Query extends \lithium\core\Object {
 		if (!$conditions) {
 			return $this->_config['conditions'] ?: $this->_entityConditions();
 		}
-		$conditions = (array) $conditions;
-		$this->_config['conditions'] = (array) $this->_config['conditions'];
-		$this->_config['conditions'] = array_merge($this->_config['conditions'], $conditions);
-
+		$this->_config['conditions'] = array_merge(
+			(array) $this->_config['conditions'], (array) $conditions
+		);
 		return $this;
 	}
 
@@ -304,10 +298,9 @@ class Query extends \lithium\core\Object {
 		if (!$having) {
 			return $this->_config['having'];
 		}
-		$having = (array) $having;
-		$this->_config['having'] = (array) $this->_config['having'];
-		$this->_config['having'] = array_merge($this->_config['having'], $having);
-
+		$this->_config['having'] = array_merge(
+			(array) $this->_config['having'], (array) $having
+		);
 		return $this;
 	}
 
@@ -341,13 +334,12 @@ class Query extends \lithium\core\Object {
 		if (!$fields) {
 			return $this;
 		}
-		$fields = is_array($fields) ? $fields : array($fields);
-		foreach ($fields as $key => $field) {
+		foreach ((array) $fields as $key => $field) {
 			if (is_string($field)) {
 				$this->_fields[1][$field] = true;
 			} elseif (is_array($field) && !is_numeric($key)) {
-				foreach ($field as &$val) {
-					$val = $key . '.' . $val;
+				foreach ($field as &$value) {
+					$value = "{$key}.{$value}";
 				}
 				$this->fields($field);
 			} else {
