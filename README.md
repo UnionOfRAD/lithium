@@ -30,6 +30,3 @@ Every component of the Lithium framework stack is replaceable through the robust
 
 If you don't even need to write a full application, build a micro-app in a single file using the routing system, without giving up the maintainability of the framework's structure.
 
-### Build status
-
-[![Build Status](https://secure.travis-ci.org/UnionOfRAD/lithium.png?branch=master)](http://travis-ci.org/UnionOfRAD/lithium)
