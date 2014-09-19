@@ -266,13 +266,10 @@ class String {
 
 			foreach ($data as $key => $value) {
 				if (!is_scalar($value)) {
-					$object = $value;
-					$value  = '';
-
-					if (is_object($object) && method_exists($object, '__toString')) {
-						try {
-							$value = (string) $object;
-						} catch (Exception $e) {}
+					if (is_object($value) && method_exists($value, '__toString')) {
+						$value = (string) $value;
+					} else {
+						$value = '';
 					}
 				}
 				$replace["{$options['before']}{$key}{$options['after']}"] = $value;
