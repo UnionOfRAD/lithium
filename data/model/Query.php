@@ -197,7 +197,7 @@ class Query extends \lithium\core\Object {
 
 	protected function _init() {
 		parent::_init();
-		$keys = array_keys($this->_config);
+
 		foreach ($this->_initializers as $key) {
 			$val = $this->_config[$key];
 			if ($val !== null) {

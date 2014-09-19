@@ -498,8 +498,6 @@ class Library extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	public function install($name = null) {
-		$results = array();
-
 		foreach ($this->_settings['servers'] as $server => $enabled) {
 			if (!$enabled) {
 				continue;
@@ -544,7 +542,7 @@ class Library extends \lithium\console\Command {
 
 			if (!empty($url['scheme']) && $url['scheme'] === 'git' && $hasGit()) {
 				$cmd = "cd {$this->path} && git clone --quiet {$source} {$plugin->name}";
-				$result = shell_exec($cmd);
+				shell_exec($cmd);
 
 				if (is_dir("{$this->path}/{$plugin->name}")) {
 					$this->out("{$plugin->name} installed to {$this->path}/{$plugin->name}");
@@ -567,7 +565,6 @@ class Library extends \lithium\console\Command {
 		if (!$name) {
 			$name = $this->in("please supply a name");
 		}
-		$result = false;
 		$path = $this->_toPath($name);
 		$name = basename($path);
 		$formula = "{$path}/config/{$name}.json";

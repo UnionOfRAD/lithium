@@ -245,7 +245,6 @@ class CouchDb extends \lithium\data\source\Http {
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
 			$query = $params['query'];
-			$options = $params['options'];
 			$params = $query->export($self);
 
 			list($_path, $conditions) = (array) $params['conditions'];

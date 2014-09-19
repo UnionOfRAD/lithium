@@ -128,6 +128,7 @@ class Inspector {
 			$result['modifiers'] = static::_modifiers($inspector);
 		} elseif ($type === 'class') {
 			$inspector = new ReflectionClass($identifier);
+			$classInspector = null;
 		} else {
 			return null;
 		}
@@ -150,12 +151,11 @@ class Inspector {
 
 				if ($setAccess) {
 					$inspector->setAccessible(false);
-					$setAccess = false;
 				}
 			}
 		}
 
-		if ($type === 'property' && !$classInspector->isAbstract()) {
+		if ($type === 'property' && $classInspector && !$classInspector->isAbstract()) {
 			$inspector->setAccessible(true);
 
 			try {

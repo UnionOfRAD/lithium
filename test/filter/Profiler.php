@@ -54,8 +54,6 @@ class Profiler extends \lithium\test\Filter {
 	 */
 	public static function reset() {
 		foreach (static::$_metrics as $name => $check) {
-			$function = current((array) $check['function']);
-
 			if (is_string($check['function']) && !function_exists($check['function'])) {
 				unset(static::$_metrics[$name]);
 			}

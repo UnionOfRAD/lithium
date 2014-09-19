@@ -490,12 +490,14 @@ class Media extends \lithium\core\StaticObject {
 				));
 			} else {
 				$host = '';
+
 				if ($defaults['absolute']) {
 					$host = $defaults['host'];
-					$index = 0;
+
 					if (is_array($host)) {
 						$hash = substr(hexdec(md5($path)), 0, 10);
 						$index = ((integer) $hash) % count($host);
+
 						if (is_array($defaults['scheme'])) {
 							$host = $defaults['scheme'][$index] . $host[$index];
 						} else {
@@ -512,10 +514,8 @@ class Media extends \lithium\core\StaticObject {
 		}
 
 		if (!$paths = static::_assets($type)) {
-			$type = 'generic';
 			$paths = static::_assets('generic');
 		}
-
 		return $options + $paths + $defaults;
 	}
 
@@ -620,7 +620,6 @@ class Media extends \lithium\core\StaticObject {
 			'scope' => false
 		);
 		if (!$base = static::_assets($type)) {
-			$type = 'generic';
 			$base = static::_assets('generic');
 		}
 		$options += ($base + $defaults);
@@ -718,8 +717,6 @@ class Media extends \lithium\core\StaticObject {
 		$params = array('response' => &$response) + compact('handler', 'data', 'options');
 
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$data = $params['data'];
-			$options = $params['options'];
 			$handler = $params['handler'];
 			$response =& $params['response'];
 

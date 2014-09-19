@@ -62,6 +62,8 @@ class Extract extends \lithium\console\Command {
 	 * @return array Returns the catalog specified. Returns boolean `false` when an error occurs.
 	 */
 	protected function _extract() {
+		$message = array();
+
 		$message[] = 'A `Catalog` class configuration with an adapter that is capable of';
 		$message[] = 'handling read requests for the `messageTemplate` category is needed';
 		$message[] = 'in order to proceed. This may also be referred to as `extractor`.';
@@ -92,6 +94,8 @@ class Extract extends \lithium\console\Command {
 	 * @return void
 	 */
 	protected function _writeTemplate($data) {
+		$message = array();
+
 		$message[] = 'In order to proceed you need to choose a `Catalog` configuration';
 		$message[] = 'which is used for writing the template. The adapter for the configuration';
 		$message[] = 'should be capable of handling write requests for the `messageTemplate`';

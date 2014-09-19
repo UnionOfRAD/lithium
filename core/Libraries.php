@@ -872,7 +872,7 @@ class Libraries {
 				continue;
 			}
 
-			foreach (static::_searchPaths($paths, $library, $params) as $tpl) {
+			foreach (static::_searchPaths($paths, $library) as $tpl) {
 				$params['library'] = rtrim($config['prefix'], '\\');
 				$class = str_replace('\\*', '', String::insert($tpl, $params));
 
@@ -890,12 +890,10 @@ class Libraries {
 	 * @see lithium\core\Libraries::_search()
 	 * @param array $paths The list of all possible path templates from `Libraries::$_paths`.
 	 * @param string $library The name of the library being searched.
-	 * @param array $params The parameters used in the service location lookup.
 	 * @return array Returns an array of valid path template strings.
 	 */
-	protected static function _searchPaths($paths, $library, $params) {
+	protected static function _searchPaths($paths, $library) {
 		$result = array();
-		$params = array('library' => null, 'type' => null) + $params;
 
 		foreach ($paths as $tpl => $opts) {
 			if (is_int($tpl)) {
@@ -930,7 +928,7 @@ class Libraries {
 		foreach ($libraries as $library => $config) {
 			$params['library'] = $config['path'];
 
-			foreach (static::_searchPaths($paths, $library, $params) as $tpl) {
+			foreach (static::_searchPaths($paths, $library) as $tpl) {
 				$options['path'] = str_replace('\\', '/', String::insert($tpl, $params, $flags));
 				$options['path'] = str_replace('*/', '', $options['path']);
 				$classes = array_merge($classes, static::_search($config, $options));
@@ -993,7 +991,7 @@ class Libraries {
 
 		if ($options['recursive']) {
 			list($current, $match) = explode('/*', $path, 2);
-			$dirs = $queue = array_diff((array) glob($current . '/*', $dFlags), $libs);
+			$queue = array_diff((array) glob($current . '/*', $dFlags), $libs);
 			$match = str_replace('##', '.+', preg_quote(str_replace('*', '##', $match), '/'));
 			$match = '/' . $match . preg_quote($suffix, '/') . '$/';
 

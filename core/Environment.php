@@ -109,7 +109,7 @@ class Environment {
 	 *
 	 * @see lithium\core\Environment::_detector()
 	 * @see lithium\core\Environment::is()
-	 * @var object
+	 * @var callable
 	 */
 	protected static $_detector = null;
 

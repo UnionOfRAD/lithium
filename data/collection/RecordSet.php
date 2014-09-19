@@ -151,7 +151,6 @@ class RecordSet extends \lithium\data\Collection {
 	protected function _hydrateRecord($relations, $primary, $record, $min, $max, $name, &$relMap, $conn) {
 		$options = array('exists' => true, 'defaults' => false);
 
-		$count = count($record);
 		if (!empty($relations)) {
 			foreach ($relations as $relation => $subrelations) {
 				$relName = $name ? $name . '.' . $relation : $relation;

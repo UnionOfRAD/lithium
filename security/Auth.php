@@ -136,7 +136,6 @@ class Auth extends \lithium\core\Adaptable {
 		return static::_filter(__FUNCTION__, $params, function($self, $params) {
 			extract($params);
 			$config = $self::invokeMethod('_config', array($name));
-			$persist = $options['persist'];
 
 			if ($config === null) {
 				throw new ConfigException("Configuration `{$name}` has not been defined.");

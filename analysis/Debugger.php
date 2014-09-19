@@ -150,7 +150,7 @@ class Debugger {
 			}
 			return;
 		}
-		list($class, $method) = explode('::', $reference);
+		list($class,) = explode('::', $reference);
 
 		if (!class_exists($class)) {
 			return;
@@ -175,8 +175,9 @@ class Debugger {
 	/**
 	 * Helper method for caching closure function references to help the process of building the
 	 * stack trace.
+	 *
 	 * @param  array $frame Backtrace information.
-	 * @param  Closure $function The method related to $frame information.
+	 * @param  callable|string $function The method related to $frame information.
 	 * @return string Returns either the cached or the fetched closure function reference while
 	 *                writing its reference to the cache array `$_closureCache`.
 	 */

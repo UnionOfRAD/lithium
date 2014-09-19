@@ -184,7 +184,6 @@ class Controller extends \lithium\core\Object {
 
 			$action = isset($dispatchParams['action']) ? $dispatchParams['action'] : 'index';
 			$args = isset($dispatchParams['args']) ? $dispatchParams['args'] : array();
-			$result = null;
 
 			if (substr($action, 0, 1) === '_' || method_exists(__CLASS__, $action)) {
 				throw new DispatchException('Attempted to invoke a private method.');

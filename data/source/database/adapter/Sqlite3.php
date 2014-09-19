@@ -291,9 +291,10 @@ class Sqlite3 extends \lithium\data\source\Database {
 	protected function _execute($sql, array $options = array()) {
 		$conn = $this->connection;
 		$params = compact('sql', 'options');
+
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($conn) {
 			$sql = $params['sql'];
-			$options = $params['options'];
+
 			try {
 				$resource = $conn->query($sql);
 			} catch(PDOException $e) {

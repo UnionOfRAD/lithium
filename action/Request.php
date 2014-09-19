@@ -89,7 +89,7 @@ class Request extends \lithium\net\http\Request {
 	 * this specified where to read it from.
 	 *
 	 * @see lithium\action\Request::_init()
-	 * @var stream
+	 * @var resource
 	 */
 	protected $_stream = null;
 

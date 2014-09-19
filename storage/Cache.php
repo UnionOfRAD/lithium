@@ -162,7 +162,7 @@ class Cache extends \lithium\core\Adaptable {
 		}
 		$key = static::key($key, $data);
 
-		if ($isMulti = is_array($key)) {
+		if (is_array($key)) {
 			$keys = $key;
 			$expiry = $data;
 		} else {
@@ -300,7 +300,7 @@ class Cache extends \lithium\core\Adaptable {
 		}
 		$key = static::key($key);
 
-		if ($isMulti = is_array($key)) {
+		if (is_array($key)) {
 			$keys = $key;
 		} else {
 			$keys = array($key);

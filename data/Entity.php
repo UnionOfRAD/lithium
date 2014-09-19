@@ -228,17 +228,15 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
-		$class = $this->_model;
-		$modelRespondsTo = false;
-		$parentRespondsTo = parent::respondsTo($method, $internal);
-		$staticRespondsTo = $class::respondsTo($method, $internal);
-		if (method_exists($class, '_object')) {
-			$model = $class::invokeMethod('_object');
-			$modelRespondsTo = $model->respondsTo($method);
+		if (method_exists($class = $this->_model, '_object')) {
+			$result = $class::invokeMethod('_object')->respondsTo($method);
 		} else {
-			$modelRespondsTo = Inspector::isCallable($class, $method, $internal);
+			$result = Inspector::isCallable($class, $method, $internal);
 		}
-		return $parentRespondsTo || $staticRespondsTo || $modelRespondsTo;
+		$result = $result || parent::respondsTo($method, $internal);
+		$result = $result || $class::respondsTo($method, $internal);
+
+		return $result;
 	}
 
 	/**

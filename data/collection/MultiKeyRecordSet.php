@@ -166,7 +166,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 		if (!$options['internal'] && !is_scalar(current($this->_index))) {
 			$options['internal'] = true;
 		}
-		return $result = parent::to($format, $options);
+		return parent::to($format, $options);
 	}
 
 	/**

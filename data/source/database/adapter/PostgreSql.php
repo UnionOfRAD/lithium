@@ -379,7 +379,6 @@ class PostgreSql extends \lithium\data\source\Database {
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) use ($conn) {
 			$sql = $params['sql'];
-			$options = $params['options'];
 
 			try {
 				$resource = $conn->query($sql);

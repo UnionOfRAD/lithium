@@ -199,7 +199,7 @@ class Route extends \lithium\core\Object {
 		if (!$this->_pattern) {
 			$this->compile();
 		}
-		if ($isKey = isset($this->_keys['controller']) || isset($this->_params['controller'])) {
+		if (isset($this->_keys['controller']) || isset($this->_params['controller'])) {
 			$this->_persist = $this->_persist ?: array('controller');
 		}
 	}

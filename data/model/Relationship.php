@@ -186,7 +186,6 @@ class Relationship extends \lithium\core\Object {
 	 * @return object Returns the object(s) for this relationship.
 	 */
 	public function get($object, array $options = array()) {
-		$model = $this->to();
 		$link = $this->link();
 		$strategies = $this->_strategies();
 

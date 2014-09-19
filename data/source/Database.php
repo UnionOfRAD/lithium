@@ -931,7 +931,6 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function _conditions($conditions, $context, array $options = array()) {
 		$defaults = array('prepend' => false);
-		$ops = $this->_operators;
 		$options += $defaults;
 
 		switch (true) {
@@ -1503,7 +1502,6 @@ abstract class Database extends \lithium\data\Source {
 		$model = $rel->to();
 
 		if ($fromAlias === null) {
-			$from = $rel->from();
 			$fromAlias = $context->alias();
 		}
 		if ($toAlias === null) {

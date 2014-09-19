@@ -20,14 +20,14 @@ class Response extends \lithium\core\Object {
 	/**
 	 * Output stream, STDOUT
 	 *
-	 * @var stream
+	 * @var resource
 	 */
 	public $output = null;
 
 	/**
 	 * Error stream, STDERR
 	 *
-	 * @var stream
+	 * @var resource
 	 */
 	public $error = null;
 

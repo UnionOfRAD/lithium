@@ -1441,7 +1441,6 @@ class Model extends \lithium\core\StaticObject {
 			},
 			'count' => function($self, $params) use ($_query) {
 				$model = $self;
-				$type = $params['type'];
 				$options = array_diff_key($params['options'], $_query);
 
 				if ($options && !isset($params['options']['conditions'])) {

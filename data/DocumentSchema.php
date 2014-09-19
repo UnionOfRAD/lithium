@@ -34,7 +34,6 @@ class DocumentSchema extends \lithium\data\Schema {
 		$options += $defaults;
 
 		$basePathKey = $options['pathKey'];
-		$model = (!$options['model'] && $object) ? $object->model() : $options['model'];
 		$classes = $this->_classes;
 
 		$fieldName = is_int($key) ? null : $key;
@@ -81,7 +80,7 @@ class DocumentSchema extends \lithium\data\Schema {
 		if ($options['wrap']) {
 			$config = array(
 				'parent' => $options['parent'],
-				'model' => $options['model'],
+				'model' => (!$options['model'] && $object) ? $object->model() : $options['model'],
 				'schema' => $this
 			);
 			$config += compact('pathKey') + array_diff_key($options, $defaults);

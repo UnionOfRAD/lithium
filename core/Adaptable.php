@@ -43,7 +43,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * )
 	 * ```
 	 *
-	 * @var object `Collection` of configurations, indexed by name.
+	 * @var array Array of configurations, indexed by name.
 	 */
 	protected static $_configurations = array();
 
@@ -70,7 +70,7 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * configuration settings.
 	 *
 	 * @param array $config Configurations, indexed by name.
-	 * @return object `Collection` of configurations or void if setting configurations.
+	 * @return array Array of configurations or void if setting configurations.
 	 */
 	public static function config($config = null) {
 		if ($config && is_array($config)) {

@@ -126,11 +126,10 @@ class Command extends \lithium\core\Object {
 	 * @see lithium\console\Response
 	 * @param string $action The name of the method to run.
 	 * @param array $args The arguments from the request.
-	 * @param array $options
 	 * @return object The response object associated with this command.
 	 * @todo Implement filters.
 	 */
-	public function __invoke($action, $args = array(), $options = array()) {
+	public function __invoke($action, $args = array()) {
 		try {
 			$this->response->status = 1;
 			$result = $this->invokeMethod($action, $args);
@@ -168,12 +167,12 @@ class Command extends \lithium\core\Object {
 	 * Writes a string to the output stream.
 	 *
 	 * @param string $output The string to write.
-	 * @param integer|string|array $options
-	 *        integer as the number of new lines.
-	 *        string as the style
-	 *        array as :
-	 *        - nl : number of new lines to add at the end
-	 *        - style : the style name to wrap around the
+	 * @param mixed $options When passed an integer or boolean it is used as the number of
+	 *                       of new lines, when passed a string it is interpreted as style
+	 *                       to use otherwise when an array following options are available:
+	 *                       - `'nl'` _integer|boolean_: number of new lines to add at the
+	 *                          end. `false` to disable adding a newline.
+	 *                       - `'style'` _string_: the style name to wrap around the output.
 	 * @return integer
 	 */
 	public function out($output = null, $options = array('nl' => 1)) {
@@ -187,12 +186,12 @@ class Command extends \lithium\core\Object {
 	 * Writes a string to error stream.
 	 *
 	 * @param string $error The string to write.
-	 * @param integer|string|array $options
-	 *        integer as the number of new lines.
-	 *        string as the style
-	 *        array as :
-	 *        - nl : number of new lines to add at the end
-	 *        - style : the style name to wrap around the
+	 * @param mixed $options When passed an integer or boolean it is used as the number of
+	 *                       of new lines, when passed a string it is interpreted as style
+	 *                       to use otherwise when an array following options are available:
+	 *                       - `'nl'` _integer|boolean_: number of new lines to add at the
+	 *                          end. `false` to disable adding a newline.
+	 *                       - `'style'` _string_: the style name to wrap around the output.
 	 * @return integer
 	 */
 	public function error($error = null, $options = array('nl' => 1)) {
@@ -219,7 +218,7 @@ class Command extends \lithium\core\Object {
 		$default = $options['default'] ? "[{$options['default']}] " : '';
 
 		do {
-			$this->out("{$prompt} {$choices} \n {$default}> ", false);
+			$this->out("{$prompt} {$choices} \n {$default}> ", 0);
 			$result = trim($this->request->input());
 		} while (
 			!empty($options['choices']) &&
@@ -365,7 +364,7 @@ class Command extends \lithium\core\Object {
 	 * Stop execution, by exiting the script.
 	 *
 	 * @param integer $status Numeric value that will be used on `exit()`.
-	 * @param boolean $message An optional message that will be written to the stream.
+	 * @param string|null $message An optional message that will be written to the stream.
 	 * @return void
 	 */
 	public function stop($status = 0, $message = null) {
@@ -380,19 +379,21 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @param string $type The stream either output or error.
 	 * @param string $string The message to render.
-	 * @param integer|string|array $options When passed an integer is used as the number
-	 *                             of new lines, when passed a string it is interpreted as
-	 *                             style to use otherwise when an array following options are
-	 *                             available:
-	 *                             - `'nl'` _integer_: number of new lines to add at the end.
-	 *                             - `'style'` _string_: the style name to wrap around the.
+	 * @param mixed $options When passed an integer or boolean it is used as the number of
+	 *                       of new lines, when passed a string it is interpreted as style
+	 *                       to use otherwise when an array following options are available:
+	 *                       - `'nl'` _integer|boolean_: number of new lines to add at the
+	 *                          end. `false` to disable adding a newline.
+	 *                       - `'style'` _string_: the style name to wrap around the output.
 	 * @return void
 	 */
 	protected function _response($type, $string, $options) {
 		$defaults = array('nl' => 1, 'style' => null);
 
 		if (!is_array($options)) {
-			if (!$options || is_int($options)) {
+			if (is_bool($options)) {
+				$options = array('nl' => (integer) $options);
+			} elseif(is_int($options)) {
 				$options = array('nl' => $options);
 			} elseif (is_string($options)) {
 				$options = array('style' => $options);
@@ -413,7 +414,7 @@ class Command extends \lithium\core\Object {
 			$string = "{:{$options['style']}}{$string}{:end}";
 		}
 		if ($options['nl']) {
-			$string = $string . $this->nl($options['nl']);
+			$string = $string . $this->nl((integer) $options['nl']);
 		}
 		return $this->response->{$type}($string);
 	}

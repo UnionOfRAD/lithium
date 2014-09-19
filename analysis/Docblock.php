@@ -85,7 +85,6 @@ class Docblock extends \lithium\core\StaticObject {
 		}
 
 		if (isset($tags['param'])) {
-			$params = $tags['param'];
 			$tags['params'] = static::_params((array) $tags['param']);
 			unset($tags['param']);
 		}

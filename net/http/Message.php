@@ -291,7 +291,7 @@ class Message extends \lithium\net\Message {
 	protected function _encode($body) {
 		$media = $this->_classes['media'];
 
-		if ($type = $media::type($this->_type)) {
+		if ($media::type($this->_type)) {
 			$encoded = $media::encode($this->_type, $body);
 			$body = $encoded !== null ? $encoded : $body;
 		}
@@ -308,7 +308,7 @@ class Message extends \lithium\net\Message {
 	protected function _decode($body) {
 		$media = $this->_classes['media'];
 
-		if ($type = $media::type($this->_type)) {
+		if ($media::type($this->_type)) {
 			$decoded = $media::decode($this->_type, $body);
 			$body = $decoded !== null ? $decoded : $body;
 		}
