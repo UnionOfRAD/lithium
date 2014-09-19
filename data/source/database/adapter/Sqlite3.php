@@ -321,8 +321,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 		$column = array_intersect_key($column, array('type' => null, 'length' => null));
 		if (isset($column['length']) && $column['length']) {
 			$length = explode(',', $column['length']) + array(null, null);
-			$column['length'] = $length[0] ? intval($length[0]) : null;
-			$length[1] ? $column['precision'] = intval($length[1]) : null;
+			$column['length'] = $length[0] ? (integer) $length[0] : null;
+			$length[1] ? $column['precision'] = (integer) $length[1] : null;
 		}
 
 		switch (true) {

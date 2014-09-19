@@ -1,9 +1,9 @@
 <?php
 
-$passes = intval($count['passes']) ?: 0;
-$asserts = intval($count['asserts']) ?: 0;
-$fails = intval($count['fails']) ?: 0;
-$exceptions = intval($count['exceptions']) ?: 0;
+$passes = (integer) $count['passes'] ?: 0;
+$asserts = (integer) $count['asserts'] ?: 0;
+$fails = (integer) $count['fails'] ?: 0;
+$exceptions = (integer) $count['exceptions'] ?: 0;
 
 ?>
 <div class="test-result test-result-<?php echo ($success ? 'success' : 'fail') ?>">

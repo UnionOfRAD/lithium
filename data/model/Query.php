@@ -364,7 +364,7 @@ class Query extends \lithium\core\Object {
 	 */
 	public function limit($limit = null) {
 		if ($limit) {
-			$this->_config['limit'] = intval($limit);
+			$this->_config['limit'] = (integer) $limit;
 			return $this;
 		}
 		if ($limit === false) {
@@ -382,7 +382,7 @@ class Query extends \lithium\core\Object {
 	 */
 	public function offset($offset = null) {
 		if ($offset !== null) {
-			$this->_config['offset'] = intval($offset);
+			$this->_config['offset'] = (integer) $offset;
 			return $this;
 		}
 		return $this->_config['offset'];
@@ -396,7 +396,7 @@ class Query extends \lithium\core\Object {
 	 */
 	public function page($page = null) {
 		if ($page) {
-			$this->_config['page'] = $page = (intval($page) ?: 1);
+			$this->_config['page'] = $page = ((integer) $page ?: 1);
 			$this->offset(($page - 1) * $this->_config['limit']);
 			return $this;
 		}

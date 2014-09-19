@@ -72,8 +72,8 @@ class Set {
 		$path = is_array($path) ? $path : explode('.', $path);
 
 		foreach ($path as $i => $key) {
-			if (is_numeric($key) && intval($key) > 0 || $key === '0') {
-				$key = intval($key);
+			if (is_numeric($key) && (integer) $key > 0 || $key === '0') {
+				$key = (integer) $key;
 			}
 			if ($i === count($path) - 1) {
 				return (is_array($data) && isset($data[$key]));
@@ -449,7 +449,7 @@ class Set {
 				continue;
 			}
 			list($path, $key) = explode($options['separator'], $key, 2);
-			$path = is_numeric($path) ? intval($path) : $path;
+			$path = is_numeric($path) ? (integer) $path : $path;
 			$result[$path][$key] = $val;
 		}
 		foreach ($result as $key => $value) {
@@ -532,8 +532,8 @@ class Set {
 		$_list =& $list;
 
 		foreach ($path as $i => $key) {
-			if (is_numeric($key) && intval($key) > 0 || $key === '0') {
-				$key = intval($key);
+			if (is_numeric($key) && (integer) $key > 0 || $key === '0') {
+				$key = (integer) $key;
 			}
 			if ($i === count($path) - 1) {
 				$_list[$key] = $data;
@@ -745,8 +745,8 @@ class Set {
 		$_list =& $list;
 
 		foreach ($path as $i => $key) {
-			if (is_numeric($key) && intval($key) > 0 || $key === '0') {
-				$key = intval($key);
+			if (is_numeric($key) && (integer) $key > 0 || $key === '0') {
+				$key = (integer) $key;
 			}
 			if ($i === count($path) - 1) {
 				unset($_list[$key]);

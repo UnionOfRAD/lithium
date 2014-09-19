@@ -165,7 +165,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 		$fromString = function($host) {
 			if (strpos($host, ':')) {
 				list($host, $port) = explode(':', $host);
-				return array($host, intval($port));
+				return array($host, (integer) $port);
 			}
 			return array($host, Memcache::CONN_DEFAULT_PORT);
 		};
