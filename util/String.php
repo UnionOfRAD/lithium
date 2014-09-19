@@ -250,7 +250,6 @@ class String {
 		);
 		$options += $defaults;
 		$format = $options['format'];
-		reset($data);
 
 		if ($format === 'regex' || (!$format && $options['escape'])) {
 			$format = sprintf(
