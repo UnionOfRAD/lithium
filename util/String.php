@@ -322,9 +322,6 @@ class String {
 	 * @return string The cleaned string.
 	 */
 	public static function clean($str, array $options = array()) {
-		if (!$options['clean']) {
-			return $str;
-		}
 		if (is_array($options['clean'])) {
 			$clean = $options['clean'];
 		} else {

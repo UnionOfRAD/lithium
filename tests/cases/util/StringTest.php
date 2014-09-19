@@ -310,9 +310,6 @@ class StringTest extends \lithium\test\Unit {
 		$string = ':a 2 3';
 		$result = String::clean($string, array('clean' => true, 'before' => ':', 'after' => ''));
 		$this->assertEqual('2 3', $result);
-
-		$result = String::clean($string, array('clean' => false, 'before' => ':', 'after' => ''));
-		$this->assertEqual($string, $result);
 	}
 
 	/**
