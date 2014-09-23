@@ -11,7 +11,7 @@ request/response flow. In that commands are quite similar to controllers.
 Commands don't leverage the full MVC as they don't utilize views, but
 directly interact with the user through `in()` and `out()`.
 
-Lithium itself provides amongst others commands for creating new applications
+li3 itself provides amongst others commands for creating new applications
 or parts thereof. However commands can also be provided through other libraries
 or by your application. Commands running in the application context will have
 complete access to your application. This is especially useful to reuse
@@ -22,7 +22,7 @@ i.e. a cron-job.
 
 You invoke the console front-controller through one of the wrappers
 provided, as shown below. The examples shown are relative to the root directory
-of a standard Lithium  distribution. The first is for users on a *nix command
+of a standard li3  distribution. The first is for users on a *nix command
 line the second for users on a Windows system. Please note that the preceding
 `$` in examples always indicates things that you enter on the command line.
 

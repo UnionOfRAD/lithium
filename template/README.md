@@ -3,12 +3,14 @@
 ## Special syntax
 
 Views have a special syntax for outputting escaped text. The standard way to
-output escaped text in your views from Lithium is as follows: {{{
+output escaped text in your views from li3 is as follows: 
+
+```
 <?=$variable; ?>
-}}}
+```
 
 This is where a lot of confusion comes in, because it is commonly misunderstood
-that Lithium depends on `short_open_tags`, however, that's not the case. The
+that li3 depends on `short_open_tags`, however, that's not the case. The
 contents of a view are processed through a [tokenizer](template/view/Compiler) before
 it is included by PHP. The file is then `compiled` into the final PHP+HTML (or whatever
 other content type that is requested), which is then passed off to be fully rendered
@@ -31,6 +33,7 @@ contained in the shorthands syntax, it will be output as normal without being
 filtered. This is to make it easier to work with helpers that return markup.
 
 An example would be something like: 
+
 ```
 <?=$this->form->create(); ?>
 ... my form here ...
@@ -100,7 +103,7 @@ plugin.
 
 ## Extending core helpers
 
-Because your application and plugins have a higher order-of-precedence than the Lithium core,
+Because your application and plugins have a higher order-of-precedence than the li3 core,
 classes like helpers can be extended and replaced seamlessly, without any changes to your templates.
 
 For example, to add or replace methods in the `Form` helper, you can add the following to
