@@ -484,6 +484,9 @@ class Validator extends \lithium\core\StaticObject {
 				$options['field'] = $field;
 
 				foreach ($rules as $key => $rule) {
+					if (array_key_exists('required', $rule) && $rule['required'] === null) {
+						unset($rule['required']);
+					}
 					$rule += $options + compact('values');
 					list($name) = $rule;
 
