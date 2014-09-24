@@ -179,12 +179,9 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 *
 	 * @param string $name Property name.
 	 * @param string $value Property value.
-	 * @return mixed Result.
+	 * @return void.
 	 */
 	public function __set($name, $value) {
-		if (is_array($name) && !$value) {
-			return array_map(array(&$this, '__set'), array_keys($name), array_values($name));
-		}
 		$this->_updated[$name] = $value;
 	}
 
