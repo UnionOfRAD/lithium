@@ -1719,6 +1719,38 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected = "INSERT INTO {mock_database_posts} ({title}) VALUES ('{:foobar}');";
 		$this->assertEqual($expected, $this->_db->sql);
 	}
+
+	public function testIncrement() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('id' => 1, 'balance' => 10),
+			'exists' => true
+		));
+
+		$entity->increment('balance', 10);
+		$query = new Query(compact('entity') + array('type' => 'update'));
+		$result = $this->_db->update($query);
+		$expected = "UPDATE {mock_database_posts} SET {id} = 1, {balance} = {balance} + 10 WHERE {id} = 1;";
+		$this->assertEqual($expected, $this->_db->sql);
+
+		$entity->increment('balance', 10);
+		$entity->decrement('balance', 20);
+		$query = new Query(compact('entity') + array('type' => 'update'));
+		$result = $this->_db->update($query);
+		$expected = "UPDATE {mock_database_posts} SET {id} = 1, {balance} = {balance} + -10 WHERE {id} = 1;";
+		$this->assertEqual($expected, $this->_db->sql);
+
+		$entity->increment('balance', 10);
+		$entity->balance = 20;
+		$query = new Query(compact('entity') + array('type' => 'update'));
+		$result = $this->_db->update($query);
+		$expected = "UPDATE {mock_database_posts} SET {id} = 1, {balance} = 20 WHERE {id} = 1;";
+		$this->assertEqual($expected, $this->_db->sql);
+
+		$this->expectException("Field 'name' cannot be incremented.");
+		$entity->name = 'Ali';
+		$entity->increment('name', 10);
+	}
 }
 
 ?>

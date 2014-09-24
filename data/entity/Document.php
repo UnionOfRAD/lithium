@@ -456,32 +456,6 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		}
 		return $this->_valid ? $this->__get(key($this->_data)) : null;
 	}
-
-	/**
-	 * Safely (atomically) increments the value of the specified field by an arbitrary value.
-	 * Defaults to `1` if no value is specified. Throws an exception if the specified field is
-	 * non-numeric.
-	 *
-	 * @param string $field The name of the field to be incrememnted.
-	 * @param integer|string $value The value to increment the field by. Defaults to `1` if this
-	 *               parameter is not specified.
-	 * @return integer Returns the current value of `$field`, based on the value retrieved from the
-	 *         data source when the entity was loaded, plus any increments applied. Note that it
-	 *         may not reflect the most current value in the persistent backend data source.
-	 * @throws UnexpectedValueException Throws an exception when `$field` is set to a non-numeric
-	 *         type.
-	 */
-	public function increment($field, $value = 1) {
-		if (!isset($this->_increment[$field])) {
-			$this->_increment[$field] = 0;
-		}
-		$this->_increment[$field] += $value;
-
-		if (!is_numeric($this->_updated[$field])) {
-			throw new UnexpectedValueException("Field `{$field}` cannot be incremented.");
-		}
-		return $this->_updated[$field] += $value;
-	}
 }
 
 ?>
