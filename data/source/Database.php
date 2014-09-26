@@ -1326,10 +1326,21 @@ abstract class Database extends \lithium\data\Source {
 
 	protected function _updateFields($data, $schema, $context) {
 		$fields = array();
+		$increment = array();
+
+		if ($entity = $context->entity()) {
+			$export = $entity->export();
+			$increment = $export['increment'];
+		}
 
 		foreach ($data as $field => $value) {
 			$schema += array($field => array('default' => null));
-			$fields[] = $this->name($field) . ' = ' . $this->value($value, $schema[$field]);
+			$name = $this->name($field);
+			if (isset($increment[$field])) {
+				$fields[] = $name . ' = ' . $name . ' + ' . $this->value($increment[$field], $schema[$field]);
+			} else {
+				$fields[] = $name . ' = ' . $this->value($value, $schema[$field]);
+			}
 		}
 		return join(', ', $fields);
 	}

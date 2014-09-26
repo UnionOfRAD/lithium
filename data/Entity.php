@@ -175,16 +175,15 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	}
 
 	/**
-	 * Overloading for writing to inaccessible properties.
+	 * PHP magic method used when setting properties on the `Entity` instance, i.e.
+	 * `$entity->title = 'Lorem Ipsum'`.
 	 *
-	 * @param string $name Property name.
-	 * @param string $value Property value.
-	 * @return mixed Result.
+	 * @param string $name The name of the field/property to write to, i.e. `title` in the above example.
+	 * @param mixed $value The value to write, i.e. `'Lorem Ipsum'`.
+	 * @return void
 	 */
 	public function __set($name, $value) {
-		if (is_array($name) && !$value) {
-			return array_map(array(&$this, '__set'), array_keys($name), array_values($name));
-		}
+		unset($this->_increment[$name]);
 		$this->_updated[$name] = $value;
 	}
 
@@ -378,6 +377,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 			$key = $model::meta('key');
 			$key = is_array($key) ? array_combine($key, $id) : array($key => $id);
 		}
+		$this->_increment = array();
 		$this->_data = $this->_updated = ($key + $data + $this->_updated);
 	}
 
@@ -387,8 +387,8 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * non-numeric.
 	 *
 	 * @param string $field The name of the field to be incremented.
-	 * @param string $value The value to increment the field by. Defaults to `1` if this parameter
-	 *        is not specified.
+	 * @param integer|string $value The value to increment the field by. Defaults to `1` if this
+	 *               parameter is not specified.
 	 * @return integer Returns the current value of `$field`, based on the value retrieved from the
 	 *         data source when the entity was loaded, plus any increments applied. Note that it may
 	 *         not reflect the most current value in the persistent backend data source.
@@ -397,11 +397,16 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 */
 	public function increment($field, $value = 1) {
 		if (!isset($this->_updated[$field])) {
-			return $this->_updated[$field] = $value;
-		}
-		if (!is_numeric($this->_updated[$field])) {
+			$this->_updated[$field] = 0;
+		} elseif (!is_numeric($this->_updated[$field])) {
 			throw new UnexpectedValueException("Field '{$field}' cannot be incremented.");
 		}
+
+		if (!isset($this->_increment[$field])) {
+			$this->_increment[$field] = 0;
+		}
+		$this->_increment[$field] += $value;
+
 		return $this->_updated[$field] += $value;
 	}
 
