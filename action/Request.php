@@ -162,6 +162,10 @@ class Request extends \lithium\net\http\Request {
 	 *        - `'env'` _array_: Defaults to `array()`.
 	 *        - `'globals'` _boolean_: Use global variables for populating
 	 *          the request's environment and data; defaults to `true`.
+	 *        - `'drain'` _boolean_: Enables/disables automatic reading of streams.
+	 *          Defaults to `true`. Disable when you're dealing with large binary
+	 *          payloads. Note that this will also disable automatic content decoding
+	 *          of stream data.
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -171,7 +175,8 @@ class Request extends \lithium\net\http\Request {
 			'data' => array(),
 			'stream' => null,
 			'globals' => true,
-			'query' => array()
+			'drain' => true,
+			'query' => array(),
 		);
 		$config += $defaults;
 
@@ -258,7 +263,7 @@ class Request extends \lithium\net\http\Request {
 		$this->method = strtoupper($this->env('REQUEST_METHOD'));
 		$hasBody = in_array($this->method, array('POST', 'PUT', 'PATCH'));
 
-		if (!$this->body && $hasBody && $type !== 'html') {
+		if ($this->_config['drain'] && !$this->body && $hasBody && $type !== 'html') {
 			$this->_stream = $this->_stream ?: fopen('php://input', 'r');
 			$this->body = stream_get_contents($this->_stream);
 			fclose($this->_stream);
