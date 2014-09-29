@@ -173,9 +173,26 @@ class MongoDb extends \lithium\data\Source {
 	protected function _init() {
 		parent::_init();
 
-		$this->_operators += array('like' => function($key, $value) {
-			return new MongoRegex($value);
-		});
+		$this->_operators += array(
+			'like' => function($key, $value) {
+				return new MongoRegex($value);
+			},
+			'$exists' => function($key, $value) {
+				return array('$exists' => (boolean) $value);
+			},
+			'$type' => function($key, $value) {
+				return array('$type' => (int) $value);
+			},
+			'$mod' => function($key, $value) {
+				$value = (array) $value;
+				$divisor = current($value);
+				$remainder = next($value) ?: 0;
+				return array('$mod' => array($divisor, $remainder));
+			},
+			'$size' => function($key, $value) {
+				return array('$size' => (int) $value);
+			}
+		);
 	}
 
 	/**

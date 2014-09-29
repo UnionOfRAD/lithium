@@ -780,6 +780,45 @@ class MongoDbTest extends \lithium\test\Unit {
 		}
 	}
 
+	public function testNotCastingConditionsForSpecialQueryOpts(){
+		$query = new Query(array(
+			'schema' => new Schema(array('fields' => $this->_schema))
+		));
+
+		$conditions = array('title' => array('$exists' => true));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('title' => array('$size' => 1));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('title' => array('$type' => 1));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('title' => array('$mod' => array(3)));
+		$result = $this->_db->conditions($conditions, $query);
+		$expected = array('title' => array('$mod' => array(3,0)));
+		$this->assertIdentical($expected, $result);
+
+		$conditions = array('tags' => array('$exists' => true));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('tags' => array('$size' => 1));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('tags' => array('$type' => 1));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('created' => array('$mod' => array(7,0)));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+	}
+
 	public function testMultiOperationConditions() {
 		$conditions = array('loc' => array('$near' => array(50, 50), '$maxDistance' => 5));
 		$result = $this->_db->conditions($conditions, $this->_query);
