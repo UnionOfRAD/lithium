@@ -6,13 +6,13 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\storage\cache\adapter;
+namespace lithium\tests\integration\storage\cache\adapter;
 
 use Memcached;
 use lithium\storage\Cache;
 use lithium\storage\cache\adapter\Memcache;
 
-class MemcacheTest extends \lithium\test\Unit {
+class MemcacheTest extends \lithium\test\Integration {
 
 	protected $_conn = null;
 

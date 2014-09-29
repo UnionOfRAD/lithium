@@ -6,14 +6,14 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\storage\cache\adapter;
+namespace lithium\tests\integration\storage\cache\adapter;
 
 use Exception;
 use Redis as RedisCore;
 use lithium\storage\Cache;
 use lithium\storage\cache\adapter\Redis;
 
-class RedisTest extends \lithium\test\Unit {
+class RedisTest extends \lithium\test\Integration {
 
 	public $redis;
 
