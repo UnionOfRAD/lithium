@@ -168,6 +168,9 @@ class Response extends \lithium\net\http\Response {
 			}
 			$code = $this->status['code'];
 		}
+		if ($cookies = $this->_cookies()) {
+			$this->headers('Set-Cookie', $cookies);
+		}
 		$this->_writeHeaders($this->status() ?: $this->status(500));
 		$this->_writeHeaders($this->headers(), $code);
 

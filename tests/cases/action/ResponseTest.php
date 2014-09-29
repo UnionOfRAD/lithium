@@ -49,6 +49,22 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->assertIdentical('HTTP/1.1 200 OK', $this->response->testHeaders[0]);
 	}
 
+	public function testResponseRenderWithCookies() {
+		$this->response->cookies(array(
+			'Name' => array('value' => 'Ali', 'domain' => '.li3.me', 'secure' => true),
+			'Destination' => array('value' => 'The Future', 'expires' => 'Oct 21 2015 4:29 PM PDT')
+		));
+		ob_start();
+		$this->response->render();
+		$result = ob_get_clean();
+		$expected = array(
+			'HTTP/1.1 200 OK',
+			'Set-Cookie: Name=Ali; Domain=.li3.me; Secure',
+			'Set-Cookie: Destination=The%20Future; Expires=Wed, 21-Oct-2015 23:29:00 GMT',
+		);
+		$this->assertIdentical($expected, $this->response->testHeaders);
+	}
+
 	public function testResponseToString() {
 		$this->response->type(false);
 		$this->response->body = 'Document body';
