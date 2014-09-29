@@ -32,8 +32,7 @@ use Closure;
  * Available assertions are (see `assert<assertion-name>` methods for details): Equal, False,
  * Identical, NoPattern, NotEqual, Null, Pattern, Tags, True.
  *
- * If an assertion is expected to produce an exception, the `expectException` method should be
- * called before it.
+ * If an assertion is expected to produce an exception, `assertException()` should be used.
  *
  * @see lithium\test\Unit::assertException()
  */
@@ -52,13 +51,6 @@ class Unit extends \lithium\core\Object {
 	 * @var string
 	 */
 	protected $_results = array();
-
-	/**
-	 * The list of expected exceptions.
-	 *
-	 * @var string
-	 */
-	protected $_expected = array();
 
 	/**
 	 * Internal types and how to test for them
@@ -449,24 +441,9 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Used before a call to `assert*()` if you expect the test assertion to generate an exception
-	 * or PHP error.  If no error or exception is thrown, a test failure will be reported.  Can
-	 * be called multiple times per assertion, if more than one error is expected.
-	 *
-	 * @param mixed $message A string indicating what the error text is expected to be.  This can
-	 *              be an exact string, a /-delimited regular expression, or true, indicating that
-	 *              any error text is acceptable.
-	 * @return void
-	 */
-	public function expectException($message = true) {
-		$this->_expected[] = $message;
-	}
-
-	/**
-	 * Assert that the code passed in a closure throws an exception matching the passed expected
-	 * exception.
-	 *
-	 * The value passed to `exepected` is either an exception class name or the expected message.
+	 * Assert that the code passed in a closure throws an exception or raises a PHP error. The
+	 * first argument to this method specifies which class name or message the exception must
+	 * have in order to make the assertion successful.
 	 *
 	 * @see lithium\test\Unit::assert()
 	 * @param mixed $expected A string indicating what the error text is expected to be.  This can
@@ -1650,12 +1627,9 @@ class Unit extends \lithium\core\Object {
 	}
 
 	/**
-	 * Normalizes `Exception` objects and PHP error data into a single array format, and checks
-	 * each error against the list of expected errors (set using `expectException()`).  If a match
-	 * is found, the expectation is removed from the stack and the error is ignored.  If no match
-	 * is found, then the error data is logged to the test results.
+	 * Normalizes `Exception` objects and PHP error data into a single array format
+	 * then the error data is logged to the test results.
 	 *
-	 * @see lithium\test\Unit::expectException()
 	 * @see lithium\test\Unit::_reportException()
 	 * @param mixed $exception An `Exception` object instance, or an array containing the following
 	 *              keys: `'message'`, `'file'`, `'line'`, `'trace'` (in `debug_backtrace()`
@@ -1973,6 +1947,34 @@ class Unit extends \lithium\core\Object {
 			$result = preg_replace('/\r\n/', "\n", $result);
 		}
 		return array($expected, $result);
+	}
+
+	/* Deprecated */
+
+	/**
+	 * The list of expected exceptions.
+	 *
+	 * @deprecated
+	 * @var string
+	 */
+	protected $_expected = array();
+
+	/**
+	 * Used before a call to `assert*()` if you expect the test assertion to generate an exception
+	 * or PHP error.  If no error or exception is thrown, a test failure will be reported.  Can
+	 * be called multiple times per assertion, if more than one error is expected.
+	 *
+	 * @deprecated
+	 * @param mixed $message A string indicating what the error text is expected to be.  This can
+	 *              be an exact string, a /-delimited regular expression, or true, indicating that
+	 *              any error text is acceptable.
+	 * @return void
+	 */
+	public function expectException($message = true) {
+		$message = "Unit::expectException() is deprecated in favor of Unit::assertException().";
+		 trigger_error($message, E_USER_DEPRECATED);
+
+		$this->_expected[] = $message;
 	}
 }
 

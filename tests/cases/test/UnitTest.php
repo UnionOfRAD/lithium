@@ -467,20 +467,6 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testExpectException() {
-		$result = null;
-		$test = $this->test;
-
-		$this->assertException('/deprecated/', function() use ($test, &$results) {
-			$results = $test->expectException('test expected exception');
-		});
-		$results = $this->test->results();
-
-		$expected = 'test expected exception';
-		$result = $this->test->expected();
-		$this->assertEqual($expected, $result[0]);
-	}
-
 	public function testHandleException() {
 		$this->test->handleException(new Exception('test handle exception'));
 		$results = $this->test->results();
@@ -497,22 +483,6 @@ class UnitTest extends \lithium\test\Unit {
 		$this->test->handleException(new Exception('test handle exception'));
 
 		$this->assertEmpty($this->test->expected());
-	}
-
-	public function testExpectExceptionPostNotThrown() {
-		$this->test->run(array(
-			'methods' => array(
-				'prepareTestExpectExceptionNotThrown'
-			)
-		));
-		$results = $this->test->results();
-		$message = 'expectException in a method with no exception should result in a failed test.';
-
-		$expected = 'fail';
-		$this->assertEqual($expected, $results[0]['result'], $message);
-
-		$expected = 'Expected exception matching `test` uncaught.';
-		$this->assertEqual($expected, $results[0]['message']);
 	}
 
 	public function testGetTest() {
