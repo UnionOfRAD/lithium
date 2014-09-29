@@ -211,6 +211,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$name = $self->invokeMethod('_entityName', array($entity, array('quoted' => true)));
 			$columns = $self->read("PRAGMA table_info({$name})", array('return' => 'array'));
 			$fields = array();
+
 			foreach ($columns as $column) {
 				$schema = $self->invokeMethod('_column', array($column['type']));
 				$default = $column['dflt_value'];
@@ -297,7 +298,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 
 			try {
 				$resource = $conn->query($sql);
-			} catch(PDOException $e) {
+			} catch (PDOException $e) {
 				$self->invokeMethod('_error', array($sql));
 			};
 			return $self->invokeMethod('_instance', array('result', compact('resource')));
