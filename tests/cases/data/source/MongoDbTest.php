@@ -88,16 +88,18 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testBadConnection() {
 		$db = new MongoDb(array('host' => null, 'autoConnect' => false));
-		$this->expectException('Could not connect to the database.');
-		$this->assertFalse($db->connect());
+		$this->assertException('Could not connect to the database.', function() use ($db) {
+			$db->connect();
+		});
 		$this->assertTrue($db->disconnect());
 	}
 
 	public function testGoodConnectionBadDatabase() {
 		$db = new MongoDb(array('database' => null, 'autoConnnect' => false));
 
-		$this->expectException('Could not connect to the database.');
-		$db->connect();
+		$this->assertException('Could not connect to the database.', function() use ($db) {
+			$db->connect();
+		});
 	}
 
 	public function testSources() {
@@ -630,32 +632,37 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testCreateNoConnectionException() {
 		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
-		$this->expectException('Could not connect to the database.');
-		$result = $db->create(null);
+		$this->assertException('Could not connect to the database.', function() use ($db) {
+			$db->create(null);
+		});
 	}
 
 	public function testReadNoConnectionException() {
 		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
-		$this->expectException('Could not connect to the database.');
-		$result = $db->read(null);
+		$this->assertException('Could not connect to the database.', function() use ($db) {
+			$db->read(null);
+		});
 	}
 
 	public function testUpdateNoConnectionException() {
 		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
-		$this->expectException('Could not connect to the database.');
-		$result = $db->update(null);
+		$this->assertException('Could not connect to the database.', function() use ($db) {
+			$db->update(null);
+		});
 	}
 
 	public function testDeleteNoConnectionException() {
 		$db = new MongoDb(array('host' => '__invalid__', 'autoConnect' => false));
-		$this->expectException('Could not connect to the database.');
-		$result = $db->delete(null);
+		$this->assertException('Could not connect to the database.', function() use ($db) {
+			$db->delete(null);
+		});
 	}
 
 	public function testSourcesNoConnectionException() {
 		$db = new MongoDb(array('host' => null, 'autoConnect' => false));
-		$this->expectException('Could not connect to the database.');
-		$result = $db->sources(null);
+		$this->assertException('Could not connect to the database.', function() use ($db) {
+			$db->sources(null);
+		});
 	}
 
 	public function testAtomicUpdate() {

@@ -116,23 +116,13 @@ class LocaleTest extends \lithium\test\Unit {
 	 * Tests failing of parsing invalid locales.
 	 */
 	public function testDecomposeFail()  {
-		$this->expectException();
-
-		try {
+		$this->assertException('/.*/', function() {
 			Locale::decompose('deee_DE');
-			$this->assert(false);
-		} catch (Exception $e) {
-			$this->assert(true);
-		}
+		});
 
-		$this->expectException();
-
-		try {
+		$this->assertException('/.*/', function() {
 			Locale::decompose('ZH-HANS-HK_REVISED_INVALID');
-			$this->assert(false);
-		} catch (Exception $e) {
-			$this->assert(true);
-		}
+		});
 	}
 
 	/**
@@ -148,14 +138,9 @@ class LocaleTest extends \lithium\test\Unit {
 		$this->assertNull(Locale::territory('zh'));
 		$this->assertNull(Locale::variant('zh'));
 
-		$this->expectException();
-
-		try {
+		$this->assertException('/.*/', function() {
 			Locale::notAValidTag('zh_Hans_HK_REVISED');
-			$this->assert(false);
-		} catch (Exception $e) {
-			$this->assert(true);
-		}
+		});
 	}
 
 	/**

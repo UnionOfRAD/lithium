@@ -79,8 +79,9 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(in_array('foo', Validator::rules()));
 		$this->assertEqual('/^foo$/', Validator::rules('foo'));
 
-		$this->expectException("Rule `bar` is not a validation rule.");
-		$this->assertNull(Validator::isBar('foo'));
+		$this->assertException("Rule `bar` is not a validation rule.", function() {
+			Validator::isBar('foo');
+		});
 	}
 
 	/**

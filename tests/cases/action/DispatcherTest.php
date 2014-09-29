@@ -31,8 +31,9 @@ class DispatcherTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithNoRouting() {
-		$this->expectException('/Could not route request/');
-		MockDispatcher::run(new Request(array('url' => '/')));
+		$this->assertException('/Could not route request/', function() {
+			MockDispatcher::run(new Request(array('url' => '/')));
+		});
 	}
 
 	/**
@@ -167,15 +168,17 @@ class DispatcherTest extends \lithium\test\Unit {
 	public function testControllerLookupFail() {
 		Dispatcher::config(array('classes' => array('router' => __CLASS__)));
 
-		$this->expectException("/Controller `SomeNonExistentController` not found/");
-		Dispatcher::run(new Request(array('url' => '/')));
+		$this->assertException("/Controller `SomeNonExistentController` not found/", function() {
+			Dispatcher::run(new Request(array('url' => '/')));
+		});
 	}
 
 	public function testPluginControllerLookupFail() {
 		Dispatcher::config(array('classes' => array('router' => __CLASS__)));
 
-		$this->expectException("/Controller `some_invalid_plugin.Controller` not found/");
-		Dispatcher::run(new Request(array('url' => '/plugin')));
+		$this->assertException("/Controller `some_invalid_plugin.Controller` not found/", function() {
+			Dispatcher::run(new Request(array('url' => '/plugin')));
+		});
 	}
 
 	public function testCall() {

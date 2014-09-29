@@ -168,8 +168,11 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testExecuteException() {
-		$this->expectException();
-		$this->_db->read('SELECT deliberate syntax error');
+		$db = $this->_db;
+
+		$this->assertException('/.*/', function() use ($db) {
+			$db->read('SELECT deliberate syntax error');
+		});
 	}
 
 	public function testEntityQuerying() {

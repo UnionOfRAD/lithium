@@ -207,8 +207,9 @@ class RouterTest extends \lithium\test\Unit {
 
 		$ex = "No parameter match found for URL ";
 		$ex .= "`('controller' => 'Sessions', 'action' => 'create', 'id' => 'foo')`.";
-		$this->expectException($ex);
-		$result = Router::match(array("Sessions::create", 'id' => 'foo'));
+		$this->assertException($ex, function() {
+			Router::match(array("Sessions::create", 'id' => 'foo'));
+		});
 	}
 
 	/**
@@ -226,11 +227,12 @@ class RouterTest extends \lithium\test\Unit {
 
 		$ex = "No parameter match found for URL `(";
 		$ex .= "'controller' => 'Posts', 'action' => 'view', 'id' => '4bbf25bd8ead0e5180130000')`.";
-		$this->expectException($ex);
-		$result = Router::match(array(
-			'controller' => 'posts', 'action' => 'view', 'id' => '4bbf25bd8ead0e5180130000'
-		));
-		$this->assertFalse(ob_get_length());
+		$this->assertException($ex, function() {
+			Router::match(array(
+				'controller' => 'posts', 'action' => 'view', 'id' => '4bbf25bd8ead0e5180130000'
+			));
+		});
+		$this->assertIdentical(0, ob_get_length());
 	}
 
 	public function testShorthandParameterMatching() {
@@ -279,10 +281,11 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match(array('controller' => 'sessions', 'action' => 'add'));
 		$this->assertIdentical('/login', $result);
 
-		$this->expectException(
-			"No parameter match found for URL `('controller' => 'Sessions', 'action' => 'index')`."
-		);
-		Router::match(array('controller' => 'sessions', 'action' => 'index'));
+		$expected  = "No parameter match found for URL `('controller' => 'Sessions', ";
+		$expected .= "'action' => 'index')`.";
+		$this->assertException($expected, function() {
+			Router::match(array('controller' => 'sessions', 'action' => 'index'));
+		});
 	}
 
 	/**
@@ -292,10 +295,11 @@ class RouterTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}');
 		$this->assertIdentical('/posts', Router::match(array('controller' => 'posts')));
 
-		$this->expectException(
-			"No parameter match found for URL `('controller' => 'Posts', 'action' => 'view')`."
-		);
-		Router::match(array('controller' => 'posts', 'action' => 'view'));
+		$expected  = "No parameter match found for URL `('controller' => 'Posts', ";
+		$expected .= "'action' => 'view')`.";
+		$this->assertException($expected, function() {
+			Router::match(array('controller' => 'posts', 'action' => 'view'));
+		});
 	}
 
 	/**
@@ -319,8 +323,9 @@ class RouterTest extends \lithium\test\Unit {
 
 		$ex = "No parameter match found for URL ";
 		$ex .= "`('controller' => 'Posts', 'action' => 'view', 'id' => '2')`.";
-		$this->expectException($ex);
-		Router::match(array('controller' => 'posts', 'action' => 'view', 'id' => '2'));
+		$this->assertException($ex, function() {
+			Router::match(array('controller' => 'posts', 'action' => 'view', 'id' => '2'));
+		});
 	}
 
 	/**
@@ -366,8 +371,9 @@ class RouterTest extends \lithium\test\Unit {
 		$expected = '/';
 		$this->assertIdentical($expected, $result);
 
-		$this->expectException('/No parameter match found for URL/');
-		Router::match(array());
+		$this->assertException('/No parameter match found for URL/', function() {
+			Router::match(array());
+		});
 	}
 
 	/**
@@ -1382,21 +1388,21 @@ class RouterTest extends \lithium\test\Unit {
 
 		$ex = "No parameter match found for URL `('controller' => 'User', ";
 		$ex .= "'action' => 'view', 'args' => 'bob')` in `app` scope.";
-		$this->expectException($ex);
-
-		$result = Router::match(array(
-			'User::view', 'args' => 'bob'
-		), null, array('scope' => 'app'));
+		$this->assertException($ex, function() {
+			Router::match(array(
+				'User::view', 'args' => 'bob'
+			), null, array('scope' => 'app'));
+		});
 	}
 
 	public function testMatchWithNoRouteDefined() {
 		$ex = "No parameter match found for URL `('controller' => 'User', ";
 		$ex .= "'action' => 'view', 'args' => 'bob')` in `app` scope.";
-		$this->expectException($ex);
-
-		$result = Router::match(array(
-			'User::view', 'args' => 'bob'
-		), null, array('scope' => 'app'));
+		$this->assertException($ex, function() {
+			Router::match(array(
+				'User::view', 'args' => 'bob'
+			), null, array('scope' => 'app'));
+		});
 	}
 
 	public function testProcessWithAbsoluteAttachment() {

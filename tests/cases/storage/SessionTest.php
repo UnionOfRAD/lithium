@@ -181,8 +181,9 @@ class SessionTest extends \lithium\test\Unit {
 	public function testSessionState() {
 		$this->assertTrue(Session::isStarted());
 		$this->assertTrue(Session::isStarted('default'));
-		$this->expectException("Configuration `invalid` has not been defined.");
-		$this->assertFalse(Session::isStarted('invalid'));
+		$this->assertException("Configuration `invalid` has not been defined.", function() {
+			Session::isStarted('invalid');
+		});
 	}
 
 	public function testSessionStateReset() {
@@ -192,8 +193,9 @@ class SessionTest extends \lithium\test\Unit {
 
 	public function testSessionStateResetNamed() {
 		Session::reset();
-		$this->expectException("Configuration `default` has not been defined.");
-		$this->assertFalse(Session::isStarted('default'));
+		$this->assertException("Configuration `default` has not been defined.", function() {
+			Session::isStarted('default');
+		});
 	}
 
 	public function testReadFilter() {

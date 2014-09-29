@@ -80,19 +80,23 @@ class CompilerTest extends \lithium\test\Unit {
 	}
 
 	public function testFallbackWithNonWritableDirectory() {
-		$this->expectException('/failed to open stream/');
-		$result = Compiler::template("{$this->_path}/{$this->_file}", array(
-			'path' => Libraries::get(true, 'path') . '/foo',
-			'fallback' => true
-		));
-		$this->assertEqual("{$this->_path}/{$this->_file}", $result);
+		$path = $this->_path;
+		$file = $this->_file;
 
-		$this->expectException('/Could not write compiled template/');
-		$this->expectException('/failed to open stream/');
-		$result = Compiler::template("{$this->_path}/{$this->_file}", array(
-			'path' => Libraries::get(true, 'path') . '/foo',
-			'fallback' => false
-		));
+		$this->assertException('/failed to open stream/', function() use ($path, $file) {
+			Compiler::template("{$path}/{$file}", array(
+				'path' => Libraries::get(true, 'path') . '/foo',
+				'fallback' => true
+			));
+		});
+
+		$expected = '/(Could not write compiled template|failed to open stream)/';
+		$this->assertException($expected, function() use ($path, $file) {
+			$result = Compiler::template("{$path}/{$file}", array(
+				'path' => Libraries::get(true, 'path') . '/foo',
+				'fallback' => false
+			));
+		});
 	}
 
 	public function testTemplateCacheHit() {

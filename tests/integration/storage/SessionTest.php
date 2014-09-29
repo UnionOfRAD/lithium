@@ -156,8 +156,10 @@ class SessionTest extends \lithium\test\Integration {
 
 		$cache = $_SESSION;
 		$_SESSION['injectedkey'] = 'hax0r';
-		$this->expectException('/Possible data tampering: HMAC signature does not match data./');
-		Session::read($key, $config);
+		$expected = '/Possible data tampering: HMAC signature does not match data./';
+		$this->asssertException($expected, function() use ($key, $config) {
+			Session::read($key, $config);
+		});
 		$_SESSION = $cache;
 
 		Session::reset();

@@ -21,8 +21,9 @@ class HmacTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructException() {
-		$this->expectException('/HMAC strategy requires a secret key./');
-		$hmac = new Hmac();
+		$this->assertException('/HMAC strategy requires a secret key./', function() {
+			 new Hmac();
+		});
 	}
 
 	public function testConstruct() {
@@ -60,8 +61,12 @@ class HmacTest extends \lithium\test\Unit {
 	public function testReadWithNoSignature() {
 		$class = $this->mock;
 		$value = 'data_read';
-		$this->expectException('/HMAC signature not found./');
-		$result = $this->Hmac->read($value, compact('class'));
+		$hmac = $this->Hmac;
+
+		$expected = '/HMAC signature not found./';
+		$this->assertException($expected, function() use ($hmac, $value, $class) {
+			 $hmac->read($value, compact('class'));
+		});
 	}
 
 	public function testReadWithInvalidSignature() {
@@ -72,8 +77,12 @@ class HmacTest extends \lithium\test\Unit {
 		$this->assertEqual($signature, $result);
 
 		$value = 'data_read_that_wont_match_signature';
-		$this->expectException('/Possible data tampering: HMAC signature does not match data./');
-		$result = $this->Hmac->read($value, compact('class'));
+		$expected = '/Possible data tampering: HMAC signature does not match data./';
+		$hmac = $this->Hmac;
+
+		$this->assertException($expected, function() use ($hmac, $value, $class) {
+			$hmac->read($value, compact('class'));
+		});
 	}
 
 	public function testDelete() {

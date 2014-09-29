@@ -295,8 +295,11 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 			'type' => 'badtype',
 			'null' => true
 		);
-		$this->expectException('Column type `badtype` does not exist.');
-		$this->_db->column($data);
+		$db = $this->_db;
+
+		$this->assertException('Column type `badtype` does not exist.', function() use ($db, $data) {
+			$db->column($data);
+		});
 	}
 
 	public function testOverrideType() {

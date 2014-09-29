@@ -494,8 +494,12 @@ class DatabaseTest extends \lithium\test\Unit {
 
 	public function testCalculation() {
 		$options = array('type' => 'read', 'model' => $this->_model);
-		$this->expectException('Undefined offset: 0');
-		$result = $this->_db->calculation('count', new Query($options), $options);
+		$result = null;
+		$db = $this->_db;
+
+		$this->assertException('Undefined offset: 0', function() use (&$result, $options, $db) {
+			$result = $db->calculation('count', new Query($options), $options);
+		});
 		$expected = 'SELECT COUNT(*) as count FROM {mock_database_posts} AS {MockDatabasePost};';
 		$this->assertEqual($expected, $this->_db->sql);
 	}
@@ -1026,8 +1030,11 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testInvalidQueryType() {
-		$this->expectException('Invalid query type `fakeType`.');
-		$this->_db->read(new Query(array('type' => 'fakeType')));
+		$db = $this->_db;
+
+		$this->assertException('Invalid query type `fakeType`.', function() use ($db) {
+			$db->read(new Query(array('type' => 'fakeType')));
+		});
 	}
 
 	public function testReadWithRelationship() {
@@ -1195,8 +1202,11 @@ class DatabaseTest extends \lithium\test\Unit {
 				)
 			))
 		));
-		$this->expectException("Unsupported operator `=>`.");
-		$this->_db->renderCommand($query);
+		$db = $this->_db;
+
+		$this->assertException("Unsupported operator `=>`.", function() use ($db, $query) {
+			$db->renderCommand($query);
+		});
 	}
 
 	public function testRenderArrayJoin() {

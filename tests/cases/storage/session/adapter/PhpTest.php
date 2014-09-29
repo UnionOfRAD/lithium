@@ -246,26 +246,30 @@ class PhpTest extends \lithium\test\Unit {
 
 	public function testCheckThrowException() {
 		$php = new MockPhp(array('init' => false));
-		$this->expectException('/Could not start session./');
-		$php->check('whatever');
+		$this->assertException('/Could not start session./', function() use ($php) {
+			$php->check('whatever');
+		});
 	}
 
 	public function testReadThrowException() {
 		$php = new MockPhp(array('init' => false));
-		$this->expectException('/Could not start session./');
-		$php->read('whatever');
+		$this->assertException('/Could not start session./', function() use ($php) {
+			$php->read('whatever');
+		});
 	}
 
 	public function testWriteThrowException() {
 		$php = new MockPhp(array('init' => false));
-		$this->expectException('/Could not start session./');
-		$php->write('whatever', 'value');
+		$this->assertException('/Could not start session./', function() use ($php) {
+			$php->write('whatever', 'value');
+		});
 	}
 
 	public function testDeleteThrowException() {
 		$php = new MockPhp(array('init' => false));
-		$this->expectException('/Could not start session./');
-		$php->delete('whatever');
+		$this->assertException('/Could not start session./', function() use ($php) {
+			$php->delete('whatever');
+		});
 	}
 
 	public function testReadDotSyntax() {

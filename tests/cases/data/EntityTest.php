@@ -78,8 +78,9 @@ class EntityTest extends \lithium\test\Unit {
 		$entity->bar = 'blah';
 		$entity->sync();
 
-		$this->expectException("/^Field 'bar' cannot be incremented.$/");
-		$entity->increment('bar');
+		$this->assertException("/^Field 'bar' cannot be incremented.$/", function() use ($entity) {
+			$entity->increment('bar');
+		});
 	}
 
 	public function testMethodDispatch() {
@@ -94,23 +95,26 @@ class EntityTest extends \lithium\test\Unit {
 		}));
 		$this->assertEqual('testInstanceMethod', $entity->testInstanceMethod($entity));
 
-		$this->expectException("/^Unhandled method call `foo`.$/");
-		$entity->foo();
+		$this->assertException("/^Unhandled method call `foo`.$/", function() use ($entity) {
+			$entity->foo();
+		});
 	}
 
 	public function testMethodDispatchWithNoModel() {
 		$data = array('foo' => true);
 		$entity = new Entity(compact('data'));
-		$this->expectException("/^No model bound to call `foo`.$/");
-		$entity->foo();
+		$this->assertException("/^No model bound to call `foo`.$/", function() use ($entity) {
+			$entity->foo();
+		});
 	}
 
 	public function testMethodDispatchWithEntityAsModel() {
 		$data = array('foo' => true);
 		$model = 'lithium\data\Entity';
 		$entity = new Entity(compact('model', 'data'));
-		$this->expectException("/^No model bound to call `foo`.$/");
-		$entity->foo();
+		$this->assertException("/^No model bound to call `foo`.$/", function() use ($entity) {
+			$entity->foo();
+		});
 	}
 
 	public function testErrors() {

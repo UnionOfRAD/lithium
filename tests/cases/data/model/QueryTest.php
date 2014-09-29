@@ -519,8 +519,9 @@ class QueryTest extends \lithium\test\Unit {
 		$entity = new Record(array('model' => $this->_model, 'exists' => true));
 		$entity->_id = 13;
 		$query = new Query(compact('entity'));
-		$this->expectException('/No matching primary key found/');
-		$query->conditions();
+		$this->assertException('/No matching primary key found/', function() use ($query) {
+			$query->conditions();
+		});
 	}
 
 	public function testAutomaticAliasing() {
@@ -765,8 +766,11 @@ class QueryTest extends \lithium\test\Unit {
 			'with' => array('Image.ImageTag.Tag', 'Image', 'Image.ImageTag'),
 			'strategy' => 'custom'
 		));
-		$this->expectException('Undefined query strategy `custom`.');
-		$export = $query->export($this->_db);
+		$db = $this->_db;
+
+		$this->assertException('Undefined query strategy `custom`.', function() use ($query, $db) {
+			$query->export($db);
+		});
 	}
 
 	public function testRespondsTo() {

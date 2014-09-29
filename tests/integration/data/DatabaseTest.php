@@ -86,8 +86,10 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$config['object'] = null;
 		$connection = 'no_database';
 		Connections::add($connection, $config);
-		$this->expectException("/No Database configured/");
-		Connections::get($connection)->connect();
+
+		$this->assertException("/No Database configured/", function() use ($connection) {
+			Connections::get($connection)->connect();
+		});
 	}
 
 	public function testConnectWithWrongHost() {
@@ -97,8 +99,10 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$config['object'] = null;
 		$connection = 'wrong_host';
 		Connections::add($connection, $config);
-		$this->expectException();
-		Connections::get($connection)->connect();
+
+		$this->assertException('/.*/', function() use ($connection) {
+			Connections::get($connection)->connect();
+		});
 	}
 
 	public function testConnectWithWrongPassword() {
@@ -109,13 +113,18 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$config['object'] = null;
 		$connection = 'wrong_passord';
 		Connections::add($connection, $config);
-		$this->expectException();
-		Connections::get($connection)->connect();
+
+		$this->assertException('/.*/', function() use ($connection) {
+			Connections::get($connection)->connect();
+		});
 	}
 
 	public function testExecuteException() {
-		$this->expectException("/error/");
-		$this->_db->read('SELECT * FROM * FROM table');
+		$db = $this->_db;
+
+		$this->assertException("/error/", function() use ($db) {
+			$db->read('SELECT * FROM * FROM table');
+		});
 	}
 
 	public function testCreateData() {

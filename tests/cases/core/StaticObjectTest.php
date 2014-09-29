@@ -158,8 +158,9 @@ class StaticObjectTest extends \lithium\test\Unit {
 	}
 
 	public function testInstanceFalse() {
-		$this->expectException('/^Invalid class lookup/');
-		MockStaticInstantiator::instance(false);
+		$this->assertException('/^Invalid class lookup/', function() {
+			MockStaticInstantiator::instance(false);
+		});
 	}
 
 	public function testResetMethodFilter() {

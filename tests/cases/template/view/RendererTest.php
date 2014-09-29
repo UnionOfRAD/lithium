@@ -198,8 +198,10 @@ class RendererTest extends \lithium\test\Unit {
 		$helper = $this->subject->helper('html');
 		$this->assertInstanceOf('lithium\template\Helper', $helper);
 
-		$this->expectException('/invalidFoo/');
-		$this->assertNull($this->subject->helper('invalidFoo'));
+		$subject = $this->subject;
+		$this->assertException('/invalidFoo/', function() use ($subject) {
+			$subject->helper('invalidFoo');
+		});
 	}
 
 	public function testHelperQuerying() {

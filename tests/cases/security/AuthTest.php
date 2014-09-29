@@ -77,8 +77,9 @@ class AuthTest extends \lithium\test\Unit {
 	public function testNoConfigurations() {
 		Auth::reset();
 		$this->assertIdentical(array(), Auth::config());
-		$this->expectException("Configuration `user` has not been defined.");
-		Auth::check('user');
+		$this->assertException("Configuration `user` has not been defined.", function() {
+			Auth::check('user');
+		});
 	}
 
 	public function testAuthPersist() {

@@ -448,9 +448,9 @@ class DocumentTest extends \lithium\test\Unit {
 	public function testInvalidCall() {
 		$doc = new Document();
 
-		$this->expectException("No model bound to call `medicin`.");
-		$result = $doc->medicin();
-		$this->assertNull($result);
+		$this->assertException("No model bound to call `medicin`.", function() use ($doc) {
+			$doc->medicin();
+		});
 	}
 
 	public function testCall() {

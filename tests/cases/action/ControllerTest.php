@@ -42,26 +42,17 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual($result2, $result);
 
 		$postsController = new MockPostsController();
-		$this->expectException('/Unhandled media type/');
-		$result = $postsController(null, array('action' => 'index', 'args' => array(true)));
-
-		$this->assertInstanceOf('lithium\action\Response', $result);
-		$this->assertEqual($result->body, '');
-
-		$headers = array('Content-Type' => 'text/html; charset=UTF-8');
-		$this->assertEqual($result->headers, $headers);
+		$this->assertException('/Unhandled media type/', function() use ($postsController) {
+			$postsController(null, array('action' => 'index', 'args' => array(true)));
+		});
 
 		$result = $postsController->access('_render');
 		$this->assertEqual($result['data'], array('foo' => 'bar'));
 
 		$postsController = new MockPostsController();
-		$result = $postsController(null, array('action' => 'view', 'args' => array('2')));
-
-		$this->assertInstanceOf('lithium\action\Response', $result);
-		$this->assertEqual($result->body, "Array\n(\n    [0] => This is a post\n)\n");
-
-		$headers = array('status' => 200, 'Content-Type' => 'text/plain; charset=UTF-8');
-		$this->assertEqual($result->headers(), $headers);
+		$this->assertException('/Unhandled media type/', function() use ($postsController) {
+			$postsController(null, array('action' => 'view', 'args' => array('2')));
+		});
 
 		$result = $postsController->access('_render');
 		$this->assertEqual($result['data'], array('This is a post'));
@@ -183,18 +174,14 @@ class ControllerTest extends \lithium\test\Unit {
 	 */
 	public function testProtectedMethodAccessAttempt() {
 		$postsController = new MockPostsController();
-		$this->expectException('/^Attempted to invoke a private method/');
-		$result = $postsController->__invoke(null, array('action' => 'redirect'));
-
-		$this->assertEqual($result->body, null);
-		$this->assertEqual($result->headers(), array());
+		$this->assertException('/^Attempted to invoke a private method/', function() use ($postsController) {
+			$postsController->__invoke(null, array('action' => 'redirect'));
+		});
 
 		$postsController = new MockPostsController();
-		$this->expectException('/^Private/');
-		$result = $postsController->invoke('_safe');
-
-		$this->assertEqual($result->body, null);
-		$this->assertEqual($result->headers(), array());
+		$this->assertException('/^Attempted to invoke a private method/', function() use ($postsController) {
+			$postsController->__invoke(null, array('action' => '_safe'));
+		});
 	}
 
 	public function testResponseStatus() {
@@ -359,8 +346,10 @@ class ControllerTest extends \lithium\test\Unit {
 
 	public function testNonExistentFunction() {
 		$postsController = new MockPostsController();
-		$this->expectException("Action `foo` not found.");
-		$postsController(new Request(), array('action' => 'foo'));
+
+		$this->assertException("Action `foo` not found.", function() use ($postsController) {
+			$postsController(new Request(), array('action' => 'foo'));
+		});
 	}
 
 	/**

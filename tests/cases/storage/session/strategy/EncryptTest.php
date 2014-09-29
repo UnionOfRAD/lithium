@@ -28,8 +28,9 @@ class EncryptTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructException() {
-		$this->expectException('/Encrypt strategy requires a secret key./');
-		$encrypt = new Encrypt();
+		$this->assertException('/Encrypt strategy requires a secret key./', function() {
+			new Encrypt();
+		});
 	}
 
 	public function testEnabled() {

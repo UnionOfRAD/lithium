@@ -376,9 +376,11 @@ class CatalogTest extends \lithium\test\Unit {
 
 	public function testInvalidWrite() {
 		Catalog::reset();
-		$data = array('house' => array('id' => 'house'));
-		$this->expectException("Configuration `runtime` has not been defined.");
-		$this->assertFalse(Catalog::write('runtime', 'message', 'de', $data));
+
+		$this->assertException("Configuration `runtime` has not been defined.", function() {
+			$data = array('house' => array('id' => 'house'));
+			Catalog::write('runtime', 'message', 'de', $data);
+		});
 	}
 }
 

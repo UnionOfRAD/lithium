@@ -435,11 +435,12 @@ class MediaTest extends \lithium\test\Unit {
 		$response = new Response();
 		$response->type('bad');
 
-		$this->expectException("Unhandled media type `bad`.");
-		Media::render($response, array('foo' => 'bar'));
+		$this->assertException("Unhandled media type `bad`.", function() use ($response) {
+			Media::render($response, array('foo' => 'bar'));
+		});
 
 		$result = $response->body();
-		$this->assertNull($result);
+		$this->assertIdentical('', $result);
 	}
 
 	/**
@@ -452,8 +453,9 @@ class MediaTest extends \lithium\test\Unit {
 		$response = new Response();
 		$response->type('xml');
 
-		$this->expectException("Unhandled media type `xml`.");
-		Media::render($response, array('foo' => 'bar'));
+		$this->assertException("Unhandled media type `xml`.", function() use ($response) {
+			Media::render($response, array('foo' => 'bar'));
+		});
 
 		$result = $response->body;
 		$this->assertNull($result);
@@ -480,11 +482,9 @@ class MediaTest extends \lithium\test\Unit {
 		$expected = array("Message: Hello, world!");
 		$this->assertEqual($expected, $result);
 
-		$this->expectException("/Template not found/");
-		Media::render($response, 'Hello, world!');
-
-		$result = $response->body;
-		$this->assertNull($result);
+		$this->assertException("/Template not found/", function() use ($response) {
+			Media::render($response, 'Hello, world!');
+		});
 	}
 
 	/**
@@ -533,8 +533,10 @@ class MediaTest extends \lithium\test\Unit {
 		$response = new Response();
 		$response->type('html');
 
-		$this->expectException('/Template not found/');
-		Media::render($response, null, compact('request'));
+		$this->assertException("/Template not found/", function() use ($response) {
+			Media::render($response, null, compact('request'));
+		});
+
 		$this->_cleanUp();
 	}
 

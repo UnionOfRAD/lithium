@@ -93,8 +93,9 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 			'database' => 'garbage', 'init' => true, 'schema' => 'garbage'
 		) + $this->_dbConfig);
 
-		$this->expectException();
-		$this->assertFalse($db->connect());
+		$this->assertException('/.*/', function() use ($db) {
+			$db->connect();
+		});
 		$this->assertFalse($db->isConnected());
 
 		$this->assertTrue($db->disconnect());
@@ -206,8 +207,11 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testExecuteException() {
-		$this->expectException();
-		$this->_db->read('SELECT deliberate syntax error');
+		$db = $this->_db;
+
+		$this->assertException('/.*/', function() use ($db) {
+			$db->read('SELECT deliberate syntax error');
+		});
 	}
 
 	public function testEntityQuerying() {

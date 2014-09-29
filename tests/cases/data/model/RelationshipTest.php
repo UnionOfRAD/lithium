@@ -131,17 +131,23 @@ class RelationshipTest extends \lithium\test\Unit {
 	}
 
 	public function testEmptyRequiredOptions() {
-		$this->expectException("/`'type'`, `'fieldName'` and `'from'` options can't be empty./");
-		$query = new Relationship();
+		$expected = "/`'type'`, `'fieldName'` and `'from'` options can't be empty./";
+		$this->assertException($expected, function() {
+			new Relationship();
+		});
 	}
 
 	public function testEmptyToAndName() {
-		$this->expectException("/`'to'` and `'name'` options can't both be empty./");
-		$query = new Relationship(array(
-			'from' => $this->_gallery,
-			'type' => 'belongsTo',
-			'fieldName' => 'field_id'
-		));
+		$expected = "/`'to'` and `'name'` options can't both be empty./";
+		$gallery = $this->_gallery;
+
+		$this->assertException($expected, function() use ($gallery) {
+			new Relationship(array(
+				'from' => $gallery,
+				'type' => 'belongsTo',
+				'fieldName' => 'field_id'
+			));
+		});
 	}
 
 	/**

@@ -210,8 +210,9 @@ class ObjectTest extends \lithium\test\Unit {
 
 	public function testInstanceFalse() {
 		$object = new MockInstantiator();
-		$this->expectException('/^Invalid class lookup/');
-		$object->instance(false);
+		$this->assertException('/^Invalid class lookup/', function() use ($object) {
+			$object->instance(false);
+		});
 	}
 
 	public function testResetMethodFilter() {

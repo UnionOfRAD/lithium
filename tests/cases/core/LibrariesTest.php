@@ -215,8 +215,9 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * Tests that an exception is thrown when a library is added which could not be found.
 	 */
 	public function testAddInvalidLibrary() {
-		$this->expectException("Library `invalid_foo` not found.");
-		Libraries::add('invalid_foo');
+		$this->assertException("Library `invalid_foo` not found.", function() {
+			Libraries::add('invalid_foo');
+		});
 	}
 
 	/**
@@ -286,8 +287,10 @@ class LibrariesTest extends \lithium\test\Unit {
 	 * Tests the loading of libraries
 	 */
 	public function testLibraryLoad() {
-		$this->expectException('Failed to load class `SomeInvalidLibrary` from path ``.');
-		Libraries::load('SomeInvalidLibrary', true);
+		$expected = 'Failed to load class `SomeInvalidLibrary` from path ``.';
+		$this->assertException($expected, function() {
+			Libraries::load('SomeInvalidLibrary', true);
+		});
 	}
 
 	/**
@@ -411,8 +414,11 @@ EOD;
 	public function testServiceLocateInstantiation() {
 		$result = Libraries::instance('adapter.template.view', 'Simple');
 		$this->assertInstanceOf('lithium\template\view\adapter\Simple', $result);
-		$this->expectException("Class `Foo` of type `adapter.template.view` not found.");
-		$result = Libraries::instance('adapter.template.view', 'Foo');
+
+		$expected = "Class `Foo` of type `adapter.template.view` not found.";
+		$this->assertException($expected, function() {
+			Libraries::instance('adapter.template.view', 'Foo');
+		});
 	}
 
 	public function testServiceLocateAllCommands() {
@@ -776,8 +782,9 @@ EOD;
 	}
 
 	public function testDeprectatedInit() {
-		$this->expectException("/Deprecated/");
-		MockInitMethod::li3();
+		$this->assertException("/Deprecated/", function() {
+			MockInitMethod::li3();
+		});
 	}
 }
 

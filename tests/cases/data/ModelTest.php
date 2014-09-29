@@ -374,8 +374,9 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual(array('foo' => 13), $result['query']->conditions());
 		$this->assertEqual(array('created_at' => 'desc'), $result['query']->order());
 
-		$this->expectException('/Method `findFoo` not defined or handled in class/');
-		MockPost::findFoo();
+		$this->assertException('/Method `findFoo` not defined or handled in class/', function() {
+			MockPost::findFoo();
+		});
 	}
 
 	/**
@@ -1014,8 +1015,9 @@ class ModelTest extends \lithium\test\Unit {
 		MockPost::config();
 		MockPost::invokeMethod('_initialize', array('lithium\tests\mocks\data\MockPost'));
 		$exception = 'Related model class \'lithium\tests\mocks\data\Unexisting\' not found.';
-		$this->expectException($exception);
-		MockPost::relations('Unexisting');
+		$this->assertException($exception, function() {
+			MockPost::relations('Unexisting');
+		});
 	}
 
 	public function testLazyMetadataInit() {

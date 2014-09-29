@@ -146,33 +146,21 @@ EOD;
 
 		$expected = array('ids' => array('singular' => 'simple context'), 'context' => 'foo');
 		$key = 'simple context|foo';
-		if (!isset($results[$key])) {
-			$this->expectException();
-		}
 		$result = array('ids' => $results[$key]['ids'],	'context' => 'foo');
 		$this->assertEqual($expected, $result);
 
 		$expected = array('ids' => array('singular' => 'simple context'), 'context' => 'bar');
 		$key = 'simple context|bar';
-		if (!isset($results[$key])) {
-			$this->expectException();
-		}
 		$result = array('ids' => $results[$key]['ids'],	'context' => 'bar');
 		$this->assertEqual($expected, $result);
 
 		$expected = array('ids' => array('singular' => 'replace context 1 {:a}'), 'context' => 'foo');
 		$key = 'replace context 1 {:a}|foo';
-		if (!isset($results[$key])) {
-			$this->expectException();
-		}
 		$result = array('ids' => $results[$key]['ids'],	'context' => 'foo');
 		$this->assertEqual($expected, $result);
 
 		$expected = array('ids' => array('singular' => 'replace context 1 {:a}'), 'context' => 'bar');
 		$key = 'replace context 1 {:a}|bar';
-		if (!isset($results[$key])) {
-			$this->expectException();
-		}
 		$result = array('ids' => $results[$key]['ids'],	'context' => 'bar');
 		$this->assertEqual($expected, $result);
 	}

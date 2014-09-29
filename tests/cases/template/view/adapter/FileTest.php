@@ -41,9 +41,11 @@ class FileTest extends \lithium\test\Unit {
 
 	public function testRenderingWithNoExtraction() {
 		$file = new File(array('extract' => false));
-		$this->expectException('Undefined variable: foo');
-		$content = $file->render("{$this->_path}/template1.html.php", array('foo' => 'bar'));
-		$this->assertEmpty($content);
+		$path = $this->_path;
+
+		$this->assertException('Undefined variable: foo', function()  use ($file, $path) {
+			$file->render("{$path}/template1.html.php", array('foo' => 'bar'));
+		});
 
 		$content = $file->render("{$this->_path}/template2.html.php", array('foo' => 'bar'));
 		$this->assertEqual('bar', $content);
@@ -87,10 +89,11 @@ class FileTest extends \lithium\test\Unit {
 		));
 		$this->assertPattern('/\/views\/pages\/home\.html\.php$/', $template);
 
-		$this->expectException('/Template not found/');
-		$file->template('template', array(
-			'controller' => 'pages', 'template' => 'foo', 'type' => 'html'
-		));
+		$this->assertException('/Template not found/', function() use ($file) {
+			$file->template('template', array(
+				'controller' => 'pages', 'template' => 'foo', 'type' => 'html'
+			));
+		});
 	}
 
 	public function testInvalidTemplateType() {
@@ -98,8 +101,9 @@ class FileTest extends \lithium\test\Unit {
 			'template' => '{:library}/views/{:controller}/{:template}.{:type}.php'
 		)));
 
-		$this->expectException("Invalid template type 'invalid'.");
-		$template = $file->template('invalid', array('template' => 'foo'));
+		$this->assertException("Invalid template type 'invalid'.", function() use ($file) {
+			$file->template('invalid', array('template' => 'foo'));
+		});
 	}
 }
 

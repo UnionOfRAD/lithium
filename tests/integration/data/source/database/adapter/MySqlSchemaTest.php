@@ -344,8 +344,12 @@ class MySqlSchemaTest extends \lithium\tests\integration\data\Base {
 			'type' => 'badtype',
 			'null' => true
 		);
-		$this->expectException('Column type `badtype` does not exist.');
-		$this->_db->column($data);
+		$db = $this->_db;
+
+		$expected = 'Column type `badtype` does not exist.';
+		$this->assertException($expected, function () use ($db, $data) {
+			$db->column($data);
+		});
 	}
 
 	public function testOverrideType() {

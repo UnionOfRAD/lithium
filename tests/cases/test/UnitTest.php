@@ -468,7 +468,12 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testExpectException() {
-		$this->test->expectException('test expected exception');
+		$result = null;
+		$test = $this->test;
+
+		$this->assertException('/deprecated/', function() use ($test, &$results) {
+			$results = $test->expectException('test expected exception');
+		});
 		$results = $this->test->results();
 
 		$expected = 'test expected exception';
@@ -485,7 +490,10 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testExpectExceptionRegex() {
-		$this->test->expectException('/test handle exception/');
+		$test = $this->test;
+		$this->assertException('/deprecated/', function() use ($test) {
+			$test->expectException('/test handle exception/');
+		});
 		$this->test->handleException(new Exception('test handle exception'));
 
 		$this->assertEmpty($this->test->expected());

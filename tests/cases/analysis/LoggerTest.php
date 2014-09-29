@@ -99,8 +99,9 @@ class LoggerTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteWithInvalidPriority() {
-		$this->expectException("Attempted to write log message with invalid priority `foo`.");
-		Logger::foo("Test message");
+		$this->assertException("Attempted to write log message with invalid priority `foo`.", function() {
+			Logger::foo("Test message");
+		});
 	}
 
 	public function testWriteByName() {

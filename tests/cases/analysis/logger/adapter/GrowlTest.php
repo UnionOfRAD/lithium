@@ -44,12 +44,13 @@ class GrowlTest extends \lithium\test\Unit {
 			'title' => 'Lithium log',
 			'port' => 0
 		));
-		$this->expectException('/Failed to parse address/');
+		$this->assertException('/Failed to parse address/', function() use ($growl) {
+			$message = 'info: Test message.';
+			$params = compact('message') + array('priority' => 'info', 'options' => array());
 
-		$message = 'info: Test message.';
-		$params = compact('message') + array('priority' => 'info', 'options' => array());
-		$writer = $growl->write('info', $message, array());
-		$writer('lithium\analysis\Logger', $params, null);
+			$writer = $growl->write('info', $message, array());
+			$writer('lithium\analysis\Logger', $params, null);
+		});
 	}
 
 	public function testInvalidConnectionWithForcedRegistration() {
@@ -59,12 +60,13 @@ class GrowlTest extends \lithium\test\Unit {
 			'port' => 0,
 			'registered' => true
 		));
-		$this->expectException('/Failed to parse address/');
+		$this->assertException('/Failed to parse address/', function() use ($growl) {
+			$message = 'info: Test message.';
+			$params = compact('message') + array('priority' => 'info', 'options' => array());
 
-		$message = 'info: Test message.';
-		$params = compact('message') + array('priority' => 'info', 'options' => array());
-		$writer = $growl->write('info', $message, array());
-		$writer('lithium\analysis\Logger', $params, null);
+			$writer = $growl->write('info', $message, array());
+			$writer('lithium\analysis\Logger', $params, null);
+		});
 	}
 
 	public function testStickyMessages() {
