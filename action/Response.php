@@ -83,8 +83,8 @@ class Response extends \lithium\net\http\Response {
 	/**
 	 * Expands on `\net\http\Message::headers()` with some magic conversions for shorthand headers.
 	 *
-	 * @param string $key
-	 * @param string $value
+	 * @param string|array $key
+	 * @param mixed $value
 	 * @param boolean $replace
 	 * @return mixed
 	 */
