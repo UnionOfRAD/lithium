@@ -17,6 +17,15 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 		$this->skipIf(!$this->with(array('MongoDb')));
 	}
 
+	public function setUp() {
+		Galleries::config(array('meta' => array('connection' => 'test')));
+	}
+
+	public function tearDown() {
+		Galleries::remove();
+		Galleries::reset();
+	}
+
 	public function testCountOnEmptyResultSet() {
 		$data = Galleries::find('all', array('conditions' => array('name' => 'no match')));
 
@@ -29,6 +38,15 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 		$data = Galleries::find('all', array('conditions' => array('name' => 'no match')));
 
 		$result = next($data);
+		$this->assertNull($result);
+	}
+
+	public function testDateCastingIssueOnExists() {
+		Galleries::config(array('schema' => array('_id' => 'id', 'created_at' => 'date')));
+		$gallery = Galleries::create(array('created_at' => time()));
+		$gallery->save();
+
+		$result = Galleries::first(array('conditions' => array('created_at' => array('$exists' => false))));
 		$this->assertNull($result);
 	}
 }
