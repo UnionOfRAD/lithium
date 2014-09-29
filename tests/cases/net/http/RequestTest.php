@@ -68,6 +68,19 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testConstructWithCookies() {
+		$request = new Request(array(
+			'host' => 'localhost',
+			'port' => 443,
+			'headers' => array('Cookie' => 'name1=value1; name2=value2'),
+			'body' => array('Part 1'),
+			'params' => array('param' => 'value')
+		));
+
+		$expected = array('name1' => 'value1', 'name2' => 'value2');
+		$this->assertEqual($expected, $request->cookies());
+	}
+
 	public function testConstructWithPath() {
 		$request = new Request(array(
 			'host' => 'localhost/base/path',

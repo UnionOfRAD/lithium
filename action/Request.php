@@ -171,7 +171,8 @@ class Request extends \lithium\net\http\Request {
 			'data' => array(),
 			'stream' => null,
 			'globals' => true,
-			'query' => array()
+			'query' => array(),
+			'headers' => array()
 		);
 		$config += $defaults;
 
@@ -210,20 +211,20 @@ class Request extends \lithium\net\http\Request {
 		$this->_base = $this->_base($config['base']);
 		$this->url = $this->_url($config['url']);
 
-		parent::__construct($config);
-
-		$this->headers(array(
+		$config['headers'] += array(
 			'Content-Type' => $this->env('CONTENT_TYPE'),
 			'Content-Length' => $this->env('CONTENT_LENGTH')
-		));
+		);
 
 		foreach ($this->_env as $name => $value) {
 			if ($name[0] === 'H' && strpos($name, 'HTTP_') === 0) {
 				$name = str_replace('_', ' ', substr($name, 5));
 				$name = str_replace(' ', '-', ucwords(strtolower($name)));
-				$this->headers($name, $value);
+				$config['headers'] += array($name => $value);
 			}
 		}
+
+		parent::__construct($config);
 	}
 
 	/**
