@@ -780,6 +780,31 @@ class MongoDbTest extends \lithium\test\Unit {
 		}
 	}
 
+	public function testCastingElemMatchValuesInConditions(){
+		$query = new Query(array(
+			'schema' => new Schema(array(
+				'fields' => array(
+					'_id' => array('type' => 'id'),
+					'members' => array('type' => 'object', 'array' => true),
+					'members.user_id' => array('type' => 'id'),
+					'members.pattern' => array('type' => 'regex'),
+				)
+			))
+		));
+
+		$user_id = new MongoId();
+		$conditions = array('members' => array(
+			'$elemMatch' => array(
+				'user_id' => (string) $user_id,
+				'pattern' => '/test/i',
+			)
+		));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertEqual($conditions, $result);
+		$this->assertInstanceOf('MongoId', $result['members']['$elemMatch']['user_id']);
+		$this->assertInstanceOf('MongoRegex', $result['members']['$elemMatch']['pattern']);
+	}
+
 	public function testNotCastingConditionsForSpecialQueryOpts(){
 		$query = new Query(array(
 			'schema' => new Schema(array('fields' => $this->_schema))
