@@ -28,7 +28,7 @@ class MemcacheTest extends \lithium\test\Integration {
 		$conn->addServer('127.0.0.1', 11211);
 		$message = 'The memcached daemon does not appear to be running on 127.0.0.1:11211';
 		$result = $conn->getVersion();
-		$this->skipIf(!$result, $message);
+		$this->skipIf(!$result || current($result) === '255.255.255', $message);
 		unset($conn);
 	}
 

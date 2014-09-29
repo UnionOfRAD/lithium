@@ -39,12 +39,12 @@ class RedisTest extends \lithium\test\Integration {
 		$cfg = $this->_config;
 
 		try {
-			$redis->connect($cfg['host'], $cfg['port']);
+			$result = $redis->connect($cfg['host'], $cfg['port']);
 		} catch (Exception $e) {
-			$info = $redis->info();
-			$msg = "redis-server does not appear to be running on {$cfg['host']}:{$cfg['port']}";
-			$this->skipIf(!$info, $msg);
+			$result = false;
 		}
+		$msg = "redis-server does not appear to be running.";
+		$this->skipIf(!$result, $msg);
 		unset($redis);
 	}
 
