@@ -83,8 +83,8 @@ class Response extends \lithium\net\http\Response {
 	/**
 	 * Expands on `\net\http\Message::headers()` with some magic conversions for shorthand headers.
 	 *
-	 * @param string $key
-	 * @param string $value
+	 * @param string|array $key
+	 * @param mixed $value
 	 * @param boolean $replace
 	 * @return mixed
 	 */
@@ -167,6 +167,9 @@ class Response extends \lithium\net\http\Response {
 				$this->status(302);
 			}
 			$code = $this->status['code'];
+		}
+		if ($cookies = $this->_cookies()) {
+			$this->headers('Set-Cookie', $cookies);
 		}
 		$this->_writeHeaders($this->status() ?: $this->status(500));
 		$this->_writeHeaders($this->headers(), $code);

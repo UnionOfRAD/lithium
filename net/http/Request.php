@@ -102,6 +102,9 @@ class Request extends \lithium\net\http\Message {
 				$this->{$field}($value);
 			}
 		}
+		if ($cookies = $this->headers('Cookie')) {
+			$this->_parseCookies($cookies);
+		}
 
 		$this->_formats += array(
 			'url' => function($req, $options) {
@@ -200,6 +203,19 @@ class Request extends \lithium\net\http\Message {
 			$value = "{$key}={$value}";
 		}
 		return implode('; ', $cookies);
+	}
+
+	/**
+	 * Parse `Cookie` header.
+	 *
+	 * @param string $header `Cookie` header.
+	 */
+	protected function _parseCookies($header) {
+		$cookies = array_map('trim', array_filter(explode('; ', $header)));
+		foreach ($cookies as $cookie) {
+			list($name, $value) = array_map('urldecode', explode('=', $cookie, 2)) + array('','');
+			$this->cookies($name, $value);
+		}
 	}
 
 	/**

@@ -141,18 +141,20 @@ class Message extends \lithium\net\Message {
 	 * $request->headers('Cache-Control', 'max-age=0');
 	 * $request->headers('Cache-Control', 'no-store, no-cache');
 	 * $request->headers();
-	 * // returns array('Cache-Control: max-age=0', 'Cache-Control: no-store, no-cache')
+	 * // returns array('Cache-Control: no-store, no-cache')
 	 * ```
 	 *
 	 * @link http://www.ietf.org/rfc/rfc2616.txt Section 4.2 Message Headers
 	 * @param string|array $key A header name, a full header line (`'<key>: <value>'`), or an array
 	 *                      of headers to set in `key => value` form.
-	 * @param string|null|boolean $value A value to set if `$key` is a string. If `null`, returns
-	 *                            the value of the header corresponding to `$key`. If `false`,
-	 *                            it unsets the header corresponding to `$key`.
+	 * @param mixed $value A value to set if `$key` is a string.
+	 *              It can be an array to set multiple headers with the same key.
+	 *              If `null`, returns the value of the header corresponding to `$key`.
+	 *              If `false`, it unsets the header corresponding to `$key`.
 	 * @param boolean $replace Whether to override or add alongside any existing header with
 	 *                the same name.
-	 * @return string|array|void When called with just $key provided, the value of a single header.
+	 * @return mixed When called with just $key provided, the value of a single header or an array
+	 *         of values in case there is multiple headers with this key.
 	 *         When calling the method without any arguments, an array of compiled headers in the
 	 *         form `array('<key>: <value>', ...)` is returned. All set and replace operations
 	 *         return no value for performance reasons.
