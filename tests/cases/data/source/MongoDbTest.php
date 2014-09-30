@@ -831,7 +831,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$conditions = array('title' => array('$mod' => array(3)));
 		$result = $this->_db->conditions($conditions, $query);
-		$expected = array('title' => array('$mod' => array(3,0)));
+		$expected = array('title' => array('$mod' => array(3, 0)));
 		$this->assertIdentical($expected, $result);
 
 		$conditions = array('tags' => array('$exists' => true));
@@ -846,7 +846,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$result = $this->_db->conditions($conditions, $query);
 		$this->assertIdentical($conditions, $result);
 
-		$conditions = array('created' => array('$mod' => array(7,0)));
+		$conditions = array('created' => array('$mod' => array(7, 0)));
 		$result = $this->_db->conditions($conditions, $query);
 		$this->assertIdentical($conditions, $result);
 	}

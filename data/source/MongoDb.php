@@ -170,6 +170,14 @@ class MongoDb extends \lithium\data\Source {
 		parent::__construct($config + $defaults);
 	}
 
+	/**
+	 * Initializer. Adds operator handlers which will
+	 * later allow to correctly cast any values.
+	 *
+	 * @see lithium\data\source\MongoDb::$_operators
+	 * @see lithium\data\source\MongoDb::_operators()
+	 * @return void
+	 */
 	protected function _init() {
 		parent::_init();
 
@@ -185,9 +193,7 @@ class MongoDb extends \lithium\data\Source {
 			},
 			'$mod' => function($key, $value) {
 				$value = (array) $value;
-				$divisor = current($value);
-				$remainder = next($value) ?: 0;
-				return array('$mod' => array($divisor, $remainder));
+				return array('$mod' => array(current($value), next($value) ?: 0));
 			},
 			'$size' => function($key, $value) {
 				return array('$size' => (integer) $value);
@@ -197,17 +203,16 @@ class MongoDb extends \lithium\data\Source {
 					'castOpts' => array(),
 					'field' => ''
 				);
-				extract($options);
+				$options['castOpts'] += array('pathKey' => $options['field']);
 				$values = (array) $values;
-				$castOpts += array('pathKey' => $field);
 
-				if(empty($castOpts['schema'])){
+				if (empty($options['castOpts']['schema'])){
 					return array('$elemMatch' => $values);
 				}
-				$schema = $castOpts['schema'];
-
 				foreach ($values as $key => &$value) {
-					$value = $schema->cast(null, $key, $value, $castOpts);
+					$value = $options['castOpts']['schema']->cast(
+						null, $key, $value, $options['castOpts']
+					);
 				}
 				return array('$elemMatch' => $values);
 			}

@@ -41,7 +41,7 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 		$this->assertNull($result);
 	}
 
-	public function testDateCastingIssueOnExists() {
+	public function testDateCastingUsingExists() {
 		Galleries::config(array('schema' => array('_id' => 'id', 'created_at' => 'date')));
 		$gallery = Galleries::create(array('created_at' => time()));
 		$gallery->save();
