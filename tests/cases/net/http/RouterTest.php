@@ -826,6 +826,21 @@ class RouterTest extends \lithium\test\Unit {
 		$this->assertEqual(array('args', 'controller'), array_keys($formatters));
 	}
 
+	public function testRouteFormattersAppliedOnMatch() {
+		Router::reset();
+		Router::connect('/{:controller:lists}/{:action:add}');
+		$this->assertIdentical(
+			'/lists/add',
+			Router::match(array('controller' => 'lists', 'action' => 'add'))
+		);
+
+		Router::connect('/lists/{:action:add}', array('controller' => 'lists'));
+		$this->assertIdentical(
+			'/lists/add',
+			Router::match(array('controller' => 'lists', 'action' => 'add'))
+		);
+	}
+
 	public function testRouteModifiers() {
 		$modifiers = Router::modifiers();
 		$this->assertEqual(array('args', 'controller'), array_keys($modifiers));
