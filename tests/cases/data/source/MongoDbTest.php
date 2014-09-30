@@ -787,6 +787,70 @@ class MongoDbTest extends \lithium\test\Unit {
 		}
 	}
 
+	public function testCastingElemMatchValuesInConditions(){
+		$query = new Query(array(
+			'schema' => new Schema(array(
+				'fields' => array(
+					'_id' => array('type' => 'id'),
+					'members' => array('type' => 'object', 'array' => true),
+					'members.user_id' => array('type' => 'id'),
+					'members.pattern' => array('type' => 'regex'),
+				)
+			))
+		));
+
+		$user_id = new MongoId();
+		$conditions = array('members' => array(
+			'$elemMatch' => array(
+				'user_id' => (string) $user_id,
+				'pattern' => '/test/i',
+			)
+		));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertEqual($conditions, $result);
+		$this->assertInstanceOf('MongoId', $result['members']['$elemMatch']['user_id']);
+		$this->assertInstanceOf('MongoRegex', $result['members']['$elemMatch']['pattern']);
+	}
+
+	public function testNotCastingConditionsForSpecialQueryOpts(){
+		$query = new Query(array(
+			'schema' => new Schema(array('fields' => $this->_schema))
+		));
+
+		$conditions = array('title' => array('$exists' => true));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('title' => array('$size' => 1));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('title' => array('$type' => 1));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('title' => array('$mod' => array(3)));
+		$result = $this->_db->conditions($conditions, $query);
+		$expected = array('title' => array('$mod' => array(3,0)));
+		$this->assertIdentical($expected, $result);
+
+		$conditions = array('tags' => array('$exists' => true));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('tags' => array('$size' => 1));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('tags' => array('$type' => 1));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+
+		$conditions = array('created' => array('$mod' => array(7,0)));
+		$result = $this->_db->conditions($conditions, $query);
+		$this->assertIdentical($conditions, $result);
+	}
+
 	public function testMultiOperationConditions() {
 		$conditions = array('loc' => array('$near' => array(50, 50), '$maxDistance' => 5));
 		$result = $this->_db->conditions($conditions, $this->_query);

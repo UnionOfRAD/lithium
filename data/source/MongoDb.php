@@ -173,9 +173,45 @@ class MongoDb extends \lithium\data\Source {
 	protected function _init() {
 		parent::_init();
 
-		$this->_operators += array('like' => function($key, $value) {
-			return new MongoRegex($value);
-		});
+		$this->_operators += array(
+			'like' => function($key, $value) {
+				return new MongoRegex($value);
+			},
+			'$exists' => function($key, $value) {
+				return array('$exists' => (boolean) $value);
+			},
+			'$type' => function($key, $value) {
+				return array('$type' => (integer) $value);
+			},
+			'$mod' => function($key, $value) {
+				$value = (array) $value;
+				$divisor = current($value);
+				$remainder = next($value) ?: 0;
+				return array('$mod' => array($divisor, $remainder));
+			},
+			'$size' => function($key, $value) {
+				return array('$size' => (integer) $value);
+			},
+			'$elemMatch' => function($operator, $values, $options = array()) {
+				$options += array(
+					'castOpts' => array(),
+					'field' => ''
+				);
+				extract($options);
+				$values = (array) $values;
+				$castOpts += array('pathKey' => $field);
+
+				if(empty($castOpts['schema'])){
+					return array('$elemMatch' => $values);
+				}
+				$schema = $castOpts['schema'];
+
+				foreach ($values as $key => &$value) {
+					$value = $schema->cast(null, $key, $value, $castOpts);
+				}
+				return array('$elemMatch' => $values);
+			}
+		);
 	}
 
 	/**
@@ -842,7 +878,7 @@ class MongoDb extends \lithium\data\Source {
 				$operator = $operator[is_array($value) ? 'multiple' : 'single'];
 			}
 			if (is_callable($operator)) {
-				return $operator($key, $value, $schema);
+				return $operator($key, $value, compact('castOpts', 'field'));
 			}
 			unset($operators[$key]);
 			$operators[$operator] = $cast($field, $value);
