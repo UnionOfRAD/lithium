@@ -1757,9 +1757,10 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected = "UPDATE {mock_database_posts} SET {id} = 1, {balance} = 20 WHERE {id} = 1;";
 		$this->assertEqual($expected, $this->_db->sql);
 
-		$this->expectException("Field 'name' cannot be incremented.");
-		$entity->name = 'Ali';
-		$entity->increment('name', 10);
+		$this->assertException("Field 'name' cannot be incremented.", function() use ($entity) {
+			$entity->name = 'Ali';
+			$entity->increment('name', 10);
+		});
 	}
 }
 
