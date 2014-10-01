@@ -605,42 +605,51 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Helper which export the query export
+	 * Helper method for `Database::read()` to export query while handling additional joins
+	 * when using relationships and limited result sets. Filters conditions on subsequent
+	 * queries to just the ones applying to the relation.
 	 *
-	 * @param object $query The query object
-	 * @return array The export array
+	 * @see lithium\data\source\Database::read()
+	 * @param object $query The query object.
+	 * @return array The exported query returned by reference.
 	 */
 	protected function &_queryExport($query) {
 		$data = $query->export($this);
 
-		if ($query->limit() && ($model = $query->model())) {
-			foreach ($query->relationships() as $relation) {
-				if ($relation['type'] === 'hasMany') {
-					$name = $model::meta('name');
-					$key = $model::key();
-					$fields = $data['fields'];
-					$fieldname = $this->name("{$name}.{$key}");
-					$data['fields'] = "DISTINCT({$fieldname}) AS _ID_";
-					$sql = $this->renderCommand('read', $data);
-					$result = $this->_execute($sql);
+		if (!$query->limit() || !($model = $query->model())) {
+			return $data;
+		}
+		foreach ($query->relationships() as $relation) {
+			if ($relation['type'] !== 'hasMany') {
+				continue;
+			}
+			$pk = $this->name($model::meta('name') . '.' . $model::key());
 
-					$ids = array();
-					while ($row = $result->next()) {
-						$ids[] = $row[0];
-					}
+			$result = $this->_execute($this->renderCommand('read', array(
+				'fields' => "DISTINCT({$pk}) AS _ID_") + $data
+			));
+			$ids = array();
 
-					if (!$ids) {
-						$return = null;
-						return $return;
-					}
-					$data['fields'] = $fields;
-					$data['limit'] = '';
-					$data['conditions'] = $this->conditions(array(
-						"{$name}.{$key}" => $ids
-					) + $query->conditions(), $query);
-					return $data;
+			while ($row = $result->next()) {
+				$ids[] = $row[0];
+			}
+			if (!$ids) {
+				$data = null;
+				break;
+			}
+
+			$conditions = array();
+			foreach ($query->conditions() as $key => $value) {
+				if (strpos($key, "{$relation['alias']}.") === 0) {
+					$conditions[$key] = $value;
 				}
 			}
+			$data['conditions'] = $this->conditions(
+				array($pk => $ids) + $conditions, $query
+			);
+
+			$data['limit'] = '';
+			break;
 		}
 		return $data;
 	}
