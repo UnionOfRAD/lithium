@@ -28,6 +28,12 @@ use PDOException;
  */
 class Result extends \lithium\data\source\Result {
 
+	/**
+	 * Controls whether PDO::FETCH_NAMED or PDO::FETCH_NUM is used. Defaults
+	 * to `false` thus PDO::FETCH_NUM is used.
+	 *
+	 * @var boolean
+	 */
 	public $named = false;
 
 	/**

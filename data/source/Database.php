@@ -31,6 +31,8 @@ use UnexpectedValueException;
 abstract class Database extends \lithium\data\Source {
 
 	/**
+	 * Holds the current connection.
+	 *
 	 * @var PDO
 	 */
 	public $connection;
@@ -579,9 +581,11 @@ abstract class Database extends \lithium\data\Source {
 					foreach ($result as $data) {
 						$offset = 0;
 						$records[$i] = array();
+
 						foreach ($columns as $path => $cols) {
 							$len = count($cols);
 							$values = array_combine($cols, array_slice($data, $offset, $len));
+
 							if ($path) {
 								$records[$i][$path] = $values;
 							} else {

@@ -12,8 +12,10 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 
 	/**
 	 * Contains the cached result set.
+	 *
+	 * @var array
 	 */
-	protected $_cache = null;
+	protected $_cache = array();
 
 	/**
 	 * The current position of the iterator.
