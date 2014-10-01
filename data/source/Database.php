@@ -633,7 +633,7 @@ abstract class Database extends \lithium\data\Source {
 					$data['limit'] = '';
 					$data['conditions'] = $this->conditions(array(
 						"{$name}.{$key}" => $ids
-					), $query);
+					) + $query->conditions(), $query);
 					return $data;
 				}
 			}
