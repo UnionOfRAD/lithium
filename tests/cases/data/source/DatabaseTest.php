@@ -1247,6 +1247,58 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	/**
+	 * Tests that when using LIMIT together with relation conditions and relationship,
+	 * relation conditions are passed into the subsequent query issued.
+	 *
+	 * @link https://github.com/UnionOfRAD/lithium/pull/1099
+	 */
+	public function testModelFindFirstPassesConditionsIntoSubsequent() {
+		$this->_db->log = true;
+		$this->_db->return['_execute'] = new MockResult(array(
+			'records' => array(
+				array(0 => 5)
+			)
+		));
+
+		MockDatabasePost::find('first', array(
+			'conditions' => array(
+				'id' => 5,
+				'is_published' => true,
+				'MockDatabaseComment.is_spam' => false
+			),
+			'with' => 'MockDatabaseComment'
+		));
+		$this->_db->log = false;
+
+		$result = $this->_db->logs;
+
+		$expected[0] = <<<SQL
+SELECT DISTINCT({MockDatabasePost}.{id}) AS _ID_
+	FROM {mock_database_posts} AS {MockDatabasePost}
+	LEFT JOIN {mock_database_comments} AS {MockDatabaseComment}
+		ON {MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id}
+	WHERE
+		{MockDatabasePost}.{id} = 5
+		AND {MockDatabasePost}.{is_published} = 1
+		AND {MockDatabaseComment}.{is_spam} = 0
+	LIMIT 1;
+SQL;
+		$expected[1] = <<<SQL
+SELECT * FROM {mock_database_posts} AS {MockDatabasePost}
+	LEFT JOIN {mock_database_comments} AS {MockDatabaseComment}
+		ON {MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id}
+	WHERE
+		{MockDatabasePost}.{id} IN (5)
+		AND {MockDatabaseComment}.{is_spam} = 0;
+SQL;
+
+		$expected = array_map(function($v) {
+			return preg_replace('/[\t\n]+/', ' ', $v);
+		}, $expected);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testsplitFieldname() {
 		$result = $this->_db->invokeMethod('_splitFieldname', array('Alias.fieldname'));
 		$this->assertEqual(array('Alias', 'fieldname'), $result);
