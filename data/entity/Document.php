@@ -9,7 +9,6 @@
 namespace lithium\data\entity;
 
 use RuntimeException;
-use UnexpectedValueException;
 
 /**
  * `Document` is an alternative to the `entity\Record` class, which is optimized for

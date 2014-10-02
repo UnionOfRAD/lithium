@@ -206,7 +206,7 @@ class MongoDb extends \lithium\data\Source {
 				$options['castOpts'] += array('pathKey' => $options['field']);
 				$values = (array) $values;
 
-				if (empty($options['castOpts']['schema'])){
+				if (empty($options['castOpts']['schema'])) {
 					return array('$elemMatch' => $values);
 				}
 				foreach ($values as $key => &$value) {

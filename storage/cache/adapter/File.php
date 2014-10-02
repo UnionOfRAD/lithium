@@ -8,7 +8,6 @@
 
 namespace lithium\storage\cache\adapter;
 
-use SplFileInfo;
 use DirectoryIterator;
 use lithium\core\Libraries;
 use lithium\storage\Cache;

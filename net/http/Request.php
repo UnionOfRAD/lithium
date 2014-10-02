@@ -50,7 +50,7 @@ class Request extends \lithium\net\http\Message {
 	 */
 	public $cookies = array();
 
- 	/**
+	/**
 	 * An array of closures representing various formats this object can be exported to.
 	 *
 	 * @var array
@@ -194,7 +194,7 @@ class Request extends \lithium\net\http\Message {
 		$invalid = str_split(",; \+\t\r\n\013\014");
 		$replace = array_map('rawurlencode', $invalid);
 
-		foreach($cookies as $key => &$value) {
+		foreach ($cookies as $key => &$value) {
 			if (!is_scalar($value)) {
 				$message = "Non-scalar value cannot be rendered for cookie `{$key}`";
 				throw new UnexpectedValueException($message);

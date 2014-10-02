@@ -25,7 +25,7 @@ use lithium\storage\Cache;
  * are not natively supported. However serialization will seldomly be needed. This cache adapter
  * does not implement any expiry-based cache invalidation logic, as the cached data will only
  * persist for the lifetime of the current request.
-  *
+ *
  * A simple configuration can be accomplished as follows:
  *
  * ```

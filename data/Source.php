@@ -231,7 +231,6 @@ abstract class Source extends \lithium\core\Object {
 	 */
 	abstract public function delete($query, array $options = array());
 
-
 	/**
 	 * Returns the list of methods which format values imported from `Query` objects. Should be
 	 * overridden in subclasses.

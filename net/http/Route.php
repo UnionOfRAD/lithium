@@ -345,7 +345,7 @@ class Route extends \lithium\core\Object {
 
 		$scope = array();
 		if (!empty($options['scope'])) {
-			$scope = (array)$options['scope'] + array('params' => array());
+			$scope = (array) $options['scope'] + array('params' => array());
 			$scope = array_flip($scope['params']);
 		}
 		unset($options['scope']);
