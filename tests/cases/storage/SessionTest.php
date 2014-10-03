@@ -309,6 +309,24 @@ class SessionTest extends \lithium\test\Unit {
 		$result = $encrypt->decrypt($encrypted);
 		$this->assertEqual($savedData, $result);
 	}
+
+	public function testHmacStrategyOnNonExistKey() {
+		Session::config(array('primary' => array(
+			'adapter' => new Memory(),
+			'strategies' => array(
+				'Hmac' => array(
+					'secret' => 's3cr3t'
+				)
+			)
+		)));
+
+		$this->assertEmpty(Session::read('test'));
+
+		Session::write('test', 'value');
+		$result = Session::read('test');
+		$expected = 'value';
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
