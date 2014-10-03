@@ -58,6 +58,24 @@ class FormSignatureTest extends \lithium\test\Unit {
 		)));
 		$this->assertTrue(FormSignature::check($request));
 	}
+
+	public function testFailsWithAddedFieldAndLocked() {
+		$data = array(
+			'fields' => array(
+				'email' => 'foo@baz',
+				'pass' => 'whatever',
+			),
+			'locked' => array(
+				'active' => 'true'
+			)
+		);
+		$signatures[] = FormSignature::key($data);
+
+		$data['fields']['invalidField'] = 'foo';
+		$signatures[] = FormSignature::key($data);
+
+		$this->assertNotEqual($signatures[0], $signatures[1]);
+	}
 }
 
 ?>
