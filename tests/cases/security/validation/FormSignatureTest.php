@@ -21,7 +21,7 @@ class FormSignatureTest extends \lithium\test\Unit {
 		$components = array(
 			'a%3A1%3A%7Bs%3A6%3A%22active%22%3Bs%3A4%3A%22true%22%3B%7D',
 			'a%3A0%3A%7B%7D',
-			'$2a$10$NuNTOeXv4OHpPJtbdAmfReFiSmFw5hmc6sSy8qwns6/DWNSSOjR1y'
+			'$2a$10$NuNTOeXv4OHpPJtbdAmfReTIDGVK87uiQcWRIRvL2rvsl7DV4vzVa'
 		);
 		$signature = join('::', $components);
 
@@ -50,7 +50,7 @@ class FormSignatureTest extends \lithium\test\Unit {
 		$components = array(
 			'a%3A1%3A%7Bs%3A6%3A%22active%22%3Bs%3A4%3A%22true%22%3B%7D',
 			'a%3A0%3A%7B%7D',
-			'$2a$10$NuNTOeXv4OHpPJtbdAmfReFiSmFw5hmc6sSy8qwns6/DWNSSOjR1y'
+			'$2a$10$NuNTOeXv4OHpPJtbdAmfReTIDGVK87uiQcWRIRvL2rvsl7DV4vzVa'
 		);
 		$signature = join('::', $components);
 
@@ -59,6 +59,45 @@ class FormSignatureTest extends \lithium\test\Unit {
 			'pass' => 'whatever',
 			'active' => 'true',
 			'security' => compact('signature') + array('foo' => 'bar')
+		)));
+		$this->assertTrue(FormSignature::check($request));
+	}
+
+	public function testSignatureKeyForDifferentValues() {
+		$data = array(
+			'fields' => array(
+				'email' => 'foo@baz',
+				'pass' => 'whatever',
+			),
+			'locked' => array(
+				'active' => 'true'
+			)
+		);
+		$signatures[] = FormSignature::key($data);
+
+		$data['fields']['invalidField'] = 'foo';
+		$signatures[] = FormSignature::key($data);
+
+		$this->assertNotEqual($signatures[0], $signatures[1]);
+	}
+
+	public function testSignatureCheckWithLockedFields() {
+		$data = array(
+			'fields' => array(
+				'email' => 'foo@baz',
+				'pass' => 'whatever',
+			),
+			'locked' => array(
+				'active' => 'true'
+			)
+		);
+		$signature = FormSignature::key($data);
+
+		$request = new Request(array('data' => array(
+			'email' => 'foo@baz',
+			'pass' => 'whatever',
+			'active' => 'true',
+			'security' => compact('signature')
 		)));
 		$this->assertTrue(FormSignature::check($request));
 	}
