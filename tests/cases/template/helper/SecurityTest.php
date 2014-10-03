@@ -190,6 +190,28 @@ class SecurityTest extends \lithium\test\Unit {
 		$expected = FormSignature::key($data);
 		$this->assertEqual($expected, $result);
 	}
+	
+	public function testFormSignatureWithMethodPUT() {
+		$form = new Form(array('context' => $this->context));
+		$this->subject->sign($form);
+
+		ob_start();
+		$content = array(
+			$form->create(null, array('url' => 'http:///', 'method' => 'PUT')),
+			$form->text('email', array('value' => 'foo@bar')),
+			$form->end()
+		);
+		$signature = ob_get_clean();
+		preg_match('/value="([^"]+)"/', $signature, $match);
+		list(, $signature) = $match;
+
+		$request = new Request(array('data' => array(
+			'_method' => 'PUT',
+			'email' => 'foo@baz',
+			'security' => compact('signature')
+		)));
+		$this->assertTrue(FormSignature::check($request));
+	}
 }
 
 ?>
