@@ -132,6 +132,9 @@ class Security extends \lithium\template\Helper {
 			$params['options'] = array_diff_key($options, $defaults);
 			$result = $chain->next($self, $params, $chain);
 
+			if ($params['method'] === 'label') {
+				return $result;
+			}
 			if (isset($options['exclude']) && $options['exclude']) {
 				return $result;
 			}

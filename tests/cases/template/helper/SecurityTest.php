@@ -97,6 +97,31 @@ class SecurityTest extends \lithium\test\Unit {
 		)));
 		$this->assertTrue(FormSignature::check($request));
 	}
+
+	public function testFormSignatureWithLabelField() {
+		$form = new Form(array('context' => $this->context));
+		$this->subject->sign($form);
+
+		ob_start();
+		$content = array(
+			$form->create(null, array('url' => 'http:///')),
+			$form->label('foo'),
+			$form->text('email', array('value' => 'foo@bar')),
+			$form->end()
+		);
+		$signature = ob_get_clean();
+		preg_match('/value="([^"]+)"/', $signature, $match);
+		list(, $signature) = $match;
+		$result = $signature;
+
+		$data = array(
+			'fields' => array(
+				'email' => 'foo@bar',
+			)
+		);
+		$expected = FormSignature::key($data);
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
