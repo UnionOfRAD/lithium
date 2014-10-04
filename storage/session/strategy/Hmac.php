@@ -101,6 +101,9 @@ class Hmac extends \lithium\core\Object {
 	 * @return array validated data
 	 */
 	public function read($data, array $options = array()) {
+		if ($data === null) {
+			return $data;
+		}
 		$class = $options['class'];
 
 		$currentData = $class::read(null, array('strategies' => false));
