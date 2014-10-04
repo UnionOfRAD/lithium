@@ -63,6 +63,7 @@ class Hmac extends \lithium\core\Object {
 
 	/**
 	 * Write strategy method.
+	 *
 	 * Adds an HMAC signature to the data. Note that this will transform the
 	 * passed `$data` to an array, and add a `__signature` key with the HMAC-calculated
 	 * value.
@@ -88,17 +89,21 @@ class Hmac extends \lithium\core\Object {
 
 	/**
 	 * Read strategy method.
-	 * Validates the HMAC signature of the stored data. If the signatures match, then
-	 * the data is safe, and the 'valid' key in the returned data will be
 	 *
-	 * If the store being read does not contain a `__signature` field, a `MissingSignatureException`
-	 * is thrown. When catching this exception, you may choose to handle it by either writing
-	 * out a signature (e.g. in cases where you know that no pre-existing signature may exist), or
-	 * you can blackhole it as a possible tampering attempt.
+	 * Validates the HMAC signature of the stored data. If the signatures match, then the data
+	 * is safe and will be passed through as-is.
 	 *
-	 * @param array $data the Data being read.
+	 * If the stored data being read does not contain a `__signature` field, a
+	 * `MissingSignatureException` is thrown. When catching this exception, you may choose
+	 * to handle it by either writing out a signature (e.g. in cases where you know that no
+	 * pre-existing signature may exist), or you can blackhole it as a possible tampering
+	 * attempt.
+	 *
+	 * @throws RuntimeException On possible data tampering.
+	 * @throws lithium\storage\session\strategy\MissingSignatureException On missing singature.
+	 * @param array $data The data being read.
 	 * @param array $options Options for this method.
-	 * @return array validated data
+	 * @return array Validated data.
 	 */
 	public function read($data, array $options = array()) {
 		if ($data === null) {
@@ -111,11 +116,10 @@ class Hmac extends \lithium\core\Object {
 		if (!isset($currentData['__signature'])) {
 			throw new MissingSignatureException('HMAC signature not found.');
 		}
-		if (!String::compare($currentData['__signature'], static::_signature($currentData))) {
-			$message = "Possible data tampering: HMAC signature does not match data.";
-			throw new RuntimeException($message);
+		if (String::compare($currentData['__signature'], static::_signature($currentData))) {
+			return $data;
 		}
-		return $data;
+		throw new RuntimeException('Possible data tampering: HMAC signature does not match data.');
 	}
 
 	/**

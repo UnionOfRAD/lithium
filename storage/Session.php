@@ -216,7 +216,7 @@ class Session extends \lithium\core\Adaptable {
 	 *                of the configuration (i.e. `'default'`) here.
 	 *              - `'strategies'` _boolean_: Indicates whether or not a configuration's applied
 	 *                strategy classes should be enabled for this operation. Defaults to `true`.
-	 * @filter
+	 * @filter This method may be filtered.
 	 */
 	public static function clear(array $options = array()) {
 		$defaults = array('name' => null, 'strategies' => true);
