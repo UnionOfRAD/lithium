@@ -896,9 +896,9 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * @param string|array $conditions The conditions for this query.
 	 * @param object $context The current `lithium\data\model\Query` instance.
-	 * @param array $options
-	 *               - `prepend` _boolean_: Whether the return string should be prepended with the
-	 *                 `WHERE` keyword.
+	 * @param array $options Available options are:
+	 *               - `'prepend'` _boolean|string_: The string to prepend or `false`
+	 *                 for no prepending. Defaults to `'WHERE'`.
 	 * @return string Returns the `WHERE` clause of an SQL query.
 	 */
 	public function conditions($conditions, $context, array $options = array()) {
@@ -918,9 +918,9 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * @param string|array $conditions The havings for this query.
 	 * @param object $context The current `lithium\data\model\Query` instance.
-	 * @param array $options
-	 *               - `prepend` _boolean_: Whether the return string should be prepended with the
-	 *                 `HAVING` keyword.
+	 * @param array $options Available options are:
+	 *               - `'prepend'` _boolean|string_: The string to prepend or `false`
+	 *                 for no prepending. Defaults to `'HAVING'`.
 	 * @return string Returns the `HAVING` clause of an SQL query.
 	 */
 	public function having($conditions, $context, array $options = array()) {
@@ -930,18 +930,17 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Returns a string of formatted conditions to be inserted into the query statement. If the
-	 * query conditions are defined as an array, key pairs are converted to SQL strings.
+	 * Returns a string of formatted conditions to be inserted into the query statement.
 	 *
-	 * Conversion rules are as follows:
-	 *
-	 * - If `$key` is numeric and `$value` is a string, `$value` is treated as a literal SQL
-	 *   fragment and returned.
+	 * If the query conditions are defined as an array, key pairs are converted to SQL strings.
+	 * If `$key` is numeric and `$value` is a string, `$value` is treated as a literal SQL
+	 * fragment and returned.
 	 *
 	 * @param string|array $conditions The conditions for this query.
 	 * @param object $context The current `lithium\data\model\Query` instance.
-	 * @param array $options
-	 *               - `prepend` mixed: The string to prepend or false for no prepending
+	 * @param array $options Available options are:
+	 *               - `'prepend'` _boolean|string_: The string to prepend or `false`
+	 *                 for no prepending. Defaults to `false`.
 	 * @return string Returns an SQL conditions clause.
 	 */
 	protected function _conditions($conditions, $context, array $options = array()) {
@@ -1096,9 +1095,10 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Helper for `Database::fields()` && `Database::schema()`.
-	 * Reformat fields to be alias based.
+	 * Reformats fields to be alias based.
 	 *
+	 * @see lithium\data\source\Database::fields()
+	 * @see lithium\data\source\Database::schema()
 	 * @param array $fields Array of fields.
 	 * @param object $context Generally a `data\model\Query` instance.
 	 * @return array Reformatted fields
@@ -1107,6 +1107,7 @@ abstract class Database extends \lithium\data\Source {
 		$alias = $context->alias();
 		$models = $context->models($this);
 		$list = array();
+
 		foreach ($fields as $key => $field) {
 			if (!is_string($field)) {
 				if (isset($models[$key])) {
@@ -1128,9 +1129,18 @@ abstract class Database extends \lithium\data\Source {
 		return $list;
 	}
 
+	/**
+	 * Quotes fields, also handles aliased fields.
+	 *
+	 * @see lithium\data\source\Database::fields()
+	 * @param string $alias
+	 * @param string $field
+	 * @return string The quoted field.
+	 */
 	protected function _fieldsQuote($alias, $field) {
 		list($open, $close) = $this->_quotes;
 		$aliasing = preg_split("/\s+as\s+/i", $field);
+
 		if (isset($aliasing[1])) {
 			list($aliasname, $fieldname) = $this->_splitFieldname($aliasing[0]);
 			$alias = $aliasname ? : $alias;
@@ -1142,13 +1152,23 @@ abstract class Database extends \lithium\data\Source {
 		}
 	}
 
+	/**
+	 * Renders the fields SQL fragment for queries.
+	 *
+	 * @see lithium\data\source\Database::fields()
+	 * @param string $type Type of query i.e. `'create'` or `'update'`.
+	 * @param object $context Generally a `data\model\Query` instance.
+	 * @param array $fields
+	 * @param array $schema An array defining the schema of the fields used in the criteria.
+	 * @return string|array
+	 */
 	protected function _fieldsReturn($type, $context, $fields, $schema) {
 		if ($type === 'create' || $type === 'update') {
 			$data = $context->data();
+
 			if (isset($data['data']) && is_array($data['data']) && count($data) === 1) {
 				$data = $data['data'];
 			}
-
 			if ($fields && is_array($fields) && is_int(key($fields))) {
 				$data = array_intersect_key($data, array_combine($fields, $fields));
 			}
@@ -1156,6 +1176,76 @@ abstract class Database extends \lithium\data\Source {
 			return $this->{$method}($data, $schema, $context);
 		}
 		return empty($fields) ? '*' : join(', ', $fields);
+	}
+
+	/**
+	 * Renders the fields part for _create_ queries.
+	 *
+	 * @see lithium\data\source\Database::_fieldsReturn()
+	 * @param array $data
+	 * @param array $schema An array defining the schema of the fields used in the criteria.
+	 * @param object $context Generally a `data\model\Query` instance.
+	 * @return array Array with `fields` and `values` keys which hold SQL fragments of fields
+	 *         an values separated by comma.
+	 */
+	protected function _createFields($data, $schema, $context) {
+		$fields = array();
+		$values = array();
+
+		foreach ($data as $field => $value) {
+			$fields[] = $this->name($field);
+			$values[] = $this->value($value, isset($schema[$field]) ? $schema[$field] : array());
+		}
+		return array(
+			'fields' => join(', ', $fields),
+			'values' => join(', ', $values)
+		);
+	}
+
+	/**
+	 * Renders the fields part for _update_ queries.
+	 *
+	 * Will only include fields if they have been updated in the entity of the context. Also
+	 * handles correct incremented/decremented fields.
+	 *
+	 * @see lithium\data\source\Entity::increment()
+	 * @see lithium\data\source\Database::_fieldsReturn()
+	 * @param array $data
+	 * @param array $schema An array defining the schema of the fields used in the criteria.
+	 * @param object $context Generally a `data\model\Query` instance.
+	 * @return string SQL fragment, with fields separated by comma.
+	 */
+	protected function _updateFields($data, $schema, $context) {
+		$fields = array();
+		$increment = array();
+
+		if ($entity = $context->entity()) {
+			$export = $entity->export();
+			$increment = $export['increment'];
+
+			array_map(function($key) use (&$data, $export){
+				if (!empty($data[$key]) && $export['data'][$key] === $data[$key]) {
+					unset($data[$key]);
+				}
+			}, array_keys($export['data']));
+
+			if (!$data) {
+				$model = $context->model();
+				$data = $model::key($context->data());
+			}
+		}
+
+		foreach ($data as $field => $value) {
+			$schema += array($field => array('default' => null));
+			$name = $this->name($field);
+
+			if (isset($increment[$field])) {
+				$fields[] = $name . ' = ' . $name . ' + ' . $this->value($increment[$field], $schema[$field]);
+			} else {
+				$fields[] = $name . ' = ' . $this->value($value, $schema[$field]);
+			}
+		}
+		return join(', ', $fields);
 	}
 
 	/**
@@ -1197,24 +1287,23 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Returns a string of formatted constraints to be inserted into the query statement. If the
-	 * query constraints are defined as an array, key pairs are converted to SQL strings.
+	 * Returns a string of formatted constraints to be inserted into the query statement.
 	 *
-	 * Conversion rules are as follows:
-	 *
-	 * - If `$key` is numeric and `$value` is a string, `$value` is treated as a literal SQL
-	 *   fragment and returned.
+	 * If the query constraints are defined as an array, key pairs are converted to SQL
+	 * strings. If `$key` is numeric and `$value` is a string, `$value` is treated as a literal
+	 * SQL fragment and returned.
 	 *
 	 * @param string|array $constraints The constraints for a `ON` clause.
 	 * @param object $context The current `lithium\data\model\Query` instance.
-	 * @param array $options
-	 *               - `prepend` _boolean_: Whether the return string should be prepended with the
-	 *                 `ON` keyword.
+	 * @param array $options Available options are:
+	 *               - `'prepend'` _boolean|string_: The string to prepend or `false`
+	 *                 for no prepending. Defaults to `'ON'`.
 	 * @return string Returns the `ON` clause of an SQL query.
 	 */
 	public function constraints($constraints, $context, array $options = array()) {
 		$defaults = array('prepend' => 'ON');
 		$options += $defaults;
+
 		if (is_array($constraints)) {
 			$constraints = $this->_constraints($constraints);
 		}
@@ -1261,7 +1350,7 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Helper method
+	 * Renders ORDER BY or GROUP BY clause.
 	 *
 	 * @see lithium\data\source\Database::order()
 	 * @see lithium\data\source\Database::group()
@@ -1325,48 +1414,6 @@ abstract class Database extends \lithium\data\Source {
 
 	public function cast($entity, array $data, array $options = array()) {
 		return $data;
-	}
-
-	protected function _createFields($data, $schema, $context) {
-		$fields = $values = array();
-
-		foreach ($data as $field => $value) {
-			$fields[] = $this->name($field);
-			$values[] = $this->value($value, isset($schema[$field]) ? $schema[$field] : array());
-		}
-		$fields = join(', ', $fields);
-		$values = join(', ', $values);
-		return compact('fields', 'values');
-	}
-
-	protected function _updateFields($data, $schema, $context) {
-		$fields = array();
-		$increment = array();
-
-		if ($entity = $context->entity()) {
-			$export = $entity->export();
-			$increment = $export['increment'];
-			array_map(function($key) use (&$data, $export){
-				if (!empty($data[$key]) && $export['data'][$key] === $data[$key]) {
-					unset($data[$key]);
-				}
-			}, array_keys($export['data']));
-			if (!$data) {
-				$model = $context->model();
-				$data = $model::key($context->data());
-			}
-		}
-
-		foreach ($data as $field => $value) {
-			$schema += array($field => array('default' => null));
-			$name = $this->name($field);
-			if (isset($increment[$field])) {
-				$fields[] = $name . ' = ' . $name . ' + ' . $this->value($increment[$field], $schema[$field]);
-			} else {
-				$fields[] = $name . ' = ' . $this->value($value, $schema[$field]);
-			}
-		}
-		return join(', ', $fields);
 	}
 
 	/**
