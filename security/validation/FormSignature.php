@@ -103,11 +103,15 @@ class FormSignature {
 		$parsed = static::_parse($signature);
 
 		$data = Set::flatten($data);
-		$fields = array_diff(array_keys($data), $parsed['excluded']);
 
 		if (array_intersect_assoc($data, $parsed['locked']) != $parsed['locked']) {
 			return false;
 		}
+		$fields = array_diff(
+			array_keys($data),
+			array_keys($parsed['locked']),
+			$parsed['excluded']
+		);
 		return $signature === static::_compile($fields, $parsed['locked'], $parsed['excluded']);
 	}
 
