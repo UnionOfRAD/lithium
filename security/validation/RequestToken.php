@@ -16,11 +16,11 @@ use lithium\util\Set;
  * The `RequestToken` class creates cryptographically-secure tokens and keys that can be used to
  * validate the authenticity of client requests.
  *
- * `RequestToken` will persist the token for the life of
- * the client session, and generate per-request keys that will match against that token.
+ * `RequestToken` will persist the token for the life of the client session, and generate
+ * per-request keys that will match against that token.
  *
- * Using these token/key pairs in forms and other non-idempotent requests will help you secure your
- * application against cross-site request forgeries, or CSRF attacks.
+ * Using these token/key pairs in forms and other non-idempotent requests will help you secure
+ * your application against cross-site request forgeries, or CSRF attacks.
  *
  * ### Example
  *
