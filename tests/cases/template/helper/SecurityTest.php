@@ -98,6 +98,74 @@ class SecurityTest extends \lithium\test\Unit {
 		$this->assertTrue(FormSignature::check($request));
 	}
 
+	public function testFormSignatureWithLockedAndExcluded() {
+		$form = new Form(array('context' => $this->context));
+		$validator = 'lithium\tests\mocks\security\validation\MockFormSignature';
+
+		$helper = new Security(array(
+			'context' => $this->context,
+			'classes' => array(
+				'formSignature' => $validator
+			)
+		));
+
+		$helper->sign($form);
+
+		ob_start();
+		$content = array(
+			$form->create(null, array('url' => 'http:///')),
+			$form->text('email', array('value' => 'foo@bar')),
+			$form->password('pass'),
+			$form->hidden('id', array('value' => 23)),
+			$form->text('foo', array('value' => 'bar', 'exclude' => true)),
+			$form->hidden('active', array('value' => 'true', 'exclude' => true, 'locked' => false)),
+			$form->end()
+		);
+		ob_get_clean();
+
+		$result = $validator::$compile[0]['in'];
+		$expected = array(
+			'fields' => array(
+				'email', 'pass'
+			),
+			'excluded' => array(
+				'foo',
+				'active'
+			),
+			'locked' => array(
+				'id' => 23
+			)
+		);
+		$compiledSignature = $validator::$compile[0]['out'];
+
+		$this->assertEqual($expected, $result);
+
+		$request = new Request(array(
+			'data' => array(
+				'security' => array('signature' => $compiledSignature)
+			)
+		));
+		$validator::check($request);
+
+		$expected = $compiledSignature;
+		$result = $validator::$parse[0]['in']['signature'];
+		$this->assertEqual($expected, $result);
+
+		$result = $validator::$parse[0]['out'];
+		$expected = array(
+			'excluded' => array(
+				'active',
+				'foo'
+			),
+			'locked' => array(
+				'id' => 23
+			)
+		);
+		$this->assertEqual($expected, $result);
+
+		$validator::reset();
+	}
+
 	public function testFormSignatureWithLabelField() {
 		$form = new Form(array('context' => $this->context));
 		$this->subject->sign($form);
