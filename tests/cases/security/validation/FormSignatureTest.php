@@ -17,22 +17,16 @@ class FormSignatureTest extends \lithium\test\Unit {
 	 * Tests that `FormSignature` fails to generate a matching signature for data where locked
 	 * values have been tampered with.
 	 */
-	public function testSignatureFailingForInvalidLockedFieldValue() {
-		$components = array(
-			'a%3A1%3A%7Bs%3A6%3A%22active%22%3Bs%3A4%3A%22true%22%3B%7D',
-			'a%3A0%3A%7B%7D',
-			'$2a$10$NuNTOeXv4OHpPJtbdAmfReFiSmFw5hmc6sSy8qwns6/DWNSSOjR1y'
-		);
-		$signature = join('::', $components);
-
-		$request = new Request(array('data' => array(
-			'email' => 'foo@baz',
-			'pass' => 'whatever',
-			'active' => 'true',
-			'security' => compact('signature')
-		)));
-		$this->assertTrue(FormSignature::check($request));
-
+	public function testFailLockedFieldValueChange() {
+		$signature = FormSignature::key(array(
+			'fields' => array(
+				'email' => 'foo@baz',
+				'pass' => 'whatever'
+			),
+			'locked' => array(
+				'active' => 'true'
+			)
+		));
 		$request = new Request(array('data' => array(
 			'email' => 'foo@baz',
 			'pass' => 'whatever',
@@ -47,13 +41,15 @@ class FormSignatureTest extends \lithium\test\Unit {
 	 * generating signatures.
 	 */
 	public function testIgnoreSecurityFields() {
-		$components = array(
-			'a%3A1%3A%7Bs%3A6%3A%22active%22%3Bs%3A4%3A%22true%22%3B%7D',
-			'a%3A0%3A%7B%7D',
-			'$2a$10$NuNTOeXv4OHpPJtbdAmfReFiSmFw5hmc6sSy8qwns6/DWNSSOjR1y'
-		);
-		$signature = join('::', $components);
-
+		$signature = FormSignature::key(array(
+			'fields' => array(
+				'email' => 'foo@baz',
+				'pass' => 'whatever'
+			),
+			'locked' => array(
+				'active' => 'true'
+			)
+		));
 		$request = new Request(array('data' => array(
 			'email' => 'foo@baz',
 			'pass' => 'whatever',
