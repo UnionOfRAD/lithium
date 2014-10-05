@@ -80,8 +80,8 @@ class FormSignature {
 		foreach (array('fields', 'excluded', 'locked') as $list) {
 			${$list} = urlencode(serialize(${$list}));
 		}
-		$hash = $classes['password']::hash($fields, static::$_salt);
-		$hash = $classes['password']::hash("{$locked}::{$excluded}::{$hash}", static::$_salt);
+		$hash = $classes['password']::hash(sha1($fields), static::$_salt);
+		$hash = $classes['password']::hash(sha1("{$locked}::{$excluded}::{$hash}"), static::$_salt);
 
 		return "{$locked}::{$excluded}::{$hash}";
 	}
@@ -95,12 +95,12 @@ class FormSignature {
 		}
 		$signature = $data['security']['signature'];
 		unset($data['security']);
-		$data = Set::flatten($data);
-		$fields = array_keys($data);
+		$fields = Set::flatten($data);
 
 		list($locked, $excluded, $hash) = explode('::', $signature, 3);
 		$locked = unserialize(urldecode($locked));
 		$excluded = unserialize(urldecode($excluded));
+		$fields = array_diff($fields, $locked);
 		$fields = array_diff($fields, $excluded);
 
 		if (array_intersect_assoc($data, $locked) != $locked) {

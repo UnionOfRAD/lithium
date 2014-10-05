@@ -85,7 +85,7 @@ class SecurityTest extends \lithium\test\Unit {
 		$expected = array(
 			'a%3A1%3A%7Bs%3A6%3A%22active%22%3Bs%3A4%3A%22true%22%3B%7D',
 			'a%3A0%3A%7B%7D',
-			'$2a$10$NuNTOeXv4OHpPJtbdAmfReFiSmFw5hmc6sSy8qwns6/DWNSSOjR1y'
+			'$2a$10$NuNTOeXv4OHpPJtbdAmfReTIDGVK87uiQcWRIRvL2rvsl7DV4vzVa'
 		);
 		$this->assertEqual(join('::', $expected), $signature);
 
