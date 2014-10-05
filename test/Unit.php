@@ -185,7 +185,7 @@ class Unit extends \lithium\core\Object {
 		$defaults = array(
 			'methods' => $this->methods(),
 			'reporter' => $this->_reporter,
-			'handler' =>  function($code, $message, $file = null, $line = null) {
+			'handler' => function($code, $message, $file = null, $line = null) {
 				throw new ErrorException($message, 0, $code, $file, $line);
 			}
 		);
