@@ -146,11 +146,11 @@ class Password {
 	public static function salt($type = null, $count = null) {
 		switch (true) {
 			case CRYPT_BLOWFISH === 1 && (!$type || $type === 'bf'):
-				return static::_genSaltBf($count);
+				return static::_generateSaltBf($count);
 			case CRYPT_EXT_DES === 1 && (!$type || $type === 'xdes'):
-				return static::_genSaltXDES($count);
+				return static::_generateSaltXdes($count);
 			default:
-				return static::_genSaltMD5();
+				return static::_generateSaltMd5();
 		}
 	}
 
@@ -163,7 +163,7 @@ class Password {
 	 *        Defaults to `10`. Can be `4` to `31`.
 	 * @return string The Blowfish salt.
 	 */
-	protected static function _genSaltBf($count = null) {
+	protected static function _generateSaltBf($count = null) {
 		$count = (integer) $count;
 		$count = ($count < 4 || $count > 31) ? static::BF : $count;
 
@@ -209,7 +209,7 @@ class Password {
 	 *                ensure we don't use a weak DES key.
 	 * @return string The XDES salt.
 	 */
-	protected static function _genSaltXDES($count = null) {
+	protected static function _generateSaltXdes($count = null) {
 		$count = (integer) $count;
 		$count = ($count < 1 || $count > 24) ? static::XDES : $count;
 
@@ -228,7 +228,7 @@ class Password {
 	 *
 	 * @return string The MD5 salt.
 	 */
-	protected static function _genSaltMD5() {
+	protected static function _generateSaltMd5() {
 		return '$1$' . String::random(6, array('encode' => String::ENCODE_BASE_64));
 	}
 }
