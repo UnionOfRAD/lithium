@@ -65,27 +65,31 @@ class FormSignature {
 		}
 	}
 
+	/**
+	 * Generates signature from data.
+	 *
+	 * @param array $data
+	 * @return string
+	 */
 	public static function key(array $data) {
-		$classes = static::$_classes;
-		$data += array('fields' => array(), 'locked' => array(), 'excluded' => array());
-
-		$fields = array_keys(Set::flatten($data['fields']));
-		$excluded = array_keys($data['excluded']);
-		$locked = $data['locked'];
-
-		sort($fields, SORT_STRING);
-		sort($excluded, SORT_STRING);
-		ksort($locked, SORT_STRING);
-
-		foreach (array('fields', 'excluded', 'locked') as $list) {
-			${$list} = urlencode(serialize(${$list}));
-		}
-		$hash = $classes['password']::hash($fields, static::$_salt);
-		$hash = $classes['password']::hash("{$locked}::{$excluded}::{$hash}", static::$_salt);
-
-		return "{$locked}::{$excluded}::{$hash}";
+		$data += array(
+			'fields' => array(),
+			'locked' => array(),
+			'excluded' => array()
+		);
+		return static::_compile(
+			array_keys(Set::flatten($data['fields'])),
+			$data['locked'],
+			array_keys($data['excluded'])
+		);
 	}
 
+	/**
+	 * Validates data using a contained signature.
+	 *
+	 * @param array $data
+	 * @return boolean
+	 */
 	public static function check($data) {
 		if (is_object($data) && isset($data->data)) {
 			$data = $data->data;
@@ -95,18 +99,59 @@ class FormSignature {
 		}
 		$signature = $data['security']['signature'];
 		unset($data['security']);
+
+		$parsed = static::_parse($signature);
+
 		$data = Set::flatten($data);
-		$fields = array_keys($data);
 
-		list($locked, $excluded, $hash) = explode('::', $signature, 3);
-		$locked = unserialize(urldecode($locked));
-		$excluded = unserialize(urldecode($excluded));
-		$fields = array_diff($fields, $excluded);
-
-		if (array_intersect_assoc($data, $locked) != $locked) {
+		if (array_intersect_assoc($data, $parsed['locked']) != $parsed['locked']) {
 			return false;
 		}
-		return $signature === static::key(compact('fields', 'locked', 'excluded'));
+		$fields = array_diff(
+			array_keys($data),
+			array_keys($parsed['locked']),
+			$parsed['excluded']
+		);
+		return $signature === static::_compile($fields, $parsed['locked'], $parsed['excluded']);
+	}
+
+	/**
+	 * Compiles signature.
+	 *
+	 * @param array $fields
+	 * @param array $locked
+	 * @param array $excluded
+	 * @return string
+	 */
+	protected static function _compile(array $fields, array $locked, array $excluded) {
+		$password = static::$_classes['password'];
+
+		sort($fields, SORT_STRING);
+		sort($excluded, SORT_STRING);
+		ksort($locked, SORT_STRING);
+
+		foreach (array('fields', 'excluded', 'locked') as $list) {
+			${$list} = urlencode(serialize(${$list}));
+		}
+		$hash = $password::hash($fields, static::$_salt);
+		$hash = $password::hash("{$locked}::{$excluded}::{$hash}", static::$_salt);
+
+		return "{$locked}::{$excluded}::{$hash}";
+	}
+
+	/**
+	 * Parses signature.
+	 *
+	 * @param string signature
+	 * @return array
+	 */
+	protected static function _parse($signature) {
+		list($locked, $excluded, $hash) = explode('::', $signature, 3);
+
+		return array(
+			'locked' => unserialize(urldecode($locked)),
+			'excluded' => unserialize(urldecode($excluded))
+		);
 	}
 }
 

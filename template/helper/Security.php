@@ -135,9 +135,6 @@ class Security extends \lithium\template\Helper {
 			if ($params['method'] === 'label') {
 				return $result;
 			}
-			if (isset($options['exclude']) && $options['exclude']) {
-				return $result;
-			}
 			$value = isset($params['options']['value']) ? $params['options']['value'] : "";
 
 			$type = array(
