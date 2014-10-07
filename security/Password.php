@@ -90,12 +90,12 @@ class Password {
 	 *
 	 * @see lithium\security\Password::hash()
 	 * @see lithium\security\Password::salt()
-	 * @param string $password The password to check.
-	 * @param string $hash The hashed password to compare it to.
+	 * @param string $password The user-supplied plaintext password to check.
+	 * @param string $hash The known hashed password to compare it to.
 	 * @return boolean Returns a boolean indicating whether the password is correct.
 	 */
 	public static function check($password, $hash) {
-		return String::compare(crypt($password, $hash), $hash);
+		return String::compare($hash, crypt($password, $hash));
 	}
 
 	/**
