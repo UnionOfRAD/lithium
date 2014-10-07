@@ -164,20 +164,28 @@ class ResponseTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests location headers and custom header add-ons, like 'download'.
-	 *
-	 * @return void
+	 * Tests custom header add-ons, like 'download'.
 	 */
-	public function testHeaderTypes() {
-		$this->response->headers('download', 'report.csv');
+	public function testDownloadMagicHeader() {
+		$response = $this->response;
+
+		$this->assertException('/deprecated/', function() use ($response) {
+			$response->headers('download', 'report.csv');
+		});
+	}
+
+	/**
+	 * Tests location headers.
+	 */
+	public function testLocationHeader() {
+		$this->response = new MockResponse();
+		$this->response->status(301);
+		$this->response->headers('Location', '/');
 		ob_start();
 		$this->response->render();
 		ob_get_clean();
 
-		$headers = array(
-			'HTTP/1.1 200 OK',
-			'Content-Disposition: attachment; filename="report.csv"'
-		);
+		$headers = array('HTTP/1.1 301 Moved Permanently', 'Location: /');
 		$this->assertEqual($headers, $this->response->testHeaders);
 
 		$this->response = new MockResponse();
@@ -187,18 +195,6 @@ class ResponseTest extends \lithium\test\Unit {
 		ob_get_clean();
 
 		$headers = array('HTTP/1.1 302 Found', 'Location: /');
-		$this->assertEqual($headers, $this->response->testHeaders);
-	}
-
-	public function testLocationHeaderStatus() {
-		$this->response = new MockResponse();
-		$this->response->status(301);
-		$this->response->headers('Location', '/');
-		ob_start();
-		$this->response->render();
-		ob_get_clean();
-
-		$headers = array('HTTP/1.1 301 Moved Permanently', 'Location: /');
 		$this->assertEqual($headers, $this->response->testHeaders);
 
 		$this->response = new Response(array(
