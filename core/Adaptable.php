@@ -65,6 +65,36 @@ class Adaptable extends \lithium\core\StaticObject {
 	 */
 	protected static $_adapters = null;
 
+	protected $_config;
+
+	protected $_class;
+
+	protected static $_instances = array();
+
+	public function __construct($class, $name) {
+		$this->_config = $name;
+		$this->_class = $class;
+	}
+
+	public static function instance($name = null) {
+		if (!$name) {
+			if (!$names = array_keys(static::$_configurations)) {
+				return;
+			}
+			$name = $names[0];
+		}
+		if (!isset(static::$_instances[$name])) {
+			static::$_instances[$name] = new self(get_called_class(), $name);
+		}
+		return static::$_instances[$name];
+	}
+
+	public function __call($method, $params) {
+		array_unshift($params, $this->_config);
+		$class = $this->_class;
+		return $class::invokeMethod($method, $params);
+	}
+
 	/**
 	 * Sets configurations for a particular adaptable implementation, or returns the current
 	 * configuration settings.
