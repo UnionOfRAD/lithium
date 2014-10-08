@@ -122,12 +122,12 @@ class Security extends \lithium\template\Helper {
 		});
 
 		$form->applyFilter('_defaults', function($self, $params, $chain) use ($form, &$state) {
-			$defaults = array('locked' => false, 'exclude' => false);
+			$defaults = array(
+				'locked' => ($params['method'] === 'hidden' && $params['name'] !== '_method'),
+				'exclude' => $params['name'] === '_method'
+			);
 			$options = $params['options'];
 
-			if ($params['method'] === 'hidden' && !isset($options['locked'])) {
-				$options['locked'] = true;
-			}
 			$options += $defaults;
 			$params['options'] = array_diff_key($options, $defaults);
 			$result = $chain->next($self, $params, $chain);
