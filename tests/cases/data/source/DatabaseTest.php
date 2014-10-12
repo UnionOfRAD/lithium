@@ -1816,6 +1816,48 @@ SQL;
 			$entity->increment('name', 10);
 		});
 	}
+
+	public function testHasManyRelationsWithLimitAndWithoutConditions() {
+		$data = new MockResult(array(
+			'records' => array(
+				array(
+					'1',
+					'2',
+					'Post title',
+					'2014-10-12 01:39:00',
+					'3',
+					'1',
+					'2',
+					'Very good post',
+					'2014-10-12 01:39:00',
+				)
+			)
+		));
+		$this->_db->return = array(
+			'_execute' => $data
+		);
+		$query = new Query(array(
+			'type' => 'read',
+			'model' => $this->_model,
+			'with' => array('MockDatabaseComment'),
+			'limit' => 3,
+		));
+		$result = $this->_db->read($query, array('return' => 'array'));
+		$expected = array(array(
+			'id' => '1',
+			'author_id' => '2',
+			'title' => 'Post title',
+			'created' => '2014-10-12 01:39:00',
+			'MockDatabaseComment' => array(
+				'id' => '3',
+				'post_id' => '1',
+				'author_id' => '2',
+				'body' => 'Very good post',
+				'created' => '2014-10-12 01:39:00',
+			)
+		));
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
