@@ -639,8 +639,10 @@ abstract class Database extends \lithium\data\Source {
 			}
 
 			$conditions = array();
+			$relations = array_keys($query->relationships());
+			$pattern = '/^(' . implode('|', $relations) . ')\./';
 			foreach ($query->conditions() as $key => $value) {
-				if (strpos($key, "{$relation['alias']}.") === 0) {
+				if (preg_match($pattern, $key)) {
 					$conditions[$key] = $value;
 				}
 			}
