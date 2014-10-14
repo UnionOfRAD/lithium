@@ -761,7 +761,7 @@ class Query extends \lithium\core\Object {
 	 */
 	protected function _entityConditions() {
 		if (!$this->_entity || !($model = $this->_config['model'])) {
-			return;
+			return array();
 		}
 		$key = $model::key($this->_entity->data());
 
