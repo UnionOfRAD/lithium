@@ -494,6 +494,25 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testValidatesWithWhitelist() {
+		$post = MockPostForValidates::create();
+
+		$whitelist = array('title');
+		$post->title = 'title';
+		$result = $post->validates(compact('whitelist'));
+		$this->assertTrue($result);
+
+		$post->title = '';
+		$result = $post->validates(compact('whitelist'));
+		$this->assertFalse($result);
+		$result = $post->errors();
+		$this->assertNotEmpty($result);
+
+		$expected = array('title' => array('please enter a title'));
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testValidatesTitle() {
 		$post = MockPostForValidates::create(array('title' => 'new post'));
 
@@ -834,6 +853,25 @@ class ModelTest extends \lithium\test\Unit {
 				'email is not in 2nd list'
 			)
 		);
+		$result = $post->errors();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSaveWithValidationAndWhitelist() {
+		$post = MockPostForValidates::create();
+
+		$whitelist = array('title');
+		$post->title = 'title';
+		$result = $post->save(null, compact('whitelist'));
+		$this->assertTrue($result);
+
+		$post->title = '';
+		$result = $post->save(null, compact('whitelist'));
+		$this->assertFalse($result);
+		$result = $post->errors();
+		$this->assertNotEmpty($result);
+
+		$expected = array('title' => array('please enter a title'));
 		$result = $post->errors();
 		$this->assertEqual($expected, $result);
 	}

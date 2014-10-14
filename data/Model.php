@@ -1119,16 +1119,19 @@ class Model extends \lithium\core\StaticObject {
 			if ($params['data']) {
 				$entity->set($params['data']);
 			}
+			if (($whitelist = $options['whitelist']) || $options['locked']) {
+				$whitelist = $whitelist ?: array_keys($_schema->fields());
+			}
 			if ($rules = $options['validate']) {
 				$events = $options['events'];
-				$validateOpts = is_array($rules) ? compact('rules', 'events') : compact('events');
+				$validateOpts = compact('events', 'whitelist');
+				if (is_array($rules)) {
+					$validateOpts['rules'] = $rules;
+				}
 
 				if (!$entity->validates($validateOpts)) {
 					return false;
 				}
-			}
-			if (($whitelist = $options['whitelist']) || $options['locked']) {
-				$whitelist = $whitelist ?: array_keys($_schema->fields());
 			}
 			$type = $entity->exists() ? 'update' : 'create';
 
@@ -1188,6 +1191,8 @@ class Model extends \lithium\core\StaticObject {
 	 *          if the corresponding key is not present. If don't set `'required'` or set this
 	 *          to `null`, the validation rule will be skipped if the corresponding key is not
 	 *          present in update and will be checked in insert. Defaults is set to `null`.
+	 *        - `'whitelist'` _array_: If specified, only fields in this array will be validated
+	 *          and others will be skipped.
 	 * @return boolean Returns `true` if all validation rules on all fields succeed, otherwise
 	 *         `false`. After validation, the messages for any validation failures are assigned to
 	 *         the entity, and accessible through the `errors()` method of the entity object.
@@ -1199,6 +1204,7 @@ class Model extends \lithium\core\StaticObject {
 			'events' => $entity->exists() ? 'update' : 'create',
 			'model' => get_called_class(),
 			'required' => null,
+			'whitelist' => null
 		);
 		$options += $defaults;
 
@@ -1215,6 +1221,10 @@ class Model extends \lithium\core\StaticObject {
 			$options = $params['options'];
 			$rules = $options['rules'];
 			unset($options['rules']);
+			if ($whitelist = $options['whitelist']) {
+				$whitelist = array_combine($whitelist, $whitelist);
+				$rules = array_intersect_key($rules, $whitelist);
+			}
 
 			if ($errors = $validator::check($entity->data(), $rules, $options)) {
 				$entity->errors($errors);
