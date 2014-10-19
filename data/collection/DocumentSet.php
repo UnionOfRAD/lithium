@@ -124,7 +124,7 @@ class DocumentSet extends \lithium\data\Collection {
 		if (is_object($key)) {
 			$key = (string) $key;
 		}
-		if (method_exists($data, 'assignTo')) {
+		if (is_object($data) && method_exists($data, 'assignTo')) {
 			$data->assignTo($this);
 		}
 		$key !== null ? $this->_data[$key] = $data : $this->_data[] = $data;
