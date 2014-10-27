@@ -246,6 +246,14 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		}
 	}
 
+	public function testOrderWithRelationAndLimit() {
+		$galleries = Galleries::first(array(
+			'with' => array('Images'),
+			'order' => 'name',
+		));
+		$this->assertNotEmpty($galleries);
+	}
+
 	public function testGroup() {
 		$field = $this->_db->name('Images.id');
 		$galleries = Galleries::find('all', array(

@@ -521,6 +521,130 @@ class PostgreSql extends \lithium\data\source\Database {
 
 		return $out;
 	}
+
+	/**
+	 * Helper method for `PostgreSql::_quryExport()` to export data
+	 * for use in distinct query.
+	 *
+	 * @see lithium\data\source\PostgreSql::_quryExport()
+	 * @param object $query The query object.
+	 * @return array Returns an array with the fields as the first
+	 *         value and the orders as the second value.
+	 */
+	protected function _distinctExport($query) {
+		$model = $query->model();
+		$orders = $query->order();
+		$result = array(
+			'fields' => array(),
+			'orders' => array(),
+		);
+
+		if (is_string($orders)) {
+			$direction = 'ASC';
+			if (preg_match('/^(.*?)\s+((?:A|DE)SC)$/i', $orders, $match)) {
+				$orders = $match[1];
+				$direction = $match[2];
+			}
+			$orders = array($orders => $direction);
+		}
+
+		if (!is_array($orders)) {
+			return array_values($result);
+		}
+
+		foreach ($orders as $column => $dir) {
+			if (is_int($column)) {
+				$column = $dir;
+				$dir = 'ASC';
+			}
+
+			if ($model && $model::schema($column)) {
+				$name = $this->name($query->alias()) . '.' . $this->name($column);
+				$alias = $this->name('_' . $query->alias() . '_' . $column . '_');
+			} else {
+				list($alias, $field) = $this->_splitFieldname($column);
+				$name = $this->name($column);
+				$alias = $this->name('_' . $alias . '_' . $field . '_');
+			}
+
+			$result['fields'][] = "{$name} AS {$alias}";
+			$result['orders'][] = "{$alias} {$dir}";
+		}
+		return array_values($result);
+	}
+
+	/**
+	 * Helper method for `Database::read()` to export query while handling additional joins
+	 * when using relationships and limited result sets. Filters conditions on subsequent
+	 * queries to just the ones applying to the relation.
+	 *
+	 * @see lithium\data\source\Database::read()
+	 * @param object $query The query object.
+	 * @return array The exported query returned by reference.
+	 */
+	protected function &_queryExport($query) {
+		$data = $query->export($this);
+
+		if (!$query->limit() || !($model = $query->model())) {
+			return $data;
+		}
+
+		foreach ($query->relationships() as $relation) {
+			if ($relation['type'] !== 'hasMany') {
+				continue;
+			}
+			$pk = $this->name($model::meta('name') . '.' . $model::key());
+
+			if ($query->order()) {
+				list($fields, $orders) = $this->_distinctExport($query);
+				array_unshift($fields, "DISTINCT ON($pk) $pk AS _ID_");
+
+				$command = $this->renderCommand('read', array(
+					'limit' => null, 'order' => null,
+					'fields' => implode(', ', $fields)
+				) + $data);
+				$command = rtrim($command, ';');
+
+				$command = $this->renderCommand('read', array(
+					'source' => "( $command ) AS _TEMP_",
+					'fields' => '_ID_',
+					'order' => "ORDER BY " . implode(', ', $orders),
+					'limit' => $data['limit'],
+				));
+			} else {
+				$command = $this->renderCommand('read', array(
+					'fields' => "DISTINCT({$pk}) AS _ID_"
+				) + $data);
+			}
+
+			$result = $this->_execute($command);
+			$ids = array();
+
+			while ($row = $result->next()) {
+				$ids[] = $row[0];
+			}
+			if (!$ids) {
+				$data = null;
+				break;
+			}
+
+			$conditions = array();
+			$relations = array_keys($query->relationships());
+			$pattern = '/^(' . implode('|', $relations) . ')\./';
+			foreach ($query->conditions() as $key => $value) {
+				if (preg_match($pattern, $key)) {
+					$conditions[$key] = $value;
+				}
+			}
+			$data['conditions'] = $this->conditions(
+				array($pk => $ids) + $conditions, $query
+			);
+
+			$data['limit'] = '';
+			break;
+		}
+		return $data;
+	}
 }
 
 ?>
