@@ -115,8 +115,8 @@ class Message extends \lithium\core\StaticObject {
 			));
 		}
 
-		if ($result || $options['default']) {
-			return String::insert($result ?: $options['default'], $options);
+		if ($result = $result ?: $options['default']) {
+			return strpos($result, '{:') !== false ? String::insert($result, $options) : $result;
 		}
 	}
 
