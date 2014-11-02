@@ -333,6 +333,7 @@ class MySql extends \lithium\data\source\Database {
 			$sql = $params['sql'];
 			$options = $params['options'];
 			$conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $options['buffered']);
+			$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 			try {
 				$resource = $conn->query($sql);
