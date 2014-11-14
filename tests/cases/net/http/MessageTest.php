@@ -113,7 +113,18 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testReturnProperlyWithEmptyValues() {
 		$this->message->type("json");
-		$result = $this->message->body(array("myvar" => ""), array('encode' => true));
+
+		$result = $this->message->body(array(
+			'active' => '0'
+		), array('encode' => true));
+		$this->assertIdentical('{"active":"0"}', $result);
+
+		$this->message = new Message();
+		$this->message->type("json");
+
+		$result = $this->message->body(array(
+			'myvar' => ''
+		), array('encode' => true));
 		$this->assertIdentical('{"myvar":""}', $result);
 	}
 
