@@ -1374,12 +1374,14 @@ class RequestTest extends \lithium\test\Unit {
 	 * Tests that the HTTP request method set by `Request` from the server information is not
 	 * overwritten in a parent class.
 	 */
-	public function testRequesMethodConfiguration() {
+	public function testRequestMethodConfiguration() {
 		$request = new Request(array('env' => array('REQUEST_METHOD' => 'POST')));
 		$this->assertEqual('POST', $request->method);
+		$this->assertTrue($request->is('post'));
 
 		$request = new Request(array('env' => array('REQUEST_METHOD' => 'PATCH')));
 		$this->assertEqual('PATCH', $request->method);
+		$this->assertTrue($request->is('patch'));
 	}
 
 	public function testRequestUriWithHtAccessRedirection() {

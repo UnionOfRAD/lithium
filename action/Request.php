@@ -111,6 +111,7 @@ class Request extends \lithium\net\http\Request {
 		'ssl'     => 'HTTPS',
 		'get'     => array('REQUEST_METHOD', 'GET'),
 		'post'    => array('REQUEST_METHOD', 'POST'),
+		'patch'   => array('REQUEST_METHOD', 'PATCH'),
 		'put'     => array('REQUEST_METHOD', 'PUT'),
 		'delete'  => array('REQUEST_METHOD', 'DELETE'),
 		'head'    => array('REQUEST_METHOD', 'HEAD'),
