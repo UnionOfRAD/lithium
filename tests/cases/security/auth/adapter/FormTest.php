@@ -29,6 +29,13 @@ class FormTest extends \lithium\test\Unit {
 		)));
 	}
 
+	public static function meta($key) {
+		switch ($key) {
+			case 'name':
+				return __CLASS__;
+		}
+	}
+
 	/**
 	 * Used by `testValidatorWithFieldMapping` and makes sure that the
 	 * custom password field name isn't sent in the query
