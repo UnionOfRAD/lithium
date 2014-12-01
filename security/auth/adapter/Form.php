@@ -12,6 +12,7 @@ use lithium\core\Libraries;
 use UnexpectedValueException;
 use lithium\security\Password;
 use lithium\core\ClassNotFoundException;
+use lithium\util\Inflector;
 
 /**
  * The `Form` adapter provides basic authentication facilities for checking credentials submitted
@@ -328,7 +329,7 @@ class Form extends \lithium\core\Object {
 	public function check($credentials, array $options = array()) {
 		$model = $this->_model;
 		$query = $this->_query;
-		$data = $this->_filters($credentials->data);
+		$data = $this->_filters($this->_data($credentials->data));
 
 		$validate = array_flip(array_intersect_key($this->_fields, $this->_validators));
 		$conditions = $this->_scope + array_diff_key($data, $validate);
@@ -443,6 +444,20 @@ class Form extends \lithium\core\Object {
 			throw new UnexpectedValueException("Authentication validator is not callable.");
 		}
 		return call_user_func($this->_validators[0], $data, $user) ? $user : false;
+	}
+
+	/**
+	 * Checks if the data container values are inside indexed arrays from binding.
+	 * Get the values from the binding coresponding to the model if such exists.
+	 *
+	 * @see lithium\security\auth\adapter\Form::check
+	 * @param array $data The array of raw form data.
+	 * @return array Original or sub array of the form data.
+	 */
+	protected function _data($data) {
+		$model = $this->_model;
+		$index = strtolower(Inflector::singularize($model::meta('name')));
+		return isset($data[$index]) && is_array($data[$index]) ? $data[$index] : $data;
 	}
 }
 
