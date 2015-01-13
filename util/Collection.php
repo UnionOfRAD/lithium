@@ -330,6 +330,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	/**
 	 * Applies a callback to all items in the collection.
 	 *
+	 * @link http://php.net/array_map
 	 * @param callback $filter The filter to apply.
 	 * @return object This collection instance.
 	 */
@@ -342,6 +343,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Applies a callback to a copy of all data in the collection
 	 * and returns the result.
 	 *
+	 * @link http://php.net/array_map
 	 * @param callback $filter The filter to apply.
 	 * @param array $options The available options are:
 	 *        - `'collect'`: If `true`, the results will be returned wrapped
@@ -364,6 +366,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	/**
 	 * Reduce, or fold, a collection down to a single value
 	 *
+	 * @link http://php.net/array_reduce
 	 * @param callback $filter The filter to apply.
 	 * @param mixed $initial Initial value
 	 * @return mixed A single reduced value
@@ -375,6 +378,8 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	/**
 	 * Sorts the objects in the collection.
 	 *
+	 * @link http://php.net/sort
+	 * @link http://php.net/usort
 	 * @param callable $sorter The sorter for the data, can either be a sort function like
 	 *        natsort or a compare function like strcmp.
 	 * @param array $options The available options are:
