@@ -283,13 +283,14 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Default query parameters for the model finders.
 	 *
-	 * - `'conditions'`: The conditional query elements, e.g.
-	 *                 `'conditions' => array('published' => true)`
-	 * - `'fields'`: The fields that should be retrieved. When set to `null`, defaults to
-	 *             all fields.
-	 * - `'order'`: The order in which the data will be returned, e.g. `'order' => 'ASC'`.
+	 * - `'conditions'`: The conditional query elements,
+	 *   e.g. `array('published' => true)`.
+	 * - `'fields'`: The fields that should be retrieved. When unset or explitily set to
+	 *   `null`, `'*'` or left unset, defaults to all fields.
+	 * - `'order'`: The order in which the data will be returned,
+	 *   e.g. `array('id' => 'ASC')` or `array('modified' => 'DESC')`.
 	 * - `'limit'`: The maximum number of records to return.
-	 * - `'page'`: For pagination of data.
+	 * - `'page'`: For pagination of data (equals limit * offset).
 	 * - `'with'`: An array of relationship names to be included in the query.
 	 *
 	 * @var array
