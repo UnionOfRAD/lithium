@@ -147,7 +147,21 @@ class Route extends \lithium\core\Object {
 	 * `Response` object, in which case the response will be returned directly. This may be used to
 	 * handle redirects, or simple API services.
 	 *
-	 * @var object
+	 * ```
+	 * new Route(array(
+	 *     'template' => '/photos/{:id:[0-9]+}.jpg',
+	 *     'handler' => function($request) {
+	 *         return new Response(array(
+	 *             'headers' => array('Content-type' => 'image/jpeg'),
+	 *             'body' => Photos::first($request->id)->bytes()
+	 *         ));
+	 *     }
+	 * });
+	 * ```
+	 *
+	 * @see lithium\net\http\Route::parse()
+	 * @see lithium\net\http\Response
+	 * @var callable
 	 */
 	protected $_handler = null;
 
@@ -207,14 +221,19 @@ class Route extends \lithium\core\Object {
 	/**
 	 * Attempts to parse a request object and determine its execution details.
 	 *
+	 * @see lithium\net\http\Request
+	 * @see lithium\net\http\Request::$params
+	 * @see lithium\net\http\Route::$_handler
 	 * @param object $request A request object, usually an instance of `lithium\net\http\Request`,
-	 *        containing the details of the request to be routed.
+	 *               containing the details of the request to be routed.
 	 * @param array $options Used to determine the operation of the method, and override certain
 	 *              values in the `Request` object:
 	 *              - `'url'` _string_: If present, will be used to match in place of the `$url`
 	 *                 property of `$request`.
-	 * @return mixed If this route matches `$request`, returns an array of the execution details
-	 *         contained in the route, otherwise returns false.
+	 * @return object|boolean If this route matches `$request`, returns the request with
+	 *         execution details attached to it (inside `Request::$params`). Alternatively when
+	 *         a route handler function was used, returns the result of its invocation. Returns
+	 *         `false` if the route never matched.
 	 */
 	public function parse($request, array $options = array()) {
 		$defaults = array('url' => $request->url);

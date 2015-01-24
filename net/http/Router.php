@@ -128,12 +128,32 @@ class Router extends \lithium\core\StaticObject {
 	 * matters, since the order of precedence is taken into account in parsing and matching
 	 * operations.
 	 *
+	 * A callable can be passed in place of `$options`. In this case the callable acts as a *route
+	 * handler*. Route handlers should return an instance of `lithium\net\http\Response`
+	 * and can be used to short-circuit the framework's lookup and invocation of controller
+	 * actions:
+	 * ```
+	 * Router::connect('/photos/{:id:[0-9]+}.jpg', array(), function($request) {
+	 *     return new Response(array(
+	 *         'headers' => array('Content-type' => 'image/jpeg'),
+	 *         'body' => Photos::first($request->id)->bytes()
+	 *     ));
+	 * });
+	 * ```
+	 *
 	 * @see lithium\net\http\Route
+	 * @see lithium\net\http\Route::$_handler
 	 * @see lithium\net\http\Router::parse()
 	 * @see lithium\net\http\Router::match()
-	 * @param string $template An empty string, or a route string "/"
-	 * @param array $params An array describing the default or required elements of the route
-	 * @param array $options
+	 * @see lithium\net\http\Router::_parseString()
+	 * @see lithium\net\http\Response
+	 * @param string|object $template An empty string, a route string `/` or an
+	 *                      instance of `lithium\net\http\Route`.
+	 * @param array|string $params An array describing the default or required elements of
+	 *                     the route or alternatively a path string i.e. `Posts::index`.
+	 * @param array|callable $options Either an array of options (`'handler'`, `'formatters'`,
+	 *                      `'modifiers'`, `'unicode'` as well as any options for `Route`) or
+	 *                      a callable that will be used as a route handler.
 	 * @return array Array of routes
 	 */
 	public static function connect($template, $params = array(), $options = array()) {
@@ -615,7 +635,7 @@ class Router extends \lithium\core\StaticObject {
 	/**
 	 * Helper function for taking a path string and parsing it into a controller and action array.
 	 *
-	 * @param string $path Path string to parse.
+	 * @param string $path Path string to parse i.e. `li3_bot.Logs::index` or `Posts::index`.
 	 * @param boolean $context
 	 * @return array
 	 */
