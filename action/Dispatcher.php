@@ -45,50 +45,52 @@ class Dispatcher extends \lithium\core\StaticObject {
 	);
 
 	/**
-	 * Contains pre-process format strings for changing Dispatcher's behavior based on 'rules'.
+	 * Contains pre-process format strings for changing Dispatcher's behavior based on `'rules'`.
 	 *
-	 * Each key in the array represents a 'rule'; if a key that matches the rule is present (and
-	 * not empty) in a route, (i.e. the result of `lithium\net\http\Router::parse()`) then the
-	 * rule's value will be applied to the route before it is dispatched.  When applying a rule, any
-	 * array elements of the flag which are present in the route will be modified
-	 * using a `lithium\util\String::insert()`-formatted string.  Alternatively,
-	 * a callback can be used to do custom transformations other than the
-	 * default `lithium\util\String::insert()`.
+	 * Each key in the array represents a 'rule'; if a key that matches the rule is present
+	 * (and not empty) in a route, (i.e. the result of `Router::parse()`) then the rule's
+	 * value will be applied to the route before it is dispatched. When applying a rule, any
+	 * array elements of the flag which are present in the route will be modified using a
+	 * `String::insert()`-formatted string. Alternatively, a callback can be used to do custom
+	 * transformations other than the default `String::insert()`.
 	 *
-	 * For example, to implement action prefixes (i.e. `admin_index()`), set a rule named 'admin',
-	 * with a value array containing a modifier key for the `action` element of a route, i.e.:
-	 * `array('action' => 'admin_{:action}')`. Now, if the `'admin'` key is present and not empty
-	 * in the parameters returned from routing, the value of `'action'` will be rewritten per the
-	 * settings in the rule.
-	 *
-	 * Here's another example.  To support normalizing actions,
-	 * set a rule named 'action' with a value array containing a callback that uses
-	 * `lithium\util\Inflector` to camelize the action:
-	 *
+	 * For example, to implement action prefixes (i.e. `admin_index`), set a rule named
+	 * `'admin'`, with a value array containing a modifier key for the `action` element of
+	 * a route, i.e.: `array('action' => 'admin_{:action}')`. Now, if the `'admin'` key is
+	 * present and not empty in the parameters returned from routing, the value of `'action'`
+	 * will be rewritten per the settings in the rule:
 	 * ```
-	 * use lithium\action\Dispatcher;
-	 * use lithium\util\Inflector;
-	 *
-	 * Dispatcher::config(array('rules' => array(
-	 * 	'action' => array('action' => function($params) {
-	 * 		return Inflector::camelize(strtolower($params['action']), false);
-	 * 	})
-	 * )));
+	 * Dispatcher::config(array(
+	 *	'rules' => array(
+	 *		'admin' => 'admin_{:action}'
+	 *	)
+	 * ));
 	 * ```
 	 *
-	 * The rules can be a callback as well:
-	 *
+	 * Here's another example. To support normalizing actions, set a rule named `'action'` with
+	 * a value array containing a callback that uses `Inflector` to camelize the
+	 * action:
 	 * ```
-	 * Dispatcher::config(array('rules' => function($params) {
-	 * 	if (isset($params['admin'])) {
-	 * 		return array('special' => array('action' => 'special_{:action}'));
-	 * 	}
-	 * 	return array();
-	 * }));
+	 * // ...
+	 *		'action' => array('action' => function($params) {
+	 *			return Inflector::camelize(strtolower($params['action']), false);
+	 *		})
+	 * // ...
+	 * ```
+	 *
+	 * The entires rules can become a callback as well:
+	 * ```
+	 * Dispatcher::config(array(
+	 *	'rules' => function($params) {
+	 *		// ...
+	 *	}
+	 * ));
 	 * ```
 	 *
 	 * @see lithium\action\Dispatcher::config()
 	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Inflector
+	 * @var array
 	 */
 	protected static $_rules = array();
 
