@@ -67,6 +67,16 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * ));
 	 * ```
 	 *
+	 * The following example shows two rules that continuously or independently transform the
+	 * action parameter in order to allow any variations i.e. `'admin_index'`, `'api_index'`
+	 * and `'admin_api_index'`.
+	 * ```
+	 * // ...
+	 *		'api' => 'api_{:action}',
+	 *		'admin' => 'admin_{:action}'
+	 * // ...
+	 * ```
+	 *
 	 * Here's another example. To support normalizing actions, set a rule named `'action'` with
 	 * a value array containing a callback that uses `Inflector` to camelize the
 	 * action:
@@ -167,8 +177,6 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return array Returns the `$params` array with formatting rules applied to array values.
 	 */
 	public static function applyRules(&$params) {
-		$result = array();
-		$values = array();
 		$rules = static::$_rules;
 
 		if (!$params) {
@@ -189,31 +197,31 @@ class Dispatcher extends \lithium\core\StaticObject {
 					$controller = "{$params['library']}.{$controller}";
 				}
 			}
-			$values = compact('controller');
+			$params['controller'] = $controller;
 		}
-		$values += $params;
 
 		if (is_callable($rules)) {
 			$rules = $rules($params);
 		}
 		foreach ($rules as $rule => $value) {
-			if (!isset($values[$rule])) {
+			if (!isset($params[$rule])) {
 				continue;
 			}
 			foreach ($value as $k => $v) {
 				if (is_callable($v)) {
-					$result[$k] = $v($values);
+					$params[$k] = $v($params);
 					continue;
 				}
 				$match = preg_replace('/\{:\w+\}/', '@', $v);
 				$match = preg_replace('/@/', '.+', preg_quote($match, '/'));
-				if (preg_match('/' . $match . '/i', $values[$k])) {
+
+				if (preg_match('/' . $match . '/i', $params[$k])) {
 					continue;
 				}
-				$result[$k] = String::insert($v, $values);
+				$params[$k] = String::insert($v, $params);
 			}
 		}
-		return $result + $values;
+		return $params;
 	}
 
 	/**
