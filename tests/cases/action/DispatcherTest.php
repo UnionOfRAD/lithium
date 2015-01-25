@@ -19,6 +19,7 @@ class DispatcherTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		Router::reset();
+		MockDispatcher::reset();
 	}
 
 	public function testRun() {
@@ -104,11 +105,13 @@ class DispatcherTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, Dispatcher::applyRules($params));
 	}
 
-	public function testConfigManipulation() {
+	public function testRunWithoutRules() {
 		$config = MockDispatcher::config();
 		$expected = array('rules' => array());
 		$this->assertEqual($expected, $config);
+	}
 
+	public function testRunWithAdminActionRule() {
 		MockDispatcher::config(array('rules' => array(
 			'admin' => array('action' => 'admin_{:action}')
 		)));
@@ -119,22 +122,24 @@ class DispatcherTest extends \lithium\test\Unit {
 		$result = end(MockDispatcher::$dispatched);
 		$expected = array('action' => 'admin_test', 'controller' => 'Test', 'admin' => true);
 		$this->assertEqual($expected, $result->params);
+	}
 
+	public function testRunWithGenericActionRule() {
 		MockDispatcher::config(array('rules' => array(
 			'action' => array('action' => function($params) {
 				return Inflector::camelize(strtolower($params['action']), false);
 			})
 		)));
 
-		MockDispatcher::$dispatched = array();
-		Router::reset();
 		Router::connect('/', array('controller' => 'test', 'action' => 'TeST-camelize'));
 		MockDispatcher::run(new Request(array('url' => '/')));
 
 		$result = end(MockDispatcher::$dispatched);
 		$expected = array('action' => 'testCamelize', 'controller' => 'Test');
 		$this->assertEqual($expected, $result->params);
+	}
 
+	public function testRunWithSpecialRuleAsCallable() {
 		MockDispatcher::config(array('rules' => function($params) {
 			if (isset($params['admin'])) {
 				return array('special' => array('action' => 'special_{:action}'));
@@ -142,8 +147,6 @@ class DispatcherTest extends \lithium\test\Unit {
 			return array();
 		}));
 
-		MockDispatcher::$dispatched = array();
-		Router::reset();
 		Router::connect('/', array('controller' => 'test', 'action' => 'test', 'admin' => true));
 		Router::connect('/special', array(
 			'controller' => 'test', 'action' => 'test',

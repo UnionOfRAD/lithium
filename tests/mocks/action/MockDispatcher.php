@@ -12,14 +12,12 @@ use stdClass;
 
 class MockDispatcher extends \lithium\action\Dispatcher {
 
-	/**
-	 * Reset Dispatcher's rules.
-	 *
-	 * @var array
-	 */
-	protected static $_rules = array();
-
 	public static $dispatched = array();
+
+	public static function reset() {
+		static::$dispatched = array();
+		static::$_rules = array();
+	}
 
 	protected static function _callable($request, $params, $options) {
 		$callable = new stdClass();
