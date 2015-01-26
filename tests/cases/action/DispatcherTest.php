@@ -168,6 +168,24 @@ class DispatcherTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result->params);
 	}
 
+	public function testRunWithContinuingRules() {
+		MockDispatcher::config(array('rules' => array(
+			'api' => array('action' => 'api_{:action}'),
+			'admin' => array('action' => 'admin_{:action}')
+		)));
+
+		Router::connect('/', array(
+			'controller' => 'test', 'action' => 'test', 'admin' => true, 'api' => true
+		));
+		MockDispatcher::run(new Request(array('url' => '/')));
+
+		$result = end(MockDispatcher::$dispatched);
+		$expected = array(
+			'action' => 'admin_api_test', 'controller' => 'Test', 'admin' => true, 'api' => true
+		);
+		$this->assertEqual($expected, $result->params);
+	}
+
 	public function testControllerLookupFail() {
 		Dispatcher::config(array('classes' => array('router' => __CLASS__)));
 
