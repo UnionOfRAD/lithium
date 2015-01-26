@@ -298,7 +298,7 @@ class Router extends \lithium\core\StaticObject {
 	 */
 	public static function parse($request) {
 		foreach (static::$_configurations as $name => $value) {
-			$orig = $request->params;
+			$original = $request->params;
 			$name = is_int($name) ? false : $name;
 
 			if (!$url = static::_parseScope($name, $request)) {
@@ -321,7 +321,7 @@ class Router extends \lithium\core\StaticObject {
 
 				return $request;
 			}
-			$request->params = $orig;
+			$request->params = $original;
 		}
 	}
 
@@ -585,19 +585,17 @@ class Router extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Returns a route from the loaded configurations, by name.
+	 * Returns one or multiple connected routes.
 	 *
-	 * @param integer $route Route number.
-	 * @param string $scope Name of the scope to get routes from. If `null`
-	 *        `lithium\net\http\Router::$_scope` will be used
-	 * @return mixed if $route is an integer, return the `lithium\net\http\Route`
-	 *         instance or `null` if not found.
-	 *         if `$route === null` and `$scope === null`, will return all the routes
-	 *         for all scopes.
-	 *         if `$route === null` and `$scope === true`, return the array of all
-	 *         `lithium\net\http\Route` instances for the default scope.
-	 *         if `$route === null` and `$scope !== null`, will return all the routes
-	 *         for for the specified scopes.
+	 * A specific route can be retrived by providing its index. All connected routes inside all
+	 * scopes may be retrieved by providing `null` instead of the route index. To retrieve all
+	 * routes for the current scope only, pass `true` for the `$scope` parameter.
+	 *
+	 * @param integer $route Index of the route.
+	 * @param string $scope Name of the scope to get routes from. Uses default scope if `true`.
+	 * @return object|array|void If $route is an integer, returns the route object at given index or
+	 *         if that fails returns `null`. If $route is `null` returns an array of routes or
+	 *         scopes with their respective routes depending on the value of $scope.
 	 */
 	public static function get($route = null, $scope = null) {
 		if ($route === null && $scope === null) {

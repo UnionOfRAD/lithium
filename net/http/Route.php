@@ -456,7 +456,6 @@ class Route extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function compile() {
-
 		foreach ($this->_params as $key => $value) {
 			if (!strpos($key, ':')) {
 				continue;
