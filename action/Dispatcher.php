@@ -177,6 +177,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return array Returns the `$params` array with formatting rules applied to array values.
 	 */
 	public static function applyRules(&$params) {
+		$values = array();
 		$rules = static::$_rules;
 
 		if (!$params) {
@@ -197,31 +198,32 @@ class Dispatcher extends \lithium\core\StaticObject {
 					$controller = "{$params['library']}.{$controller}";
 				}
 			}
-			$params['controller'] = $controller;
+			$values = compact('controller');
 		}
+		$values += $params;
 
 		if (is_callable($rules)) {
 			$rules = $rules($params);
 		}
 		foreach ($rules as $rule => $value) {
-			if (!isset($params[$rule])) {
+			if (!isset($values[$rule])) {
 				continue;
 			}
 			foreach ($value as $k => $v) {
 				if (is_callable($v)) {
-					$params[$k] = $v($params);
+					$values[$k] = $v($values);
 					continue;
 				}
 				$match = preg_replace('/\{:\w+\}/', '@', $v);
 				$match = preg_replace('/@/', '.+', preg_quote($match, '/'));
 
-				if (preg_match('/' . $match . '/i', $params[$k])) {
+				if (preg_match('/' . $match . '/i', $values[$k])) {
 					continue;
 				}
-				$params[$k] = String::insert($v, $params);
+				$values[$k] = String::insert($v, $values);
 			}
 		}
-		return $params;
+		return $values;
 	}
 
 	/**
