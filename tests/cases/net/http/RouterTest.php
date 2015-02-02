@@ -11,6 +11,7 @@ namespace lithium\tests\cases\net\http;
 use lithium\action\Request;
 use lithium\net\http\Router;
 use lithium\action\Response;
+use lithium\tests\mocks\action\MockDispatcher;
 
 class RouterTest extends \lithium\test\Unit {
 
@@ -1939,6 +1940,21 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match($result->params, $request);
 
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testMatchWithScopeAndWithoutController() {
+		Router::scope('app', function() {
+			Router::connect('/{:id}', 'Posts::index');
+		});
+
+		$request = new Request(array('url' => '/1', 'base' => ''));
+		MockDispatcher::run($request);
+
+		$result = Router::match(array(
+			'id' => 2
+		), $request);
+
+		$this->assertEqual('/2', $result);
 	}
 }
 
