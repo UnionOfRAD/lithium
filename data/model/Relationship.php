@@ -26,7 +26,7 @@ class Relationship extends \lithium\core\Object {
 	 * @var array
 	 */
 	protected $_classes = array(
-		'entity'      => 'lithium\data\Entity'
+		'entity' => 'lithium\data\Entity'
 	);
 
 	/**
