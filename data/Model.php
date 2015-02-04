@@ -563,8 +563,7 @@ class Model extends \lithium\core\StaticObject {
 		if (isset($methods[$method]) && is_callable($methods[$method])) {
 			return call_user_func_array($methods[$method], $params);
 		}
-		$message = "Unhandled method call `{$method}`.";
-		throw new BadMethodCallException($message);
+		return self::__callStatic($method, $params);
 	}
 
 	/**
