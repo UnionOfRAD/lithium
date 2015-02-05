@@ -246,6 +246,29 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		}
 	}
 
+	public function testOrderWithHasMany() {
+		$expected = include $this->_export . '/testHasManyWithOrder.php';
+
+		$galleries = Galleries::find('all', array(
+			'order' => 'Images.title DESC',
+			'with' => 'Images',
+		));
+
+		$this->assertCount(2, $galleries);
+		$this->assertEqual($expected, $galleries->to('array'));
+
+		$galleries = Galleries::find('all', array(
+			'order' => array(
+				'name' => 'DESC',
+				'Images.title' => 'DESC'
+			),
+			'with' => 'Images',
+		));
+
+		$this->assertCount(2, $galleries);
+		$this->assertEqual(array_reverse($expected, true), $galleries->to('array'));
+	}
+
 	public function testGroup() {
 		$field = $this->_db->name('Images.id');
 		$galleries = Galleries::find('all', array(
