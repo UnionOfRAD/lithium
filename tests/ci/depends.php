@@ -7,7 +7,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-use RuntimeException;
+use \RuntimeException;
 
 foreach (explode(' ', getenv('PHP_EXT')) ?: array() as $extension) {
 	PhpExtensions::install($extension);
