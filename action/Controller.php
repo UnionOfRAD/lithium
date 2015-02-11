@@ -126,6 +126,43 @@ class Controller extends \lithium\core\Object {
 	 */
 	protected $_autoConfig = array('render' => 'merge', 'classes' => 'merge');
 
+	/**
+	 * A filter is executed before the current action.
+	 *
+	 * For an filter to always be executed before all actions:
+	 * {{{
+	 * public $beforeFilters = array('findUser');
+	 * }}}
+	 *
+	 * For a filter to be executed before every action except `show` and `index`:
+	 * {{{
+	 * public $beforeFilters = array(
+	 *     'findUser' => array(
+	 *         'except' => array('show', 'index'),
+	 *     )
+	 * );
+	 * }}}
+	 *
+	 * For a filter to be executed only before `show` and `index` actions:
+	 * {{{
+	 * public $beforeFilters = array(
+	 *     'findUser' => array(
+	 *         'only' => array('show', 'index'),
+	 *     )
+	 * );
+	 * }}}
+	 * @var array
+	 */
+	public $beforeFilters = array();
+
+	/**
+	 * Filters to be executed after the current action.
+	 *
+	 * @see lithium\action\Controller::$beforeFilters For examples.
+	 * @var array
+	 */
+	public $afterFilters = array();
+
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'request' => null, 'response' => array(), 'render' => array(), 'classes' => array()
@@ -193,13 +230,15 @@ class Controller extends \lithium\core\Object {
 			}
 			$render['template'] = $render['template'] ?: $action;
 
+			$self->callFilters($action, $self->beforeFilters);
 			if ($result = $self->invokeMethod($action, $args)) {
+				if (is_array($result)) {
+					$self->set($result);
+				}
+				$self->callFilters($action, $self->afterFilters);
 				if (is_string($result)) {
 					$self->render(array('text' => $result));
 					return $self->response;
-				}
-				if (is_array($result)) {
-					$self->set($result);
 				}
 			}
 
@@ -208,6 +247,82 @@ class Controller extends \lithium\core\Object {
 			}
 			return $self->response;
 		});
+	}
+
+	/**
+	 * Calls the given filters based on the current action.
+	 *
+	 * @param  string $action
+	 * @param  array  $filters
+	 * @return void
+	 */
+	public function callFilters($action, $filters) {
+		foreach ($filters as $key => $value) {
+			$data = $this->_parseFilter($key, $value);
+			if ($this->_usableFilter($action, $data['options'])) {
+				$this->{$data['method']}();
+			}
+		}
+		return;
+	}
+
+	/**
+	 * Determines if a filter can be called on this action.
+	 *
+	 * @param  string $action  Current action.
+	 * @param  array  $options Can contain none or all of the following:
+	 *        - `'only'` _array_: Actions the filter should ONLY be applied on.
+	 *        - `'except'` _array_: Actions the filter should NOT be applied on.
+	 * @return bool
+	 */
+	protected function _usableFilter($action, $options) {
+		if (empty($options)) {
+			return true;
+		}
+		if (isset($options['only'])) {
+			return in_array($action, (array) $options['only']);
+		}
+		return !in_array($action, (array) $options['except']);
+	}
+
+	/**
+	 * Parses the current filter.
+	 *
+	 * {{{
+	 * $this->_parseFilter(0, 'name');
+	 * array(
+	 *     'method' => 'name',
+	 *     'options' => array(),
+	 * )
+	 * }}}
+	 *
+	 * {{{
+	 * $this->_parseFilter('foobar', array(
+	 *     'only' => array('index'),
+	 * ));
+	 * array(
+	 *     'method' => 'foobar',
+	 *     'options' => array(
+	 *         'only' => array('index'),
+	 *     ),
+	 * )
+	 * }}}
+	 *
+	 * @param  mixed $key
+	 * @param  mixed $value
+	 * @return array
+	 */
+	protected function _parseFilter($key, $value) {
+		if (is_int($key)) {
+			return array(
+				'method' => $value,
+				'options' => array(),
+			);
+		}
+		return array(
+			'method' => $key,
+			'options' => $value,
+		);
 	}
 
 	/**

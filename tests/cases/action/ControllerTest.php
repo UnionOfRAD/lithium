@@ -9,11 +9,18 @@
 namespace lithium\tests\cases\action;
 
 use lithium\action\Request;
+use lithium\test\Mocker;
 use lithium\tests\mocks\action\MockPostsController;
 use lithium\tests\mocks\action\MockRenderAltController;
 use lithium\tests\mocks\action\MockControllerRequest;
+use lithium\tests\mocks\action\mockPostsController\Mock as DoubleMockController;
 
 class ControllerTest extends \lithium\test\Unit {
+
+	public function setUp() {
+		Mocker::register();
+		Mocker::applyFilter(false);
+	}
 
 	/**
 	 * Tests that controllers can be instantiated with custom request objects.
@@ -367,6 +374,210 @@ class ControllerTest extends \lithium\test\Unit {
 		$controller->render();
 		$this->assertEqual('lithium', $controller->response->options['library']);
 	}
+
+	public function testParseFilterBasicString() {
+		$controller = new MockPostsController();
+		$expected = array(
+			'method' => 'foobar',
+			'options' => array(),
+		);
+		$results = $controller->invokeMethod('_parseFilter', array(0, 'foobar'));
+		$this->assertIdentical($expected, $results);
+	}
+
+	public function testParseFilterKeyWithArray() {
+		$controller = new MockPostsController();
+		$expected = array(
+			'method' => 'foobar',
+			'options' => array(
+				'only' => array('index'),
+			),
+		);
+		$results = $controller->invokeMethod('_parseFilter', array(
+			'foobar',
+			array('only' => array('index')),
+		));
+		$this->assertIdentical($expected, $results);
+	}
+
+	public function testUsableFilterWithEmptyOptions() {
+		$controller = new MockPostsController();
+		$result = $controller->invokeMethod('_usableFilter', array(
+			'fooAction',
+			array(),
+		));
+		$this->assertTrue($result);
+	}
+
+	public function testUsableFilterWithPositiveOnlyOptions() {
+		$controller = new MockPostsController();
+		$result = $controller->invokeMethod('_usableFilter', array(
+			'fooAction',
+			array(
+				'only' => array('fooAction'),
+			),
+		));
+		$this->assertTrue($result);
+	}
+
+	public function testUsableFilterWithNegativeOnlyOptions() {
+		$controller = new MockPostsController();
+		$result = $controller->invokeMethod('_usableFilter', array(
+			'fooAction',
+			array(
+				'only' => array('show'),
+			),
+		));
+		$this->assertFalse($result);
+	}
+
+	public function testUsableFilterWithPositiveOnlyOptionAsString() {
+		$controller = new MockPostsController();
+		$result = $controller->invokeMethod('_usableFilter', array(
+			'fooAction',
+			array(
+				'only' => 'fooAction',
+			),
+		));
+		$this->assertTrue($result);
+	}
+
+	public function testUsableFilterWithPositiveExceptOptions() {
+		$controller = new MockPostsController();
+		$result = $controller->invokeMethod('_usableFilter', array(
+			'fooAction',
+			array(
+				'except' => array('index'),
+			),
+		));
+		$this->assertTrue($result);
+	}
+
+	public function testUsableFilterWithNegativeExceptOptions() {
+		$controller = new MockPostsController();
+		$result = $controller->invokeMethod('_usableFilter', array(
+			'fooAction',
+			array(
+				'except' => array('fooAction'),
+			),
+		));
+		$this->assertFalse($result);
+	}
+
+	public function testUsableFilterWithPositiveExceptOptionAsString() {
+		$controller = new MockPostsController();
+		$result = $controller->invokeMethod('_usableFilter', array(
+			'fooAction',
+			array(
+				'except' => 'index',
+			),
+		));
+		$this->assertTrue($result);
+	}
+
+	public function testCallFiltersSimpleString() {
+		$controller = new DoubleMockController();
+		$controller->callFilters('index', array(
+			'type',
+		));
+		$this->assertTrue(Mocker::chain($controller)->called('type')->success());
+	}
+
+	public function testCallFiltersWithOnlySuccess() {
+		$controller = new DoubleMockController();
+		$controller->callFilters('index', array(
+			'type' => array(
+				'only' => array('index'),
+			),
+		));
+		$this->assertTrue(Mocker::chain($controller)->called('type')->success());
+	}
+
+	public function testCallFiltersWithOnlyFailure() {
+		$controller = new DoubleMockController();
+		$controller->callFilters('index', array(
+			'type' => array(
+				'only' => array('show'),
+			),
+		));
+		$this->assertFalse(Mocker::chain($controller)->called('type')->success());
+	}
+
+	public function testCallFiltersWithExceptSuccess() {
+		$controller = new DoubleMockController();
+		$controller->callFilters('index', array(
+			'type' => array(
+				'except' => array('show'),
+			),
+		));
+		$this->assertTrue(Mocker::chain($controller)->called('type')->success());
+	}
+
+	public function testCallFiltersWithExceptFailure() {
+		$controller = new DoubleMockController();
+		$controller->callFilters('index', array(
+			'type' => array(
+				'except' => array('index'),
+			),
+		));
+		$this->assertFalse(Mocker::chain($controller)->called('type')->success());
+	}
+
+	public function testBeforeFilterGetsCalled() {
+		$controller = new DoubleMockController();
+		$controller->beforeFilters = array('type');
+		$controller->__invoke(null, array('action' => 'index', 'args' => array()));
+		$this->assertTrue(Mocker::chain($controller)->called('type')->success());
+	}
+
+	public function testBeforeFilterGetsCalledBefore() {
+		$controller = new DoubleMockController();
+		$controller->beforeFilters = array('type');
+		$controller->applyFilter('type', function($self, $params, $chain) use($controller) {
+			$controller->set(array(
+				'name' => 'FooBar',
+			));
+		});
+		$controller->applyFilter('index', function($self, $params, $chain) use($controller) {
+			$controller->set(array(
+				'name' => 'FooBaz',
+			));
+		});
+		$controller->applyFilter('render', function($self, $params, $chain) use($controller) {
+			return;
+		});
+		$controller->__invoke(null, array('action' => 'index', 'args' => array()));
+		$this->assertIdentical('FooBaz', $controller->_render['data']['name']);
+	}
+
+	public function testAfterFilterGetsCalled() {
+		$controller = new DoubleMockController();
+		$controller->afterFilters = array('type');
+		$controller->__invoke(null, array('action' => 'index', 'args' => array()));
+		$this->assertTrue(Mocker::chain($controller)->called('type')->success());
+	}
+
+	public function testAfterFilterGetsCalledAfter() {
+		$controller = new DoubleMockController();
+		$controller->afterFilters = array('type');
+		$controller->applyFilter('type', function($self, $params, $chain) use($controller) {
+			$controller->set(array(
+				'name' => 'FooBar',
+			));
+		});
+		$controller->applyFilter('index', function($self, $params, $chain) use($controller) {
+			$controller->set(array(
+				'name' => 'FooBaz',
+			));
+			return true;
+		});
+		$controller->applyFilter('render', function($self, $params, $chain) use($controller) {
+			return;
+		});
+		$result = $controller->__invoke(null, array('action' => 'index', 'args' => array()));
+		$this->assertIdentical('FooBar', $controller->_render['data']['name']);
+	}
+
 }
 
 ?>
