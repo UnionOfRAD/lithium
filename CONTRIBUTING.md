@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to lithium! This project is built by a thriving community of developers who value cutting-edge technology and concise, maintainable code. If you've found a bug, or have an idea for a feature, we encourage your participation in making lithium better.
 
-**Security vulnerabilities** are an especially sensitive class of bug and should be confidentially reported directly to security@--.me WEBSITE HOST--. Please do not disclose any details publicly. Also see the [full explanation](http://li3.me/development#security).
+**Security vulnerabilities** are an especially sensitive class of bug and should not be disclosed publicly. Please read the [full information](http://li3.me/development#security) on our website.
 
 Here's what you need to stick to in order to have the best chance of getting your code pushed to the core:
 * **Conceptual integrity**: code should conform to the goals of the framework
