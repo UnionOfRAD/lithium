@@ -1224,6 +1224,64 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	public function testFormFieldErrorSurpressed() {
+		$record = new Record(array('model' => $this->_model));
+		$record->errors(array('name' => array('notEmpty' => 'Please enter a name')));
+		$this->form->create($record);
+
+		$result = $this->form->field('name', array(
+			'error' => false
+		));
+		$this->assertTags($result, array(
+			'<div', 'label' => array('for' => 'MockFormPostName'), 'Name', '/label',
+			'input' => array('type' => "text", 'name' => 'name', 'id' => 'MockFormPostName'),
+			 '/div'
+		));
+	}
+
+	public function testFormFieldErrorWithCustomStringMessage() {
+		$record = new Record(array('model' => $this->_model));
+		$record->errors(array('name' => array('notEmpty' => 'Please enter a name')));
+		$this->form->create($record);
+
+		$result = $this->form->field('name', array(
+			'error' => 'Nothing.'
+		));
+		$this->assertTags($result, array(
+			'<div', 'label' => array('for' => 'MockFormPostName'), 'Name', '/label',
+			'input' => array('type' => "text", 'name' => 'name', 'id' => 'MockFormPostName'),
+			'div' => array('class' => "error"), 'Nothing.', '/div', '/div'
+		));
+	}
+
+	public function testFormFieldErrorWithCustomArrayMessages() {
+		$record = new Record(array('model' => $this->_model));
+		$record->errors(array('name' => array('notEmpty' => 'Please enter a name')));
+		$this->form->create($record);
+
+		$result = $this->form->field('name', array(
+			'error' => array(
+				'notEmpty' => 'Nothing.'
+			)
+		));
+		$this->assertTags($result, array(
+			'<div', 'label' => array('for' => 'MockFormPostName'), 'Name', '/label',
+			'input' => array('type' => "text", 'name' => 'name', 'id' => 'MockFormPostName'),
+			'div' => array('class' => "error"), 'Nothing.', '/div', '/div'
+		));
+
+		$result = $this->form->field('name', array(
+			'error' => array(
+				'default' => 'Nothing.'
+			)
+		));
+		$this->assertTags($result, array(
+			'<div', 'label' => array('for' => 'MockFormPostName'), 'Name', '/label',
+			'input' => array('type' => "text", 'name' => 'name', 'id' => 'MockFormPostName'),
+			'div' => array('class' => "error"), 'Nothing.', '/div', '/div'
+		));
+	}
+
 	/**
 	 * Tests that the string template form `Form::field()` can be overridden.
 	 */

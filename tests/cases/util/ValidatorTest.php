@@ -989,6 +989,19 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertEmpty($result);
 	}
 
+	public function testNamedRules() {
+		$rules = array(
+			'title' => array(
+				'one' => array('notEmpty', 'message' => 'please enter a title')
+			)
+		);
+		$data = array();
+
+		$expected = array('title' => array('one' => 'please enter a title'));
+		$result = Validator::check($data, $rules);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCheckSkipEmpty() {
 		$rules = array(
 			'email' => array('email', 'skipEmpty' => true, 'message' => 'email is not valid')
@@ -1068,8 +1081,8 @@ class ValidatorTest extends \lithium\test\Unit {
 
 		// result:
 		$errors = array(
-			'title' => array('please enter a title'),
-			'email' => array('email is not valid')
+			'title' => array(0 => 'please enter a title'),
+			'email' => array(1 => 'email is not valid')
 		);
 		$this->assertNotEmpty($result);
 		$this->assertEqual($errors, $result);
@@ -1087,7 +1100,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$result = Validator::check($data, $rules);
 		$this->assertNotEmpty($result);
 
-		$expected = array('email' => array('email is not valid'));
+		$expected = array('email' => array(1 => 'email is not valid'));
 		$this->assertEqual($expected, $result);
 	}
 
