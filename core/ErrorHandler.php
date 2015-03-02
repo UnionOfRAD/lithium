@@ -42,7 +42,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	/**
 	 * Currently registered exception handler.
 	 *
-	 * @var closure Closure representing exception handler.
+	 * @var \Closure Closure representing exception handler.
 	 */
 	protected static $_exceptionHandler = null;
 

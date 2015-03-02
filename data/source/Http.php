@@ -156,7 +156,7 @@ class Http extends \lithium\data\Source {
 	 *
 	 * @param array $query a query object
 	 * @param array $options array.
-	 * @return result
+	 * @return mixed
 	 */
 	public function send($query = null, array $options = array()) {
 		$query = !is_object($query) ? new Query((array) $query) : $query;
@@ -226,7 +226,7 @@ class Http extends \lithium\data\Source {
 	 *
 	 * @param object $query
 	 * @param array $options
-	 * @return void
+	 * @return mixed
 	 * @filter
 	 */
 	public function create($query, array $options = array()) {

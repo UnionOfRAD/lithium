@@ -30,8 +30,6 @@ class CatalogTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests for values returned by `read()`.
-	 *
-	 * @return void
 	 */
 	public function testRead() {
 		$result = Catalog::read('runtime', 'validation.ssn', 'de_DE');
@@ -40,8 +38,6 @@ class CatalogTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests for values returned by `write()`.
-	 *
-	 * @return void
 	 */
 	public function testWrite() {
 		$data = array(
@@ -53,8 +49,6 @@ class CatalogTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests writing and reading for single and multiple items.
-	 *
-	 * @return void
 	 */
 	public function testWriteRead() {
 		$data = '/postalCode en_US/';
@@ -79,8 +73,6 @@ class CatalogTest extends \lithium\test\Unit {
 	 *
 	 * Only complete items are merged in, (atomic) merging between items
 	 * should not occur. Categories fall back to results for more generic locales.
-	 *
-	 * @return void
 	 */
 	public function testWriteReadMergeLocales() {
 		$data = '/postalCode en/';
@@ -149,8 +141,6 @@ class CatalogTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that a scope is honored if one is used.
-	 *
-	 * @return void
 	 */
 	public function testWriteReadWithScope() {
 		$data = '/postalCode en_US scope0/';
@@ -187,8 +177,6 @@ class CatalogTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests reading from all configured stores with fallbacks.
-	 *
-	 * @return void
 	 */
 	public function testWriteReadMergeAllConfigurations() {
 		Catalog::reset();
@@ -236,8 +224,6 @@ class CatalogTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests reading from selected multiple configured stores.
-	 *
-	 * @return void
 	 */
 	public function testReadMergeSelectedConfigurations() {
 		Catalog::reset();
@@ -282,8 +268,6 @@ class CatalogTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests writing, then reading different types of values.
-	 *
-	 * @return void
 	 */
 	public function testDataTypeSupport() {
 		$data = function($n) { return $n === 1 ? 0 : 1; };
@@ -299,8 +283,6 @@ class CatalogTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests if the output is normalized and doesn't depend on the input format.
-	 *
-	 * @return void
 	 */
 	public function testInputFormatNormalization() {
 		$data = array('house' => 'Haus');

@@ -701,7 +701,7 @@ class Request extends \lithium\net\http\Request {
 	 *
 	 * @param string $locale An optional locale string like `'en'`, `'en_US'` or `'de_DE'`. If
 	 *        specified, will overwrite the existing locale.
-	 * @return Returns the currently set locale string.
+	 * @return string Returns the currently set locale string.
 	 */
 	public function locale($locale = null) {
 		if ($locale) {

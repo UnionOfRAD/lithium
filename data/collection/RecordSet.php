@@ -200,13 +200,10 @@ class RecordSet extends \lithium\data\Collection {
 			return array();
 		}
 		if (!is_object($this->_query) || !$this->_query->join()) {
-			$map = $model::connection()->schema($this->_query);
-			return $map;
+			return $model::connection()->schema($this->_query);
 		}
 		$model = $this->_model;
-		$map = $model::connection()->schema($this->_query);
-
-		return $map;
+		return $model::connection()->schema($this->_query);
 	}
 
 	/**
@@ -239,6 +236,7 @@ class RecordSet extends \lithium\data\Collection {
 			}
 			$index += count($value);
 		}
+		return array();
 	}
 }
 

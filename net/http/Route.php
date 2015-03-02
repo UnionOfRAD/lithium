@@ -224,8 +224,8 @@ class Route extends \lithium\core\Object {
 	 * @see lithium\net\http\Request
 	 * @see lithium\net\http\Request::$params
 	 * @see lithium\net\http\Route::$_handler
-	 * @param object $request A request object, usually an instance of `lithium\net\http\Request`,
-	 *               containing the details of the request to be routed.
+	 * @param \lithium\net\http\Request $request A request object containing the details of
+	 *        the request to be routed.
 	 * @param array $options Used to determine the operation of the method, and override certain
 	 *              values in the `Request` object:
 	 *              - `'url'` _string_: If present, will be used to match in place of the `$url`

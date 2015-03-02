@@ -200,7 +200,7 @@ class Create extends \lithium\console\Command {
 	 *
 	 * @param string $name the name of the sub-command to instantiate
 	 * @param array $config
-	 * @return object;
+	 * @return object
 	 */
 	protected function _instance($name, array $config = array()) {
 		if ($class = Libraries::locate('command.create', Inflector::camelize($name))) {
@@ -218,8 +218,8 @@ class Create extends \lithium\console\Command {
 	 * Save a template with the current params. Writes file to `Create::$path`.
 	 *
 	 * @param array $params
-	 * @return string A result string on success of writing the file. If any errors occur along
-	 *         the way such as missing information boolean false is returned.
+	 * @return string|boolean A result string on success of writing the file. If any errors
+	 *         occur along the way such as missing information boolean false is returned.
 	 */
 	protected function _save(array $params = array()) {
 		$defaults = array('namespace' => null, 'class' => null);

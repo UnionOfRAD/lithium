@@ -15,8 +15,6 @@ class ParserTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that PHP code snippets properly resolve to their corresponding tokens.
-	 *
-	 * @return void
 	 */
 	public function testSingleTokenization() {
 		$result = Parser::token('static');

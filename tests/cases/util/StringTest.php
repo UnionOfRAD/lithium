@@ -13,11 +13,6 @@ use lithium\tests\mocks\util\MockStringObject;
 
 class StringTest extends \lithium\test\Unit {
 
-	/**
-	 * testUuidGeneration method
-	 *
-	 * @return void
-	 */
 	public function testUuidGeneration() {
 		$result = String::uuid();
 		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[8-9a-b][a-f0-9]{3}-[a-f0-9]{12}$/";
@@ -27,11 +22,6 @@ class StringTest extends \lithium\test\Unit {
 		$this->assertPattern($pattern, $result);
 	}
 
-	/**
-	 * testMultipleUuidGeneration method
-	 *
-	 * @return void
-	 */
 	public function testMultipleUuidGeneration() {
 		$check = array();
 		$count = 50;
@@ -46,11 +36,6 @@ class StringTest extends \lithium\test\Unit {
 		}
 	}
 
-	/**
-	 * testInsert method
-	 *
-	 * @return void
-	 */
 	public function testInsert() {
 		$string = '2 + 2 = {:sum}. Lithium is {:adjective}.';
 		$expected = '2 + 2 = 4. Lithium is yummy.';
@@ -233,8 +218,6 @@ class StringTest extends \lithium\test\Unit {
 	/**
 	 * Tests that text replacements with `String::insert()` using key/value pairs are not
 	 * mis-handled if numeric keys are present in the array (only if they appear first).
-	 *
-	 * @return void
 	 */
 	public function testInsertWithUnusedNumericKey() {
 		$result = String::insert("Hey, what are you tryin' to {:action} on us?", array(
@@ -246,8 +229,6 @@ class StringTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests casting/inserting of custom objects with `String::insert()`.
-	 *
-	 * @return void
 	 */
 	public function testInsertWithObject() {
 		$foo = new MockStringObject();
@@ -258,8 +239,6 @@ class StringTest extends \lithium\test\Unit {
 
 	/**
 	 * Test that an empty array is not added to the string
-	 *
-	 * @return void
 	 */
 	public function testInsertWithEmptyArray() {
 		$result = String::insert("Hey, what are you tryin' to {:action} on us?",
@@ -269,11 +248,6 @@ class StringTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	/**
-	 * test Clean Insert
-	 *
-	 * @return void
-	 */
 	public function testCleanInsert() {
 		$result = String::clean(':incomplete', array(
 			'clean' => true, 'before' => ':', 'after' => ''
@@ -312,11 +286,6 @@ class StringTest extends \lithium\test\Unit {
 		$this->assertEqual('2 3', $result);
 	}
 
-	/**
-	 * testTokenize method
-	 *
-	 * @return void
-	 */
 	public function testTokenize() {
 		$result = String::tokenize('A,(short,boring test)');
 		$expected = array('A', '(short,boring test)');

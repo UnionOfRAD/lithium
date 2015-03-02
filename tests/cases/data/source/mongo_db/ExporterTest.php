@@ -316,8 +316,6 @@ class ExporterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests handling type values based on specified schema settings.
-	 *
-	 * @return void
 	 */
 	public function testTypeCasting() {
 		$time = time();
@@ -374,8 +372,6 @@ class ExporterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests handling type values of subdocument arrays based on specified schema settings.
-	 *
-	 * @return void
 	 */
 	public function testTypeCastingSubObjectArrays() {
 		$time = time();

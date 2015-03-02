@@ -131,7 +131,7 @@ class Curl extends \lithium\net\Socket {
 	/**
 	 * Writes data to curl options
 	 *
-	 * @param object $data a `lithium\net\Message` object or array
+	 * @param array|\lithium\net\Message $data
 	 * @return boolean
 	 */
 	public function write($data = null) {

@@ -452,8 +452,6 @@ class QueryTest extends \lithium\test\Unit {
 	/**
 	 * Tests that assigning a whitelist to a query properly restricts the list of data fields that
 	 * the query exposes.
-	 *
-	 * @return void
 	 */
 	public function testWhitelisting() {
 		$data = array('foo' => 1, 'bar' => 2, 'baz' => 3);
@@ -470,8 +468,6 @@ class QueryTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests basic property accessors and mutators.
-	 *
-	 * @return void
 	 */
 	public function testBasicAssignments() {
 		$query = new Query();

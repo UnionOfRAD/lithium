@@ -87,8 +87,6 @@ class CollectionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the `find()` method properly filters items out of the resulting collection.
-	 *
-	 * @return void
 	 */
 	public function testCollectionFindFilter() {
 		$collection = new Collection(array('data' => array_merge(
@@ -108,8 +106,6 @@ class CollectionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the `first()` method properly returns the first non-empty value.
-	 *
-	 * @return void
 	 */
 	public function testCollectionFirstFilter() {
 		$collection = new Collection(array('data' => array(0, 1, 2)));
@@ -132,8 +128,6 @@ class CollectionTest extends \lithium\test\Unit {
 	/**
 	 * Tests that the `each()` filter applies the callback to each item in the current collection,
 	 * returning an instance of itself.
-	 *
-	 * @return void
 	 */
 	public function testCollectionEachFilter() {
 		$collection = new Collection(array('data' => array(1, 2, 3, 4, 5)));
@@ -168,8 +162,6 @@ class CollectionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests the `ArrayAccess` interface implementation for manipulating values by direct offsets.
-	 *
-	 * @return void
 	 */
 	public function testArrayAccessOffsetMethods() {
 		$collection = new Collection(array('data' => array('foo', 'bar', 'baz' => 'dib')));
@@ -201,8 +193,6 @@ class CollectionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests the `ArrayAccess` interface implementation for traversing values.
-	 *
-	 * @return void
 	 */
 	public function testArrayAccessTraversalMethods() {
 		$collection = new Collection(array('data' => array('foo', 'bar', 'baz' => 'dib')));
@@ -246,8 +236,6 @@ class CollectionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests objects and scalar values being appended to the collection.
-	 *
-	 * @return void
 	 */
 	public function testValueAppend() {
 		$collection = new Collection();
@@ -265,8 +253,6 @@ class CollectionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests getting the index of the internal array.
-	 *
-	 * @return void
 	 */
 	public function testInternalKeys() {
 		$collection = new Collection(array('data' => array('foo', 'bar', 'baz' => 'dib')));
@@ -276,8 +262,6 @@ class CollectionTest extends \lithium\test\Unit {
 	/**
 	 * Tests that various types of handlers can be registered with `Collection::formats()`, and
 	 * that collection instances are converted correctly.
-	 *
-	 * @return void
 	 */
 	public function testCollectionFormatConversion() {
 		Collection::formats('lithium\net\http\Media');

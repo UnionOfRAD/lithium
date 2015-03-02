@@ -851,8 +851,10 @@ class Libraries {
 	 *
 	 * @see lithium\core\Libraries::$_paths
 	 * @see lithium\core\Libraries::locate()
-	 * @param boolean $defer A boolean flag indicating which libraries to search, either the ones
-	 *        with the `'defer'` flag set, or the ones without.
+	 * @param boolean|null $defer A boolean flag indicating which libraries to search, either
+	 *        the ones with the `'defer'` flag set, or the ones without. Providing `null`
+	 *        will cause the method to ignore the `'defer'` flag set on any library and
+	 *        perform a complete lookup.
 	 * @param array $paths List of paths to be searched for the given service (class).  These are
 	 *        defined in `lithium\core\Libraries::$_paths`, and are organized by class type.
 	 * @param array $params The list of insert parameters to be injected into each path format
@@ -942,12 +944,12 @@ class Libraries {
 	 *
 	 * @see lithium\core\Libraries::$_paths
 	 * @param string $type Path type (specified in `Libraries::$_paths`).
-	 * @param string $params Path parameters.
-	 * @return string Valid path name.
+	 * @param array $params Path parameters.
+	 * @return string|null Valid path name or `null` when no of path of given tpe is set.
 	 */
 	protected static function _locatePath($type, $params) {
 		if (!isset(static::$_paths[$type])) {
-			return;
+			return null;
 		}
 		$params += array('app' => LITHIUM_APP_PATH, 'root' => LITHIUM_LIBRARY_PATH);
 
@@ -962,7 +964,7 @@ class Libraries {
 	 * Search file system.
 	 *
 	 * @param string $config
-	 * @param string $options
+	 * @param array $options
 	 * @param string $name
 	 * @return array
 	 */

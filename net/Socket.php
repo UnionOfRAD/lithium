@@ -133,7 +133,7 @@ abstract class Socket extends \lithium\core\Object {
 	/**
 	 * Aggregates read and write methods into a coherent request response
 	 *
-	 * @param mixed $message a request object based on `\lithium\net\Message`
+	 * @param \lithium\net\Message $message
 	 * @param array $options
 	 *              - '`response`': a fully-namespaced string for the response object
 	 * @return object a response object based on `\lithium\net\Message`

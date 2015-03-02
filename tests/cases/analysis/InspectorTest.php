@@ -95,8 +95,6 @@ class InspectorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests reading specific line numbers of a file.
-	 *
-	 * @return void
 	 */
 	public function testLineIntrospection() {
 		$result = Inspector::lines(__FILE__, array(__LINE__ - 1));
@@ -120,8 +118,6 @@ class InspectorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests reading specific line numbers of a file that has CRLF line endings.
-	 *
-	 * @return void
 	 */
 	public function testLineIntrospectionWithCRLFLineEndings() {
 		$tmpPath = Libraries::get(true, 'resources') . '/tmp/tests/inspector_crlf';
@@ -141,8 +137,6 @@ class InspectorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests getting a list of parent classes from an object or string class name.
-	 *
-	 * @return void
 	 */
 	public function testClassParents() {
 		$result = Inspector::parents($this);
@@ -169,8 +163,6 @@ class InspectorTest extends \lithium\test\Unit {
 	/**
 	 * Tests that names of classes, methods, properties and namespaces are parsed properly from
 	 * strings.
-	 *
-	 * @return void
 	 */
 	public function testTypeDetection() {
 		$this->assertEqual('namespace', Inspector::type('lithium\util'));
@@ -189,8 +181,6 @@ class InspectorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests getting reflection information based on a string identifier.
-	 *
-	 * @return void
 	 */
 	public function testIdentifierIntrospection() {
 		$result = Inspector::info(__METHOD__);
@@ -239,8 +229,6 @@ class InspectorTest extends \lithium\test\Unit {
 	/**
 	 * Tests that class and namepace names which are equivalent in a case-insensitive search still
 	 * match properly.
-	 *
-	 * @return void
 	 */
 	public function testCaseSensitiveIdentifiers() {
 		$result = Inspector::type('lithium\storage\Cache');
@@ -254,8 +242,6 @@ class InspectorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests getting static and non-static properties from various types of classes.
-	 *
-	 * @return void
 	 */
 	public function testGetClassProperties() {
 		$result = array_map(
@@ -347,8 +333,6 @@ class InspectorTest extends \lithium\test\Unit {
 	/**
 	 * Tests that the correct parameters are always passed in `Inspector::invokeMethod()`,
 	 * regardless of the number.
-	 *
-	 * @return void
 	 */
 	public function testMethodInvocationWithParameters() {
 		$class = 'lithium\tests\mocks\analysis\MockInspector';

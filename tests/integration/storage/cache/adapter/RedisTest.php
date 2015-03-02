@@ -29,8 +29,6 @@ class RedisTest extends \lithium\test\Integration {
 
 	/**
 	 * Skip the test if the Redis extension is unavailable.
-	 *
-	 * @return void
 	 */
 	public function skip() {
 		$this->skipIf(!Redis::enabled(), 'The redis extension is not installed.');

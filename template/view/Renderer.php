@@ -477,7 +477,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 * Retuns the `View` object that controls this rendering context's instance. This can be used,
 	 * for example, to render view elements, i.e. `<?=$this->view()->render('element' $name); ?>`.
 	 *
-	 * @return void
+	 * @return object
 	 */
 	public function view() {
 		return $this->_view;

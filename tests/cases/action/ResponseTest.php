@@ -139,8 +139,6 @@ class ResponseTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests various methods of specifying HTTP status codes.
-	 *
-	 * @return void
 	 */
 	public function testStatusCodes() {
 		$this->response->status('Created');

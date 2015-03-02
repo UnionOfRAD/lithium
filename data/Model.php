@@ -668,7 +668,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Gets or sets the default query for the model.
 	 *
-	 * @param array $query.  Possible options are:
+	 * @param array $query Possible options are:
 	 *        - `'conditions'`: The conditional query elements, e.g.
 	 *          `'conditions' => array('published' => true)`
 	 *        - `'fields'`: The fields that should be retrieved. When set to `null`, defaults to
@@ -810,7 +810,7 @@ class Model extends \lithium\core\StaticObject {
 	 * to this model, but of a certain type.
 	 *
 	 * @param string $type A type of model relation.
-	 * @return mixed An array of relation instances or an instance of relation.
+	 * @return array|object|void An array of relation instances or an instance of relation.
 	 */
 	public static function relations($type = null) {
 		$self = static::_object();
@@ -818,7 +818,6 @@ class Model extends \lithium\core\StaticObject {
 		if ($type === null) {
 			return static::_relations();
 		}
-
 		if (isset($self->_relationFieldNames[$type])) {
 			$type = $self->_relationFieldNames[$type];
 		}
@@ -826,15 +825,12 @@ class Model extends \lithium\core\StaticObject {
 		if (isset($self->_relations[$type])) {
 			return $self->_relations[$type];
 		}
-
 		if (isset($self->_relationsToLoad[$type])) {
 			return static::_relations(null, $type);
 		}
-
 		if (in_array($type, $self->_relationTypes, true)) {
 			return array_keys(static::_relations($type));
 		}
-		return null;
 	}
 
 	/**
@@ -909,7 +905,7 @@ class Model extends \lithium\core\StaticObject {
 	 *        one field. Otherwise, an array containing all fields is returned. If `false`, the
 	 *        schema is reset to an empty value. If an array, field definitions contained are
 	 *        appended to the schema.
-	 * @return array
+	 * @return array|lithium\data\Schema
 	 */
 	public static function schema($field = null) {
 		$self = static::_object();
@@ -1167,7 +1163,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @see lithium\data\Model::$validates
 	 * @see lithium\util\Validator::check()
 	 * @see lithium\data\Entity::errors()
-	 * @param string $entity Model entity to validate. Typically either a `Record` or `Document`
+	 * @param object $entity Model entity to validate. Typically either a `Record` or `Document`
 	 *        object. In the following example:
 	 *        ```
 	 *            $post = Posts::create($data);
@@ -1368,7 +1364,7 @@ class Model extends \lithium\core\StaticObject {
 		if (!strpos($method, '::')) {
 			$method = get_called_class() . '::' . $method;
 		}
-		list($class, $method) = explode('::', $method, 2);
+		list(, $method) = explode('::', $method, 2);
 		$instance = static::_object();
 
 		if (isset($instance->_instanceFilters[$method])) {
@@ -1399,7 +1395,7 @@ class Model extends \lithium\core\StaticObject {
 			if (!$connection = static::connection()) {
 				return;
 			}
-		} catch (ConfigExcepton $e) {
+		} catch (ConfigException $e) {
 			return;
 		}
 

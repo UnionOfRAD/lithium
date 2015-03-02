@@ -34,6 +34,7 @@ use Closure;
  *   call. Finally, the `_stop()` method may be used instead of `exit()`, as it can be overridden
  *   for testing purposes.
  *
+ * @link http://php.net/manual/en/language.oop5.magic.php#object.set-state
  * @see lithium\core\StaticObject
  */
 class Object {

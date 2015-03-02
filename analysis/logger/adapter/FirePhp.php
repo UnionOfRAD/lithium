@@ -161,7 +161,7 @@ class FirePhp extends \lithium\core\Object {
 	 *
 	 * @see lithium\analysis\logger\adapter\FirePhp::_format()
 	 * @param array $message A message containing the key and the content to store.
-	 * @return void
+	 * @return array|void The queued message when no `Response` object was bound.
 	 */
 	protected function _write($message) {
 		if (!$this->_response) {

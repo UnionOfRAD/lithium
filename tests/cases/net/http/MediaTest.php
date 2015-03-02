@@ -413,8 +413,6 @@ class MediaTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that rendering plain text correctly returns the render data as-is.
-	 *
-	 * @return void
 	 */
 	public function testPlainTextOutput() {
 		$response = new Response();
@@ -428,8 +426,6 @@ class MediaTest extends \lithium\test\Unit {
 	/**
 	 * Tests that an exception is thrown for cases where an attempt is made to render content for
 	 * a type which is not registered.
-	 *
-	 * @return void
 	 */
 	public function testUndhandledContent() {
 		$response = new Response();
@@ -446,8 +442,6 @@ class MediaTest extends \lithium\test\Unit {
 	/**
 	 * Tests that attempts to render a media type with no handler registered produces an
 	 * 'unhandled media type' exception, even if the type itself is a registered content type.
-	 *
-	 * @return void
 	 */
 	public function testUnregisteredContentHandler() {
 		$response = new Response();
@@ -464,8 +458,6 @@ class MediaTest extends \lithium\test\Unit {
 	/**
 	 * Tests handling content type manually using parameters to `Media::render()`, for content types
 	 * that are registered but have no default handler.
-	 *
-	 * @return void
 	 */
 	public function testManualContentHandling() {
 		Media::type('custom', 'text/x-custom');
@@ -491,8 +483,6 @@ class MediaTest extends \lithium\test\Unit {
 	 * Tests that parameters from the `Request` object passed into `render()` via
 	 * `$options['request']` are properly merged into the `$options` array passed to render
 	 * handlers.
-	 *
-	 * @return void
 	 */
 	public function testRequestOptionMerging() {
 		Media::type('custom', 'text/x-custom');
@@ -565,8 +555,6 @@ class MediaTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that the `Media` class' configuration can be reset to its default state.
-	 *
-	 * @return void
 	 */
 	public function testStateReset() {
 		$this->assertFalse(in_array('foo', Media::types()));
@@ -597,8 +585,6 @@ class MediaTest extends \lithium\test\Unit {
 	/**
 	 * Tests that calling `Media::type()` to retrieve the details of a type that is aliased to
 	 * another type, automatically resolves to the settings of the type being pointed at.
-	 *
-	 * @return void
 	 */
 	public function testTypeAliasResolution() {
 		$resolved = Media::type('text');
@@ -644,8 +630,6 @@ class MediaTest extends \lithium\test\Unit {
 	/**
 	 * Tests that the `Response` object can be directly modified from a templating class or encode
 	 * function.
-	 *
-	 * @return void
 	 */
 	public function testResponseModification() {
 		Media::type('my', 'text/x-my', array('view' => 'lithium\tests\mocks\net\http\Template'));
@@ -658,8 +642,6 @@ class MediaTest extends \lithium\test\Unit {
 	/**
 	 * Tests that `Media::asset()` will not prepend path strings with the base application path if
 	 * it has already been prepended.
-	 *
-	 * @return void
 	 */
 	public function testDuplicateBasePathCheck() {
 		$result = Media::asset('/foo/bar/image.jpg', 'image', array('base' => '/bar'));

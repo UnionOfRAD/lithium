@@ -40,8 +40,6 @@ class RecordTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that a record's fields are accessible as object properties.
-	 *
-	 * @return void
 	 */
 	public function testDataPropertyAccess() {
 		$data = array('title' => 'Test record', 'body' => 'Some test record data');
@@ -59,8 +57,6 @@ class RecordTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that a record can be exported to a given series of formats.
-	 *
-	 * @return void
 	 */
 	public function testRecordFormatExport() {
 		$data = array('foo' => 'bar');

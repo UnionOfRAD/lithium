@@ -286,7 +286,7 @@ class Parser extends \lithium\core\StaticObject {
 	 * Helper function to normalize parameters for token matching.
 	 *
 	 * @see lithium\analysis\Parser::match()
-	 * @param array $parameters Params to be normalized.
+	 * @param array|string $parameters Params to be normalized.
 	 * @return array Normalized parameters.
 	 */
 	protected static function _prepareMatchParams($parameters) {

@@ -125,7 +125,7 @@ class Stream extends \lithium\net\Socket {
 	 * @link http://php.net/function.stream-set-timeout.php
 	 *       PHP Manual: stream_set_timeout()
 	 * @param integer $time The timeout value in seconds.
-	 * @return void
+	 * @return boolean
 	 */
 	public function timeout($time) {
 		if (!is_resource($this->_resource)) {
@@ -135,13 +135,13 @@ class Stream extends \lithium\net\Socket {
 	}
 
 	/**
-	 * Sets the character set for stream encoding
-	 *
-	 * Note: This function only exists in PHP 6. For PHP < 6, this method will return void.
+	 * Sets the character set for stream encoding if possible. The `stream_encoding`
+	 * function is not guaranteed to be available as it is seems as if it's experimental
+	 * or just not officially documented. If the function is not available returns `false`.
 	 *
 	 * @link http://php.net/function.stream-encoding.php stream_encoding()
 	 * @param string $charset
-	 * @return mixed Returns `null` if `stream_encoding()` function does not exist, boolean
+	 * @return boolean Returns `false` if `stream_encoding()` function does not exist, boolean
 	 *         result of `stream_encoding()` otherwise.
 	 */
 	public function encoding($charset) {

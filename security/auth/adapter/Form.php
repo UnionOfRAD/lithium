@@ -360,8 +360,7 @@ class Form extends \lithium\core\Object {
 	 * @param array $options Adapter-specific options. Not implemented in the `Form` adapter.
 	 * @return void
 	 */
-	public function clear(array $options = array()) {
-	}
+	public function clear(array $options = array()) {}
 
 	/**
 	 * Iterates over the filters configured in `$_filters` which are applied to submitted form data

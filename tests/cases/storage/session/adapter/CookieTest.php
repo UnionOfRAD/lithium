@@ -16,8 +16,6 @@ class CookieTest extends \lithium\test\Unit {
 
 	/**
 	 * Skip the test if running under CLI.
-	 *
-	 * @return void
 	 */
 	public function skip() {
 		$sapi = PHP_SAPI;

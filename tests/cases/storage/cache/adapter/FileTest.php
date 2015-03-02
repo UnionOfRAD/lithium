@@ -26,8 +26,6 @@ class FileTest extends \lithium\test\Unit {
 	/**
 	 * Skip the test if the default File adapter read/write path
 	 * is not read/write-able.
-	 *
-	 * @return void
 	 */
 	public function skip() {
 		$directory = new SplFileInfo(Libraries::get(true, 'resources') . "/tmp/cache/");

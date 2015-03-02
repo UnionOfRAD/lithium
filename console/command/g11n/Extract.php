@@ -91,7 +91,7 @@ class Extract extends \lithium\console\Command {
 	 * Prompts for data source and writes template.
 	 *
 	 * @param array $data Data to save.
-	 * @return void
+	 * @return boolean|void Return `false` if writing the catalog failed.
 	 */
 	protected function _writeTemplate($data) {
 		$message = array();

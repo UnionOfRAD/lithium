@@ -126,8 +126,7 @@ class StaticObject {
 	 * callback, and iteratively wrapping the filters around it.
 	 *
 	 * @see lithium\util\collection\Filters
-	 * @param string|array $method The name of the method being executed, or an array containing
-	 *        the name of the class that defined the method, and the method name.
+	 * @param string $method The name of the method being executed.
 	 * @param array $params An associative array containing all the parameters passed into
 	 *        the method.
 	 * @param Closure $callback The method's implementation, wrapped in a closure.

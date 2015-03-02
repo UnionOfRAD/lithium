@@ -15,8 +15,6 @@ class ApcTest extends \lithium\test\Unit {
 
 	/**
 	 * Skip the test if APC extension is unavailable.
-	 *
-	 * @return void
 	 */
 	public function skip() {
 		$this->skipIf(!Apc::enabled(), 'APC is either not loaded or not enabled.');

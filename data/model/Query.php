@@ -254,11 +254,13 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Set and get method for the model associated with the `Query`.
-	 * Will also set the source table, i.e. `$this->_config['source']`.
+	 * Set or get the associated model.
 	 *
-	 * @param string $model
-	 * @return string
+	 * Will also set the source table, i.e. `$this->_config['source']` when setting the model.
+	 *
+	 * @param string|null $model Name of model to use, or `null` to retrieve current one.
+	 * @return string|Query Either the current model name in use when $model is `null`,
+	 *         or the query itself when setting the model name.
 	 */
 	public function model($model = null) {
 		if (!$model) {
@@ -271,12 +273,15 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Set and get method for conditions.
+	 * Set or append to existing conditions, or get current conditions.
 	 *
-	 * If no conditions are set in query, it will ask the bound entity for condition array.
+	 * When getting current conditions and none are configured for the query,
+	 * will ask the bound entity for its conditions instead.
 	 *
-	 * @param mixed $conditions String or array to append to existing conditions.
-	 * @return array Returns an array of all conditions applied to this query.
+	 * @param string|array|null $conditions Condition/s to append to existing conditions.
+	 *        Provide `null` to get current conditions.
+	 * @return string|Query Either the currrent conditions when $conditions is
+	 *         `null` or the query itself when setting the conditions.
 	 */
 	public function conditions($conditions = null) {
 		if (!$conditions) {
@@ -289,10 +294,11 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Set and get method for havings.
+	 * Set and get _having_.
 	 *
 	 * @param mixed $having String or array to append to existing having.
-	 * @return array Returns an array of all having applied to this query.
+	 * @return string|Query Either the currrent _having_ when $having is
+	 *         `null` or the query itself when setting _having_.
 	 */
 	public function having($having = null) {
 		if (!$having) {
@@ -350,10 +356,12 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Set and get method for query's limit of amount of records to return
+	 * Set or get the limit for the amount of results to return.
 	 *
-	 * @param integer $limit
-	 * @return integer
+	 * @param integer|boolean $limit An integer indicating the number of results to limit or
+	 *        `false` to employ no limit at all. Or `null` to retrieve the current limit.
+	 * @return integer|null|Query Either the currrent limit when $limit is
+	 *         `null` or the query itself when setting the limit or providing `false`.
 	 */
 	public function limit($limit = null) {
 		if ($limit) {
@@ -370,8 +378,8 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Set and get method for query's offset, i.e. which records to get
 	 *
-	 * @param integer $offset
-	 * @return integer
+	 * @param integer|null $offset
+	 * @return integer|\lithium\data\Query
 	 */
 	public function offset($offset = null) {
 		if ($offset !== null) {
@@ -384,8 +392,8 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Set and get method for page, in relation to limit, of which records to get
 	 *
-	 * @param integer $page
-	 * @return integer
+	 * @param integer|null $page
+	 * @return integer|\lithium\data\Query
 	 */
 	public function page($page = null) {
 		if ($page) {
@@ -399,8 +407,8 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Set and get method for the query's order specification.
 	 *
-	 * @param array|string $order
-	 * @return mixed
+	 * @param array|string|null $order
+	 * @return array|\lithium\data\Query
 	 */
 	public function order($order = null) {
 		if ($order) {
@@ -413,8 +421,8 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Set and get method for the `Query` group config setting.
 	 *
-	 * @param string $group New group config setting.
-	 * @return mixed Current group config setting.
+	 * @param string|array|null $group
+	 * @return array|null|\lithium\data\Query
 	 */
 	public function group($group = null) {
 		if ($group) {
@@ -433,8 +441,8 @@ class Query extends \lithium\core\Object {
 	 *
 	 * Comment will have no effect on query, but will be passed along so data source can log it.
 	 *
-	 * @param string $comment
-	 * @return string
+	 * @param string|null $comment
+	 * @return string|\lithium\data\Query
 	 */
 	public function comment($comment = null) {
 		if ($comment) {
@@ -448,7 +456,7 @@ class Query extends \lithium\core\Object {
 	 * Set and get method for the query's entity instance.
 	 *
 	 * @param object $entity Reference to the query's current entity object.
-	 * @return object Reference to the query's current entity object.
+	 * @return \lithium\data\Query|\lithium\data\Entity
 	 */
 	public function &entity(&$entity = null) {
 		if ($entity) {
@@ -536,8 +544,7 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Convert the query's properties to the data sources' syntax and return it as an array.
 	 *
-	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
-	 *        conversion.
+	 * @param \lithium\data\Source $source Instance of the data source to use for conversion.
 	 * @param array $options Options to use when exporting the data.
 	 * @return array Returns an array containing a data source-specific representation of a query.
 	 */
@@ -584,8 +591,7 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Helper method used by `export()` which delegate the query generation to the datasource.
 	 *
-	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
-	 *        conversion.
+	 * @param \lithium\data\Source $source Instance of the data source to use for conversion.
 	 */
 	public function applyStrategy(Source $source) {
 		if ($this->_built) {
@@ -691,8 +697,7 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Return the generated aliases mapped to their relation path
 	 *
-	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
-	 *        conversion.
+	 * @param \lithium\data\Source $source Instance of the data source to use for conversion.
 	 * @return array Map between aliases and their corresponding dotted relation paths.
 	 */
 	public function paths(Source $source = null) {
@@ -705,8 +710,7 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Return the generated aliases mapped to their corresponding model
 	 *
-	 * @param object $source Instance of the data source (`lithium\data\Source`) to use for
-	 *        conversion.
+	 * @param \lithium\data\Source $source Instance of the data source to use for conversion.
 	 * @return array Map between aliases and their corresponding fully-namespaced model names.
 	 */
 	public function models(Source $source = null) {

@@ -43,8 +43,6 @@ class ResourcesMessageTest extends \lithium\test\Integration {
 	 * Germanic family:
 	 * - English (en)
 	 * - German (de)
-	 *
-	 * @return void
 	 */
 	public function testPlurals1() {
 		$locales = array(
@@ -76,8 +74,6 @@ class ResourcesMessageTest extends \lithium\test\Integration {
 	 *
 	 * Romanic family:
 	 * - French (fr)
-	 *
-	 * @return void
 	 */
 	public function testPlurals2() {
 		$locales = array(

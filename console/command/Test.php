@@ -211,7 +211,8 @@ class Test extends \lithium\console\Command {
 	 *
 	 * @param string $path Absolute or relative path to tests or a file which
 	 *                     corresponding test should be run.
-	 * @return boolean Will exit with status `1` if one or more tests failed otherwise with `0`.
+	 * @return integer|boolean Will (indirectly) exit with status `1` if one or more tests
+	 *         failed otherwise with `0`.
 	 */
 	public function run($path = null) {
 		if (!$path = $this->_path($path)) {

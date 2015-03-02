@@ -332,7 +332,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * @link http://php.net/array_map
 	 * @param callback $filter The filter to apply.
-	 * @return object This collection instance.
+	 * @return Collection This collection instance.
 	 */
 	public function each($filter) {
 		$this->_data = array_map($filter, $this->_data);
@@ -380,11 +380,12 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 *
 	 * @link http://php.net/sort
 	 * @link http://php.net/usort
-	 * @param callable $sorter The sorter for the data, can either be a sort function like
-	 *        natsort or a compare function like strcmp.
-	 * @param array $options The available options are:
-	 *        - No options yet implemented
-	 * @return $this, useful for chaining this with other methods.
+	 * @link http://php.net/strcmp
+	 * @param string|callable $sorter The sorter for the data. Either a callable to use
+	 *        as the sort function or a string with the name of a well-known sort function like
+	 *        `'natsort'` or a compare function like `'strcmp'`. Defaults to `'sort'`.
+	 * @param array $options Reserved for future use.
+	 * @return Collection Returns itself.
 	 */
 	public function sort($sorter = 'sort', array $options = array()) {
 		if (is_string($sorter) && strpos($sorter, 'sort') !== false && is_callable($sorter)) {

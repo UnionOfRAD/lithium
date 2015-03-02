@@ -38,7 +38,7 @@ class Debugger {
 	 *        - `'scope'`: Scope for items to include.
 	 *        - `'start'`: The depth to start with.
 	 *        - `'trace'`: A trace to use instead of generating one.
-	 * @return string Stack trace formatted according to `'format'` option.
+	 * @return string|array|null Stack trace formatted according to `'format'` option.
 	 */
 	public static function trace(array $options = array()) {
 		$defaults = array(

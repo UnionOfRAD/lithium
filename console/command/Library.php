@@ -66,7 +66,9 @@ class Library extends \lithium\console\Command {
 	public $password = '';
 
 	/**
-	 * @see `force`
+	 * Shorthand for `force`.
+	 *
+	 * @see lithium\console\command\Library::$force
 	 * @var boolean
 	 */
 	public $f = false;
@@ -74,7 +76,7 @@ class Library extends \lithium\console\Command {
 	/**
 	 * Force operation to complete. Typically used for overwriting files.
 	 *
-	 * @var string
+	 * @var boolean
 	 */
 	public $force = false;
 
@@ -612,7 +614,7 @@ class Library extends \lithium\console\Command {
 	 * Send a plugin archive to the server. The plugin must have a formula.
 	 *
 	 * @param string $name the library name or full path to the archive to send
-	 * @return void
+	 * @return boolean
 	 */
 	public function push($name = null) {
 		if (!$name) {

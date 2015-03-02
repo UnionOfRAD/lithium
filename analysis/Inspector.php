@@ -51,7 +51,7 @@ class Inspector {
 	/**
 	 * Determines if a given method can be called on an object/class.
 	 *
-	 * @param string|object $class Class or instance to inspect.
+	 * @param string|object $object Class or instance to inspect.
 	 * @param string $method Name of the method.
 	 * @param boolean $internal Should be `true` if you want to check from inside the
 	 *                class/object. When `false` will also check for public visibility,

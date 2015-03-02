@@ -21,8 +21,6 @@ class InflectorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests singularization inflection rules
-	 *
-	 * @return void
 	 */
 	public function testSingularize() {
 		$this->assertEqual(Inflector::singularize('categorias'), 'categoria');
@@ -69,8 +67,6 @@ class InflectorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests pluralization inflection rules
-	 *
-	 * @return void
 	 */
 	public function testPluralize() {
 		$this->assertEqual(Inflector::pluralize('categoria'), 'categorias');
@@ -118,11 +114,6 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertNotEqual(Inflector::pluralize('errata'), $result);
 	}
 
-	/**
-	 * testInflectorSlug method
-	 *
-	 * @return void
-	 */
 	public function testSlug() {
 		$result = Inflector::slug('Foo Bar: Not just for breakfast any-more');
 		$expected = 'Foo-Bar-Not-just-for-breakfast-any-more';
@@ -244,8 +235,6 @@ class InflectorTest extends \lithium\test\Unit {
 	/**
 	 * Tests that rules for uninflected singular words are kept in sync with the plural, and vice
 	 * versa.
-	 *
-	 * @return void
 	 */
 	public function testIrregularWords() {
 		$expectedPlural = Inflector::rules('plural');
@@ -269,11 +258,6 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual($resultPlural, $expectedPlural);
 	}
 
-	/**
-	 * testVariableNaming method
-	 *
-	 * @return void
-	 */
 	public function testCamelize() {
 		$this->assertEqual(Inflector::camelize('test-field'), 'TestField');
 		$this->assertEqual(Inflector::camelize('test_field'), 'TestField');
@@ -282,33 +266,18 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual(Inflector::camelize('Test_field', false), 'testField');
 	}
 
-	/**
-	 * testClassNaming method
-	 *
-	 * @return void
-	 */
 	public function testClassify() {
 		$this->assertEqual(Inflector::classify('artists_genres'), 'ArtistsGenre');
 		$this->assertEqual(Inflector::classify('file_systems'), 'FileSystem');
 		$this->assertEqual(Inflector::classify('news'), 'News');
 	}
 
-	/**
-	 * testTableNaming method
-	 *
-	 * @return void
-	 */
 	public function testTabelize() {
 		$this->assertEqual(Inflector::tableize('ArtistsGenre'), 'artists_genres');
 		$this->assertEqual(Inflector::tableize('FileSystem'), 'file_systems');
 		$this->assertEqual(Inflector::tableize('News'), 'news');
 	}
 
-	/**
-	 * testHumanization method
-	 *
-	 * @return void
-	 */
 	public function testHumanize() {
 		$this->assertEqual(Inflector::humanize('posts'), 'Posts');
 		$this->assertEqual(Inflector::humanize('posts_tags'), 'Posts Tags');
@@ -318,8 +287,6 @@ class InflectorTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests adding transliterated characters to the map used in `Inflector::slug()`.
-	 *
-	 * @return void
 	 */
 	public function testAddTransliterations() {
 		$this->assertEqual(Inflector::slug('Montréal'), 'Montreal');
@@ -350,8 +317,6 @@ class InflectorTest extends \lithium\test\Unit {
 	/**
 	 * Tests the storage mechanism for `$_underscored`, `$_camelized`,
 	 *  `$_humanized` and `$_pluralized`.
-	 *
-	 * @return void
 	 */
 	public function testStorageMechanism() {
 		Inflector::reset();

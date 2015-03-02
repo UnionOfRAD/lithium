@@ -90,8 +90,6 @@ class SessionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests a scenario where no session handler is available that matches the passed parameters.
-	 *
-	 * @return void
 	 */
 	public function testUnhandledWrite() {
 		Session::config(array(
@@ -103,8 +101,6 @@ class SessionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests deleting a session key from one or all adapters.
-	 *
-	 * @return void
 	 */
 	public function testSessionKeyCheckAndDelete() {
 		Session::config(array(
@@ -138,8 +134,6 @@ class SessionTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests clearing all session data from one or all adapters.
-	 *
-	 * @return void
 	 */
 	public function testSessionClear() {
 		Session::config(array(

@@ -281,7 +281,6 @@ class ModelTest extends \lithium\test\Unit {
 	 * types, and individual relationships.
 	 *
 	 * @todo Some tests will need to change when full relationship support is built out.
-	 * @return void
 	 */
 	public function testRelationshipIntrospection() {
 		$result = array_keys(MockPost::relations());
@@ -381,8 +380,6 @@ class ModelTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests the find 'first' filter on a simple record set.
-	 *
-	 * @return void
 	 */
 	public function testSimpleFindFirst() {
 		$result = MockComment::first();
@@ -1001,8 +998,6 @@ class ModelTest extends \lithium\test\Unit {
 	/**
 	 * Tests that varying `count` syntaxes all produce the same query operation (i.e.
 	 * `Model::count(...)`, `Model::find('count', ...)` etc).
-	 *
-	 * @return void
 	 */
 	public function testCountSyntax() {
 		$base = MockPost::count(array('email' => 'foo@example.com'));
@@ -1187,7 +1182,7 @@ class ModelTest extends \lithium\test\Unit {
 		$post->validates(array('rules' => array(
 			'title' => 'A custom message here for empty titles.',
 			'email' => array(
-				array('notEmpty', 'message' => 'email is empty.', 'required' => true)	
+				array('notEmpty', 'message' => 'email is empty.', 'required' => true)
 			)
 		)));
 		$this->assertNotEmpty($post->errors());

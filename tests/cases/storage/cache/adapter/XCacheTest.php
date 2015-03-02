@@ -15,8 +15,6 @@ class XCacheTest extends \lithium\test\Unit {
 
 	/**
 	 * Skip the test if XCache extension is unavailable.
-	 *
-	 * @return void
 	 */
 	public function skip() {
 		$extensionExists = (extension_loaded('xcache') && (ini_get('xcache.var_size') !== 0));
@@ -26,8 +24,6 @@ class XCacheTest extends \lithium\test\Unit {
 
 	/**
 	 * Clear the userspace cache
-	 *
-	 * @return void
 	 */
 	public function setUp() {
 		for ($i = 0, $max = xcache_count(XC_TYPE_VAR); $i < $max; $i++) {

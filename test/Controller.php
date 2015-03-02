@@ -31,7 +31,7 @@ class Controller extends \lithium\core\Object {
 	 * Magic method to make Controller callable.
 	 *
 	 * @see lithium\action\Dispatcher::_callable()
-	 * @param object $request A \lithium\action\Request object.
+	 * @param \lithium\action\Request $request
 	 * @param array $dispatchParams Array of params after being parsed by router.
 	 * @param array $options Some basic options for this controller.
 	 * @return string

@@ -260,7 +260,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * `'Accept-Language'` header as described by RFC 2616, section 14.4.
 	 *
 	 * @link http://www.ietf.org/rfc/rfc2616.txt
-	 * @param object $request An instance of `lithium\action\Request`.
+	 * @param \lithium\action\Request $request
 	 * @return array Preferred locales in their canonical form (i.e. `'fr_CA'`).
 	 */
 	protected static function _preferredAction($request) {
@@ -296,7 +296,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * into the `Locale` class' format.
 	 *
 	 * @link http://www.linux.com/archive/feature/53781
-	 * @param object $request An instance of `lithium\console\Request`.
+	 * @param \lithium\console\Request $request
 	 * @return array Preferred locales in their canonical form (i.e. `'fr_CA'`).
 	 */
 	protected static function _preferredConsole($request) {

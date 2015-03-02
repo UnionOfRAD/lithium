@@ -103,7 +103,7 @@ class Response extends \lithium\core\Object {
 	/**
 	 * Handles styling output.
 	 *
-	 * @param array $styles
+	 * @param array|boolean $styles
 	 * @return array
 	 */
 	public function styles($styles = array()) {

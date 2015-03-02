@@ -1251,8 +1251,8 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Returns a LIMIT statement from the given limit and the offset of the context object.
 	 *
-	 * @param integer $limit An
-	 * @param object $context The `lithium\data\model\Query` object
+	 * @param integer $limit
+	 * @param \lithium\data\model\Query $context
 	 * @return string
 	 */
 	public function limit($limit, $context) {
@@ -1269,7 +1269,7 @@ abstract class Database extends \lithium\data\Source {
 	 * Returns a join statement for given array of query objects
 	 *
 	 * @param object|array $joins A single or array of `lithium\data\model\Query` objects
-	 * @param object $context The parent `lithium\data\model\Query` object
+	 * @param \lithium\data\model\Query $context
 	 * @return string
 	 */
 	public function joins(array $joins, $context) {
@@ -1294,7 +1294,7 @@ abstract class Database extends \lithium\data\Source {
 	 * SQL fragment and returned.
 	 *
 	 * @param string|array $constraints The constraints for a `ON` clause.
-	 * @param object $context The current `lithium\data\model\Query` instance.
+	 * @param \lithium\data\model\Query $context
 	 * @param array $options Available options are:
 	 *               - `'prepend'` _boolean|string_: The string to prepend or `false`
 	 *                 for no prepending. Defaults to `'ON'`.

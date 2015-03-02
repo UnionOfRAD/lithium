@@ -95,7 +95,7 @@ class Context extends \lithium\net\Socket {
 	/**
 	 * Reads from the socket. Does not apply to this implementation.
 	 *
-	 * @return void
+	 * @return boolean|string
 	 */
 	public function read() {
 		if (!is_resource($this->_resource)) {

@@ -66,8 +66,6 @@ class StaticObjectTest extends \lithium\test\Unit {
 	/**
 	 * Tests that the correct parameters are always passed in `StaticObject::invokeMethod()`,
 	 * regardless of the number.
-	 *
-	 * @return void
 	 */
 	public function testMethodInvocationWithParameters() {
 		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
@@ -102,8 +100,6 @@ class StaticObjectTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that calling a filter-able method with no filters added does not trigger an error.
-	 *
-	 * @return void
 	 */
 	public function testCallingUnfilteredMethods() {
 		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
@@ -116,8 +112,6 @@ class StaticObjectTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that filtered methods in parent classes can call methods in subclasses.
-	 *
-	 * @return void
 	 */
 	public function testCallingSubclassMethodsInFilteredMethods() {
 		$class = 'lithium\tests\mocks\core\MockStaticFilteringExtended';

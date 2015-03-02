@@ -357,7 +357,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @param string $conditions
 	 * @param string $context
 	 * @param array $options
-	 * @return void
+	 * @return string
 	 */
 	public function conditions($conditions, $context, array $options = array()) {
 		return parent::conditions($conditions, $context, $options);

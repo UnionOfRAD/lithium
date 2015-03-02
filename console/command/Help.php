@@ -24,7 +24,7 @@ class Help extends \lithium\console\Command {
 	 * Auto run the help command.
 	 *
 	 * @param string $command Name of the command to return help about.
-	 * @return void
+	 * @return boolean
 	 */
 	public function run($command = null) {
 		$message = 'Lithium console started in the ' . Environment::get() . ' environment.';

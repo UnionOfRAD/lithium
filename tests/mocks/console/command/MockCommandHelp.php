@@ -80,9 +80,7 @@ class MockCommandHelp extends \lithium\console\Command {
 	 *
 	 * @return void
 	 */
-	protected function _sampleHelper() {
-
-	}
+	protected function _sampleHelper() {}
 }
 
 ?>

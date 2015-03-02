@@ -54,8 +54,6 @@ class ViewTest extends \lithium\test\Unit {
 	/**
 	 * Tests that the output-escaping handler correctly inherits its encoding from the `Response`
 	 * object, if provided.
-	 *
-	 * @return void
 	 */
 	public function testEscapeOutputFilterWithInjectedEncoding() {
 		$message = "Multibyte string support must be enabled to test character encodings.";

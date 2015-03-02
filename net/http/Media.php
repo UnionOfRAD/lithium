@@ -284,8 +284,8 @@ class Media extends \lithium\core\StaticObject {
 	 * @see lithium\net\http\Media::type()
 	 * @see lithium\net\http\Media::match()
 	 * @see lithium\action\Request
-	 * @param object $request The instance of `lithium\action\Request` which contains the details of
-	 *               the request to be content-negotiated.
+	 * @param \lithium\action\Request $request The request which contains the details of
+	 *        the request to be content-negotiated.
 	 * @return string Returns the first matching type name, i.e. `'html'` or `'json'`.
 	 */
 	public static function negotiate($request) {
@@ -322,8 +322,8 @@ class Media extends \lithium\core\StaticObject {
 	 * @see lithium\net\http\Media::negotiate()
 	 * @see lithium\net\http\Media::type()
 	 * @see lithium\action\Request
-	 * @param object $request The instance of `lithium\action\Request` to be checked against a
-	 *               set of conditions (if applicable).
+	 * @param \lithium\action\Request $request The request to be checked against a
+	 *        set of conditions (if applicable).
 	 * @param array $config Represents a content type configuration, which is an array containing 3
 	 *              keys:
 	 *              - `'name'` _string_: The type name, i.e. `'html'` or `'json'`.

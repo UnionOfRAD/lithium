@@ -108,6 +108,14 @@ class DocumentSet extends \lithium\data\Collection {
 		return $result;
 	}
 
+	/**
+	 * Helper method to normalize and set data.
+	 *
+	 * @param mixed $data
+	 * @param null|integer|string $offset
+	 * @param array $options
+	 * @return mixed The (potentially) cast data.
+	 */
 	protected function _set($data = null, $offset = null, $options = array()) {
 		if ($schema = $this->schema()) {
 			$model = $this->_model;

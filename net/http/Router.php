@@ -188,8 +188,8 @@ class Router extends \lithium\core\StaticObject {
 	 * Wrapper method which takes a `Request` object, parses it through all attached `Route`
 	 * objects, assigns the resulting parameters to the `Request` object, and returns it.
 	 *
-	 * @param object $request A request object, usually an instance of `lithium\action\Request`.
-	 * @return object Returns a copy of the `Request` object with parameters applied.
+	 * @param \lithium\action\Request $request
+	 * @return \lithium\action\Request Returns a copy of the request with parameters applied.
 	 */
 	public static function process($request) {
 		if (!$result = static::parse($request)) {
@@ -370,7 +370,7 @@ class Router extends \lithium\core\StaticObject {
 	 *
 	 * @param string|array $url Options to match to a URL. Optionally, this can be a string
 	 *        containing a manually generated URL.
-	 * @param object $context An instance of `lithium\action\Request`. This supplies the context for
+	 * @param \lithium\action\Request $context This supplies the context for
 	 *        any persistent parameters, as well as the base URL for the application.
 	 * @param array $options Options for the generation of the matched URL. Currently accepted
 	 *        values are:
@@ -432,7 +432,7 @@ class Router extends \lithium\core\StaticObject {
 	 *
 	 * @param string|array $url Options to match to a URL. Optionally, this can be a string
 	 *        containing a manually generated URL.
-	 * @param object $context An instance of `lithium\action\Request`.
+	 * @param \lithium\action\Request $context
 	 * @param array $options Options for the generation of the matched URL.
 	 * @return array The initialized options.
 	 */
@@ -565,7 +565,7 @@ class Router extends \lithium\core\StaticObject {
 	 *
 	 * @see lithium\action\Request::$persist
 	 * @param array $url The parameters that define the URL to be matched.
-	 * @param object $context Typically an instance of `lithium\action\Request`, which contains a
+	 * @param \lithium\action\Request $context A request object, which contains a
 	 *        `$persist` property, which is an array of keys to be persisted in URLs between
 	 *        requests.
 	 * @return array Returns the modified URL array.
@@ -592,8 +592,9 @@ class Router extends \lithium\core\StaticObject {
 	 * routes for the current scope only, pass `true` for the `$scope` parameter.
 	 *
 	 * @param integer $route Index of the route.
-	 * @param string $scope Name of the scope to get routes from. Uses default scope if `true`.
-	 * @return object|array|void If $route is an integer, returns the route object at given index or
+	 * @param string|boolean $scope Name of the scope to get routes from. Uses default
+	 *        scope if `true`.
+	 * @return object|array|null If $route is an integer, returns the route object at given index or
 	 *         if that fails returns `null`. If $route is `null` returns an array of routes or
 	 *         scopes with their respective routes depending on the value of $scope.
 	 */

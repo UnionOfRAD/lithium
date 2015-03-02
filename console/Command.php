@@ -83,7 +83,6 @@ class Command extends \lithium\core\Object {
 	 * Constructor.
 	 *
 	 * @param array $config
-	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('request' => null, 'response' => array(), 'classes' => $this->_classes);
@@ -166,7 +165,7 @@ class Command extends \lithium\core\Object {
 	/**
 	 * Writes a string to the output stream.
 	 *
-	 * @param string $output The string to write.
+	 * @param string|array $output The string or an array of strings to write.
 	 * @param mixed $options When passed an integer or boolean it is used as the number of
 	 *                       of new lines, when passed a string it is interpreted as style
 	 *                       to use otherwise when an array following options are available:
@@ -185,7 +184,7 @@ class Command extends \lithium\core\Object {
 	/**
 	 * Writes a string to error stream.
 	 *
-	 * @param string $error The string to write.
+	 * @param string|array $error The string or an array of strings to write.
 	 * @param mixed $options When passed an integer or boolean it is used as the number of
 	 *                       of new lines, when passed a string it is interpreted as style
 	 *                       to use otherwise when an array following options are available:
@@ -204,8 +203,8 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @param string $prompt
 	 * @param array $options
-	 * @return string Returns the result of the input data. If the input is equal to the `quit`
-	 *          option boolean `false` is returned
+	 * @return string|boolean Returns the result of the input data. If the input is
+	 *         equal to the `quit` option boolean `false` is returned.
 	 */
 	public function in($prompt = null, array $options = array()) {
 		$defaults = array('choices' => null, 'default' => null, 'quit' => 'q');
@@ -378,7 +377,7 @@ class Command extends \lithium\core\Object {
 	 * Handles the response that is sent to the stream.
 	 *
 	 * @param string $type The stream either output or error.
-	 * @param string $string The message to render.
+	 * @param string|array $string The message to render.
 	 * @param mixed $options When passed an integer or boolean it is used as the number of
 	 *                       of new lines, when passed a string it is interpreted as style
 	 *                       to use otherwise when an array following options are available:

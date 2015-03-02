@@ -21,7 +21,7 @@ class Router extends \lithium\core\Object {
 	 * XF68-style long options (i.e. `-foo`) are not supported but support
 	 * can be added by extending this class.
 	 *
-	 * @param object $request lithium\console\Request
+	 * @param \lithium\console\Request $request
 	 * @return array $params
 	 */
 	public static function parse($request = null) {

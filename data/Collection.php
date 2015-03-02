@@ -61,7 +61,7 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 * A pointer or resource that is used to load entities from the backend data source that
 	 * originated this collection.
 	 *
-	 * @var resource
+	 * @var resource|object
 	 */
 	protected $_result = null;
 
@@ -84,9 +84,9 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	protected $_stats = array();
 
 	/**
-	 * Setted to `true` when the collection has begun iterating.
+	 * Set to `true` when the collection has begun iterating.
 	 *
-	 * @var integer
+	 * @var boolean
 	 */
 	protected $_started = false;
 
@@ -314,7 +314,7 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	/**
 	 * Returns the currently pointed to record in the set.
 	 *
-	 * @return object `Record`
+	 * @return object|boolean An instance of `Record` or `false` if there is no current valid one.
 	 */
 	public function current() {
 		if (!$this->_started) {
@@ -479,11 +479,11 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 *
 	 * Overriden to load any data that has not yet been loaded.
 	 *
-	 * @param mixed $field The field to sort the data on, can also be a callback
+	 * @see lithium\util\Collection::sort()
+	 * @param string|callable $field The field to sort the data on, can also be a callback
 	 *        to a custom sort function.
-	 * @param array $options The available options are:
-	 *        - No options yet implemented
-	 * @return $this, useful for chaining this with other methods.
+	 * @param array $options Reserved for future use.
+	 * @return lithium\data\Collection Returns itself.
 	 */
 	public function sort($field = 'id', array $options = array()) {
 		$this->offsetGet(null);
@@ -493,17 +493,16 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 				if (is_array($a)) {
 					$a = (object) $a;
 				}
-
 				if (is_array($b)) {
 					$b = (object) $b;
 				}
-
 				return strcmp($a->$field, $b->$field);
 			};
 		} elseif (is_callable($field)) {
 			$sorter = $field;
+		} else {
+			return $this;
 		}
-
 		return parent::sort($sorter, $options);
 	}
 
