@@ -960,7 +960,7 @@ class ValidatorTest extends \lithium\test\Unit {
 	}
 
 	public function testCheckHasErrors() {
-		$rules = array('title' => array('please enter a title'));
+		$rules = array('title' => 'please enter a title');
 		$result = Validator::check(array(), $rules);
 		$this->assertNotEmpty($result);
 
@@ -971,6 +971,20 @@ class ValidatorTest extends \lithium\test\Unit {
 	public function testCheckPasses() {
 		$rules = array('title' => 'please enter a title');
 		$data = array('title' => 'new title');
+		$result = Validator::check($data, $rules);
+		$this->assertEmpty($result);
+	}
+
+	public function testRuleFormatMessageOnly() {
+		$rules = array('title' => 'please enter a title');
+		$data = array();
+
+		$expected = array('title' => array('please enter a title'));
+		$result = Validator::check($data, $rules);
+		$this->assertEqual($expected, $result);
+
+		$data = array('title' => 'new title');
+
 		$result = Validator::check($data, $rules);
 		$this->assertEmpty($result);
 	}
@@ -1025,7 +1039,7 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	public function testCheckWithLastRule() {
 		$rules = array(
-			'title' => array('please enter a title'),
+			'title' => 'please enter a title',
 			'email' => array(
 				array('notEmpty', 'message' => 'email is empty', 'last' => true),
 				array('email', 'message' => 'email is invalid')
@@ -1035,7 +1049,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertNotEmpty($result);
 
 		$expected = array(
-			'title' => array('title is empty'),
+			'title' => array('please enter a title'),
 			'email' => array('email is empty')
 		);
 		$this->assertEqual($expected, $result);
