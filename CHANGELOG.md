@@ -6,6 +6,8 @@
 
 ### Improved
 
+- Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
+
 ### Added
 
 - Enable custom error messages in form helper. This feature allows to provide messages
@@ -17,6 +19,10 @@
   #1171 (David Persson)
 
 ### Changed
+    
+- Database encoding, timezone, and searchPath methods may now throw exceptions. Please
+  wrap code calling these methods directly in try/catch blocks - if needed. #1172
+  (David Persson)
 
 ## v1.0.0
 
