@@ -58,7 +58,7 @@ class Request extends \lithium\net\http\Message {
 	protected $_formats = array();
 
 	/**
-	 * Adds config values to the public properties when a new object is created.
+	 * Constructor. Adds config values to the public properties when a new object is created.
 	 *
 	 * @see lithium\net\http\Message::__construct()
 	 * @see lithium\net\Message::__construct()
@@ -73,6 +73,7 @@ class Request extends \lithium\net\http\Message {
 	 *        - `'proxy'` _string_: Defaults to `null`.
 	 *        - `'ignoreErrors'` _boolean_: Defaults to `true`.
 	 *        - `'followLocation'` _boolean_: Defaults to `true`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

@@ -43,12 +43,12 @@ class Response extends \lithium\core\Object {
 	public $status = 0;
 
 	/**
-	 * Construct Request object
+	 * Constructor.
 	 *
-	 * @param array $config
-	 *              - request object lithium\console\Request
-	 *              - output stream
-	 *              _ error stream
+	 * @param array $config Available configuration options are:
+	 *        - `'output'` _resource|null_
+	 *        - `'error'` _resource|null_
+	 * @return void
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('output' => null, 'error' => null);
@@ -89,7 +89,9 @@ class Response extends \lithium\core\Object {
 	}
 
 	/**
-	 * Destructor to close streams
+	 * Destructor. Closes streams.
+	 *
+	 * @return void
 	 */
 	public function __destruct() {
 		if ($this->output) {

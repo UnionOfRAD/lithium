@@ -37,9 +37,10 @@ class Curl extends \lithium\net\Socket {
 	public $options = array();
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
 	 * @param array $config
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('ignoreExpect' => true);

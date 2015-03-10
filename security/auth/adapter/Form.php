@@ -250,31 +250,32 @@ class Form extends \lithium\core\Object {
 	protected $_autoConfig = array('model', 'fields', 'scope', 'filters', 'validators', 'query');
 
 	/**
-	 * Sets the initial configuration for the `Form` adapter, as detailed below.
+	 * Constructor. Sets the initial configuration for the `Form` adapter, as detailed below.
 	 *
 	 * @see lithium\security\auth\adapter\Form::$_model
 	 * @see lithium\security\auth\adapter\Form::$_fields
 	 * @see lithium\security\auth\adapter\Form::$_filters
 	 * @see lithium\security\auth\adapter\Form::$_validators
 	 * @see lithium\security\auth\adapter\Form::$_query
-	 * @param array $config Sets the configuration for the adapter, which has the following options:
-	 *              - `'model'` _string_: The name of the model class to use. See the `$_model`
-	 *                property for details.
-	 *              - `'fields'` _array_: The model fields to query against when taking input from
-	 *                the request data. See the `$_fields` property for details.
-	 *              - `'scope'` _array_: Any additional conditions used to constrain the
-	 *                authentication query. For example, if active accounts in an application have
-	 *                an `active` field which must be set to `true`, you can specify
-	 *                `'scope' => array('active' => true)`. See the `$_scope` property for more
-	 *                details.
-	 *              - `'filters'` _array_: Named callbacks to apply to request data before the user
-	 *                lookup query is generated. See the `$_filters` property for more details.
-	 *              - `'validators'` _array_: Named callbacks to apply to fields in request data and
-	 *                corresponding fields in database data in order to do programmatic
-	 *                authentication checks after the query has occurred. See the `$_validators`
-	 *                property for more details.
-	 *              - `'query'` _string_: Determines the model method to invoke for authentication
-	 *                checks. See the `$_query` property for more details.
+	 * @param array $config Available configuration options:
+	 *         `'model'` _string_: The name of the model class to use. See the `$_model`
+	 *         property for details.
+	 *         `'fields'` _array_: The model fields to query against when taking input from
+	 *         the request data. See the `$_fields` property for details.
+	 *         `'scope'` _array_: Any additional conditions used to constrain the
+	 *         authentication query. For example, if active accounts in an application have
+	 *         an `active` field which must be set to `true`, you can specify
+	 *         `'scope' => array('active' => true)`. See the `$_scope` property for more
+	 *         details.
+	 *         `'filters'` _array_: Named callbacks to apply to request data before the user
+	 *         lookup query is generated. See the `$_filters` property for more details.
+	 *         `'validators'` _array_: Named callbacks to apply to fields in request data and
+	 *         corresponding fields in database data in order to do programmatic
+	 *         authentication checks after the query has occurred. See the `$_validators`
+	 *         property for more details.
+	 *         `'query'` _string_: Determines the model method to invoke for authentication
+	 *         checks. See the `$_query` property for more details.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

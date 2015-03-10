@@ -28,9 +28,12 @@ class Context extends \lithium\net\Socket {
 	protected $_content = null;
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
-	 * @param array $config
+	 * @param array $config Available configuration options are:
+	 *        - `'mode'` _string_
+	 *        - `'message'` _object_
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('mode' => 'r', 'message' => null);

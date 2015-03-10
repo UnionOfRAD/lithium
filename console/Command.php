@@ -82,7 +82,11 @@ class Command extends \lithium\core\Object {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $config
+	 * @param array $config Available configuration options are:
+	 *        - `'request'` _object|null_
+	 *        - `'response'` _array_
+	 *        - `'classes'` _array_
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('request' => null, 'response' => array(), 'classes' => $this->_classes);

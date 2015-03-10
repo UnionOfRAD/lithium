@@ -52,7 +52,11 @@ class CouchDb extends \lithium\data\source\Http {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $config
+	 * @param array $config Available configuration options are:
+	 *        - `'port'` _integer_
+	 *        - `'version'` _integer_
+	 *        - `'database'` _string_
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('port' => 5984, 'version' => 1, 'database' => null);
@@ -69,8 +73,8 @@ class CouchDb extends \lithium\data\source\Http {
 	}
 
 	/**
-	 * Ensures that the server connection is closed and resources are freed when the adapter
-	 * instance is destroyed.
+	 * Destructor. Ensures that the server connection is closed and resources are freed when
+	 * the adapter instance is destroyed.
 	 *
 	 * @return void
 	 */

@@ -77,16 +77,17 @@ class Object {
 	protected static $_parents = array();
 
 	/**
-	 * Initializes class configuration (`$_config`), and assigns object properties using the
-	 * `_init()` method, unless otherwise specified by configuration. See below for details.
+	 * Constructor. Initializes class configuration (`$_config`), and assigns object properties
+	 * using the `_init()` method, unless otherwise specified by configuration. See below for
+	 * details.
 	 *
 	 * @see lithium\core\Object::$_config
 	 * @see lithium\core\Object::_init()
 	 * @param array $config The configuration options which will be assigned to the `$_config`
-	 *              property. This method accepts one configuration option:
-	 *              - `'init'` _boolean_: Controls constructor behavior for calling the `_init()`
-	 *                method. If `false`, the method is not called, otherwise it is. Defaults to
-	 *                `true`.
+	 *        property. This method accepts one configuration option:
+	 *        - `'init'` _boolean_: Controls constructor behavior for calling the `_init()`
+	 *          method. If `false`, the method is not called, otherwise it is. Defaults to `true`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('init' => true);

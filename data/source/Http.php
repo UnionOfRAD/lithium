@@ -62,9 +62,10 @@ class Http extends \lithium\data\Source {
 	);
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
 	 * @param array $config
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

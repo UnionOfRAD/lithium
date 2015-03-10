@@ -185,6 +185,25 @@ class Route extends \lithium\core\Object {
 		'keys', 'defaults', 'subPatterns', 'persist', 'handler'
 	);
 
+	/**
+	 * Constructor.
+	 *
+	 * @param array $config Available configuration options are:
+	 *         - `'params'` _array_
+	 *         - `'template'` _string_
+	 *         - `'pattern'` _string_
+	 *         - `'match'` _array_
+	 *         - `'meta'` _array_
+	 *         - `'defaults'` _array_
+	 *         - `'keys'` _array_
+	 *         - `'persist'` _array_
+	 *         - `'handler'` _callable_
+	 *         - `'continue'` _boolean_
+	 *         - `'modifiers'` _array_
+	 *         - `'formatters'` _array_
+	 *         - `'unicode'` _boolean_
+	 * @return void
+	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'params'   => array(),

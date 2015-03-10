@@ -137,15 +137,13 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	);
 
 	/**
-	 * Creates a new record object with default values.
+	 * Constructor.
 	 *
-	 * Options defined:
-	 * - 'data' _array_: Data to enter into the record. Defaults to an empty array.
-	 * - 'model' _string_: Class name that provides the data-source for this record.
-	 *   Defaults to `null`.
-	 *
-	 * @param array $config
-	 * @return object Record object.
+	 * @param array $config Available configuration options are:
+	 *        - `'data'` _array_: Data to enter into the record. Defaults to an empty array.
+	 *        - `'model'` _string_: Class name that provides the data-source for this record.
+	 *           Defaults to `null`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('model' => null, 'data' => array(), 'relationships' => array());

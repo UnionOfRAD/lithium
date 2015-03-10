@@ -127,9 +127,14 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	);
 
 	/**
-	 * Class constructor.
+	 * Constructor.
 	 *
-	 * @param array $config
+	 * @see lithium\data\Collection::$_data
+	 * @see lithium\data\Collection::$_model
+	 * @param array $config Available configuration options are:
+	 *        - `'data'` _array_
+	 *        - `'model'` _string|null_
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('data' => array(), 'model' => null);
@@ -612,7 +617,9 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	}
 
 	/**
-	 * Ensures that the data set's connection is closed when the object is destroyed.
+	 * Destructor. Ensures that the data set's connection is closed when the object is destroyed.
+	 *
+	 * @return void
 	 */
 	public function __destruct() {
 		$this->close();

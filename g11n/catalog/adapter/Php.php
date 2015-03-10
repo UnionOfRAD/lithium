@@ -57,6 +57,7 @@ class Php extends \lithium\g11n\catalog\Adapter {
 	 *
 	 * @param array $config Available configuration options are:
 	 *        - `'path'`: The path to the directory holding the data.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('path' => null);

@@ -161,18 +161,17 @@ abstract class Database extends \lithium\data\Source {
 	abstract protected function _insertId($query);
 
 	/**
-	 * Creates the database object and set default values for it.
+	 * Constructor.
 	 *
-	 * Options defined:
-	 *  - 'database' _string_ Name of the database to use. Defaults to `null`.
-	 *  - 'host' _string_ Name/address of server to connect to. Defaults to 'localhost'.
-	 *  - 'login' _string_ Username to use when connecting to server. Defaults to 'root'.
-	 *  - 'password' _string_ Password to use when connecting to server. Defaults to `''`.
-	 *  - 'persistent' _boolean_ If true a persistent connection will be attempted, provided the
-	 *    adapter supports it. Defaults to `true`.
-	 *
-	 * @param $config array Array of configuration options.
-	 * @return Database object.
+	 * @param $config array Available configuration options are:
+	 *         - `'database'` _string_: Name of the database to use. Defaults to `null`.
+	 *         - `'host'` _string_: Name/address of server to connect to. Defaults to `'localhost'`.
+	 *         - `'login'` _string_: Username to use when connecting to server.
+	 *            Defaults to `'root'`.
+	 *         - `'password'` _string_: Password to use when connecting to server. Defaults to `''`.
+	 *         - `'persistent'` _boolean_: If true a persistent connection will be attempted,
+	 *           provided the  adapter supports it. Defaults to `true`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
@@ -285,6 +284,14 @@ abstract class Database extends \lithium\data\Source {
 		);
 	}
 
+	/**
+	 * Connects to the database by creating a PDO intance using the constructed DSN string.
+	 * Will set general options on the connection as provided (persistence, encoding).
+	 *
+	 * @see lithium\data\source\Database::encoding()
+	 * @return boolean Returns `true` if a database connection could be established,
+	 *         otherwise `false`.
+	 */
 	public function connect() {
 		$this->_isConnected = false;
 		$config = $this->_config;

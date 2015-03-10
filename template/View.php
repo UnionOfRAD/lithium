@@ -218,6 +218,7 @@ class View extends \lithium\core\Object {
 	 *         - `'outputFilters'` _array_: An array of filters to be used when handling output. By
 	 *           default, the class is initialized with one filter, `h`, which is used in automatic
 	 *           output escaping.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

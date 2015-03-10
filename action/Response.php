@@ -40,8 +40,9 @@ class Response extends \lithium\net\http\Response {
 	protected $_autoConfig = array('classes' => 'merge');
 
 	/**
-	 * Adds config values to the public properties when a new object is created. Config options
-	 * also include default values for `Response::body()` when called from `Response::render()`.
+	 * Constructor. Adds config values to the public properties when a new object is created.
+	 * Config options also include default values for `Response::body()` when called from
+	 * `Response::render()`.
 	 *
 	 * @see lithium\net\http\Message::body()
 	 * @see lithium\net\http\Response::__construct()
@@ -53,6 +54,7 @@ class Response extends \lithium\net\http\Response {
 	 *        - `'decode'` _boolean_: Defaults to `null`.
 	 *        - `'location'` _array|string|null_: Defaults to `null`.
 	 *        - `'request'` _object_: Defaults to `null`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

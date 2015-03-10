@@ -64,7 +64,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 	public $connection;
 
 	/**
-	 * Class constructor. Instantiates the `Redis` object and connects it to the configured server.
+	 * Constructor.
 	 *
 	 * @todo Implement configurable & optional authentication
 	 * @see lithium\storage\Cache::config()
@@ -82,6 +82,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 *          connection when attempting to connect to the Redis server. If `true`, it will
 	 *          attempt to reuse an existing connection when connecting, and the connection will
 	 *          not close when the request is terminated. Defaults to `false`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

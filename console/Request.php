@@ -62,9 +62,12 @@ class Request extends \lithium\core\Object {
 	protected $_autoConfig = array('env' => 'merge');
 
 	/**
-	 * Class Constructor
+	 * Constructor.
 	 *
-	 * @param array $config
+	 * @param array $config Available configuration options are:
+	 *        - `'args'` _array_
+	 *        - `'input'` _resource|null_
+	 * @return void
 	 */
 	public function __construct($config = array()) {
 		$defaults = array('args' => array(), 'input' => null);
@@ -188,7 +191,6 @@ class Request extends \lithium\core\Object {
 	}
 
 	/**
-	 * Return input
 	 * Destructor. Closes input.
 	 *
 	 * @return void

@@ -107,6 +107,7 @@ class Report extends \lithium\core\Object {
 	 *        - `'filters'`: An array of filters that the test output should be run through.
 	 *        - `'format'`: The format of the template to use, defaults to `'txt'`.
 	 *        - `'reporter'`: The reporter to use.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

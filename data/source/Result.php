@@ -189,7 +189,9 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	}
 
 	/**
-	 * The destructor.
+	 * Destructor.
+	 *
+	 * @return void
 	 */
 	public function __destruct() {
 		$this->close();

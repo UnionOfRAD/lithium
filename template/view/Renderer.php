@@ -151,19 +151,18 @@ abstract class Renderer extends \lithium\core\Object {
 	abstract public function render($template, $data = array(), array $options = array());
 
 	/**
-	 * Renderer constructor.
+	 * Constructor.
 	 *
-	 * Accepts these following configuration parameters:
-	 * - `view`: The `View` object associated with this renderer.
-	 * - `strings`: String templates used by helpers.
-	 * - `handlers`: An array of output handlers for string template inputs.
-	 * - `request`: The `Request` object associated with this renderer and passed to the
-	 *              defined handlers.
-	 * - `response`: The `Response` object associated with this renderer.
-	 * - `context`: An array of the current rendering context data, including `content`,
-	 *              `title`, `scripts`, `head` and `styles`.
-	 *
-	 * @param array $config
+	 * @param array $config Available configuration options are:
+	 *        - `view`: The `View` object associated with this renderer.
+	 *        - `strings`: String templates used by helpers.
+	 *        - `handlers`: An array of output handlers for string template inputs.
+	 *        - `request`: The `Request` object associated with this renderer and passed to the
+	 *           defined handlers.
+	 *        - `response`: The `Response` object associated with this renderer.
+	 *        - `context`: An array of the current rendering context data, including `content`,
+	 *           `title`, `scripts`, `head` and `styles`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

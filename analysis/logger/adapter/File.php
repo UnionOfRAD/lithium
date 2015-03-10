@@ -34,22 +34,23 @@ use Closure;
 class File extends \lithium\core\Object {
 
 	/**
-	 * Class constructor.
+	 * Constructor.
 	 *
 	 * @see lithium\util\String::insert()
 	 * @param array $config Settings used to configure the adapter. Available options:
-	 *              - `'path'` _string_: The directory to write log files to. Defaults to
-	 *                `<app>/resources/tmp/logs`.
-	 *              - `'timestamp'` _string_: The `date()`-compatible timestamp format. Defaults to
-	 *                `'Y-m-d H:i:s'`.
-	 *              - `'file'` _closure_: A closure which accepts two parameters: an array
-	 *                containing the current log message details, and an array containing the `File`
-	 *                adapter's current configuration. It must then return a file name to write the
-	 *                log message to. The default will produce a log file name corresponding to the
-	 *                priority of the log message, i.e. `"debug.log"` or `"alert.log"`.
-	 *              - `'format'` _string_: A `String::insert()`-compatible string that specifies how
-	 *                the log message should be formatted. The default format is
-	 *                `"{:timestamp} {:message}\n"`.
+	 *        - `'path'` _string_: The directory to write log files to. Defaults to
+	 *          `<app>/resources/tmp/logs`.
+	 *        - `'timestamp'` _string_: The `date()`-compatible timestamp format. Defaults to
+	 *          `'Y-m-d H:i:s'`.
+	 *        - `'file'` _closure_: A closure which accepts two parameters: an array
+	 *          containing the current log message details, and an array containing the `File`
+	 *          adapter's current configuration. It must then return a file name to write the
+	 *          log message to. The default will produce a log file name corresponding to the
+	 *          priority of the log message, i.e. `"debug.log"` or `"alert.log"`.
+	 *        - `'format'` _string_: A `String::insert()`-compatible string that specifies how
+	 *          the log message should be formatted. The default format is
+	 *          `"{:timestamp} {:message}\n"`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

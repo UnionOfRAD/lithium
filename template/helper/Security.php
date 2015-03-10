@@ -25,9 +25,11 @@ class Security extends \lithium\template\Helper {
 	protected $_state = array();
 
 	/**
-	 * Configures the helper with the default settings for interacting with security tokens.
+	 * Constructor. Configures the helper with the default settings for interacting with
+	 * security tokens.
 	 *
 	 * @param array $config
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('sessionKey' => 'security.token', 'salt' => null);

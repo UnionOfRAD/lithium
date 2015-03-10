@@ -69,13 +69,12 @@ abstract class Source extends \lithium\core\Object {
 	protected $_cachedMethods = array();
 
 	/**
-	 * Constructor. Sets defaults and returns object.
+	 * Constructor.
 	 *
-	 * Options defined:
-	 * - 'autoConnect' `boolean` If true, a connection is made on initialization. Defaults to true.
-	 *
-	 * @param array $config
-	 * @return Source object
+	 * @param array $config Available options are:
+	 *        - `'autoConnect'` _boolean_: If `true`, a connection is made on
+	 *           initialization. Defaults to `true`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('autoConnect' => true);
@@ -83,7 +82,7 @@ abstract class Source extends \lithium\core\Object {
 	}
 
 	/**
-	 * Ensures the connection is closed, before the object is destroyed.
+	 * Destructor. Ensures the connection is closed, before the object is destroyed.
 	 *
 	 * @return void
 	 */

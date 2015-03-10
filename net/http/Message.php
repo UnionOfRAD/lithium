@@ -53,7 +53,7 @@ class Message extends \lithium\net\Message {
 	);
 
 	/**
-	 * Adds config values to the public properties when a new object is created.
+	 * Constructor. Adds config values to the public properties when a new object is created.
 	 *
 	 * @see lithium\net\Message::__construct()
 	 * @param array $config The available configuration options are the following. Further
@@ -62,6 +62,7 @@ class Message extends \lithium\net\Message {
 	 *        - `'version'` _string_: Defaults to `'1.1'`.
 	 *        - `'scheme'` _string_: Overridden and defaulting to `'http'`.
 	 *        - `'headers'` _array_: Defaults to `array()`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

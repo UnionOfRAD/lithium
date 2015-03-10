@@ -143,8 +143,8 @@ class Request extends \lithium\net\http\Request {
 	protected $_locale = null;
 
 	/**
-	 * Adds config values to the public properties when a new object is created, pulling
-	 * request data from superglobals if `globals` is set to `true`.
+	 * Constructor. Adds config values to the public properties when a new object is created,
+	 * pulling request data from superglobals if `globals` is set to `true`.
 	 *
 	 * Normalizes casing of request headers.
 	 *
@@ -163,6 +163,7 @@ class Request extends \lithium\net\http\Request {
 	 *        - `'env'` _array_: Defaults to `array()`.
 	 *        - `'globals'` _boolean_: Use global variables for populating
 	 *          the request's environment and data; defaults to `true`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

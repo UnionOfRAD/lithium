@@ -12,12 +12,16 @@ use PDO;
 use PDOException;
 
 /**
- * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
- * features for working with MySQL databases.
+ * MySQL database driver. Extends the `Database` class to implement the necessary
+ * SQL-formatting and resultset-fetching features for working with MySQL databases.
  *
- * For more information on configuring the database connection, see the `__construct()` method.
+ * - Implements optional strict mode.
+ *
+ * For more information on configuring the database connection, see
+ * the `__construct()` method.
  *
  * @see lithium\data\source\database\adapter\MySql::__construct()
+ * @see lithium\data\source\database\adapter\MySql::strict()
  */
 class MySql extends \lithium\data\source\Database {
 
@@ -96,24 +100,20 @@ class MySql extends \lithium\data\source\Database {
 	protected $_useAlias = true;
 
 	/**
-	 * Constructs the MySQL adapter and sets the default port to 3306.
+	 * Constructor. Constructs the MySQL adapter and sets the default port to 3306.
 	 *
 	 * @see lithium\data\source\Database::__construct()
 	 * @see lithium\data\Source::__construct()
 	 * @see lithium\data\Connections::add()
-	 * @param array $config Configuration options for this class. For additional configuration,
-	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
-	 *        defined by this class:
-	 *        - `'database'`: The name of the database to connect to. Defaults to 'lithium'.
-	 *        - `'host'`: The IP or machine name where MySQL is running, followed by a colon,
-	 *          followed by a port number or socket. Defaults to `'localhost:3306'`.
-	 *        - `'persistent'`: If a persistent connection (if available) should be made.
-	 *          Defaults to true.
-	 *        Typically, these parameters are set in `Connections::add()`, when adding the
-	 *        adapter to the list of active connections.
+	 * @param array $config The available configuration options are the following. Further
+	 *        options are inherited from the parent classes. Typically, these parameters are
+	 *        set in `Connections::add()`, when adding the adapter to the list of active
+	 *        connections.
+	 *        - `'host'` _string_: Defaults to `'localhost:3306'`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('host' => 'localhost:3306', 'encoding' => null);
+		$defaults = array('host' => 'localhost:3306');
 		parent::__construct($config + $defaults);
 	}
 
@@ -157,10 +157,11 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Connects to the database using the options provided to the class constructor.
+	 * Connects to the database by constructing DSN string and creating a PDO intance using
+	 * the parent class. Will set specific options on the connection as provided.
 	 *
-	 * @return boolean Returns `true` if a database connection could be established, otherwise
-	 *         `false`.
+	 * @return boolean Returns `true` if a database connection could be established,
+	 *         otherwise `false`.
 	 */
 	public function connect() {
 		if (!$this->_config['dsn']) {

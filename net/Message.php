@@ -69,9 +69,9 @@ class Message extends \lithium\core\Object {
 	public $body = null;
 
 	/**
-	 * Adds config values to the public properties when a new object is created.
+	 * Constructor Adds config values to the public properties when a new object is created.
 	 *
-	 * @param array $config The available configuration options are the following.
+	 * @param array $config Available configuration options are:
 	 *        - `'scheme'` _string_: 'tcp'
 	 *        - `'host'` _string_: 'localhost'
 	 *        - `'port'` _integer_: null
@@ -79,6 +79,7 @@ class Message extends \lithium\core\Object {
 	 *        - `'password'` _string_: null
 	 *        - `'path'` _string_: null
 	 *        - `'body'` _mixed_: null
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

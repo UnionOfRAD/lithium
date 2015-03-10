@@ -118,12 +118,12 @@ class MongoDb extends \lithium\data\Source {
 	protected $_autoConfig = array('schema', 'classes' => 'merge');
 
 	/**
-	 * Instantiates the MongoDB adapter with the default connection information.
+	 * Constructor.
 	 *
 	 * @see lithium\data\Connections::add()
 	 * @see lithium\data\source\MongoDb::$_schema
 	 * @link http://php.net/mongo.construct.php PHP Manual: Mongo::__construct()
-	 * @param array $config All information required to connect to the database, including:
+	 * @param array $config Configuration options required to connect to the database, including:
 	 *        - `'database'` _string_: The name of the database to connect to. Defaults to `null`.
 	 *        - `'host'` _string_: The IP or machine name where Mongo is running, followed by a
 	 *           colon, and the port number. Defaults to `'localhost:27017'`.
@@ -145,6 +145,7 @@ class MongoDb extends \lithium\data\Source {
 	 *          `Mongo::setReadPreference()`. Defaults to null.
 	 *          Typically, these parameters are set in `Connections::add()`, when adding the
 	 *          adapter to the list of active connections.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$host = 'localhost:27017';
@@ -220,8 +221,8 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
-	 * Ensures that the server connection is closed and resources are freed when the adapter
-	 * instance is destroyed.
+	 * Destructor. Ensures that the server connection is closed and resources are freed when
+	 * the adapter instance is destroyed.
 	 *
 	 * @return void
 	 */

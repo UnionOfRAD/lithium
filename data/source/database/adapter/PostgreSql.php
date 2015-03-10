@@ -12,11 +12,17 @@ use PDO;
 use PDOException;
 
 /**
- * Extends the `Database` class to implement the necessary SQL-formatting and resultset-fetching
- * features for working with PostgreSQL databases.
+ * PostgreSQL database driver. Extends the `Database` class to implement the necessary
+ * SQL-formatting and resultset-fetching features for working with PostgreSQL databases.
  *
- * For more information on configuring the database connection, see the `__construct()` method.
+ * - Implements timezone support.
+ * - Implements schema/searchPath support.
  *
+ * For more information on configuring the database connection, see
+ * the `__construct()` method.
+ *
+ * @see lithium\data\source\database\adapter\PostgreSql::timezone()
+ * @see lithium\data\source\database\adapter\PostgreSql::searchPath()
  * @see lithium\data\source\database\adapter\PostgreSql::__construct()
  */
 class PostgreSql extends \lithium\data\source\Database {
@@ -85,27 +91,23 @@ class PostgreSql extends \lithium\data\source\Database {
 	protected $_useAlias = true;
 
 	/**
-	 * Constructs the PostgreSQL adapter and sets the default port to 5432.
+	 * Constructor. Constructs the PostgreSQL adapter and sets the default port to 5432.
 	 *
 	 * @see lithium\data\source\Database::__construct()
 	 * @see lithium\data\Source::__construct()
 	 * @see lithium\data\Connections::add()
-	 * @param array $config Configuration options for this class. For additional configuration,
-	 *        see `lithium\data\source\Database` and `lithium\data\Source`. Available options
-	 *        defined by this class:
-	 *        - `'database'`: The name of the database to connect to. Defaults to 'lithium'.
-	 *        - `'host'`: The IP or machine name where PostgreSQL is running, followed by a colon,
-	 *        followed by a port number or socket. Defaults to `'localhost:5432'`.
-	 *        - `'persistent'`: If a persistent connection (if available) should be made.
-	 *        Defaults to true.
-	 *        - `'schema'`: The name of the database schema to use. Defaults to 'public'
-	 *        Typically, these parameters are set in `Connections::add()`, when adding the
-	 *        adapter to the list of active connections.
+	 * @param array $config The available configuration options are the following. Further
+	 *        options are inherited from the parent classes. Typically, these parameters are
+	 *        set in `Connections::add()`, when adding the adapter to the list of active
+	 *        connections.
+	 *        - `'host'` _string_: Defaults to `'localhost:5432'`.
+	 *        - `'schema'` _string_: The name of the database schema to use. Defaults to `'public'`.
+	 *        - `'timezone'` _string_: The timezone to use. Defaults to `'null'`
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'host' => 'localhost:5432',
-			'encoding' => null,
 			'schema' => 'public',
 			'timezone' => null
 		);
@@ -136,10 +138,13 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Connects to the database using the options provided to the class constructor.
+	 * Connects to the database by constructing DSN string and creating a PDO intance using
+	 * the parent class. Will set specific options on the connection as provided (timezone,
+	 * schema).
 	 *
-	 * @return boolean Returns `true` if a database connection could be established, otherwise
-	 *         `false`.
+	 * @see lithium\data\source\dataase\adapter\PostgreSql::timezone()
+	 * @return boolean Returns `true` if a database connection could be established,
+	 *         otherwise `false`.
 	 */
 	public function connect() {
 		if (!$this->_config['dsn']) {
@@ -253,7 +258,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Gets or sets the search path for the connection
+	 * Gets or sets the search path for the connection.
 	 *
 	 * @param $searchPath
 	 * @return mixed If setting the searchPath; returns ture on success, else false

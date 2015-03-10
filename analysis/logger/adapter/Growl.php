@@ -77,29 +77,30 @@ class Growl extends \lithium\core\Object {
 	protected $_autoConfig = array('connection', 'registered');
 
 	/**
-	 * Growl logger constructor. Accepts an array of settings which are merged with the default
-	 * settings and used to create the connection and handle notifications.
+	 * Constructor. Growl logger constructor. Accepts an array of settings which are merged
+	 * with the default settings and used to create the connection and handle notifications.
 	 *
 	 * @see lithium\analysis\Logger::write()
 	 * @param array $config The settings to configure the logger. Available settings are as follows:
-	 *              - `'name`' _string_: The name of the application as it should appear in Growl's
-	 *                system settings. Defaults to the directory name containing your application.
-	 *              - `'host'` _string_: The Growl host with which to communicate, usually your
-	 *                local machine. Use this setting to send notifications to another machine on
-	 *                the network. Defaults to `'127.0.0.1'`.
-	 *              - `'port'` _integer_: Port of the host machine. Defaults to the standard Growl
-	 *                port, `9887`.
-	 *              - `'password'` _string_: Only required if the host machine requires a password.
-	 *                If notification or registration fails, check this against the host machine's
-	 *                Growl settings.
-	 *              - '`protocol'` _string_: Protocol to use when opening socket communication to
-	 *                Growl. Defaults to `'udp'`.
-	 *              - `'title'` _string_: The default title to display when showing Growl messages.
-	 *                The default value is the same as `'name'`, but can be changed on a per-message
-	 *                basis by specifying a `'title'` key in the `$options` parameter of
-	 *                `Logger::write()`.
-	 *              - `'notification'` _array_: A list of message types you wish to register with
-	 *                Growl to be able to send. Defaults to `array('Errors', 'Messages')`.
+	 *        - `'name`' _string_: The name of the application as it should appear in Growl's
+	 *          system settings. Defaults to the directory name containing your application.
+	 *        - `'host'` _string_: The Growl host with which to communicate, usually your
+	 *          local machine. Use this setting to send notifications to another machine on
+	 *          the network. Defaults to `'127.0.0.1'`.
+	 *        - `'port'` _integer_: Port of the host machine. Defaults to the standard Growl
+	 *          port, `9887`.
+	 *        - `'password'` _string_: Only required if the host machine requires a password.
+	 *          If notification or registration fails, check this against the host machine's
+	 *          Growl settings.
+	 *        - '`protocol'` _string_: Protocol to use when opening socket communication to
+	 *          Growl. Defaults to `'udp'`.
+	 *        - `'title'` _string_: The default title to display when showing Growl messages.
+	 *          The default value is the same as `'name'`, but can be changed on a per-message
+	 *          basis by specifying a `'title'` key in the `$options` parameter of
+	 *          `Logger::write()`.
+	 *        - `'notification'` _array_: A list of message types you wish to register with
+	 *          Growl to be able to send. Defaults to `array('Errors', 'Messages')`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$name = basename(Libraries::get(true, 'path'));
@@ -237,7 +238,9 @@ class Growl extends \lithium\core\Object {
 	}
 
 	/**
-	 * Destructor method. Closes and releases the socket connection to Growl.
+	 * Destructor. Closes and releases the socket connection to Growl.
+	 *
+	 * @return void
 	 */
 	public function __destruct() {
 		if (is_resource($this->_connection)) {

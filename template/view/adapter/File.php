@@ -78,9 +78,9 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	);
 
 	/**
-	 * Sets up defaults and passes to parent to setup class.
+	 * Constructor.
 	 *
-	 * @param  array $config Configuration options.
+	 * @param array $config Configuration options.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {

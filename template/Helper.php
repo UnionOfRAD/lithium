@@ -66,9 +66,9 @@ abstract class Helper extends \lithium\core\Object {
 	);
 
 	/**
-	 * Sets up defaults and passes to parent to setup class.
+	 * Constructor.
 	 *
-	 * @param  array $config Configuration options.
+	 * @param array $config Configuration options.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {

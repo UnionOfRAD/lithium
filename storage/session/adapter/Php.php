@@ -41,8 +41,8 @@ class Php extends \lithium\core\Object {
 	);
 
 	/**
-	 * Class constructor. Takes care of setting appropriate configurations for this object. Also
-	 * sets session ini settings.
+	 * Constructor. Takes care of setting appropriate configurations for this object. Also sets
+	 * session ini settings.
 	 *
 	 * @see lithium\storage\session\adapter\Php::$_defaults
 	 * @param array $config Configuration options matching the pattern `'session.*'` are interpreted
@@ -51,7 +51,7 @@ class Php extends \lithium\core\Object {
 	 *              A few ini settings are set by default here and will overwrite those from
 	 *              your php.ini. To disable sending a cache limiter set `'session.cache_limiter'`
 	 *              to `false`.
-	 *
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		if (empty($config['session.name'])) {

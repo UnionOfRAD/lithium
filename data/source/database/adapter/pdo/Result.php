@@ -56,6 +56,11 @@ class Result extends \lithium\data\source\Result {
 		return false;
 	}
 
+	/**
+	 * Destructor.
+	 *
+	 * @return void
+	 */
 	public function __destruct() {
 		$this->close();
 	}

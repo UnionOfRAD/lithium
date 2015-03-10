@@ -60,7 +60,7 @@ class Relationship extends \lithium\core\Object {
 	const LINK_REF = 'ref';
 
 	/**
-	 * Constructs an object that represents a relationship between two model classes.
+	 * Constructor. Constructs an object that represents a relationship between two model classes.
 	 *
 	 * @param array $config The relationship's configuration, which defines how the two models in
 	 *        question are bound. The available options are:
@@ -103,6 +103,7 @@ class Relationship extends \lithium\core\Object {
 	 *        - `'strategy'` _closure_: An anonymous function used by an instantiating class,
 	 *          such as a database object, to provide additional, dynamic configuration, after
 	 *          the `Relationship` instance has finished configuring itself.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

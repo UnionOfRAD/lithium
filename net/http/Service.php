@@ -65,10 +65,20 @@ class Service extends \lithium\core\Object {
 	);
 
 	/**
-	 * Initializes a new `Service` instance with the default HTTP request settings and
-	 * transport- and format-handling classes.
+	 * Constructor. Initializes a new `Service` instance with the default HTTP request settings
+	 * and transport- and format-handling classes.
 	 *
-	 * @param array $config
+	 * @param array $config Available configuration options are:
+	 *        - `'persistent'` _boolean_
+	 *        - `'scheme'` _string_
+	 *        - `'host'` _string_
+	 *        - `'port'` _integer_
+	 *        - `'timeout'` _integer_
+	 *        - `'auth'` _boolean_
+	 *        - `'username'` _string_
+	 *        - `'password'` _string_
+	 *        - `'encoding'` _string_
+	 *        - `'socket'` _string_
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {

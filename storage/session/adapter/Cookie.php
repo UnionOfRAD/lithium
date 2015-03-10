@@ -36,11 +36,12 @@ class Cookie extends \lithium\core\Object {
 	);
 
 	/**
-	 * Class constructor.
+	 * Constructor.
 	 *
 	 * Takes care of setting appropriate configurations for this object.
 	 *
 	 * @param array $config Optional configuration parameters.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		if (empty($config['name'])) {

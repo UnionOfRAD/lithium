@@ -49,7 +49,7 @@ use lithium\storage\Cache;
 class XCache extends \lithium\storage\cache\Adapter {
 
 	/**
-	 * Class constructor.
+	 * Constructor.
 	 *
 	 * @see lithium\storage\Cache::config()
 	 * @param array $config Configuration for this cache adapter. These settings are queryable
@@ -59,6 +59,7 @@ class XCache extends \lithium\storage\cache\Adapter {
 	 *          is otherwise set. Can be either a `strtotime()` compatible tring or TTL in
 	 *          seconds. To indicate items should not expire use `Cache::PERSIST`. Defaults
 	 *          to `+1 hour`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

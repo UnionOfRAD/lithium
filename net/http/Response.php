@@ -100,7 +100,7 @@ class Response extends \lithium\net\http\Message {
 	);
 
 	/**
-	 * Adds config values to the public properties when a new object is created.
+	 * Constructor. Adds config values to the public properties when a new object is created.
 	 *
 	 * @see lithium\net\http\Message::__construct()
 	 * @see lithium\net\Message::__construct()
@@ -110,6 +110,7 @@ class Response extends \lithium\net\http\Message {
 	 *        - `'status'` _mixed_: Defaults to `null`.
 	 *        - `'type'` _string_: Defaults to `null`.
 	 *        - `'cookies'` _array_: Defaults to `array()`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

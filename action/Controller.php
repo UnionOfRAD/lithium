@@ -126,6 +126,20 @@ class Controller extends \lithium\core\Object {
 	 */
 	protected $_autoConfig = array('render' => 'merge', 'classes' => 'merge');
 
+	/**
+	 * Constructor.
+	 *
+	 * @see lithium\action\Controller::$request
+	 * @see lithium\action\Controller::$response
+	 * @see lithium\action\Controller::$_render
+	 * @see lithium\action\Controller::$_classes
+	 * @param array $config Available configuration options are:
+	 *        - `'request'` _object|null_: Either a request object or `null`.
+	 *        - `'response'` _array_: Options for constructing the response object.
+	 *        - `'render'` _array_: Rendering control options.
+	 *        - `'classes'` _array_
+	 * @return void
+	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'request' => null, 'response' => array(), 'render' => array(), 'classes' => array()

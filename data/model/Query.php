@@ -129,17 +129,17 @@ class Query extends \lithium\core\Object {
 	protected $_built = false;
 
 	/**
-	 * Class constructor, which initializes the default values this object supports.
-	 * Even though only a specific list of configuration parameters is available
-	 * by default, the `Query` object uses the `__call()` method to implement
-	 * automatic getters and setters for any arbitrary piece of data.
+	 * Constructor, which initializes the default values this object supports. Even though only
+	 * a specific list of configuration parameters is available by default, the `Query` object
+	 * uses the `__call()` method to implement automatic getters and setters for any arbitrary
+	 * piece of data.
 	 *
-	 * This means that any information may be passed into the constructor may be
-	 * used by the backend data source executing the query (or ignored, if support
-	 * is not implemented). This is useful if, for example, you wish to extend a
-	 * core data source and implement custom fucntionality.
+	 * This means that any information may be passed into the constructor may be used by the
+	 * backend data source executing the query (or ignored, if support is not implemented).
+	 * This is useful if, for example, you wish to extend a core data source and implement
+	 * custom functionality.
 	 *
-	 * @param array $config Config options:
+	 * @param array $config Available configuration options are:
 	 *        - `'type'` _string_: The type of the query (`read`, `create`, `update`, `delete`).
 	 *        - `'mode'` _string_: `JOIN` mode for a join query.
 	 *        - `'entity'` _object_: The base entity to query on. If set `'model'` is optionnal.
@@ -165,6 +165,7 @@ class Query extends \lithium\core\Object {
 	 *        - `'comment'` _string_: Comment for the query.
 	 *        - `'map'` _object_: Unnecessary if `model` is set.
 	 *        - `'relationships'` _array_: Unnecessary if `model` is set.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

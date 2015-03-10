@@ -53,6 +53,7 @@ class Hmac extends \lithium\core\Object {
 	 *
 	 * @param array $config Configuration array. Will throw an exception if the 'secret'
 	 *        configuration key is not set.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		if (!isset($config['secret'])) {

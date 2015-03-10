@@ -50,12 +50,13 @@ class Http extends \lithium\core\Object {
 	);
 
 	/**
-	 * Setup default configuration options.
+	 * Constructor.
 	 *
 	 * @param array $config
-	 *        - `method`: default: `digest` options: `basic|digest`
-	 *        - `realm`: default: `Protected by Lithium`
-	 *        - `users`: the users to permit. key => value pair of username => password
+	 *        - `'method'`: default: `digest` options: `basic|digest`
+	 *        - `'realm'`: default: `Protected by Lithium`
+	 *        - `'users'`: the users to permit. key => value pair of username => password
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$realm = basename(Libraries::get(true, 'path'));

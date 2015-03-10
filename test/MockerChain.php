@@ -60,9 +60,10 @@ class MockerChain extends \lithium\core\Object {
 	);
 
 	/**
-	 * Saves the results from the mock.
+	 * Constructor. Saves the results from the mock.
 	 *
 	 * @param array $results Results from the mock
+	 * @return void
 	 */
 	public function __construct($results) {
 		$this->_data['results'] = $results;

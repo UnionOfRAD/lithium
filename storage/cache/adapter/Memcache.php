@@ -64,8 +64,8 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	public $connection = null;
 
 	/**
-	 * Class constructor. Instantiates the `Memcached` object, adds appropriate servers to the
-	 * pool, and configures any optional settings passed (see the `_init()` method). When adding
+	 * Constructor. Instantiates the `Memcached` object, adds appropriate servers to the pool,
+	 * and configures any optional settings passed (see the `_init()` method). When adding
 	 * servers, the following formats are valid for the `'host'` key:
 	 *
 	 *   - `'127.0.0.1'`
@@ -88,6 +88,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 *          to `+1 hour`.
 	 *        - `'host'` _mixed_: Specifies one or more Memcache servers to connect to, with
 	 *          optional server selection weights. See above for example values.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(

@@ -42,19 +42,20 @@ class Syslog extends \lithium\core\Object {
 	);
 
 	/**
-	 * Class constructor. Configures the `Syslog` adapter instance with the default settings. For
-	 * more information on these settings, see the documentation for
-	 * [the `openlog()` function](http://php.net/openlog).
+	 * Constructor. Configures the `Syslog` adapter instance with the default settings. For
+	 * more information on these settings, see the documentation for tthe `openlog()` function.
 	 *
+	 * @link http://php.net/openlog
 	 * @param array $config Available configuration settings for this adapter:
-	 *              - `'identity'` _string_: The identity string to be attached to each message in
-	 *                the system log. This is usually a string that meaningfully identifies your
-	 *                application. Defaults to `false`.
-	 *              - `'options'` _integer_: The flags to use when opening the log. Defaults to
-	 *                `LOG_ODELAY`.
-	 *              - `'facility'` _integer_: A flag specifying the program to use to log the
-	 *                messages. See the `openlog()` documentation for more information. Defaults to
-	 *                `LOG_USER`.
+	 *        - `'identity'` _string_: The identity string to be attached to each message in
+	 *          the system log. This is usually a string that meaningfully identifies your
+	 *          application. Defaults to `false`.
+	 *        - `'options'` _integer_: The flags to use when opening the log. Defaults to
+	 *          `LOG_ODELAY`.
+	 *        - `'facility'` _integer_: A flag specifying the program to use to log the
+	 *          messages. See the `openlog()` documentation for more information. Defaults to
+	 *          `LOG_USER`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array('identity' => false, 'options'  => LOG_ODELAY, 'facility' => LOG_USER);

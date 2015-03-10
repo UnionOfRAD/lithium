@@ -80,6 +80,7 @@ class Encrypt extends \lithium\core\Object {
 	 * Constructor.
 	 *
 	 * @param array $config Configuration array. You can override the default cipher and mode.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		if (!static::enabled()) {
@@ -98,9 +99,9 @@ class Encrypt extends \lithium\core\Object {
 	}
 
 	/**
-	 * Destructor.
+	 * Destructor. Closes the crypto resource when it is no longer needed.
 	 *
-	 * Closes the crypto resource when it is no longer needed.
+	 * @return void
 	 */
 	public function __destruct() {
 		mcrypt_module_close(static::$_resource);

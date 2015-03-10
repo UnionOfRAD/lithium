@@ -49,7 +49,7 @@ use Closure;
 class File extends \lithium\storage\cache\Adapter {
 
 	/**
-	 * Class constructor.
+	 * Constructor.
 	 *
 	 * @see lithium\storage\Cache::config()
 	 * @param array $config Configuration for this cache adapter. These settings are queryable
@@ -61,6 +61,7 @@ class File extends \lithium\storage\cache\Adapter {
 	 *          to `+1 hour`.
 	 *        - `'path'` _string_: Path where cached entries live, defaults to
 	 *          `Libraries::get(true, 'resources') . '/tmp/cache'`.
+	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
