@@ -92,14 +92,6 @@ class MySql extends \lithium\data\source\Database {
 	protected $_quotes = array('`', '`');
 
 	/**
-	 * MySQL-specific value denoting whether or not table aliases should be used in DELETE and
-	 * UPDATE queries.
-	 *
-	 * @var boolean
-	 */
-	protected $_useAlias = true;
-
-	/**
 	 * Constructor. Constructs the MySQL adapter and sets the default port to 3306.
 	 *
 	 * @see lithium\data\source\Database::__construct()
@@ -170,14 +162,7 @@ class MySql extends \lithium\data\source\Database {
 			$dsn = "mysql:host=%s;port=%s;dbname=%s";
 			$this->_config['dsn'] = sprintf($dsn, $host, $port, $this->_config['database']);
 		}
-
-		if (!parent::connect()) {
-			return false;
-		}
-
-		$info = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
-		$this->_useAlias = (boolean) version_compare($info, "4.1", ">=");
-		return true;
+		return parent::connect();
 	}
 
 	/**

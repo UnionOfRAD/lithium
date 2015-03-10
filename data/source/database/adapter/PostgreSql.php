@@ -83,14 +83,6 @@ class PostgreSql extends \lithium\data\source\Database {
 	protected $_quotes = array('"', '"');
 
 	/**
-	 * PostgreSQL-specific value denoting whether or not table aliases should be used in DELETE and
-	 * UPDATE queries.
-	 *
-	 * @var boolean
-	 */
-	protected $_useAlias = true;
-
-	/**
 	 * Constructor. Constructs the PostgreSQL adapter and sets the default port to 5432.
 	 *
 	 * @see lithium\data\source\Database::__construct()
