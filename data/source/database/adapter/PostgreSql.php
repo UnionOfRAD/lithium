@@ -250,68 +250,64 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Gets or sets the search path for the connection.
+	 * Getter/Setter for the connection's search path.
 	 *
-	 * @param $searchPath
-	 * @return mixed If setting the searchPath; returns ture on success, else false
-	 *         When getting, returns the searchPath
+	 * @param null|string $searchPath Either `null` to retrieve the current one, or
+	 *        a string to set the current one to.
+	 * @return string|boolean When $searchPath is `null` returns the current search path
+	 *         in effect, otherwise a boolean indicating if setting the search path
+	 *         succeeded or failed.
 	 */
-	public function searchPath($searchPath) {
-		if (empty($searchPath)) {
-			$query = $this->connection->query('SHOW search_path');
-			$searchPath = $query->fetchColumn(1);
-			return explode(",", $searchPath);
+	public function searchPath($searchPath = null) {
+		if ($searchPath === null) {
+			return explode(',', $this->connection->query('SHOW search_path')->fetchColumn(1));
 		}
-		try{
-			$this->connection->exec("SET search_path TO ${searchPath}");
-			return true;
-		} catch (PDOException $e) {
-			return false;
-		}
+		return $this->connection->exec("SET search_path TO {$searchPath}") !== false;
 	}
 
 	/**
-	 * Gets or sets the time zone for the connection
+	 * Getter/Setter for the connection's timezone.
 	 *
-	 * @param $timezone
-	 * @return mixed If setting the time zone; returns true on success, else false
-	 *         When getting, returns the time zone
+	 * @param null|string $timezone Either `null` to retrieve the current TZ, or
+	 *        a string to set the current TZ to.
+	 * @return string|boolean When $timezone is `null` returns the current TZ
+	 *         in effect, otherwise a boolean indicating if setting the TZ
+	 *         succeeded or failed.
 	 */
 	public function timezone($timezone = null) {
-		if (empty($timezone)) {
-			$query = $this->connection->query('SHOW TIME ZONE');
-			return $query->fetchColumn();
+		if ($timezone === null) {
+			return $this->connection->query('SHOW TIME ZONE')->fetchColumn();
 		}
-		try {
-			$this->connection->exec("SET TIME ZONE '{$timezone}'");
-			return true;
-		} catch (PDOException $e) {
-			return false;
-		}
+		return $this->connection->exec("SET TIME ZONE '{$timezone}'") !== false;
 	}
 
 	/**
-	 * Gets or sets the encoding for the connection.
+	 * Getter/Setter for the connection's encoding.
 	 *
-	 * @param $encoding
-	 * @return mixed If setting the encoding; returns true on success, else false.
-	 *         When getting, returns the encoding.
+	 * PostgreSQL uses the string `UTF8` to identify the UTF-8 encoding. In general `UTF-8` is used
+	 * to identify that encoding. This methods allows both strings to be used for _setting_ the
+	 * encoding (in lower and uppercase, with or without dash) and will transparently convert
+	 * to PostgreSQL native format. When _getting_ the encoding, it is converted back into `UTF-8`.
+	 * So that this method should ever only return `UTF-8` when the encoding is used.
+	 *
+	 * @param null|string $encoding Either `null` to retrieve the current encoding, or
+	 *        a string to set the current encoding to. For UTF-8 accepts any permutation.
+	 * @return string|boolean When $encoding is `null` returns the current encoding
+	 *         in effect, otherwise a boolean indicating if setting the encoding
+	 *         succeeded or failed. Returns `'UTF-8'` when this encoding is used.
 	 */
 	public function encoding($encoding = null) {
-		$encodingMap = array('UTF-8' => 'UTF8');
+		if ($encoding === null) {
+			$encoding = $this->connection
+				->query('SHOW client_encoding')
+				->fetchColumn();
 
-		if (empty($encoding)) {
-			$query = $this->connection->query("SHOW client_encoding");
-			$encoding = $query->fetchColumn();
-			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
+			return $encoding === 'UTF8' ? 'UTF-8' : $encoding;
 		}
-		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
-		try {
-			$this->connection->exec("SET NAMES '{$encoding}'");
-			return true;
-		} catch (PDOException $e) {
-			return false;
+		if (stripos($encoding, 'utf-8') !== false || stripos($encoding, 'utf8') !== false) {
+			$encoding = 'UTF8';
 		}
+		return $this->connection->exec("SET NAMES '{$encoding}'") !== false;
 	}
 
 	/**
