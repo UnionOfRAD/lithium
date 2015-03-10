@@ -94,6 +94,7 @@ class MySql extends \lithium\data\source\Database {
 	/**
 	 * Constructor. Constructs the MySQL adapter and sets the default port to 3306.
 	 *
+	 * @link http://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-strict
 	 * @see lithium\data\source\Database::__construct()
 	 * @see lithium\data\Source::__construct()
 	 * @see lithium\data\Connections::add()
@@ -102,10 +103,15 @@ class MySql extends \lithium\data\source\Database {
 	 *        set in `Connections::add()`, when adding the adapter to the list of active
 	 *        connections.
 	 *        - `'host'` _string_: Defaults to `'localhost:3306'`.
+	 *        - `'strict'` _boolean|null_: When `true` will enable strict mode by setting
+	 *          sql-mode to `STRICT_ALL_TABLES`. When `false` will disable strict mode
+	 *          explictly by settings sql-mode to an empty value ``. A value of `null`
+	 *          leaves the setting untouched (this is the default) and the default setting
+	 *          of the database is used.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('host' => 'localhost:3306');
+		$defaults = array('host' => 'localhost:3306', 'strict' => null);
 		parent::__construct($config + $defaults);
 	}
 
@@ -162,7 +168,14 @@ class MySql extends \lithium\data\source\Database {
 			$dsn = "mysql:host=%s;port=%s;dbname=%s";
 			$this->_config['dsn'] = sprintf($dsn, $host, $port, $this->_config['database']);
 		}
-		return parent::connect();
+
+		if (!parent::connect()) {
+			return false;
+		}
+		if ($this->_config['strict'] !== null && !$this->strict($this->_config['strict'])) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -260,6 +273,34 @@ class MySql extends \lithium\data\source\Database {
 		} catch (PDOException $e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Enables/disables or retrieves strictness setting.
+	 *
+	 * This method will only operate on _session_ level, it will not check/set
+	 * _global_ settings. `STRICT_ALL_TABLES` mode is used to enable strict mode.
+	 *
+	 * @link http://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-strict
+	 * @param boolean|null $value `true` to enable strict mode, `false` to disable or `null`
+	 *        to retrieve the current setting.
+	 * @return boolean When setting, returns `true` on success, else `false`. When $value was
+	 *         `null` return either `true` or `false` indicating whether strict mode is enabled
+	 *         or disabled.
+	 */
+	public function strict($value = null) {
+		if ($value === null) {
+			return strpos(
+				$this->connection->query('SELECT @@SESSION.sql_mode')->fetchColumn(),
+				'STRICT_ALL_TABLES'
+			) !== false;
+		}
+		if ($value) {
+			$sql = "SET SESSION sql_mode = 'STRICT_ALL_TABLES'";
+		} else {
+			$sql = "SET SESSION sql_mode = ''";
+		}
+		return $this->connection->exec($sql) !== false;
 	}
 
 	/**
