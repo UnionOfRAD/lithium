@@ -33,6 +33,7 @@ php:
   - 5.4
   - 5.5
   - 5.6
+  - 7.0
   - hhvm
 
 matrix:
@@ -74,6 +75,9 @@ matrix:
     # useful to test against HHVM to see if we make progress.
     # Remove this line when all tests are green with HHVM.
     - php: hhvm
+    # PHP 7 is still in active development. Expected launch is in October
+    # 2015, this line should be removed once PHP 7 has been launched
+    - php: 7.0
   # Mark build as failed as soon as one job failed.
   fast_finish: true
 
