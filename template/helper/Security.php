@@ -62,18 +62,25 @@ class Security extends \lithium\template\Helper {
 	 * Binds the `Security` helper to the `Form` helper to create a signature used to secure form
 	 * fields against tampering.
 	 *
+	 * First `FormSignature` must be provided with a secret unique to your app. This is best
+	 * done in the bootstrap process. The secret key should be a random lengthy string.
+	 * ```php
+	 * use lithium\security\validation\FormSignature;
+	 * FormSignature::config(array('secret' => 'a long secret key'));
 	 * ```
-	 * // view:
+	 *
+	 * In the view call the `sign()` method before creating the form.
+	 * ```php
 	 * <?php $this->security->sign(); ?>
 	 * <?=$this->form->create(...); ?>
-	 * 	// Form fields...
+	 *     // Form fields...
 	 * <?=$this->form->end(); ?>
 	 * ```
 	 *
-	 * ```
-	 * // controller:
+	 * In the corresponding controller action verify the signature.
+	 * ```php
 	 * if ($this->request->is('post') && !FormSignature::check($this->request)) {
-	 * 	// The key didn't match, meaning the request has been tampered with.
+	 *     // The key didn't match, meaning the request has been tampered with.
 	 * }
 	 * ```
 	 *

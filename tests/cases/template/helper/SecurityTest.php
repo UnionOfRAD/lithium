@@ -31,6 +31,10 @@ class SecurityTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->context = new MockFormRenderer(compact('request'));
 		$this->subject = new Security(array('context' => $this->context));
+
+		FormSignature::config(array(
+			'secret' => 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY'
+		));
 	}
 
 	/**
@@ -83,11 +87,11 @@ class SecurityTest extends \lithium\test\Unit {
 		list(, $signature) = $match;
 
 		$expected = array(
-			'a%3A1%3A%7Bs%3A6%3A%22active%22%3Bs%3A4%3A%22true%22%3B%7D',
+			'#a%3A1%3A%7Bs%3A6%3A%22active%22%3Bs%3A4%3A%22true%22%3B%7D',
 			'a%3A0%3A%7B%7D',
-			'$2a$10$NuNTOeXv4OHpPJtbdAmfReFiSmFw5hmc6sSy8qwns6/DWNSSOjR1y'
+			'[a-z0-9]{128}#'
 		);
-		$this->assertEqual(join('::', $expected), $signature);
+		$this->assertPattern(join('::', $expected), $signature);
 
 		$request = new Request(array('data' => array(
 			'email' => 'foo@baz',
@@ -190,7 +194,7 @@ class SecurityTest extends \lithium\test\Unit {
 		$expected = FormSignature::key($data);
 		$this->assertEqual($expected, $result);
 	}
-	
+
 	public function testFormSignatureWithMethodPUT() {
 		$form = new Form(array('context' => $this->context));
 		$this->subject->sign($form);
