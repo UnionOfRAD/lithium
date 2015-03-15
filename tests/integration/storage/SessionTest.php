@@ -12,15 +12,15 @@ use lithium\storage\Session;
 
 class SessionTest extends \lithium\test\Integration {
 
-	public function skip() {
-		$this->skipIf(PHP_SAPI === 'cli', 'No session support in cli SAPI');
-	}
-
 	public function tearDown() {
-		Session::clear();
+		if (Session::config()) {
+			Session::clear();
+		}
 	}
 
 	public function testPhpReadWriteDelete() {
+		$this->skipIf(PHP_SAPI === 'cli', 'No PHP session support in cli SAPI.');
+
 		$config = array('name' => 'phpInt');
 
 		Session::config(array(
@@ -45,6 +45,8 @@ class SessionTest extends \lithium\test\Integration {
 	}
 
 	public function testCookieReadWriteDelete() {
+		$this->skipIf(PHP_SAPI === 'cli', 'No headers support in cli SAPI.');
+
 		$config = array('name' => 'cookieInt');
 
 		Session::config(array(
@@ -95,6 +97,8 @@ class SessionTest extends \lithium\test\Integration {
 	}
 
 	public function testNamespacesWithPhpAdapter() {
+		$this->skipIf(PHP_SAPI === 'cli', 'No PHP session support in cli SAPI.');
+
 		$config = array('name' => 'namespaceInt');
 
 		Session::config(array(
@@ -119,6 +123,8 @@ class SessionTest extends \lithium\test\Integration {
 	}
 
 	public function testHmacStrategyWithPhpAdapter() {
+		$this->skipIf(PHP_SAPI === 'cli', 'No PHP session support in cli SAPI.');
+
 		$config = array('name' => 'hmacInt');
 
 		Session::config(array(
@@ -166,6 +172,7 @@ class SessionTest extends \lithium\test\Integration {
 	}
 
 	public function testEncryptStrategyWithPhpAdapter() {
+		$this->skipIf(PHP_SAPI === 'cli', 'No PHP session support in cli SAPI.');
 		$this->skipIf(!extension_loaded('mcrypt'), 'The `mcrypt` extension is not loaded.');
 
 		$config = array('name' => 'encryptInt');
