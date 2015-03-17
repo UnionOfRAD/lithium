@@ -1961,6 +1961,39 @@ SQL;
 		}, $expected);
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testUpdateWithNoFieldsChanged() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('id' => 1, 'title' => 'the post', 'body' => 'the body'),
+			'exists' => true
+		));
+		$query = new Query(compact('entity') + array('type' => 'update'));
+		$result = $this->_db->update($query);
+
+		$this->assertTrue($result);
+		$this->assertEqual(1, $query->entity()->id);
+		$this->assertNull($this->_db->sql);
+	}
+
+	public function testUpdateWithAllChangedFieldsRemovedViaWhitelist() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('id' => 1, 'title' => 'the post', 'body' => 'the body'),
+			'exists' => true
+		));
+		$entity->title = 'foo';
+
+		$query = new Query(compact('entity') + array(
+			'type' => 'update',
+			'whitelist' => array('body')
+		));
+		$result = $this->_db->update($query);
+
+		$this->assertTrue($result);
+		$this->assertEqual(1, $query->entity()->id);
+		$this->assertNull($this->_db->sql);
+	}
 }
 
 ?>
