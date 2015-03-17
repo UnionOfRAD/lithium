@@ -483,6 +483,77 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		));
 		$this->assertEqual(2, $results->count());
 	}
+
+	public function testUpdateWithMultiThread() {
+		$thread1 = Images::first(1);
+		$thread2 = Images::first(1);
+		
+		$thread1->image = 'tmp';
+		$thread2->title = 'tmp';
+
+		$thread2->save();
+		$thread1->save();
+
+		$this->assertEqual('tmp', Images::first(1)->title);
+	}
+
+	public function testUpdateWithoutFieldsChanged() {
+		$image = Images::first(1);
+		$title = $image->title;
+		$image->title = $title;
+		$this->assertTrue($image->save());
+		
+		$image = Images::first(1);
+		$title = $image->title;
+		$image->save(array('title' => 'test'), array(
+			'whitelist' => array('image')
+		));
+		$this->assertEqual($title, Images::first(1)->title);
+	}
+
+	public function testUpdateWithSomeFieldsChanged() {
+		$image = Images::first(1);
+		$image->save(array('title' => 'foo'));
+		$this->assertEqual('foo', Images::first(1)->title);
+	}
+
+	public function testUpdateWithNonExistFieldsChanged() {
+		$image = Images::first(1);
+		$image->save(array('foo' => 'foo'));
+		$this->assertNull(Images::first(1)->foo);
+	}
+
+	public function testUpdateWithRemoveFieldsViaWhitelist() {
+		$image = Images::first(1);
+		$image->save(array('foo' => 'foo'), array(
+			'whitelist' => array('image')
+		));
+		$this->assertNull(Images::first(1)->foo);
+
+		$image = Images::first(1);
+		$title = $image->title;
+		$image->save(array('title' => 'foo'), array(
+			'whitelist' => array('image')
+		));
+		$this->assertEqual($title, Images::first(1)->title);
+
+		$image = Images::first(1);
+		$body = $image->body;
+		$image->save(array('title' => 'foo', 'body' => 'bar'), array(
+			'whitelist' => array('title')
+		));
+		$this->assertEqual('foo', Images::first(1)->title);
+		$this->assertEqual($body, Images::first(1)->body);
+
+		$image = Images::first(1);
+		$body = $image->body;
+		$title = $image->title;
+		$image->save(array('title' => 'foo', 'body' => 'bar'), array(
+			'whitelist' => array()
+		));
+		$this->assertEqual($title, Images::first(1)->title);
+		$this->assertEqual($body, Images::first(1)->body);
+	}
 }
 
 ?>

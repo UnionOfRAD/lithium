@@ -697,8 +697,13 @@ abstract class Database extends \lithium\data\Source {
 
 		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$query = $params['query'];
+			$exportedQuery = $query->export($this);
 
-			$sql = $this->renderCommand('update', $query->export($this), $query);
+			if ($exportedQuery['fields'] === null) {
+				return true;
+			}
+
+			$sql = $this->renderCommand('update', $exportedQuery, $query);
 			$result = (boolean) $this->_execute($sql);
 
 			if ($result && is_object($query) && $query->entity()) {
@@ -1197,7 +1202,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @param object $context Generally a `data\model\Query` instance.
 	 * @param array $fields
 	 * @param array $schema An array defining the schema of the fields used in the criteria.
-	 * @return string|array
+	 * @return string|array|null
 	 */
 	protected function _fieldsReturn($type, $context, $fields, $schema) {
 		if ($type === 'create' || $type === 'update') {
@@ -1242,14 +1247,16 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Renders the fields part for _update_ queries.
 	 *
-	 * Also handles correct incremented/decremented fields.
+	 * Will only include fields if they have been updated in the entity of the context. Also
+	 * handles correct incremented/decremented fields.
 	 *
 	 * @see lithium\data\source\Entity::increment()
 	 * @see lithium\data\source\Database::_fieldsReturn()
 	 * @param array $data
 	 * @param array $schema An array defining the schema of the fields used in the criteria.
 	 * @param object $context Generally a `data\model\Query` instance.
-	 * @return string SQL fragment, with fields separated by comma.
+	 * @return string|null SQL fragment, with fields separated by comma. Null when the fields
+	 *         haven't been changed.
 	 */
 	protected function _updateFields($data, $schema, $context) {
 		$fields = array();
@@ -1258,6 +1265,16 @@ abstract class Database extends \lithium\data\Source {
 		if ($entity = $context->entity()) {
 			$export = $entity->export();
 			$increment = $export['increment'];
+
+			array_map(function($key) use (&$data, $export){
+				if (!empty($data[$key]) && $export['data'][$key] === $data[$key]) {
+					unset($data[$key]);
+				}
+			}, array_keys($export['data']));
+
+			if (!$data) {
+				return null;
+			}
 		}
 
 		foreach ($data as $field => $value) {
