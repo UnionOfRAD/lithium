@@ -10,6 +10,7 @@ namespace lithium\tests\cases\core;
 
 use stdClass;
 use SplFileInfo;
+use Phar;
 use lithium\util\Inflector;
 use lithium\core\Libraries;
 use lithium\tests\mocks\core\MockInitMethod;
@@ -575,7 +576,6 @@ EOD;
 		$this->assertTrue(count($result) > 3);
 		$this->assertNotIdentical(array_search('controller.txt.php', $result), false);
 		$this->assertNotIdentical(array_search('model.txt.php', $result), false);
-		$this->assertNotIdentical(array_search('plugin.phar.gz', $result), false);
 	}
 
 	public function testLocateWithDotSyntax() {
@@ -589,7 +589,6 @@ EOD;
 			'lithium\console\command\Create',
 			'lithium\console\command\G11n',
 			'lithium\console\command\Help',
-			'lithium\console\command\Library',
 			'lithium\console\command\Route',
 			'lithium\console\command\Test'
 		);
@@ -604,7 +603,6 @@ EOD;
 			'lithium\console\command\Create',
 			'lithium\console\command\G11n',
 			'lithium\console\command\Help',
-			'lithium\console\command\Library',
 			'lithium\console\command\Route',
 			'lithium\console\command\Test',
 			'lithium\console\command\g11n\Extract',
@@ -666,12 +664,19 @@ EOD;
 	 * Tests that `Libraries::realPath()` correctly resolves paths to files inside Phar archives.
 	 */
 	public function testPathsInPharArchives() {
-		$base = Libraries::get('lithium', 'path');
-		$path = realpath("{$base}/console/command/create/template/app.phar.gz");
+		$this->skipIf(!Phar::canWrite(), '`Phar support is read only.');
+		$path = Libraries::get(true, 'resources') . '/tmp/tests';
 
-		$expected = "phar://{$path}/controllers/HelloWorldController.php";
+		$file = $path . '/test.phar';
+		$phar = new Phar($file);
+		$phar->addFromString('/controllers/HelloWorldController.php', '<?php "Hello World" ?>');
+
+		$expected = "phar://{$file}/controllers/HelloWorldController.php";
 		$result = Libraries::realPath($expected);
 		$this->assertEqual($expected, $result);
+
+		unset($phar);
+		unlink($file);
 	}
 
 	public function testClassInstanceWithSubnamespace() {
