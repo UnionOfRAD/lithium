@@ -68,6 +68,7 @@
 - Performance optimization of `DocumentSet::_set()` #1144 (Warren Seymour)
 - Removed most `extract()`-usage 651d07a, f74b691 (David Persson)
 - String::compare() will use native `hash_equals()` if possible. #1138 (David Persson)
+- `Model::save()` using a relational database adapter will now only save updated fields,
   instead of blindly saving all. #1121 (Hamid Reza Koushki)
 - Better cookie support in Request/Response #618, #1123 (Ali Farhadi)
 - We're now using standard tripple-backtick markdown syntax for fenced code blocks. (David Persson)
