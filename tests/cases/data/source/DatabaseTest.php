@@ -537,11 +537,9 @@ class DatabaseTest extends \lithium\test\Unit {
 	public function testUpdate() {
 		$entity = new Record(array(
 			'model' => $this->_model,
-			'data' => array('id' => 1, 'title' => 'the post', 'body' => 'the body'),
+			'data' => array('id' => 1, 'title' => 'new post', 'body' => 'the body'),
 			'exists' => true
 		));
-		$entity->title = 'new post';
-		$entity->body = 'new body';
 		$query = new Query(compact('entity') + array('type' => 'update'));
 		$result = $this->_db->update($query);
 
@@ -549,15 +547,14 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual(1, $query->entity()->id);
 
 		$expected = "UPDATE {mock_database_posts} SET";
-		$expected .= " {title} = 'new post', {body} = 'new body' WHERE {id} = 1;";
+		$expected .= " {id} = 1, {title} = 'new post', {body} = 'the body' WHERE {id} = 1;";
 		$this->assertEqual($expected, $this->_db->sql);
 
 		$entity = new Record(array(
 			'model' => $this->_model,
-			'data' => array('id' => 2, 'count' => 10),
+			'data' => array('id' => 2, 'count' => (object) '{count} + 1'),
 			'exists' => true
 		));
-		$entity->count = (object) '{count} + 1';
 		$query = new Query(compact('entity') + array('type' => 'update'));
 		$result = $this->_db->update($query);
 
@@ -565,23 +562,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual(2, $query->entity()->id);
 
 		$expected = "UPDATE {mock_database_posts} SET";
-		$expected .= " {count} = {count} + 1 WHERE {id} = 2;";
-		$this->assertEqual($expected, $this->_db->sql);
-
-		$entity = new Record(array(
-			'model' => $this->_model,
-			'data' => array('id' => 3, 'title' => 'the post', 'body' => 'the body'),
-			'exists' => true
-		));
-		$entity->title = 'the post';
-		$query = new Query(compact('entity') + array('type' => 'update'));
-		$result = $this->_db->update($query);
-
-		$this->assertTrue($result);
-		$this->assertEqual(3, $query->entity()->id);
-
-		$expected = "UPDATE {mock_database_posts} SET";
-		$expected .= " {id} = 3 WHERE {id} = 3;";
+		$expected .= " {id} = 2, {count} = {count} + 1 WHERE {id} = 2;";
 		$this->assertEqual($expected, $this->_db->sql);
 
 		$query = new Query(array(
@@ -591,6 +572,23 @@ class DatabaseTest extends \lithium\test\Unit {
 		));
 		$sql = "UPDATE {mock_database_posts} SET {modified} = NOW();";
 		$this->assertEqual($sql, $this->_db->renderCommand($query));
+	}
+
+	public function testUpdateWithValueBySchema() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('id' => 1, 'title' => '007', 'body' => 'the body'),
+			'exists' => true
+		));
+		$query = new Query(compact('entity') + array('type' => 'update'));
+		$result = $this->_db->update($query);
+
+		$this->assertTrue($result);
+		$this->assertEqual(1, $query->entity()->id);
+
+		$expected = "UPDATE {mock_database_posts} SET";
+		$expected .= " {id} = 1, {title} = '007', {body} = 'the body' WHERE {id} = 1;";
+		$this->assertEqual($expected, $this->_db->sql);
 	}
 
 	public function testDelete() {
@@ -1794,21 +1792,21 @@ SQL;
 		$entity->increment('balance', 10);
 		$query = new Query(compact('entity') + array('type' => 'update'));
 		$result = $this->_db->update($query);
-		$expected = "UPDATE {mock_database_posts} SET {balance} = {balance} + 10 WHERE {id} = 1;";
+		$expected = "UPDATE {mock_database_posts} SET {id} = 1, {balance} = {balance} + 10 WHERE {id} = 1;";
 		$this->assertEqual($expected, $this->_db->sql);
 
 		$entity->increment('balance', 10);
 		$entity->decrement('balance', 20);
 		$query = new Query(compact('entity') + array('type' => 'update'));
 		$result = $this->_db->update($query);
-		$expected = "UPDATE {mock_database_posts} SET {balance} = {balance} + -10 WHERE {id} = 1;";
+		$expected = "UPDATE {mock_database_posts} SET {id} = 1, {balance} = {balance} + -10 WHERE {id} = 1;";
 		$this->assertEqual($expected, $this->_db->sql);
 
 		$entity->increment('balance', 10);
 		$entity->balance = 20;
 		$query = new Query(compact('entity') + array('type' => 'update'));
 		$result = $this->_db->update($query);
-		$expected = "UPDATE {mock_database_posts} SET {balance} = 20 WHERE {id} = 1;";
+		$expected = "UPDATE {mock_database_posts} SET {id} = 1, {balance} = 20 WHERE {id} = 1;";
 		$this->assertEqual($expected, $this->_db->sql);
 
 		$this->assertException("Field 'name' cannot be incremented.", function() use ($entity) {

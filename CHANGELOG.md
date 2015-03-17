@@ -34,7 +34,6 @@
 - Performance optimaziation of `Message::translate()` 28a2023 (David Persson)
 - Performance optimization of `DocumentSet::_set()` #1144 (Warren Seymour)
 - String::compare() will use native `hash_equals()` if possible. #1138 (David Persson)
-- `Model::save()` using a relational database adapter will now only save updated fields,
   instead of blindly saving all. #1121 (Hamid Reza Koushki)
 - Better cookie support in Request/Response #618, #1123 (Ali Farhadi)
 - We're now using standard tripple-backtick markdown syntax for fenced code blocks. (David Persson)

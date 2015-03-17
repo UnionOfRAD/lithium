@@ -1212,8 +1212,7 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Renders the fields part for _update_ queries.
 	 *
-	 * Will only include fields if they have been updated in the entity of the context. Also
-	 * handles correct incremented/decremented fields.
+	 * Also handles correct incremented/decremented fields.
 	 *
 	 * @see lithium\data\source\Entity::increment()
 	 * @see lithium\data\source\Database::_fieldsReturn()
@@ -1229,17 +1228,6 @@ abstract class Database extends \lithium\data\Source {
 		if ($entity = $context->entity()) {
 			$export = $entity->export();
 			$increment = $export['increment'];
-
-			array_map(function($key) use (&$data, $export){
-				if (!empty($data[$key]) && $export['data'][$key] === $data[$key]) {
-					unset($data[$key]);
-				}
-			}, array_keys($export['data']));
-
-			if (!$data) {
-				$model = $context->model();
-				$data = $model::key($context->data());
-			}
 		}
 
 		foreach ($data as $field => $value) {
