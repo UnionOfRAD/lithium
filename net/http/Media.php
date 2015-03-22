@@ -176,7 +176,7 @@ class Media extends \lithium\core\StaticObject {
 	 *   use the same template(s) or other settings. Therefore, when serving JSONP content, you
 	 *   can specify that the extension defined in the type must be present in the URL:
 	 *  ```
-	 *  Media::type('jsonp', array('text/html'), array(
+	 *  Media::type('jsonp', array('application/json'), array(
 	 *  	// template settings...
 	 *  	'conditions' => array('type' => true)
 	 *  ));
@@ -286,7 +286,8 @@ class Media extends \lithium\core\StaticObject {
 	 * @see lithium\action\Request
 	 * @param \lithium\action\Request $request The request which contains the details of
 	 *        the request to be content-negotiated.
-	 * @return string Returns the first matching type name, i.e. `'html'` or `'json'`.
+	 * @return string|null Returns the first matching type name, i.e. `'html'` or `'json'`. When
+	 *         no matching type is found returns `null`.
 	 */
 	public static function negotiate($request) {
 		$self = get_called_class();
@@ -851,6 +852,7 @@ class Media extends \lithium\core\StaticObject {
 	 * Helper method for listing registered media types. Returns all types, or a single
 	 * content type if a specific type is specified.
 	 *
+	 * @todo Use fnmatch() to support wildcards.
 	 * @param string $type Type to return.
 	 * @return mixed Array of types, or single type requested.
 	 */

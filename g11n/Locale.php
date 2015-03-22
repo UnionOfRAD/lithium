@@ -62,8 +62,8 @@ class Locale extends \lithium\core\StaticObject {
 	 * methods to parse and retrieve individual tags from a locale.
 	 *
 	 * ```
-	 *     Locale::language('en_US'); // returns 'en'
-	 *     Locale::territory('en_US'); // returns 'US'
+	 * Locale::language('en_US'); // returns 'en'
+	 * Locale::territory('en_US'); // returns 'US'
 	 * ```
 	 *
 	 * @see lithium\g11n\Locale::$_tags
