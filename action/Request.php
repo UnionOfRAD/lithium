@@ -133,7 +133,7 @@ class Request extends \lithium\net\http\Request {
 	 *
 	 * @var array
 	 */
-	protected $_acceptContent = array();
+	protected $_accept = array();
 
 	/**
 	 * Holds the value of the current locale, set through the `locale()` method.
@@ -454,7 +454,7 @@ class Request extends \lithium\net\http\Request {
 	 */
 	public function accepts($type = null) {
 		if ($type === true) {
-			return $this->_parseAccept();
+			return $this->_accept ?: ($this->_accept = $this->_parseAccept());
 		}
 		if (!$type && isset($this->params['type'])) {
 			return $this->params['type'];
@@ -470,9 +470,6 @@ class Request extends \lithium\net\http\Request {
 	 * @return array All the types of content the client can accept.
 	 */
 	protected function _parseAccept() {
-		if ($this->_acceptContent) {
-			return $this->_acceptContent;
-		}
 		$accept = $this->env('HTTP_ACCEPT');
 		$accept = (preg_match('/[a-z,-]/i', $accept)) ? explode(',', $accept) : array('text/html');
 
@@ -494,7 +491,7 @@ class Request extends \lithium\net\http\Request {
 				$accept = array(current($type) => 1) + $accept;
 			}
 		}
-		return $this->_acceptContent = array_keys($accept);
+		return array_keys($accept);
 	}
 
 	/**

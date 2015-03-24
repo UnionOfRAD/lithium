@@ -13,10 +13,6 @@ use lithium\action\Request;
 
 class RequestTest extends \lithium\test\Unit {
 
-	protected $_library = null;
-
-	protected $_docroot = null;
-
 	protected $_superglobals = array('_GET', '_POST', '_SERVER', '_ENV');
 
 	protected $_env = array();
@@ -76,17 +72,6 @@ class RequestTest extends \lithium\test\Unit {
 	);
 
 	public function setUp() {
-		$resources = Libraries::get(true, 'resources') . '/tmp/tests';
-		$this->skipIf(!is_writable($resources), "Can't write to resources directory.");
-		$app = $resources . '/www/lithium/app';
-		mkdir($app, 0777, true);
-
-		$this->_library = Libraries::get(true);
-		Libraries::remove($this->_library['name']);
-
-		Libraries::add('app', array('path' => $app, 'default' => true));
-		$this->_docroot = $resources . '/www';
-
 		foreach ($this->_superglobals as $varname) {
 			$this->_env[$varname] = $GLOBALS[$varname];
 			unset($GLOBALS[$varname]);
@@ -97,9 +82,6 @@ class RequestTest extends \lithium\test\Unit {
 		foreach ($this->_superglobals as $varname) {
 			$GLOBALS[$varname] = $this->_env[$varname];
 		}
-		Libraries::remove('app');
-		Libraries::add($this->_library['name'], $this->_library);
-		$this->_cleanUp();
 	}
 
 	public function testInitData() {
@@ -339,7 +321,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testBaseWithDirectory() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'PHP_SELF' => '/lithium/app/webroot/index.php',
 			'REQUEST_URI' => '/lithium/hello/world'
 		)));
@@ -348,7 +330,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRequestWithColon() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'PHP_SELF' => '/lithium/app/webroot/index.php',
 			'REQUEST_URI' => '/lithium/pages/lithium/test:a'
 		)));
@@ -356,7 +338,7 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual('/pages/lithium/test:a', $request->url);
 
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'PHP_SELF' => '/lithium/app/webroot/index.php',
 			'REQUEST_URI' => '/lithium/pages/lithium/test:1'
 		)));
@@ -366,7 +348,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRequestWithoutUrlQueryParamAndNoApp() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'PHP_SELF' => '/lithium/webroot/index.php',
 			'REQUEST_URI' => '/lithium/'
 		)));
@@ -376,7 +358,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRequestWithoutUrlQueryParamAndNoAppOrWebroot() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'PHP_SELF' => '/lithium/index.php',
 			'REQUEST_URI' => '/lithium/'
 		)));
@@ -386,7 +368,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testBaseWithAppAndOtherDirectory() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'PHP_SELF' => '/lithium/app/other/webroot/index.php'
 		)));
 		$this->assertEqual('/lithium/app/other', $request->env('base'));
@@ -418,7 +400,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testGetMethod() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'PHP_SELF' => '/lithium/app/webroot/index.php',
 			'HTTP_ACCEPT' => 'text/html,application/xml,image/png,*/*',
 			'HTTP_ACCEPT_LANGUAGE' => 'da, en-gb;q=0.8, en;q=0.7'
@@ -1386,7 +1368,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRequestUriWithHtAccessRedirection() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'REQUEST_URI' => '/lithium/hello/world?page=1',
 			'PHP_SELF' => '/lithium/app/webroot/index.php'
 		)));
@@ -1397,7 +1379,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRequestUriWithNoHtAccessRedirection() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'REQUEST_URI' => '/lithium/app/webroot/hello/world?page=1',
 			'PHP_SELF' => '/lithium/app/webroot/index.php'
 		)));
@@ -1408,7 +1390,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRequestUriWithVirtualHost() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot . '/lithium/app/webroot',
+			'DOCUMENT_ROOT' => '/www/lithium/app/webroot',
 			'REQUEST_URI' => '/hello/world?page=1',
 			'PHP_SELF' => '/index.php'
 		)));
@@ -1419,7 +1401,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRequestUriWithAdminRoute() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot . '/lithium/app/webroot',
+			'DOCUMENT_ROOT' => '/www/lithium/app/webroot',
 			'REQUEST_URI' => '/lithium/admin/hello/world?page=1',
 			'PHP_SELF' => '/lithium/app/webroot/index.php'
 		)));
@@ -1430,7 +1412,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRequestWithNoGlobals() {
 		$_SERVER = array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'HTTP_HOST' => 'foo.com',
 			'HTTPS' => 'on',
 			'SERVER_PROTOCOL' => 'HTTP/1.0',
@@ -1449,7 +1431,7 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testRequestWithEnvVariables() {
 		$request = new Request(array('env' => array(
-			'DOCUMENT_ROOT' => $this->_docroot,
+			'DOCUMENT_ROOT' => '/www',
 			'HTTP_HOST' => 'foo.com',
 			'HTTPS' => 'on',
 			'SERVER_PROTOCOL' => 'HTTP/1.0',
