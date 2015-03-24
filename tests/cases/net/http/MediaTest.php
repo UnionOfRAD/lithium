@@ -657,6 +657,18 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual('/foo/bar/image.jpg', $result);
 	}
 
+	public function testContentNegotiationSimple() {
+		$request = new Request(array('env' => array(
+			'HTTP_ACCEPT' => 'text/html,text/plain;q=0.5'
+		)));
+		$this->assertEqual('html', Media::negotiate($request));
+
+		$request = new Request(array('env' => array(
+			'HTTP_ACCEPT' => 'application/json'
+		)));
+		$this->assertEqual('json', Media::negotiate($request));
+	}
+
 	public function testContentNegotiationByType() {
 		$this->assertEqual('html', Media::type('text/html'));
 

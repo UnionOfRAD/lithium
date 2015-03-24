@@ -95,4 +95,7 @@
   before the APC adapter. Normally this should happen automatically and no updates are needed. However
   if you use an old bootstrap file, the base adapter may not been loaded before the apc one. 
   A deprecation notice will then be triggered. 
-
+- When used with a parameter `lithium\action\Request::accepts()` now returns a boolean.
+  It previously was returning i.e. `'json'` when `application/json` was in accepted content types 
+  and invoked with `Request::accepts('json')`. This change matches the actual behavior with
+  documented (and expected) behavior.

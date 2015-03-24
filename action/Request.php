@@ -442,24 +442,36 @@ class Request extends \lithium\net\http\Request {
 	/**
 	 * Returns information about the type of content that the client is requesting.
 	 *
+	 * This method may work different then you might think. This is a _convenience_ method
+	 * working exclusively with short type names it knows about. Only those types will be
+	 * matched. You can tell this method about more types via `Media::type()`.
+	 *
+	 * Note: In case negotiation fails, `'html'` is used as a fallback type.
+	 *
 	 * @see lithium\net\http\Media::negotiate()
-	 * @param boolean|string $type If not specified, returns the media type name that the client
-	 *        prefers, using content negotiation. If a media type name (string) is passed, returns
-	 *        `true` or `false`, indicating whether or not that type is accepted by the client at
-	 *        all. If `true`, returns the raw content types from the `Accept` header, parsed into
-	 *        an array and sorted by client preference.
-	 * @return mixed Returns a simple type name if the type is registered (i.e. `'json'`), or
-	 *         a fully-qualified content-type if not (i.e. `'image/jpeg'`), or a boolean or array,
-	 *         depending on the value of `$type`.
+	 * @param boolean|string $type Optionally a type name i.e. `'json'` or `true`.
+	 *        1. If not specified, returns the media type name that the client prefers, using
+	 *           a potentially set `type` param, then content negotiation and that fails,
+	 *           ultimately falling back and returning the string `'html'`.
+	 *        2. If a media type name (string) is passed, returns `true` or `false`, indicating
+	 *           whether or not that type is accepted by the client at all.
+	 *        3. If `true`, returns the raw content types from the `Accept` header, parsed into
+	 *           an array and sorted by client preference.
+	 * @return string|boolean|array Returns a type name (i.e. 'json'`) or a
+	 *         boolean or an array, depending on the value of `$type`.
 	 */
 	public function accepts($type = null) {
+		$media = $this->_classes['media'];
+
 		if ($type === true) {
 			return $this->_accept ?: ($this->_accept = $this->_parseAccept());
 		}
-		if (!$type && isset($this->params['type'])) {
+		if ($type) {
+			return ($media::negotiate($this) ?: 'html') === $type;
+		}
+		if (isset($this->params['type'])) {
 			return $this->params['type'];
 		}
-		$media = $this->_classes['media'];
 		return $media::negotiate($this) ?: 'html';
 	}
 

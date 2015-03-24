@@ -1129,6 +1129,45 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $request->accepts(true));
 	}
 
+	public function testAcceptWithTypeParam() {
+		$request = new Request(array('env' => array(
+			'HTTP_ACCEPT' => 'application/json'
+		)));
+		$this->assertFalse($request->accepts('text'));
+		$this->assertTrue($request->accepts('json'));
+		$this->assertFalse($request->accepts('html'));
+	}
+
+	public function testAcceptWithTypeParamFallbackHtml() {
+		$request = new Request(array('env' => array(
+			'HTTP_ACCEPT' => 'nothing/matches'
+		)));
+		$this->assertFalse($request->accepts('json'));
+		$this->assertTrue($request->accepts('html'));
+
+		$request = new Request(array('env' => array(
+			'HTTP_ACCEPT' => 'application/json'
+		)));
+		$this->assertFalse($request->accepts('text'));
+		$this->assertTrue($request->accepts('json'));
+		$this->assertFalse($request->accepts('html'));
+	}
+
+	public function testAcceptForBothXmlWithAliasedHtml() {
+		$request = new Request(array('env' => array(
+			'HTTP_ACCEPT' => 'application/xml'
+		)));
+		$this->assertTrue($request->accepts('xml'));
+		$this->assertFalse($request->accepts('html'));
+	}
+
+	public function testAcceptDoesNotAccepFullNamespacedType() {
+		$request = new Request(array('env' => array(
+			'HTTP_ACCEPT' => 'application/json'
+		)));
+		$this->assertFalse($request->accepts('application/json'));
+	}
+
 	public function testParsingAcceptHeader() {
 		$chrome = array(
 			'application/xml',
