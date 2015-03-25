@@ -2,6 +2,8 @@
 
 ## v1.0.0
 
+(This includes changes from 1.0.0-beta on only.)
+
 ### Fixed
 
 - Most coding standard violations have been fixed. (David Persson)
@@ -23,6 +25,10 @@
 - Fixed case where custom configuration was ignored when using form helper with checkboxes #1061 (Mark Wilde)
 - Fixed #888 to make the any option in Validator::check() work correctly. #1051 (David Persson)
 - Fixed issue with compiled view templates on Windows. 32b878a (David Persson)
+- Dechunking body data is now more safe and unwanted urldecoding of data is prevented. #1020 (Warren Seymour)
+- Fixed bug when using LIMIT, ORDER and hasMany relations with PostgreSql. #1145 (Hamid Reza Koushki)
+- Matched implementation with documentation of `Request::accepts()`. The method now returns a boolean 
+  when type is provided. #1180, #856 (David Persson, David Rogers)
 
 ### Improved
 
@@ -31,8 +37,9 @@
 - Uniform __construct/__destruct docblocks. (David Persson)
 - Improved overall API documentation. (David Persson) 
 - Removed unused code (David Persson)
-- Performance optimaziation of `Message::translate()` 28a2023 (David Persson)
+- Performance optimization of `Message::translate()` 28a2023 (David Persson)
 - Performance optimization of `DocumentSet::_set()` #1144 (Warren Seymour)
+- Removed most `extract()`-usage 651d07a, f74b691 (David Persson)
 - String::compare() will use native `hash_equals()` if possible. #1138 (David Persson)
   instead of blindly saving all. #1121 (Hamid Reza Koushki)
 - Better cookie support in Request/Response #618, #1123 (Ali Farhadi)
@@ -73,9 +80,9 @@
 - Implemented cache item persistence through `Cache::PERSIST`. 8a0b24a (David Persson)
 - The g11n infrastructure now supports gettext-like contexts. #999 (Jasper Tey) 
 
-
 ### Changed
 
+- Removed the automatic `__init()` for static classes. fa4ef11 (jails)
 - `String::compare()` is now stricter and errors out when on of the provided params is not a string. 7822a2b (David Persson)
 - The shorthand `Download` header has been deprecated because of its overhead and magicness. #1134 (David Persson)
 - When updating an *existing* entity, validation rules for fields that are not present on the to-be-saved entity are
@@ -94,8 +101,10 @@
 - The APC cache adapter now extends the base cache adapter class. Thus the base class must be loaded
   before the APC adapter. Normally this should happen automatically and no updates are needed. However
   if you use an old bootstrap file, the base adapter may not been loaded before the apc one. 
-  A deprecation notice will then be triggered. 
+  A deprecation notice will then be triggered. (David Persson)
 - When used with a parameter `lithium\action\Request::accepts()` now returns a boolean.
   It previously was returning i.e. `'json'` when `application/json` was in accepted content types 
   and invoked with `Request::accepts('json')`. This change matches the actual behavior with
-  documented (and expected) behavior.
+  documented (and expected) behavior. (David Persson, David Rogers)
+- The `library` command has been extracted into the `li3_lab` plugin. Please install the plugin
+  to continue using that command. #1174 (David Persson)
