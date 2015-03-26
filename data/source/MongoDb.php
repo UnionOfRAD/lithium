@@ -283,7 +283,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean Returns `true` the connection attempt was successful, otherwise `false`.
 	 */
 	public function connect() {
-		if ($this->server && $this->server->connected && $this->connection) {
+		if ($this->server && $this->server->getConnections() && $this->connection) {
 			return $this->_isConnected = true;
 		}
 
