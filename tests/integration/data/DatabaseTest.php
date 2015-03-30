@@ -384,6 +384,48 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		));
 		$this->assertEqual(1, $results->count());
 	}
+
+	/**
+	 * Tests if DISTINCT queries work as expected and do not
+	 * duplicate records.
+	 *
+	 * @link https://github.com/UnionOfRAD/lithium/issues/1175
+	 */
+	public function testDistinctResultsInNoDuplicates() {
+		Galleries::create(array('name' => 'A'))->save();
+		Galleries::create(array('name' => 'B'))->save();
+		Galleries::create(array('name' => 'C'))->save();
+		Galleries::create(array('name' => 'D'))->save();
+		Galleries::create(array('name' => 'A'))->save();
+		Galleries::create(array('name' => 'A'))->save();
+		Galleries::create(array('name' => 'A'))->save();
+		Galleries::create(array('name' => 'B'))->save();
+		Galleries::create(array('name' => 'C'))->save();
+		Galleries::create(array('name' => 'D'))->save();
+
+		$results = Galleries::find('all', array(
+			'fields' => array(
+				'DISTINCT name as d__name'
+			)
+		));
+		$names = array();
+		foreach ($results as $result) {
+			$this->assertNotContains($result->d__name, $names);
+			$names[] = $result->d__name;
+		}
+
+		$results = Galleries::find('all', array(
+			'fields' => array(
+				'DISTINCT id AS d__id',
+				'name'
+			)
+		));
+		$ids = array();
+		foreach ($results as $result) {
+			$this->assertNotContains($result->d__id, $ids);
+			$ids[] = $result->d__id;
+		}
+	}
 }
 
 ?>
