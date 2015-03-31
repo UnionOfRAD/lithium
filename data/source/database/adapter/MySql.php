@@ -320,6 +320,11 @@ class MySql extends \lithium\data\source\Database {
 			$options = $params['options'];
 			$conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $options['buffered']);
 
+			if (strpos($conn->getAttribute(PDO::ATTR_CLIENT_VERSION), 'mysqlnd') !== false) {
+				$conn->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+				$conn->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+			}
+
 			try {
 				$resource = $conn->query($sql);
 			} catch (PDOException $e) {
