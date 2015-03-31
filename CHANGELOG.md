@@ -29,6 +29,7 @@
 - Fixed bug when using LIMIT, ORDER and hasMany relations with PostgreSql. #1145 (Hamid Reza Koushki)
 - Matched implementation with documentation of `Request::accepts()`. The method now returns a boolean 
   when type is provided. #1180, #856 (David Persson, David Rogers)
+- Fixed several bugs in the FormSignature class. #839, #998, #1173 (Hamid Reza Koushki, David Persson, Ciaro Vermeire, cinaeco) 
 
 ### Improved
 
@@ -60,6 +61,7 @@
 - Use transactions when bulk-inserting in redis cache adapter. 995214f (David Persson)
 - Improved view template cache GC and compilation. 6f641e7, a502da5 (David Persson)
 - Support DELETE method in curl socket #1034 (Warren Seymour)
+- Improved performance by using HMAC in the FormSignature class. #1173 (David Persson) 
 
 ### Added
 
@@ -108,3 +110,5 @@
   documented (and expected) behavior. (David Persson, David Rogers)
 - The `library` command has been extracted into the `li3_lab` plugin. Please install the plugin
   to continue using that command. #1174 (David Persson)
+- The `FormSignature` class now uses HMAC with a secret key. This will now require configuring the class
+  with an app specific secret key before using it. #1173 (David Persson) 
