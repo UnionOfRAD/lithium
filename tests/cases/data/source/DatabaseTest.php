@@ -652,13 +652,14 @@ class DatabaseTest extends \lithium\test\Unit {
 			'model' => $this->_model,
 			'with' => array('MockDatabaseComment')
 		));
+		$this->_db->schema($query);
 
 		$result = $this->_db->order('MockDatabaseComment.created DESC', $query);
-		$expected = 'ORDER BY {MockDatabaseComment}.{created} DESC';
+		$expected = 'ORDER BY {MockDatabasePost}.{id} ASC, {MockDatabaseComment}.{created} DESC';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_db->order(array('MockDatabaseComment.created' => 'DESC'), $query);
-		$expected = 'ORDER BY {MockDatabaseComment}.{created} DESC';
+		$expected = 'ORDER BY {MockDatabasePost}.{id} ASC, {MockDatabaseComment}.{created} DESC';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_db->order(
@@ -668,7 +669,8 @@ class DatabaseTest extends \lithium\test\Unit {
 			),
 			$query
 		);
-		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, {MockDatabaseComment}.{created} DESC';
+		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, ';
+		$expected .= '{MockDatabasePost}.{id} ASC, {MockDatabaseComment}.{created} DESC';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_db->order(
@@ -678,7 +680,70 @@ class DatabaseTest extends \lithium\test\Unit {
 			),
 			$query
 		);
-		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, {MockDatabaseComment}.{created} DESC';
+		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, ';
+		$expected .= '{MockDatabasePost}.{id} ASC, {MockDatabaseComment}.{created} DESC';
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_db->order(
+			array(
+				'MockDatabaseComment.created' => 'DESC',
+				'title' => 'ASC',
+			),
+			$query
+		);
+		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, ';
+		$expected .= '{MockDatabasePost}.{id} ASC, {MockDatabaseComment}.{created} DESC';
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_db->order(
+			array(
+				'id' => 'DESC',
+				'MockDatabaseComment.created' => 'DESC',
+			),
+			$query
+		);
+		$expected = 'ORDER BY {MockDatabasePost}.{id} DESC, {MockDatabaseComment}.{created} DESC';
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_db->order(
+			array(
+				'MockDatabaseComment.created' => 'DESC',
+				'title' => 'ASC',
+				'id' => 'DESC',
+			),
+			$query
+		);
+		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, ';
+		$expected .= '{MockDatabasePost}.{id} DESC, {MockDatabaseComment}.{created} DESC';
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_db->order(array('title'),	$query);
+		$expected = 'ORDER BY {MockDatabasePost}.{title} ASC, {MockDatabasePost}.{id} ASC';
+		$this->assertEqual($expected, $result);
+
+		$query = new Query(array(
+			'model' => $this->_model,
+			'with' => array('MockDatabaseComment'),
+			'return' => 'array'
+		));
+		$this->_db->schema($query);
+
+		$result = $this->_db->order('MockDatabaseComment.created DESC', $query);
+		$expected = 'ORDER BY {MockDatabaseComment}.{created} DESC';
+		$this->assertEqual($expected, $result);
+
+		$query = new Query(array(
+			'model' => 'lithium\tests\mocks\data\model\MockDatabaseComment',
+			'with' => array('MockDatabasePost'),
+		));
+		$this->_db->schema($query);
+
+		$result = $this->_db->order(array('MockDatabasePost.title' => 'DESC'), $query);
+		$expected = 'ORDER BY {MockDatabasePost}.{title} DESC';
+		$this->assertEqual($expected, $result);
+
+		$result = $this->_db->order(array('created'), $query);
+		$expected = 'ORDER BY {MockDatabaseComment}.{created} ASC';
 		$this->assertEqual($expected, $result);
 	}
 

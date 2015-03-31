@@ -1330,6 +1330,49 @@ abstract class Database extends \lithium\data\Source {
 	 * @return string Formatted clause.
 	 */
 	public function order($order, $context) {
+		$model = $context->model();
+		$return = $context->return();
+		$relations = $context->relationships();
+		$direction = 'ASC';
+
+		if (is_string($order)) {
+			if (preg_match('/^(.*?)\s+((?:A|DE)SC)$/i', $order, $match)) {
+				$order = $match[1];
+				$direction = $match[2];
+			}
+			$order = array($order => $direction);
+		}
+
+		if (is_array($order) && $relations && $model && (!$return || $return === 'item')) {
+			foreach ($relations as $relation) {
+				if ($relation['type'] !== 'hasMany') {
+					continue;
+				}
+				$orders = array(
+					'main' => array(),
+					'relations' => array()
+				);
+				$keyDirection = 'ASC';
+				$relPattern = '/^(' . implode('|', array_keys($relations)) . ')\./';
+				$keyPattern = '/^(' . $model::meta('name') . '\.)?' . $model::key() . '/';
+				foreach ($order as $column => $dir) {
+					if (is_int($column)) {
+						$column = $dir;
+						$dir = $direction;
+					}
+					if (preg_match($relPattern, $column)) {
+						$orders['relations'][$column] = $dir;
+					} elseif (preg_match($keyPattern, $column)) {
+						$keyDirection = $dir;
+					} else {
+						$orders['main'][$column] = $dir;
+					}
+				}
+				$orders['main'][$model::key()] = $keyDirection;
+				$order = array_merge($orders['main'], $orders['relations']);
+				break;
+			}
+		}
 		return $this->_sort($order, $context);
 	}
 
@@ -1358,10 +1401,6 @@ abstract class Database extends \lithium\data\Source {
 		$model = $context->model();
 
 		if (is_string($field)) {
-			if (preg_match('/^(.*?)\s+((?:A|DE)SC)$/i', $field, $match)) {
-				$field = $match[1];
-				$direction = $match[2];
-			}
 			$field = array($field => $direction);
 		}
 
