@@ -66,7 +66,7 @@ class MongoDb extends \lithium\data\Source {
 		'schema'       => 'lithium\data\source\mongo_db\Schema',
 		'exporter'     => 'lithium\data\source\mongo_db\Exporter',
 		'relationship' => 'lithium\data\model\Relationship',
-		'server'       => 'Mongo'
+		'server'       => 'MongoClient'
 	);
 
 	/**
