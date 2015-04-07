@@ -112,3 +112,4 @@
   to continue using that command. #1174 (David Persson)
 - The `FormSignature` class now uses HMAC with a secret key. This will now require configuring the class
   with an app specific secret key before using it. #1173 (David Persson) 
+- When installed via composer the default location is now `libraries/lithium`.

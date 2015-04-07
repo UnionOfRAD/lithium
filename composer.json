@@ -1,25 +1,21 @@
 {
-	"name": "unionofrad/lithium",
-	"description": "The core library of the Lithium PHP framework",
-	"keywords": ["lithium", "framework"],
-	"homepage": "http://li3.me",
-	"license": "BSD-3-Clause",
-	"authors": [
-		{
-			"name": "Union of RAD",
-			"homepage": "http://union-of-rad.org"
-		},
-		{
-			"name": "The Lithium Community",
-			"homepage": "http://github.com/UnionOfRAD/lithium/graphs/contributors"
-		}
-	],
-	"require": {
-		"php": ">=5.3.6"
-	},
-	"autoload": {
-		"psr-0": { "lithium": "" }
-	},
-	"target-dir": "lithium",
-	"bin" : ["console/li3"]
+    "name": "unionofrad/lithium",
+    "description": "The core library of the Lithium PHP framework",
+    "keywords": ["lithium", "li3", "framework"],
+    "homepage": "http://li3.me",
+    "license": "BSD-3-Clause",
+    "type": "lithium-library",
+    "authors": [
+        {"name": "Union of RAD"},
+        {"name": "The Community"}
+    ],
+    "support": {
+        "stack overflow": "https://stackoverflow.com/tags/lithium",
+        "irc": "irc://irc.freenode.org/li3"
+    },
+    "require": {
+        "php": ">=5.3.6",
+        "composer/installers": "1.*"
+    },
+    "bin" : ["console/li3"]
 }
