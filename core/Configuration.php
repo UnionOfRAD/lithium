@@ -23,7 +23,7 @@ class Configuration extends \lithium\core\Object {
 	 *
 	 * @var array of configurations, indexed by name.
 	 */
-	public $_configurations = array();
+	protected $_configurations = array();
 
 	/**
 	 * A closure called by `_config()` which allows to automatically
