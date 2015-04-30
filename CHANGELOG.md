@@ -1,5 +1,15 @@
 # Change Log
 
+## v1.1.0
+
+### Fixed
+
+### Improved
+
+### Added
+
+### Changed
+
 ## v1.0.0
 
 (This includes changes from 1.0.0-beta on only.)
