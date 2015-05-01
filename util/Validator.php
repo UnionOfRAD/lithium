@@ -495,7 +495,7 @@ class Validator extends \lithium\core\StaticObject {
 					}
 					if (!array_key_exists($field, $values)) {
 						if ($rule['required']) {
-							$errors[$field][] = $rule['message'] ?: $key;
+							$errors[$field][$key] = $rule['message'] ?: $key;
 						}
 						if ($rule['last']) {
 							break;
@@ -507,7 +507,7 @@ class Validator extends \lithium\core\StaticObject {
 					}
 
 					if (!$self::rule($name, $values[$field], $rule['format'], $rule + $options)) {
-						$errors[$field][] = $rule['message'] ?: $key;
+						$errors[$field][$key] = $rule['message'] ?: $key;
 
 						if ($rule['last']) {
 							break;

@@ -8,6 +8,11 @@
 
 ### Added
 
+- Enable custom error messages in form helper. This feature allows to provide messages
+  for validation error inside the template. This allows easier translation of messages and
+  customization in case there is no control over the model (i.e. developing a "theme" for a
+  customer without changing the basic functionality). #1167 (David Persson)
+
 ### Changed
 
 ## v1.0.0

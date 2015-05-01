@@ -451,6 +451,14 @@ class Form extends \lithium\template\Helper {
 	 *          wrapper tag.
 	 *        - `list` _array_: If `'type'` is set to `'select'`, `'list'` is an array of
 	 *          key/value pairs representing the `$list` parameter of the `select()` method.
+	 *        - `error` _array|string|boolean_: Allows to control rendering of error messages.
+	 *          By setting this option to `false` any messages are disabled. When an array
+	 *          mapping failed rule names to messages, will use these alternative message
+	 *          instead of the ones provided when the validation was originally defined (i.e
+	 *          inside the model). The array may contain a `'default'` key which value will
+	 *          be used as a fallback message. In absence of a default message, the original
+	 *          messages get rendered instead. When providing a string it will be used for
+	 *          any error messages.
 	 * @return string Returns a form input (the input type is based on the `'type'` option), with
 	 *         label and error message, wrapped in a `<div />` element.
 	 */
@@ -468,7 +476,8 @@ class Form extends \lithium\template\Helper {
 			'type' => isset($options['list']) ? 'select' : 'text',
 			'template' => $template,
 			'wrap' => array(),
-			'list' => null
+			'list' => null,
+			'error' => array()
 		);
 		list($options, $field) = $this->_options($defaults, $options);
 
@@ -476,6 +485,7 @@ class Form extends \lithium\template\Helper {
 		$wrap = $options['wrap'];
 		$type = $options['type'];
 		$list = $options['list'];
+		$error = $options['error'];
 		$template = $options['template'];
 		$notText = $template === 'field' && $type !== 'text';
 
@@ -491,7 +501,12 @@ class Form extends \lithium\template\Helper {
 
 		$call = ($type === 'select') ? array($name, $list, $field) : array($name, $field);
 		$input = call_user_func_array(array($this, $type), $call);
-		$error = ($this->_binding) ? $this->error($name) : null;
+
+		if ($error !== false && $this->_binding) {
+			$error = $this->error($name, null, array('messages' => $error));
+		} else {
+			$error = null;
+		}
 		return $this->_render(__METHOD__, $template, compact('wrap', 'label', 'input', 'error'));
 	}
 
@@ -775,14 +790,23 @@ class Form extends \lithium\template\Helper {
 	 * @return string Returns a rendered error message based on the `'error'` string template.
 	 */
 	public function error($name, $key = null, array $options = array()) {
-		$defaults = array('class' => 'error');
+		$defaults = array('class' => 'error', 'messages' => array());
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		$options += $defaults;
-		$params = compact('name', 'key', 'options', 'template');
+
+		if (is_array($options['messages'])) {
+			$messages = $options['messages'] + array('default' => null);
+		} else {
+			$messages = array('default' => $options['messages']);
+		}
+		unset($options['messages']);
+
+		$params = compact('name', 'key', 'messages', 'options', 'template');
 
 		return $this->_filter(__METHOD__, $params, function($self, $params) {
 			$options = $params['options'];
 			$template = $params['template'];
+			$messages = $params['messages'];
 
 			if (isset($options['value'])) {
 				unset($options['value']);
@@ -799,7 +823,12 @@ class Form extends \lithium\template\Helper {
 			$errors = $content;
 
 			if ($params['key'] === null) {
-				foreach ($errors as $content) {
+				foreach ($errors as $rule => $content) {
+					if (isset($messages[$rule])) {
+						$content = $messages[$rule];
+					} elseif ($messages['default']) {
+						$content = $messages['default'];
+					}
 					$args = array(__METHOD__, $template, compact('content', 'options'));
 					$result .= $self->invokeMethod('_render', $args);
 				}
