@@ -80,7 +80,7 @@ use lithium\util\Inflector;
  * Auth::config(array(
  * 	'default' => array(
  * 		'adapter' => 'Form',
- * 		'filters' => array('password' => array('lithium\util\String', 'hash')),
+ * 		'filters' => array('password' => array('lithium\security\Hash', 'calculate')),
  * 		'validators' => array('password' => false)
  * 	)
  * ));
@@ -137,7 +137,7 @@ use lithium\util\Inflector;
  *
  * @see lithium\net\http\Request::$data
  * @see lithium\data\Model::find()
- * @see lithium\util\String::hash()
+ * @see lithium\security\Hash::calculate()
  */
 class Form extends \lithium\core\Object {
 
@@ -188,7 +188,10 @@ class Form extends \lithium\core\Object {
 	 * key in the array must match a request field specified in the `$_fields` property, and each
 	 * value must either be a reference to a function or method name, or a closure. For example, to
 	 * automatically hash passwords using simple SHA 512 hashing, the `Form` adapter could be
-	 * configured with the following: `array('password' => array('lithium\util\String', 'hash'))`.
+	 * configured with the following:
+	 * ```
+	 * array('password' => array('lithium\security\Hash', 'calculate'))
+	 * ```
 	 *
 	 * Optionally, you can specify a callback with no key, which will receive (and can modify) the
 	 * entire credentials array before the query is executed, as in the following example:
