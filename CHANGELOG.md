@@ -12,6 +12,9 @@
   for validation error inside the template. This allows easier translation of messages and
   customization in case there is no control over the model (i.e. developing a "theme" for a
   customer without changing the basic functionality). #1167 (David Persson)
+- Strict mode can now be enabled for MySQL via the `'strict'` option. Read more about the
+  feature at http://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-strict.
+  #1171 (David Persson)
 
 ### Changed
 
