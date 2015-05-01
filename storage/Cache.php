@@ -101,7 +101,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * an optimized way dependending on the type of data.
 	 *
 	 * Simple usage (in this case noop):
-	 * {{{
+	 * ```
 	 * Cache::key('default', 'post');
 	 * // returns `'post'`
 	 *
@@ -110,17 +110,17 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * Cache::key('default', array('posts' => 'foo', 'banners' => 'bar));
 	 * // returns `array('posts' => 'foo', 'banners' => 'bar')`
-	 * }}}
+	 * ```
 	 *
 	 * Make a key safe to use with adapter (exact result depends
 	 * on key constraints enforced by the selected adapter:
-	 * {{{
+	 * ```
 	 * Cache::key('default', 'posts for Helgi Þorbjörnsson');
 	 * // returns `'posts_for_Helgi__orbj_rnsson_c7f8433a'`
-	 * }}}
+	 * ```
 	 *
 	 * Using additional scalar or non-scalar data to generate key:
-	 * {{{
+	 * ```
 	 * Cache::key('default', 'post', 2);
 	 * // returns `'post:1ad5be0d'`
 	 *
@@ -132,10 +132,10 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * Cache::key('default', array('posts' => 'foo', 'banners' => 'bar'), 'json');
 	 * // returns `array('posts:38ec40e5' => 'foo', 'banners:38ec40e5' => 'bar')`
-	 * }}}
+	 * ```
 	 *
 	 * Or with a resuable key generator function:
-	 * {{{
+	 * ```
 	 * $posts[0] = array('id' => 1);
 	 * $posts[1] = array('id' => 2);
 	 *
@@ -143,16 +143,16 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * Cache::key('default', $key, $post[0]); // returns `'post:1'`
 	 * Cache::key('default', $key, $post[1]); // returns `'post:2'`
-	 * }}}
+	 * ```
 	 *
 	 * This example shows a key mutating generator function:
-	 * {{{
+	 * ```
 	 * $base = 'post';
 	 * $key  = function($id) use (&base) { return $base .= ":{$id}"; };
 	 *
 	 * Cache::key('default', $key, 1); // returns `'post:1'`
 	 * Cache::key('default', $key, 2); // returns `'post:1:2'`
-	 * }}}
+	 * ```
 	 *
 	 * @param string $name Configuration to be used for generating key/s.
 	 * @param mixed $key String or an array of strings that will be used as the cache key/s.
