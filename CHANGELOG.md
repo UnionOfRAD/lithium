@@ -17,6 +17,26 @@
 - Strict mode can now be enabled for MySQL via the `'strict'` option. Read more about the
   feature at http://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-strict.
   #1171 (David Persson)
+- Added drain option to action request allowing to disable auto stream reading. When the
+  drain option is disabled, action request will not drain stream data - when sent. This reduces
+  memory usage and is a first step in enabling streaming very large files (i.e. uploading video
+  content). The option is enabled by default to keep current behavior, but future versions may
+  disable it. #1110 (David Persson)
+
+  With draining disabled, streams must be read manually:
+
+  ```php
+  $stream = fopen('php://input', 'r');
+  // Do something with $stream.
+  fclose($stream);
+  ```
+
+  Note that with draining disabled, automatic content decoding is not supported
+  anymore. It must be manually decoded as follows.
+
+  ```php
+  $data = Media::decode($request->type, stream_get_contents($stream));
+  ```
 
 ### Changed
     
