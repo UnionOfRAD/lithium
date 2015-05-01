@@ -251,28 +251,32 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Gets or sets the encoding for the connection.
+	 * Getter/Setter for the connection's encoding.
 	 *
-	 * @param $encoding
-	 * @return mixed If setting the encoding; returns true on success, else false.
-	 *         When getting, returns the encoding.
+	 * MySQL uses the string `utf8` to identify the UTF-8 encoding. In general `UTF-8` is used
+	 * to identify that encoding. This methods allows both strings to be used for _setting_ the
+	 * encoding (in lower and uppercase, with or without dash) and will transparently convert
+	 * to MySQL native format. When _getting_ the encoding, it is converted back into `UTF-8`.
+	 * So that this method should ever only return `UTF-8` when the encoding is used.
+	 *
+	 * @param null|string $encoding Either `null` to retrieve the current encoding, or
+	 *        a string to set the current encoding to. For UTF-8 accepts any permutation.
+	 * @return string|boolean When $encoding is `null` returns the current encoding
+	 *         in effect, otherwise a boolean indicating if setting the encoding
+	 *         succeeded or failed. Returns `'UTF-8'` when this encoding is used.
 	 */
 	public function encoding($encoding = null) {
-		$encodingMap = array('UTF-8' => 'utf8');
+		if ($encoding === null) {
+			$encoding = $this->connection
+				->query("SHOW VARIABLES LIKE 'character_set_client'")
+				->fetchColumn(1);
 
-		if (empty($encoding)) {
-			$query = $this->connection->query("SHOW VARIABLES LIKE 'character_set_client'");
-			$encoding = $query->fetchColumn(1);
-			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
+			return $encoding === 'utf8' ? 'UTF-8' : $encoding;
 		}
-		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
-
-		try {
-			$this->connection->exec("SET NAMES '{$encoding}'");
-			return true;
-		} catch (PDOException $e) {
-			return false;
+		if (stripos($encoding, 'utf-8') !== false || stripos($encoding, 'utf8') !== false) {
+			$encoding = 'utf8';
 		}
+		return $this->connection->exec("SET NAMES '{$encoding}'") !== false;
 	}
 
 	/**

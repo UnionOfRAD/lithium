@@ -126,11 +126,14 @@ abstract class Database extends \lithium\data\Source {
 	protected $_cachedNames = array();
 
 	/**
-	 * Getter/Setter for the connection's encoding
+	 * Getter/Setter for the connection's encoding.
 	 * Abstract. Must be defined by child class.
 	 *
-	 * @param mixed $encoding
-	 * @return mixed.
+	 * @param null|string $encoding Either `null` to retrieve the current encoding, or
+	 *        a string to set the current encoding to. For UTF-8 accepts any permutation.
+	 * @return string|boolean When $encoding is `null` returns the current encoding
+	 *         in effect, otherwise a boolean indicating if setting the encoding
+	 *         succeeded or failed. Returns `'UTF-8'` when this encoding is used.
 	 */
 	abstract public function encoding($encoding = null);
 
@@ -328,8 +331,8 @@ abstract class Database extends \lithium\data\Source {
 		}
 		$this->_isConnected = true;
 
-		if ($this->_config['encoding']) {
-			$this->encoding($this->_config['encoding']);
+		if ($this->_config['encoding'] && !$this->encoding($this->_config['encoding'])) {
+			return false;
 		}
 		return $this->_isConnected;
 	}
