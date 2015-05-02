@@ -8,7 +8,7 @@
 
 namespace lithium\console;
 
-use lithium\util\String;
+use lithium\util\Text;
 
 /**
  * The `Response` class is used by other console classes to generate output. It contains stream
@@ -75,7 +75,7 @@ class Response extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function output($output) {
-		return fwrite($this->output, String::insert($output, $this->styles()));
+		return fwrite($this->output, Text::insert($output, $this->styles()));
 	}
 
 	/**
@@ -85,7 +85,7 @@ class Response extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function error($error) {
-		return fwrite($this->error, String::insert($error, $this->styles()));
+		return fwrite($this->error, Text::insert($error, $this->styles()));
 	}
 
 	/**

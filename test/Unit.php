@@ -12,7 +12,7 @@ use Exception;
 use ErrorException;
 use ReflectionClass;
 use InvalidArgumentException;
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\core\Libraries;
 use lithium\util\Validator;
 use lithium\analysis\Debugger;
@@ -216,7 +216,7 @@ class Unit extends \lithium\core\Object {
 	 * @param boolean $expression
 	 * @param string|boolean $message The message to output. If the message is not a string,
 	 *        then it will be converted to '{:message}'. Use '{:message}' in the string and it
-	 *        will use the `$data` to format the message with `String::insert()`.
+	 *        will use the `$data` to format the message with `Text::insert()`.
 	 * @param array $data
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
@@ -227,7 +227,7 @@ class Unit extends \lithium\core\Object {
 		if (strpos($message, "{:message}") !== false) {
 			$params = $data;
 			$params['message'] = $this->_message($params);
-			$message = String::insert($message, $params);
+			$message = Text::insert($message, $params);
 		}
 		$trace = Debugger::trace(array(
 			'start' => 1, 'depth' => 4, 'format' => 'array', 'closures' => !$expression

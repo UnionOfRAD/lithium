@@ -2,7 +2,7 @@
 
 namespace lithium\tests\mocks\template\view\adapters;
 
-use lithium\util\String;
+use lithium\util\Text;
 
 class TestRenderer extends \lithium\template\view\adapter\File implements \ArrayAccess {
 	public static $templateData = array();
@@ -10,7 +10,7 @@ class TestRenderer extends \lithium\template\view\adapter\File implements \Array
 
 	public function template($type, array $params) {
 		foreach ((array) $this->_paths[$type] as $path) {
-			if (!file_exists($path = String::insert($path, $params))) {
+			if (!file_exists($path = Text::insert($path, $params))) {
 				continue;
 			}
 			self::$templateData[] = compact('type', 'params') + array(

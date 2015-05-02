@@ -8,7 +8,7 @@
 
 namespace lithium\template\view\adapter;
 
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\core\Libraries;
 use lithium\template\TemplateException;
 
@@ -226,7 +226,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 		}
 
 		foreach ((array) $this->_paths[$type] as $path) {
-			if (!file_exists($path = String::insert($path, $params))) {
+			if (!file_exists($path = Text::insert($path, $params))) {
 				continue;
 			}
 			return $path;

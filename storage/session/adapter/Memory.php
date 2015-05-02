@@ -8,7 +8,7 @@
 
 namespace lithium\storage\session\adapter;
 
-use lithium\util\String;
+use lithium\util\Text;
 use Closure;
 
 /**
@@ -31,7 +31,7 @@ class Memory extends \lithium\core\Object {
 	 * @return string UUID.
 	 */
 	public static function key() {
-		return String::uuid();
+		return Text::uuid();
 	}
 
 	/**

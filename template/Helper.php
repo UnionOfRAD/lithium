@@ -8,7 +8,7 @@
 
 namespace lithium\template;
 
-use lithium\util\String;
+use lithium\util\Text;
 
 /**
  * Abstract class for template helpers to extend.
@@ -166,7 +166,7 @@ abstract class Helper extends \lithium\core\Object {
 			}
 			$strings = $this->_context->strings();
 		}
-		return String::insert(isset($strings[$string]) ? $strings[$string] : $string, $params);
+		return Text::insert(isset($strings[$string]) ? $strings[$string] : $string, $params);
 	}
 
 	/**

@@ -8,7 +8,7 @@
 
 namespace lithium\net\http;
 
-use lithium\util\String;
+use lithium\util\Text;
 use UnexpectedValueException;
 
 /**
@@ -112,7 +112,7 @@ class Request extends \lithium\net\http\Message {
 				$options['port'] = $options['port'] ? ":{$options['port']}" : '';
 				$options['path'] = str_replace('//', '/', $options['path']);
 
-				return String::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
+				return Text::insert("{:scheme}://{:host}{:port}{:path}{:query}", $options);
 			},
 			'context' => function($req, $options, $defaults) {
 				$req->headers($options['headers']);
@@ -243,14 +243,14 @@ class Request extends \lithium\net\http\Message {
 			$q = null;
 			foreach ($query as $key => $value) {
 				if (!is_array($value)) {
-					$q .= String::insert($format, array(
+					$q .= Text::insert($format, array(
 						'key' => urlencode($key),
 						'value' => urlencode($value)
 					));
 					continue;
 				}
 				foreach ($value as $val) {
-					$q .= String::insert($format, array(
+					$q .= Text::insert($format, array(
 						'key' => urlencode("{$key}[]"),
 						'value' => urlencode($val)
 					));

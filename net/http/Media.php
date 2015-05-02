@@ -9,7 +9,7 @@
 namespace lithium\net\http;
 
 use lithium\util\Set;
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\core\Libraries;
 use lithium\core\Environment;
 use lithium\net\http\MediaException;
@@ -202,7 +202,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @see lithium\action\Request::get()
 	 * @see lithium\action\Request::is()
 	 * @see lithium\action\Request::detect()
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @param string $type A file-extension-style type name, i.e. `'txt'`, `'js'`, or `'atom'`.
 	 *               Alternatively, a mapped content type, i.e. `'text/html'`,
 	 *               `'application/atom+xml'`, etc.; in which case, the matching type name (i.e.
@@ -224,8 +224,8 @@ class Media extends \lithium\core\StaticObject {
 	 *          specified encode function is first cast to array structures.
 	 *        - `'paths'` _array_: Optional key/value pairs mapping paths for
 	 *          `'template'`, `'layout'`, and `'element'` template files.  Any keys ommitted
-	 *          will use the default path.  The values should be `String::insert()`-style
-	 *          paths or an array of `String::insert()`-style paths.  If it is an array,
+	 *          will use the default path.  The values should be `Text::insert()`-style
+	 *          paths or an array of `Text::insert()`-style paths.  If it is an array,
 	 *          each path will be tried in the order specified until a template is found.
 	 *          This is useful for allowing custom templates while falling back on
 	 *          default templates if no custom template was found.  If you want to
@@ -366,7 +366,7 @@ class Media extends \lithium\core\StaticObject {
 	/**
 	 * Gets or sets options for various asset types.
 	 *
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @param string $type The name of the asset type, i.e. `'js'` or `'css'`.
 	 * @param array $options If registering a new asset type or modifying an existing asset type,
 	 *        contains settings for the asset type, where the available keys are as follows:
@@ -374,7 +374,7 @@ class Media extends \lithium\core\StaticObject {
 	 *          applicable.
 	 *        - `'filter'`: An array of key/value pairs representing simple string replacements to
 	 *          be done on a path once it is generated.
-	 *        - `'paths'`: An array of key/value pairs where the keys are `String::insert()`
+	 *        - `'paths'`: An array of key/value pairs where the keys are `Text::insert()`
 	 *          compatible paths, and the values are array lists of keys to be inserted into the
 	 *          path string.
 	 * @return array If `$type` is empty, an associative array of all registered types and all
@@ -421,7 +421,7 @@ class Media extends \lithium\core\StaticObject {
 	 *        - `'filter'`: An array of key/value pairs representing simple string replacements to
 	 *          be done on a path once it is generated.
 	 *        - `'paths'`: An array of paths to search for the asset in. The paths should use
-	 *          `String::insert()` formatting. See `Media::$_assets` for more.
+	 *          `Text::insert()` formatting. See `Media::$_assets` for more.
 	 *        - `suffix`: The suffix to attach to the path, generally a file extension.
 	 *        - `'timestamp'`: Appends the last modified time of the file to the path if `true`.
 	 *          Defaults to `false`.
@@ -548,7 +548,7 @@ class Media extends \lithium\core\StaticObject {
 		if ($isAbsolute && $options['base'] && strpos($asset, $options['base']) !== 0) {
 			$asset = "{$options['base']}{$asset}";
 		} elseif (!$isAbsolute) {
-			$asset = String::insert(key($path), array('path' => $asset) + $options);
+			$asset = Text::insert(key($path), array('path' => $asset) + $options);
 		}
 
 		if (is_array($options['filter']) && !empty($options['filter'])) {
@@ -642,7 +642,7 @@ class Media extends \lithium\core\StaticObject {
 		} else {
 			$template = str_replace('{:library}/', '', key($paths));
 			$insert = array('base' => $root) + compact('path');
-			$file = String::insert($template, $insert);
+			$file = Text::insert($template, $insert);
 		}
 		return realpath($file);
 	}

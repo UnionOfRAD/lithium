@@ -9,7 +9,7 @@
 namespace lithium\g11n;
 
 use lithium\core\Environment;
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\g11n\Catalog;
 
 /**
@@ -65,7 +65,7 @@ class Message extends \lithium\core\StaticObject {
 	 * Message::translate('house', array('count' => 23));
 	 * ```
 	 *
-	 * `String::insert()`-style placeholders may be used within the message
+	 * `Text::insert()`-style placeholders may be used within the message
 	 * and replacements provided directly within the `options`  argument.
 	 *
 	 * Example:
@@ -76,7 +76,7 @@ class Message extends \lithium\core\StaticObject {
 	 * ));
 	 * ```
 	 *
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @param string $id The id to use when looking up the translation.
 	 * @param array $options Valid options are:
 	 *              - `'count'`: Used to determine the correct plural form. You can either pass
@@ -116,7 +116,7 @@ class Message extends \lithium\core\StaticObject {
 		}
 
 		if ($result = $result ?: $options['default']) {
-			return strpos($result, '{:') !== false ? String::insert($result, $options) : $result;
+			return strpos($result, '{:') !== false ? Text::insert($result, $options) : $result;
 		}
 	}
 

@@ -9,7 +9,7 @@
 namespace lithium\tests\cases\template\view\adapter;
 
 use lithium\template\view\adapter\Simple;
-use lithium\tests\mocks\util\MockStringObject;
+use lithium\tests\mocks\util\MockTextObject;
 
 class SimpleTest extends \lithium\test\Unit {
 
@@ -24,7 +24,7 @@ class SimpleTest extends \lithium\test\Unit {
 		$expected = '{:content}';
 		$this->assertEqual($expected, $result);
 
-		$message = new MockStringObject();
+		$message = new MockTextObject();
 		$message->message = 'Lithium is about to rock you.';
 
 		$result = $this->subject->render('Hello {:name}! {:message}', compact('message') + array(

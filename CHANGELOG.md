@@ -43,13 +43,27 @@
 - Database encoding, timezone, and searchPath methods may now throw exceptions. Please
   wrap code calling these methods directly in try/catch blocks - if needed. #1172
   (David Persson)
-- The String/Text class has been thinned. RNG functionality has been extracted 
-  into `security\Random` and hashing functionality extracted into `security\Hash`.
-  Please update your code accordingly. #1184 (David Persson)
+- The String class has been renamed to `Text` while RNG and hashing functionality 
+  have been extracted into `lithium\security\Random` and `lithium\security\Hash`. #1184 (David Persson)
+
+  This is mainly to achieve PHP 7.0 compatibilty as `String` 
+  [will become a reserved name](https://wiki.php.net/rfc/reserve_even_more_types_in_php_7).  
   
-  - `lithium\util\String::hash()` -> `lithium\security\Hash::calculate()`
-  - `lithium\util\String::compare()` -> `lithium\security\Hash::compare()`
-  - `lithium\util\String::random()` -> `lithium\security\Random::generate()`
+  Old methods are deprecated but continue to work and redirect to new methods. It wont be 
+  possible to use the old String class with PHP >= 7.0. You must use the new names before 
+  switching to PHP 7.0. 
+  
+  | old | new |
+  | --- | --- |
+  | `lithium\util\String::hash()` | `lithium\security\Hash::calculate()` |
+  | `lithium\util\String::compare()` | `lithium\security\Hash::compare()` |
+  | `lithium\util\String::random()` | `lithium\security\Random::generate()` |
+  | `lithium\util\String::ENCODE_BASE_64` | `lithium\security\Random::ENCODE_BASE_64` |
+  | `lithium\util\String::uuid()` | `lithium\util\Text::uuid()` |
+  | `lithium\util\String::insert()` | `lithium\util\Text::insert()` |
+  | `lithium\util\String::clean()` | `lithium\util\Text::clean()` |
+  | `lithium\util\String::extract()` | `lithium\util\Text::extract()` |
+  | `lithium\util\String::tokenize()` | `lithium\util\Text::tokenize()` |
 
 ## v1.0.0
 

@@ -8,7 +8,7 @@
 
 namespace lithium\console\command;
 
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\core\Libraries;
 use lithium\util\Inflector;
 use lithium\core\ClassNotFoundException;
@@ -229,7 +229,7 @@ class Create extends \lithium\console\Command {
 			return false;
 		}
 		$contents = $this->_template();
-		$result = String::insert($contents, $params);
+		$result = Text::insert($contents, $params);
 		$namespace = str_replace($this->_library['prefix'], '\\', $params['namespace']);
 		$path = str_replace('\\', '/', "{$namespace}\\{$params['class']}");
 		$path = $this->_library['path'] . stristr($path, '/');

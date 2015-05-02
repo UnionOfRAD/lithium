@@ -8,7 +8,7 @@
 
 namespace lithium\test;
 
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\util\collection\Filters;
 use ReflectionClass;
 use ReflectionMethod;
@@ -610,7 +610,7 @@ class Mocker {
 		$tokens += $defaults;
 		$name = '_' . $type . 'Ingredients';
 		$code = implode("\n", self::${$name}[$key]);
-		return String::insert($code, $tokens) . "\n";
+		return Text::insert($code, $tokens) . "\n";
 	}
 
 	/**

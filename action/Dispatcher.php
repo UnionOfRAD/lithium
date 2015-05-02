@@ -8,7 +8,7 @@
 
 namespace lithium\action;
 
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\util\Inflector;
 use lithium\core\Libraries;
 use lithium\action\DispatchException;
@@ -51,8 +51,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * (and not empty) in a route, (i.e. the result of `Router::parse()`) then the rule's
 	 * value will be applied to the route before it is dispatched. When applying a rule, any
 	 * array elements of the flag which are present in the route will be modified using a
-	 * `String::insert()`-formatted string. Alternatively, a callback can be used to do custom
-	 * transformations other than the default `String::insert()`.
+	 * `Text::insert()`-formatted string. Alternatively, a callback can be used to do custom
+	 * transformations other than the default `Text::insert()`.
 	 *
 	 * For example, to implement action prefixes (i.e. `admin_index`), set a rule named
 	 * `'admin'`, with a value array containing a modifier key for the `action` element of
@@ -98,7 +98,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * ```
 	 *
 	 * @see lithium\action\Dispatcher::config()
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @see lithium\util\Inflector
 	 * @var array
 	 */
@@ -220,7 +220,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 				if (preg_match('/' . $match . '/i', $values[$k])) {
 					continue;
 				}
-				$values[$k] = String::insert($v, $values);
+				$values[$k] = Text::insert($v, $values);
 			}
 		}
 		return $values;
