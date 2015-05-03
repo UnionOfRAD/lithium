@@ -71,7 +71,7 @@ class PhpExtensions {
 
 	protected static function _apcu() {
 		if (!static::_isHhvm()) {
-			static::_pecl('apcu', '4.0.2');
+			static::_pecl('apcu', '4.0.7', true);
 			static::_ini(array('extension=apcu.so'));
 		}
 		static::_ini(array(
@@ -101,7 +101,7 @@ class PhpExtensions {
 			throw new RuntimeException("`xcache` cannot be used with HHVM.");
 		}
 		static::_build(array(
-			'url' => 'http://xcache.lighttpd.net/pub/Releases/3.1.0/xcache-3.1.0.tar.gz',
+			'url' => 'http://xcache.lighttpd.net/pub/Releases/3.2.0/xcache-3.2.0.tar.gz',
 			'configure' => array('--enable-xcache'),
 		));
 		static::_ini(array(
@@ -159,16 +159,22 @@ class PhpExtensions {
 	 * @param string $name The name of the package to install.
 	 * @param string|null $forceVersion Optionally a specific version string, if not provided
 	 *                    will install the latest available package version..
+	 * @param boolean $autoAccept
 	 * @return void
 	 */
-	protected static function _pecl($name, $forceVersion = null) {
+	protected static function _pecl($name, $forceVersion = null, $autoAccept = false) {
 		echo "=> installing from pecl\n";
 
 		if ($forceVersion) {
-			static::_system(sprintf('pecl install -f %s-%s', $name, $forceVersion));
+			$command = sprintf('pecl install -f %s-%s', $name, $forceVersion);
 		} else {
-			static::_system(sprintf('pecl install %s', $name));
+			$command = sprintf('pecl install %s', $name);
 		}
+		if ($autoAccept) {
+			$command = 'printf "\n" | ' . $command;
+		}
+
+		static::_system($command);
 		echo "=> installed from pecl\n";
 	}
 
