@@ -53,16 +53,6 @@ class PhpExtensions {
 		if (static::_isHhvm()) {
 			throw new RuntimeException("`opcache` cannot be used with HHVM.");
 		}
-		if (version_compare(PHP_VERSION, '5.5', '<')) {
-			static::_pecl('zendopcache', 'beta');
-
-			$pattern  = '/home/travis/.phpenv/versions/';
-			$pattern .= phpversion() . '/lib/php/extensions/*/opcache.so';
-			$files = glob($pattern);
-			static::_ini(array(
-				'zend_extension=' . array_pop($files)
-			));
-		}
 		static::_ini(array(
 			'opcache.enable=1',
 			'opcache.enable_cli=1'
@@ -73,16 +63,6 @@ class PhpExtensions {
 		if (!static::_isHhvm()) {
 			static::_pecl('apcu', '4.0.7', true);
 			static::_ini(array('extension=apcu.so'));
-		}
-		static::_ini(array(
-			'apc.enabled=1',
-			'apc.enable_cli=1'
-		));
-	}
-
-	protected static function _apc() {
-		if (!static::_isHhvm()) {
-			static::_ini(array('extension=apc.so'));
 		}
 		static::_ini(array(
 			'apc.enabled=1',
