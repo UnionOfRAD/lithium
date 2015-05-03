@@ -10,6 +10,10 @@ namespace lithium\storage\cache\adapter;
 
 use lithium\storage\Cache;
 
+$message  = 'The XCache cache adapter has been deprecated as xcache is not ';
+$message .= 'compatible with the often by default enabled opcache extension.';
+trigger_error($message, E_USER_DEPRECATED);
+
 /**
  * An XCache cache adapter implementation leveraging the user-
  * space caching features (not the opcode caching features).
@@ -41,6 +45,7 @@ use lithium\storage\Cache;
  * you wish to use `XCache::clear()` - all other methods do not require XCache
  * administrator credentials.
  *
+ * @deprecated
  * @link http://xcache.lighttpd.net/
  * @see lithium\storage\Cache::key()
  * @see lithium\storage\cache\adapter

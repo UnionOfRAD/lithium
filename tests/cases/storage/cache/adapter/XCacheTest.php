@@ -11,7 +11,12 @@ namespace lithium\tests\cases\storage\cache\adapter;
 use lithium\storage\Cache;
 use lithium\storage\cache\adapter\XCache;
 
+/**
+ * @deprecated
+ */
 class XCacheTest extends \lithium\test\Unit {
+
+	protected $_backup = null;
 
 	/**
 	 * Skip the test if XCache extension is unavailable.
@@ -26,6 +31,8 @@ class XCacheTest extends \lithium\test\Unit {
 	 * Clear the userspace cache
 	 */
 	public function setUp() {
+		 error_reporting(($this->_backup = error_reporting()) & ~E_USER_DEPRECATED);
+
 		for ($i = 0, $max = xcache_count(XC_TYPE_VAR); $i < $max; $i++) {
 			if (xcache_clear_cache(XC_TYPE_VAR, $i) === false) {
 				return false;
@@ -36,6 +43,7 @@ class XCacheTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		unset($this->XCache);
+		error_reporting($this->_backup);
 	}
 
 	public function testEnabled() {

@@ -297,6 +297,9 @@
   blown mocking from us. You might want to have a look at 
   [Mockery](https://github.com/padraic/mockery).
 
+- The XCache caching adapter has been deprecated as it is not compatible with the wildly
+  deployed OPcache and does not perform better.
+
 ### Backwards Incompatible Changes
 
 - When failing to close an established network connection via the `Socket` subclasses 
