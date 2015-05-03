@@ -665,7 +665,7 @@ EOD;
 	 */
 	public function testPathsInPharArchives() {
 		$this->skipIf(!Phar::canWrite(), '`Phar support is read only.');
-		$path = Libraries::get(true, 'resources') . '/tmp/tests';
+		$path = realpath(Libraries::get(true, 'resources') . '/tmp/tests');
 
 		$file = $path . '/test.phar';
 		$phar = new Phar($file);

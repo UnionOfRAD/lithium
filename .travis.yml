@@ -16,64 +16,30 @@ services:
 env:
   # Run one build with as many enabled and compatible extensions as possible.
   # Keep in-sync with potential partial excludes in the `matrix` section.
-  - PHP_EXT="memcached redis"
-  # Test compatiblity with opcode caches in isolation.
-  - PHP_EXT=apc
-  - PHP_EXT=xcache
-  - PHP_EXT=opcache
-  # Test each database in isolation.
-  - DB=mysql
-  - DB=pgsql
-  - DB=sqlite
-  - DB=mongodb PHP_EXT=mongo
-  - DB=couchdb
+  - DB=sqlite PHP_EXT="opcache memcached redis apcu" TESTS=all
+  # Must be tested in isolation as it interferes with other opcaches.
+  - PHP_EXT=xcache TESTS=storage
+  # Test each remaining database in isolation.
+  - DB=mysql TESTS=data
+  - DB=pgsql TESTS=data
+  - DB=mongodb PHP_EXT=mongo TESTS=data
+  - DB=couchdb TESTS=data
 
 php:
   - 5.3
   - 5.4
   - 5.5
   - 5.6
-  - hhvm
 
 matrix:
-  exclude:
-    - php: 5.5
-      env: PHP_EXT=apc
-    - php: 5.6
-      env: PHP_EXT=apc
-    - php: 5.6
-      env: PHP_EXT=xcache
-    # HHVM doesn't bundle xcache, pgsql, mongo, pgsql extensions yet.
-    # See https://github.com/facebook/hhvm/wiki/Extensions
-    - php: hhvm
-      env: PHP_EXT=opcache
-    - php: hhvm
-      env: PHP_EXT=xcache
-    - php: hhvm
-      env: DB=pgsql
-    - php: hhvm
-      env: DB=mongodb PHP_EXT=mongo
-    # Partially excluding redis, see include where we add back memcached.
-    # Must be kept in sync with relevant line in `env` section.
-    - php: hhvm
-      env: PHP_EXT="memcached redis"
-    # The following builds have been excluded to reduce noise until we make
-    # progress with HHVM compatibility. The items below can then be removed.
-    - php: hhvm
-      env: DB=couchdb
-    - php: hhvm
-      env: DB=sqlite
-    - php: hhvm
-      env: PHP_EXT=apc
   include:
-    - php: hhvm
-      env: PHP_EXT="memcached"
+    # We just include one exemplaric job here.
+    - php: hhvm-nightly
+      env: PHP_EXT=memcached TESTS=all
   allow_failures:
-    # We aim for full HHVM compatibilty while on the way
-    # to reach the goal we tolerate failures. Still it is
-    # useful to test against HHVM to see if we make progress.
-    # Remove this line when all tests are green with HHVM.
-    - php: hhvm
+    # We do not aim for full HHVM compatibilty now.
+    - php: hhvm-nightly
+      env: PHP_EXT=memcached TESTS=all
   # Mark build as failed as soon as one job failed.
   fast_finish: true
 
@@ -92,18 +58,14 @@ before_script:
 
 script:
   # Run all tests.
-  - sh -c "if [ '$DB' = '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases; fi"
-  - sh -c "if [ '$DB' = '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration; fi"
+  - sh -c "if [ '$TESTS' = 'all' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases; fi"
+  - sh -c "if [ '$TESTS' = 'all' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration; fi"
   # Run just the database related tests.
-  - sh -c "if [ '$DB' != '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases/data; fi"
-  - sh -c "if [ '$DB' != '' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration/data; fi"
+  - sh -c "if [ '$TESTS' = 'data' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases/data; fi"
+  - sh -c "if [ '$TESTS' = 'data' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration/data; fi"
+  # Run just the storage related tests.
+  - sh -c "if [ '$TESTS' = 'storage' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/cases/storage; fi"
+  - sh -c "if [ '$TESTS' = 'storage' ]; then ../libraries/lithium/console/li3 test --filters=Profiler ../libraries/lithium/tests/integration/storage; fi"
 
 notifications:
   email: false
-
-webhooks:
-  urls:
-  - https://webhooks.gitter.im/e/ba81912e2566bb78b7b2
-  on_success: change
-  on_failure: always
-  on_start: false
