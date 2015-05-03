@@ -1982,34 +1982,6 @@ class Unit extends \lithium\core\Object {
 		}
 		return [$expected, $result];
 	}
-
-	/* Deprecated */
-
-	/**
-	 * The list of expected exceptions.
-	 *
-	 * @deprecated
-	 * @var string
-	 */
-	protected $_expected = [];
-
-	/**
-	 * Used before a call to `assert*()` if you expect the test assertion to generate an exception
-	 * or PHP error.  If no error or exception is thrown, a test failure will be reported.  Can
-	 * be called multiple times per assertion, if more than one error is expected.
-	 *
-	 * @deprecated
-	 * @param mixed $message A string indicating what the error text is expected to be.  This can
-	 *              be an exact string, a /-delimited regular expression, or true, indicating that
-	 *              any error text is acceptable.
-	 * @return void
-	 */
-	public function expectException($message = true) {
-		$message = "Unit::expectException() is deprecated in favor of Unit::assertException().";
-		 trigger_error($message, E_USER_DEPRECATED);
-
-		$this->_expected[] = $message;
-	}
 }
 
 ?>

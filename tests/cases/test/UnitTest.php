@@ -488,16 +488,6 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $results[0]['message']);
 	}
 
-	public function testExpectExceptionRegex() {
-		$test = $this->test;
-		$this->assertException('/deprecated/', function() use ($test) {
-			$test->expectException('/test handle exception/');
-		});
-		$this->test->handleException(new Exception('test handle exception'));
-
-		$this->assertEmpty($this->test->expected());
-	}
-
 	public function testGetTest() {
 		$expected = __CLASS__;
 		$result = static::get('lithium\test\Unit');

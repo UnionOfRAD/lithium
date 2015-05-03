@@ -1,5 +1,12 @@
 # Change Log
 
+## v2.0.0
+
+### Changed
+
+- Removed deprecated functionality: magic download header in action response, unit testing's
+  expectException method. (David Persson) 
+
 ## v1.2.0
 
 ### Added
