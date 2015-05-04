@@ -28,7 +28,7 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	protected $_current = false;
 
 	/**
-	 * Setted to `true` when the collection has begun iterating.
+	 * Set to `true` when the collection has begun iterating.
 	 *
 	 * @var integer
 	 */

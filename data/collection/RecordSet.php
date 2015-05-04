@@ -47,18 +47,22 @@ class RecordSet extends \lithium\data\Collection {
 	 */
 	protected function _init() {
 		parent::_init();
-		if ($this->_result) {
-			$this->_columns = $this->_columnMap();
-			if ($this->_query) {
-				$columns = array_filter(array_keys($this->_columns));
-				$this->_dependencies = Set::expand(Set::normalize($columns));
-				$this->_keyIndex = $this->_keyIndex('');
-			}
+
+		if (!$this->_result) {
+			return;
 		}
+		$this->_columns = $this->_columnMap();
+
+		if (!$this->_query) {
+			return;
+		}
+		$columns = array_filter(array_keys($this->_columns));
+		$this->_dependencies = Set::expand(Set::normalize($columns));
+		$this->_keyIndex = $this->_keyIndex('');
 	}
 
 	/**
-	 * Extract the next item from the result ressource and wraps it into a `Record` object.
+	 * Extracts the next item from the result resource and wraps it into a `Record` object.
 	 *
 	 * @return mixed Returns the next `Record` if exists. Returns `null` otherwise
 	 */
@@ -109,8 +113,10 @@ class RecordSet extends \lithium\data\Collection {
 
 		do {
 			$offset = 0;
+
 			if ($i != 0) {
 				$keys = array();
+
 				foreach ($this->_keyIndex as $key => $value) {
 					$keys[$key] = $data[$key];
 				}
@@ -130,6 +136,7 @@ class RecordSet extends \lithium\data\Collection {
 		} while ($main && $data = $this->_result->next());
 
 		$relMap = $this->_query->relationships();
+
 		return $this->_hydrateRecord(
 			$this->_dependencies, $primary, $record, 0, $i, '', $relMap, $conn
 		);

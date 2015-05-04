@@ -1831,9 +1831,8 @@ SQL;
 				)
 			)
 		));
-		$this->_db->return = array(
-			'_execute' => $data
-		);
+		$this->_db->return = array('_execute' => $data);
+
 		$query = new Query(array(
 			'type' => 'read',
 			'model' => $this->_model,
@@ -1841,6 +1840,7 @@ SQL;
 			'limit' => 3,
 		));
 		$result = $this->_db->read($query, array('return' => 'array'));
+
 		$expected = array(array(
 			'id' => '1',
 			'author_id' => '2',
