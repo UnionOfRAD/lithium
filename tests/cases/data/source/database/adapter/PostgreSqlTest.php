@@ -45,6 +45,7 @@ class PostgreSqlTest extends \lithium\test\Unit {
 			),
 			'order' => array(
 				'title',
+				'id',
 				'MockDatabaseComment.body' => 'DESC'
 			)
 		));
@@ -56,12 +57,13 @@ class PostgreSqlTest extends \lithium\test\Unit {
 SELECT _ID_ FROM (
 		SELECT DISTINCT ON({MockDatabasePost}.{id}) {MockDatabasePost}.{id} AS _ID_,
 			{MockDatabasePost}.{title} AS {_MockDatabasePost_title_},
+			{MockDatabasePost}.{id} AS {_MockDatabasePost_id_},
 			{MockDatabaseComment}.{body} AS {_MockDatabaseComment_body_}
 			FROM {mock_database_posts} AS {MockDatabasePost}
 			LEFT JOIN {mock_database_comments} AS {MockDatabaseComment}
 				ON {MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id}
 	) AS _TEMP_
-	ORDER BY {_MockDatabasePost_title_} ASC, {_MockDatabaseComment_body_} DESC
+	ORDER BY {_MockDatabasePost_title_} ASC, {_MockDatabasePost_id_} ASC, {_MockDatabaseComment_body_} DESC
 	LIMIT 1;
 SQL;
 		$expected[1] = <<<SQL
@@ -69,7 +71,7 @@ SELECT * FROM {mock_database_posts} AS {MockDatabasePost}
 	LEFT JOIN {mock_database_comments} AS {MockDatabaseComment}
 		ON {MockDatabasePost}.{id} = {MockDatabaseComment}.{mock_database_post_id}
 	WHERE {MockDatabasePost}.{id} IN (5)
-	ORDER BY {MockDatabasePost}.{title} ASC, {MockDatabaseComment}.{body} DESC;
+	ORDER BY {MockDatabasePost}.{title} ASC, {MockDatabasePost}.{id} ASC, {MockDatabaseComment}.{body} DESC;
 SQL;
 
 		$expected = array_map(function($v) {

@@ -105,14 +105,16 @@ class CrudTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testCrudMulti() {
-		$cities  = Galleries::create(array('name' => 'Cities', 'active' => true));
-		$flowers = Galleries::create(array('name' => 'Flowers', 'active' => true));
-		$poneys  = Galleries::create(array('name' => 'Poneys', 'active' => true));
+		$records = array(
+			'cities'  => Galleries::create(array('name' => 'Cities', 'active' => true)),
+			'flowers' => Galleries::create(array('name' => 'Flowers', 'active' => true)),
+			'poneys'  => Galleries::create(array('name' => 'Poneys', 'active' => true))
+		);
 
-		foreach (array('cities', 'flowers', 'poneys') as $key) {
-			$this->assertFalse(${$key}->exists());
-			$this->assertTrue(${$key}->save());
-			$this->assertTrue(${$key}->exists());
+		foreach ($records as $key => $record) {
+			$this->assertFalse($record->exists());
+			$this->assertTrue($record->save());
+			$this->assertTrue($record->exists());
 		}
 		$this->assertEqual(3, Galleries::count());
 

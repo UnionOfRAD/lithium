@@ -174,8 +174,9 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		));
 		$galleries = $this->_db->read($query)->data();
 		$expected = include $this->_export . '/testOneToMany.php';
-
 		$gallery = Galleries::find('first', $opts + array('with' => 'Images'))->data();
+
+		$this->assertEqual(3, count($gallery['images']));
 		$this->assertEqual(reset($expected), $gallery);
 	}
 
@@ -252,6 +253,38 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 			'order' => 'name',
 		));
 		$this->assertNotEmpty($galleries);
+	}
+
+	public function testOrderWithHasManyThrowsExceptionIfNonSequential() {
+		$this->assertException('/^Associated records hydrated out of order.*/', function() {
+			Galleries::find('all', array(
+				'order' => array('Images.title' => 'DESC'),
+				'with' => 'Images'
+			))->to('array');
+		});
+	}
+
+	public function testOrderWithHasManyWorksIfOrderByMainIdFirst() {
+		$expected = include $this->_export . '/testHasManyWithOrder.php';
+
+		$galleries = Galleries::find('all', array(
+			'order' => array('id', 'Images.title' => 'DESC'),
+			'with' => 'Images'
+		));
+
+		$this->assertCount(2, $galleries);
+		$this->assertEqual($expected, $galleries->to('array'));
+
+		$galleries = Galleries::find('all', array(
+			'order' => array(
+				'name' => 'DESC',
+				'Images.title' => 'DESC'
+			),
+			'with' => 'Images'
+		));
+
+		$this->assertCount(2, $galleries);
+		$this->assertEqual(array_reverse($expected, true), $galleries->to('array'));
 	}
 
 	public function testGroup() {

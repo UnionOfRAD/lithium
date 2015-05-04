@@ -584,41 +584,36 @@ abstract class Database extends \lithium\data\Source {
 			}
 			$result = $self->invokeMethod('_execute', array($sql));
 
-			switch ($return) {
-				case 'resource':
-					return $result;
-				case 'array':
-					$columns = $args['schema'] ?: $self->schema($query, $result);
-
-					if (!is_array(reset($columns))) {
-						$columns = array('' => $columns);
-					}
-
-					$i = 0;
-					$records = array();
-					foreach ($result as $data) {
-						$offset = 0;
-						$records[$i] = array();
-
-						foreach ($columns as $path => $cols) {
-							$len = count($cols);
-							$values = array_combine($cols, array_slice($data, $offset, $len));
-
-							if ($path) {
-								$records[$i][$path] = $values;
-							} else {
-								$records[$i] += $values;
-							}
-							$offset += $len;
-						}
-						$i++;
-					}
-					return Set::expand($records);
-				case 'item':
-					return $model::create(array(), compact('query', 'result') + array(
-						'class' => 'set', 'defaults' => false
-					));
+			if ($return === 'resource') {
+				return $result;
 			}
+			if ($return === 'item') {
+				return $model::create(array(), compact('query', 'result') + array(
+					'class' => 'set', 'defaults' => false
+				));
+			}
+			$columns = $args['schema'] ?: $self->schema($query, $result);
+
+			if (!is_array(reset($columns))) {
+				$columns = array('' => $columns);
+			}
+
+			$i = 0;
+			$records = array();
+
+			foreach ($result as $data) {
+				$offset = 0;
+				$records[$i] = array();
+
+				foreach ($columns as $path => $cols) {
+					$len = count($cols);
+					$values = array_combine($cols, array_slice($data, $offset, $len));
+					($path) ? $records[$i][$path] = $values : $records[$i] += $values;
+					$offset += $len;
+				}
+				$i++;
+			}
+			return Set::expand($records);
 		});
 	}
 
@@ -648,7 +643,7 @@ abstract class Database extends \lithium\data\Source {
 			));
 			$ids = array();
 
-			while ($row = $result->next()) {
+			foreach ($result as $row) {
 				$ids[] = $row[0];
 			}
 			if (!$ids) {
@@ -659,6 +654,7 @@ abstract class Database extends \lithium\data\Source {
 			$conditions = array();
 			$relations = array_keys($query->relationships());
 			$pattern = '/^(' . implode('|', $relations) . ')\./';
+
 			foreach ($query->conditions() as $key => $value) {
 				if (preg_match($pattern, $key)) {
 					$conditions[$key] = $value;

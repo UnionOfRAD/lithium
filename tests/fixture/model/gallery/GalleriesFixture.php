@@ -22,14 +22,12 @@ class GalleriesFixture extends \li3_fixtures\test\Fixture {
 
 	protected $_records = array(
 		array(
-			'id' => 1,
 			'name' => 'Foo Gallery',
 			'active' => true,
 			'created' => '2007-06-20 21:02:27',
 			'modified' => '2009-12-14 22:36:09'
 		),
 		array(
-			'id' => 2,
 			'name' => 'Bar Gallery',
 			'active' => true,
 			'created' => '2008-08-22 16:12:42',

@@ -16,7 +16,7 @@ use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 use lithium\data\source\mongo_db\Schema;
 use lithium\data\source\mongo_db\Exporter;
-use lithium\tests\mocks\data\source\mongo_db\MockResult;
+use lithium\tests\mocks\data\source\MockResult;
 use lithium\tests\mocks\data\source\MockMongoPost;
 
 class ExporterTest extends \lithium\test\Unit {
@@ -144,8 +144,14 @@ class ExporterTest extends \lithium\test\Unit {
 	}
 
 	public function testUpdateFromResourceLoading() {
-		$resource = new MockResult();
-		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$result = new MockResult(array(
+			'data' => array(
+				array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar'),
+				array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo'),
+				array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib')
+			)
+		));
+		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $result));
 		$this->assertEmpty(Exporter::get('update', $doc->export()));
 		$this->assertEqual('dib', $doc['6c8f86167675abfabdbf0302']->title);
 

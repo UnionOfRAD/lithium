@@ -8,88 +8,104 @@
 
 namespace lithium\data\source;
 
+/**
+ * The `Result` class is a wrapper around a forward-only data soure result cursor and can be
+ * used to iterate over it.
+ *
+ * Just a forward-only cursor is required, not necessarily a rolling cursor. Not all
+ * data sources can support rolling cursors, that's why forward-only cursors have been
+ * chosen here as the least common denominator for the abstraction.
+ *
+ * Rolling cursors cannot be emulated from an underlying forward-only cursor in a
+ * (memory) efficient way. `Result` does not try to and will deliberately not keep
+ * already yielded results in an internal cache.
+ *
+ * To allow full (back and forth) iteration over the yielded results, a wrapping class
+ * (i.e. `Collection`) may keep such a cache while draining the `Result` from outside.
+ *
+ * Because of these characteristics an instance of `Result` may be used only once.
+ * After draining the result it cannot be rewinded or reset. This is similar to the
+ * behavior of the `NoRewindIterator`, where rewind calls have no effect.
+ *
+ * The first result will be eager loaded from the cursor, as it is expected the
+ * result will be used at least once.
+ *
+ * The class also provides a mechanism which buffers results when peeking for next ones. The
+ * buffered results will then be used when continuing to iterate over the result object.
+ *
+ * @link https://en.wikipedia.org/wiki/Cursor_(databases)
+ * @link http://php.net/manual/class.iterator.php The Iterator interface.
+ * @link http://php.net/manual/norewinditerator.rewind.php
+ */
 abstract class Result extends \lithium\core\Object implements \Iterator {
 
 	/**
-	 * Contains the cached result set.
-	 *
-	 * @var array
-	 */
-	protected $_cache = array();
-
-	/**
 	 * The current position of the iterator.
+	 *
+	 * @var integer
 	 */
 	protected $_iterator = 0;
 
 	/**
 	 * Contains the current element of the result set.
-	 */
-	protected $_current = false;
-
-	/**
-	 * Setted to `true` when the collection has begun iterating.
 	 *
-	 * @var integer
+	 * @var mixed
 	 */
-	protected $_started = false;
-
-	/**
-	 * If the result resource has been initialized
-	 */
-	protected $_init = false;
+	protected $_current = null;
 
 	/**
 	 * Indicates whether the current position is valid or not.
 	 *
-	 * @var boolean
 	 * @see lithium\data\source\Result::valid()
+	 * @var boolean
 	 */
 	protected $_valid = false;
 
 	/**
-	 * If the result resource has been initialized
+	 * Key of the current result.
+	 *
+	 * @var integer|null
 	 */
 	protected $_key = null;
 
 	/**
 	 * The bound resource.
+	 *
+	 * @var object|resource|null
 	 */
 	protected $_resource = null;
 
 	/**
 	 * Autoconfig.
+	 *
+	 * @var array
 	 */
 	protected $_autoConfig = array('resource');
 
 	/**
+	 * Buffer results of query before returning / iterating. Allows consumers to 'peek' at results.
+	 *
+	 * @var array
+	 */
+	protected $_buffer = array();
+
+	/**
 	 * Returns the used resource.
+	 *
+	 * @return object|resource
 	 */
 	public function resource() {
 		return $this->_resource;
 	}
 
 	/**
-	 * Checks if current position is valid.
+	 * Initializer. Eager loads the first result.
 	 *
-	 * @return boolean `true` if valid, `false` otherwise.
+	 * @return void
 	 */
-	public function valid() {
-		if (!$this->_init) {
-			$this->_valid = $this->_fetch();
-		}
-		return $this->_valid;
-	}
-
-	/**
-	 * Rewinds the result set to the first position.
-	 */
-	public function rewind() {
-		$this->_iterator = 0;
-		$this->_started = false;
-		$this->_key = null;
-		$this->_current = false;
-		$this->_init = false;
+	protected function _init() {
+		parent::_init();
+		$this->next();
 	}
 
 	/**
@@ -98,90 +114,79 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	 * @return array The current result (or `null` if there is none).
 	 */
 	public function current() {
-		if (!$this->_init) {
-			$this->_fetch();
-		}
-		$this->_started = true;
 		return $this->_current;
 	}
 
 	/**
 	 * Returns the current key position on the result.
 	 *
-	 * @return integer The current iterator position.
+	 * @return integer|null The current key position or `null` if there is none.
 	 */
 	public function key() {
-		if (!$this->_init) {
-			$this->_fetch();
-		}
-		$this->_started = true;
 		return $this->_key;
-	}
-
-	/**
-	 * Fetches the previous element from the cache.
-	 *
-	 * @return mixed The previous result (or `false` if there is none).
-	 */
-	public function prev() {
-		if (!$this->_cache) {
-			return;
-		}
-		if (isset($this->_cache[--$this->_iterator - 1])) {
-			$this->_key = $this->_iterator - 1;
-			return $this->_current = $this->_cache[$this->_iterator - 1];
-		}
-		return false;
 	}
 
 	/**
 	 * Fetches the next element from the resource.
 	 *
-	 * @return mixed The next result (or `false` if there is none).
+	 * @return mixed The next result (or `null` if there is none).
 	 */
 	public function next() {
-		if ($this->_started === false) {
-			return $this->current();
+		if ($this->_buffer) {
+			list($this->_key, $this->_current) = array_shift($this->_buffer);
+			return $this->_current;
 		}
-		$this->_valid = $this->_fetch();
-		if (!$this->_valid) {
+
+		if (!$next = $this->_fetch()) {
 			$this->_key = null;
-			$this->_current = false;
+			$this->_current = null;
+			$this->_valid = false;
+
+			return null;
+		} else {
+			list($this->_key, $this->_current) = $next;
+			$this->_valid = true;
 		}
-		return $this->current();
+		return $this->_current;
 	}
 
 	/**
-	 * Fetches the current element from the resource.
+	 * Peeks at the next element in the resource without advancing `Result`'s cursor.
 	 *
-	 * @return boolean Return `true` on success or `false` otherwise.
+	 * @return mixed The next result (or `null` if there is none).
 	 */
-	protected function _fetch() {
-		$this->_init = true;
-		if ($this->_fetchFromCache() || $this->_fetchFromResource()) {
-			return true;
+	public function peek() {
+		if ($this->_buffer) {
+			return reset($this->_buffer);
 		}
-		return false;
+		if (!$next = $this->_fetch()) {
+			return null;
+		}
+		$this->_buffer[] = $next;
+		$first = reset($this->_buffer);
+		return end($first);
 	}
 
-	abstract protected function _fetchFromResource();
+	/**
+	 * Noop to fulfill the `Iterator` interface. `Result` is forward-only.
+	 *
+	 * @return void
+	 */
+	public function rewind() {}
 
 	/**
-	 * Returns the result from the primed cache.
+	 * Checks if current position is valid.
 	 *
-	 * @return boolean Return `true` on success or `false` if it has not been cached yet.
+	 * @return boolean `true` if valid, `false` otherwise.
 	 */
-	protected function _fetchFromCache() {
-		if ($this->_iterator < count($this->_cache)) {
-			$this->_key = $this->_iterator;
-			$this->_current = $this->_cache[$this->_iterator++];
-			return true;
-		}
-		return false;
+	public function valid() {
+		return $this->_valid;
 	}
 
 	/**
 	 * Close the resource.
+	 *
+	 * @return void
 	 */
 	public function close() {
 		unset($this->_resource);
@@ -196,6 +201,14 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	public function __destruct() {
 		$this->close();
 	}
+
+	/**
+	 * Fetches the next result from the resource.
+	 *
+	 * @return array|boolean|null Returns a key/value pair for the next result,
+	 *         `null` if there is none, `false` if something bad happened.
+	 */
+	abstract protected function _fetch();
 }
 
 ?>

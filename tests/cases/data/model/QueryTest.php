@@ -439,13 +439,13 @@ class QueryTest extends \lithium\test\Unit {
 			'type' => 'read',
 			'with' => 'MockQueryComment',
 			'limit' => 3,
-			'order' => 'author_id ASC',
+			'order' => array('author_id', 'id'),
 			'group' => 'author_id'
 		));
 		$expected = 'SELECT * FROM {foo} AS {MockQueryPost} LEFT JOIN {mock_query_comments} AS ';
 		$expected .= '{MockQueryComment} ON {MockQueryPost}.{id} = {MockQueryComment}';
 		$expected .= '.{mock_query_post_id} GROUP BY {MockQueryPost}.{author_id} ORDER BY ';
-		$expected .= '{MockQueryPost}.{author_id} ASC LIMIT 3;';
+		$expected .= '{MockQueryPost}.{author_id} ASC, {MockQueryPost}.{id} ASC LIMIT 3;';
 		$this->assertEqual($expected, $this->_db->renderCommand($query));
 	}
 
