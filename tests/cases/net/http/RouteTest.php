@@ -829,6 +829,45 @@ class RouteTest extends \lithium\test\Unit {
 		$this->assertIdentical('/Admin/view', $route->match($nonDefault));
 	}
 
+	/**
+	 * Tests that routes with defaults keep their defaults, even when there
+	 * are keys in the route template.
+	 */
+	public function testDefaultsAreKept() {
+		$request = new Request();
+		$request->url = '/shop/pay/123';
+
+		$route = new Route(array(
+			'template' => '/shop/pay/{:uuid}',
+			'params' => array('controller' => 'orders', 'action' => 'pay'),
+			'defaults' => array('language' => 'de')
+		));
+		$result = $route->parse($request);
+		$this->assertArrayHasKey('language', $result->params);
+
+		$request = new Request();
+		$request->url = '/shop/pay/123';
+
+		$route = new Route(array(
+			'template' => '/shop/pay/{:uuid:[0-9]+}',
+			'params' => array('controller' => 'orders', 'action' => 'pay'),
+			'defaults' => array('language' => 'de')
+		));
+		$result = $route->parse($request);
+		$this->assertArrayHasKey('language', $result->params);
+
+		$request = new Request();
+		$request->url = '/shop/pay';
+
+		$route = new Route(array(
+			'template' => '/shop/pay',
+			'params' => array('controller' => 'orders', 'action' => 'pay'),
+			'defaults' => array('language' => 'de')
+		));
+		$result = $route->parse($request);
+		$this->assertArrayHasKey('language', $result->params);
+	}
+
 	public function testRouteParsingWithRegexAction() {
 		$route = new Route(array(
 			'template' => '/products/{:action:add|edit|remove}/{:category}',

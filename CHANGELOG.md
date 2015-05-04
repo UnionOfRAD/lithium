@@ -30,6 +30,7 @@
 - Matched implementation with documentation of `Request::accepts()`. The method now returns a boolean 
   when type is provided. #1180, #856 (David Persson, David Rogers)
 - Fixed several bugs in the FormSignature class. #839, #998, #1173 (Hamid Reza Koushki, David Persson, Ciaro Vermeire, cinaeco) 
+- Fixed bug where route defaults weren't kept when key params were present in route. (David Persson)
 
 ### Improved
 

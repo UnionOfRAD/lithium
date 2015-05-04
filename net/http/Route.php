@@ -510,7 +510,7 @@ class Route extends \lithium\core\Object {
 			$this->_keys[$param] = $param;
 			$this->_pattern = $this->_regex($regexs[$i], $param, $tokens[$i], $slashes[$i]);
 		}
-		$this->_defaults = array_intersect_key($this->_params, $this->_keys);
+		$this->_defaults += array_intersect_key($this->_params, $this->_keys);
 		$this->_match = array_diff_key($this->_params, $this->_defaults);
 	}
 
