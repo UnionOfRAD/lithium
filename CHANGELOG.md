@@ -43,6 +43,13 @@
 - Database encoding, timezone, and searchPath methods may now throw exceptions. Please
   wrap code calling these methods directly in try/catch blocks - if needed. #1172
   (David Persson)
+- The String/Text class has been thinned. RNG functionality has been extracted 
+  into `security\Random` and hashing functionality extracted into `security\Hash`.
+  Please update your code accordingly. #1184 (David Persson)
+  
+  - `lithium\util\String::hash()` -> `lithium\security\Hash::calculate()`
+  - `lithium\util\String::compare()` -> `lithium\security\Hash::compare()`
+  - `lithium\util\String::random()` -> `lithium\security\Random::generate()`
 
 ## v1.0.0
 

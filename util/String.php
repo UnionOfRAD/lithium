@@ -8,14 +8,11 @@
 
 namespace lithium\util;
 
-use COM;
-use Closure;
-use Exception;
+use lithium\security\Random;
 
 /**
  * String manipulation utility class. Includes functionality for generating UUIDs,
- * {:tag} and regex replacement, and tokenization. Also includes a cryptographically-strong random
- * number generator, and a base64 encoder for use with DES and XDES.
+ * {:tag} and regex replacement, and tokenization.
  */
 class String {
 
@@ -40,26 +37,13 @@ class String {
 	const UUID_VAR_RFC = 128;
 
 	/**
-	 * Option flag used in `String::random()`.
-	 */
-	const ENCODE_BASE_64 = 1;
-
-	/**
-	 * A closure which, given a number of bytes, returns that amount of
-	 * random bytes.
-	 *
-	 * @var Closure
-	 */
-	protected static $_source;
-
-	/**
 	 * Generates an RFC 4122-compliant version 4 UUID.
 	 *
 	 * @return string The string representation of an RFC 4122-compliant, version 4 UUID.
 	 * @link http://www.ietf.org/rfc/rfc4122.txt RFC 4122: UUID URN Namespace
 	 */
 	public static function uuid() {
-		$uuid = static::random(16);
+		$uuid = Random::generate(16);
 		$uuid[6] = chr(ord($uuid[6]) & static::UUID_CLEAR_VER | static::UUID_VERSION_4);
 		$uuid[8] = chr(ord($uuid[8]) & static::UUID_CLEAR_VAR | static::UUID_VAR_RFC);
 
@@ -70,156 +54,6 @@ class String {
 			bin2hex(substr($uuid, 8, 2)),
 			bin2hex(substr($uuid, 10, 6))
 		));
-	}
-
-	/**
-	 * Generates random bytes for use in UUIDs and password salts, using
-	 * (when available) a cryptographically strong random number generator.
-	 *
-	 * ```
-	 * $bits = String::random(8); // 64 bits
-	 * $hex = bin2hex($bits); // [0-9a-f]+
-	 * ```
-	 *
-	 * Optionally base64-encodes the resulting random string per the following:
-	 *
-	 *  _The alphabet used by `base64_encode()` is different than the one we should be using. When
-	 * considering the meaty part of the resulting string, however, a bijection allows to go the
-	 * from one to another. Given that we're working on random bytes, we can use safely use
-	 * `base64_encode()` without losing any entropy._
-	 *
-	 * @param integer $bytes The number of random bytes to generate.
-	 * @param array $options The options used when generating random bytes:
-	 *              - `'encode'` _integer_: If specified, and set to `String::ENCODE_BASE_64`, the
-	 *                resulting value will be base64-encoded, per the notes above.
-	 * @return string Returns a string of random bytes.
-	 */
-	public static function random($bytes, array $options = array()) {
-		$defaults = array('encode' => null);
-		$options += $defaults;
-
-		$source = static::$_source ?: static::_source();
-		$result = $source($bytes);
-
-		if ($options['encode'] !== static::ENCODE_BASE_64) {
-			return $result;
-		}
-		return strtr(rtrim(base64_encode($result), '='), '+', '.');
-	}
-
-	/**
-	 * Initializes `String::$_source` using the best available random number generator.
-	 *
-	 * When available, `/dev/urandom` and COM gets used on *nix and
-	 * [Windows systems](http://msdn.microsoft.com/en-us/library/aa388182%28VS.85%29.aspx?ppud=4),
-	 * respectively.
-	 *
-	 * If all else fails, a Mersenne Twister gets used. (Strictly
-	 * speaking, this fallback is inadequate, but good enough.)
-	 *
-	 * @see lithium\util\String::$_source
-	 * @return Closure Returns a closure containing a random number generator.
-	 */
-	protected static function _source() {
-		switch (true) {
-			case isset(static::$_source):
-				return static::$_source;
-			case is_readable('/dev/urandom') && $fp = fopen('/dev/urandom', 'rb'):
-				return static::$_source = function($bytes) use (&$fp) {
-					return fread($fp, $bytes);
-				};
-			case class_exists('COM', false):
-				try {
-					$com = new COM('CAPICOM.Utilities.1');
-					return static::$_source = function($bytes) use ($com) {
-						return base64_decode($com->GetRandom($bytes, 0));
-					};
-				} catch (Exception $e) {
-				}
-			default:
-				return static::$_source = function($bytes) {
-					$rand = '';
-
-					for ($i = 0; $i < $bytes; $i++) {
-						$rand .= chr(mt_rand(0, 255));
-					}
-					return $rand;
-				};
-		}
-	}
-
-	/**
-	 * Uses PHP's hashing functions to create a hash of the string provided, using the options
-	 * specified. The default hash algorithm is SHA-512.
-	 *
-	 * @link http://php.net/function.hash.php PHP Manual: `hash()`
-	 * @link http://php.net/function.hash-hmac.php PHP Manual: `hash_hmac()`
-	 * @link http://php.net/function.hash-algos.php PHP Manual: `hash_algos()`
-	 * @param string $string The string to hash.
-	 * @param array $options Supported options:
-	 *        - `'type'` _string_: Any valid hashing algorithm. See the `hash_algos()` function to
-	 *          determine which are available on your system.
-	 *        - `'salt'` _string_: A _salt_ value which, if specified, will be prepended to the
-	 *          string.
-	 *        - `'key'` _string_: If specified `hash_hmac()` will be used to hash the string,
-	 *          instead of `hash()`, with `'key'` being used as the message key.
-	 *        - `'raw'` _boolean_: If `true`, outputs the raw binary result of the hash operation.
-	 *          Defaults to `false`.
-	 * @return string Returns a hashed string.
-	 */
-	public static function hash($string, array $options = array()) {
-		$defaults = array(
-			'type' => 'sha512',
-			'salt' => false,
-			'key' => false,
-			'raw' => false
-		);
-		$options += $defaults;
-
-		if ($options['salt']) {
-			$string = $options['salt'] . $string;
-		}
-		if ($options['key']) {
-			return hash_hmac($options['type'], $string, $options['key'], $options['raw']);
-		}
-		return hash($options['type'], $string, $options['raw']);
-	}
-
-	/**
-	 * Compares two strings in constant time to prevent timing attacks.
-	 *
-	 * To successfully mitigate timing attacks and not leak the actual length of the known
-	 * string, it is important that _both provided strings have the same length_ and that
-	 * the _user-supplied string is passed as a second parameter_ rather than first.
-	 *
-	 * This function has the same signature and behavior as the native `hash_equals()` function
-	 * and will use that function if available (PHP >= 5.6).
-	 *
-	 * An E_USER_WARNING will be emitted when either of the supplied parameters is not a string.
-	 *
-	 * @link http://php.net/hash_equals
-	 * @link http://codahale.com/a-lesson-in-timing-attacks/ More about timing attacks.
-	 * @param string $known The string of known length to compare against.
-	 * @param string $user The user-supplied string.
-	 * @return boolean Returns a boolean indicating whether the two strings are equal.
-	 */
-	public static function compare($known, $user) {
-		if (function_exists('hash_equals')) {
-			return hash_equals($known, $user);
-		}
-		if (!is_string($known) || !is_string($user)) {
-			trigger_error('Expected `$known` & `$user` parameters to be strings.', E_USER_WARNING);
-			return false;
-		}
-		$result = true;
-
-		if (($length = strlen($known)) !== strlen($user)) {
-			return false;
-		}
-		for ($i = 0; $i < $length; $i++) {
-			$result = $result && ($known[$i] === $user[$i]);
-		}
-		return $result;
 	}
 
 	/**
@@ -477,6 +311,75 @@ class String {
 			$results[] = $buffer;
 		}
 		return $results ? array_map('trim', $results) : array();
+	}
+
+	/* Deprecated / BC */
+
+	/**
+	 * Option flag used in `String::random()`.
+	 *
+	 * @deprecated
+	 */
+	const ENCODE_BASE_64 = 1;
+
+	/**
+	 * Generates random bytes for use in UUIDs and password salts, using
+	 * (when available) a cryptographically strong random number generator.
+	 *
+	 * @deprecated
+	 * @param integer $bytes The number of random bytes to generate.
+	 * @param array $options The options used when generating random bytes:
+	 *              - `'encode'` _integer_: If specified, and set to `String::ENCODE_BASE_64`, the
+	 *                resulting value will be base64-encoded, per the notes above.
+	 * @return string Returns a string of random bytes.
+	 */
+	public static function random($bytes, array $options = array()) {
+		$message  = "lithium\util\String::random() has been deprecated in favor of ";
+		$message .= "lithium\security\Random::generate().";
+		trigger_error($message, E_USER_DEPRECATED);
+
+		return \lithium\security\Random::generate($bytes, $options);
+	}
+
+	/**
+	 * Uses PHP's hashing functions to create a hash of the string provided, using the options
+	 * specified. The default hash algorithm is SHA-512.
+	 *
+	 * @deprecated
+	 * @param string $string The string to hash.
+	 * @param array $options Supported options:
+	 *        - `'type'` _string_: Any valid hashing algorithm. See the `hash_algos()` function to
+	 *          determine which are available on your system.
+	 *        - `'salt'` _string_: A _salt_ value which, if specified, will be prepended to the
+	 *          string.
+	 *        - `'key'` _string_: If specified `hash_hmac()` will be used to hash the string,
+	 *          instead of `hash()`, with `'key'` being used as the message key.
+	 *        - `'raw'` _boolean_: If `true`, outputs the raw binary result of the hash operation.
+	 *          Defaults to `false`.
+	 * @return string Returns a hashed string.
+	 */
+	public static function hash($string, array $options = array()) {
+		$message  = "lithium\util\String::hash() has been deprecated in favor of ";
+		$message .= "lithium\security\Hash::calculate().";
+		trigger_error($message, E_USER_DEPRECATED);
+
+		return \lithium\security\Hash::calculate($string, $options);
+	}
+
+	/**
+	 * Compares two strings in constant time to prevent timing attacks.
+	 *
+	 * @deprecated
+	 * @param string $known The string of known length to compare against.
+	 * @param string $user The user-supplied string.
+	 * @return boolean Returns a boolean indicating whether the two strings are equal.
+	 */
+	public static function compare($known, $user) {
+		$message  = "lithium\util\String::compare() has been deprecated in favor of ";
+		$message .= "lithium\security\Hash::compare().";
+		trigger_error($message, E_USER_DEPRECATED);
+
+		return \lithium\security\Hash::compare($known, $user);
 	}
 }
 

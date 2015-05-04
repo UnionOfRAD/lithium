@@ -11,7 +11,7 @@ namespace lithium\storage\session\strategy;
 use RuntimeException;
 use lithium\core\ConfigException;
 use lithium\storage\session\strategy\MissingSignatureException;
-use lithium\util\String;
+use lithium\security\Hash;
 
 /**
  * This strategy allows you to sign your `Session` and / or `Cookie` data with a passphrase
@@ -117,7 +117,7 @@ class Hmac extends \lithium\core\Object {
 		if (!isset($currentData['__signature'])) {
 			throw new MissingSignatureException('HMAC signature not found.');
 		}
-		if (String::compare($currentData['__signature'], static::_signature($currentData))) {
+		if (Hash::compare($currentData['__signature'], static::_signature($currentData))) {
 			return $data;
 		}
 		throw new RuntimeException('Possible data tampering: HMAC signature does not match data.');
