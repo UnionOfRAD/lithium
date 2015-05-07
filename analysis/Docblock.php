@@ -25,7 +25,7 @@ class Docblock extends \lithium\core\StaticObject {
 	public static $tags = array(
 		'todo', 'discuss', 'fix', 'important', 'var',
 		'param', 'return', 'throws', 'see', 'link',
-		'task', 'dependencies', 'filter'
+		'task', 'dependencies', 'filter', 'deprecated'
 	);
 
 	/**
