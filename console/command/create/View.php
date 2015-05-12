@@ -9,7 +9,7 @@
 namespace lithium\console\command\create;
 
 use lithium\util\Inflector;
-use lithium\util\String;
+use lithium\util\Text;
 
 /**
  * Generate a View file in the `--library` namespace
@@ -61,7 +61,7 @@ class View extends \lithium\console\command\Create {
 		$params['file'] = $this->request->args(0);
 
 		$contents = $this->_template();
-		$result = String::insert($contents, $params);
+		$result = Text::insert($contents, $params);
 
 		if (!empty($this->_library['path'])) {
 			$path = $this->_library['path'] . "/views/{$params['path']}/{$params['file']}";

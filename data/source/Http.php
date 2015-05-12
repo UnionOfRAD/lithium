@@ -8,7 +8,7 @@
 
 namespace lithium\data\source;
 
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\data\model\Query;
 
 /**
@@ -170,7 +170,7 @@ class Http extends \lithium\data\Source {
 			$data = array_diff_key($data,  array_flip($matches[1]));
 		}
 		return $this->connection->{$method}(
-			String::insert($path, $insert, array('clean' => true)),
+			Text::insert($path, $insert, array('clean' => true)),
 			$data + (array) $query->conditions() + array('limit' => $query->limit()),
 			(array) $options
 		);

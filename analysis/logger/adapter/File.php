@@ -8,7 +8,7 @@
 
 namespace lithium\analysis\logger\adapter;
 
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\core\Libraries;
 use Closure;
 
@@ -36,7 +36,7 @@ class File extends \lithium\core\Object {
 	/**
 	 * Constructor.
 	 *
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @param array $config Settings used to configure the adapter. Available options:
 	 *        - `'path'` _string_: The directory to write log files to. Defaults to
 	 *          `<app>/resources/tmp/logs`.
@@ -47,7 +47,7 @@ class File extends \lithium\core\Object {
 	 *          adapter's current configuration. It must then return a file name to write the
 	 *          log message to. The default will produce a log file name corresponding to the
 	 *          priority of the log message, i.e. `"debug.log"` or `"alert.log"`.
-	 *        - `'format'` _string_: A `String::insert()`-compatible string that specifies how
+	 *        - `'format'` _string_: A `Text::insert()`-compatible string that specifies how
 	 *          the log message should be formatted. The default format is
 	 *          `"{:timestamp} {:message}\n"`.
 	 * @return void
@@ -76,7 +76,7 @@ class File extends \lithium\core\Object {
 		return function($self, $params) use (&$config) {
 			$path = $config['path'] . '/' . $config['file']($params, $config);
 			$params['timestamp'] = date($config['timestamp']);
-			$message = String::insert($config['format'], $params);
+			$message = Text::insert($config['format'], $params);
 			return file_put_contents($path, $message, FILE_APPEND);
 		};
 	}

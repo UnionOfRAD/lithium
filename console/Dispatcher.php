@@ -45,10 +45,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * not empty) in a route, (i.e. the result of `lithium\console\Router::parse()`) then the rule's
 	 * value will be applied to the route before it is dispatched.  When applying a rule, any array
 	 * elements array elements of the flag which are present in the route will be modified using a
-	 * `lithium\util\String::insert()`-formatted string.
+	 * `lithium\util\Text::insert()`-formatted string.
 	 *
 	 * @see lithium\console\Dispatcher::config()
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @var array
 	 */
 	protected static $_rules = array(

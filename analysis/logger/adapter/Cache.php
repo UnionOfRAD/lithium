@@ -8,7 +8,7 @@
 
 namespace lithium\analysis\logger\adapter;
 
-use lithium\util\String;
+use lithium\util\Text;
 use Closure;
 
 /**
@@ -48,7 +48,7 @@ class Cache extends \lithium\core\Object {
 	/**
 	 * Constructor.
 	 *
-	 * @see lithium\util\String
+	 * @see lithium\util\Text
 	 * @param array $config Possible configuration options are:
 	 *        - `'config'`: The name of the cache configuration to use; defaults to none.
 	 *        - `'expiry'`: Defines when the logged item should expire, by default will
@@ -83,7 +83,7 @@ class Cache extends \lithium\core\Object {
 		return function($self, $params) use ($config) {
 			$params += array('timestamp' => strtotime('now'));
 			$key = $config['key'];
-			$key = is_callable($key) ? $key($params) : String::insert($key, $params);
+			$key = is_callable($key) ? $key($params) : Text::insert($key, $params);
 
 			$cache = $config['cache'];
 			return $cache::write($config['config'], $key, $params['message'], $config['expiry']);

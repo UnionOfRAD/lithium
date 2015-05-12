@@ -11,7 +11,7 @@ namespace lithium\template\view\adapter;
 use Closure;
 use Exception;
 use lithium\util\Set;
-use lithium\util\String;
+use lithium\util\Text;
 
 /**
  * This view adapter renders content using simple string substitution, and is only useful for very
@@ -39,7 +39,7 @@ class Simple extends \lithium\template\view\Renderer {
 			$context[$key] = $this->__get($key);
 		}
 		$data = array_merge($this->_toString($context), $this->_toString($data));
-		return String::insert($template, $data, $options);
+		return Text::insert($template, $data, $options);
 	}
 
 	/**

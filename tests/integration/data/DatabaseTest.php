@@ -13,7 +13,7 @@ use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\tests\fixture\model\gallery\Images;
 use lithium\tests\fixture\model\gallery\Galleries;
-use lithium\util\String;
+use lithium\util\Text;
 use li3_fixtures\test\Fixtures;
 use lithium\data\Schema;
 
@@ -207,14 +207,14 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 
 	public function testUpdate() {
 		$options = array('conditions' => array('id' => 1));
-		$uuid = String::uuid();
+		$uuid = Text::uuid();
 		$image = Images::find('first', $options);
 		$image->title = $uuid;
 		$firstID = $image->id;
 		$image->save();
 		$this->assertEqual($uuid, Images::find('first', $options)->title);
 
-		$uuid = String::uuid();
+		$uuid = Text::uuid();
 		Images::update(array('title' => $uuid), array('id' => $firstID));
 		$this->assertEqual($uuid, Images::find('first', $options)->title);
 		$this->images[0]['title'] = $uuid;

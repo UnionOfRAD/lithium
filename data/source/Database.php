@@ -11,7 +11,7 @@ namespace lithium\data\source;
 use PDO;
 use PDOException;
 use lithium\util\Set;
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
 use lithium\core\NetworkException;
@@ -503,10 +503,10 @@ abstract class Database extends \lithium\data\Source {
 	 * Inserts a new record into the database based on a the `Query`. The record is updated
 	 * with the id of the insert.
 	 *
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @param object $query An SQL query string, or `lithium\data\model\Query` object instance.
 	 * @param array $options If $query is a string, $options contains an array of bind values to be
-	 *              escaped, quoted, and inserted into `$query` using `String::insert()`.
+	 *              escaped, quoted, and inserted into `$query` using `Text::insert()`.
 	 * @return boolean Returns `true` if the query succeeded, otherwise `false`.
 	 * @filter
 	 */
@@ -522,7 +522,7 @@ abstract class Database extends \lithium\data\Source {
 				$entity =& $query->entity();
 				$query = $self->renderCommand('create', $params, $query);
 			} else {
-				$query = String::insert($query, $self->value($params['options']));
+				$query = Text::insert($query, $self->value($params['options']));
 			}
 
 			if (!$self->invokeMethod('_execute', array($query))) {
@@ -567,7 +567,7 @@ abstract class Database extends \lithium\data\Source {
 			$model = is_object($query) ? $query->model() : null;
 
 			if (is_string($query)) {
-				$sql = String::insert($query, $self->value($args));
+				$sql = Text::insert($query, $self->value($args));
 			} else {
 				if (!$data = $self->invokeMethod('_queryExport', array($query))) {
 					return false;
@@ -706,7 +706,7 @@ abstract class Database extends \lithium\data\Source {
 			if ($isObject) {
 				$sql = $self->renderCommand('delete', $query->export($self), $query);
 			} else {
-				$sql = String::insert($query, $self->value($params['options']));
+				$sql = Text::insert($query, $self->value($params['options']));
 			}
 			$result = (boolean) $self->invokeMethod('_execute', array($sql));
 
@@ -804,8 +804,8 @@ abstract class Database extends \lithium\data\Source {
 		foreach ($data as $key => $value) {
 			$placeholders[$key] = "{{$key}}";
 		}
-		$template = String::insert($template, $placeholders, array('clean' => true));
-		return trim(String::insert($template, $data, array('before' => '{')));
+		$template = Text::insert($template, $placeholders, array('clean' => true));
+		return trim(Text::insert($template, $data, array('before' => '{')));
 	}
 
 	/**
@@ -1446,7 +1446,7 @@ abstract class Database extends \lithium\data\Source {
 
 		switch (true) {
 			case (isset($config['format'])):
-				return $key . ' ' . String::insert($config['format'], $values);
+				return $key . ' ' . Text::insert($config['format'], $values);
 			case (is_object($value) && isset($config['multiple'])):
 				$op = $config['multiple'];
 				$value = trim(rtrim($this->renderCommand($value), ';'));
@@ -1742,7 +1742,7 @@ abstract class Database extends \lithium\data\Source {
 			}
 		}
 
-		return trim(String::insert($template, $data, array('clean' => array('method' => 'text'))));
+		return trim(Text::insert($template, $data, array('clean' => array('method' => 'text'))));
 	}
 
 	/**
