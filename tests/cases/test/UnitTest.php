@@ -467,6 +467,18 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testErrorLevelHonored() {
+		$original = error_reporting();
+
+		error_reporting($original & ~E_USER_DEPRECATED);
+
+		$this->assertNotException('/^test deprecation$/', function() {
+			trigger_error('test deprecation', E_USER_DEPRECATED);
+		});
+
+		error_reporting($original);
+	}
+
 	public function testHandleException() {
 		$this->test->handleException(new Exception('test handle exception'));
 		$results = $this->test->results();

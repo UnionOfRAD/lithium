@@ -173,6 +173,12 @@ class Unit extends \lithium\core\Object {
 	 * exceptions in order to make both errors and exceptions be handled
 	 * in a unified way.
 	 *
+	 * The error handler honors the PHP `error_level` and will not convert errors
+	 * to exceptions if they are masked by the `error_level`. This allows test
+	 * methods to run assertions against i.e. deprecated functions. Usually
+	 * the error_level is set by the test runner so that all errors are converted.
+	 *
+	 * @see http://php.net/manual/function.error-reporting.php
 	 * @param array $options The options to use when running the test. Available options are:
 	 *             - `'methods'`: An arbitrary array of method names to execute. If
 	 *                unspecified, all methods starting with 'test' are run.
@@ -186,7 +192,9 @@ class Unit extends \lithium\core\Object {
 			'methods' => $this->methods(),
 			'reporter' => $this->_reporter,
 			'handler' => function($code, $message, $file = null, $line = null) {
-				throw new ErrorException($message, 0, $code, $file, $line);
+				if (error_reporting() & $code) {
+					throw new ErrorException($message, 0, $code, $file, $line);
+				}
 			}
 		);
 		$options += $defaults;
