@@ -10,7 +10,6 @@ namespace lithium\util;
 
 use lithium\util\Set;
 use InvalidArgumentException;
-use Closure;
 
 /**
  * The `Validator` class provides static access to commonly used data validation logic. These common
@@ -641,7 +640,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * and an array specifying which formats within the rule to use.
 	 *
 	 * @param array $rules All available rules.
-	 * @return Closure Function returning boolean `true` if validation succeeded, `false` otherwise.
+	 * @return \Closure Function returning boolean `true` if validation succeeded, `false` otherwise.
 	 */
 	protected static function _checkFormats($rules) {
 		return function($self, $params, $chain) use ($rules) {

@@ -8,7 +8,6 @@
 
 namespace lithium\storage\cache\adapter;
 
-use Closure;
 use lithium\storage\Cache;
 
 /**

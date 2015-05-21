@@ -10,7 +10,6 @@ namespace lithium\analysis\logger\adapter;
 
 use lithium\util\Text;
 use lithium\core\Libraries;
-use Closure;
 
 /**
  * A simple log adapter that writes messages to files. By default, messages are written to
@@ -42,7 +41,7 @@ class File extends \lithium\core\Object {
 	 *          `<app>/resources/tmp/logs`.
 	 *        - `'timestamp'` _string_: The `date()`-compatible timestamp format. Defaults to
 	 *          `'Y-m-d H:i:s'`.
-	 *        - `'file'` _closure_: A closure which accepts two parameters: an array
+	 *        - `'file'` _\Closure_: A closure which accepts two parameters: an array
 	 *          containing the current log message details, and an array containing the `File`
 	 *          adapter's current configuration. It must then return a file name to write the
 	 *          log message to. The default will produce a log file name corresponding to the
@@ -68,7 +67,7 @@ class File extends \lithium\core\Object {
 	 * @see lithium\analysis\Logger::$_priorities
 	 * @param string $priority The message priority. See `Logger::$_priorities`.
 	 * @param string $message The message to write to the log.
-	 * @return Closure Function returning boolean `true` on successful write, `false` otherwise.
+	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($priority, $message) {
 		$config = $this->_config;

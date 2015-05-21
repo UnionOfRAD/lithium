@@ -144,7 +144,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return mixed Returns the value returned from the callable object retrieved from
 	 *         `Dispatcher::_callable()`, which is either a string or an instance of
 	 *         `lithium\action\Response`.
-	 * @filter
+	 * @filter Allows to perform actions very early or late in the request.
 	 */
 	public static function run($request, array $options = array()) {
 		$router = static::$_classes['router'];

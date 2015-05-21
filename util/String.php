@@ -68,8 +68,12 @@ class String {
 	}
 
 	/**
-	 * Uses PHP's hashing functions to create a hash of the string provided.
+	 * Uses PHP's hashing functions to create a hash of the string provided, using the options
+	 * specified. The default hash algorithm is SHA-512.
 	 *
+	 * @link http://php.net/function.hash.php PHP Manual: `hash()`
+	 * @link http://php.net/function.hash-hmac.php PHP Manual: `hash_hmac()`
+	 * @link http://php.net/function.hash-algos.php PHP Manual: `hash_algos()`
 	 * @param string $string The string to hash.
 	 * @param array $options
 	 * @return string Returns a hashed string.

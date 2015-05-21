@@ -8,6 +8,7 @@
 
 namespace lithium\net\http;
 
+use Closure;
 use lithium\util\Set;
 use lithium\util\Text;
 use lithium\core\Libraries;
@@ -978,7 +979,7 @@ class Media extends \lithium\core\StaticObject {
 	 * the specified scope.
 	 *
 	 * @param string $name Name of the scope to use.
-	 * @param array $closure A closure to execute inside the scope.
+	 * @param \Closure $closure A closure to execute inside the scope.
 	 * @return mixed Returns the previous scope if if `$name` is not null and `$closure` is null,
 	 *               returns the default used scope if `$name` is null, otherwise returns `null`.
 	 */

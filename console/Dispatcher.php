@@ -84,6 +84,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *        `null`, an instance will be created.
 	 * @param array $options
 	 * @return object The command action result which is an instance of `lithium\console\Response`.
+	 * @filter Allows to execute very early or very late in the command request.
 	 */
 	public static function run($request = null, $options = array()) {
 		$defaults = array('request' => array());
@@ -115,6 +116,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @param array $params Request params that can be accessed inside the filter.
 	 * @param array $options
 	 * @return class lithium\console\Command Returns the instantiated command object.
+	 * @filter
 	 */
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
@@ -173,6 +175,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @param string $request The associated `Request` object.
 	 * @param string $params Additional params that should be passed along.
 	 * @return mixed Returns the result of the called action, typically `true` or `false`.
+	 * @filter
 	 */
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');

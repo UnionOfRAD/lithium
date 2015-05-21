@@ -8,8 +8,6 @@
 
 namespace lithium\data;
 
-use Closure;
-
 /**
  * The `Collection` class extends the generic `lithium\util\Collection` class to provide
  * context-specific features for working with sets of data persisted by a backend data store. This
@@ -399,7 +397,7 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 * `Collection`.
 	 *
 	 * @param array $filter An array of key/value pairs used to filter `Collection` items.
-	 * @return Closure Returns a closure that wraps the array and attempts to match each value
+	 * @return \Closure Returns a closure that wraps the array and attempts to match each value
 	 *         against `Collection` item properties.
 	 */
 	protected function _filterFromArray(array $filter) {

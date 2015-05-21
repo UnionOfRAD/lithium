@@ -11,7 +11,6 @@ namespace lithium\storage\cache\adapter;
 use Memcached;
 use lithium\util\Set;
 use lithium\storage\Cache;
-use Closure;
 
 /**
  * Memcache (libmemcached) cache adapter implementation using `pecl/memcached`.

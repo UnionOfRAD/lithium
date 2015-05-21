@@ -187,7 +187,9 @@ class Controller extends \lithium\core\Object {
 	 * @param array $dispatchParams The array of parameters that will be passed to the action.
 	 * @param array $options The dispatch options for this action.
 	 * @return object Returns the response object associated with this controller.
-	 * @filter This method can be filtered.
+	 * @filter Filter to execute logic before an action is invoked (i.e. custom access
+	 *         control) or after it has been called and has returned its response (i.e.
+	 *         for caching it).
 	 */
 	public function __invoke($request, $dispatchParams, array $options = array()) {
 		$render =& $this->_render;
@@ -312,7 +314,8 @@ class Controller extends \lithium\core\Object {
 	 *                Because `redirect()` does not exit by default, you should always prefix calls
 	 *                with a `return` statement, so that the action is always immediately exited.
 	 * @return object Returns the instance of the `Response` object associated with this controller.
-	 * @filter This method can be filtered.
+	 * @filter Allows to intercept redirects, either stopping them completely i.e. during debugging
+	 *         or for logging purposes.
 	 */
 	public function redirect($url, array $options = array()) {
 		$router = $this->_classes['router'];

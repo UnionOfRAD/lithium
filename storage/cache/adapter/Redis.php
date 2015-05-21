@@ -10,7 +10,6 @@ namespace lithium\storage\cache\adapter;
 
 use lithium\storage\Cache;
 use Redis as RedisCore;
-use Closure;
 
 /**
  * A Redis cache adapter implementation using `phpredis`.
