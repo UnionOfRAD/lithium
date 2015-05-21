@@ -14,20 +14,25 @@ class MockResult extends \lithium\data\source\Result {
 
 	protected $_autoConfig = array('resource', 'records');
 
+	public function rewind() {
+		$this->_key = $this->_iterator = 0;
+		$this->_current = reset($this->_records);
+		return parent::rewind();
+	}
+
 	/**
 	 * Fetches the result from the resource and caches it.
 	 *
 	 * @return boolean Return `true` on success or `false` if it is not valid.
 	 */
-	protected function _fetchFromResource() {
-		if ($this->_iterator < count($this->_records)) {
-			$result = current($this->_records);
-			$this->_key = $this->_iterator;
-			$this->_current = $this->_cache[$this->_iterator++] = $result;
-			next($this->_records);
-			return true;
+	protected function _fetch() {
+		if ($this->_iterator >= count($this->_records)) {
+			return false;
 		}
-		return false;
+		$this->_current = current($this->_records);
+		$this->_key = $this->_iterator++;
+		next($this->_records);
+		return true;
 	}
 
 	protected function _close() {

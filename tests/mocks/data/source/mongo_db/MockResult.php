@@ -29,7 +29,7 @@ class MockResult extends \lithium\data\source\Result {
 	}
 
 	public function getNext() {
-		$this->_fetchFromResource();
+		$this->_fetch();
 		return $this->_current;
 	}
 
@@ -38,15 +38,15 @@ class MockResult extends \lithium\data\source\Result {
 	 *
 	 * @return boolean Return `true` on success or `false` if it is not valid.
 	 */
-	protected function _fetchFromResource() {
-		if ($this->_iterator < count($this->_data)) {
-			$result = current($this->_data);
-			$this->_key = $this->_iterator;
-			$this->_current = $this->_cache[$this->_iterator++] = $result;
-			next($this->_data);
-			return true;
+	protected function _fetch() {
+		if (!$this->hasNext()) {
+			return false;
 		}
-		return false;
+		$result = current($this->_data);
+		$this->_key = $this->_iterator++;
+		$this->_current = $result;
+		next($this->_data);
+		return true;
 	}
 
 	public function getName() {

@@ -11,13 +11,6 @@ namespace lithium\data\source;
 abstract class Result extends \lithium\core\Object implements \Iterator {
 
 	/**
-	 * Contains the cached result set.
-	 *
-	 * @var array
-	 */
-	protected $_cache = array();
-
-	/**
 	 * The current position of the iterator.
 	 */
 	protected $_iterator = 0;
@@ -77,6 +70,7 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	public function valid() {
 		if (!$this->_init) {
 			$this->_valid = $this->_fetch();
+			$this->_init = true;
 		}
 		return $this->_valid;
 	}
@@ -100,6 +94,7 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	public function current() {
 		if (!$this->_init) {
 			$this->_fetch();
+			$this->_init = true;
 		}
 		$this->_started = true;
 		return $this->_current;
@@ -119,22 +114,6 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	}
 
 	/**
-	 * Fetches the previous element from the cache.
-	 *
-	 * @return mixed The previous result (or `false` if there is none).
-	 */
-	public function prev() {
-		if (!$this->_cache) {
-			return;
-		}
-		if (isset($this->_cache[--$this->_iterator - 1])) {
-			$this->_key = $this->_iterator - 1;
-			return $this->_current = $this->_cache[$this->_iterator - 1];
-		}
-		return false;
-	}
-
-	/**
 	 * Fetches the next element from the resource.
 	 *
 	 * @return mixed The next result (or `false` if there is none).
@@ -144,6 +123,8 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 			return $this->current();
 		}
 		$this->_valid = $this->_fetch();
+		$this->_init = true;
+
 		if (!$this->_valid) {
 			$this->_key = null;
 			$this->_current = false;
@@ -156,29 +137,7 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	 *
 	 * @return boolean Return `true` on success or `false` otherwise.
 	 */
-	protected function _fetch() {
-		$this->_init = true;
-		if ($this->_fetchFromCache() || $this->_fetchFromResource()) {
-			return true;
-		}
-		return false;
-	}
-
-	abstract protected function _fetchFromResource();
-
-	/**
-	 * Returns the result from the primed cache.
-	 *
-	 * @return boolean Return `true` on success or `false` if it has not been cached yet.
-	 */
-	protected function _fetchFromCache() {
-		if ($this->_iterator < count($this->_cache)) {
-			$this->_key = $this->_iterator;
-			$this->_current = $this->_cache[$this->_iterator++];
-			return true;
-		}
-		return false;
-	}
+	abstract protected function _fetch();
 
 	/**
 	 * Close the resource.

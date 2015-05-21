@@ -41,18 +41,23 @@ class Result extends \lithium\data\source\Result {
 	 *
 	 * @return boolean Return `true` on success or `false` if it is not valid.
 	 */
-	protected function _fetchFromResource() {
-		if ($this->_resource instanceof PDOStatement) {
-			try {
-				$mode = $this->named ? PDO::FETCH_NAMED : PDO::FETCH_NUM;
-				if ($result = $this->_resource->fetch($mode)) {
-					$this->_key = $this->_iterator;
-					$this->_current = $this->_cache[$this->_iterator++] = $result;
-					return true;
-				}
-			} catch (PDOException $e) {}
+	protected function _fetch() {
+		if (!$this->_resource instanceof PDOStatement) {
+			$this->close();
+			return false;
 		}
-		$this->_resource = null;
+
+		try {
+			$mode = $this->named ? PDO::FETCH_NAMED : PDO::FETCH_NUM;
+
+			if ($result = $this->_resource->fetch($mode)) {
+				$this->_key = $this->_iterator++;
+				$this->_current = $result;
+				return true;
+			}
+		} catch (PDOException $e) {}
+
+		$this->close();
 		return false;
 	}
 

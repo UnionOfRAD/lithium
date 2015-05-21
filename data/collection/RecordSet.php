@@ -37,6 +37,13 @@ class RecordSet extends \lithium\data\Collection {
 	protected $_keyIndex = array();
 
 	/**
+	 * Buffer results of query before inserting into a record.
+	 *
+	 * @var array
+	 */
+	protected $_buffer = array();
+
+	/**
 	 * Initializes the record set and uses the database connection to get the column list contained
 	 * in the query that created this object.
 	 *
@@ -103,13 +110,18 @@ class RecordSet extends \lithium\data\Collection {
 	 */
 	protected function _mapRecord($data) {
 		$primary = $this->_model;
-		$conn = $primary::connection();
 		$main = $record = array();
+		$result =& $this->_result;
+		$buffer =& $this->_buffer;
 		$i = 0;
 
 		foreach ($this->_keyIndex as $key => $value) {
 			$main[$key] = $data[$key];
 		}
+
+		$canIterate = function() use (&$result, &$buffer) {
+			return count($buffer) > 0 ? array_shift($buffer) : $result->next();
+		};
 
 		do {
 			$offset = 0;
@@ -121,7 +133,7 @@ class RecordSet extends \lithium\data\Collection {
 					$keys[$key] = $data[$key];
 				}
 				if ($main != $keys) {
-					$this->_result->prev();
+					$buffer[] = $data;
 					break;
 				}
 			}
@@ -133,13 +145,11 @@ class RecordSet extends \lithium\data\Collection {
 				$offset += $fieldCount;
 			}
 			$i++;
-		} while ($main && $data = $this->_result->next());
+		} while ($main && $data = $canIterate());
 
 		$relMap = $this->_query->relationships();
 
-		return $this->_hydrateRecord(
-			$this->_dependencies, $primary, $record, 0, $i, '', $relMap, $conn
-		);
+		return $this->_hydrateRecord($this->_dependencies, $primary, $record, 0, $i, '', $relMap);
 	}
 
 	/**
@@ -152,10 +162,9 @@ class RecordSet extends \lithium\data\Collection {
 	 * @param integer $max
 	 * @param string $name Alias name
 	 * @param array $relMap The query relationships array
-	 * @param object $conn The connection object
 	 * @return object Returns a `Record` object
 	 */
-	protected function _hydrateRecord($relations, $primary, $record, $min, $max, $name, &$relMap, $conn) {
+	protected function _hydrateRecord($relations, $primary, $record, $min, $max, $name, &$relMap) {
 		$options = array('exists' => true, 'defaults' => false);
 
 		if (!empty($relations)) {
@@ -164,34 +173,37 @@ class RecordSet extends \lithium\data\Collection {
 				$field = $relMap[$relName]['fieldName'];
 				$relModel = $relMap[$relName]['model'];
 
-				if ($relMap[$relName]['type'] === 'hasMany') {
-					$rel = array();
-					$main = $relModel::key($record[$min][$relName]);
-					$i = $min;
-					$j = $i + 1;
-					while ($j < $max) {
-						$keys = $relModel::key($record[$j][$relName]);
-						if ($main != $keys) {
-							$rel[] = $this->_hydrateRecord(
-								$subrelations, $relModel, $record, $i, $j, $relName, $relMap, $conn
-							);
-							$main = $keys;
-							$i = $j;
-						}
-						$j++;
-					}
-					if (array_filter($record[$i][$relName])) {
-						$rel[] = $this->_hydrateRecord(
-							$subrelations, $relModel, $record, $i, $j, $relName, $relMap, $conn
-						);
-					}
-					$opts = array('class' => 'set') + $options;
-					$record[$min][$name][$field] = $relModel::create($rel, $opts);
-				} else {
+				if ($relMap[$relName]['type'] !== 'hasMany') {
 					$record[$min][$name][$field] = $this->_hydrateRecord(
-						$subrelations, $relModel, $record, $min, $max, $relName, $relMap, $conn
+						$subrelations, $relModel, $record, $min, $max, $relName, $relMap
+					);
+					continue;
+				}
+
+				$rel = array();
+				$main = $relModel::key($record[$min][$relName]);
+				$i = $min;
+				$j = $i + 1;
+
+				while ($j < $max) {
+					$keys = $relModel::key($record[$j][$relName]);
+
+					if ($main != $keys) {
+						$rel[] = $this->_hydrateRecord(
+							$subrelations, $relModel, $record, $i, $j, $relName, $relMap
+						);
+						$main = $keys;
+						$i = $j;
+					}
+					$j++;
+				}
+				if (array_filter($record[$i][$relName])) {
+					$rel[] = $this->_hydrateRecord(
+						$subrelations, $relModel, $record, $i, $j, $relName, $relMap
 					);
 				}
+				$opts = array('class' => 'set') + $options;
+				$record[$min][$name][$field] = $relModel::create($rel, $opts);
 			}
 		}
 		return $primary::create(
