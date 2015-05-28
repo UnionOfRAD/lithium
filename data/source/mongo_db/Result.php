@@ -23,10 +23,7 @@ class Result extends \lithium\data\source\Result {
 		}
 		$result = $this->_resource->getNext();
 		$isFile = ($result instanceof MongoGridFSFile);
-		$result = $isFile ? array('file' => $result) + $result->file : $result;
-		$this->_key = $this->_iterator;
-		$this->_current = $result;
-		return true;
+		return array($this->_iterator, $isFile ? array('file' => $result) + $result->file : $result);
 	}
 }
 

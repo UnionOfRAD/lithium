@@ -42,11 +42,9 @@ class MockResult extends \lithium\data\source\Result {
 		if (!$this->hasNext()) {
 			return false;
 		}
-		$result = current($this->_data);
-		$this->_key = $this->_iterator++;
-		$this->_current = $result;
+		$result = [$this->_iterator++, current($this->_data)];
 		next($this->_data);
-		return true;
+		return $result;
 	}
 
 	public function getName() {

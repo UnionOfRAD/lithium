@@ -37,13 +37,6 @@ class RecordSet extends \lithium\data\Collection {
 	protected $_keyIndex = array();
 
 	/**
-	 * Buffer results of query before inserting into a record.
-	 *
-	 * @var array
-	 */
-	protected $_buffer = array();
-
-	/**
 	 * Initializes the record set and uses the database connection to get the column list contained
 	 * in the query that created this object.
 	 *
@@ -69,6 +62,15 @@ class RecordSet extends \lithium\data\Collection {
 	}
 
 	/**
+	 * Returns the next result from the iterator, or from the buffer, if the buffer is not empty.
+	 *
+	 * @return array Returns the next array to be wrapped as a `Record` object
+	 */
+	protected function _next() {
+		return count($this->_buffer) > 0 ? array_shift($this->_buffer) : $this->_result->next();
+	}
+
+	/**
 	 * Extracts the next item from the result resource and wraps it into a `Record` object.
 	 *
 	 * @return mixed Returns the next `Record` if exists. Returns `null` otherwise
@@ -77,8 +79,8 @@ class RecordSet extends \lithium\data\Collection {
 		if ($this->closed() || !$this->_result->valid()) {
 			return;
 		}
-
 		$data = $this->_result->current();
+
 		if ($this->_query) {
 			$data = $this->_mapRecord($data);
 		}
@@ -111,32 +113,13 @@ class RecordSet extends \lithium\data\Collection {
 	protected function _mapRecord($data) {
 		$primary = $this->_model;
 		$main = $record = array();
-		$result =& $this->_result;
-		$buffer =& $this->_buffer;
+		$keyMap = array_combine($this->_keyIndex, $this->_keyIndex);
+		$main = array_intersect_key($data, $keyMap);
 		$i = 0;
-
-		foreach ($this->_keyIndex as $key => $value) {
-			$main[$key] = $data[$key];
-		}
-
-		$canIterate = function() use (&$result, &$buffer) {
-			return count($buffer) > 0 ? array_shift($buffer) : $result->next();
-		};
 
 		do {
 			$offset = 0;
 
-			if ($i != 0) {
-				$keys = array();
-
-				foreach ($this->_keyIndex as $key => $value) {
-					$keys[$key] = $data[$key];
-				}
-				if ($main != $keys) {
-					$buffer[] = $data;
-					break;
-				}
-			}
 			foreach ($this->_columns as $name => $fields) {
 				$fieldCount = count($fields);
 				$record[$i][$name] = array_combine(
@@ -144,8 +127,11 @@ class RecordSet extends \lithium\data\Collection {
 				);
 				$offset += $fieldCount;
 			}
+			if ($i > 0 && $main != array_intersect_key($this->_result->peek(), $keyMap)) {
+				break;
+			}
 			$i++;
-		} while ($main && $data = $canIterate());
+		} while ($main && $data = $this->_result->next());
 
 		$relMap = $this->_query->relationships();
 

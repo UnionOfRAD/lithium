@@ -114,9 +114,7 @@ class CrudTest extends \lithium\tests\integration\data\Base {
 		foreach ($records as $key => $record) {
 			$this->assertFalse($record->exists());
 			$this->assertTrue($record->save());
-			if (!$this->assertTrue($record->exists())) {
-				eval(\Psy\sh());
-			}
+			$this->assertTrue($record->exists());
 		}
 		$this->assertEqual(3, Galleries::count());
 

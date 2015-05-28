@@ -39,21 +39,18 @@ class Result extends \lithium\data\source\Result {
 	/**
 	 * Fetches the result from the resource and caches it.
 	 *
-	 * @return boolean Return `true` on success or `false` if it is not valid.
+	 * @return array Return `true` on success or `false` if it is not valid.
 	 */
 	protected function _fetch() {
 		if (!$this->_resource instanceof PDOStatement) {
 			$this->close();
 			return false;
 		}
+		$mode = $this->named ? PDO::FETCH_NAMED : PDO::FETCH_NUM;
 
 		try {
-			$mode = $this->named ? PDO::FETCH_NAMED : PDO::FETCH_NUM;
-
 			if ($result = $this->_resource->fetch($mode)) {
-				$this->_key = $this->_iterator++;
-				$this->_current = $result;
-				return true;
+				return array($this->_iterator++, $result);
 			}
 		} catch (PDOException $e) {}
 
