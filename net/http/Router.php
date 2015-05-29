@@ -203,7 +203,7 @@ class Router extends \lithium\core\StaticObject {
 	 * to a `PostsController::indexAction()` method.
 	 *
 	 * ```
-	 * use litthium\util\Inflector;
+	 * use lithium\util\Inflector;
 	 *
 	 * Router::modifiers(array(
 	 *     'controller' => function($value) {
