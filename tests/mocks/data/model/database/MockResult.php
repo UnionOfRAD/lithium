@@ -29,7 +29,7 @@ class MockResult extends \lithium\data\source\Result {
 		if ($this->_iterator >= count($this->_records)) {
 			return false;
 		}
-		$result = [$this->_iterator++, current($this->_records)];
+		$result = array($this->_iterator++, current($this->_records));
 		next($this->_records);
 		return $result;
 	}
