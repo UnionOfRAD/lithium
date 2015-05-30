@@ -8,6 +8,7 @@
 
 namespace lithium\data\collection;
 
+use RuntimeException;
 use lithium\util\Set;
 
 class RecordSet extends \lithium\data\Collection {
@@ -35,6 +36,13 @@ class RecordSet extends \lithium\data\Collection {
 	 * @var array
 	 */
 	protected $_keyIndex = array();
+
+	/**
+	 * Keeps a list of hydrated record indexes.
+	 *
+	 * @var array
+	 */
+	protected $_keyCache = array();
 
 	/**
 	 * Initializes the record set and uses the database connection to get the column list contained
@@ -117,6 +125,10 @@ class RecordSet extends \lithium\data\Collection {
 		$main = array_intersect_key($data, $keyMap);
 		$i = 0;
 
+		if (in_array($main, $this->_keyCache)) {
+			throw new RuntimeException("Associated records hydrated out of order: " . var_export($this->_keyCache, true));
+		}
+
 		do {
 			$offset = 0;
 
@@ -127,12 +139,16 @@ class RecordSet extends \lithium\data\Collection {
 				);
 				$offset += $fieldCount;
 			}
-			if ($i > 0 && $main != array_intersect_key($this->_result->peek(), $keyMap)) {
+			$i++;
+
+			if ($i > 1 && $main != array_intersect_key($this->_result->peek(), $keyMap)) {
 				break;
 			}
-			$i++;
 		} while ($main && $data = $this->_result->next());
 
+		if ($main) {
+			$this->_keyCache[] = $main;
+		}
 		$relMap = $this->_query->relationships();
 
 		return $this->_hydrateRecord($this->_dependencies, $primary, $record, 0, $i, '', $relMap);
