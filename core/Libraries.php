@@ -790,7 +790,7 @@ class Libraries {
 		if (is_object($name) || strpos($name, '\\') !== false) {
 			return $name;
 		}
-		$ident = $name ? ($type . '.' . $name) : ($type . '.*');
+		$ident  = $name ? ($type . '.' . $name) : ($type . '.*');
 		$ident .= $options ? '.' . md5(serialize($options)) : null;
 
 		if (isset(static::$_cachedPaths[$ident])) {
