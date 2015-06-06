@@ -233,7 +233,6 @@ class Test extends \lithium\console\Command {
 		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : array();
 		$params = compact('filters') + array('format' => $this->format);
 		$runner = function($options = array()) use ($path, $params) {
-			error_reporting(E_ALL | E_STRICT | E_DEPRECATED);
 			return Dispatcher::run($path, $params + $options);
 		};
 		$report = $handlers[$this->format]($runner, $path);
