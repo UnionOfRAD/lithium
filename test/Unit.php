@@ -1640,9 +1640,10 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @see lithium\test\Unit::_reportException()
 	 * @param mixed $exception An `Exception` object instance, or an array containing the following
-	 *              keys: `'message'`, `'file'`, `'line'`, `'trace'` (in `debug_backtrace()`
-	 *              format) and optionally `'code'` (error code number) and `'context'` (an array
-	 *              of variables relevant to the scope of where the error occurred).
+	 *              keys: `'name'`,` 'message'`, `'file'`, `'line'`, `'trace'` (in
+	 *              `debug_backtrace()` format) and optionally `'code'` (error code number)
+	 *              and `'context'` (an array of variables relevant to the scope of where the
+	 *              error occurred).
 	 * @param integer $lineFlag A flag used for determining the relevant scope of the call stack.
 	 *                Set to the line number where test methods are called.
 	 * @return void
@@ -1651,12 +1652,25 @@ class Unit extends \lithium\core\Object {
 		$data = $exception;
 
 		if (is_object($exception)) {
-			$data = array();
+			$data = array('name' => get_class($exception));
 
-			foreach (array('message', 'file', 'line', 'trace') as $key) {
+			foreach (array('message', 'file', 'line', 'trace', 'code') as $key) {
 				$method = 'get' . ucfirst($key);
 				$data[$key] = $exception->{$method}();
 			}
+
+			if ($exception instanceof ErrorException) {
+				$mapSeverity = function($severity) {
+					foreach (get_defined_constants(true)['Core'] as $constant => $value) {
+						if (substr($constant, 0, 2) === 'E_' && $value === $severity) {
+							return $constant;
+						}
+					}
+					return 'E_UNKNOWN';
+				};
+				$data['code'] = $mapSeverity($exception->getSeverity());
+			}
+
 			$ref = $exception->getTrace();
 			$ref = $ref[0] + array('class' => null);
 
