@@ -15,7 +15,11 @@ foreach ((array) $stats['errors'] as $error) {
 		echo " ________\n";
 		echo "\n";
 	} elseif ($error['result'] == 'exception') {
-		echo "{:purple}Exception{:end} thrown.\n";
+		if ($error['code'] !== 0) {
+			echo "{:purple}{$error['name']} ({$error['code']}){:end} thrown.\n";
+		} else {
+			echo "{:purple}{$error['name']}{:end} thrown.\n";
+		}
 		echo " File    : {$error['file']}\n";
 		echo " Class   : {$error['class']}\n";
 		echo " Method  : {$error['method']}()\n";
