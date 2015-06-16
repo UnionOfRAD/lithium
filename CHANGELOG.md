@@ -7,6 +7,8 @@
 ### Improved
 
 - Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
+- `Hash::calculate()` learned to hash over arbitrary data (scalar and non-scalar, closures). 
+  #1196 (David Persson)
 
 ### Added
 
