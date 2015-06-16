@@ -15,6 +15,8 @@
 
 - `Model::save()` using a relational database adapter will now only save updated fields,
   instead of blindly saving all. #1121 (Hamid Reza Koushki)
+- `Hash::calculate()` learned to hash over arbitrary data (scalar and non-scalar, closures). 
+  #1196 (David Persson)
 - Due to a new host string parser implementation and framework wide rollout, first 
   any class accepting a host string in the form of `<host>` or `<host>:<port>` now
   also accepts the port only notation `:<port>`. This allows to change just the

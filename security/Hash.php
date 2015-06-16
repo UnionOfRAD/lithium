@@ -8,6 +8,8 @@
 
 namespace lithium\security;
 
+use Closure;
+
 /**
  * Hash utility class. Contains methods to calculate hashes and compare
  * them in a safe way preventing timing attacks.
@@ -15,25 +17,43 @@ namespace lithium\security;
 class Hash {
 
 	/**
-	 * Uses PHP's hashing functions to calculate a hash over the string provided, using the options
+	 * Uses PHP's hashing functions to calculate a hash over the data provided, using the options
 	 * specified. The default hash algorithm is SHA-512.
+	 *
+	 * Examples:
+	 * ```
+	 * // Calculates a secure hash over string `'foo'`.
+	 * Hash::calculate('foo'));
+	 *
+	 * // It is possible to hash non-scalar data, too.
+	 * Hash::calculate(array('foo' => 'bar'));        // serializes before hashing
+	 * Hash::calculate(new Foo());                    // -- " --
+	 * Hash::calculate(function() { return 'bar'; }); // uses `spl_object_hash()`
+	 *
+	 * // Also allows for quick - non secure - hashing of arbitrary data.
+	 * Hash::calculate(array('foo' => 'bar'), array('type' => 'crc32b'));
+	 * ```
 	 *
 	 * @link http://php.net/hash
 	 * @link http://php.net/hash_hmac
 	 * @link http://php.net/hash_algos
-	 * @param string $string The string to hash.
+	 * @param mixed $data The arbitrary data to hash. Non-scalar data will be serialized, before
+	 *        being hashed. For anonymous functions the object hash will be used.
 	 * @param array $options Supported options:
 	 *        - `'type'` _string_: Any valid hashing algorithm. See the `hash_algos()` function to
 	 *          determine which are available on your system.
 	 *        - `'salt'` _string_: A _salt_ value which, if specified, will be prepended to the
-	 *          string.
-	 *        - `'key'` _string_: If specified `hash_hmac()` will be used to hash the string,
+	 *          data.
+	 *        - `'key'` _string_: If specified generates a keyed hash using `hash_hmac()`
 	 *          instead of `hash()`, with `'key'` being used as the message key.
 	 *        - `'raw'` _boolean_: If `true`, outputs the raw binary result of the hash operation.
 	 *          Defaults to `false`.
-	 * @return string Returns a hashed string.
+	 * @return string Returns a hash calculated over given data.
 	 */
-	public static function calculate($string, array $options = array()) {
+	public static function calculate($data, array $options = array()) {
+		if (!is_scalar($data)) {
+			$data = ($data instanceof Closure) ? spl_object_hash($data) : serialize($data);
+		}
 		$defaults = array(
 			'type' => 'sha512',
 			'salt' => false,
@@ -43,12 +63,12 @@ class Hash {
 		$options += $defaults;
 
 		if ($options['salt']) {
-			$string = $options['salt'] . $string;
+			$data = "{$options['salt']}{$data}";
 		}
 		if ($options['key']) {
-			return hash_hmac($options['type'], $string, $options['key'], $options['raw']);
+			return hash_hmac($options['type'], $data, $options['key'], $options['raw']);
 		}
-		return hash($options['type'], $string, $options['raw']);
+		return hash($options['type'], $data, $options['raw']);
 	}
 
 	/**
