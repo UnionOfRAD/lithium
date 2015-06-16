@@ -114,3 +114,5 @@
 - The `FormSignature` class now uses HMAC with a secret key. This will now require configuring the class
   with an app specific secret key before using it. #1173 (David Persson) 
 - When installed via composer the default location is now `libraries/lithium`.
+- Test `test` command no longer modifies the `error_reporting` setting. Please make sure
+  you have set the `error_reporting` to `E_ALL` in your php.ini.
