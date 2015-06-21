@@ -8,6 +8,7 @@
 
 namespace lithium\template;
 
+use lithium\aop\Filters;
 use lithium\core\Libraries;
 use lithium\template\TemplateException;
 
@@ -389,11 +390,10 @@ class View extends \lithium\core\Object {
 			'renderer' => $_renderer
 		);
 
-		$filter = function($self, $params) {
+		$result = Filters::run($this, __FUNCTION__, $params, function($params) {
 			$template = $params['loader']->template($params['step']['path'], $params['params']);
 			return $params['renderer']->render($template, $params['data'], $params['options']);
-		};
-		$result = $this->_filter(__METHOD__, $params, $filter);
+		});
 
 		if (is_array($step['capture'])) {
 			switch (key($step['capture'])) {

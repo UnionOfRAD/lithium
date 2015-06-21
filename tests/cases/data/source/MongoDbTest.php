@@ -1073,7 +1073,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testRespondsToParentCall() {
 		$db = new MongoDb($this->_testConfig);
-		$this->assertTrue($db->respondsTo('applyFilter'));
+		$this->assertTrue($db->respondsTo('_parents'));
 		$this->assertFalse($db->respondsTo('fooBarBaz'));
 	}
 

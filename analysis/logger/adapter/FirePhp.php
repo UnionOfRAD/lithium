@@ -8,6 +8,8 @@
 
 namespace lithium\analysis\logger\adapter;
 
+use lithium\aop\Filters;
+
 /**
  * The `FirePhp` log adapter allows you to log messages to FirePHP.
  *
@@ -18,18 +20,18 @@ namespace lithium\analysis\logger\adapter;
  * For example, the following can be placed in a bootstrap file:
  *
  * ```
- * use lithium\action\Dispatcher;
  * use lithium\analysis\Logger;
+ * use lithium\aop\Filters;
  *
  * Logger::config(array(
  * 	'default' => array('adapter' => 'FirePhp')
  * ));
  *
- * Dispatcher::applyFilter('_call', function($self, $params, $chain) {
+ * Filters::apply('lithium\action\Dispatcher', '_call', function($params, $chain) {
  * 	if (isset($params['callable']->response)) {
  * 		Logger::adapter('default')->bind($params['callable']->response);
  * 	}
- * 	return $chain->next($self, $params, $chain);
+ * 	return $next($params);
  * });
  * ```
  *
@@ -144,13 +146,11 @@ class FirePhp extends \lithium\core\Object {
 	 *                 the current request. See the `bind()` method.
 	 */
 	public function write($priority, $message) {
-		$_self =& $this;
-
-		return function($self, $params) use (&$_self) {
+		return function($params) {
 			$priority = $params['priority'];
 			$message = $params['message'];
-			$message = $_self->invokeMethod('_format', array($priority, $message));
-			$_self->invokeMethod('_write', array($message));
+			$message = $this->_format($priority, $message);
+			$this->_write($message);
 			return true;
 		};
 	}

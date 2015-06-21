@@ -15,7 +15,7 @@ $exceptions = (integer) $count['exceptions'] ?: 0;
 
 <?php foreach ((array) $stats['errors'] as $error): ?>
 	<?php if ($error['result'] == 'fail' || $error['result'] == 'exception'): ?>
-		<?php echo $self->render("{$error['result']}", compact('error')); ?>
+		<?php echo $this->render("{$error['result']}", compact('error')); ?>
 	<?php endif ?>
 <?php endforeach ?>
 

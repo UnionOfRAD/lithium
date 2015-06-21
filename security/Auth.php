@@ -8,6 +8,7 @@
 
 namespace lithium\security;
 
+use lithium\aop\Filters;
 use lithium\core\ConfigException;
 
 /**
@@ -135,9 +136,9 @@ class Auth extends \lithium\core\Adaptable {
 		$options += $defaults;
 		$params = compact('name', 'credentials', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			extract($params);
-			$config = $self::invokeMethod('_config', array($name));
+			$config = static::_config($name);
 
 			if ($config === null) {
 				throw new ConfigException("Configuration `{$name}` has not been defined.");
@@ -150,13 +151,13 @@ class Auth extends \lithium\core\Adaptable {
 				}
 			}
 
-			if (($credentials) && $data = $self::adapter($name)->check($credentials, $options)) {
+			if (($credentials) && $data = static::adapter($name)->check($credentials, $options)) {
 				if ($options['persist'] && is_array($data)) {
 					$data = array_intersect_key($data, array_fill_keys($options['persist'], true));
 				} elseif (is_array($data)) {
 					unset($data['password']);
 				}
-				return ($options['writeSession']) ? $self::set($name, $data) : $data;
+				return ($options['writeSession']) ? static::set($name, $data) : $data;
 			}
 			return false;
 		});
@@ -182,12 +183,12 @@ class Auth extends \lithium\core\Adaptable {
 	public static function set($name, $data, array $options = array()) {
 		$params = compact('name', 'data', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			extract($params);
-			$config = $self::invokeMethod('_config', array($name));
+			$config = static::_config($name);
 			$session = $config['session'];
 
-			if ($data = $self::adapter($name)->set($data, $options)) {
+			if ($data = static::adapter($name)->set($data, $options)) {
 				$session['class']::write($session['key'], $data, $options + $session['options']);
 				return $data;
 			}
@@ -213,15 +214,17 @@ class Auth extends \lithium\core\Adaptable {
 		$defaults = array('clearSession' => true);
 		$options += $defaults;
 
-		return static::_filter(__FUNCTION__, compact('name', 'options'), function($self, $params) {
+		$params = compact('name', 'options');
+
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			extract($params);
-			$config = $self::invokeMethod('_config', array($name));
+			$config = static::_config($name);
 			$session = $config['session'];
 
 			if ($options['clearSession']) {
 				$session['class']::delete($session['key'], $session['options']);
 			}
-			$self::adapter($name)->clear($options);
+			static::adapter($name)->clear($options);
 		});
 	}
 }

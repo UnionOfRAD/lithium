@@ -8,6 +8,7 @@
 
 namespace lithium\test;
 
+use lithium\aop\Filters;
 use lithium\test\Dispatcher;
 use lithium\core\Libraries;
 use lithium\test\Group;
@@ -44,7 +45,7 @@ class Controller extends \lithium\core\Object {
 		$options += (array) $request->query + $defaults;
 		$params = compact('request', 'dispatchParams', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$request = $params['request'];
 			$options = $params['options'];
 			$params = $params['dispatchParams'];
@@ -56,9 +57,9 @@ class Controller extends \lithium\core\Object {
 				$options['title'] = 'All Tests';
 			}
 
-			$self->invokeMethod('_saveCtrlContext');
+			$this->_saveCtrlContext();
 			$report = Dispatcher::run($group, $options);
-			$self->invokeMethod('_restoreCtrlContext');
+			$this->_restoreCtrlContext();
 
 			$filters = Libraries::locate('test.filter');
 			$menu = Libraries::locate('tests', null, array(

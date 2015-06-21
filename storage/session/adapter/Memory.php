@@ -50,9 +50,8 @@ class Memory extends \lithium\core\Object {
 	 * @return \Closure Function returning boolean `true` if the key exists, `false` otherwise.
 	 */
 	public function check($key, array $options = array()) {
-		$session =& $this->_session;
-		return function($self, $params) use (&$session) {
-			return isset($session[$params['key']]);
+		return function($params) {
+			return isset($this->_session[$params['key']]);
 		};
 	}
 
@@ -65,13 +64,11 @@ class Memory extends \lithium\core\Object {
 	 * @return \Closure Function returning data in the session if successful, `false` otherwise.
 	 */
 	public function read($key = null, array $options = array()) {
-		$session = $this->_session;
-
-		return function($self, $params) use ($session) {
+		return function($params) {
 			if (!$params['key']) {
-				return $session;
+				return $this->_session;
 			}
-			return isset($session[$params['key']]) ? $session[$params['key']] : null;
+			return isset($this->_session[$params['key']]) ? $this->_session[$params['key']] : null;
 		};
 	}
 
@@ -84,10 +81,8 @@ class Memory extends \lithium\core\Object {
 	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($key, $value, array $options = array()) {
-		$session =& $this->_session;
-
-		return function($self, $params) use (&$session) {
-			return (boolean) ($session[$params['key']] = $params['value']);
+		return function($params) {
+			return (boolean) ($this->_session[$params['key']] = $params['value']);
 		};
 	}
 
@@ -99,11 +94,9 @@ class Memory extends \lithium\core\Object {
 	 * @return \Closure Function returning boolean `true` on successful delete, `false` otherwise
 	 */
 	public function delete($key, array $options = array()) {
-		$session =& $this->_session;
-
-		return function($self, $params) use (&$session) {
-			unset($session[$params['key']]);
-			return !isset($session[$params['key']]);
+		return function($params) {
+			unset($this->_session[$params['key']]);
+			return !isset($this->_session[$params['key']]);
 		};
 	}
 
@@ -114,10 +107,8 @@ class Memory extends \lithium\core\Object {
 	 * @return \Closure Function that clears the session
 	 */
 	public function clear(array $options = array()) {
-		$session =& $this->_session;
-
-		return function($self, $params) use (&$session) {
-			$session = array();
+		return function($params) {
+			$this->_session = array();
 		};
 	}
 

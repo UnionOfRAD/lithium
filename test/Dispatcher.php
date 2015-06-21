@@ -8,6 +8,7 @@
 
 namespace lithium\test;
 
+use lithium\aop\Filters;
 use lithium\util\Set;
 use lithium\core\Libraries;
 use lithium\core\Environment;
@@ -62,7 +63,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$group = static::_group($items);
 		$report = static::_report($group, $options);
 
-		return static::_filter(__FUNCTION__, compact('report'), function($self, $params, $chain) {
+		return Filters::run(get_called_class(), __FUNCTION__, compact('report'), function($params) {
 			$environment = Environment::get();
 			Environment::set('test');
 

@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\test;
 
 use lithium\test\Mocker;
+use lithium\aop\Filters;
 use lithium\data\entity\document\Mock as Document;
 use lithium\tests\mocks\data\mockPost\Mock as MockPost;
 
@@ -23,7 +24,8 @@ class MockerTest extends \lithium\test\Unit {
 	}
 
 	public function tearDown() {
-		Mocker::applyFilter(false);
+		Filters::clear('lithium\test\Mocker');
+		Filters::clear('lithium\test\Mocker');
 	}
 
 	public function testAutoloadRegister() {
@@ -57,11 +59,12 @@ class MockerTest extends \lithium\test\Unit {
 
 		$this->assertInternalType('bool', $std->method1());
 
-		$std->applyFilter('method1', function($self, $params, $chain) {
+		$std->applyFilter('method1', function($params, $next) {
 			return array();
 		});
 
 		$this->assertInternalType('array', $std->method1());
+		Filters::clear('\lithium\tests\mocks\test\mockNonLi3StdClass\Mock');
 	}
 
 	public function testNonLithiumStaticClass() {
@@ -70,11 +73,12 @@ class MockerTest extends \lithium\test\Unit {
 
 		$this->assertInternalType('string', $class::export($var));
 
-		$class::applyFilter('export', function($self, $params, $chain) {
+		$class::applyFilter('export', function($params, $next) {
 			return array();
 		});
 
 		$this->assertInternalType('array', $class::export($var));
+		Filters::clear($class);
 	}
 
 	public function testCannotCreateNonStandardMockClass() {
@@ -88,7 +92,7 @@ class MockerTest extends \lithium\test\Unit {
 
 		$originalResult = $dispatcher->config(array());
 
-		$dispatcher->applyFilter('config', function($self, $params, $chain) {
+		$dispatcher->applyFilter('config', function($params, $next) {
 			return array();
 		});
 
@@ -96,6 +100,8 @@ class MockerTest extends \lithium\test\Unit {
 
 		$this->assertCount(0, $filteredResult);
 		$this->assertNotEqual($filteredResult, $originalResult);
+
+		Filters::clear('\lithium\console\dispatcher\Mock');
 	}
 
 	public function testFilteringNonStaticClassCanReturnOriginal() {
@@ -103,13 +109,15 @@ class MockerTest extends \lithium\test\Unit {
 
 		$originalResult = $response->styles();
 
-		$response->applyFilter('styles', function($self, $params, $chain) {
-			return $chain->next($self, $params, $chain);
+		$response->applyFilter('styles', function($params, $next) {
+			return $next($params);
 		});
 
 		$filteredResult = $response->styles();
 
 		$this->assertEqual($filteredResult, $originalResult);
+
+		Filters::clear('\lithium\console\response\Mock');
 	}
 
 	public function testFilteringStaticClass() {
@@ -119,7 +127,7 @@ class MockerTest extends \lithium\test\Unit {
 
 		$originalResult = $mockee::tokenize($code, array('wrap' => true));
 
-		$mockee::applyFilter('tokenize', function($self, $params, $chain) {
+		$mockee::applyFilter('tokenize', function($params, $next) {
 			return array();
 		});
 
@@ -127,6 +135,8 @@ class MockerTest extends \lithium\test\Unit {
 
 		$this->assertCount(0, $filteredResult);
 		$this->assertNotEqual($filteredResult, $originalResult);
+
+		Filters::clear($mockee);
 	}
 
 	public function testFilteringStaticClassCanReturnOriginal() {
@@ -134,13 +144,15 @@ class MockerTest extends \lithium\test\Unit {
 
 		$originalResult = $mockee::export(array('foo', 'bar', 'baz'));
 
-		$mockee::applyFilter('export', function($self, $params, $chain) {
-			return $chain->next($self, $params, $chain);
+		$mockee::applyFilter('export', function($params, $next) {
+			return $next($params);
 		});
 
 		$filteredResult = $mockee::export(array('foo', 'bar', 'baz'));
 
 		$this->assertEqual($filteredResult, $originalResult);
+
+		Filters::clear($mockee);
 	}
 
 	public function testOriginalMethodNotCalled() {
@@ -152,26 +164,30 @@ class MockerTest extends \lithium\test\Unit {
 
 		$this->assertCount(1, $http->headers);
 
-		$http->applyFilter('_writeHeader', function($self, $params, $chain) {
+		$http->applyFilter('_writeHeader', function($params, $next) {
 			return false;
 		});
 
 		$http->_writeHeader('Content-type: application/pdf');
 
 		$this->assertCount(1, $http->headers);
+
+		Filters::clear('lithium\tests\mocks\security\auth\adapter\mockHttp\Mock');
 	}
 
 	public function testFilteringAFilteredMethod() {
 		$adapt = 'lithium\core\adaptable\Mock';
-		$adapt::applyFilter('_initAdapter', function($self, $params, $chain) {
+		$adapt::applyFilter('_initAdapter', function($params, $next) {
 			return false;
 		});
 		$this->assertFalse($adapt::_initAdapter('foo', array()));
+
+		Filters::clear($adapt);
 	}
 
 	public function testStaticResults() {
 		$docblock = 'lithium\analysis\docblock\Mock';
-		$docblock::applyFilter(array('comment', 'tags'), function($self, $params, $chain) {
+		$docblock::applyFilter(array('comment', 'tags'), function($params, $next) {
 			return false;
 		});
 		$docblock::comment('foobar');
@@ -187,11 +203,13 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertIdentical(1, count($docblock::$staticResults['tags']));
 		$this->assertIdentical(array('baz', 'foo'), $docblock::$staticResults['tags'][0]['args']);
 		$this->assertFalse($docblock::$staticResults['tags'][0]['result']);
+
+		Filters::clear($docblock);
 	}
 
 	public function testInstanceResults() {
 		$debugger = new \lithium\data\schema\Mock;
-		$debugger->applyFilter(array('names', 'meta'), function($self, $params, $chain) {
+		$debugger->applyFilter(array('names', 'meta'), function($params, $next) {
 			return false;
 		});
 		$debugger->names('foo', 'foobar');
@@ -207,17 +225,21 @@ class MockerTest extends \lithium\test\Unit {
 		$this->assertIdentical(1, count($debugger->results['meta']));
 		$this->assertIdentical(array('baz'), $debugger->results['meta'][0]['args']);
 		$this->assertFalse($debugger->results['meta'][0]['result']);
+
+		Filters::clear('lithium\data\schema\Mock');
 	}
 
 	public function testSkipByReference() {
 		$stdObj = new \lithium\tests\mocks\test\mockStdClass\Mock();
 		$stdObj->foo = 'foo';
 		$originalData = $stdObj->data();
-		$stdObj->applyFilter('data', function($self, $params, $chain) {
+		$stdObj->applyFilter('data', function($params, $next) {
 			return array();
 		});
 		$nonfilteredData = $stdObj->data();
 		$this->assertIdentical($originalData, $nonfilteredData);
+
+		Filters::clear('lithium\tests\mocks\test\mockStdClass\Mock');
 	}
 
 	public function testGetByReference() {

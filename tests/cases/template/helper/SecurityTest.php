@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\template\helper;
 
+use lithium\aop\Filters;
 use lithium\action\Request;
 use lithium\template\helper\Form;
 use lithium\template\helper\Security;
@@ -19,6 +20,10 @@ class SecurityTest extends \lithium\test\Unit {
 	public $subject;
 
 	public $context;
+
+	public function tearDown() {
+		Filters::clear('lithium\template\helper\Form');
+	}
 
 	public static function key($token) {
 		return 'WORKING';

@@ -8,6 +8,9 @@
 
 namespace lithium\tests\mocks\core;
 
+/**
+ * @deprecated
+ */
 class MockMethodFiltering extends \lithium\core\Object {
 
 	public function method($data) {

@@ -8,6 +8,8 @@
 
 namespace lithium\test\filter;
 
+use lithium\aop\Filters;
+
 /**
  * The `Profiler` filter tracks timing and memory usage information for each test method, and
  * presents aggregate reports across single test runs. Used for performance-tuning classes and
@@ -80,42 +82,44 @@ class Profiler extends \lithium\test\Filter {
 	public static function apply($report, $tests, array $options = array()) {
 		$defaults = array('method' => 'run', 'checks' => static::$_metrics);
 		$options += $defaults;
-		$m = $options['method'];
-		$filter = function($self, $params, $chain) use ($report, $options) {
-			$start = $results = array();
 
-			$runCheck = function($check) {
-				switch (true) {
-					case (is_object($check) || is_string($check)):
-						return $check();
-					break;
-					case (is_array($check)):
-						$function = array_shift($check);
-						$result = !$check ? $check() : call_user_func_array($function, $check);
-					break;
+		foreach ($tests as $test) {
+			$filter = function($params, $next) use ($report, $options, $test) {
+				$start = $results = array();
+
+				$runCheck = function($check) {
+					switch (true) {
+						case (is_object($check) || is_string($check)):
+							return $check();
+						break;
+						case (is_array($check)):
+							$function = array_shift($check);
+							$result = !$check ? $check() : call_user_func_array($function, $check);
+						break;
+					}
+					return $result;
+				};
+
+				foreach ($options['checks'] as $name => $check) {
+					$start[$name] = $runCheck($check['function']);
 				}
-				return $result;
+				$methodResult = $next($params);
+
+				foreach ($options['checks'] as $name => $check) {
+					$results[$name] = $runCheck($check['function']) - $start[$name];
+				}
+				$report->collect(
+					__CLASS__,
+					array(
+						$test->subject() => $results,
+						'options' => $options + array('test' => get_class($test)),
+						'method' => $params['method']
+					)
+				);
+				return $methodResult;
 			};
-
-			foreach ($options['checks'] as $name => $check) {
-				$start[$name] = $runCheck($check['function']);
-			}
-			$methodResult = $chain->next($self, $params, $chain);
-
-			foreach ($options['checks'] as $name => $check) {
-				$results[$name] = $runCheck($check['function']) - $start[$name];
-			}
-			$report->collect(
-				__CLASS__,
-				array(
-					$self->subject() => $results,
-					'options' => $options + array('test' => get_class($self)),
-					'method' => $params['method']
-				)
-			);
-			return $methodResult;
-		};
-		$tests->invoke('applyFilter', array($m, $filter));
+			Filters::apply($test, $options['method'], $filter);
+		}
 		return $tests;
 	}
 

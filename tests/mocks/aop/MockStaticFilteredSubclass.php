@@ -6,14 +6,12 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\mocks\analysis;
+namespace lithium\tests\mocks\aop;
 
-class MockLoggerAdapter extends \lithium\core\Object {
+class MockStaticFilteredSubclass extends \lithium\tests\mocks\aop\MockStaticFiltered {
 
-	public function write($name, $value) {
-		return function($params) {
-			return true;
-		};
+	public static function childMethod() {
+		return 'Working';
 	}
 }
 

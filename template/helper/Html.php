@@ -8,6 +8,8 @@
 
 namespace lithium\template\helper;
 
+use lithium\aop\Filters;
+
 /**
  * A template helper that assists in generating HTML content. Accessible in templates via
  * `$this->html`, which will auto-load this helper into the rendering context. For examples of how
@@ -185,8 +187,8 @@ class Html extends \lithium\template\Helper {
 		$m = __METHOD__;
 		$params = compact('path', 'options');
 
-		$script = $this->_filter(__METHOD__, $params, function($self, $params, $chain) use ($m) {
-			return $self->invokeMethod('_render', array($m, 'script', $params));
+		$script = Filters::run($this, __FUNCTION__, $params, function($params) use ($m) {
+			return $this->_render($m, 'script', $params);
 		});
 		if ($scope['inline']) {
 			return $script;
@@ -226,14 +228,14 @@ class Html extends \lithium\template\Helper {
 			}
 			return ($scope['inline']) ? join("\n\t", $path) . "\n" : null;
 		}
-		$method = __METHOD__;
+		$m = __METHOD__;
 		$type = $scope['type'];
 		$params = compact('type', 'path', 'options');
-		$filter = function($self, $params, $chain) use ($defaults, $method) {
+
+		$style = Filters::run($this, __FUNCTION__, $params, function($params) use ($m) {
 			$template = ($params['type'] === 'import') ? 'style-import' : 'style-link';
-			return $self->invokeMethod('_render', array($method, $template, $params));
-		};
-		$style = $this->_filter($method, $params, $filter);
+			return $this->_render($m, $template, $params);
+		});
 
 		if ($scope['inline']) {
 			return $style;
@@ -260,11 +262,11 @@ class Html extends \lithium\template\Helper {
 		if (!isset($this->_strings[$tag])) {
 			return null;
 		}
-		$method = __METHOD__;
-		$filter = function($self, $options, $chain) use ($method, $tag) {
-			return $self->invokeMethod('_render', array($method, $tag, $options));
-		};
-		$head = $this->_filter($method, $options, $filter);
+		$m = __METHOD__;
+
+		$head = Filters::run($this, __FUNCTION__, $options, function($params) use ($m, $tag) {
+			return $this->_render($m, $tag, $params);
+		});
 		if ($this->_context) {
 			$this->_context->head($head);
 		}
@@ -287,11 +289,12 @@ class Html extends \lithium\template\Helper {
 		$defaults = array('alt' => '');
 		$options += $defaults;
 		$path = is_array($path) ? $this->_context->url($path) : $path;
-		$params = compact('path', 'options');
-		$method = __METHOD__;
 
-		return $this->_filter($method, $params, function($self, $params, $chain) use ($method) {
-			return $self->invokeMethod('_render', array($method, 'image', $params));
+		$params = compact('path', 'options');
+		$m = __METHOD__;
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) use ($m) {
+			return $this->_render($m, 'image', $params);
 		});
 	}
 

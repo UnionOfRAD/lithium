@@ -8,10 +8,15 @@
 
 namespace lithium\tests\mocks\util;
 
+/**
+ * Mock Filters Class
+ *
+ * @deprecated In use by deprecated test.
+ */
 class MockFilters extends \lithium\core\StaticObject {
 
 	public static function filteredMethod() {
-		return static::_filter(__FUNCTION__, array(), function($self, $params) {
+		return static::_filter(__FUNCTION__, array(), function($params) {
 			return 'Working?';
 		});
 	}

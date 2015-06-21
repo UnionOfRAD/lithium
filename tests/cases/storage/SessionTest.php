@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\storage;
 
+use lithium\aop\Filters;
 use lithium\storage\Session;
 use lithium\storage\session\adapter\Memory;
 use lithium\tests\mocks\storage\session\adapter\SessionStorageConditional;
@@ -197,8 +198,8 @@ class SessionTest extends \lithium\test\Unit {
 			'primary' => array('adapter' => new Memory(), 'filters' => array()),
 			'secondary' => array('adapter' => new Memory(), 'filters' => array())
 		));
-		Session::applyFilter('read', function($self, $params, $chain) {
-			$result = $chain->next($self, $params, $chain);
+		Filters::apply('lithium\storage\Session', 'read', function($params, $next) {
+			$result = $next($params);
 
 			if (isset($params['options']['increment'])) {
 				$result += $params['options']['increment'];
@@ -210,6 +211,8 @@ class SessionTest extends \lithium\test\Unit {
 
 		Session::write('bar', 1);
 		$this->assertEqual(2, Session::read('bar', array('increment' => 1)));
+
+		Filters::clear('lithium\storage\Session');
 	}
 
 	public function testStrategies() {

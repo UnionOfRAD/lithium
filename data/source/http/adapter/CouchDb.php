@@ -8,6 +8,7 @@
 
 namespace lithium\data\source\http\adapter;
 
+use lithium\aop\Filters;
 use lithium\core\ConfigException;
 
 /**
@@ -201,10 +202,8 @@ class CouchDb extends \lithium\data\source\Http {
 		$defaults = array('model' => $query->model());
 		$options += $defaults;
 		$params = compact('query', 'options');
-		$conn =& $this->connection;
-		$config = $this->_config;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$request = array('type' => 'json');
 			$query = $params['query'];
 			$options = $params['options'];
@@ -212,18 +211,19 @@ class CouchDb extends \lithium\data\source\Http {
 			$data += array('type' => $options['model']::meta('source'));
 
 			if (isset($data['id'])) {
-				return $self->update($query, $options);
+				return $this->update($query, $options);
 			}
 
 			$retry = false;
 			do {
-				$result = $conn->post($config['database'], $data, $request);
+				$result = $this->connection->post($this->_config['database'], $data, $request);
 				$result = is_string($result) ? json_decode($result, true) : $result;
-				$retry = $retry ? !$retry : $self->invokeMethod('_autoBuild', array($result));
+
+				$retry = $retry ? !$retry : $this->_autoBuild($result);
 			} while ($retry);
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
-				$result = $self->invokeMethod('_format', array($result, $options));
+				$result = $this->_format($result, $options);
 				$query->entity()->sync($result['id'], $result);
 				return true;
 			}
@@ -243,12 +243,10 @@ class CouchDb extends \lithium\data\source\Http {
 		$defaults = array('return' => 'resource', 'model' => $query->model());
 		$options += $defaults;
 		$params = compact('query', 'options');
-		$conn =& $this->connection;
-		$config = $this->_config;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$query = $params['query'];
-			$params = $query->export($self);
+			$params = $query->export($this);
 
 			list($_path, $conditions) = (array) $params['conditions'];
 			$model = $query->model();
@@ -257,10 +255,12 @@ class CouchDb extends \lithium\data\source\Http {
 				$_path = '_all_docs';
 				$conditions['include_docs'] = 'true';
 			}
-			$path = "{$config['database']}/{$_path}";
+			$path = "{$this->_config['database']}/{$_path}";
 			$args = (array) $conditions + (array) $params['limit'] + (array) $params['order'];
-			$result = $conn->get($path, $args);
+
+			$result = $this->connection->get($path, $args);
 			$result = is_string($result) ? json_decode($result, true) : $result;
+
 			$data = $stats = array();
 
 			if (isset($result['_id'])) {
@@ -275,7 +275,7 @@ class CouchDb extends \lithium\data\source\Http {
 				'class' => 'set', 'exists' => true, 'defaults' => false
 			);
 
-			return $self->item($model, $data, $opts);
+			return $this->item($model, $data, $opts);
 		});
 	}
 
@@ -289,13 +289,11 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function update($query, array $options = array()) {
 		$params = compact('query', 'options');
-		$conn =& $this->connection;
-		$config = $this->_config;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$query = $params['query'];
 			$options = $params['options'];
-			$params = $query->export($self);
+			$params = $query->export($this);
 
 			list($_path, $conditions) = (array) $params['conditions'];
 			$data = $query->data();
@@ -308,14 +306,17 @@ class CouchDb extends \lithium\data\source\Http {
 
 			$retry = false;
 			do {
-				$result = $conn->put("{$config['database']}/{$_path}", $data, array(
-					'type' => 'json'
-				));
+				$result = $this->connection->put(
+					"{$this->_config['database']}/{$_path}",
+					$data,
+					array('type' => 'json')
+				);
 				$result = is_string($result) ? json_decode($result, true) : $result;
-				$retry = $retry ? !$retry : $self->invokeMethod('_autoBuild', array($result));
+				$retry = $retry ? !$retry : $this->_autoBuild($result);
 			} while ($retry);
+
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
-				$result = $self->invokeMethod('_format', array($result, $options));
+				$result = $this->_format($result, $options);
 				$query->entity()->sync($result['id'], array('rev' => $result['rev']));
 				return true;
 			}
@@ -354,19 +355,21 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function delete($query, array $options = array()) {
 		$params = compact('query', 'options');
-		$conn =& $this->connection;
-		$config = $this->_config;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$conn, $config) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$query = $params['query'];
-			$params = $query->export($self);
+			$params = $query->export($this);
 			list($_path, $conditions) = $params['conditions'];
 			$data = $query->data();
 
 			if (!empty($data['rev'])) {
 				$conditions['rev'] = $data['rev'];
 			}
-			$result = json_decode($conn->delete("{$config['database']}/{$_path}", $conditions));
+			$result = $this->connection->delete(
+				"{$this->_config['database']}/{$_path}",
+				$conditions
+			);
+			$result = json_decode($result);
 			$result = (isset($result->ok) && $result->ok === true);
 
 			if ($query->entity()) {

@@ -69,7 +69,6 @@ class Syslog extends \lithium\core\Object {
 	 */
 	public function write($priority, $message) {
 		$config = $this->_config;
-		$_priorities = $this->_priorities;
 
 		if (!$this->_isConnected) {
 			closelog();
@@ -77,8 +76,8 @@ class Syslog extends \lithium\core\Object {
 			$this->_isConnected = true;
 		}
 
-		return function($self, $params) use ($_priorities) {
-			$priority = $_priorities[$params['priority']];
+		return function($params) {
+			$priority = $this->_priorities[$params['priority']];
 			return syslog($priority, $params['message']);
 		};
 	}

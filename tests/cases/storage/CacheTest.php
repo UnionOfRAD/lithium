@@ -47,7 +47,7 @@ class CacheTest extends \lithium\test\Unit {
 
 		$config = array('default' => array(
 			'adapter' => '\some\adapter',
-			'filters' => array('Filter1', 'Filter2')
+			'filters' => array()
 		));
 		Cache::config($config);
 		$result = Cache::config();

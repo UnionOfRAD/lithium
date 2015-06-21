@@ -9,7 +9,6 @@
 namespace lithium\tests\cases\analysis\logger\adapter;
 
 use lithium\core\Libraries;
-use lithium\util\collection\Filters;
 use lithium\analysis\logger\adapter\File;
 
 class FileTest extends \lithium\test\Unit {
@@ -38,7 +37,7 @@ class FileTest extends \lithium\test\Unit {
 		$message = 'This is a debug message';
 		$function = $this->subject->write($priority, $message);
 		$now = date('Y-m-d H:i:s');
-		$function('lithium\analysis\Logger', compact('priority', 'message'), new Filters());
+		$function(compact('priority', 'message'));
 
 		$log = file_get_contents("{$this->path}/debug.log");
 		$this->assertEqual("{$now} This is a debug message\n", $log);
@@ -52,7 +51,7 @@ class FileTest extends \lithium\test\Unit {
 		$message = 'This is a debug message';
 		$function = $this->subject->write($priority, $message);
 		$now = date('Y-m-d H:i:s');
-		$function('lithium\analysis\Logger', compact('priority', 'message'), new Filters());
+		$function(compact('priority', 'message'));
 
 		$log = file_get_contents("{$this->path}/debug.log");
 		$this->assertEqual("This is a debug message\n", $log);

@@ -148,7 +148,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'value');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 
 		$this->assertEqual($_SESSION[$key], $value);
 	}
@@ -165,7 +165,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 
 		$this->assertIdentical($value, $result);
 
@@ -174,13 +174,13 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 		$this->assertNull($result);
 
 		$closure = $this->php->read();
 		$this->assertInternalType('callable', $closure);
 
-		$result = $closure($this->php, array('key' => null), null);
+		$result = $closure(array('key' => null), null);
 		$expected = array('read_test' => 'value to be read');
 		$this->assertEqual($expected, $result);
 	}
@@ -196,7 +196,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 		$this->assertTrue($result);
 
 		$key = 'does_not_exist';
@@ -204,7 +204,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 		$this->assertFalse($result);
 	}
 
@@ -220,7 +220,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 		$this->assertTrue($result);
 
 		$key = 'non-existent';
@@ -228,7 +228,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 		$this->assertTrue($result);
 	}
 
@@ -240,7 +240,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertNotEmpty($_SESSION);
 		$closure = $this->php->clear();
 		$this->assertInternalType('callable', $closure);
-		$result = $closure($this->php, array(), null);
+		$result = $closure(array(), null);
 		$this->assertEmpty($_SESSION);
 	}
 
@@ -284,12 +284,12 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 
 		$this->assertIdentical($value, $result);
 
 		$params = array('key' => 'dot.syntax');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 
 		$this->assertIdentical($value['syntax'], $result);
 	}
@@ -302,7 +302,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'value');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 
 		$this->assertEqual($_SESSION['dot']['syntax'], $value);
 	}

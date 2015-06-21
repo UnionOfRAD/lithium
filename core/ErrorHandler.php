@@ -10,7 +10,7 @@ namespace lithium\core;
 
 use Exception;
 use ErrorException;
-use lithium\util\collection\Filters;
+use lithium\aop\Filters;
 
 /**
  * The `ErrorHandler` class allows PHP errors and exceptions to be handled in a uniform way. Using
@@ -237,25 +237,19 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	public static function apply($object, array $conditions, $handler) {
 		$conditions = $conditions ?: array('type' => 'Exception');
 		list($class, $method) = is_string($object) ? explode('::', $object) : $object;
-		$wrap = static::$_exceptionHandler;
-		$_self = get_called_class();
 
-		$filter = function($self, $params, $chain) use ($_self, $conditions, $handler, $wrap) {
+		Filters::apply($class, $method, function($params, $next) use ($conditions, $handler) {
+			$wrap = static::$_exceptionHandler;
+
 			try {
-				return $chain->next($self, $params, $chain);
+				return $next($params);
 			} catch (Exception $e) {
-				if (!$_self::matches($e, $conditions)) {
+				if (!static::matches($e, $conditions)) {
 					throw $e;
 				}
 				return $handler($wrap($e, true), $params);
 			}
-		};
-
-		if (is_string($class)) {
-			Filters::apply($class, $method, $filter);
-		} else {
-			$class->applyFilter($method, $filter);
-		}
+		});
 	}
 
 	public static function matches($info, $conditions) {

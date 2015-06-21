@@ -70,12 +70,10 @@ class File extends \lithium\core\Object {
 	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($priority, $message) {
-		$config = $this->_config;
-
-		return function($self, $params) use (&$config) {
-			$path = $config['path'] . '/' . $config['file']($params, $config);
-			$params['timestamp'] = date($config['timestamp']);
-			$message = Text::insert($config['format'], $params);
+		return function($params) {
+			$path = $this->_config['path'] . '/' . $this->_config['file']($params, $this->_config);
+			$params['timestamp'] = date($this->_config['timestamp']);
+			$message = Text::insert($this->_config['format'], $params);
 			return file_put_contents($path, $message, FILE_APPEND);
 		};
 	}

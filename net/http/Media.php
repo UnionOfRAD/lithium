@@ -13,6 +13,7 @@ use lithium\util\Set;
 use lithium\util\Text;
 use lithium\core\Libraries;
 use lithium\core\Environment;
+use lithium\aop\Filters;
 use lithium\net\http\MediaException;
 
 /**
@@ -436,7 +437,7 @@ class Media extends \lithium\core\StaticObject {
 		$options = static::_assetOptions($path, $type, $options);
 		$params = compact('path', 'type', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$path = $params['path'];
 			$type = $params['type'];
 			$options = $params['options'];
@@ -453,7 +454,7 @@ class Media extends \lithium\core\StaticObject {
 			if ($options['suffix'] && strpos($path, $options['suffix']) === false) {
 				$path .= $options['suffix'];
 			}
-			return $self::filterAssetPath($path, $paths, $config, compact('type') + $options);
+			return static::filterAssetPath($path, $paths, $config, compact('type') + $options);
 		});
 	}
 
@@ -662,12 +663,12 @@ class Media extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function render($response, $data = null, array $options = array()) {
-		$params   = compact('response', 'data', 'options');
-		$types    = static::_types();
-		$handlers = static::handlers();
-		$func     = __FUNCTION__;
+		$params = compact('response', 'data', 'options');
 
-		return static::_filter($func, $params, function($self, $params) use ($types, $handlers) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
+			$types = static::_types();
+			$handlers = static::handlers();
+
 			$defaults = array('encode' => null, 'template' => null, 'layout' => '', 'view' => null);
 			$response = $params['response'];
 			$data = $params['data'];
@@ -690,7 +691,7 @@ class Media extends \lithium\core\StaticObject {
 				$header .= $response->encoding ? "; charset={$response->encoding}" : '';
 				$response->headers('Content-Type', $header);
 			}
-			$response->body($self::invokeMethod('_handle', array($handler, $data, $response)));
+			$response->body(static::_handle($handler, $data, $response));
 
 			return $response;
 		});
@@ -716,16 +717,16 @@ class Media extends \lithium\core\StaticObject {
 	public static function view($handler, $data, &$response = null, array $options = array()) {
 		$params = array('response' => &$response) + compact('handler', 'data', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$handler = $params['handler'];
 			$response =& $params['response'];
 
-			$handler = is_array($handler) ? $handler : $self::handlers($handler);
+			$handler = is_array($handler) ? $handler : static::handlers($handler);
 			$class = $handler['view'];
 			unset($handler['view']);
 
 			$config = $handler + array('response' => &$response);
-			return $self::invokeMethod('_instance', array($class, $config));
+			return static::_instance($class, $config);
 		});
 	}
 
@@ -749,11 +750,11 @@ class Media extends \lithium\core\StaticObject {
 	public static function encode($handler, $data, &$response = null) {
 		$params = array('response' => &$response) + compact('handler', 'data');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$data = $params['data'];
 			$handler = $params['handler'];
 			$response =& $params['response'];
-			$handler = is_array($handler) ? $handler : $self::handlers($handler);
+			$handler = is_array($handler) ? $handler : static::handlers($handler);
 
 			if (!$handler || empty($handler['encode'])) {
 				return null;
@@ -821,7 +822,7 @@ class Media extends \lithium\core\StaticObject {
 	protected static function _handle($handler, $data, &$response) {
 		$params = array('response' => &$response) + compact('handler', 'data');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$response = $params['response'];
 			$handler = $params['handler'];
 			$data = $params['data'];
@@ -834,12 +835,12 @@ class Media extends \lithium\core\StaticObject {
 
 			switch (true) {
 				case $handler['encode']:
-					return $self::encode($handler, $data, $response);
+					return static::encode($handler, $data, $response);
 				case ($handler['template'] === false) && is_string($data):
 					return $data;
 				case $handler['view']:
 					unset($options['view']);
-					$instance = $self::view($handler, $data, $response, $options);
+					$instance = static::view($handler, $data, $response, $options);
 					return $instance->render('all', (array) $data, $options);
 				default:
 					throw new MediaException("Could not interpret type settings for handler.");

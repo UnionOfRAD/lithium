@@ -12,6 +12,8 @@ use Closure;
 use Exception;
 use UnexpectedValueException;
 use lithium\core\ErrorHandler;
+use lithium\aop\Filters;
+use lithium\tests\mocks\core\MockStaticObject;
 use lithium\tests\mocks\core\MockErrorHandler;
 
 class ErrorHandlerTest extends \lithium\test\Unit {
@@ -103,18 +105,14 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 	}
 
 	public function testApply() {
-		$subject = new ErrorHandlerTest();
-		ErrorHandler::apply(array($subject, 'throwException'), array(), function($details) {
+		$class = 'lithium\tests\mocks\core\MockStaticObject';
+
+		ErrorHandler::apply("{$class}::throwException", array(), function($details) {
 			return $details['exception']->getMessage();
 		});
-		$this->assertEqual('foo', $subject->throwException());
-	}
+		$this->assertEqual('foo', MockStaticObject::throwException());
 
-	public function throwException() {
-		return $this->_filter(__METHOD__, array(), function($self, $params) {
-			throw new Exception('foo');
-			return 'bar';
-		});
+		Filters::clear('lithium\tests\mocks\core\MockStaticObject');
 	}
 
 	public function testTrace() {
@@ -170,11 +168,12 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 	}
 
 	public function testRenderedOutput() {
+		$class = 'lithium\tests\mocks\core\MockStaticObject';
+
 		ob_start();
 		echo 'Some Output';
-		$subject = new ErrorHandlerTest();
-		ErrorHandler::apply(array($subject, 'throwException'), array(), function($details) {});
-		$subject->throwException();
+		ErrorHandler::apply("{$class}::throwException", array(), function($details) {});
+		MockStaticObject::throwException();
 		$this->assertEmpty(ob_get_length());
 	}
 }

@@ -8,6 +8,9 @@
 
 namespace lithium\tests\mocks\core;
 
+/**
+ * @deprecated
+ */
 class MockStaticFilteringExtended extends \lithium\tests\mocks\core\MockStaticMethodFiltering {
 
 	public static function childMethod() {

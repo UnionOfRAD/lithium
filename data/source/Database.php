@@ -15,6 +15,7 @@ use lithium\util\Text;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
 use lithium\core\NetworkException;
+use lithium\aop\Filters;
 use lithium\data\model\QueryException;
 use lithium\data\model\Query;
 use InvalidArgumentException;
@@ -521,27 +522,29 @@ abstract class Database extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function create($query, array $options = array()) {
-		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
+		$params = compact('query', 'options');
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$query = $params['query'];
 			$model = $entity = $object = $id = null;
 
 			if (is_object($query)) {
 				$object = $query;
 				$model = $query->model();
-				$params = $query->export($self);
+				$params = $query->export($this);
 				$entity =& $query->entity();
-				$query = $self->renderCommand('create', $params, $query);
+				$query = $this->renderCommand('create', $params, $query);
 			} else {
-				$query = Text::insert($query, $self->value($params['options']));
+				$query = Text::insert($query, $this->value($params['options']));
 			}
 
-			if (!$self->invokeMethod('_execute', array($query))) {
+			if (!$this->_execute($query)) {
 				return false;
 			}
 
 			if ($entity) {
 				if (($model) && !$model::key($entity)) {
-					$id = $self->invokeMethod('_insertId', array($object));
+					$id = $this->_insertId($object);
 				}
 				$entity->sync($id);
 			}
@@ -568,7 +571,9 @@ abstract class Database extends \lithium\data\Source {
 		);
 		$options += $defaults;
 
-		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
+		$params = compact('query', 'options');
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$query = $params['query'];
 			$args = $params['options'];
 			$return = $args['return'];
@@ -577,14 +582,14 @@ abstract class Database extends \lithium\data\Source {
 			$model = is_object($query) ? $query->model() : null;
 
 			if (is_string($query)) {
-				$sql = Text::insert($query, $self->value($args));
+				$sql = Text::insert($query, $this->value($args));
 			} else {
-				if (!$data = $self->invokeMethod('_queryExport', array($query))) {
+				if (!$data = $this->_queryExport($query)) {
 					return false;
 				}
-				$sql = $self->renderCommand($data['type'], $data);
+				$sql = $this->renderCommand($data['type'], $data);
 			}
-			$result = $self->invokeMethod('_execute', array($sql));
+			$result = $this->_execute($sql);
 
 			if ($return === 'resource') {
 				return $result;
@@ -594,7 +599,7 @@ abstract class Database extends \lithium\data\Source {
 					'class' => 'set', 'defaults' => false
 				));
 			}
-			$columns = $args['schema'] ?: $self->schema($query, $result);
+			$columns = $args['schema'] ?: $this->schema($query, $result);
 
 			if (!is_array(reset($columns))) {
 				$columns = array('' => $columns);
@@ -681,11 +686,13 @@ abstract class Database extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function update($query, array $options = array()) {
-		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
+		$params = compact('query', 'options');
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$query = $params['query'];
-			$params = $query->export($self);
-			$sql = $self->renderCommand('update', $params, $query);
-			$result = (boolean) $self->invokeMethod('_execute', array($sql));
+
+			$sql = $this->renderCommand('update', $query->export($this), $query);
+			$result = (boolean) $this->_execute($sql);
 
 			if ($result && is_object($query) && $query->entity()) {
 				$query->entity()->sync();
@@ -705,16 +712,18 @@ abstract class Database extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function delete($query, array $options = array()) {
-		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
+		$params = compact('query', 'options');
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$query = $params['query'];
 			$isObject = is_object($query);
 
 			if ($isObject) {
-				$sql = $self->renderCommand('delete', $query->export($self), $query);
+				$sql = $this->renderCommand('delete', $query->export($this), $query);
 			} else {
-				$sql = Text::insert($query, $self->value($params['options']));
+				$sql = Text::insert($query, $this->value($params['options']));
 			}
-			$result = (boolean) $self->invokeMethod('_execute', array($sql));
+			$result = (boolean) $this->_execute($sql);
 
 			if ($result && $isObject && $query->entity()) {
 				$query->entity()->sync(null, array(), array('dematerialize' => true));
@@ -1552,10 +1561,10 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function _error($sql){
 		$params = compact('sql');
-		return $this->_filter(__METHOD__, $params, function($self, $params) {
-			$sql = $params['sql'];
-			list($code, $error) = $self->error();
-			throw new QueryException("{$sql}: {$error}", $code);
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
+			list($code, $error) = $this->error();
+			throw new QueryException("{$params['sql']}: {$error}", $code);
 		});
 	}
 

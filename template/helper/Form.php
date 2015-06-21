@@ -8,6 +8,7 @@
 
 namespace lithium\template\helper;
 
+use lithium\aop\Filters;
 use lithium\util\Set;
 use lithium\util\Inflector;
 
@@ -291,15 +292,13 @@ class Form extends \lithium\template\Helper {
 		list(, $options, $tpl) = $this->_defaults(__FUNCTION__, null, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
-		$_binding =& $this->_binding;
-		$_options =& $this->_bindingOptions;
 		$params = compact('scope', 'options', 'bindings');
 		$extra = array('method' => __METHOD__) + compact('tpl', 'defaults');
 
-		$filter = function($self, $params) use ($extra, &$_binding, &$_options) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) use ($extra) {
 			$scope = $params['scope'];
 			$options = $params['options'];
-			$_binding = $params['bindings'];
+			$this->_binding = $params['bindings'];
 			$append = null;
 			$scope['method'] = strtolower($scope['method']);
 
@@ -311,18 +310,18 @@ class Form extends \lithium\template\Helper {
 			}
 
 			if (!($scope['method'] === 'get' || $scope['method'] === 'post')) {
-				$append = $self->hidden('_method', array('value' => strtoupper($scope['method'])));
+				$append = $this->hidden('_method', array('value' => strtoupper($scope['method'])));
 				$scope['method'] = 'post';
 			}
 
 			$url = $scope['action'] ? array('action' => $scope['action']) : $scope['url'];
 			$options['method'] = strtolower($scope['method']);
-			$args = array($extra['method'], $extra['tpl'], compact('url', 'options', 'append'));
-			$_options = $scope + $options;
+			$this->_bindingOptions = $scope + $options;
 
-			return $self->invokeMethod('_render', $args);
-		};
-		return $this->_filter(__METHOD__, $params, $filter);
+			return $this->_render($extra['method'], $extra['tpl'],
+				compact('url', 'options', 'append')
+			);
+		});
 	}
 
 	/**
@@ -335,14 +334,11 @@ class Form extends \lithium\template\Helper {
 	public function end() {
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, array());
 		$params = compact('options', 'template');
-		$_context =& $this->_context;
-		$_options =& $this->_bindingOptions;
 
-		$filter = function($self, $params) use (&$_context, &$_options, $template) {
-			$_options = array();
-			return $self->invokeMethod('_render', array('end', $params['template'], array()));
-		};
-		$result = $this->_filter(__METHOD__, $params, $filter);
+		$result = Filters::run($this, __FUNCTION__, $params, function($params) {
+			$this->_bindingOptions = array();
+			return $this->_render('end', $params['template'], array());
+		});
 		unset($this->_binding);
 		$this->_binding = null;
 		return $result;
@@ -841,7 +837,7 @@ class Form extends \lithium\template\Helper {
 
 		$params = compact('name', 'key', 'messages', 'options', 'template');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$options = $params['options'];
 			$template = $params['template'];
 			$messages = $params['messages'];
@@ -849,14 +845,13 @@ class Form extends \lithium\template\Helper {
 			if (isset($options['value'])) {
 				unset($options['value']);
 			}
-			if (!$content = $self->binding($params['name'])->errors) {
+			if (!$content = $this->binding($params['name'])->errors) {
 				return null;
 			}
 			$result = '';
 
 			if (!is_array($content)) {
-				$args = array(__METHOD__, $template, compact('content', 'options'));
-				return $self->invokeMethod('_render', $args);
+				return $this->_render(__METHOD__, $template, compact('content', 'options'));
 			}
 			$errors = $content;
 
@@ -867,16 +862,14 @@ class Form extends \lithium\template\Helper {
 					} elseif ($messages['default']) {
 						$content = $messages['default'];
 					}
-					$args = array(__METHOD__, $template, compact('content', 'options'));
-					$result .= $self->invokeMethod('_render', $args);
+					$result .= $this->_render(__METHOD__, $template, compact('content', 'options'));
 				}
 				return $result;
 			}
 
 			$key = $params['key'];
 			$content = !isset($errors[$key]) || $key === true ? reset($errors) : $errors[$key];
-			$args = array(__METHOD__, $template, compact('content', 'options'));
-			return $self->invokeMethod('_render', $args);
+			return $this->_render(__METHOD__, $template, compact('content', 'options'));
 		});
 	}
 
@@ -889,22 +882,20 @@ class Form extends \lithium\template\Helper {
 	 * @return array Defaults array contents.
 	 */
 	protected function _defaults($method, $name, $options) {
-		$config = $this->_config;
 		$params = compact('method', 'name', 'options');
-		$tpls = $this->_templateMap;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($config, $tpls) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$method = $params['method'];
 			$name = $params['name'];
 			$options = $params['options'];
 
-			$methodConfig = isset($config[$method]) ? $config[$method] : array();
-			$options += $methodConfig + $config['base'];
-			$options = $self->invokeMethod('_generators', array($method, $name, $options));
+			$methodConfig = isset($this->_config[$method]) ? $this->_config[$method] : array();
+			$options += $methodConfig + $this->_config['base'];
+			$options = $this->_generators($method, $name, $options);
 
 			$hasValue = (
 				(!isset($options['value']) || $options['value'] === null) &&
-				$name && $value = $self->binding($name)->data
+				$name && $value = $this->binding($name)->data
 			);
 			$isZero = (isset($value) && ($value === 0 || $value === "0"));
 
@@ -919,11 +910,11 @@ class Form extends \lithium\template\Helper {
 			}
 			unset($options['default']);
 
-			$generator = $config['attributes']['name'];
+			$generator = $this->_config['attributes']['name'];
 			$name = $generator($method, $name, $options);
 
 			$tplKey = isset($options['template']) ? $options['template'] : $method;
-			$template = isset($tpls[$tplKey]) ? $tpls[$tplKey] : $tplKey;
+			$template = isset($this->_templateMap[$tplKey]) ? $this->_templateMap[$tplKey] : $tplKey;
 			return array($name, $options, $template);
 		});
 	}

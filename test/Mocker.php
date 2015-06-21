@@ -8,8 +8,8 @@
 
 namespace lithium\test;
 
+use lithium\aop\Filters;
 use lithium\util\Text;
-use lithium\util\collection\Filters;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionFunction;
@@ -56,7 +56,7 @@ use Reflection;
  * ```
  * use lithium\console\dispatcher\Mock as DispatcherMock;
  * $dispatcher = new DispatcherMock();
- * $dispatcher->applyFilter('config', function($self, $params, $chain) {
+ * $dispatcher->applyFilter('config', function($params, $next) {
  * 	return array();
  * });
  * $results = $dispatcher->config();
@@ -64,7 +64,7 @@ use Reflection;
  * ```
  * use lithium\analysis\parser\Mock as ParserMock;
  * $code = 'echo "foobar";';
- * ParserMock::applyFilter('config', function($self, $params, $chain) {
+ * ParserMock::applyFilter('config', function($params, $next) {
  *   return array();
  * });
  * $tokens = ParserMock::tokenize($code, array('wrap' => true));
@@ -165,7 +165,7 @@ use Reflection;
  *   public function speak() {
  *     $params = compact();
  *     $person = $this->person;
- *     return $this->_filter(__METHOD__, array(), function($self, $params) use (&$person) {
+ *     return Filters::run($this, __FUNCTION__, array(), function($params) use (&$person) {
  *       return $person->speak();
  *     };
  *   }
@@ -201,13 +201,6 @@ use Reflection;
  * if it should go back to the original PHP function.
  */
 class Mocker {
-
-	/**
-	 * Stores the closures that represent the method filters. They are indexed by called class.
-	 *
-	 * @var array Method filters, indexed by class.
-	 */
-	protected static $_methodFilters = array();
 
 	/**
 	 * Functions to be called instead of the original.
@@ -326,17 +319,18 @@ class Mocker {
 	protected static $_mockIngredients = array(
 		'startClass' => array(
 			'namespace {:namespace};',
+			'use lithium\aop\Filters as _Filters;',
 			'class Mock extends \{:mocker} {',
 			'    public $mocker;',
 			'    public $results = array();',
 			'    public static $staticResults = array();',
 			'    protected $_safeVars = array(',
 			'        "_classes",',
-			'        "_methodFilters",',
 			'        "mocker",',
 			'        "_safeVars",',
 			'        "results",',
 			'        "staticResults",',
+			'        "_methodFilters",',
 			'    );',
 		),
 		'get' => array(
@@ -381,14 +375,11 @@ class Mocker {
 			'    $args = compact({:stringArgs});',
 			'    $args["hash"] = "1f3870be274f6c49b3e31a0c6728957f";',
 			'    $method = \'{:namespace}\MockDelegate::{:method}\';',
-			'    $result = {:master}::invokeMethod("_filter", array(',
-			'        __CLASS__, ',
-			'        "{:method}",',
-			'        $args,',
-			'        function($self, $args) use(&$method) {',
+			'    $result = _Filters::run(__CLASS__, "{:method}", $args,',
+			'        function($args) use(&$method) {',
 			'            return call_user_func_array($method, $args);',
 			'        }',
-			'    ));',
+			'    );',
 			'    if (!isset(self::$staticResults["{:method}"])) {',
 			'        self::$staticResults["{:method}"] = array();',
 			'    }',
@@ -405,14 +396,11 @@ class Mocker {
 			'    $args = compact({:stringArgs});',
 			'    $args["hash"] = spl_object_hash($this->mocker);',
 			'    $_method = array($this->mocker, "{:method}");',
-			'    $result = {:master}::invokeMethod("_filter", array(',
-			'        __CLASS__,',
-			'        "{:method}",',
-			'        $args,',
-			'        function($self, $args) use(&$_method) {',
+			'    $result = _Filters::run(__CLASS__, "{:method}", $args,',
+			'        function($args) use(&$_method) {',
 			'           return call_user_func_array($_method, $args);',
 			'        }',
-			'    ));',
+			'    );',
 			'    if (!isset($this->results["{:method}"])) {',
 			'        $this->results["{:method}"] = array();',
 			'    }',
@@ -426,7 +414,16 @@ class Mocker {
 		),
 		'applyFilter' => array(
 			'public {:static} function applyFilter($method, $filter = null) {',
-			'    return {:master}::applyFilter(__CLASS__, $method, $filter);',
+			'    $message  = "<mocked class>::applyFilter() is deprecated. ";',
+			'    $message .= "Use Filters::applyFilter(" . __CLASS__ .", ...) instead.";',
+			'    // trigger_error($message, E_USER_DEPRECATED);',
+			'    foreach ((array) $method as $m) {',
+			'        if ($filter === null) {',
+			'            _Filters::clear(__CLASS__, $m);',
+			'        } else {',
+			'            _Filters::apply(__CLASS__, $m, $filter);',
+			'        }',
+			'    }',
 			'}',
 		),
 		'endClass' => array(
@@ -447,8 +444,8 @@ class Mocker {
 		'__get', '__set', '__isset', '__unset', '__sleep',
 		'__wakeup', '__toString', '__clone', '__invoke',
 		'_stop', '_init', 'invokeMethod', '__set_state',
-		'_instance', '_filter', '_object', '_initialize',
-		'applyFilter',
+		'_instance', '_object', '_initialize',
+		'_filter', 'applyFilter',
 	);
 
 	/**
@@ -690,63 +687,6 @@ class Mocker {
 	}
 
 	/**
-	 * Apply a closure to a method of the current static object.
-	 *
-	 * @see lithium\core\StaticObject::_filter()
-	 * @see lithium\util\collection\Filters
-	 * @param string $class Fully namespaced class to apply filters.
-	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
-	 *        method name as a string, or an array of method names. Can also be false to remove
-	 *        all filters on the current object.
-	 * @param \Closure $filter The closure that is used to filter the method(s), can also be false
-	 *        to remove all the current filters for the given method.
-	 * @return void
-	 */
-	public static function applyFilter($class, $method = null, $filter = null) {
-		if ($class === false) {
-			return static::$_methodFilters = array();
-		}
-		if ($method === false) {
-			return static::$_methodFilters[$class] = array();
-		}
-		foreach ((array) $method as $m) {
-			if (!isset(static::$_methodFilters[$class][$m]) || $filter === false) {
-				static::$_methodFilters[$class][$m] = array();
-			}
-			if ($filter !== false) {
-				static::$_methodFilters[$class][$m][] = $filter;
-			}
-		}
-	}
-
-	/**
-	 * Executes a set of filters against a method by taking a method's main implementation as a
-	 * callback, and iteratively wrapping the filters around it.
-	 *
-	 * @see lithium\util\collection\Filters
-	 * @param string $class Fully namespaced class to apply filters.
-	 * @param string|array $method The name of the method being executed, or an array containing
-	 *        the name of the class that defined the method, and the method name.
-	 * @param array $params An associative array containing all the parameters passed into
-	 *        the method.
-	 * @param \Closure $callback The method's implementation, wrapped in a closure.
-	 * @param array $filters Additional filters to apply to the method for this call only.
-	 * @return mixed
-	 */
-	protected static function _filter($class, $method, $params, $callback, $filters = array()) {
-		$hasNoFilters = empty(static::$_methodFilters[$class][$method]);
-		if ($hasNoFilters && !$filters && !Filters::hasApplied($class, $method)) {
-			return $callback($class, $params, null);
-		}
-		if (!isset(static::$_methodFilters[$class][$method])) {
-			static::$_methodFilters += array($class => array());
-			static::$_methodFilters[$class][$method] = array();
-		}
-		$data = array_merge(static::$_methodFilters[$class][$method], $filters, array($callback));
-		return Filters::run($class, $params, compact('data', 'class', 'method'));
-	}
-
-	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
 	 * `forward_static_call_array()`.
 	 *
@@ -819,6 +759,77 @@ class Mocker {
 		return $result;
 	}
 
+	/* Deprecated / BC */
+
+	/**
+	 * Stores the closures that represent the method filters. They are indexed by called class.
+	 *
+	 * @deprecated
+	 * @var array Method filters, indexed by class.
+	 */
+	protected static $_methodFilters = array();
+
+	/**
+	 * Apply a closure to a method of the current static object.
+	 *
+	 * @deprecated
+	 * @see lithium\core\StaticObject::_filter()
+	 * @see lithium\util\collection\Filters
+	 * @param string $class Fully namespaced class to apply filters.
+	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
+	 *        method name as a string, or an array of method names. Can also be false to remove
+	 *        all filters on the current object.
+	 * @param \Closure $filter The closure that is used to filter the method(s), can also be false
+	 *        to remove all the current filters for the given method.
+	 * @return void
+	 */
+	public static function applyFilter($class, $method = null, $filter = null) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
+		$message .= '`\lithium\aop\Filters::apply()` and `::clear()`.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		$class = get_called_class();
+
+		if ($method === false) {
+			Filters::clear($class);
+			return;
+		}
+		foreach ((array) $method as $m) {
+			if ($filter === false) {
+				Filters::clear($class, $m);
+			} else {
+				Filters::apply($class, $m, $filter);
+			}
+		}
+	}
+
+	/**
+	 * Executes a set of filters against a method by taking a method's main implementation as a
+	 * callback, and iteratively wrapping the filters around it.
+	 *
+	 * @deprecated
+	 * @see lithium\util\collection\Filters
+	 * @param string $class Fully namespaced class to apply filters.
+	 * @param string|array $method The name of the method being executed, or an array containing
+	 *        the name of the class that defined the method, and the method name.
+	 * @param array $params An associative array containing all the parameters passed into
+	 *        the method.
+	 * @param \Closure $callback The method's implementation, wrapped in a closure.
+	 * @param array $filters Additional filters to apply to the method for this call only.
+	 * @return mixed
+	 */
+	protected static function _filter($class, $method, $params, $callback, $filters = array()) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
+		$message .= '`\lithium\aop\Filters::run()` and `::apply()`.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		$class = get_called_class();
+
+		foreach ($filters as $filter) {
+			Filters::apply($class, $method, $filter);
+		}
+		return Filters::run($class, $method, $params, $callback);
+	}
 }
 
 ?>

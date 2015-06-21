@@ -545,8 +545,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * and schema are ignored with serialized objects.
 	 *
 	 * Properties that hold anonymous functions are also skipped. Some of these
-	 * can almost be reconstructed (`_handlers`) others cannot (`_methodFilters`
-	 * and `schema`).
+	 * can almost be reconstructed (`_handlers`) others cannot (`schema`).
 	 *
 	 * @return string Serialized properties of the object.
 	 */
@@ -555,7 +554,6 @@ class Entity extends \lithium\core\Object implements \Serializable {
 		unset($vars['_schema']);
 		unset($vars['_config']['schema']);
 		unset($vars['_handlers']);
-		unset($vars['_methodFilters']);
 
 		return serialize($vars);
 	}

@@ -84,10 +84,8 @@ class Cookie extends \lithium\core\Object {
 	 * @return \Closure Function returning boolean `true` if the key exists, `false` otherwise.
 	 */
 	public function check($key) {
-		$config = $this->_config;
-
-		return function($self, $params) use (&$config) {
-			return (isset($_COOKIE[$config['name']][$params['key']]));
+		return function($params) {
+			return (isset($_COOKIE[$this->_config['name']][$params['key']]));
 		};
 	}
 
@@ -100,19 +98,22 @@ class Cookie extends \lithium\core\Object {
 	 * @return \Closure Function returning data in the session if successful, `null` otherwise.
 	 */
 	public function read($key = null, array $options = array()) {
-		$config = $this->_config;
-
-		return function($self, $params) use (&$config) {
+		return function($params) {
 			$key = $params['key'];
 			if (!$key) {
-				if (isset($_COOKIE[$config['name']])) {
-					return $_COOKIE[$config['name']];
+				if (isset($_COOKIE[$this->_config['name']])) {
+					return $_COOKIE[$this->_config['name']];
 				}
 				return array();
 			}
 			if (strpos($key, '.') !== false) {
 				$key = explode('.', $key);
-				$result = (isset($_COOKIE[$config['name']])) ? $_COOKIE[$config['name']] : array();
+
+				if (isset($_COOKIE[$this->_config['name']])) {
+					$result = $_COOKIE[$this->_config['name']];
+				} else {
+					$result = array();
+				}
 
 				foreach ($key as $k) {
 					if (!isset($result[$k])) {
@@ -122,8 +123,8 @@ class Cookie extends \lithium\core\Object {
 				}
 				return $result;
 			}
-			if (isset($_COOKIE[$config['name']][$key])) {
-				return $_COOKIE[$config['name']][$key];
+			if (isset($_COOKIE[$this->_config['name']][$key])) {
+				return $_COOKIE[$this->_config['name']][$key];
 			}
 		};
 	}
@@ -138,15 +139,14 @@ class Cookie extends \lithium\core\Object {
 	 */
 	public function write($key, $value = null, array $options = array()) {
 		$expire = (!isset($options['expire']) && empty($this->_config['expire']));
-		$config = $this->_config;
 		$cookieClass = __CLASS__;
 
-		if ($expire && $key !== $config['name']) {
+		if ($expire && $key !== $this->_config['name']) {
 			return null;
 		}
-		$expires = (isset($options['expire'])) ? $options['expire'] : $config['expire'];
+		$expires = (isset($options['expire'])) ? $options['expire'] : $this->_config['expire'];
 
-		return function($self, $params) use (&$config, &$expires, $cookieClass) {
+		return function($params) use (&$expires, $cookieClass) {
 			$key = $params['key'];
 			$value = $params['value'];
 			$key = array($key => $value);
@@ -155,11 +155,15 @@ class Cookie extends \lithium\core\Object {
 			}
 
 			foreach ($key as $name => $val) {
-				$name = $cookieClass::keyFormat($name, $config);
-				$result = setcookie($name, $val, strtotime($expires), $config['path'],
-					$config['domain'], $config['secure'], $config['httponly']
+				$result = setcookie(
+					$cookieClass::keyFormat($name, $this->_config),
+					$val,
+					strtotime($expires),
+					$this->_config['path'],
+					$this->_config['domain'],
+					$this->_config['secure'],
+					$this->_config['httponly']
 				);
-
 				if (!$result) {
 					throw new RuntimeException("There was an error setting {$name} cookie.");
 				}
@@ -176,12 +180,11 @@ class Cookie extends \lithium\core\Object {
 	 * @return \Closure Function returning boolean `true` on successful delete, `false` otherwise.
 	 */
 	public function delete($key, array $options = array()) {
-		$config = $this->_config;
 		$cookieClass = get_called_class();
 
-		return function($self, $params) use (&$config, $cookieClass) {
+		return function($params) use ($cookieClass) {
 			$key = $params['key'];
-			$path = '/' . str_replace('.', '/', $config['name'] . '.' . $key) . '/.';
+			$path = '/' . str_replace('.', '/', $this->_config['name'] . '.' . $key) . '/.';
 			$cookies = current(Set::extract($_COOKIE, $path));
 			if (is_array($cookies)) {
 				$cookies = array_keys(Set::flatten($cookies));
@@ -192,9 +195,14 @@ class Cookie extends \lithium\core\Object {
 				$cookies = array($key);
 			}
 			foreach ($cookies as &$name) {
-				$name = $cookieClass::keyFormat($name, $config);
-				$result = setcookie($name, "", 1, $config['path'],
-					$config['domain'], $config['secure'], $config['httponly']
+				$result = setcookie(
+					$cookieClass::keyFormat($name, $this->_config),
+					"",
+					1,
+					$this->_config['path'],
+					$this->_config['domain'],
+					$this->_config['secure'],
+					$this->_config['httponly']
 				);
 				if (!$result) {
 					throw new RuntimeException("There was an error deleting {$name} cookie.");
@@ -212,27 +220,31 @@ class Cookie extends \lithium\core\Object {
 	 */
 	public function clear(array $options = array()) {
 		$options += array('destroySession' => true);
-		$config = $this->_config;
 		$cookieClass = get_called_class();
 
-		return function($self, $params) use (&$config, $options, $cookieClass) {
+		return function($params) use ($options, $cookieClass) {
 			if ($options['destroySession'] && session_id()) {
 				session_destroy();
 			}
-			if (!isset($_COOKIE[$config['name']])) {
+			if (!isset($_COOKIE[$this->_config['name']])) {
 				return true;
 			}
-			$cookies = array_keys(Set::flatten($_COOKIE[$config['name']]));
+			$cookies = array_keys(Set::flatten($_COOKIE[$this->_config['name']]));
 			foreach ($cookies as $name) {
-				$name = $cookieClass::keyFormat($name, $config);
-				$result = setcookie($name, "", 1, $config['path'],
-					$config['domain'], $config['secure'], $config['httponly']
+				$result = setcookie(
+					$cookieClass::keyFormat($name, $this->_config),
+					"",
+					1,
+					$this->_config['path'],
+					$this->_config['domain'],
+					$this->_config['secure'],
+					$this->_config['httponly']
 				);
 				if (!$result) {
 					throw new RuntimeException("There was an error clearing {$cookie} cookie.");
 				}
 			}
-			unset($_COOKIE[$config['name']]);
+			unset($_COOKIE[$this->_config['name']]);
 			return true;
 		};
 	}

@@ -8,6 +8,7 @@
 
 namespace lithium\g11n;
 
+use lithium\aop\Filters;
 use lithium\core\Environment;
 use lithium\util\Text;
 use lithium\g11n\Catalog;
@@ -191,8 +192,7 @@ class Message extends \lithium\core\StaticObject {
 	protected static function _translated($id, $count, $locale, array $options = array()) {
 		$params = compact('id', 'count', 'locale', 'options');
 
-		$cache =& static::$_cachedPages;
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use (&$cache) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			extract($params);
 
 			if (isset($options['context']) && $options['context'] !== null) {
@@ -200,12 +200,12 @@ class Message extends \lithium\core\StaticObject {
 				$id = "{$id}|{$context}";
 			}
 
-			if (!isset($cache[$options['scope']][$locale])) {
-				$cache[$options['scope']][$locale] = Catalog::read(
+			if (!isset(static::$_cachedPages[$options['scope']][$locale])) {
+				static::$_cachedPages[$options['scope']][$locale] = Catalog::read(
 					true, 'message', $locale, $options
 				);
 			}
-			$page = $cache[$options['scope']][$locale];
+			$page = static::$_cachedPages[$options['scope']][$locale];
 
 			if (!isset($page[$id])) {
 				return null;

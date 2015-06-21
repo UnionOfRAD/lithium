@@ -637,7 +637,7 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 * the `_result` property which may hold unserializable `PDOStatement`s.
 	 *
 	 * Properties that hold anonymous functions are also skipped. Some of these
-	 * can almost be reconstructed (`_handlers`) others cannot (`_methodFilters`).
+	 * can almost be reconstructed (`_handlers`).
 	 *
 	 * @return string Serialized properties of the object.
 	 */
@@ -648,7 +648,6 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 		$vars = get_object_vars($this);
 		unset($vars['_result']);
 		unset($vars['_handlers']);
-		unset($vars['_methodFilters']);
 
 		return serialize($vars);
 	}

@@ -492,7 +492,7 @@ class LocaleTest extends \lithium\test\Unit {
 	}
 
 	public function testRespondsToParentCall() {
-		$this->assertTrue(Locale::respondsTo('applyFilter'));
+		$this->assertTrue(Locale::respondsTo('invokeMethod'));
 		$this->assertFalse(Locale::respondsTo('fooBarBaz'));
 	}
 

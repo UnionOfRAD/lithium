@@ -9,6 +9,7 @@
 namespace lithium\data\source;
 
 use lithium\util\Text;
+use lithium\aop\Filters;
 use lithium\data\model\Query;
 
 /**
@@ -133,9 +134,9 @@ class Http extends \lithium\data\Source {
 		}
 		$params[0] = new Query($params[0]->export($this) + $this->_methods[$method]);
 
-		return $this->_filter(__CLASS__ . "::" . $method, $params, function($self, $params) {
+		return Filters::run($this, $method, $params, function($params) {
 			list($query, $options) = $params;
-			return $self->send($query, $options);
+			return $this->send($query, $options);
 		});
 	}
 
@@ -234,9 +235,12 @@ class Http extends \lithium\data\Source {
 		$query = !is_object($query) ? new Query() : $query;
 		$query->method() ?: $query->method("post");
 		$query->path() ?: $query->path("/{:source}");
-		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+
+		$params = array($query, $options);
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			list($query, $options) = $params;
-			return $self->send($query, $options);
+			return $this->send($query, $options);
 		});
 	}
 
@@ -252,9 +256,12 @@ class Http extends \lithium\data\Source {
 		$query = !is_object($query) ? new Query() : $query;
 		$query->method() ?: $query->method("get");
 		$query->path() ?: $query->path("/{:source}");
-		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+
+		$params = array($query, $options);
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			list($query, $options) = $params;
-			return $self->send($query, $options);
+			return $this->send($query, $options);
 		});
 	}
 
@@ -270,9 +277,12 @@ class Http extends \lithium\data\Source {
 		$query = !is_object($query) ? new Query() : $query;
 		$query->method() ?: $query->method("put");
 		$query->path() ?: $query->path("/{:source}/{:id}");
-		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+
+		$params = array($query, $options);
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			list($query, $options) = $params;
-			return $self->send($query, $options);
+			return $this->send($query, $options);
 		});
 	}
 
@@ -288,9 +298,12 @@ class Http extends \lithium\data\Source {
 		$query = !is_object($query) ? new Query() : $query;
 		$query->method() ?: $query->method("delete");
 		$query->path() ?: $query->path("/{:source}/{:id}");
-		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+
+		$params = array($query, $options);
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			list($query, $options) = $params;
-			return $self->send($query, $options);
+			return $this->send($query, $options);
 		});
 	}
 

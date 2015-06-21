@@ -9,6 +9,7 @@
 namespace lithium\data;
 
 use lithium\core\Libraries;
+use lithium\aop\Filters;
 use lithium\util\Set;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
@@ -133,13 +134,6 @@ class Model extends \lithium\core\StaticObject {
 	 * @var array
 	 */
 	protected static $_initialized = array();
-
-	/**
-	 * Stores the filters that are applied to the model instances stored in `Model::$_instances`.
-	 *
-	 * @var array
-	 */
-	protected $_instanceFilters = array();
 
 	/**
 	 * Class dependencies.
@@ -673,17 +667,34 @@ class Model extends \lithium\core\StaticObject {
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 		$params = compact('type', 'options');
 
-		$filter = function($self, $params) use ($meta) {
+		$implementation = function($params) use ($meta) {
 			$options = $params['options'] + array('type' => 'read', 'model' => $meta['name']);
-			$query = $self::invokeMethod('_instance', array('query', $options));
-			return $self::connection()->read($query, $options);
+			$query = static::_instance('query', $options);
+
+			return static::connection()->read($query, $options);
 		};
 		if (isset($self->_finders[$type])) {
-			$finder = array($self->_finders[$type]);
-		} else {
-			$finder = array();
+			$finder = $self->_finders[$type];
+
+			$reflect = new \ReflectionFunction($finder);
+			if ($reflect->getNumberOfParameters() > 2) {
+				$message  = 'Old style finder function in file ' . $reflect->getFileName() . ' ';
+				$message .= 'on line ' . $reflect->getStartLine() . '. ';
+				$message .= 'The signature for finder functions has changed. It is now ';
+				$message .= '`($params, $next)` instead of the old `($self, $params, $chain)`. ';
+				$message .= 'Instead of `$self` use `$this` or `static`.';
+				trigger_error($message, E_USER_DEPRECATED);
+
+				return Filters::bcRun(
+					get_called_class(), __FUNCTION__, $params, $implementation, array($finder)
+				);
+			}
+
+			$implementation = function($params) use ($finder, $implementation) {
+				return $finder($params, $implementation);
+			};
 		}
-		return static::_filter(__FUNCTION__, $params, $filter, $finder);
+		return Filters::run(get_called_class(), __FUNCTION__, $params, $implementation);
 	}
 
 	/**
@@ -735,9 +746,9 @@ class Model extends \lithium\core\StaticObject {
 			return isset($self->_finders[$name]) ? $self->_finders[$name] : null;
 		}
 		if (is_array($finder)) {
-			$finder = function($self, $params, $chain) use ($finder) {
+			$finder = function($params, $next) use ($finder) {
 				$params['options'] = Set::merge($params['options'], $finder);
-				return $chain->next($self, $params, $chain);
+				return $next($params);
 			};
 		}
 		$self->_finders[$name] = $finder;
@@ -750,17 +761,17 @@ class Model extends \lithium\core\StaticObject {
 	 * @return array
 	 */
 	protected static function _finders() {
-		$_query = static::_object()->_query;
+		$self = static::_object();
 
 		return array(
-			'all' => function($self, $params, $chain) {
-				return $chain->next($self, $params, $chain);
+			'all' => function($params, $next) {
+				return $next($params);
 			},
-			'first' => function($self, $params, $chain) {
+			'first' => function($params, $next) {
 				$options =& $params['options'];
 				$options['limit'] = 1;
 
-				$data = $chain->next($self, $params, $chain);
+				$data = $next($params);
 
 				if (isset($options['return']) && $options['return'] === 'array') {
 					$data = is_array($data) ? reset($data) : $data;
@@ -769,19 +780,19 @@ class Model extends \lithium\core\StaticObject {
 				}
 				return $data ?: null;
 			},
-			'list' => function($self, $params, $chain) {
+			'list' => function($params, $next) use ($self) {
 				$result = array();
 				$meta = $self::meta();
 				$name = $meta['key'];
 
-				foreach ($chain->next($self, $params, $chain) as $entity) {
+				foreach ($next($params) as $entity) {
 					$key = $entity->{$name};
 					$result[is_scalar($key) ? $key : (string) $key] = $entity->title();
 				}
 				return $result;
 			},
-			'count' => function($self, $params, $chain) use ($_query) {
-				$options = array_diff_key($params['options'], $_query);
+			'count' => function($params, $next) use ($self) {
+				$options = array_diff_key($params['options'], $self->_query);
 
 				if ($options && !isset($params['options']['conditions'])) {
 					$options = array('conditions' => $options);
@@ -1120,16 +1131,21 @@ class Model extends \lithium\core\StaticObject {
 	public static function create(array $data = array(), array $options = array()) {
 		$defaults = array('defaults' => true, 'class' => 'entity');
 		$options += $defaults;
-		return static::_filter(__FUNCTION__, compact('data', 'options'), function($self, $params) {
+
+		$params = compact('data', 'options');
+
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$class = $params['options']['class'];
 			unset($params['options']['class']);
 			if ($class === 'entity' && $params['options']['defaults']) {
-				$data = Set::merge(Set::expand($self::schema()->defaults()), $params['data']);
+				$data = Set::merge(Set::expand(static::schema()->defaults()), $params['data']);
 			} else {
 				$data = $params['data'];
 			}
-			$options = array('model' => $self, 'data' => $data) + $params['options'];
-			return $self::invokeMethod('_instance', array($class, $options));
+			return static::_instance($class, array(
+				'model' => get_called_class(),
+				'data' => $data
+			) + $params['options']);
 		});
 	}
 
@@ -1239,7 +1255,7 @@ class Model extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$params = compact('entity', 'data', 'options');
 
-		$filter = function($self, $params) use ($_meta, $_schema) {
+		$filter = function($params) use ($_meta, $_schema) {
 			$entity = $params['entity'];
 			$options = $params['options'];
 
@@ -1262,16 +1278,16 @@ class Model extends \lithium\core\StaticObject {
 			}
 			$type = $entity->exists() ? 'update' : 'create';
 
-			$query = $self::invokeMethod('_instance', array(
-				'query', compact('type', 'whitelist', 'entity') + $options + $_meta
-			));
-			return $self::connection()->{$type}($query, $options);
+			$query = static::_instance('query',
+				compact('type', 'whitelist', 'entity') + $options + $_meta
+			);
+			return static::connection()->{$type}($query, $options);
 		};
 
 		if (!$options['callbacks']) {
-			return $filter(get_called_class(), $params);
+			return $filter($params);
 		}
-		return static::_filter(__FUNCTION__, $params, $filter);
+		return Filters::run(get_called_class(), __FUNCTION__, $params, $filter);
 	}
 
 	/**
@@ -1343,7 +1359,7 @@ class Model extends \lithium\core\StaticObject {
 		$entity->errors(false);
 		$params = compact('entity', 'options');
 
-		$filter = function($parent, $params) use ($validator) {
+		$implementation = function($params) use ($validator) {
 			$entity = $params['entity'];
 			$options = $params['options'];
 			$rules = $options['rules'];
@@ -1358,7 +1374,7 @@ class Model extends \lithium\core\StaticObject {
 			}
 			return empty($errors);
 		};
-		return static::_filter(__FUNCTION__, $params, $filter);
+		return Filters::run(get_called_class(), __FUNCTION__, $params, $implementation);
 	}
 
 	/**
@@ -1372,12 +1388,15 @@ class Model extends \lithium\core\StaticObject {
 	public function delete($entity, array $options = array()) {
 		$params = compact('entity', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$options = $params + $params['options'] + array('model' => $self, 'type' => 'delete');
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
+			$options = $params + $params['options'] + array(
+				'model' => get_called_class(),
+				'type' => 'delete'
+			);
 			unset($options['options']);
 
-			$query = $self::invokeMethod('_instance', array('query', $options));
-			return $self::connection()->delete($query, $options);
+			$query = static::_instance('query', $options);
+			return static::connection()->delete($query, $options);
 		});
 	}
 
@@ -1399,12 +1418,15 @@ class Model extends \lithium\core\StaticObject {
 	public static function update($data, $conditions = array(), array $options = array()) {
 		$params = compact('data', 'conditions', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$options = $params + $params['options'] + array('model' => $self, 'type' => 'update');
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
+			$options = $params + $params['options'] + array(
+				'model' => get_called_class(),
+				'type' => 'update'
+			);
 			unset($options['options']);
 
-			$query = $self::invokeMethod('_instance', array('query', $options));
-			return $self::connection()->update($query, $options);
+			$query = static::_instance('query', $options);
+			return static::connection()->update($query, $options);
 		});
 	}
 
@@ -1425,12 +1447,15 @@ class Model extends \lithium\core\StaticObject {
 	public static function remove($conditions = array(), array $options = array()) {
 		$params = compact('conditions', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$options = $params['options'] + $params + array('model' => $self, 'type' => 'delete');
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
+			$options = $params['options'] + $params + array(
+				'model' => get_called_class(),
+				'type' => 'delete'
+			);
 			unset($options['options']);
 
-			$query = $self::invokeMethod('_instance', array('query', $options));
-			return $self::connection()->delete($query, $options);
+			$query = static::_instance('query', $options);
+			return static::connection()->delete($query, $options);
 		});
 	}
 
@@ -1452,55 +1477,6 @@ class Model extends \lithium\core\StaticObject {
 		$class = get_called_class();
 		$msg = "The data connection `{$name}` is not configured for model `{$class}`.";
 		throw new ConfigException($msg);
-	}
-
-	/**
-	 * Wraps `StaticObject::applyFilter()` to account for object instances.
-	 *
-	 * @see lithium\core\StaticObject::applyFilter()
-	 * @param string $method
-	 * @param mixed $closure
-	 */
-	public static function applyFilter($method, $closure = null) {
-		$instance = static::_object();
-
-		if ($method === false) {
-			$instance->_instanceFilters = array();
-			return;
-		}
-		$methods = (array) $method;
-
-		foreach ($methods as $method) {
-			if (!isset($instance->_instanceFilters[$method]) || $closure === false) {
-				$instance->_instanceFilters[$method] = array();
-			}
-			if ($closure !== false) {
-				$instance->_instanceFilters[$method][] = $closure;
-			}
-		}
-	}
-
-	/**
-	 * Wraps `StaticObject::_filter()` to account for object instances.
-	 *
-	 * @see lithium\core\StaticObject::_filter()
-	 * @param string $method
-	 * @param array $params
-	 * @param mixed $callback
-	 * @param array $filters Defaults to empty array.
-	 * @return object
-	 */
-	protected static function _filter($method, $params, $callback, $filters = array()) {
-		if (!strpos($method, '::')) {
-			$method = get_called_class() . '::' . $method;
-		}
-		list(, $method) = explode('::', $method, 2);
-		$instance = static::_object();
-
-		if (isset($instance->_instanceFilters[$method])) {
-			$filters = array_merge($instance->_instanceFilters[$method], $filters);
-		}
-		return parent::_filter($method, $params, $callback, $filters);
 	}
 
 	protected static function &_object() {

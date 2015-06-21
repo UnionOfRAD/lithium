@@ -53,6 +53,64 @@
   ```
 
 
+- Filters and related classes have been refactored and extracted into the new
+  `lithium\aop` namespace.
+
+  **Shallow hirarchy.** With the new `Filters`, classes that need filter functionality
+  don't need to inherit from `Object`/`StaticObject` anymore and don't need to have
+  special methods or properties defined. This is possible by entirely relying on a central
+  filters manager and using `spl_object_hash()` internally.
+
+  **Simplified filters signature.** By using PHP 5.4's new context binding feature for
+  closures, we were able to simplify the signature of filters - i.e. by dropping the
+  `$self`.
+
+  This - as a sideeffect - reduces the requirement of using `invokeMethod()` to access
+  protected members of the context. `$this` and `static` can be used to access
+  the filtered object. Also makes better stacktraces.
+
+  **Simplified chain advancing.**
+  Instead of advancing the chain via `$chain->next()`, a callable (`$next()`) is used.
+  The advancing function just requires one argument.
+
+  ```php
+  function($self, $params, $chain) { // old
+      $self->invokeMethod('_foo');
+      $params['bar'] = 'baz';
+      return $chain->next($self, $params, $chain);
+  }
+
+  function($params, $next) { // new
+      $this->_foo();
+      $params['bar'] = 'baz';
+      return $next($params);
+  }
+  ```
+
+  **Strict separation of filters and implementation.** The implementation function (the one
+  being filtered) now takes just a single `$params` argument. It doesn't have access to
+  the chain anymore.
+
+  **Everything is lazy.** The new filter manager will now by default apply any filters -
+  for both concrete and static classes - lazily.
+
+  **Better filtering of concrete classes.** It is now possible to apply
+  filters to both all and/or specific instances of a concrete class.
+
+  ```php
+  $foo = new Foo();
+
+  // Executes filter only for `$foo`'s `bar` method.
+  Filters::apply($foo, 'bar', function($params, $next) {});
+
+  // Executes filter for all `Foo`'s `bar` methods.
+  Filters::apply('Foo', 'bar', function($params, $next) {});
+  ```
+
+  **Performance** for filtered methods - especially when there are no filters applied to it -
+  has been improved, so that there is only a minimal penality for making a method
+  filterable.
+
 ### Added
 
 - `Cache` together with the `File` adapter can now be used to store BLOBs. 
@@ -125,16 +183,16 @@
   present in the command class definition. Previously `--no-color` was made available as
   `no-color`. This has been deprecated.
 	
-- The String class has been renamed to `Text` while RNG and hashing functionality 
+- The String class has been renamed to `Text` while RNG and hashing functionality
   have been extracted into `lithium\security\Random` and `lithium\security\Hash`. #1184 (David Persson)
 
-  This is mainly to achieve PHP 7.0 compatibilty as `String` 
-  [will become a reserved name](https://wiki.php.net/rfc/reserve_even_more_types_in_php_7).  
-  
-  Old methods are deprecated but continue to work and redirect to new methods. It wont be 
-  possible to use the old String class with PHP >= 7.0. You must use the new names before 
-  switching to PHP 7.0. 
-  
+  This is mainly to achieve PHP 7.0 compatibilty as `String`
+  [will become a reserved name](https://wiki.php.net/rfc/reserve_even_more_types_in_php_7).
+
+  Old methods are deprecated but continue to work and redirect to new methods. It wont be
+  possible to use the old String class with PHP >= 7.0. You must use the new names before
+  switching to PHP 7.0.
+
   | old | new |
   | --- | --- |
   | `lithium\util\String::hash()` | `lithium\security\Hash::calculate()` |
@@ -146,6 +204,80 @@
   | `lithium\util\String::clean()` | `lithium\util\Text::clean()` |
   | `lithium\util\String::extract()` | `lithium\util\Text::extract()` |
   | `lithium\util\String::tokenize()` | `lithium\util\Text::tokenize()` |
+
+- The `lithium\util\collection\Filters` class has been deprecated in favor
+  of `lithium\aop\Filters`.There have also been changes in how filters should
+  be implemented and advanced. **Everything old keeps on working** and calls are
+  forwarded to the new implementations. Methods for filtering functionality in
+  `Object`/`StaticObject` have also been deprecated.
+
+  | old | new |
+  | --- | --- |
+  | `lithium\core\*Object::applyFilter()` | `lithium\aop\Filters::apply()` |
+  | `lithium\core\*Object::_filter()` | `lithium\aop\Filters::run()` |
+  | `lithium\util\collection\Filters::apply()` | `lithium\aop\Filters::apply()` |
+  | `lithium\util\collection\Filters::run()` | `lithium\aop\Filters::run()` |
+  | `lithium\util\collection\Filters::hasApplied()` | `lithium\aop\Filters::hasApplied()` |
+
+  **Changes in making a method filterable**:
+  ```
+  $this->_filter(__METHOD__, $params, function($self, $params) { // old (instance)
+  static::_filter(__METHOD__, $params, function($self, $params) { // old (static)
+
+  Filters::run($this, __FUNCTION__, $params, function($params) { // new (instance)
+  Filters::run(get_called_class(), __FUNCTION__, $params, function($params) { // new (static)
+  ```
+
+  **Changes in applying filters**:
+  ```
+  $foo::applyFilter(/* ... */) // old (instance)
+  Foo::applyFilter(/* ... */) // old (static)
+
+  Filters::apply($foo, 'bar', /* ... */) // new (instance)
+  Filters::apply('Foo', 'bar', /* ... */) // new (any instance)
+  Filters::apply('Foo', 'bar', /* ... */) // new (static)
+  ```
+
+  **Changes in the filter signature**:
+  ```php
+  // old
+  Filters::apply('Foo', 'bar', function($self, $params, $chain) {
+    $self->invokeMethod('_qux');
+    return $chain->next($self, $params, $chain);
+  });
+
+  // new
+  Filters::apply('Foo', 'bar', function($params, $next) {
+    $this->_qux();
+    return $next($params);
+  });
+  ```
+
+  Accessing the currently filtered class/method from inside a filter function
+  (via `$chain->method()`) has been deprecated. 
+
+- Per adapter filters in `Logger` and `Session` have been deprecated. Please apply filters 
+  directly to the static `Logger::*` and `Session::*` methods instead.
+
+  ```php
+  // deprecated usage
+  Session::config(array(
+    'default' => array(
+       'filters' => array(function($self, $params, $chain) { /* ... */ })
+    )
+  ));
+
+  // always use this
+  Filters::apply('lithium\storage\Session', 'write', function($params, $next) { 
+    /* ... */ 
+  });
+  ```
+
+-  Methods in an adapter of `Logger` and `Session`, which returned a closure taking
+  `$self` as the first parameter, should now drop that parameter expectation.
+
+- Instance filters are now not cleaned up automatically anymore, that
+  is when the instance was destroyed, its filters went away with it.
 
 ### Backwards Incompatible Changes
 

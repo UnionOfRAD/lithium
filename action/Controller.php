@@ -11,6 +11,7 @@ namespace lithium\action;
 use lithium\util\Inflector;
 use lithium\action\DispatchException;
 use lithium\core\Libraries;
+use lithium\aop\Filters;
 
 /**
  * The `Controller` class is the fundamental building block of your application's request/response
@@ -192,10 +193,9 @@ class Controller extends \lithium\core\Object {
 	 *         for caching it).
 	 */
 	public function __invoke($request, $dispatchParams, array $options = array()) {
-		$render =& $this->_render;
 		$params = compact('request', 'dispatchParams', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$render) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$dispatchParams = $params['dispatchParams'];
 
 			$action = isset($dispatchParams['action']) ? $dispatchParams['action'] : 'index';
@@ -204,25 +204,25 @@ class Controller extends \lithium\core\Object {
 			if (substr($action, 0, 1) === '_' || method_exists(__CLASS__, $action)) {
 				throw new DispatchException('Attempted to invoke a private method.');
 			}
-			if (!method_exists($self, $action)) {
+			if (!method_exists($this, $action)) {
 				throw new DispatchException("Action `{$action}` not found.");
 			}
-			$render['template'] = $render['template'] ?: $action;
+			$this->_render['template'] = $this->_render['template'] ?: $action;
 
-			if ($result = $self->invokeMethod($action, $args)) {
+			if ($result = $this->invokeMethod($action, $args)) {
 				if (is_string($result)) {
-					$self->render(array('text' => $result));
-					return $self->response;
+					$this->render(array('text' => $result));
+					return $this->response;
 				}
 				if (is_array($result)) {
-					$self->set($result);
+					$this->set($result);
 				}
 			}
 
-			if (!$render['hasRendered'] && $render['auto']) {
-				$self->render();
+			if (!$this->_render['hasRendered'] && $this->_render['auto']) {
+				$this->render();
 			}
-			return $self->response;
+			return $this->response;
 		});
 	}
 
@@ -318,15 +318,16 @@ class Controller extends \lithium\core\Object {
 	 *         or for logging purposes.
 	 */
 	public function redirect($url, array $options = array()) {
-		$router = $this->_classes['router'];
 		$defaults = array('location' => null, 'status' => 302, 'head' => true, 'exit' => false);
 		$options += $defaults;
 		$params = compact('url', 'options');
 
-		$this->_filter(__METHOD__, $params, function($self, $params) use ($router) {
+		Filters::run($this, __FUNCTION__, $params, function($params) {
+			$router = $this->_classes['router'];
+
 			$options = $params['options'];
-			$location = $options['location'] ?: $router::match($params['url'], $self->request);
-			$self->render(compact('location') + $options);
+			$location = $options['location'] ?: $router::match($params['url'], $this->request);
+			$this->render(compact('location') + $options);
 		});
 
 		if ($options['exit']) {

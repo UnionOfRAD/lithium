@@ -79,7 +79,7 @@ class Cache extends \lithium\core\Object {
 	public function write($priority, $message) {
 		$config = $this->_config + $this->_classes;
 
-		return function($self, $params) use ($config) {
+		return function($params) use ($config) {
 			$params += array('timestamp' => strtotime('now'));
 			$key = $config['key'];
 			$key = is_callable($key) ? $key($params) : Text::insert($key, $params);

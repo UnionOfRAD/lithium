@@ -29,7 +29,7 @@ your application's lifecycle, if your needs require.
 
 li₃ takes full advantage of the latest PHP features, including
 namespaces, late static binding and closures. li₃'s innovative [method filter
-system](http://li3.me/docs/lithium/util/collection/Filters) makes extensive use
+system](http://li3.me/docs/lithium/aop/Filters) makes extensive use
 of closures and anonymous functions to allow application developers to "wrap"
 framework method calls, intercepting parameters before, and return values after.
 

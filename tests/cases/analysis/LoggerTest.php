@@ -200,7 +200,7 @@ class LoggerTest extends \lithium\test\Unit {
 	}
 
 	public function testRespondsToParentCall() {
-		$this->assertTrue(Logger::respondsTo('applyFilter'));
+		$this->assertTrue(Logger::respondsTo('invokeMethod'));
 		$this->assertFalse(Logger::respondsTo('fooBarBaz'));
 	}
 

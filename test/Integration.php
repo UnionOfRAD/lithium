@@ -8,6 +8,8 @@
 
 namespace lithium\test;
 
+use lithium\aop\Filters;
+
 /**
  * This is the base class for integration tests.
  *
@@ -28,12 +30,12 @@ class Integration extends \lithium\test\Unit {
 	protected function _init() {
 		parent::_init();
 
-		$this->applyFilter('run', function($self, $params, $chain) {
-			$before = $self->results();
+		Filters::apply($this, 'run', function($params, $next) {
+			$before = $this->results();
 
-			$chain->next($self, $params, $chain);
+			$next($params);
 
-			$after = $self->results();
+			$after = $this->results();
 
 			while (count($after) > count($before)) {
 				$result = array_pop($after);

@@ -8,6 +8,8 @@
 
 namespace lithium\template\helper;
 
+use lithium\aop\Filters;
+
 /**
  * The `Security` helper is responsible for various tasks associated with verifying the authenticity
  * of requests, including embedding secure tokens to protect against CSRF attacks, and signing forms
@@ -101,36 +103,37 @@ class Security extends \lithium\template\Helper {
 	 * @return void
 	 */
 	public function sign($form = null) {
-		$state =& $this->_state;
-		$classes = $this->_classes;
 		$form = $form ?: $this->_context->form;
-		$id = spl_object_hash($form);
-		$hasBound = isset($state[$id]);
 
-		if ($hasBound) {
+		if (isset($state[spl_object_hash($form)])) {
 			return;
 		}
 
-		$form->applyFilter('create', function($self, $params, $chain) use ($form, &$state) {
-			$id = spl_object_hash($form);
-			$state[$id] = array('fields' => array(), 'locked' => array(), 'excluded' => array());
-			return $chain->next($self, $params, $chain);
+		Filters::apply($form, 'create', function($params, $next) use ($form) {
+			$this->_state[spl_object_hash($form)] = array(
+				'fields' => array(),
+				'locked' => array(),
+				'excluded' => array()
+			);
+			return $next($params);
 		});
 
-		$form->applyFilter('end', function($self, $params, $chain) use ($form, &$state, $classes) {
+		Filters::apply($form, 'end', function($params, $next) use ($form) {
 			$id = spl_object_hash($form);
 
-			if (!$state[$id]) {
-				return $chain->next($self, $params, $chain);
+			if (!$this->_state[$id]) {
+				return $next($params);
 			}
-			$value = $classes['formSignature']::key($state[$id]);
+			$formSignature = $this->_classes['formSignature'];
+
+			$value = $formSignature::key($this->_state[$id]);
 			echo $form->hidden('security.signature', compact('value'));
 
-			$state[$id] = array();
-			return $chain->next($self, $params, $chain);
+			$this->_state[$id] = array();
+			return $next($params);
 		});
 
-		$form->applyFilter('_defaults', function($self, $params, $chain) use ($form, &$state) {
+		Filters::apply($form, '_defaults', function($params, $next) use ($form) {
 			$defaults = array(
 				'locked' => ($params['method'] === 'hidden' && $params['name'] !== '_method'),
 				'exclude' => $params['name'] === '_method'
@@ -139,7 +142,7 @@ class Security extends \lithium\template\Helper {
 
 			$options += $defaults;
 			$params['options'] = array_diff_key($options, $defaults);
-			$result = $chain->next($self, $params, $chain);
+			$result = $next($params);
 
 			if ($params['method'] === 'label') {
 				return $result;
@@ -154,7 +157,7 @@ class Security extends \lithium\template\Helper {
 			if (!$name = preg_replace('/(\.\d+)+$/', '', $params['name'])) {
 				return $result;
 			}
-			$state[spl_object_hash($form)][$type[true]][$name] = $value;
+			$this->_state[spl_object_hash($form)][$type[true]][$name] = $value;
 			return $result;
 		});
 	}
