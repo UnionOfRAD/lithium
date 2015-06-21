@@ -430,7 +430,7 @@ class Model extends \lithium\core\StaticObject {
 			$self->_schema += $source['schema'];
 		}
 
-		$self->_finders += $source['finders'] + $self->_findFilters();
+		$self->_finders += $source['finders'] + static::_finders();
 
 		$self->_classes += array(
 			'query'       => 'lithium\data\model\Query',
@@ -510,7 +510,23 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Allows the use of syntactic-sugar like `Model::all()` instead of `Model::find('all')`.
+	 * Enables magic finders. These are syntactic-sugar like which allows to i.e. use
+	 * `Model::all()` instead  of `Model::find('all')`.
+	 *
+	 * ```
+	 * // Retrieves post with id `23` using the `'first'` finder.
+	 * Posts::first(array('conditions' => array('id' => 23)));
+	 * Posts::findById(23);
+	 * Posts::findById(23);
+	 *
+	 * // All posts that have a trueish `is_published` field.
+	 * Posts::all(array('conditions' => array('is_published' => true)));
+	 * Posts::findAll(array('conditions' => array('is_published' => true)));
+	 * Posts::findAllByIsPublshed(true)
+	 *
+	 * // Counts all posts.
+	 * Posts::count()
+	 * ```
 	 *
 	 * @see lithium\data\Model::find()
 	 * @see lithium\data\Model::$_meta
@@ -522,13 +538,11 @@ class Model extends \lithium\core\StaticObject {
 	 */
 	public static function __callStatic($method, $params) {
 		$self = static::_object();
-		$isFinder = isset($self->_finders[$method]);
 
-		if ($isFinder && count($params) === 2 && is_array($params[1])) {
-			$params = array($params[1] + array($method => $params[0]));
-		}
-
-		if ($method === 'all' || $isFinder) {
+		if (isset($self->_finders[$method])) {
+			if (count($params) === 2 && is_array($params[1])) {
+				$params = array($params[1] + array($method => $params[0]));
+			}
 			if ($params && !is_array($params[0])) {
 				$params[0] = array('conditions' => static::key($params[0]));
 			}
@@ -595,46 +609,68 @@ class Model extends \lithium\core\StaticObject {
 	 * Posts::find('all'); // returns all records
 	 * Posts::find('count'); // returns a count of all records
 	 *
-	 * // The first ten records that have 'author' set to 'Bob'
+	 * // The first ten records that have `'author'` set to `'Bob'`.
 	 * Posts::find('all', array(
-	 *     'conditions' => array('author' => "Bob"), 'limit' => 10
+	 *     'conditions' => array('author' => 'Bob'),
+	 *     'limit' => 10
 	 * ));
+	 *
+	 * // First record where the id matches 23.
+	 * Posts::find('first', array(
+	 *     'conditions' => array('id' => 23)
+	 * ));
+	 *
+	 * // Shorthand for find first by primary key.
+	 * Posts::find(23);
+	 *
+	 * // Also works with objects.
+	 * Posts::find(new MongoId(23));
 	 * ```
 	 *
-	 * @see lithium\data\Model::$_finders
-	 * @param string $type The find type, which is looked up in `Model::$_finders`. By default it
-	 *        accepts `all`, `first`, `list` and `count`,
+	 * @see lithium\data\Model::finder()
+	 * @param string|object|integer $type The name of the finder to use. By default the
+	 *        following finders are available. Custom finders can be added via `Model::finder()`.
+	 *        - `'all'`: Returns all records matching the conditions.
+	 *        - `'first'`: Returns the first record matching the conditions.
+	 *        - `'list'`: Returns a one dimensional array, where the key is the (primary)
+	 *          key and the value the title of the record (the record must have a `'title'`
+	 *          field). A result may look like: `array(1 => 'Foo', 2 => 'Bar')`.
+	 *        - `'count'`: Returns an integer with the count of all records matching
+	 *        the conditions.
+	 *
+	 *        Instead of the name of a finder, also supports for shorthand usage an object or
+	 *        integer as a first parameter. When passed such a value it is equal to
+	 *        `Model::find('first', array('conditions' => array('<key>' => <value>)))`.
+	 *
+	 *        When an undefine finder is tried to be used, the method will not error out, but
+	 *        fallback to the `'all'` finder.
 	 * @param array $options Options for the query. By default, accepts:
-	 *        - `conditions`: The conditional query elements, e.g.
-	 *                 `'conditions' => array('published' => true)`
-	 *        - `fields`: The fields that should be retrieved. When set to `null`, defaults to
-	 *             all fields.
-	 *        - `order`: The order in which the data will be returned, e.g. `'order' => 'ASC'`.
-	 *        - `limit`: The maximum number of records to return.
-	 *        - `page`: For pagination of data.
-	 * @return mixed
+	 *        - `'conditions'` _array_: The conditions for the query
+	 *           i.e. `'array('is_published' => true)`.
+	 *        - `'fields'` _array|null_: The fields that should be retrieved. When set to
+	 *          `null` and by default, uses all fields. To optimize query performance, limit
+	 *          the fields to just the ones actually needed.
+	 *        - `'order'` _array|string_: The order in which the data will be returned,
+	 *           i.e. `'created ASC'` sorts by created date in ascending order. To sort by
+	 *           multiple fields use the array syntax `array('title' => 'ASC', 'id' => 'ASC)`.
+	 *        - `'limit'` _integer_: The maximum number of records to return.
+	 *        - `'page'` _integer_: Allows to paginate data sets. Specifies the page of the set
+	 *          together with the limit option specifying the number of records per page. The first
+	 *          page starts at `1`.
+	 * @return mixed The result/s of the find. Actual result depends on the finder being used. Most
+	 *         is an instance of `lithium\data\Collection` or `lithium\data\Entity`.
 	 * @filter Allows to execute logic before queriny (i.e. for rewriting of $options)
 	 *         or after i.e. for caching results.
 	 */
 	public static function find($type, array $options = array()) {
 		$self = static::_object();
-		$finder = array();
 
-		if ($type === null) {
-			return null;
-		}
-		$isFinder = is_string($type) && isset($self->_finders[$type]);
-
-		if ($type !== 'all' && !is_array($type) && !$isFinder) {
+		if (is_object($type) || !isset($self->_finders[$type])) {
 			$options['conditions'] = static::key($type);
 			$type = 'first';
 		}
 
-		if ($isFinder && is_array($self->_finders[$type])) {
-			$options = Set::merge($self->_finders[$type], $options);
-		}
-
-		$options = (array) $options + (array) $self->_query;
+		$options += (array) $self->_query;
 		$meta = array('meta' => $self->_meta, 'name' => get_called_class());
 		$params = compact('type', 'options');
 
@@ -643,27 +679,121 @@ class Model extends \lithium\core\StaticObject {
 			$query = $self::invokeMethod('_instance', array('query', $options));
 			return $self::connection()->read($query, $options);
 		};
-		if (is_string($type) && isset($self->_finders[$type])) {
-			$finder = is_callable($self->_finders[$type]) ? array($self->_finders[$type]) : array();
+		if (isset($self->_finders[$type])) {
+			$finder = array($self->_finders[$type]);
+		} else {
+			$finder = array();
 		}
 		return static::_filter(__FUNCTION__, $params, $filter, $finder);
 	}
 
 	/**
-	 * Gets or sets a finder by name.  This can be an array of default query options,
-	 * or a closure that accepts an array of query options, and a closure to execute.
+	 * Sets or gets a custom finder by name. The finder definition can be an array of
+	 * default query options, or an anonymous functions that accepts an array of query
+	 * options, and a function to continue. To get a finder specify just the name.
 	 *
-	 * @param string $name The finder name, e.g. `first`.
-	 * @param string $finder If you are setting a finder, this is the finder definition.
-	 * @return mixed Returns finder definition if querying, or `null` if setting.
+	 * In this example we define and use `'published'` finder to quickly
+	 * retrieve all published posts.
+	 * ```
+	 * Posts::finder('published', array(
+	 *     'conditions' => array('is_published' => true)
+	 * ));
+	 *
+	 * Posts::find('published');
+	 * ```
+	 *
+	 * Here we define the same finder using an anonymous function which
+	 * gives us more control over query modification.
+	 * ```
+	 * Posts::finder('published', function($params, $next) {
+	 *     $params['options']['conditions']['is_published'] = true;
+	 *
+	 *     // Perform modifications before executing the query...
+	 *     $result = $next($params);
+	 *     // ... or after it has executed.
+	 *
+	 *     return $result;
+	 * });
+	 * ```
+	 *
+	 * When using finder array definitions the option array is _recursivly_ merged
+	 * (using `Set::merge()`) with additional options specified on the `Model::find()`
+	 * call. Options specificed on the find will overwrite options specified in the
+	 * finder.
+	 *
+	 * Array finder definitions are normalized here, so that it can be relied upon that defined
+	 * finders are always anonymous functions.
+	 *
+	 * @see lithium\util\Set::merge()
+	 * @param string $name The finder name, e.g. `'first'`.
+	 * @param string|callable|null $finder The finder definition.
+	 * @return callable|void Returns finder definition if querying, or void if setting.
 	 */
 	public static function finder($name, $finder = null) {
 		$self = static::_object();
 
-		if (!$finder) {
+		if ($finder === null) {
 			return isset($self->_finders[$name]) ? $self->_finders[$name] : null;
 		}
+		if (is_array($finder)) {
+			$finder = function($self, $params, $chain) use ($finder) {
+				$params['options'] = Set::merge($params['options'], $finder);
+				return $chain->next($self, $params, $chain);
+			};
+		}
 		$self->_finders[$name] = $finder;
+	}
+
+	/**
+	 * Returns an array with the default finders.
+	 *
+	 * @see lithium\Model::_initialize()
+	 * @return array
+	 */
+	protected static function _finders() {
+		$_query = static::_object()->_query;
+
+		return array(
+			'all' => function($self, $params, $chain) {
+				return $chain->next($self, $params, $chain);
+			},
+			'first' => function($self, $params, $chain) {
+				$options =& $params['options'];
+				$options['limit'] = 1;
+
+				$data = $chain->next($self, $params, $chain);
+
+				if (isset($options['return']) && $options['return'] === 'array') {
+					$data = is_array($data) ? reset($data) : $data;
+				} else {
+					$data = is_object($data) ? $data->rewind() : $data;
+				}
+				return $data ?: null;
+			},
+			'list' => function($self, $params, $chain) {
+				$result = array();
+				$meta = $self::meta();
+				$name = $meta['key'];
+
+				foreach ($chain->next($self, $params, $chain) as $entity) {
+					$key = $entity->{$name};
+					$result[is_scalar($key) ? $key : (string) $key] = $entity->title();
+				}
+				return $result;
+			},
+			'count' => function($self, $params, $chain) use ($_query) {
+				$options = array_diff_key($params['options'], $_query);
+
+				if ($options && !isset($params['options']['conditions'])) {
+					$options = array('conditions' => $options);
+				} else {
+					$options = $params['options'];
+				}
+				$options += array('type' => 'read', 'model' => $self);
+				$query = $self::invokeMethod('_instance', array('query', $options));
+				return $self::connection()->calculation('count', $query, $options);
+			}
+		);
 	}
 
 	/**
@@ -1425,57 +1555,7 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Exports an array of custom finders which use the filter system to wrap around `find()`.
-	 *
-	 * @return void
-	 */
-	protected static function _findFilters() {
-		$self = static::_object();
-		$_query = $self->_query;
-
-		return array(
-			'first' => function($self, $params, $chain) {
-				$options =& $params['options'];
-				$options['limit'] = 1;
-				$data = $chain->next($self, $params, $chain);
-
-				if (isset($options['return']) && $options['return'] === 'array') {
-					$data = is_array($data) ? reset($data) : $data;
-				} else {
-					$data = is_object($data) ? $data->rewind() : $data;
-				}
-
-				return $data ?: null;
-			},
-			'list' => function($self, $params, $chain) {
-				$result = array();
-				$meta = $self::meta();
-				$name = $meta['key'];
-
-				foreach ($chain->next($self, $params, $chain) as $entity) {
-					$key = $entity->{$name};
-					$result[is_scalar($key) ? $key : (string) $key] = $entity->title();
-				}
-				return $result;
-			},
-			'count' => function($self, $params) use ($_query) {
-				$model = $self;
-				$options = array_diff_key($params['options'], $_query);
-
-				if ($options && !isset($params['options']['conditions'])) {
-					$options = array('conditions' => $options);
-				} else {
-					$options = $params['options'];
-				}
-				$options += array('type' => 'read') + compact('model');
-				$query = $self::invokeMethod('_instance', array('query', $options));
-				return $self::connection()->calculation('count', $query, $options);
-			}
-		);
-	}
-
-	/**
-	 * Reseting the model
+	 * Resetting the model.
 	 */
 	public static function reset() {
 		$class = get_called_class();
