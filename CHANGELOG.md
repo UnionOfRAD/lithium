@@ -85,34 +85,37 @@
 
 ### Changed
 
-- Removed the automatic `__init()` for static classes. fa4ef11 (jails)
-- `String::compare()` is now stricter and errors out when on of the provided params is not a string. 7822a2b (David Persson)
 - The shorthand `Download` header has been deprecated because of its overhead and magicness. #1134 (David Persson)
 - When updating an *existing* entity, validation rules for fields that are not present on the to-be-saved entity are
   skipped. The old behavior of requiring on *create and update* can be brought back by using the `'required'` option
   set to `true` with `Model::save()` or `Model::validates()`. #1118  (Hamid Reza Koushki)
-- Encoding/decoding of JSON using empty values has been improved. When encoding `null` into JSON 
-  an empty string instead of an empty array is returned. `{}` is now correctly decoded into an 
-  empty array. #1103, #1090 (Simon Jaillet) 
-- When setting Request/Response headers, the new headers are not returned directly. Instead
-  one must now first set, then get. #1089 (David Persson) 
-- Cache adapter instances cannot directly be filtered anymore, instead the `Cache` class' methods may
-  be filtered. This clears up some misconceptions and simplifies adapter code. #1068 (David Persson)
 - Strategy support for Cache::delete() has been removed as it made no sense. d15f3e7 (David Persson)
-- Cache adapters must now extend the new cache adapter base class. (David Persson)
-- Cache adapters must now support multi-key reads and writes. (David Persson)
 - The APC cache adapter now extends the base cache adapter class. Thus the base class must be loaded
   before the APC adapter. Normally this should happen automatically and no updates are needed. However
-  if you use an old bootstrap file, the base adapter may not been loaded before the apc one. 
+  if you use an old bootstrap file, the base adapter may not been loaded before the apc one.
   A deprecation notice will then be triggered. (David Persson)
+
+### Backwards Incompatible Changes
+
+- Removed the automatic `__init()` for static classes. fa4ef11 (jails)
+- `String::compare()` is now stricter and errors out when one of the provided params is not a string. 7822a2b (David Persson)
+- Encoding/decoding of JSON using empty values has been improved. When encoding `null` into JSON
+  an empty string instead of an empty array is returned. `{}` is now correctly decoded into an
+  empty array. #1103, #1090 (Simon Jaillet)
+- When setting Request/Response headers, the new headers are not returned directly. Instead
+  one must now first set, then get. #1089 (David Persson)
+- Cache adapter instances cannot directly be filtered anymore, instead the `Cache` class' methods may
+  be filtered. This clears up some misconceptions and simplifies adapter code. #1068 (David Persson)
+- Cache adapters must now extend the new cache adapter base class. (David Persson)
+- Cache adapters must now support multi-key reads and writes. (David Persson)
 - When used with a parameter `lithium\action\Request::accepts()` now returns a boolean.
-  It previously was returning i.e. `'json'` when `application/json` was in accepted content types 
+  It previously was returning i.e. `'json'` when `application/json` was in accepted content types
   and invoked with `Request::accepts('json')`. This change matches the actual behavior with
   documented (and expected) behavior. (David Persson, David Rogers)
 - The `library` command has been extracted into the `li3_lab` plugin. Please install the plugin
   to continue using that command. #1174 (David Persson)
 - The `FormSignature` class now uses HMAC with a secret key. This will now require configuring the class
-  with an app specific secret key before using it. #1173 (David Persson) 
+  with an app specific secret key before using it. #1173 (David Persson)
 - When installed via composer the default location is now `libraries/lithium`.
 - Test `test` command no longer modifies the `error_reporting` setting. Please make sure
   you have set the `error_reporting` to `E_ALL` in your php.ini.
