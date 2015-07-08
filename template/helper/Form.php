@@ -49,7 +49,7 @@ class Form extends \lithium\template\Helper {
 		'form'           => '<form action="{:url}"{:options}>{:append}',
 		'form-end'       => '</form>',
 		'hidden'         => '<input type="hidden" name="{:name}"{:options} />',
-		'field'          => '<div{:wrap}>{:label}{:input}{:error}</div>',
+		'field'          => '<div{:wrap}>{:label}{:input}{:datalist}{:error}</div>',
 		'field-checkbox' => '<div{:wrap}>{:input}{:label}{:error}</div>',
 		'field-radio'    => '<div{:wrap}>{:input}{:label}{:error}</div>',
 		'label'          => '<label for="{:id}"{:options}>{:title}</label>',
@@ -65,7 +65,9 @@ class Form extends \lithium\template\Helper {
 		'submit-image'   => '<input type="image" src="{:url}"{:options} />',
 		'text'           => '<input type="text" name="{:name}"{:options} />',
 		'textarea'       => '<textarea name="{:name}"{:options}>{:value}</textarea>',
-		'fieldset'       => '<fieldset{:options}><legend>{:content}</legend>{:raw}</fieldset>'
+		'fieldset'       => '<fieldset{:options}><legend>{:content}</legend>{:raw}</fieldset>',
+		'datalist'       => '<datalist{:options}>{:raw}</datalist>',
+		'datalist-option' => '<option value="{:value}"></option>'
 	);
 
 	/**
@@ -449,8 +451,11 @@ class Form extends \lithium\template\Helper {
 	 *          `'<li{:wrap}>{:label}{:input}{:error}</li>'`.
 	 *        - `'wrap'` _array_: An array of HTML attributes which will be embedded in the
 	 *          wrapper tag.
-	 *        - `list` _array_: If `'type'` is set to `'select'`, `'list'` is an array of
+	 *        - `list` _array|string_: If `'type'` is set to `'select'`, `'list'` is an array of
 	 *          key/value pairs representing the `$list` parameter of the `select()` method.
+	 *          If `'type'` is set to `'text'`, `'list'` is used to render/reference a corresponding
+	 *          `<datalist>` element. It then can either be an array of option values or
+	 *          a string to reference an existing `<datalist>`.
 	 *        - `error` _array|string|boolean_: Allows to control rendering of error messages.
 	 *          By setting this option to `false` any messages are disabled. When an array
 	 *          mapping failed rule names to messages, will use these alternative message
@@ -499,6 +504,15 @@ class Form extends \lithium\template\Helper {
 			$label = $this->label(isset($options['id']) ? $options['id'] : '', $options['label']);
 		}
 
+		if ($type === 'text' && $list) {
+			if (is_array($list)) {
+				list($list, $datalist) = $this->_datalist($list, $options);
+			}
+			$field['list'] = $list;
+		} else {
+			$datalist = null;
+		}
+
 		$call = ($type === 'select') ? array($name, $list, $field) : array($name, $field);
 		$input = call_user_func_array(array($this, $type), $call);
 
@@ -507,7 +521,9 @@ class Form extends \lithium\template\Helper {
 		} else {
 			$error = null;
 		}
-		return $this->_render(__METHOD__, $template, compact('wrap', 'label', 'input', 'error'));
+		return $this->_render(__METHOD__, $template, compact(
+			'wrap', 'label', 'input', 'datalist', 'error'
+		));
 	}
 
 	/**
@@ -589,6 +605,30 @@ class Form extends \lithium\template\Helper {
 	public function text($name, array $options = array()) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
+	}
+
+	/**
+	 * Generates an HTML `<datalist></datalist>` object with `<option>` elements.
+	 *
+	 * @link https://www.w3.org/wiki/HTML/Elements/datalist
+	 * @param array $list Valuues, which will be used to render the options of the datalist.
+	 * @param array $scope An array of options passed to the parent scope.
+	 * @return string Returns a `<datalist>` tag with `<option>` elements.
+	 */
+	protected function _datalist(array $list, array $scope) {
+		$options = array();
+
+		if (isset($scope['id'])) {
+			$id = $options['id'] = $scope['id'] . 'List';
+		}
+		$raw = array_reduce($list, function($carry, $value) {
+			return $carry .= $this->_render(__METHOD__, 'datalist-option', compact('value'));
+		}, '');
+
+		return array(
+			isset($options['id']) ? $options['id'] : null,
+			$this->_render(__METHOD__, 'datalist', compact('options', 'raw'))
+		);
 	}
 
 	/**
