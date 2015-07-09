@@ -63,6 +63,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual(Inflector::singularize('shelves'), 'shelf');
 		$this->assertEqual(Inflector::singularize('causes'), 'cause');
 		$this->assertEqual(Inflector::singularize(''), '');
+        $this->assertEqual(Inflector::singularize('taxes'), 'tax');
 	}
 
 	/**
@@ -105,6 +106,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual(Inflector::pluralize('leaf'), 'leaves');
 		$this->assertEqual(Inflector::pluralize('ContactPeople'), 'ContactPeople');
 		$this->assertEqual(Inflector::pluralize(''), '');
+        $this->assertEqual(Inflector::pluralize('tax'), 'taxes');
 
 		$result = Inflector::pluralize('errata');
 		$this->assertNull(Inflector::rules('plural', array('/rata/' => '\1ratum')));

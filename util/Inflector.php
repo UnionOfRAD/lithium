@@ -180,7 +180,7 @@ class Inflector {
 			'mythos' => 'mythoi', 'numen' => 'numina', 'occiput' => 'occiputs',
 			'octopus' => 'octopuses', 'opus' => 'opuses', 'ox' => 'oxen', 'penis' => 'penises',
 			'person' => 'people', 'sex' => 'sexes', 'soliloquy' => 'soliloquies',
-			'testis' => 'testes', 'trilby' => 'trilbys', 'turf' => 'turfs'
+			'tax' => 'taxes', 'testis' => 'testes', 'trilby' => 'trilbys', 'turf' => 'turfs'
 		),
 		'uninflected' => array(
 			'.*[nrlm]ese', '.*deer', '.*fish', '.*measles', '.*ois', '.*pox', '.*sheep'
