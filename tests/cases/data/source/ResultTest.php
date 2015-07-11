@@ -13,9 +13,6 @@ use lithium\tests\mocks\data\model\database\MockResult;
 
 class ResultTest extends \lithium\test\Unit {
 
-	public function setUp() {
-	}
-
 	public function testIteration() {
 		$iterator = new MockResult(array(
 			'records' => array("one", "two", "three", "four")
@@ -45,10 +42,6 @@ class ResultTest extends \lithium\test\Unit {
 			$this->assertEqual($iterator->peek(), $map[$val]);
 		}
 		$this->assertEqual($records, $result);
-	}
-
-
-	public function tearDown() {
 	}
 }
 

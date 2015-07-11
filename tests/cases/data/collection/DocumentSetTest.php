@@ -13,7 +13,7 @@ use lithium\data\DocumentSchema;
 use lithium\data\entity\Document;
 use lithium\data\collection\DocumentSet;
 use lithium\tests\mocks\data\model\MockDocumentPost;
-use lithium\tests\mocks\data\source\mongo_db\MockResult;
+use lithium\tests\mocks\data\source\MockResult;
 use lithium\tests\mocks\data\MockDocumentSource;
 use lithium\util\Collection;
 
@@ -204,9 +204,14 @@ class DocumentSetTest extends \lithium\test\Unit {
 	}
 
 	public function testPopulateResourceClose() {
-		$resource = new MockResult();
-
-		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$result = new MockResult(array(
+			'data' => array(
+				array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar'),
+				array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo'),
+				array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib')
+			)
+		));
+		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $result));
 
 		$result = $doc->rewind();
 		$this->assertInstanceOf('lithium\data\entity\Document', $result);
@@ -226,8 +231,14 @@ class DocumentSetTest extends \lithium\test\Unit {
 	}
 
 	public function testOffsetGetBackwards() {
-		$resource = new MockResult();
-		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$result = new MockResult(array(
+			'data' => array(
+				array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar'),
+				array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo'),
+				array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib')
+			)
+		));
+		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $result));
 
 		$expected = array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib');
 		$this->assertEqual($expected, $doc['6c8f86167675abfabdbf0302']->data());
@@ -240,7 +251,13 @@ class DocumentSetTest extends \lithium\test\Unit {
 	}
 
 	public function testMappingToNewDocumentSet() {
-		$result = new MockResult();
+		$result = new MockResult(array(
+			'data' => array(
+				array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar'),
+				array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo'),
+				array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib')
+			)
+		));
 		$model = $this->_model;
 		$doc = new DocumentSet(compact('model', 'result'));
 
@@ -269,8 +286,14 @@ class DocumentSetTest extends \lithium\test\Unit {
 	}
 
 	public function testInternalKeys() {
-		$resource = new MockResult();
-		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$result = new MockResult(array(
+			'data' => array(
+				array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar'),
+				array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo'),
+				array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib')
+			)
+		));
+		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $result));
 		$this->assertEqual(array(
 			0 => '4c8f86167675abfabdbf0300',
 			1 => '5c8f86167675abfabdbf0301',
@@ -280,8 +303,14 @@ class DocumentSetTest extends \lithium\test\Unit {
 
 	public function testTo() {
 		Collection::formats('lithium\net\http\Media');
-		$resource = new MockResult();
-		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $resource));
+		$result = new MockResult(array(
+			'data' => array(
+				array('_id' => '4c8f86167675abfabdbf0300', 'title' => 'bar'),
+				array('_id' => '5c8f86167675abfabdbf0301', 'title' => 'foo'),
+				array('_id' => '6c8f86167675abfabdbf0302', 'title' => 'dib')
+			)
+		));
+		$doc = new DocumentSet(array('model' => $this->_model, 'result' => $result));
 		$expected = array(
 			'4c8f86167675abfabdbf0300' => array(
 				'_id' => '4c8f86167675abfabdbf0300',

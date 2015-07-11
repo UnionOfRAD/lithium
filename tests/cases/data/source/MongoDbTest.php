@@ -22,7 +22,7 @@ use lithium\tests\mocks\data\MockComment;
 use lithium\tests\mocks\core\MockCallable;
 use lithium\tests\mocks\data\source\MockMongoSource;
 use lithium\tests\mocks\data\source\MockMongoConnection;
-use lithium\tests\mocks\data\source\mongo_db\MockResult;
+use lithium\tests\mocks\data\source\mongo_db\MockResultResource;
 use lithium\tests\mocks\data\source\MockMongoPost;
 
 class MongoDbTest extends \lithium\test\Unit {
@@ -339,8 +339,8 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$this->_db->connection->results = array(
-			new MockResult(array('data' => array($data))),
-			new MockResult(array('data' => array($data)))
+			new MockResultResource(array('data' => array($data))),
+			new MockResultResource(array('data' => array($data)))
 		);
 		$this->_db->connection->queries = array();
 
@@ -372,7 +372,7 @@ class MongoDbTest extends \lithium\test\Unit {
 			)
 		);
 
-		array_push($this->_db->connection->results, new MockResult(array(
+		array_push($this->_db->connection->results, new MockResultResource(array(
 			'data' => array($update + $original)
 		)));
 		$this->_db->connection->queries = array();
@@ -404,7 +404,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->_query->data($data);
 		$this->_db->create($this->_query);
 
-		array_push($this->_db->connection->results, new MockResult(array(
+		array_push($this->_db->connection->results, new MockResultResource(array(
 			'data' => array()
 		)));
 		$this->assertFalse($this->_db->read($this->_query)->first());
@@ -443,7 +443,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testCalculation() {
-		$this->_db->connection->results = array(new MockResult(array('data' => array(5))));
+		$this->_db->connection->results = array(new MockResultResource(array('data' => array(5))));
 		$this->assertIdentical(5, $this->_db->calculation('count', $this->_query));
 	}
 
@@ -493,7 +493,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 
-		array_push($this->_db->connection->results, new MockResult(array(
+		array_push($this->_db->connection->results, new MockResultResource(array(
 			'data' => array($first, $second, $third)
 		)));
 		$this->_db->connection->queries = array();
@@ -513,7 +513,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$result = $documents->result()->resource()->query['sort'];
 		$this->assertEqual(array('position' => 1), $result);
 
-		array_push($this->_db->connection->results, new MockResult(array(
+		array_push($this->_db->connection->results, new MockResultResource(array(
 			'data' => array($first, $second, $third)
 		)));
 		$documents = MockMongoPost::all(array('order' => array('position' => 'asc')));
@@ -526,7 +526,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$result = $documents->result()->resource()->query['sort'];
 		$this->assertEqual(array('position' => 1), $result);
 
-		array_push($this->_db->connection->results, new MockResult(array(
+		array_push($this->_db->connection->results, new MockResultResource(array(
 			'data' => array($third, $second, $first)
 		)));
 		$documents = MockMongoPost::all(array('order' => array('position' => 'desc')));
@@ -705,7 +705,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		);
 		$this->assertEqual($expected, $result);
 
-		array_push($this->_db->connection->results, new MockResult(array('data' => array(
+		array_push($this->_db->connection->results, new MockResultResource(array('data' => array(
 			array('_id' => $duplicate->_id, 'initial' => 'one', 'values' => 'new')
 		))));
 
@@ -1001,7 +1001,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$this->_db->connection->gridFsPrefix = null;
 
 		MockMongoPost::config(array('meta' => array('source' => $source)));
-		$this->_db->connection->results = array(new MockResult(array('data' => $data)));
+		$this->_db->connection->results = array(new MockResultResource(array('data' => $data)));
 		$this->assertNotEmpty(MockMongoPost::find('all'));
 		$this->assertIdentical('fs', $this->_db->connection->gridFsPrefix);
 		$this->_db->connection->gridFsPrefix = null;
@@ -1033,7 +1033,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 	public function testGridFsReadWithCustomPrefix() {
 		$data = array('filename' => 'lithium', 'file' => 'some_datas');
-		$result = new MockResult(array('data' => array(
+		$result = new MockResultResource(array('data' => array(
 			array('filename' => 'lithium', 'file' => 'some_datas')
 		)));
 

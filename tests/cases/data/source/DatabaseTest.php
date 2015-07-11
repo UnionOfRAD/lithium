@@ -1816,22 +1816,33 @@ SQL;
 	}
 
 	public function testHasManyRelationsWithLimitAndWithoutConditions() {
-		$data = new MockResult(array(
-			'records' => array(
-				array(
-					'1',
-					'2',
-					'Post title',
-					'2014-10-12 01:39:00',
-					'3',
-					'1',
-					'2',
-					'Very good post',
-					'2014-10-12 01:39:00',
-				)
-			)
-		));
-		$this->_db->return = array('_execute' => $data);
+		$this->_db->return['_execute'] = function($sql) {
+			if (strpos($sql, 'SELECT DISTINCT') === 0) {
+				return new MockResult(array(
+					'records' => array(
+						array(1),
+						array(2)
+					)
+				));
+			} else {
+				return new MockResult(array(
+					'records' => array(
+						array(
+							'1',
+							'2',
+							'Post title',
+							'2014-10-12 01:39:00',
+							'3',
+							'1',
+							'2',
+							'Very good post',
+							'2014-10-12 01:39:00',
+						)
+					)
+				));
+
+			}
+		};
 
 		$query = new Query(array(
 			'type' => 'read',

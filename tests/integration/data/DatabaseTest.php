@@ -174,8 +174,9 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		));
 		$galleries = $this->_db->read($query)->data();
 		$expected = include $this->_export . '/testOneToMany.php';
-
 		$gallery = Galleries::find('first', $opts + array('with' => 'Images'))->data();
+
+		$this->assertEqual(3, count($gallery['images']));
 		$this->assertEqual(reset($expected), $gallery);
 	}
 

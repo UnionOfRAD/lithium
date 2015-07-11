@@ -61,7 +61,8 @@
 - Use transactions when bulk-inserting in redis cache adapter. 995214f (David Persson)
 - Improved view template cache GC and compilation. 6f641e7, a502da5 (David Persson)
 - Support DELETE method in curl socket #1034 (Warren Seymour)
-- Improved performance by using HMAC in the FormSignature class. #1173 (David Persson) 
+- Improved performance by using HMAC in the FormSignature class. #1173 (David Persson)
+- Improved memory profile and (internal) semantics of `RecordSet` and PDO `Result` fetching. (Nate Abele)
 
 ### Added
 
@@ -113,3 +114,4 @@
 - The `FormSignature` class now uses HMAC with a secret key. This will now require configuring the class
   with an app specific secret key before using it. #1173 (David Persson) 
 - When installed via composer the default location is now `libraries/lithium`.
+

@@ -6,17 +6,17 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\mocks\data\model\database;
+namespace lithium\tests\mocks\data\source;
 
 class MockResult extends \lithium\data\source\Result {
 
-	protected $_records = array();
+	protected $_data = array();
 
-	protected $_autoConfig = array('resource', 'records');
+	protected $_autoConfig = array('data');
 
 	protected function _fetch() {
-		if ($this->_records) {
-			return array($this->_iterator++, array_shift($this->_records));
+		if ($this->_data) {
+			return array($this->_iterator++, array_shift($this->_data));
 		}
 	}
 }

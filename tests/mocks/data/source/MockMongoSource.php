@@ -9,7 +9,7 @@
 namespace lithium\tests\mocks\data\source;
 
 use MongoId;
-use lithium\tests\mocks\data\source\mongo_db\MockResult;
+use lithium\tests\mocks\data\source\mongo_db\MockResultResource;
 
 class MockMongoSource extends \lithium\core\Object {
 
@@ -31,7 +31,7 @@ class MockMongoSource extends \lithium\core\Object {
 
 	public function find($conditions, $fields) {
 		$this->queries[] = compact('conditions', 'fields');
-		$result = new MockResult(array('data' => current($this->resultSets)));
+		$result = new MockResultResource(array('data' => current($this->resultSets)));
 		next($this->resultSets);
 		return $result;
 	}

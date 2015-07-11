@@ -632,7 +632,7 @@ abstract class Database extends \lithium\data\Source {
 			));
 			$ids = array();
 
-			while ($row = $result->next()) {
+			foreach ($result as $row) {
 				$ids[] = $row[0];
 			}
 			if (!$ids) {

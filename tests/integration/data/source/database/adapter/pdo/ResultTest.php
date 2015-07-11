@@ -72,9 +72,9 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 		$resource = $this->_db->connection->query("SELECT id, name FROM galleries;");
 		$result = new Result(compact('resource'));
 
-		$this->assertEqual($this->_mockData[1], $result->next());
+		$this->assertEqual($this->_mockData[1], $result->current());
 		$this->assertEqual($this->_mockData[2], $result->next());
-		$this->assertFalse($result->next());
+		$this->assertNull($result->next());
 	}
 
 	public function testValid() {
@@ -86,26 +86,24 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 		$this->assertTrue($result->valid());
 	}
 
-	public function testRewind() {
+	public function testRewindIsNoop() {
 		$resource = $this->_db->connection->query("SELECT id, name FROM galleries;");
 		$result = new Result(compact('resource'));
 
-		$this->assertEqual($this->_mockData[1], $result->next());
+		$this->assertEqual($this->_mockData[1], $result->current());
 		$this->assertEqual($this->_mockData[2], $result->next());
 		$result->rewind();
-		$this->assertEqual($this->_mockData[1], $result->current());
+		$this->assertEqual($this->_mockData[2], $result->current());
 	}
 
 	public function testCurrent() {
 		$resource = $this->_db->connection->query("SELECT id, name FROM galleries;");
 		$result = new Result(compact('resource'));
 
-		$this->assertEqual($this->_mockData[1], $result->next());
+		$this->assertEqual($this->_mockData[1], $result->current());
 		$this->assertEqual($this->_mockData[1], $result->current());
 		$this->assertEqual($this->_mockData[2], $result->next());
 		$this->assertEqual($this->_mockData[2], $result->current());
-		$this->assertEqual($this->_mockData[1], $result->prev());
-		$this->assertEqual($this->_mockData[1], $result->current());
 	}
 
 	public function testKey() {
@@ -115,14 +113,8 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 		$this->assertIdentical(0, $result->key());
 		$result->next();
 		$this->assertIdentical(1, $result->key());
-		$result->prev();
-		$this->assertIdentical(0, $result->key());
-		$result->next();
-		$this->assertIdentical(1, $result->key());
 		$result->next();
 		$this->assertIdentical(null, $result->key());
-		$result->rewind();
-		$this->assertIdentical(0, $result->key());
 	}
 
 	/**

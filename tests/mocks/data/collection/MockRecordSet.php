@@ -13,10 +13,10 @@ class MockRecordSet extends \lithium\data\collection\RecordSet {
 	public function close() {
 		$this->_closed = true;
 	}
+
 	/**
-	 * Convenience method for lazy loading testing
-	 * Reset the `RecordSet` to its inital state after `_construct`
-	 *
+	 * Convenience method for lazy loading testing.
+	 * Reset the `RecordSet` to its inital state after `_construct`.
 	 */
 	public function reset() {
 		if (is_object($this->_result) && method_exists($this->_result, 'rewind')) {

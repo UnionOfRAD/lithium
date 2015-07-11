@@ -10,20 +10,33 @@ namespace lithium\data\source\mongo_db;
 
 use MongoGridFSFile;
 
+/**
+ * This is the result class for all MongoDB. It needs a `MongoCursor` as
+ * a resource to operate on.
+ *
+ * @link http://php.net/manual/en/class.mongocursor.php
+ */
 class Result extends \lithium\data\source\Result {
 
 	/**
-	 * Fetches the result from the resource and caches it.
+	 * Fetches the next result from the resource.
 	 *
-	 * @return boolean Return `true` on success or `false` if it is not valid.
+	 * @return array|boolean|null Returns a key/value pair for the next result,
+	 *         `null` if there is none, `false` if something bad happened.
 	 */
 	protected function _fetch() {
-		if (!$this->_resource || !$this->_resource->hasNext()) {
+		if (!$this->_resource) {
 			return false;
 		}
+		if (!$this->_resource->hasNext()) {
+			return null;
+		}
 		$result = $this->_resource->getNext();
-		$isFile = ($result instanceof MongoGridFSFile);
-		return array($this->_iterator, $isFile ? array('file' => $result) + $result->file : $result);
+
+		if ($result instanceof MongoGridFSFile) {
+			$result = array('file' => $result) + $result->file;
+		}
+		return array($this->_iterator, $result);
 	}
 }
 

@@ -182,8 +182,8 @@ class PostgreSql extends \lithium\data\source\Database {
 			}
 			$sources = array();
 
-			while ($data = $result->next()) {
-				$sources[] = array_shift($data);
+			foreach ($result as $row) {
+				$sources[] = $row[0];
 			}
 			return $sources;
 		});
@@ -366,7 +366,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @see lithium\data\source\Database::renderCommand()
 	 * @param string $sql The sql string to execute
 	 * @param array $options Available options:
-	 * @return resource Returns the result resource handle if the query is successful.
+	 * @return \lithium\data\source\Result Returns a result object if the query was successful.
 	 * @filter
 	 */
 	protected function _execute($sql, array $options = array()) {
@@ -617,7 +617,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			$result = $this->_execute($command);
 			$ids = array();
 
-			while ($row = $result->next()) {
+			foreach ($result as $row) {
 				$ids[] = $row[0];
 			}
 			if (!$ids) {
