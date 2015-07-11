@@ -9,6 +9,7 @@
 namespace lithium\tests\cases\security;
 
 use lithium\security\Hash;
+use stdClass;
 
 class HashTest extends \lithium\test\Unit {
 
@@ -69,6 +70,62 @@ class HashTest extends \lithium\test\Unit {
 		$expected = 'a9050b4f44797bf60262de984ca12967711389cd6c4c4aeee2a739c159f1f667';
 		$result = Hash::calculate($string, compact('type'));
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testCalculateInstance() {
+		$data0 = new stdClass();
+		$data1 = new stdClass();
+
+		$result0 = Hash::calculate($data0);
+		$result1 = Hash::calculate($data1);
+
+		$this->assertEqual($result0, $result1);
+
+		$data0 = new stdClass();
+		$data1 = new stdClass();
+
+		$data1->foo = 'bar';
+
+		$result0 = Hash::calculate($data0);
+		$result1 = Hash::calculate($data1);
+
+		$this->assertNotEqual($result0, $result1);
+	}
+
+	public function testCalculateArray() {
+		$data0 = array('foo' => 'bar');
+		$data1 = array('foo' => 'bar');
+
+		$result0 = Hash::calculate($data0);
+		$result1 = Hash::calculate($data1);
+
+		$this->assertEqual($result0, $result1);
+
+		$data0 = array('foo' => 'bar');
+		$data1 = array('foo' => 'bar', 'baz');
+
+		$result0 = Hash::calculate($data0);
+		$result1 = Hash::calculate($data1);
+
+		$this->assertNotEqual($result0, $result1);
+	}
+
+	public function testCalculateClosure() {
+		$data0 = function() {};
+		$data1 = $data0;
+
+		$result0 = Hash::calculate($data0);
+		$result1 = Hash::calculate($data1);
+
+		$this->assertEqual($result0, $result1);
+
+		$data0 = function() {};
+		$data1 = function() {};
+
+		$result0 = Hash::calculate($data0);
+		$result1 = Hash::calculate($data1);
+
+		$this->assertNotEqual($result0, $result1);
 	}
 
 	public function testCompare() {
