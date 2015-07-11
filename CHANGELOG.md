@@ -38,6 +38,7 @@
   $data = Media::decode($request->type, stream_get_contents($stream));
   ```
 - Text form fields now support generating corresponding `<datalist>` elements for autocompletion.
+
   ```php
   $this->form->field('region', array(
       'type' => 'text',
