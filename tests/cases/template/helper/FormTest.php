@@ -1135,6 +1135,39 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	public function testFormFieldTextDatalist() {
+		$result = $this->form->field('states', array(
+			'type' => 'text', 'list' => array('CA', 'RI')
+		));
+		$this->assertTags($result, array(
+			'div' => array(),
+			'label' => array('for' => 'States'), 'States', '/label',
+			'input' => array(
+				'type' => 'text','name' => 'states',
+				'id' => 'States', 'list' => 'StatesList'
+			),
+			'datalist' => array('id' => 'StatesList'),
+				array('option' => array('value' => 'CA')),
+				'/option',
+				array('option' => array('value' => 'RI')),
+				'/option',
+			'/datalist',
+			'/div',
+		));
+
+		$result = $this->form->field('states', array(
+			'type' => 'text', 'list' => 'StatesList'
+		));
+		$this->assertTags($result, array(
+			'div' => array(),
+			'label' => array('for' => 'States'), 'States', '/label',
+			'input' => array(
+				'type' => 'text','name' => 'states',
+				'id' => 'States', 'list' => 'StatesList'
+			),
+		));
+	}
+
 	public function testFormErrorWithout() {
 		$this->form->create(null);
 		$result = $this->form->error('name');
