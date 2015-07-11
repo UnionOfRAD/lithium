@@ -77,19 +77,6 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 		$this->assertFalse($result->next());
 	}
 
-	public function testPrev() {
-		$resource = $this->_db->connection->query("SELECT id, name FROM galleries;");
-		$result = new Result(compact('resource'));
-
-		$this->assertNull($result->prev());
-		$this->assertEqual($this->_mockData[1], $result->next());
-		$this->assertEqual($this->_mockData[2], $result->next());
-		$this->assertEqual($this->_mockData[1], $result->prev());
-		$this->assertEqual($this->_mockData[2], $result->next());
-		$this->assertEqual($this->_mockData[1], $result->prev());
-		$this->assertFalse($result->prev());
-	}
-
 	public function testValid() {
 		$result = new Result();
 		$this->assertFalse($result->valid());

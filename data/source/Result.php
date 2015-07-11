@@ -11,13 +11,6 @@ namespace lithium\data\source;
 abstract class Result extends \lithium\core\Object implements \Iterator {
 
 	/**
-	 * Contains the cached result set.
-	 *
-	 * @var array
-	 */
-	protected $_cache = array();
-
-	/**
 	 * The current position of the iterator.
 	 */
 	protected $_iterator = 0;
@@ -28,7 +21,7 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	protected $_current = false;
 
 	/**
-	 * Setted to `true` when the collection has begun iterating.
+	 * Set to `true` when the collection has begun iterating.
 	 *
 	 * @var integer
 	 */
@@ -63,6 +56,13 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	protected $_autoConfig = array('resource');
 
 	/**
+	 * Buffer results of query before returning / iterating. Allows consumers to 'peek' at results.
+	 *
+	 * @var array
+	 */
+	protected $_buffer = array();
+
+	/**
 	 * Returns the used resource.
 	 */
 	public function resource() {
@@ -76,7 +76,8 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	 */
 	public function valid() {
 		if (!$this->_init) {
-			$this->_valid = $this->_fetch();
+			$this->current();
+			$this->_init = true;
 		}
 		return $this->_valid;
 	}
@@ -99,7 +100,11 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	 */
 	public function current() {
 		if (!$this->_init) {
-			$this->_fetch();
+			if ($next = $this->_fetch()) {
+				list($this->_key, $this->_current) = $next;
+				$this->_valid = true;
+			}
+			$this->_init = true;
 		}
 		$this->_started = true;
 		return $this->_current;
@@ -119,22 +124,6 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	}
 
 	/**
-	 * Fetches the previous element from the cache.
-	 *
-	 * @return mixed The previous result (or `false` if there is none).
-	 */
-	public function prev() {
-		if (!$this->_cache) {
-			return;
-		}
-		if (isset($this->_cache[--$this->_iterator - 1])) {
-			$this->_key = $this->_iterator - 1;
-			return $this->_current = $this->_cache[$this->_iterator - 1];
-		}
-		return false;
-	}
-
-	/**
 	 * Fetches the next element from the resource.
 	 *
 	 * @return mixed The next result (or `false` if there is none).
@@ -143,42 +132,47 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 		if ($this->_started === false) {
 			return $this->current();
 		}
-		$this->_valid = $this->_fetch();
-		if (!$this->_valid) {
+		$this->_init = true;
+		$this->_valid = true;
+
+		if ($this->_buffer) {
+			list($this->_key, $this->_current) = array_shift($this->_buffer);
+			return $this->current();
+		}
+
+		if (!$next = $this->_fetch()) {
 			$this->_key = null;
 			$this->_current = false;
+			$this->_valid = false;
+			return $this->current();
+		} else {
+			list($this->_key, $this->_current) = $next;
 		}
 		return $this->current();
 	}
 
 	/**
-	 * Fetches the current element from the resource.
+	 * Peeks at the next element in the resource without advancing `Result`'s cursor.
 	 *
-	 * @return boolean Return `true` on success or `false` otherwise.
+	 * @return mixed The next result (or `false` if there is none).
 	 */
-	protected function _fetch() {
-		$this->_init = true;
-		if ($this->_fetchFromCache() || $this->_fetchFromResource()) {
-			return true;
+	public function peek() {
+		if ($this->_buffer) {
+			return reset($this->_buffer);
 		}
-		return false;
+		if ($next = $this->_fetch()) {
+			$this->_buffer[] = $next;
+			$first = reset($this->_buffer);
+			return end($first);
+		}
 	}
-
-	abstract protected function _fetchFromResource();
 
 	/**
-	 * Returns the result from the primed cache.
+	 * Fetches the current element from the resource.
 	 *
-	 * @return boolean Return `true` on success or `false` if it has not been cached yet.
+	 * @return array Return a key/value pair for the next result in the iterator, or `null`.
 	 */
-	protected function _fetchFromCache() {
-		if ($this->_iterator < count($this->_cache)) {
-			$this->_key = $this->_iterator;
-			$this->_current = $this->_cache[$this->_iterator++];
-			return true;
-		}
-		return false;
-	}
+	abstract protected function _fetch();
 
 	/**
 	 * Close the resource.

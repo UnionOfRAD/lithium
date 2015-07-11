@@ -8,6 +8,7 @@
 
 namespace lithium\data\collection;
 
+use RuntimeException;
 use lithium\util\Set;
 
 class RecordSet extends \lithium\data\Collection {
@@ -37,6 +38,13 @@ class RecordSet extends \lithium\data\Collection {
 	protected $_keyIndex = array();
 
 	/**
+	 * Keeps a list of hydrated record indexes.
+	 *
+	 * @var array
+	 */
+	protected $_keyCache = array();
+
+	/**
 	 * Initializes the record set and uses the database connection to get the column list contained
 	 * in the query that created this object.
 	 *
@@ -47,18 +55,31 @@ class RecordSet extends \lithium\data\Collection {
 	 */
 	protected function _init() {
 		parent::_init();
-		if ($this->_result) {
-			$this->_columns = $this->_columnMap();
-			if ($this->_query) {
-				$columns = array_filter(array_keys($this->_columns));
-				$this->_dependencies = Set::expand(Set::normalize($columns));
-				$this->_keyIndex = $this->_keyIndex('');
-			}
+
+		if (!$this->_result) {
+			return;
 		}
+		$this->_columns = $this->_columnMap();
+
+		if (!$this->_query) {
+			return;
+		}
+		$columns = array_filter(array_keys($this->_columns));
+		$this->_dependencies = Set::expand(Set::normalize($columns));
+		$this->_keyIndex = $this->_keyIndex('');
 	}
 
 	/**
-	 * Extract the next item from the result ressource and wraps it into a `Record` object.
+	 * Returns the next result from the iterator, or from the buffer, if the buffer is not empty.
+	 *
+	 * @return array Returns the next array to be wrapped as a `Record` object
+	 */
+	protected function _next() {
+		return count($this->_buffer) > 0 ? array_shift($this->_buffer) : $this->_result->next();
+	}
+
+	/**
+	 * Extracts the next item from the result resource and wraps it into a `Record` object.
 	 *
 	 * @return mixed Returns the next `Record` if exists. Returns `null` otherwise
 	 */
@@ -66,8 +87,8 @@ class RecordSet extends \lithium\data\Collection {
 		if ($this->closed() || !$this->_result->valid()) {
 			return;
 		}
-
 		$data = $this->_result->current();
+
 		if ($this->_query) {
 			$data = $this->_mapRecord($data);
 		}
@@ -99,26 +120,18 @@ class RecordSet extends \lithium\data\Collection {
 	 */
 	protected function _mapRecord($data) {
 		$primary = $this->_model;
-		$conn = $primary::connection();
 		$main = $record = array();
+		$keyMap = array_combine($this->_keyIndex, $this->_keyIndex);
+		$main = array_intersect_key($data, $keyMap);
 		$i = 0;
 
-		foreach ($this->_keyIndex as $key => $value) {
-			$main[$key] = $data[$key];
+		if (in_array($main, $this->_keyCache)) {
+			throw new RuntimeException("Associated records hydrated out of order: " . var_export($this->_keyCache, true));
 		}
 
 		do {
 			$offset = 0;
-			if ($i != 0) {
-				$keys = array();
-				foreach ($this->_keyIndex as $key => $value) {
-					$keys[$key] = $data[$key];
-				}
-				if ($main != $keys) {
-					$this->_result->prev();
-					break;
-				}
-			}
+
 			foreach ($this->_columns as $name => $fields) {
 				$fieldCount = count($fields);
 				$record[$i][$name] = array_combine(
@@ -127,12 +140,18 @@ class RecordSet extends \lithium\data\Collection {
 				$offset += $fieldCount;
 			}
 			$i++;
+
+			if ($i > 1 && $main != array_intersect_key($this->_result->peek(), $keyMap)) {
+				break;
+			}
 		} while ($main && $data = $this->_result->next());
 
+		if ($main) {
+			$this->_keyCache[] = $main;
+		}
 		$relMap = $this->_query->relationships();
-		return $this->_hydrateRecord(
-			$this->_dependencies, $primary, $record, 0, $i, '', $relMap, $conn
-		);
+
+		return $this->_hydrateRecord($this->_dependencies, $primary, $record, 0, $i, '', $relMap);
 	}
 
 	/**
@@ -145,10 +164,9 @@ class RecordSet extends \lithium\data\Collection {
 	 * @param integer $max
 	 * @param string $name Alias name
 	 * @param array $relMap The query relationships array
-	 * @param object $conn The connection object
 	 * @return object Returns a `Record` object
 	 */
-	protected function _hydrateRecord($relations, $primary, $record, $min, $max, $name, &$relMap, $conn) {
+	protected function _hydrateRecord($relations, $primary, $record, $min, $max, $name, &$relMap) {
 		$options = array('exists' => true, 'defaults' => false);
 
 		if (!empty($relations)) {
@@ -157,34 +175,37 @@ class RecordSet extends \lithium\data\Collection {
 				$field = $relMap[$relName]['fieldName'];
 				$relModel = $relMap[$relName]['model'];
 
-				if ($relMap[$relName]['type'] === 'hasMany') {
-					$rel = array();
-					$main = $relModel::key($record[$min][$relName]);
-					$i = $min;
-					$j = $i + 1;
-					while ($j < $max) {
-						$keys = $relModel::key($record[$j][$relName]);
-						if ($main != $keys) {
-							$rel[] = $this->_hydrateRecord(
-								$subrelations, $relModel, $record, $i, $j, $relName, $relMap, $conn
-							);
-							$main = $keys;
-							$i = $j;
-						}
-						$j++;
-					}
-					if (array_filter($record[$i][$relName])) {
-						$rel[] = $this->_hydrateRecord(
-							$subrelations, $relModel, $record, $i, $j, $relName, $relMap, $conn
-						);
-					}
-					$opts = array('class' => 'set') + $options;
-					$record[$min][$name][$field] = $relModel::create($rel, $opts);
-				} else {
+				if ($relMap[$relName]['type'] !== 'hasMany') {
 					$record[$min][$name][$field] = $this->_hydrateRecord(
-						$subrelations, $relModel, $record, $min, $max, $relName, $relMap, $conn
+						$subrelations, $relModel, $record, $min, $max, $relName, $relMap
+					);
+					continue;
+				}
+
+				$rel = array();
+				$main = $relModel::key($record[$min][$relName]);
+				$i = $min;
+				$j = $i + 1;
+
+				while ($j < $max) {
+					$keys = $relModel::key($record[$j][$relName]);
+
+					if ($main != $keys) {
+						$rel[] = $this->_hydrateRecord(
+							$subrelations, $relModel, $record, $i, $j, $relName, $relMap
+						);
+						$main = $keys;
+						$i = $j;
+					}
+					$j++;
+				}
+				if (array_filter($record[$i][$relName])) {
+					$rel[] = $this->_hydrateRecord(
+						$subrelations, $relModel, $record, $i, $j, $relName, $relMap
 					);
 				}
+				$opts = array('class' => 'set') + $options;
+				$record[$min][$name][$field] = $relModel::create($rel, $opts);
 			}
 		}
 		return $primary::create(
