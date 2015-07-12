@@ -1319,71 +1319,76 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
-	 * Return formatted clause for `ORDER BY`.
+	 * Return formatted clause for `ORDER BY` with known fields escaped and
+	 * directions normalized to uppercase. When order direction is missing or
+	 * unrecognized defaults to `ASC`.
 	 *
-	 * @param mixed $order The clause to be formatted
+	 * @param string|array $order The clause to be formatted.
 	 * @param object $context
-	 * @return string Formatted clause.
+	 * @return string|null Formatted clause, `null` if there is nothing to format.
 	 */
 	public function order($order, $context) {
-		return $this->_sort($order, $context);
+		if (!$order) {
+			return null;
+		}
+		$model = $context->model();
+		$alias = $context->alias();
+
+		$normalized = array();
+		if (is_string($order)) {
+			if (preg_match('/^(.*?)\s+((?:A|DE)SC)$/i', $order, $match)) {
+				$normalized[$match[1]] = strtoupper($match[2]);
+			} else {
+				$normalized[$order] = 'ASC';
+			}
+		} else {
+			foreach ($order as $field => $direction) {
+				if (is_int($field)) {
+					$normalized[$direction] = 'ASC';
+				} elseif (in_array($direction, array('ASC', 'DESC', 'asc', 'desc'))) {
+					$normalized[$field] = strtoupper($direction);
+				} else {
+					$normalized[$field] = 'ASC';
+				}
+			}
+		}
+
+		$escaped = array();
+		foreach ($normalized as $field => $direction) {
+			if (!$model || !$model::schema($field)) {
+				$field = $this->name($field);
+			} else {
+				$field = $this->name($alias) . '.' . $this->name($field);
+			}
+			$escaped[] = "{$field} {$direction}";
+		}
+
+		return 'ORDER BY ' . join(', ', $escaped);
 	}
 
 	/**
-	 * Return formatted clause for `GROUP BY`.
+	 * Return formatted clause for `GROUP BY` with known fields escaped.
 	 *
-	 * @param mixed $group The clause to be formatted
+	 * @param string|array $group The clause to be formatted.
 	 * @param object $context
-	 * @return string Formatted clause.
+	 * @return string|null Formatted clause, `null` if there is nothing to format.
 	 */
 	public function group($group, $context) {
-		return $this->_sort($group, $context, 'GROUP BY', false);
-	}
-
-	/**
-	 * Renders ORDER BY or GROUP BY clause.
-	 *
-	 * @see lithium\data\source\Database::order()
-	 * @see lithium\data\source\Database::group()
-	 * @param mixed $field The field
-	 * @param object $context
-	 * @return string Formatted clause.
-	 */
-	protected function _sort($field, $context, $clause = 'ORDER BY', $direction = true) {
-		$direction = $direction ? ' ASC' : '';
+		if (!$group) {
+			return null;
+		}
+		$self = $this;
 		$model = $context->model();
+		$alias = $context->alias();
 
-		if (is_string($field)) {
-			if (preg_match('/^(.*?)\s+((?:A|DE)SC)$/i', $field, $match)) {
-				$field = $match[1];
-				$direction = $match[2];
+		$escaped = array_map(function($field) use ($self, $model, $alias) {
+			if (!$model || !$model::schema($field)) {
+				return $self->name($field);
 			}
-			$field = array($field => $direction);
-		}
+			return $self->name($alias) . '.' . $self->name($field);
+		}, (array) $group);
 
-		if (!is_array($field) || empty($field)) {
-			return;
-		}
-		$result = array();
-
-		foreach ($field as $column => $dir) {
-			if (is_int($column)) {
-				$column = $dir;
-				$dir = $direction;
-			}
-			$dir = in_array($dir, array('ASC', 'asc', 'DESC', 'desc')) ? " {$dir}" : $direction;
-
-			if ($model && $field = $model::schema($column)) {
-				$column = $this->name($column);
-				$name = $this->name($context->alias()) . '.' . $column;
-				$result[] = "{$name}{$dir}";
-				continue;
-			}
-			$column = $this->name($column);
-			$result[] = "{$column}{$dir}";
-		}
-		$fields = join(', ', $result);
-		return "$clause {$fields}";
+		return 'GROUP BY ' .  join(', ', $escaped);
 	}
 
 	/**

@@ -88,6 +88,7 @@
 - Support DELETE method in curl socket #1034 (Warren Seymour)
 - Improved performance by using HMAC in the FormSignature class. #1173 (David Persson)
 - Improved memory profile and (internal) semantics of `RecordSet` and PDO `Result` fetching. (Nate Abele)
+- Order direction using `Database` are now normalized to uppercase (i.e. `ASC`). (David Person)
 
 ### Added
 
