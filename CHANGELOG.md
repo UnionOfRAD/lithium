@@ -29,7 +29,32 @@
 - Fixed bug when using LIMIT, ORDER and hasMany relations with PostgreSql. #1145 (Hamid Reza Koushki)
 - Matched implementation with documentation of `Request::accepts()`. The method now returns a boolean 
   when type is provided. #1180, #856 (David Persson, David Rogers)
-- Fixed several bugs in the FormSignature class. #839, #998, #1173 (Hamid Reza Koushki, David Persson, Ciaro Vermeire, cinaeco) 
+- Fixed several bugs in the FormSignature class. #839, #998, #1173 (Hamid Reza Koushki, David Persson, Ciaro Vermeire, cinaeco)
+- Fixed undetected buggy behavior in `Database`/`RecordSet` where records could get out of order and **associated has-many** 
+  records would be partially missing. The bug occurred when querying for results with a has-many relationship and without ordering 
+  by the primary key of the main record. In all queries involving a has-many relationship, it is adviced to first order by the main 
+  id as otherwise an exception will be thrown. 
+  We've decided against adding in the main id magically, as silently rewriting users' queries is a rabbit hole we dont't want 
+  to go down. In general implicit order by the database is not something to rely on, if you want records in a certain order, always 
+  explictly specify it. 
+  Fixes #1162 and #1182 (Hamid Reza Koushki, Nate Abele, David Persson)
+
+  ```php
+  Posts::find('all', array( // wrong :(
+	'order' => 'Comments.created',
+	'with' => 'Comments'
+  ));
+
+  Posts::find('all', array( // correct :)
+	'order' => array('id', 'Comments.created'),
+	'with' => 'Comments'
+  ));
+
+  Posts::find('all', array( // correct :)
+	'order' => array('title', 'id', 'Comments.created'),
+	'with' => 'Comments'
+  ));
+  ```
 
 ### Improved
 

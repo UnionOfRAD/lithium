@@ -255,12 +255,21 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$this->assertNotEmpty($galleries);
 	}
 
-	public function testOrderWithHasMany() {
+	public function testOrderWithHasManyThrowsExceptionIfNonSequential() {
+		$this->assertException('/^Associated records hydrated out of order.*/', function() {
+			Galleries::find('all', array(
+				'order' => array('Images.title' => 'DESC'),
+				'with' => 'Images'
+			))->to('array');
+		});
+	}
+
+	public function testOrderWithHasManyWorksIfOrderByMainIdFirst() {
 		$expected = include $this->_export . '/testHasManyWithOrder.php';
 
 		$galleries = Galleries::find('all', array(
-			'order' => 'Images.title DESC',
-			'with' => 'Images',
+			'order' => array('id', 'Images.title' => 'DESC'),
+			'with' => 'Images'
 		));
 
 		$this->assertCount(2, $galleries);
@@ -271,7 +280,7 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 				'name' => 'DESC',
 				'Images.title' => 'DESC'
 			),
-			'with' => 'Images',
+			'with' => 'Images'
 		));
 
 		$this->assertCount(2, $galleries);
