@@ -641,7 +641,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_db->order(array("title" => "desc"), $query);
-		$expected = 'ORDER BY {MockDatabasePost}.{title} desc';
+		$expected = 'ORDER BY {MockDatabasePost}.{title} DESC';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_db->order(array("title" => "dasc"), $query);
@@ -1094,8 +1094,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model
 		));
-		$result = $this->_db->group(array('id' => 'ASC'), $query);
-		$expected = 'GROUP BY {MockDatabasePost}.{id} ASC';
+		$result = $this->_db->group(array('id'), $query);
+		$expected = 'GROUP BY {MockDatabasePost}.{id}';
 		$this->assertEqual($expected, $result);
 	}
 
