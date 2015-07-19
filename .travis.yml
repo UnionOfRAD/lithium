@@ -69,3 +69,6 @@ script:
 
 notifications:
   email: false
+
+# Enable container based infra.
+sudo: false
