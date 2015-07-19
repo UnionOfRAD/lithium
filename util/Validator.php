@@ -672,4 +672,5 @@ class Validator extends \lithium\core\StaticObject {
 }
 
 Validator::reset();
+
 ?>

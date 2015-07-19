@@ -460,21 +460,19 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @see lithium\data\source\Database::_formatters()
 	 */
 	protected function _formatters() {
-		$self = $this;
-
-		$datetime = $timestamp = function($format, $value) use ($self) {
+		$datetime = $timestamp = function($format, $value) {
 			if ($format && (($time = strtotime($value)) !== false)) {
 				$val = date($format, $time);
 				if (!preg_match('/^' . preg_quote($val) . '\.\d+$/', $value)) {
 					$value = $val;
 				}
 			}
-			return $self->connection->quote($value);
+			return $this->connection->quote($value);
 		};
 
 		return compact('datetime', 'timestamp') + array(
-			'boolean' => function($value) use ($self){
-				return $self->connection->quote($value ? 't' : 'f');
+			'boolean' => function($value) {
+				return $this->connection->quote($value ? 't' : 'f');
 			}
 		) + parent::_formatters();
 	}

@@ -70,7 +70,7 @@ class Profiler extends \lithium\test\Filter {
 	 * instances. Allows for preparing tests before they are run.
 	 *
 	 * @param object $report Instance of Report which is calling apply.
-	 * @param array $tests The test to apply this filter on
+	 * @param \lithium\util\Collection $tests The tests to apply this filter on.
 	 * @param array $options Options for how this filter should be applied. Available options are:
 	 *              - `'method'`
 	 *              - `'run'`
@@ -240,4 +240,5 @@ class Profiler extends \lithium\test\Filter {
 }
 
 Profiler::reset();
+
 ?>

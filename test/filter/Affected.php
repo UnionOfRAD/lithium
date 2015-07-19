@@ -30,7 +30,7 @@ class Affected extends \lithium\test\Filter {
 	 * instances. Adds affected tests to the test collection.
 	 *
 	 * @param object $report Instance of Report which is calling apply.
-	 * @param array $tests The test to apply this filter on
+	 * @param \lithium\util\Collection $tests The tests to apply this filter on.
 	 * @param array $options Not used.
 	 * @return object Returns the instance of `$tests`.
 	 */

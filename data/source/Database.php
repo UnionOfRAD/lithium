@@ -215,11 +215,11 @@ abstract class Database extends \lithium\data\Source {
 		);
 
 		$this->_strategies += array(
-			'joined' => function($self, $model, $context) {
+			'joined' => function($model, $context) {
 
 				$with = $context->with();
 
-				$strategy = function($me, $model, $tree, $path, $from, &$deps) use ($self, $context, $with) {
+				$strategy = function($me, $model, $tree, $path, $from, &$deps) use ($context, $with) {
 					foreach ($tree as $name => $childs) {
 						if (!$rel = $model::relations($name)) {
 							throw new QueryException("Model relationship `{$name}` not found.");
@@ -252,7 +252,7 @@ abstract class Database extends \lithium\data\Source {
 								'fieldName' => $rel->fieldName(),
 								'alias' => $to
 							));
-							$self->join($context, $rel, $from, $to, $constraints);
+							$this->join($context, $rel, $from, $to, $constraints);
 						}
 
 						if (!empty($childs)) {
@@ -271,7 +271,7 @@ abstract class Database extends \lithium\data\Source {
 					if (!is_string($field)) {
 						continue;
 					}
-					list($alias, $field) = $self->invokeMethod('_splitFieldname', array($field));
+					list($alias, $field) = $this->_splitFieldname($field);
 					$alias = $alias ?: $field;
 					if ($alias && isset($models[$alias])) {
 						foreach ($deps[$alias] as $depAlias) {
@@ -281,7 +281,7 @@ abstract class Database extends \lithium\data\Source {
 					}
 				}
 			},
-			'nested' => function($self, $model, $context) {
+			'nested' => function($model, $context) {
 				throw new QueryException("This strategy is not yet implemented.");
 			}
 		);
@@ -492,15 +492,13 @@ abstract class Database extends \lithium\data\Source {
 	 * @return array of column types to Closure formatter
 	 */
 	protected function _formatters() {
-		$self = $this;
-
-		$datetime = $timestamp = $date = $time = function($format, $value) use ($self) {
+		$datetime = $timestamp = $date = $time = function($format, $value) {
 			if ($format && (($time = strtotime($value)) !== false)) {
 				$value = date($format, $time);
 			} else {
 				return false;
 			}
-			return $self->connection->quote($value);
+			return $this->connection->quote($value);
 		};
 
 		return compact('datetime', 'timestamp', 'date', 'time') + array(
@@ -1573,7 +1571,7 @@ abstract class Database extends \lithium\data\Source {
 		$strategy = $options['strategy'];
 		if (isset($this->_strategies[$strategy])) {
 			$strategy = $this->_strategies[$strategy];
-			$strategy($this, $model, $context);
+			$strategy($model, $context);
 		} else {
 			throw new QueryException("Undefined query strategy `{$strategy}`.");
 		}
@@ -1753,7 +1751,7 @@ abstract class Database extends \lithium\data\Source {
 			}
 		}
 
-		return trim(Text::insert($template, $data, array('clean' => array('method' => 'text'))));
+		return trim(Text::insert($template, $data, array('clean' => true)));
 	}
 
 	/**

@@ -72,25 +72,25 @@ class Group extends \lithium\util\Collection {
 	 * @return array Updated list of tests contained within this collection.
 	 */
 	public function add($test = null, array $options = array()) {
-		$resolve = function($self, $test) {
+		$resolve = function($test) {
 			switch (true) {
 				case !$test:
 					return array();
 				case is_object($test) && $test instanceof Unit:
 					return array(get_class($test));
 				case is_string($test) && !file_exists(Libraries::path($test)):
-					return $self->invokeMethod('_resolve', array($test));
+					return $this->_resolve($test);
 				default:
 					return (array) $test;
 			}
 		};
 		if (is_array($test)) {
 			foreach ($test as $t) {
-				$this->_data = array_filter(array_merge($this->_data, $resolve($this, $t)));
+				$this->_data = array_filter(array_merge($this->_data, $resolve($t)));
 			}
 			return $this->_data;
 		}
-		return $this->_data = array_merge($this->_data, $resolve($this, $test));
+		return $this->_data = array_merge($this->_data, $resolve($test));
 	}
 
 	/**

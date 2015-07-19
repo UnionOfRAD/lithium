@@ -11,10 +11,6 @@ namespace lithium\security;
 /**
  * Hash utility class. Contains methods to calculate hashes and compare
  * them in a safe way preventing timing attacks.
- *
- * @link http://php.net/function.hash.php PHP Manual: `hash()`
- * @link http://php.net/function.hash-hmac.php PHP Manual: `hash_hmac()`
- * @link http://php.net/function.hash-algos.php PHP Manual: `hash_algos()`
  */
 class Hash {
 
@@ -22,6 +18,9 @@ class Hash {
 	 * Uses PHP's hashing functions to calculate a hash over the string provided, using the options
 	 * specified. The default hash algorithm is SHA-512.
 	 *
+	 * @link http://php.net/hash
+	 * @link http://php.net/hash_hmac
+	 * @link http://php.net/hash_algos
 	 * @param string $string The string to hash.
 	 * @param array $options Supported options:
 	 *        - `'type'` _string_: Any valid hashing algorithm. See the `hash_algos()` function to

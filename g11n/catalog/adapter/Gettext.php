@@ -118,7 +118,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 				continue;
 			}
 			$stream = fopen($file, 'rb');
-			$data = $this->invokeMethod($method, array($stream));
+			$data = $this->{$method}($stream);
 			fclose($stream);
 
 			if ($data) {
@@ -151,7 +151,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			if (!$stream = fopen($file, 'wb')) {
 				return false;
 			}
-			$this->invokeMethod($method, array($stream, $data));
+			$this->{$method}($stream, $data);
 			fclose($stream);
 		}
 		return true;
@@ -275,15 +275,15 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	protected function _parseMo($stream) {
 		$stat = fstat($stream);
 
-		if ($stat['size'] < self::MO_HEADER_SIZE) {
+		if ($stat['size'] < static::MO_HEADER_SIZE) {
 			throw new RangeException("MO stream content has an invalid format.");
 		}
 		$magic = unpack('V1', fread($stream, 4));
 		$magic = hexdec(substr(dechex(current($magic)), -8));
 
-		if ($magic == self::MO_LITTLE_ENDIAN_MAGIC) {
+		if ($magic == static::MO_LITTLE_ENDIAN_MAGIC) {
 			$isBigEndian = false;
-		} elseif ($magic == self::MO_BIG_ENDIAN_MAGIC) {
+		} elseif ($magic == static::MO_BIG_ENDIAN_MAGIC) {
 			$isBigEndian = true;
 		} else {
 			throw new RangeException("MO stream content has an invalid format.");

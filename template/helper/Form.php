@@ -135,22 +135,20 @@ class Form extends \lithium\template\Helper {
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		$self =& $this;
-
 		$defaults = array(
 			'base' => array(),
 			'text' => array(),
 			'textarea' => array(),
 			'select' => array('multiple' => false),
 			'attributes' => array(
-				'id' => function($method, $name, $options) use (&$self) {
+				'id' => function($method, $name, $options) {
 					if (in_array($method, array('create', 'end', 'label', 'error'))) {
 						return;
 					}
 					if (!$name || ($method === 'hidden' && $name === '_method')) {
 						return;
 					}
-					$info = $self->binding($name);
+					$info = $this->binding($name);
 					$model = $info->class;
 					$id = Inflector::camelize(Inflector::slug($info->name));
 					return $model ? basename(str_replace('\\', '/', $model)) . $id : $id;

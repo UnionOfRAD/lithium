@@ -23,7 +23,7 @@ class Coverage extends \lithium\test\Filter {
 	 *
 	 * @see lithium\test\filter\Coverage::collect()
 	 * @param object $report Instance of Report which is calling apply.
-	 * @param array $tests The test to apply this filter on
+	 * @param \lithium\util\Collection $tests The tests to apply this filter on.
 	 * @param array $options Options for how code coverage should be applied. These options are
 	 *              also passed to `Coverage::collect()` to determine how to aggregate results. See
 	 *              the documentation for `collect()` for further options.  Options affecting this

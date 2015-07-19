@@ -291,10 +291,8 @@ class Media extends \lithium\core\StaticObject {
 	 *         no matching type is found returns `null`.
 	 */
 	public static function negotiate($request) {
-		$self = get_called_class();
-
-		$match = function($name) use ($self, $request) {
-			if (($cfg = $self::type($name)) && $self::match($request, compact('name') + $cfg)) {
+		$match = function($name) use ($request) {
+			if (($cfg = static::type($name)) && static::match($request, compact('name') + $cfg)) {
 				return true;
 			}
 			return false;

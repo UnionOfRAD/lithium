@@ -814,8 +814,8 @@ class Router extends \lithium\core\StaticObject {
 	 */
 	protected static function _initScopes() {
 		static::$_scopes = static::_instance('configuration');
-		$self = get_called_class();
-		static::$_scopes->initConfig = function($name, $config) use ($self) {
+
+		static::$_scopes->initConfig = function($name, $config) {
 			$defaults = array(
 				'absolute' => false,
 				'host' => null,
@@ -830,7 +830,7 @@ class Router extends \lithium\core\StaticObject {
 			$config += $defaults;
 
 			if (!$config['pattern']) {
-				$config = $self::invokeMethod('_compileScope', array($config));
+				$config = static::_compileScope($config);
 			}
 			$config['base'] = $config['base'] ? trim($config['base'], '/') : $config['base'];
 			return $config;

@@ -34,15 +34,6 @@ abstract class Filter extends \lithium\core\StaticObject {
 	public static function analyze($report, array $options = array()) {
 		return $report->results['filters'][get_called_class()];
 	}
-
-	/**
-	 * Returns data to be output by a reporter.
-	 *
-	 * @param string $format I.e. `'html'` or `'text'`.
-	 * @param array $analysis The results of the analysis.
-	 * @return string
-	 */
-	public static function output($format, $analysis) {}
 }
 
 ?>

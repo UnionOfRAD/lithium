@@ -22,32 +22,42 @@ trigger_error($message, E_USER_DEPRECATED);
 /**
  * String manipulation utility class.
  *
- * @deprecated
+ * @deprecated Replaced by `\lithium\util\Text` and `\lithium\security\{Hash,Random}`.
  */
 class String {
 
 	/**
 	 * Option flag used in `String::random()`.
+	 *
+	 * @deprecated Use `lithium\util\Random::ENCODE_BASE_64`.
 	 */
 	const ENCODE_BASE_64 = 1;
 
 	/**
 	 * UUID-related constant. Clears all bits of version byte (`00001111`).
+	 *
+	 * @deprecated Use `lithium\util\Text::UUID_CLEAR_VER`.
 	 */
 	const UUID_CLEAR_VER = 15;
 
 	/**
 	 * UUID constant that sets the version bit for generated UUIDs (`01000000`).
+	 *
+	 * @deprecated Use `lithium\util\Text::UUID_VERSION_4`.
 	 */
 	const UUID_VERSION_4 = 64;
 
 	/**
 	 * Clears relevant bits of variant byte (`00111111`).
+	 *
+	 * @deprecated Use `lithium\util\Text::UUID_CLEAR_VAR`.
 	 */
 	const UUID_CLEAR_VAR = 63;
 
 	/**
 	 * The RFC 4122 variant (`10000000`).
+	 *
+	 * @deprecated Use `lithium\util\Text::UUID_CLEAR_RFC`.
 	 */
 	const UUID_VAR_RFC = 128;
 
@@ -55,6 +65,7 @@ class String {
 	 * Generates random bytes for use in UUIDs and password salts, using
 	 * (when available) a cryptographically strong random number generator.
 	 *
+	 * @deprecated Replaced by `lithium\security\Random::generate()`.
 	 * @param integer $bytes The number of random bytes to generate.
 	 * @param array $options
 	 * @return string Returns a string of random bytes.
@@ -71,6 +82,7 @@ class String {
 	 * Uses PHP's hashing functions to create a hash of the string provided, using the options
 	 * specified. The default hash algorithm is SHA-512.
 	 *
+	 * @deprecated Replaced by `lithium\security\Hash::calculate()`.
 	 * @link http://php.net/function.hash.php PHP Manual: `hash()`
 	 * @link http://php.net/function.hash-hmac.php PHP Manual: `hash_hmac()`
 	 * @link http://php.net/function.hash-algos.php PHP Manual: `hash_algos()`
@@ -89,6 +101,7 @@ class String {
 	/**
 	 * Compares two strings in constant time to prevent timing attacks.
 	 *
+	 * @deprecated Replaced by `lithium\security\Hash::compare()`.
 	 * @param string $known The string of known length to compare against.
 	 * @param string $user The user-supplied string.
 	 * @return boolean Returns a boolean indicating whether the two strings are equal.
@@ -104,6 +117,7 @@ class String {
 	/**
 	 * Generates an RFC 4122-compliant version 4 UUID.
 	 *
+	 * @deprecated Replaced by `lithium\util\Text::uuid()`.
 	 * @return string The string representation of an RFC 4122-compliant, version 4 UUID.
 	 * @link http://www.ietf.org/rfc/rfc4122.txt RFC 4122: UUID URN Namespace
 	 */
@@ -119,6 +133,7 @@ class String {
 	 * Replaces variable placeholders inside a string with any given data. Each key
 	 * in the `$data` array corresponds to a variable placeholder name in `$str`.
 	 *
+	 * @deprecated Replaced by `lithium\util\Text::insert()`.
 	 * @param string $str A string containing variable place-holders.
 	 * @param array $data A key, value array where each key stands for a place-holder variable
 	 *                     name to be replaced with value.
@@ -138,6 +153,7 @@ class String {
 	 * on the `'clean'` option. The goal of this function is to replace all whitespace
 	 * and unneeded mark-up around place-holders that did not get replaced by `String::insert()`.
 	 *
+	 * @deprecated Replaced by `lithium\util\Text::clean()`.
 	 * @param string $str The string to clean.
 	 * @param array $options
 	 * @return string The cleaned string.
@@ -153,6 +169,7 @@ class String {
 	/**
 	 * Extract a part of a string based on a regular expression `$regex`.
 	 *
+	 * @deprecated Replaced by `lithium\util\Text::extract()`.
 	 * @param string $regex The regular expression to use.
 	 * @param string $str The string to run the extraction on.
 	 * @param integer $index The number of the part to return based on the regex.
@@ -171,6 +188,7 @@ class String {
 	 * `$options['separator']` that appear between `$options['leftBound']` and
 	 * `$options['rightBound']`.
 	 *
+	 * @deprecated Replaced by `lithium\util\Text::tokenize()`.
 	 * @param string $data The data to tokenize.
 	 * @param array $options
 	 * @return array Returns an array of tokens.

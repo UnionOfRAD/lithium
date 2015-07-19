@@ -91,15 +91,14 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		}
 		static::$_isRunning = true;
 		static::$_runOptions = $config + $defaults;
-		$self = get_called_class();
 
-		$trap = function($code, $message, $file, $line = 0, $context = null) use ($self) {
+		$trap = function($code, $message, $file, $line = 0, $context = null) {
 			$trace = debug_backtrace();
 			$trace = array_slice($trace, 1, count($trace));
-			$self::handle(compact('type', 'code', 'message', 'file', 'line', 'trace', 'context'));
+			static::handle(compact('type', 'code', 'message', 'file', 'line', 'trace', 'context'));
 		};
 
-		$convert = function($code, $message, $file, $line = 0, $context = null) use ($self) {
+		$convert = function($code, $message, $file, $line = 0, $context = null) {
 			throw new ErrorException($message, 500, $code, $file, $line);
 		};
 
@@ -155,21 +154,19 @@ class ErrorHandler extends \lithium\core\StaticObject {
 				return preg_match($config['message'], $info['message']);
 			}
 		);
-		$self = get_called_class();
-
-		static::$_exceptionHandler = function($exception, $return = false) use ($self) {
+		static::$_exceptionHandler = function($exception, $return = false) {
 			if (ob_get_length()) {
 				ob_end_clean();
 			}
 			$info = compact('exception') + array(
 				'type' => get_class($exception),
-				'stack' => $self::trace($exception->getTrace())
+				'stack' => static::trace($exception->getTrace())
 			);
 			foreach (array('message', 'file', 'line', 'trace') as $key) {
 				$method = 'get' . ucfirst($key);
 				$info[$key] = $exception->{$method}();
 			}
-			return $return ? $info : $self::handle($info);
+			return $return ? $info : static::handle($info);
 		};
 	}
 
@@ -306,4 +303,5 @@ class ErrorHandler extends \lithium\core\StaticObject {
 }
 
 ErrorHandler::reset();
+
 ?>

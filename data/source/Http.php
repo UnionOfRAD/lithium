@@ -292,7 +292,6 @@ class Http extends \lithium\data\Source {
 			list($query, $options) = $params;
 			return $self->send($query, $options);
 		});
-
 	}
 
 	/**
