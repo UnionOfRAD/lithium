@@ -156,8 +156,8 @@ class FormSignature {
 	 * Calculates signature over given data.
 	 *
 	 * Will first derive a signing key from the secret key and current date, then
-	 * calculating HMAC over given data. This process is modelled after Amazon's
-	 * _Message Singature Version 4_ but uses less key derivations as we don't have
+	 * calculate the HMAC over given data. This process is modelled after Amazon's
+	 * _Message Signature Version 4_ but uses less key derivations as we don't have
 	 * more information at our hands.
 	 *
 	 * During key derivation the strings `li3,1` and `li3,1_form` are inserted. `1`

@@ -227,7 +227,7 @@ class ModelTest extends \lithium\test\Unit {
 
 		$this->assertArrayHasKey('MockCreator', MockSubProduct::relations());
 
-		$this->assertCount(3, MockSubProduct::finders());
+		$this->assertCount(4, MockSubProduct::finders());
 
 		$this->assertCount(1, MockSubProduct::initializers());
 

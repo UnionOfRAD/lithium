@@ -294,14 +294,13 @@ class Route extends \lithium\core\Object {
 	}
 
 	/**
-	 * Matches a set of parameters against the route, and returns a URL string if the route matches
-	 * the parameters, or false if it does not match.
+	 * Matches a set of parameters against the route, and returns a URL string
+	 * if the route matches the parameters.
 	 *
 	 * @param array $options
-	 * @param string $context
-	 * @return mixed
+	 * @return string|boolean URL string on success, else `false` if the route didn't match.
 	 */
-	public function match(array $options = array(), $context = null) {
+	public function match(array $options = array()) {
 		$defaults = array('action' => 'index', 'http:method' => 'GET');
 		$query = null;
 

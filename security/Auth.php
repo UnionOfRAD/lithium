@@ -117,6 +117,8 @@ class Auth extends \lithium\core\Adaptable {
 	 *                user information is, by default, written to the session. Set this to `false`
 	 *                to disable session writing for this authentication check.
 	 *              - `'persist'` _array_: A list of fields that should be stored in the session.
+	 *                If no list is provided will store all fields in the session except
+	 *                the `'password'` field.
 	 * @return array After a successful credential check against the adapter (or a successful
 	 *         lookup against the current session), returns an array of user information from the
 	 *         storage backend used by the configured adapter.

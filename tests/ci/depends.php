@@ -177,7 +177,7 @@ class PhpExtensions {
 		$folder = basename($folder, '.tar.gz');
 
 		$message  = 'sh -c "cd %s && phpize && ./configure %s ';
-		$message .= '&& make && sudo make install" > /dev/null 2>&1';
+		$message .= '&& make && make install" > /dev/null 2>&1';
 		static::_system(sprintf(
 			$message, $folder, implode(' ', $data['configure'])
 		));

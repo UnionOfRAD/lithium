@@ -253,29 +253,23 @@ class Set {
 	 * @return array An array of matched items.
 	 */
 	public static function extract(array $data, $path = null, array $options = array()) {
+		$defaults = array('flatten' => true);
+		$options += $defaults;
+
 		if (!$data) {
 			return array();
 		}
-
-		if (is_string($data)) {
-			$tmp = $path;
-			$path = $data;
-			$data = $tmp;
-			unset($tmp);
-		}
-
 		if ($path === '/') {
 			return array_filter($data, function($data) {
 				return ($data === 0 || $data === '0' || !empty($data));
 			});
 		}
 		$contexts = $data;
-		$defaults = array('flatten' => true);
-		$options += $defaults;
 
 		if (!isset($contexts[0])) {
 			$contexts = array($data);
 		}
+
 		$tokens = array_slice(preg_split('/(?<!=)\/(?![a-z-]*\])/', $path), 1);
 
 		do {
@@ -352,7 +346,7 @@ class Set {
 						);
 					}
 				} elseif (
-					$key === $token || (ctype_digit($token) && $key == $token) || $token === '.'
+					$key === $token || (is_numeric($token) && $key == $token) || $token === '.'
 				) {
 					$context['trace'][] = $key;
 					$matches[] = array(
@@ -380,7 +374,7 @@ class Set {
 			if (empty($tokens)) {
 				break;
 			}
-		} while (1);
+		} while (true);
 
 		$r = array();
 

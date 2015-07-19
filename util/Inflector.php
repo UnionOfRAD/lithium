@@ -179,8 +179,9 @@ class Inflector {
 			'leaf' => 'leaves', 'money' => 'monies', 'mongoose' => 'mongooses', 'move' => 'moves',
 			'mythos' => 'mythoi', 'numen' => 'numina', 'occiput' => 'occiputs',
 			'octopus' => 'octopuses', 'opus' => 'opuses', 'ox' => 'oxen', 'penis' => 'penises',
-			'person' => 'people', 'sex' => 'sexes', 'soliloquy' => 'soliloquies',
-			'testis' => 'testes', 'trilby' => 'trilbys', 'turf' => 'turfs'
+			'person' => 'people', 'sex' => 'sexes', 'sleeve' => 'sleeves',
+			'soliloquy' => 'soliloquies', 'tax' => 'taxes', 'testis' => 'testes',
+			'trilby' => 'trilbys', 'turf' => 'turfs'
 		),
 		'uninflected' => array(
 			'.*[nrlm]ese', '.*deer', '.*fish', '.*measles', '.*ois', '.*pox', '.*sheep'

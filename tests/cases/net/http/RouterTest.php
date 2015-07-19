@@ -233,7 +233,6 @@ class RouterTest extends \lithium\test\Unit {
 				'controller' => 'posts', 'action' => 'view', 'id' => '4bbf25bd8ead0e5180130000'
 			));
 		});
-		$this->assertIdentical(0, ob_get_length());
 	}
 
 	public function testShorthandParameterMatching() {

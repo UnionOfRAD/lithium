@@ -687,6 +687,56 @@ class RouteTest extends \lithium\test\Unit {
 		$this->assertEqual("/posts", $url);
 	}
 
+	public function testRouteMatchParseSymmetryWithoutTrimming() {
+		$route = new Route(array(
+			'template' => '/{:language:(de|en)}/{:country:(DE|NL)}/home',
+			'params' => array('controller' => 'pages', 'action' => 'home'),
+			'defaults' => array(
+				'language' => 'de',
+				'country' => 'DE'
+			)
+		));
+
+		$params = array(
+			'controller' => 'pages', 'action' => 'home',
+			'language' => 'en', 'country' => 'DE'
+		);
+		$url = $route->match($params);
+
+		$this->assertEqual('/en/DE/home', $url);
+
+		$request = new Request();
+		$request->url = $url;
+
+		$result = $route->parse($request);
+		$this->assertEqual($params, $result->params);
+	}
+
+	public function testRouteMatchParseSymmetryWithRootTrimming() {
+		$route = new Route(array(
+			'template' => '/{:language:(de|en)}/{:country:(DE|NL)}',
+			'params' => array('controller' => 'pages', 'action' => 'home', 'country' => true),
+			'defaults' => array(
+				'language' => 'de',
+				'country' => 'DE'
+			)
+		));
+
+		$params = array(
+			'controller' => 'pages', 'action' => 'home',
+			'language' => 'en', 'country' => 'DE'
+		);
+		$url = $route->match($params);
+
+		$this->assertEqual('/en', $url);
+
+		$request = new Request();
+		$request->url = $url;
+
+		$result = $route->parse($request);
+		$this->assertEqual($params, $result->params);
+	}
+
 	public function testUrlEncodedArgs() {
 		$route = new Route(array(
 			'template' => '/{:controller}/{:action}/{:args}',

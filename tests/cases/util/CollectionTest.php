@@ -464,7 +464,6 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertTrue($collection->respondsTo('foobar'));
 		$this->assertFalse($collection->respondsTo('foobarbaz'));
 	}
-
 }
 
 ?>
