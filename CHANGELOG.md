@@ -48,9 +48,6 @@
 
 ### Changed
     
-- Database encoding, timezone, and searchPath methods may now throw exceptions. Please
-  wrap code calling these methods directly in try/catch blocks - if needed. #1172
-  (David Persson)
 - The String class has been renamed to `Text` while RNG and hashing functionality 
   have been extracted into `lithium\security\Random` and `lithium\security\Hash`. #1184 (David Persson)
 
@@ -72,6 +69,12 @@
   | `lithium\util\String::clean()` | `lithium\util\Text::clean()` |
   | `lithium\util\String::extract()` | `lithium\util\Text::extract()` |
   | `lithium\util\String::tokenize()` | `lithium\util\Text::tokenize()` |
+
+### Backwards Incompatible Changes
+
+- Database encoding, timezone, and searchPath methods may now throw exceptions. Please
+  wrap code calling these methods directly in try/catch blocks - if needed. #1172
+  (David Persson)
 
 ## v1.0.0
 
