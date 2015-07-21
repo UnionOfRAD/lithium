@@ -88,28 +88,24 @@ class Libraries {
 	protected static $_paths = array(
 		'adapter' => array(
 			'{:library}\extensions\adapter\{:namespace}\{:class}\{:name}',
-			'{:library}\{:namespace}\{:class}\adapter\{:name}' => array('libraries' => 'lithium')
+			'{:library}\{:namespace}\{:class}\adapter\{:name}'
 		),
 		'command' => array(
 			'{:library}\extensions\command\{:namespace}\{:class}\{:name}',
-			'{:library}\console\command\{:namespace}\{:class}\{:name}' => array(
-				'libraries' => 'lithium'
-			)
+			'{:library}\console\command\{:namespace}\{:class}\{:name}'
 		),
 		'controllers' => array(
 			'{:library}\controllers\{:namespace}\{:class}\{:name}Controller'
 		),
 		'data' => array(
 			'{:library}\extensions\data\{:namespace}\{:class}\{:name}',
-			'{:library}\data\{:namespace}\{:class}\adapter\{:name}' => array(
-				'libraries' => 'lithium'
-			),
-			'{:library}\data\{:namespace}\{:class}\{:name}' => array('libraries' => 'lithium'),
-			'{:library}\data\{:class}\adapter\{:name}' => array('libraries' => 'lithium')
+			'{:library}\data\{:namespace}\{:class}\adapter\{:name}',
+			'{:library}\data\{:namespace}\{:class}\{:name}',
+			'{:library}\data\{:class}\adapter\{:name}'
 		),
 		'helper' => array(
 			'{:library}\extensions\helper\{:name}',
-			'{:library}\template\helper\{:name}' => array('libraries' => 'lithium')
+			'{:library}\template\helper\{:name}'
 		),
 		'libraries' => array(
 			'{:app}/libraries/{:name}',
@@ -121,7 +117,7 @@ class Libraries {
 		'strategy' => array(
 			'{:library}\extensions\strategy\{:namespace}\{:class}\{:name}',
 			'{:library}\extensions\strategy\{:class}\{:name}',
-			'{:library}\{:namespace}\{:class}\strategy\{:name}' => array('libraries' => 'lithium')
+			'{:library}\{:namespace}\{:class}\strategy\{:name}'
 		),
 		'socket' => array(
 			'{:library}\extensions\net\socket\{:name}',
@@ -130,7 +126,7 @@ class Libraries {
 		),
 		'test' => array(
 			'{:library}\extensions\test\{:namespace}\{:class}\{:name}',
-			'{:library}\test\{:namespace}\{:class}\{:name}' => array('libraries' => 'lithium')
+			'{:library}\test\{:namespace}\{:class}\{:name}'
 		),
 		'tests' => array(
 			'{:library}\tests\{:namespace}\{:class}\{:name}Test'

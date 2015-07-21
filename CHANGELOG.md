@@ -4,6 +4,39 @@
 
 ### Fixed
 
+- Restrictions on library search paths for i.e. adapters inside non-core libraries have been
+  relaxed. This fixes an inconvenience where adapters (and other classes) always had to be placed
+  under the `extensions` directory. Even in cases where it didn't feel natural to put them there.
+
+  This is best demonstrated using the `li3_access` plugin as an example. This plugin
+  defines a new adaptable class (`security\Access`).
+
+  Before:
+  ```
+  li3_access
+  ├── security
+  │   ├── Access.php
+  │   └── access
+  │       └── Adapter.php
+  └── extensions
+      └── adapter
+          └── access
+              ├── Resources.php
+              └── Rules.php
+  ```
+
+  After:
+  ```
+  li3_access
+  └── security
+      ├── Access.php
+      └── access
+          ├── Adapter.php
+          └── adapter
+              ├── Resources.php
+              └── Rules.php
+  ```
+
 ### Improved
 
 - Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
