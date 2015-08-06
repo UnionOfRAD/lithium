@@ -73,10 +73,9 @@ class TestTest extends \lithium\test\Unit {
 		$command->format = 'foobar';
 		$path = LITHIUM_LIBRARY_PATH . '/bob/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
-		$expected = "No library found in path `";
-		$expected .= LITHIUM_LIBRARY_PATH . "/bob/tests/mocks/test/cases/MockTest.php`.\n";
+		$expected = '#^(No library found in path `.*`\.|Path `.*` not found\.)#i';
 		$result = $command->response->error;
-		$this->assertEqual($expected, $result);
+		$this->assertPattern($expected, $result);
 	}
 
 	public function testRunWithInvalidHandler() {

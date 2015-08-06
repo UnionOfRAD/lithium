@@ -4,9 +4,15 @@
  * Bootstrap.
  */
 define('LITHIUM_APP_PATH', dirname(__DIR__));
-define('LITHIUM_LIBRARY_PATH', dirname(LITHIUM_APP_PATH) . '/libraries');
+define('LITHIUM_LIBRARY_PATH', dirname(__DIR__) . '/libraries');
 
-include __DIR__ . '/libraries.php';
+include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php';
+
+use lithium\core\Libraries;
+
+Libraries::add('lithium');
+Libraries::add('app', array('default' => true));
+Libraries::add('li3_fixtures');
 
 /*
  * Setup test databases.
