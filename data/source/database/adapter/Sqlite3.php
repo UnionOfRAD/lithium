@@ -177,8 +177,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$result = $self->invokeMethod('_execute', array($sql));
 			$sources = array();
 
-			while ($data = $result->next()) {
-				$sources[] = reset($data);
+			foreach ($result as $row) {
+				$sources[] = $row[0];
 			}
 			return $sources;
 		});
@@ -294,7 +294,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @see lithium\data\source\Database::renderCommand()
 	 * @param string $sql The sql string to execute
 	 * @param array $options No available options.
-	 * @return resource
+	 * @return \lithium\data\source\Result Returns a result object if the query was successful.
 	 * @filter
 	 */
 	protected function _execute($sql, array $options = array()) {

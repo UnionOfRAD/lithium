@@ -641,7 +641,7 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_db->order(array("title" => "desc"), $query);
-		$expected = 'ORDER BY {MockDatabasePost}.{title} desc';
+		$expected = 'ORDER BY {MockDatabasePost}.{title} DESC';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->_db->order(array("title" => "dasc"), $query);
@@ -1094,8 +1094,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		$query = new Query(array(
 			'type' => 'read', 'model' => $this->_model
 		));
-		$result = $this->_db->group(array('id' => 'ASC'), $query);
-		$expected = 'GROUP BY {MockDatabasePost}.{id} ASC';
+		$result = $this->_db->group(array('id'), $query);
+		$expected = 'GROUP BY {MockDatabasePost}.{id}';
 		$this->assertEqual($expected, $result);
 	}
 
@@ -1830,24 +1830,34 @@ SQL;
 	}
 
 	public function testHasManyRelationsWithLimitAndWithoutConditions() {
-		$data = new MockResult(array(
-			'records' => array(
-				array(
-					'1',
-					'2',
-					'Post title',
-					'2014-10-12 01:39:00',
-					'3',
-					'1',
-					'2',
-					'Very good post',
-					'2014-10-12 01:39:00',
-				)
-			)
-		));
-		$this->_db->return = array(
-			'_execute' => $data
-		);
+		$this->_db->return['_execute'] = function($sql) {
+			if (strpos($sql, 'SELECT DISTINCT') === 0) {
+				return new MockResult(array(
+					'records' => array(
+						array(1),
+						array(2)
+					)
+				));
+			} else {
+				return new MockResult(array(
+					'records' => array(
+						array(
+							'1',
+							'2',
+							'Post title',
+							'2014-10-12 01:39:00',
+							'3',
+							'1',
+							'2',
+							'Very good post',
+							'2014-10-12 01:39:00',
+						)
+					)
+				));
+
+			}
+		};
+
 		$query = new Query(array(
 			'type' => 'read',
 			'model' => $this->_model,
@@ -1855,6 +1865,7 @@ SQL;
 			'limit' => 3,
 		));
 		$result = $this->_db->read($query, array('return' => 'array'));
+
 		$expected = array(array(
 			'id' => '1',
 			'author_id' => '2',

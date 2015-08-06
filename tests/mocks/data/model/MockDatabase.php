@@ -91,6 +91,9 @@ class MockDatabase extends \lithium\data\source\Database {
 			$this->logs[] = $sql;
 		}
 		if (isset($this->return['_execute'])) {
+			if (is_callable($this->return['_execute'])) {
+				return $this->return['_execute']($sql);
+			}
 			return $this->return['_execute'];
 		}
 		return new MockResult();

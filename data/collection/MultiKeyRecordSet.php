@@ -216,26 +216,6 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 		return parent::map($filter, $options);
 	}
 
-	/**
-	 * Extract the next item from the result ressource and wraps it into a `Record` object.
-	 *
-	 * @return mixed Returns the next `Record` if exists. Returns `null` otherwise
-	 */
-	protected function _populate() {
-		if ($this->closed() || !$this->_result->valid()) {
-			return;
-		}
-
-		$data = $this->_result->current();
-		if ($this->_query) {
-			$data = $this->_mapRecord($data);
-		}
-		$result = $this->_set($data, null, array('exists' => true));
-		$this->_result->next();
-
-		return $result;
-	}
-
 	protected function _set($data = null, $offset = null, $options = array()) {
 		if ($model = $this->_model) {
 			$options += array('defaults' => false);
@@ -261,6 +241,38 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 		$this->_data[] = $data;
 		$this->_index[] = $key;
 		return $data;
+	}
+
+	/**
+	 * Extracts the numerical indices of the primary keys in numerical indexed row data.
+	 * Works only for the main row data and not for relationship rows.
+	 *
+	 * This method will also correctly detect primary keys which don't come
+	 * first or are in sequential order.
+	 *
+	 * @return array An array where key are index and value are primary key fieldname.
+	 */
+	protected function _keyIndex() {
+		if (!($model = $this->_model) || !isset($this->_columns[''])) {
+			return array();
+		}
+		$index = 0;
+
+		foreach ($this->_columns as $name => $fields) {
+			if ($name === '') {
+				$flip = array_flip($fields);
+
+				$keys = array_flip($model::meta('key'));
+				$keys = array_intersect_key($flip, $keys);
+
+				foreach ($keys as &$key) {
+					$key += $index;
+				}
+				return array_flip($keys);
+			}
+			$index += count($fields);
+		}
+		return array();
 	}
 }
 

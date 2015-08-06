@@ -9,7 +9,9 @@
 namespace lithium\tests\mocks\data;
 
 class MockCollection extends \lithium\data\Collection {
+
 	protected function _populate() {}
+
 	protected function _set($data = null, $offset = null, $options = array()) {
 		$this->_data[$offset] = $data;
 		return $data;

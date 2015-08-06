@@ -13,56 +13,34 @@ use PDOStatement;
 use PDOException;
 
 /**
- * This class is a wrapper around the database result
- * returned and can be used to iterate over it.
+ * This is the result class for all PDO based databases. It needs a `PDOStatement` as
+ * a resource to operate on. Results will be fetched using `PDO::FETCH_NUM` as a numerically
+ * indexed array.
  *
- * It also provides a simple caching mechanism which stores the result after the first load.
- * You are then free to iterate over the result back and forth through the provided methods
- * and don't have to think about hitting the database too often.
- *
- * On initialization, it needs a `PDOStatement` to operate on. You are then free to use all
- * methods provided by the `Iterator` interface.
- *
- * @link http://php.net/class.pdostatement.php The PDOStatement class.
- * @link http://php.net/class.iterator.php The Iterator interface.
+ * @link http://php.net/manual/class.pdostatement.php The PDOStatement class.
  */
 class Result extends \lithium\data\source\Result {
 
 	/**
-	 * Controls whether PDO::FETCH_NAMED or PDO::FETCH_NUM is used. Defaults
-	 * to `false` thus PDO::FETCH_NUM is used.
+	 * Fetches the next result from the resource.
 	 *
-	 * @var boolean
+	 * @return array|boolean|null Returns a key/value pair for the next result,
+	 *         `null` if there is none, `false` if something bad happened.
 	 */
-	public $named = false;
-
-	/**
-	 * Fetches the result from the resource and caches it.
-	 *
-	 * @return boolean Return `true` on success or `false` if it is not valid.
-	 */
-	protected function _fetchFromResource() {
-		if ($this->_resource instanceof PDOStatement) {
-			try {
-				$mode = $this->named ? PDO::FETCH_NAMED : PDO::FETCH_NUM;
-				if ($result = $this->_resource->fetch($mode)) {
-					$this->_key = $this->_iterator;
-					$this->_current = $this->_cache[$this->_iterator++] = $result;
-					return true;
-				}
-			} catch (PDOException $e) {}
+	protected function _fetch() {
+		if (!$this->_resource instanceof PDOStatement) {
+			$this->close();
+			return false;
 		}
-		$this->_resource = null;
-		return false;
-	}
-
-	/**
-	 * Destructor.
-	 *
-	 * @return void
-	 */
-	public function __destruct() {
-		$this->close();
+		try {
+			if ($result = $this->_resource->fetch(PDO::FETCH_NUM)) {
+				return array($this->_iterator++, $result);
+			}
+		} catch (PDOException $e) {
+			$this->close();
+			return false;
+		}
+		return null;
 	}
 }
 

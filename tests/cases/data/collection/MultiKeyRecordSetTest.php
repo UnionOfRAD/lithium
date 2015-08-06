@@ -654,37 +654,6 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 		$this->assertEqual(4, $counter);
 	}
 
-	public function testRewindResourceOnConstruct() {
-		$result = new MockResult(array('records' => $this->_records));
-
-		$model = $this->_model;
-
-		$cpt = 0;
-		while ($result->valid()) {
-			$result->current();
-			$result->next();
-			$cpt++;
-		}
-		$this->assertEqual(4, $cpt);
-
-		$cpt = 0;
-		foreach ($result as $value) {
-			$cpt++;
-		}
-		$this->assertEqual(4, $cpt);
-		$result->rewind();
-
-		$recordSet = new MockMultiKeyRecordSet(compact('result', 'model'));
-		$expected = array(
-			1 => array('id' => 1, 'data' => 'data1'),
-			2 => array('id' => 2, 'data' => 'data2'),
-			3 => array('id' => 3, 'data' => 'data3'),
-			4 => array('id' => 4, 'data' => 'data4')
-		);
-		$result = $recordSet->to('array');
-		$this->assertEqual($expected, $result);
-	}
-
 	public function testMockResultContent() {
 		$result = new MockResult(array('records' => array()));
 
@@ -868,7 +837,6 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 	}
 
 	public function testRecordWithCombinedPkAndLazyLoading() {
-
 		$records = array(
 			array('client_id' => 1, 'invoice_id' => 4, 'title' => 'Payment1'),
 			array('client_id' => 2, 'invoice_id' => 5, 'title' => 'Payment2'),
@@ -900,11 +868,7 @@ class MultiKeyRecordSetTest extends \lithium\test\Unit {
 
 		$this->assertCount(4, $payments->get('_data'));
 
-		$this->assertTrue($payments->reset());
-		$this->assertCount(0, $payments->get('_data'));
-
 		$this->assertEqual($records, $payments->to('array'));
-
 		$expected = '[{"client_id":1,"invoice_id":4,"title":"Payment1"},';
 		$expected .= '{"client_id":2,"invoice_id":5,"title":"Payment2"},';
 		$expected .= '{"client_id":2,"invoice_id":6,"title":"Payment3"},';

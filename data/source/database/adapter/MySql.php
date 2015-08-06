@@ -197,8 +197,8 @@ class MySql extends \lithium\data\source\Database {
 			}
 			$sources = array();
 
-			while ($data = $result->next()) {
-				$sources[] = array_shift($data);
+			foreach ($result as $row) {
+				$sources[] = $row[0];
 			}
 			return $sources;
 		});
@@ -349,7 +349,7 @@ class MySql extends \lithium\data\source\Database {
 	 *        - 'buffered': If set to `false` uses mysql_unbuffered_query which
 	 *          sends the SQL query query to MySQL without automatically fetching and buffering the
 	 *          result rows as `mysql_query()` does (for less memory usage).
-	 * @return resource Returns the result resource handle if the query is successful.
+	 * @return \lithium\data\source\Result Returns a result object if the query was successful.
 	 * @filter
 	 */
 	protected function _execute($sql, array $options = array()) {
@@ -382,9 +382,8 @@ class MySql extends \lithium\data\source\Database {
 	 *         bound to a sequence.
 	 */
 	protected function _insertId($query) {
-		$resource = $this->_execute('SELECT LAST_INSERT_ID() AS insertID');
-		list($id) = $resource->next();
-		return ($id && $id !== '0') ? $id : null;
+		$row = $this->_execute('SELECT LAST_INSERT_ID() AS insertID')->current();
+		return ($row[0] && $row[0] !== '0') ? $row[0] : null;
 	}
 
 	/**
