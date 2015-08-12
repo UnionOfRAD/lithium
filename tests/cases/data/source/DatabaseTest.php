@@ -727,6 +727,13 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($sql, $this->_db->renderCommand($query));
 
 		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => array(
+			'score' => array('not between' => array(90, 100))
+		)));
+		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ({score} ";
+		$sql .= "NOT BETWEEN 90 AND 100);";
+		$this->assertEqual($sql, $this->_db->renderCommand($query));
+
+		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => array(
 			'score' => array('>' => 90, '<' => 100)
 		)));
 		$sql = "SELECT * FROM {mock_database_posts} AS {MockDatabasePost} WHERE ";
