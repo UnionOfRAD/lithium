@@ -72,6 +72,36 @@ class File extends \lithium\storage\cache\Adapter {
 	}
 
 	/**
+	 * Generates safe cache keys.
+	 *
+	 * Keys should be safe to be used as filename. So we conservatively disallalow
+	 * any non alphanumeric characters with the exception of dash und underscore.
+	 *
+	 * We also limit to max. 255 characters. The limit is actually lowered
+	 * to 255 minus the length of an crc32b hash minus separator (246)
+	 * minus scope length minus separator (246 - x).
+	 *
+	 * 255 was chosen as most commonly used filesystems (ext2-4, HFS+,
+	 * NTFS, XFS, FAT32, btrfs) limit filename characters to a length of
+	 * 255.
+	 *
+	 * @link https://en.wikipedia.org/wiki/Comparison_of_file_systems#Limits
+	 * @param array $keys The original keys.
+	 * @return array Keys modified and safe to use with adapter.
+	 */
+	public function key(array $keys) {
+		$length = 246 - ($this->_config['scope'] ? strlen($this->_config['scope']) + 1 : 0);
+
+		return array_map(
+			function($key) use ($length) {
+				$result = substr(preg_replace('/[^a-z0-9_\-]/iu', '_', $key), 0, $length);
+				return $result !== $key ? $result . '_' . hash('crc32b', $key) : $result;
+			},
+			$keys
+		);
+	}
+
+	/**
 	 * Write values to the cache. All items to be cached will receive an
 	 * expiration time of `$expiry`.
 	 *

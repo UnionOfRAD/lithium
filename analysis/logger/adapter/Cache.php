@@ -80,11 +80,13 @@ class Cache extends \lithium\core\Object {
 		$config = $this->_config + $this->_classes;
 
 		return function($self, $params) use ($config) {
-			$params += array('timestamp' => strtotime('now'));
-			$key = $config['key'];
-			$key = is_callable($key) ? $key($params) : String::insert($key, $params);
-
 			$cache = $config['cache'];
+			$params += array('timestamp' => strtotime('now'));
+
+			if (!is_callable($key = $config['key'])) {
+				$key = function($data) use ($key) { return String::insert($key, $data); };
+			}
+			$key = $cache::key($config['config'], $key, $params);
 			return $cache::write($config['config'], $key, $params['message'], $config['expiry']);
 		};
 	}
