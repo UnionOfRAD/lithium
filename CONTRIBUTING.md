@@ -22,7 +22,7 @@ your code pushed to the core:
 
 As always, all contributions are important, and we're very grateful for the help
 of all those who have gotten us this far. If you're interested in helping out,
-but feel you could use a little coaching, be sure to drop by `#li3-core` and
+but feel you could use a little coaching, be sure to message us and
 introduce yourself -- we'd love to help you get started.
 
 You may also want to review the full [development
