@@ -40,6 +40,7 @@
 ### Improved
 
 - Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
+- `Database` now supports the `NOT BETWEEN` operator. #1208 (Eric Cholis)
 
 ### Added
 
