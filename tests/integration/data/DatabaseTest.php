@@ -467,6 +467,22 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 			$ids[] = $result->d__id;
 		}
 	}
+
+	/**
+	 * Tests that even when using a subquery the correct
+	 * number of records is returned.
+	 *
+	 * @link https://github.com/UnionOfRAD/lithium/issues/1209
+	 */
+	public function testSubqueryWithMultipleRecords() {
+		$results = Galleries::find('all', array(
+			'fields' => array(
+				'name',
+				'(SELECT 23) AS number'
+			)
+		));
+		$this->assertEqual(2, $results->count());
+	}
 }
 
 ?>
