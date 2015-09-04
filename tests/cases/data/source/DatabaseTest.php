@@ -1003,6 +1003,18 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual("HAVING CUSTOM", $this->_db->having("CUSTOM", $query));
 	}
 
+	/**
+	 * Verifies that setting options using a raw SQL string works, when
+	 * the operation returns no result.
+	 *
+	 * @link https://github.com/UnionOfRAD/lithium/issues/1210
+	 */
+	public function testRawOptionSettingWithNoResultResource() {
+		$expected = array();
+		$result = $this->_db->read('SET SESSION group_concat_max_len = 100000;');
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testRelationshipGeneration() {
 		$comment = 'lithium\tests\mocks\data\model\MockDatabaseComment';
 
