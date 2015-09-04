@@ -29,8 +29,11 @@ class DatabaseTest extends \lithium\test\Unit {
 	protected $_configs = array();
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDatabasePost';
+
 	protected $_comment = 'lithium\tests\mocks\data\model\MockDatabaseComment';
+
 	protected $_gallery = 'lithium\tests\mocks\data\model\MockGallery';
+
 	protected $_imageTag = 'lithium\tests\mocks\data\model\MockImageTag';
 
 	public function setUp() {
@@ -1008,6 +1011,18 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEmpty($this->_db->having(5, $query));
 		$this->assertEmpty($this->_db->having(null, $query));
 		$this->assertEqual("HAVING CUSTOM", $this->_db->having("CUSTOM", $query));
+	}
+
+	/**
+	 * Verifies that setting options using a raw SQL string works, when
+	 * the operation returns no result.
+	 *
+	 * @link https://github.com/UnionOfRAD/lithium/issues/1210
+	 */
+	public function testRawOptionSettingWithNoResultResource() {
+		$expected = array();
+		$result = $this->_db->read('SET SESSION group_concat_max_len = 100000;');
+		$this->assertEqual($expected, $result);
 	}
 
 	public function testRelationshipGeneration() {

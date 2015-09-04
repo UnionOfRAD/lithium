@@ -29,8 +29,6 @@ use lithium\tests\mocks\data\model\MockDatabase;
 
 class ModelTest extends \lithium\test\Unit {
 
-	protected $_model = 'lithium\tests\mocks\data\MockModelCompositePk';
-
 	protected $_altSchema = null;
 
 	public function setUp() {
@@ -460,7 +458,7 @@ class ModelTest extends \lithium\test\Unit {
 
 		$this->assertNull(MockPost::key(array()));
 
-		$model = $this->_model;
+		$model = 'lithium\tests\mocks\data\MockModelCompositePk';
 		$this->assertNull($model::key(array('client_id' => 3)));
 
 		$result = $model::key(array('invoice_id' => 5, 'payment' => '100'));

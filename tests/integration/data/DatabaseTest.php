@@ -32,7 +32,7 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 	public function skip() {
 		parent::connect($this->_connection);
 		if (!class_exists('li3_fixtures\test\Fixtures')) {
-			$this->skipIf(true, "These tests need `'li3_fixtures'` to be runned.");
+			$this->skipIf(true, 'Need `li3_fixtures` to run tests.');
 		}
 		$this->skipIf(!$this->with(array('MySql', 'PostgreSql', 'Sqlite3')));
 		$this->_export = Libraries::path('lithium\tests\fixture\model\gallery\export', array(
@@ -466,6 +466,22 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 			$this->assertNotContains($result->d__id, $ids);
 			$ids[] = $result->d__id;
 		}
+	}
+
+	/**
+	 * Tests that even when using a subquery the correct
+	 * number of records is returned.
+	 *
+	 * @link https://github.com/UnionOfRAD/lithium/issues/1209
+	 */
+	public function testSubqueryWithMultipleRecords() {
+		$results = Galleries::find('all', array(
+			'fields' => array(
+				'name',
+				'(SELECT 23) AS number'
+			)
+		));
+		$this->assertEqual(2, $results->count());
 	}
 }
 

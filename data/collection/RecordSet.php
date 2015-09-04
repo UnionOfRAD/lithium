@@ -38,7 +38,7 @@ class RecordSet extends \lithium\data\Collection {
 
 	/**
 	 * Precompute index of the main model primary key(s) which allow to find
-	 * values directly is result data without the column name matching process.
+	 * values directly in result data without the column name matching process.
 	 *
 	 * @var array
 	 */
@@ -257,7 +257,10 @@ class RecordSet extends \lithium\data\Collection {
 
 		foreach ($this->_columns as $name => $fields) {
 			if ($name === '') {
-				return array($index => $model::meta('key'));
+				if (($offset = array_search($model::meta('key'), $fields)) === false) {
+					return array();
+				}
+				return array($index + $offset => $model::meta('key'));
 			}
 			$index += count($fields);
 		}
