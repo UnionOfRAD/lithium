@@ -32,7 +32,7 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 	public function skip() {
 		parent::connect($this->_connection);
 		if (!class_exists('li3_fixtures\test\Fixtures')) {
-			$this->skipIf(true, "These tests need `'li3_fixtures'` to be runned.");
+			$this->skipIf(true, 'Need `li3_fixtures` to run tests.');
 		}
 		$this->skipIf(!$this->with(array('MySql', 'PostgreSql', 'Sqlite3')));
 		$this->_export = Libraries::path('lithium\tests\fixture\model\gallery\export', array(

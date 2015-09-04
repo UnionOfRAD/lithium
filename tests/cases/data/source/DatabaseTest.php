@@ -29,8 +29,11 @@ class DatabaseTest extends \lithium\test\Unit {
 	protected $_configs = array();
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDatabasePost';
+
 	protected $_comment = 'lithium\tests\mocks\data\model\MockDatabaseComment';
+
 	protected $_gallery = 'lithium\tests\mocks\data\model\MockGallery';
+
 	protected $_imageTag = 'lithium\tests\mocks\data\model\MockImageTag';
 
 	public function setUp() {

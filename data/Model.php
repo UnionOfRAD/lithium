@@ -510,8 +510,8 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Enables magic finders. These are syntactic-sugar like which allows to i.e. use
-	 * `Model::all()` instead  of `Model::find('all')`.
+	 * Enables magic finders. These provide some syntactic-sugar which allows
+	 * to i.e. use `Model::all()` instead  of `Model::find('all')`.
 	 *
 	 * ```
 	 * // Retrieves post with id `23` using the `'first'` finder.
@@ -659,7 +659,7 @@ class Model extends \lithium\core\StaticObject {
 	 *          page starts at `1`.
 	 * @return mixed The result/s of the find. Actual result depends on the finder being used. Most
 	 *         is an instance of `lithium\data\Collection` or `lithium\data\Entity`.
-	 * @filter Allows to execute logic before queriny (i.e. for rewriting of $options)
+	 * @filter Allows to execute logic before querying (i.e. for rewriting of $options)
 	 *         or after i.e. for caching results.
 	 */
 	public static function find($type, array $options = array()) {

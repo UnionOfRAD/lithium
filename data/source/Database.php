@@ -816,16 +816,16 @@ abstract class Database extends \lithium\data\Source {
 	 * Builds an array of keyed on the fully-namespaced `Model` with array of fields as values
 	 * for the given `Query`
 	 *
-	 * @param data\model\Query $query A Query instance.
-	 * @param object $resource
-	 * @param object $context
+	 * @param \lithium\data\model\Query $query A Query instance.
+	 * @param \lithium\data\source\Result|null $resource An optional a result resource.
+	 * @param object|null $context
+	 * @return array
 	 */
 	public function schema($query, $resource = null, $context = null) {
 		if (is_object($query)) {
 			$query->applyStrategy($this);
 			return $this->_schema($query, $this->_fields($query->fields(), $query));
 		}
-
 		$result = array();
 
 		if (!$resource) {
@@ -843,8 +843,9 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Helper method for `data\model\Database::shema()`
 	 *
-	 * @param data\model\Query $query A Query instance.
-	 * @param array $fields Array of formatted fields.
+	 * @param \lithium\data\model\Query $query A Query instance.
+	 * @param array|null $fields Array of formatted fields.
+	 * @return array
 	 */
 	protected function _schema($query, $fields = null) {
 		$model = $query->model();
