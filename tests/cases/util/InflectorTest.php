@@ -152,18 +152,6 @@ class InflectorTest extends \lithium\test\Unit {
 		$expected = 'La-langue-francaise-est-un-attribut-de-souverainete-en-France';
 		$this->assertEqual($expected, $result);
 
-		$result = Inflector::slug('!@$#exciting stuff! - what !@-# was that?');
-		$expected = 'exciting-stuff-what-was-that';
-		$this->assertEqual($expected, $result);
-
-		$result = Inflector::slug('20% of profits went to me!');
-		$expected = '20-of-profits-went-to-me';
-		$this->assertEqual($expected, $result);
-
-		$result = Inflector::slug('#this melts your face1#2#3');
-		$expected = 'this-melts-your-face1-2-3';
-		$this->assertEqual($expected, $result);
-
 		$result = Inflector::slug('ThisMeltsYourFace');
 		$expected = 'This-Melts-Your-Face';
 		$this->assertEqual($expected, $result);
@@ -190,6 +178,36 @@ class InflectorTest extends \lithium\test\Unit {
 
 		$result = Inflector::slug('Đorđe đorđe');
 		$expected = 'Djordje-djordje';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSlugRemoveUntransliterable() {
+		$result = Inflector::slug('!@$#exciting stuff! - what !@-# was that?');
+		$expected = 'exciting-stuff-what-was-that';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('20% of profits went to me!');
+		$expected = '20-of-profits-went-to-me';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('#this melts your face1#2#3');
+		$expected = 'this-melts-your-face1-2-3';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSlugRemoveUntransliterableMultibyte() {
+		$result = Inflector::slug('li₃ is great');
+		$expected = 'li-is-great';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('♥ nach Bern');
+		$expected = 'nach-Bern';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSlugRemoveWhitespaceMultibyte() {
+		$result = Inflector::slug('X X');
+		$expected = 'X-X';
 		$this->assertEqual($expected, $result);
 	}
 

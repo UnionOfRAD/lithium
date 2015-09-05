@@ -426,7 +426,8 @@ class Inflector {
 	 */
 	public static function slug($string, $replacement = '-') {
 		$map = static::$_transliteration + array(
-			'/[^\w\s]/' => ' ', '/\\s+/' => $replacement,
+			'/[^\s\p{L}\p{Nd}]/u' => ' ',
+			'/\s+/u' => $replacement,
 			'/(?<=[a-z])([A-Z])/' => $replacement . '\\1',
 			str_replace(':rep', preg_quote($replacement, '/'), '/^[:rep]+|[:rep]+$/') => ''
 		);

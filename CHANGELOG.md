@@ -4,6 +4,9 @@
 
 ### Fixed
 
+- Fixed slug generation by `Inflector` for strings containing multibyte characters or
+  (unprintable) whitespaces.
+
 ### Improved
 
 - Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
