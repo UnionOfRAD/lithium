@@ -4,6 +4,10 @@
 
 ### Fixed
 
+### Improved
+
+- Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
+- `Database` now supports the `NOT BETWEEN` operator. #1208 (Eric Cholis)
 - Restrictions on library search paths for i.e. adapters inside non-core libraries have been
   relaxed. This fixes an inconvenience where adapters (and other classes) always had to be placed
   under the `extensions` directory. Even in cases where it didn't feel natural to put them there.
@@ -37,10 +41,6 @@
               └── Rules.php
   ```
 
-### Improved
-
-- Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
-- `Database` now supports the `NOT BETWEEN` operator. #1208 (Eric Cholis)
 
 ### Added
 
