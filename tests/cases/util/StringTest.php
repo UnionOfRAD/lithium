@@ -13,6 +13,14 @@ use lithium\tests\mocks\util\MockStringObject;
 
 class StringTest extends \lithium\test\Unit {
 
+	public function testUrandomUnreadable() {
+		$this->skipIf(!ini_get("open_basedir"), "open_basedir not set");
+
+		$result = ini_get("open_basedir") || !is_readable("/dev/urandom");
+		$expected = true;
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testUuidGeneration() {
 		$result = String::uuid();
 		$pattern = "/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[8-9a-b][a-f0-9]{3}-[a-f0-9]{12}$/";
