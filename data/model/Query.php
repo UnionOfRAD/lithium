@@ -590,7 +590,7 @@ class Query extends \lithium\core\Object {
 	}
 
 	/**
-	 * Helper method used by `export()` which delegate the query generation to the datasource.
+	 * Helper method used by `export()` which delegate the query generation to the data source.
 	 *
 	 * @param \lithium\data\Source $source Instance of the data source to use for conversion.
 	 */

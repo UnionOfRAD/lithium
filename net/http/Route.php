@@ -13,15 +13,18 @@ namespace lithium\net\http;
  * order to determine the correct controller and action that an HTTP request should be dispatched
  * to.
  *
- * Typically, `Route` objects are created and handled through the `lithium\net\http\Router` class,
- * as follows:
+ * Typically, `Route` objects are created and handled through the `Router` class, as follows.
+ * When connecting a route, a `Route` object is instantiated behind the scenes, and added
+ * to the `Router`'s collection.
  *
  * ```
- * // This instantiates a Route object behind the scenes, and adds it to Router's collection:
  * Router::connect("/{:controller}/{:action}");
+ * ```
  *
- * // This matches a set of parameters against all Route objects contained in Router, and if a match
- * // is found, returns a string URL with parameters inserted into the URL pattern:
+ * This following matches a set of parameters against all `Route` objects contained in Router, and
+ * if a match is found, returns a string URL with parameters inserted into the URL pattern.
+ *
+ * ```
  * Router::match(array("controller" => "users", "action" => "login")); // returns "/users/login"
  * ```
  *
@@ -40,12 +43,9 @@ namespace lithium\net\http;
  *        'keys' => array('user' => 'user'),
  *        'options' => array('compile' => false, 'wrap' => false)
  * ));
+ *
  * Router::connect($route); // this will match '/users/<username>' or '/u/<username>'.
  * ```
- *
- * For additional information on the `'options'` constructor key, see
- * `lithium\net\http\Route::compile()`. To learn more about Lithium's routing system, see
- * `lithium\net\http\Router`.
  *
  * @see lithium\net\http\Route::compile()
  * @see lithium\net\http\Router
@@ -53,13 +53,16 @@ namespace lithium\net\http;
 class Route extends \lithium\core\Object {
 
 	/**
-	 * The URL template string that the route matches.
+	 * The URL template string that the route matches, i.e.
+	 * `'/admin/{:controller}/{:id:\d+}/{:args}'`.
 	 *
-	 * This string can contain fixed elements, i.e. `"/admin"`, capture elements,
-	 * i.e. `"/{:controller}"`, capture elements optionally paired with regular expressions or
-	 * named regular expression patterns, i.e. `"/{:id:\d+}"` or `"/{:id:ID}"`, the special wildcard
-	 * capture, i.e. `"{:args}"`, or any combination thereof, i.e.
-	 * `"/admin/{:controller}/{:id:\d+}/{:args}"`.
+	 * This string can contain any combination of...
+	 *
+	 * 1. fixed elements, i.e. `'/admin'`
+	 * 2. plain capture elements, i.e. `'/{:controller}'`
+	 * 3. capture elements paired with regular expressions, i.e. `'/{:id:\d+}'`
+	 * 4. capture elements paired with named regular expression patterns, `'/{:id:ID}'`
+	 * 5. the speciall wildcard capture element `'{:args}'`
 	 *
 	 * @var string
 	 */
@@ -68,7 +71,7 @@ class Route extends \lithium\core\Object {
 	/**
 	 * The regular expression used to match URLs.
 	 *
-	 * This regular expression is typically 'compiled' down from the higher-level syntax used in
+	 * This regular expression is typically _compiled_ down from the higher-level syntax used in
 	 * `$_template`, but can be set manually with compilation turned off in the constructor for
 	 * extra control or if you are using pre-compiled `Route` objects.
 	 *
@@ -79,7 +82,7 @@ class Route extends \lithium\core\Object {
 	protected $_pattern = '';
 
 	/**
-	 * An array of route parameter names (i.e. {:foo}) that appear in the URL template.
+	 * An array of route parameter names (i.e. `{:foo}`) that appear in the URL template.
 	 *
 	 * @var array
 	 * @see lithium\net\http\Route::$_template
@@ -297,7 +300,7 @@ class Route extends \lithium\core\Object {
 	 * Matches a set of parameters against the route, and returns a URL string
 	 * if the route matches the parameters.
 	 *
-	 * @param array $options
+	 * @param array $options An array of parameters.
 	 * @return string|boolean URL string on success, else `false` if the route didn't match.
 	 */
 	public function match(array $options = array()) {

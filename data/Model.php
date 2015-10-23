@@ -19,34 +19,31 @@ use BadMethodCallException;
  * Models are tasked with providing meaning to otherwise raw and unprocessed data (e.g.
  * user profile).
  *
- * Models expose a consistent and unified API to interact with an underlying datasource (e.g.
+ * Models expose a consistent and unified API to interact with an underlying data source (e.g.
  * MongoDB, CouchDB, MySQL) for operations such as querying, saving, updating and deleting data
  * from the persistent storage.
  *
- * Models allow you to interact with your data in two fundamentally different ways: querying, and
- * data mutation (saving/updating/deleting). All query-related operations may be done through the
- * static `find()` method, along with some additional utility methods provided for convenience.
- *
  * Classes extending this one should, conventionally, be named as Plural, CamelCase and be
  * placed in the `models` directory. i.e. a posts model would be `model/Posts.php`.
+ *
+ * Models allow you to interact with your data in two fundamentally different ways: querying, and
+ * data mutation (saving/updating/deleting). All **query-related** operations may be done through the
+ * static `find()` method, along with some additional utility methods provided for convenience.
  *
  * Examples:
  * ```
  * // Return all 'post' records
  * Posts::find('all');
- * Posts::all();
+ * Posts::all(); // This is equivalent to the above.
  *
  * // With conditions and a limit
  * Posts::find('all', array('conditions' => array('published' => true), 'limit' => 10));
- * Posts::all(array('conditions' => array('published' => true), 'limit' => 10));
  *
  * // Integer count of all 'post' records
  * Posts::find('count');
- * Posts::count(); // This is equivalent to the above.
  *
  * // With conditions
  * Posts::find('count', array('conditions' => array('published' => true)));
- * Posts::count(array('published' => true));
  * ```
  *
  * The actual objects returned from `find()` calls will depend on the type of data source in use.
@@ -55,7 +52,7 @@ use BadMethodCallException;
  * class, and provide the necessary abstraction to make working with either type completely
  * transparent.
  *
- * For data mutation (saving/updating/deleting), the `Model` class acts as a broker to the proper
+ * For **data mutation** (saving/updating/deleting), the `Model` class acts as a broker to the proper
  * objects. When creating a new record or document, for example, a call to `Posts::create()` will
  * return an instance of `lithium\data\entity\Record` or `lithium\data\entity\Document`, which can
  * then be acted upon.
@@ -619,7 +616,10 @@ class Model extends \lithium\core\StaticObject {
 	 * Posts::find('first', array(
 	 *     'conditions' => array('id' => 23)
 	 * ));
+	 * ```
 	 *
+	 * Shorthands:
+	 * ```
 	 * // Shorthand for find first by primary key.
 	 * Posts::find(23);
 	 *
@@ -632,17 +632,16 @@ class Model extends \lithium\core\StaticObject {
 	 *        following finders are available. Custom finders can be added via `Model::finder()`.
 	 *        - `'all'`: Returns all records matching the conditions.
 	 *        - `'first'`: Returns the first record matching the conditions.
+	 *        - `'count'`: Returns an integer count of all records matching the conditions.
 	 *        - `'list'`: Returns a one dimensional array, where the key is the (primary)
 	 *          key and the value the title of the record (the record must have a `'title'`
 	 *          field). A result may look like: `array(1 => 'Foo', 2 => 'Bar')`.
-	 *        - `'count'`: Returns an integer with the count of all records matching
-	 *        the conditions.
 	 *
-	 *        Instead of the name of a finder, also supports for shorthand usage an object or
-	 *        integer as a first parameter. When passed such a value it is equal to
+	 *        Instead of the name of a finder, also supports shorthand usage with an object or
+	 *        integer as the first parameter. When passed such a value it is equal to
 	 *        `Model::find('first', array('conditions' => array('<key>' => <value>)))`.
 	 *
-	 *        When an undefine finder is tried to be used, the method will not error out, but
+	 *        Note: When an undefined finder is tried to be used, the method will not error out, but
 	 *        fallback to the `'all'` finder.
 	 * @param array $options Options for the query. By default, accepts:
 	 *        - `'conditions'` _array_: The conditions for the query
@@ -658,7 +657,7 @@ class Model extends \lithium\core\StaticObject {
 	 *          together with the limit option specifying the number of records per page. The first
 	 *          page starts at `1`.
 	 * @return mixed The result/s of the find. Actual result depends on the finder being used. Most
-	 *         is an instance of `lithium\data\Collection` or `lithium\data\Entity`.
+	 *         often this is an instance of `lithium\data\Collection` or `lithium\data\Entity`.
 	 * @filter Allows to execute logic before querying (i.e. for rewriting of $options)
 	 *         or after i.e. for caching results.
 	 */

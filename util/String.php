@@ -74,7 +74,6 @@ class String {
 		$message  = "lithium\util\String::random() has been deprecated in favor of ";
 		$message .= "lithium\security\Random::generate().";
 		trigger_error($message, E_USER_DEPRECATED);
-
 		return Random::generate($bytes, $options);
 	}
 

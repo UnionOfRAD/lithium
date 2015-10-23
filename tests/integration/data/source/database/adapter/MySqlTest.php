@@ -345,7 +345,7 @@ class MySqlTest extends \lithium\tests\integration\data\Base {
 	}
 
 	/**
-	 * Contrary to other datasources, MySQL only support one TIMESTAMP column by table.
+	 * Contrary to other data sources, MySQL only support one TIMESTAMP column by table.
 	 */
 	public function testDefaultValues() {
 		$this->_db->dropSchema('galleries');

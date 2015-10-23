@@ -208,8 +208,7 @@ class Html extends \lithium\template\Helper {
 	 *              inline. When set to `false`, the `styles()` handler prints out the styles,
 	 *              and other specified styles to be included in the layout. Defaults to `true`.
 	 *              This is useful when page-specific styles are created inline in the page, and
-	 *              you'd like to place them in
-	 *              the `<head />` along with your other styles.
+	 *              you'd like to place them in the `<head />` along with your other styles.
 	 *              - `'type'` _string_: By default, accepts `stylesheet` or `import`, which
 	 *              respectively correspond to `style-link` and `style-import` strings templates
 	 *              defined in `Html::$_strings`.

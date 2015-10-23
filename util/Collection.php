@@ -367,12 +367,13 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * Reduce, or fold, a collection down to a single value
 	 *
 	 * @link http://php.net/array_reduce
-	 * @param callback $filter The filter to apply.
-	 * @param mixed $initial Initial value
-	 * @return mixed A single reduced value
+	 * @param callback $reducer The reduce function, i.e. `function($carry, $item) { return ... }`
+	 * @param mixed $initial Initial value passed to the reduce function as `$carry`,
+	 *        defaults to `false`.
+	 * @return mixed A single reduced value.
 	 */
-	public function reduce($filter, $initial = false) {
-		return array_reduce($this->_data, $filter, $initial);
+	public function reduce($reducer, $initial = false) {
+		return array_reduce($this->_data, $reducer, $initial);
 	}
 
 	/**
