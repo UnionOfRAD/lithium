@@ -12,35 +12,48 @@ use lithium\util\Inflector;
 use lithium\net\http\RoutingException;
 
 /**
- * The two primary responsibilities of the `Router` class are to generate URLs from parameter lists,
- * and to determine the correct set of dispatch parameters for incoming requests.
+ * The two primary responsibilities of the `Router` are to determine the correct set of
+ * parameters for incoming request (_parsing_) and second to generate URLs from parameters
+ * (_matching_). These two operations can be handled in a reciprocally consistent way.
  *
- * Using `Route` objects, these two operations can be handled in a reciprocally consistent way.
- * For example, if you wanted the `/login` URL to be routed to
- * `myapp\controllers\SessionsController::add()`, you could set up a route like the following in
- * `config/routes.php`:
+ * To begin using the router, routes must be defined first. A route maps an URL (template)
+ * to a set of paremeters and vice versa. The following example maps the `'/login'` URL
+ * to `SessionController::add()`.
  *
  * ```
- * use lithium\net\http\Router;
- *
  * Router::connect('/login', array('controller' => 'Sessions', 'action' => 'add'));
- *
- * // -- or --
- *
- * Router::connect('/login', 'Sessions::add');
  * ```
  *
- * Not only would that correctly route all requests for `/login` to `SessionsController::add()`, but
- * any time the framework generated a route with matching parameters, `Router` would return the
- * correct short URL.
+ * The `Router` plays an important role in the dispatching process. It allows the `Dispatcher`
+ * to invoke the correct controller action for a requested URL. During this process the `Router`
+ * will _parse_ the URL and respond with a set of dispatch parameters.
  *
- * While most framework components that work with URLs (and utilize routing) handle calling the
- * `Router` directly (i.e. controllers doing redirects, or helpers generating links), if you have a
- * scenario where you need to call the `Router` directly, you can use the `match()` method.
+ * ```
+ * Router::parse('/login'); // returns array('controller' => 'Sessions', 'action' => 'add')
+ * ```
  *
- * This allows you to keep your application's URL structure nicely decoupled from the underlying
- * software design. For more information on parsing and generating URLs, see the `parse()` and
- * `match()` methods.
+ * Another important thing the `Router` is quite often used for, is the so called _reverse
+ * routing_. During this process the `Router` will _match_ a set of parameters and return
+ * a URL. In contrast to normal, manually created URLs (i.e. `http://li3.me/support`) These
+ * URLs are called _routed URLs_ as they have been generated through the `Router`.
+ *
+ * ```
+ * Router::match(('controller' => 'Sessions', 'action' => 'add')); // returns `'/login'`
+ * ```
+ *
+ * Framework components that work with URLs (and utilize routing), also support
+ * reverse routing and accept route parameters.
+ *
+ * ```
+ * $this->html->link(array(...));
+ * ```
+ *
+ * But why use reverse routing and parameters instead of URL string at all? Well, as the whole
+ * application URL structure is defined in one place (the routes defintion file) it is quite easy to
+ * change the URL structure without touching i.e. the templates.
+ *
+ * @see lithium\net\http\Router::parse()
+ * @see lithium\net\http\Router::match()
  */
 class Router extends \lithium\core\StaticObject {
 
@@ -364,11 +377,14 @@ class Router extends \lithium\core\StaticObject {
 	 * // again, returns /posts/1138
 	 * ```
 	 *
-	 * You can use either syntax anywhere a URL is accepted, i.e.
-	 * `lithium\action\Controller::redirect()`, or `lithium\template\helper\Html::link()`.
+	 * You can use either syntax anywhere an URL is accepted, i.e. when redirecting
+	 * or creating links using the `Html` helper.
 	 *
-	 * @param string|array $url Options to match to a URL. Optionally, this can be a string
-	 *        containing a manually generated URL.
+	 * @see lithium\action\Controller::redirect()
+	 * @see lithium\template\helper\Html::link()
+	 * @param array|string $url An array of parameters to match, or paremeters in their
+	 *        shorthand form (i.e. `'Posts::view'`). Also takes non-routed, manually generated
+	 *        URL strings.
 	 * @param \lithium\action\Request $context This supplies the context for
 	 *        any persistent parameters, as well as the base URL for the application.
 	 * @param array $options Options for the generation of the matched URL. Currently accepted
@@ -512,6 +528,18 @@ class Router extends \lithium\core\StaticObject {
 		return $params;
 	}
 
+	/**
+	 * Prepares URL parameters for matching. Detects and Passes through un-routed URL strings,
+	 * leaving them untouched.
+	 *
+	 * Will not attempt to parse strings as shorthand parameters but instead interpret
+	 * them as normal, non-routed URLs when they are prefixed with a known scheme.
+	 *
+	 * @param array|string $url An array of parameters, shorthand parameter string or URL string.
+	 * @param \lithium\action\Request $context
+	 * @param array $options
+	 * @return array|string Depending on the type of $url either a string or an array.
+	 */
 	protected static function _prepareParams($url, $context, array $options) {
 		if (is_string($url)) {
 			if (strpos($url, '://')) {

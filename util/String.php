@@ -80,12 +80,11 @@ class String {
 	 * $hex = bin2hex($bits); // [0-9a-f]+
 	 * ```
 	 *
-	 * Optionally base64-encodes the resulting random string per the following:
-	 *
-	 *  _The alphabet used by `base64_encode()` is different than the one we should be using. When
-	 * considering the meaty part of the resulting string, however, a bijection allows to go the
-	 * from one to another. Given that we're working on random bytes, we can use safely use
-	 * `base64_encode()` without losing any entropy._
+	 * Optionally base64-encodes the resulting random string per the following. The
+	 * alphabet used by `base64_encode()` is different than the one we should be using.
+	 * When considering the meaty part of the resulting string, however, a bijection
+	 * allows to go the from one to another. Given that we're working on random bytes, we
+	 * can use safely use `base64_encode()` without losing any entropy.
 	 *
 	 * @param integer $bytes The number of random bytes to generate.
 	 * @param array $options The options used when generating random bytes:
@@ -115,6 +114,10 @@ class String {
 	 *
 	 * If all else fails, a Mersenne Twister gets used. (Strictly
 	 * speaking, this fallback is inadequate, but good enough.)
+	 *
+	 * Note: Users restricting path access through the `open_basedir` INI setting set,
+	 * will need to include `/dev/urandom` into the list of alloed paths, as this
+	 * method might access `/dev/urandom`.
 	 *
 	 * @see lithium\util\String::$_source
 	 * @return \Closure Returns a closure containing a random number generator.

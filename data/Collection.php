@@ -206,14 +206,17 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	}
 
 	/**
-	 * Allows several properties to be assigned at once.
+	 * Allows several items to be assigned at once.
 	 *
 	 * For example:
 	 * ```
-	 * $collection->set(array('title' => 'Lorem Ipsum', 'value' => 42));
+	 * $collection->set(array(
+	 *	42 => array('title' => 'Lorem Ipsum'),
+	 *	43 => array('title' => 'Dolor Amet')
+	 * ));
 	 * ```
 	 *
-	 * @param $values An associative array of fields and values to assign to the `Collection`.
+	 * @param arary $values An associative array of fields and values to assign to the `Collection`.
 	 * @return void
 	 */
 	public function set($values) {
