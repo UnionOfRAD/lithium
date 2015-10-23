@@ -115,9 +115,9 @@ class String {
 	 * If all else fails, a Mersenne Twister gets used. (Strictly
 	 * speaking, this fallback is inadequate, but good enough.)
 	 *
-	 * Note: Users restricting path access through the `open_basedir` INI setting set,
-	 * will need to include `/dev/urandom` into the list of alloed paths, as this
-	 * method might access `/dev/urandom`.
+	 * Note: Users restricting path access through the `open_basedir` INI setting,
+	 * will need to include `/dev/urandom` into the list of allowed paths, as this
+	 * method might read from `/dev/urandom`.
 	 *
 	 * @see lithium\util\String::$_source
 	 * @return \Closure Returns a closure containing a random number generator.
