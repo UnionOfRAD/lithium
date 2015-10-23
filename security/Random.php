@@ -9,30 +9,35 @@
 namespace lithium\security;
 
 use COM;
-use Exception;
+use LogicException;
 
 /**
- * A cryptographically-strong random number generator, and a base64 encoder
- * for use with DES and XDES.
+ * A cryptographically-strong random number generator, which allows to generate arbritrary
+ * length strings of bytes, usable for i.e. password salts, UUIDs, keys or initialization
+ * vectors (IVs). Random byte strings can be encoded using the base64-encoder for use with
+ * DES and XDES.
  */
 class Random {
 
 	/**
-	 * Option flag used in `Random::generate()`.
+	 * Option flag for the encoder.
+	 *
+	 * @see lithium\security\Random::generate()
 	 */
 	const ENCODE_BASE_64 = 1;
 
 	/**
-	 * A callable which, given a number of bytes, returns that amount of
-	 * random bytes.
+	 * A callable which, given a number of bytes, returns that
+	 * amount of random bytes.
 	 *
+	 * @see lithium\security\Random::_source()
 	 * @var callable
 	 */
 	protected static $_source;
 
 	/**
 	 * Generates random bytes for use in UUIDs and password salts, using
-	 * (when available) a cryptographically strong random number generator.
+	 * a cryptographically strong random number generator source.
 	 *
 	 * ```
 	 * $bits = Random::generate(8); // 64 bits
@@ -48,14 +53,14 @@ class Random {
 	 * @param integer $bytes The number of random bytes to generate.
 	 * @param array $options The options used when generating random bytes:
 	 *              - `'encode'` _integer_: If specified, and set to `Random::ENCODE_BASE_64`, the
-	 *                resulting value will be base64-encoded, per the notes above.
-	 * @return string Returns a string of random bytes.
+	 *                resulting value will be base64-encoded, per the note above.
+	 * @return string Returns (an encoded) string of random bytes.
 	 */
 	public static function generate($bytes, array $options = array()) {
 		$defaults = array('encode' => null);
 		$options += $defaults;
 
-		$source = static::$_source ?: static::_source();
+		$source = static::$_source ?: (static::$_source = static::_source());
 		$result = $source($bytes);
 
 		if ($options['encode'] !== static::ENCODE_BASE_64) {
@@ -64,50 +69,58 @@ class Random {
 		return strtr(rtrim(base64_encode($result), '='), '+', '.');
 	}
 
-
 	/**
-	 * Initializes `Random::$_source` using the best available random number generator.
+	 * Returns the best available random number generator source.
 	 *
-	 * When available, `/dev/urandom` and COM gets used on *nix and
-	 * [Windows systems](http://msdn.microsoft.com/en-us/library/aa388182%28VS.85%29.aspx?ppud=4),
-	 * respectively.
+	 * The source of randomness used are as follows:
 	 *
-	 * If all else fails, a Mersenne Twister gets used. (Strictly
-	 * speaking, this fallback is inadequate, but good enough.)
+	 * 1. `random_bytes()`, available in PHP >=7.0
+	 * 2. `mcrypt_create_iv()`, available if the mcrypt extensions is installed
+	 * 3. `/dev/urandom`, available on *nix
+	 * 4. `GetRandom()` through COM, available on Windows
 	 *
 	 * Note: Users restricting path access through the `open_basedir` INI setting,
 	 * will need to include `/dev/urandom` into the list of allowed paths, as this
-	 * method might read from `/dev/urandom`.
+	 * method might read from it.
 	 *
+	 * The `openssl_random_pseudo_bytes()` function is not used, as it is not clear
+	 * under which circumstances it will not have a strong source available to it.
+	 *
+	 * @link http://php.net/random_bytes
+	 * @link http://php.net/mcrypt_create_iv
+	 * @link http://msdn.microsoft.com/en-us/library/aa388182%28VS.85%29.aspx?ppud=4
+	 * @link http://sockpuppet.org/blog/2014/02/25/safely-generate-random-numbers/
 	 * @see lithium\util\Random::$_source
-	 * @return Closure Returns a closure containing a random number generator.
+	 * @return callable Returns a closure containing a random number generator.
 	 */
 	protected static function _source() {
-		switch (true) {
-			case isset(static::$_source):
-				return static::$_source;
-			case is_readable('/dev/urandom') && $fp = fopen('/dev/urandom', 'rb'):
-				return static::$_source = function($bytes) use (&$fp) {
-					return fread($fp, $bytes);
-				};
-			case class_exists('COM', false):
-				try {
-					$com = new COM('CAPICOM.Utilities.1');
-					return static::$_source = function($bytes) use ($com) {
-						return base64_decode($com->GetRandom($bytes, 0));
-					};
-				} catch (Exception $e) {
-				}
-			default:
-				return static::$_source = function($bytes) {
-					$rand = '';
-
-					for ($i = 0; $i < $bytes; $i++) {
-						$rand .= chr(mt_rand(0, 255));
-					}
-					return $rand;
-				};
+		if (function_exists('random_bytes')) {
+			return function($bytes) {
+				return random_bytes($bytes);
+			};
 		}
+		if (function_exists('mcrypt_create_iv')) {
+			return function($bytes) {
+				return mcrypt_create_iv($bytes, MCRYPT_DEV_URANDOM);
+			};
+		}
+		if (is_readable('/dev/urandom')) {
+			return function($bytes) {
+				$stream = fopen('/dev/urandom', 'rb');
+				$result = fread($stream, $bytes);
+				fclose($stream);
+
+				return $result;
+			};
+		}
+		if (class_exists('COM', false)) {
+			$com = new COM('CAPICOM.Utilities.1');
+
+			return function($bytes) use ($com) {
+				return base64_decode($com->GetRandom($bytes, 0));
+			};
+		}
+		throw new LogicException('No suitable strong random number generator source found.');
 	}
 }
 

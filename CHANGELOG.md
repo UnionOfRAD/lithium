@@ -9,6 +9,8 @@
 
 ### Improved
 
+- It is now guaranteed that `Random::generate()` will use a cryptographic strong RNG. It 
+  no longer falls back to a less strong source. 
 - `Router::match()` now additionaly supports the magic schemes `tel` and `sms`. This
   allows to create `tel:+49401234567` style links.
 - Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
@@ -49,6 +51,7 @@
 
 ### Added
 
+- `mcrypt_create_iv()` and PHP7's `random_bytes()` have been added as new RNG sources.
 - Enable custom error messages in form helper. This feature allows to provide messages
   for validation error inside the template. This allows easier translation of messages and
   customization in case there is no control over the model (i.e. developing a "theme" for a
@@ -111,6 +114,7 @@
 
 ### Backwards Incompatible Changes
 
+- When no suitable RNG is found (rare), `Random::generate()` will throw an exception.
 - Database encoding, timezone, and searchPath methods may now throw exceptions. Please
   wrap code calling these methods directly in try/catch blocks - if needed. #1172
   (David Persson)
