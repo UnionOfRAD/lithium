@@ -411,17 +411,25 @@ class RouterTest extends \lithium\test\Unit {
 		$prefix  = $this->request->env('HTTPS') ? 'https://' : 'http://';
 		$prefix .= $this->request->env('HTTP_HOST');
 		$this->assertIdentical($prefix . '/my/web/path/some/where', $result);
+	}
 
+	public function testStringUrlGenerationPassedThrough() {
 		$result = Router::match('mailto:foo@localhost');
 		$expected = 'mailto:foo@localhost';
+		$this->assertIdentical($expected, $result);
+
+		$result = Router::match('tel:+49401234567');
+		$expected = 'tel:+49401234567';
+		$this->assertIdentical($expected, $result);
+
+		$result = Router::match('sms:+49401234567');
+		$expected = 'sms:+49401234567';
 		$this->assertIdentical($expected, $result);
 
 		$result = Router::match('#top');
 		$expected = '#top';
 		$this->assertIdentical($expected, $result);
-	}
 
-	public function testJavaScriptUrlGeneration() {
 		$result = Router::match('javascript:alert(1)');
 		$expected = 'javascript:alert(1)';
 		$this->assertEqual($expected, $result);

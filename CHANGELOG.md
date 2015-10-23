@@ -9,6 +9,8 @@
 
 ### Improved
 
+- `Router::match()` now additionaly supports the magic schemes `tel` and `sms`. This
+  allows to create `tel:+49401234567` style links.
 - Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
 - `Database` now supports the `NOT BETWEEN` operator. #1208 (Eric Cholis)
 - Restrictions on library search paths for i.e. adapters inside non-core libraries have been

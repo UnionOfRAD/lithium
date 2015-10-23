@@ -514,13 +514,11 @@ class Router extends \lithium\core\StaticObject {
 
 	protected static function _prepareParams($url, $context, array $options) {
 		if (is_string($url)) {
-			if (strpos($url, '://')) {
+			if (strpos($url, '://') !== false) {
 				return $url;
 			}
-			foreach (array('#', '//', 'mailto', 'javascript') as $prefix) {
-				if (strpos($url, $prefix) === 0) {
-					return $url;
-				}
+			if (preg_match('%^((#|//)|(mailto|tel|sms|javascript):)%', $url)) {
+				return $url;
 			}
 			if (is_string($url = static::_parseString($url, $context, $options))) {
 				return static::_prefix($url, $context, $options);
