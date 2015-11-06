@@ -229,7 +229,7 @@ class Route extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 
-		if (!$this->_config['continue'] && !preg_match('@{:action:.*?}@', $this->_template)) {
+		if (!$this->_config['continue'] && strpos($this->_template, '{:action:') === false) {
 			$this->_params += array('action' => 'index');
 		}
 		if (!$this->_pattern) {
