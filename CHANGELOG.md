@@ -52,6 +52,29 @@
 
 ### Added
 
+- `Cache` together with the `File` adapter can now be used to store BLOBs. 
+
+  ```php
+  Cache::config(array(
+    'blob' => array(
+      'adapter' => 'File', 
+      'streams' => true // Enable this option for BLOB support.
+    )
+  ));
+  
+  $stream = fopen('php://temp', 'wb');
+  $pdf->generate()->store($stream); // some expensive action
+  
+  // We must rewind the stream, as Cache will not do this for us.
+  rewind($stream);
+  
+  // Store the contents of $stream into a cache item.
+  Cache::write('blob', 'productCatalogPdf', $stream);
+  
+  // ... later somewhere else in the galaxy ...
+  $stream = Cache::read('blob', 'productCatalogPdf');
+  ```
+
 - `mcrypt_create_iv()` and PHP7's `random_bytes()` have been added as new RNG sources.
 - Enable custom error messages in form helper. This feature allows to provide messages
   for validation error inside the template. This allows easier translation of messages and

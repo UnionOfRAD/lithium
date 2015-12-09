@@ -216,6 +216,25 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testWriteUsingStream() {
+		$now = time();
+
+		$adapter = new File();
+		$file = Libraries::get(true, 'resources') . '/tmp/cache/bar';
+
+		$time = $now + 5;
+		$expiry = 5;
+
+		$stream = fopen('php://temp', 'wb');
+		fwrite($stream, 'foo');
+		rewind($stream);
+		$adapter->write(array('bar' => $stream), $expiry);
+
+		$expected = "{:expiry:{$time}}\nfoo";
+		$result = file_get_contents($file);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testRead() {
 		$key = 'key';
 		$keys = array($key);
@@ -302,6 +321,18 @@ class FileTest extends \lithium\test\Unit {
 		$keys = array('key1');
 		$expected = array('key1' => 'test1');
 		$result = $adapter->read($keys);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testReadStreams() {
+		$adapter = new File(array('streams' => true));
+
+		$adapter->write(array('bar' => 'foo'), 50);
+		$result = $adapter->read(array('bar'));
+		$this->assertTrue(is_resource($result['bar']));
+
+		$expected = 'foo';
+		$result = stream_get_contents($result['bar']);
 		$this->assertEqual($expected, $result);
 	}
 

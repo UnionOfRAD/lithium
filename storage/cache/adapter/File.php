@@ -15,15 +15,15 @@ use lithium\storage\Cache;
 /**
  * A minimal file-based cache.
  *
- * The File adapter is a very simple cache, and should only be used for prototyping
- * or for specifically caching _files_. For more general caching needs, please consider
- * using a more appropriate cache adapter.
+ * The File adapter is a very simple cache, and should only be used for prototyping or for
+ * specifically caching _files_ in conjunction with the `'streams'` configuration option.
+ * For more general caching needs, please consider using a more appropriate cache adapter.
  *
  * This adapter has no external dependencies. Operations in read/write/delete are atomic
  * for single-keys only. Clearing the cache is supported. Real persistence of cached items
  * is provided. Increment/decrement functionality is provided but only in a non-atomic way.
  *
- * This can't handle serialization natively. Scope support is available but not natively.
+ * This adapter can't handle serialization natively. Scope support is available but not natively.
  *
  * A simple configuration can be accomplished as follows:
  *
@@ -48,6 +48,13 @@ use lithium\storage\Cache;
 class File extends \lithium\storage\cache\Adapter {
 
 	/**
+	 * The maximum line length of the file header storing meta data.
+	 *
+	 * @var integer
+	 */
+	const MAX_HEADER_LENGTH = 500;
+
+	/**
 	 * Constructor.
 	 *
 	 * @see lithium\storage\Cache::config()
@@ -60,13 +67,17 @@ class File extends \lithium\storage\cache\Adapter {
 	 *          to `+1 hour`.
 	 *        - `'path'` _string_: Path where cached entries live, defaults to
 	 *          `Libraries::get(true, 'resources') . '/tmp/cache'`.
+	 *        - `'streams'`: When enabled (by default disabled) read operations will return
+	 *          stream handles instead of the value itself. This is useful when reading
+	 *          BLOBs.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'path' => Libraries::get(true, 'resources') . '/tmp/cache',
 			'scope' => null,
-			'expiry' => '+1 hour'
+			'expiry' => '+1 hour',
+			'streams' => false
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -119,7 +130,7 @@ class File extends \lithium\storage\cache\Adapter {
 		$results = array();
 
 		foreach ($keys as $key) {
-			if (!$item = $this->_read($key)) {
+			if (!$item = $this->_read($key, $this->_config['streams'])) {
 				continue;
 			}
 			if ($item['expiry'] < time() && $item['expiry'] != 0) {
@@ -243,15 +254,24 @@ class File extends \lithium\storage\cache\Adapter {
 	 *
 	 * @see lithium\storage\cache\adapter\File::write()
 	 * @param string $key Key to uniquely identify the cached item.
-	 * @param mixed $value Value to store under given key.
+	 * @param mixed $value Value or resource with value to store under given key.
 	 * @param integer $expires UNIX timestamp after which the item is invalid.
 	 * @return boolean `true` on success, `false` otherwise.
 	 */
 	protected function _write($key, $value, $expires) {
-		return file_put_contents(
-			"{$this->_config['path']}/{$key}",
-			$this->_compile($key, $value, $expires)
-		);
+		$path = "{$this->_config['path']}/{$key}";
+
+		if (!$stream = fopen($path, 'wb')) {
+			return false;
+		}
+		fwrite($stream, "{:expiry:{$expires}}\n");
+
+		if (is_resource($value)) {
+			stream_copy_to_stream($value, $stream);
+		} else {
+			fwrite($stream, $value);
+		}
+		return fclose($stream);
 	}
 
 	/**
@@ -259,15 +279,34 @@ class File extends \lithium\storage\cache\Adapter {
 	 *
 	 * @see lithium\storage\cache\adapter\File::read()
 	 * @param string $key Key to uniquely identify the cached item.
+	 * @param boolean $streams When `true` will return stream handle instead of value.
 	 * @return array|boolean Array with `expiry` and `value` or `false` otherwise.
 	 */
-	protected function _read($key) {
+	protected function _read($key, $streams = false) {
 		$path = "{$this->_config['path']}/{$key}";
 
 		if (!is_file($path) || !is_readable($path)) {
 			return false;
 		}
-		return $this->_parse(file_get_contents($path));
+		if (!$stream = fopen($path, 'rb')) {
+			return false;
+		}
+		$header = stream_get_line($stream, static::MAX_HEADER_LENGTH, "\n");
+
+		if (!preg_match('/^\{\:expiry\:(\d+)\}/', $header, $matches)) {
+			return false;
+		}
+		if ($streams) {
+			$value = fopen('php://temp', 'wb');
+			stream_copy_to_stream($stream, $value);
+			rewind($value);
+		} else {
+			$value = stream_get_contents($stream);
+		}
+		fclose($stream);
+
+		return array('expiry' => $matches[1], 'value' => $value);
+
 	}
 
 	/**
@@ -280,29 +319,6 @@ class File extends \lithium\storage\cache\Adapter {
 	protected function _delete($key) {
 		$path = "{$this->_config['path']}/{$key}";
 		return is_readable($path) && is_file($path) && unlink($path);
-	}
-
-	/**
-	 * Compiles value to format.
-	 *
-	 * @param string $key Key to uniquely identify the cached items.
-	 * @param mixed $value Value to store under given key.
-	 * @param integer $expires UNIX timestamp after which the item is invalid.
-	 * @return string The compiled data string.
-	 */
-	protected function _compile($key, $value, $expires) {
-		return "{:expiry:{$expires}}\n{$value}";
-	}
-
-	/**
-	 * Parses value from format.
-	 *
-	 * @param string $data Compiled data string.
-	 * @return array Array with `expiry` and `value`.
-	 */
-	protected function _parse($data) {
-		preg_match('/^\{\:expiry\:(\d+)\}\\n(.*)/sS', $data, $matches);
-		return array('expiry' => $matches[1], 'value' => $matches[2]);
 	}
 }
 
