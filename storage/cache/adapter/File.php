@@ -250,7 +250,7 @@ class File extends \lithium\storage\cache\Adapter {
 	 *
 	 * @see lithium\storage\cache\adapter\File::write()
 	 * @param string $key Key to uniquely identify the cached item.
-	 * @param mixed $value Value to store under given key.
+	 * @param mixed $value Value or resource with value to store under given key.
 	 * @param integer $expires UNIX timestamp after which the item is invalid.
 	 * @return boolean `true` on success, `false` otherwise.
 	 */
@@ -261,8 +261,12 @@ class File extends \lithium\storage\cache\Adapter {
 			return false;
 		}
 		fwrite($stream, "{:expiry:{$expires}}\n");
-		fwrite($stream, $value);
 
+		if (is_resource($value)) {
+			stream_copy_to_stream($value, $stream);
+		} else {
+			fwrite($stream, $value);
+		}
 		return fclose($stream);
 	}
 

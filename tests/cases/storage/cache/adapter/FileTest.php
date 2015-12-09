@@ -216,6 +216,25 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testWriteUsingStream() {
+		$now = time();
+
+		$adapter = new File();
+		$file = Libraries::get(true, 'resources') . '/tmp/cache/bar';
+
+		$time = $now + 5;
+		$expiry = 5;
+
+		$stream = fopen('php://temp', 'wb');
+		fwrite($stream, 'foo');
+		rewind($stream);
+		$adapter->write(array('bar' => $stream), $expiry);
+
+		$expected = "{:expiry:{$time}}\nfoo";
+		$result = file_get_contents($file);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testRead() {
 		$key = 'key';
 		$keys = array($key);
