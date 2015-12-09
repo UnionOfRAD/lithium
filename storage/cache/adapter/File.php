@@ -48,6 +48,13 @@ use lithium\storage\Cache;
 class File extends \lithium\storage\cache\Adapter {
 
 	/**
+	 * The maximum line length of the file header storing meta data.
+	 *
+	 * @var integer
+	 */
+	const MAX_HEADER_LENGTH = 500;
+
+	/**
 	 * Constructor.
 	 *
 	 * @see lithium\storage\Cache::config()
@@ -248,10 +255,15 @@ class File extends \lithium\storage\cache\Adapter {
 	 * @return boolean `true` on success, `false` otherwise.
 	 */
 	protected function _write($key, $value, $expires) {
-		return file_put_contents(
-			"{$this->_config['path']}/{$key}",
-			$this->_compile($key, $value, $expires)
-		);
+		$path = "{$this->_config['path']}/{$key}";
+
+		if (!$stream = fopen($path, 'wb')) {
+			return false;
+		}
+		fwrite($stream, "{:expiry:{$expires}}\n");
+		fwrite($stream, $value);
+
+		return fclose($stream);
 	}
 
 	/**
@@ -267,7 +279,18 @@ class File extends \lithium\storage\cache\Adapter {
 		if (!is_file($path) || !is_readable($path)) {
 			return false;
 		}
-		return $this->_parse(file_get_contents($path));
+		if (!$stream = fopen($path, 'rb')) {
+			return false;
+		}
+		$header = stream_get_line($stream, static::MAX_HEADER_LENGTH, "\n");
+
+		if (!preg_match('/^\{\:expiry\:(\d+)\}/', $header, $matches)) {
+			return false;
+		}
+		$value = stream_get_contents($stream);
+		fclose($stream);
+
+		return array('expiry' => $matches[1], 'value' => $value);
 	}
 
 	/**
@@ -280,29 +303,6 @@ class File extends \lithium\storage\cache\Adapter {
 	protected function _delete($key) {
 		$path = "{$this->_config['path']}/{$key}";
 		return is_readable($path) && is_file($path) && unlink($path);
-	}
-
-	/**
-	 * Compiles value to format.
-	 *
-	 * @param string $key Key to uniquely identify the cached items.
-	 * @param mixed $value Value to store under given key.
-	 * @param integer $expires UNIX timestamp after which the item is invalid.
-	 * @return string The compiled data string.
-	 */
-	protected function _compile($key, $value, $expires) {
-		return "{:expiry:{$expires}}\n{$value}";
-	}
-
-	/**
-	 * Parses value from format.
-	 *
-	 * @param string $data Compiled data string.
-	 * @return array Array with `expiry` and `value`.
-	 */
-	protected function _parse($data) {
-		preg_match('/^\{\:expiry\:(\d+)\}\\n(.*)/sS', $data, $matches);
-		return array('expiry' => $matches[1], 'value' => $matches[2]);
 	}
 }
 
