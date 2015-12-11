@@ -324,6 +324,18 @@ class FileTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testReadStreams() {
+		$adapter = new File(array('streams' => true));
+
+		$adapter->write(array('bar' => 'foo'), 50);
+		$result = $adapter->read(array('bar'));
+		$this->assertTrue(is_resource($result['bar']));
+
+		$expected = 'foo';
+		$result = stream_get_contents($result['bar']);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testWriteAndReadNull() {
 		$expiry = '+1 minute';
 		$keys = array(

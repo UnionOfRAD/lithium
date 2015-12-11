@@ -15,9 +15,9 @@ use lithium\storage\Cache;
 /**
  * A minimal file-based cache.
  *
- * The File adapter is a very simple cache, and should only be used for prototyping
- * or for specifically caching _files_. For more general caching needs, please consider
- * using a more appropriate cache adapter.
+ * The File adapter is a very simple cache, and should only be used for prototyping or for
+ * specifically caching _files_ in conjunction with the `'streams'` configuration option.
+ * For more general caching needs, please consider using a more appropriate cache adapter.
  *
  * This adapter has no external dependencies. Operations in read/write/delete are atomic
  * for single-keys only. Clearing the cache is supported. Real persistence of cached items
@@ -67,13 +67,17 @@ class File extends \lithium\storage\cache\Adapter {
 	 *          to `+1 hour`.
 	 *        - `'path'` _string_: Path where cached entries live, defaults to
 	 *          `Libraries::get(true, 'resources') . '/tmp/cache'`.
+	 *        - `'streams'`: When enabled (by default disabled) read operations will return
+	 *          stream handles instead of the value itself. This is useful when reading
+	 *          BLOBs.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'path' => Libraries::get(true, 'resources') . '/tmp/cache',
 			'scope' => null,
-			'expiry' => '+1 hour'
+			'expiry' => '+1 hour',
+			'streams' => false
 		);
 		parent::__construct($config + $defaults);
 	}
@@ -126,7 +130,7 @@ class File extends \lithium\storage\cache\Adapter {
 		$results = array();
 
 		foreach ($keys as $key) {
-			if (!$item = $this->_read($key)) {
+			if (!$item = $this->_read($key, $this->_config['streams'])) {
 				continue;
 			}
 			if ($item['expiry'] < time() && $item['expiry'] != 0) {
@@ -275,9 +279,10 @@ class File extends \lithium\storage\cache\Adapter {
 	 *
 	 * @see lithium\storage\cache\adapter\File::read()
 	 * @param string $key Key to uniquely identify the cached item.
+	 * @param boolean $streams When `true` will return stream handle instead of value.
 	 * @return array|boolean Array with `expiry` and `value` or `false` otherwise.
 	 */
-	protected function _read($key) {
+	protected function _read($key, $streams = false) {
 		$path = "{$this->_config['path']}/{$key}";
 
 		if (!is_file($path) || !is_readable($path)) {
@@ -291,10 +296,17 @@ class File extends \lithium\storage\cache\Adapter {
 		if (!preg_match('/^\{\:expiry\:(\d+)\}/', $header, $matches)) {
 			return false;
 		}
-		$value = stream_get_contents($stream);
+		if ($streams) {
+			$value = fopen('php://temp', 'wb');
+			stream_copy_to_stream($stream, $value);
+			rewind($value);
+		} else {
+			$value = stream_get_contents($stream);
+		}
 		fclose($stream);
 
 		return array('expiry' => $matches[1], 'value' => $value);
+
 	}
 
 	/**
