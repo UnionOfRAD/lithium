@@ -23,7 +23,7 @@ use lithium\storage\Cache;
  * for single-keys only. Clearing the cache is supported. Real persistence of cached items
  * is provided. Increment/decrement functionality is provided but only in a non-atomic way.
  *
- * This can't handle serialization natively. Scope support is available but not natively.
+ * This adapter can't handle serialization natively. Scope support is available but not natively.
  *
  * A simple configuration can be accomplished as follows:
  *
