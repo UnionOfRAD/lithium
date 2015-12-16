@@ -192,6 +192,19 @@ class TestTest extends \lithium\test\Unit {
 		$this->assertArrayHasKey('stats', $result);
 	}
 
+	public function testPlainFormat() {
+		$command = new Test(array(
+			'request' => $this->request, 'classes' => $this->classes
+		));
+		$lithium = Libraries::get('lithium', 'path');
+		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
+		$command->format = 'plain';
+		$command->run($path);
+
+		$result = $command;
+		$this->assertTrue($result);
+	}
+
 	public function testPathWithCustomDirectoryName() {
 		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/custom_dir';
 		$testDir = $testApp . '/tests/cases/models';
