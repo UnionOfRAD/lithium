@@ -97,7 +97,6 @@ class Test extends \lithium\console\Command {
 					$command->header('Test');
 					$command->out(null, 1);
 				}
-
 				$colorize = function($result) {
 					switch (trim($result)) {
 						case '.':
