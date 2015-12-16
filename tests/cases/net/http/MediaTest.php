@@ -716,7 +716,8 @@ class MediaTest extends \lithium\test\Unit {
 
 	public function testLocation() {
 		$webroot = Libraries::get(true, 'resources') . '/tmp/tests/webroot';
-		mkdir($webroot);
+		mkdir($webroot, 0777, true);
+
 		$webroot = realpath($webroot);
 		$this->assertNotEmpty($webroot);
 		Media::attach('tests', array(
