@@ -8,6 +8,8 @@
 
 namespace lithium\console;
 
+use lithium\util\Inflector;
+
 /**
  * The `Router` class uses an instance of `lithium\console\Request`, which represents an incoming
  * command-line invocation, to parse the correct command, and sub-command(s) and parameters, which
@@ -20,6 +22,10 @@ class Router extends \lithium\core\Object {
 	 * in the form of `-f`, `--foo`, `--foo-bar` and `--foo=bar` are parsed.
 	 * XF68-style long options (i.e. `-foo`) are not supported but support
 	 * can be added by extending this class.
+	 *
+	 * If passing through `--foo-bar` this previously (pre 1.1) resulted in
+	 * the option `foo-bar` being available. This has been deprecated in favor
+	 * of `fooBar` being created.
 	 *
 	 * @param \lithium\console\Request $request
 	 * @return array $params
@@ -34,11 +40,13 @@ class Router extends \lithium\core\Object {
 			while ($args) {
 				$arg = array_shift($args);
 				if (preg_match('/^-(?P<key>[a-zA-Z0-9])$/i', $arg, $match)) {
-					$params[$match['key']] = true;
+					$key = Inflector::camelize($match['key'], false);
+					$params[$key] = $params[$match['key']] = true;
 					continue;
 				}
 				if (preg_match('/^--(?P<key>[a-z0-9-]+)(?:=(?P<val>.+))?$/i', $arg, $match)) {
-					$params[$match['key']] = !isset($match['val']) ? true : $match['val'];
+					$key = Inflector::camelize($match['key'], false);
+					$params[$key] = $params[$match['key']] = !isset($match['val']) ? true : $match['val'];
 					continue;
 				}
 				$params['args'][] = $arg;
