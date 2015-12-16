@@ -57,6 +57,13 @@ class Command extends \lithium\core\Object {
 	public $plain = false;
 
 	/**
+	 * Shows text output with color or without
+	 *
+	 * @var boolean
+	 */
+	public $no_color = false;
+
+	/**
 	 * Only shows error output.
 	 *
 	 * @var boolean
@@ -118,6 +125,10 @@ class Command extends \lithium\core\Object {
 		$params = array_diff_key((array) $this->request->params, $default);
 
 		foreach ($params as $key => $param) {
+			if($key == 'no-color') {
+				$key = 'no_color';
+			}
+
 			$this->{$key} = $param;
 		}
 	}
@@ -413,7 +424,7 @@ class Command extends \lithium\core\Object {
 			}
 			return;
 		}
-		if ($options['style'] !== null && !$this->plain) {
+		if ($options['style'] !== null && !$this->plain && !$this->no_color) {
 			$string = "{:{$options['style']}}{$string}{:end}";
 		}
 		if ($options['nl']) {
