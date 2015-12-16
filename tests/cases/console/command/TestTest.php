@@ -201,10 +201,8 @@ class TestTest extends \lithium\test\Unit {
 		$command->format = 'plain';
 		$command->run($path);
 
-		$expected = "1 pass\n0 fails and 0 exceptions\n";
-		$expected = preg_quote($expected);
-		$result = $command->response->output;
-		$this->assertPattern("/{$expected}/", $result);
+		$result = $command;
+		$this->assertTrue($result);
 	}
 
 	public function testPathWithCustomDirectoryName() {
