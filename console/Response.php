@@ -137,36 +137,11 @@ class Response extends \lithium\core\Object {
 			'bold'    => "\033[1m",
 		);
 
-		if($this->noColor) {
-			$defaults = array(
-				'end'    => "",
-				'black'  => "",
-				'red'    => "",
-				'green'  => "",
-				'yellow' => "",
-				'blue'   => "",
-				'purple' => "",
-				'cyan'   => "",
-				'white'  => "",
-				'heading' => "",
-				'option'  => "",
-				'command' => "",
-				'error'   => "",
-				'success' => "",
-				'bold'    => "",
-			);
-
-			$styles = false;
-		}
-
-		if ($styles === false) {
+		if ($styles === false || $this->noColor || strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 			return array_combine(array_keys($defaults), array_pad(array(), count($defaults), null));
 		}
 		$styles += $defaults;
 
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			return $this->styles(false);
-		}
 		return $styles;
 	}
 }
