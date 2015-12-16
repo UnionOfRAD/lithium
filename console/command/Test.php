@@ -67,6 +67,13 @@ class Test extends \lithium\console\Command {
 	public $plain = false;
 
 	/**
+	 * Shows text output with color or without
+	 *
+	 * @var boolean
+	 */
+	public $noColor = false;
+
+	/**
 	 * An array of closures, mapped by type, which are set up to handle different test output
 	 * formats.
 	 *
