@@ -8,6 +8,8 @@
 
 namespace lithium\console;
 
+use lithium\util\Inflector;
+
 /**
  * The `Router` class uses an instance of `lithium\console\Request`, which represents an incoming
  * command-line invocation, to parse the correct command, and sub-command(s) and parameters, which
@@ -34,11 +36,13 @@ class Router extends \lithium\core\Object {
 			while ($args) {
 				$arg = array_shift($args);
 				if (preg_match('/^-(?P<key>[a-zA-Z0-9])$/i', $arg, $match)) {
-					$params[$match['key']] = true;
+					$key = Inflector::camelize(Inflector::classify($match['key']), false);
+					$params[$key] = true;
 					continue;
 				}
 				if (preg_match('/^--(?P<key>[a-z0-9-]+)(?:=(?P<val>.+))?$/i', $arg, $match)) {
-					$params[$match['key']] = !isset($match['val']) ? true : $match['val'];
+					$key = Inflector::camelize(Inflector::classify($match['key']), false);
+					$params[$key] = !isset($match['val']) ? true : $match['val'];
 					continue;
 				}
 				$params['args'][] = $arg;
