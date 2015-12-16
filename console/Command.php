@@ -61,7 +61,7 @@ class Command extends \lithium\core\Object {
 	 *
 	 * @var boolean
 	 */
-	public $no_color = false;
+	public $noColor = false;
 
 	/**
 	 * Only shows error output.
@@ -116,20 +116,22 @@ class Command extends \lithium\core\Object {
 		if (!is_object($this->request) || !$this->request->params) {
 			return;
 		}
-		$this->response = $this->_config['response'];
 
-		if (!is_object($this->response)) {
-			$this->response = $this->_instance('response', $this->response);
-		}
 		$default = array('command' => null, 'action' => null, 'args' => null);
 		$params = array_diff_key((array) $this->request->params, $default);
 
 		foreach ($params as $key => $param) {
 			if($key == 'no-color') {
-				$key = 'no_color';
+				$key = 'noColor';
 			}
 
 			$this->{$key} = $param;
+		}
+
+		$this->response = $this->_config['response'];
+
+		if (!is_object($this->response)) {
+			$this->response = $this->_instance('response', $this->response + ['noColor' => $this->noColor]);
 		}
 	}
 
@@ -424,7 +426,7 @@ class Command extends \lithium\core\Object {
 			}
 			return;
 		}
-		if ($options['style'] !== null && !$this->plain && !$this->no_color) {
+		if ($options['style'] !== null && !$this->plain) {
 			$string = "{:{$options['style']}}{$string}{:end}";
 		}
 		if ($options['nl']) {

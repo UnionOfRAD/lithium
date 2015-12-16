@@ -59,13 +59,6 @@ class Test extends \lithium\console\Command {
 	public $verbose = false;
 
 	/**
-	 * Shows text output with color or without
-	 *
-	 * @var boolean
-	 */
-	public $no_color = false;
-
-	/**
 	 * Enable plain mode to prevent any headers or similar decoration being output.
 	 * Good for command calls embedded into other scripts.
 	 *
@@ -98,27 +91,23 @@ class Test extends \lithium\console\Command {
 					$command->out(null, 1);
 				}
 
-				$colorize = function ($result) use ($command) {
-					if($command->no_color) {
-						return $result;
-					} else {
-						switch (trim($result)) {
-							case '.':
-								return $result;
-							case 'pass':
-								return "{:green}{$result}{:end}";
-							case 'F':
-							case 'fail':
-								return "{:red}{$result}{:end}";
-							case 'E':
-							case 'exception':
-								return "{:purple}{$result}{:end}";
-							case 'S':
-							case 'skip':
-								return "{:cyan}{$result}{:end}";
-							default:
-								return "{:yellow}{$result}{:end}";
-						}
+				$colorize = function ($result) {
+					switch (trim($result)) {
+						case '.':
+							return $result;
+						case 'pass':
+							return "{:green}{$result}{:end}";
+						case 'F':
+						case 'fail':
+							return "{:red}{$result}{:end}";
+						case 'E':
+						case 'exception':
+							return "{:purple}{$result}{:end}";
+						case 'S':
+						case 'skip':
+							return "{:cyan}{$result}{:end}";
+						default:
+							return "{:yellow}{$result}{:end}";
 					}
 				};
 
