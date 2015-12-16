@@ -8,6 +8,7 @@
 
 namespace lithium\storage\session\adapter;
 
+use lithium\core\Filterable;
 use RuntimeException;
 use lithium\util\Set;
 use lithium\core\Libraries;
@@ -21,6 +22,7 @@ use lithium\core\Libraries;
  *
  */
 class Cookie extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Default settings for this session adapter.

@@ -8,6 +8,7 @@
 
 namespace lithium\security\auth\adapter;
 
+use lithium\core\Filterable;
 use lithium\core\Libraries;
 
 /**
@@ -39,6 +40,7 @@ use lithium\core\Libraries;
  * @see lithium\action\Request::env
  */
 class Http extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Dynamic class dependencies.

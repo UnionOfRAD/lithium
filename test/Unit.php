@@ -10,6 +10,7 @@ namespace lithium\test;
 
 use Exception;
 use ErrorException;
+use lithium\core\Filterable;
 use ReflectionClass;
 use InvalidArgumentException;
 use lithium\util\Text;
@@ -36,6 +37,7 @@ use RecursiveIteratorIterator;
  * @see lithium\test\Unit::assertException()
  */
 class Unit extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * The Reference to a test reporter class.

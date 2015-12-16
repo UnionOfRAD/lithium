@@ -8,6 +8,7 @@
 
 namespace lithium\analysis\logger\adapter;
 
+use lithium\core\Filterable;
 use lithium\util\Text;
 use lithium\core\Libraries;
 
@@ -31,7 +32,7 @@ use lithium\core\Libraries;
  * @see lithium\analysis\logger\adapter\File::__construct()
  */
 class File extends \lithium\core\Object {
-
+	use Filterable;
 	/**
 	 * Constructor.
 	 *

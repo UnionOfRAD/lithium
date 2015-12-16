@@ -8,6 +8,7 @@
 
 namespace lithium\data;
 
+use lithium\core\Filterable;
 use lithium\core\NetworkException;
 use lithium\util\Inflector;
 
@@ -24,6 +25,7 @@ use lithium\util\Inflector;
  * requirements for interacting with `Model` objects, and other classes within `lithium\data`.
  */
 abstract class Source extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * The list of object properties to be automatically assigned from configuration passed to

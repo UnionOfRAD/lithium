@@ -8,12 +8,14 @@
 
 namespace lithium\storage\session\adapter;
 
+use lithium\core\Filterable;
 use lithium\util\Text;
 
 /**
  * Simple memory session storage engine. Used for testing.
  */
 class Memory extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Holds the array that corresponds to session keys & values.

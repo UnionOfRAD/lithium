@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\util;
 
+use lithium\core\Filterable;
+
 class MockCollectionObject extends \lithium\core\Object {
+	use Filterable;
 
 	public $data = array(1 => 2);
 

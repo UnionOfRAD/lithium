@@ -8,10 +8,13 @@
 
 namespace lithium\g11n\catalog;
 
+use lithium\core\Filterable;
+
 /**
  * This is the foundation class for all g11n catalog adapters.
  */
 class Adapter extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Reads data.

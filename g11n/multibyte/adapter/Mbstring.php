@@ -8,6 +8,8 @@
 
 namespace lithium\g11n\multibyte\adapter;
 
+use lithium\core\Filterable;
+
 /**
  * The `Mbstring` class is an adapter which uses certain string functions from
  * `ext/mbstring`. You will need to have the extension installed to use this adapter.
@@ -18,6 +20,7 @@ namespace lithium\g11n\multibyte\adapter;
  * @link http://php.net/book.mbstring.php
  */
 class Mbstring extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Determines if this adapter is enabled by checking if the `mbstring` extension is loaded.

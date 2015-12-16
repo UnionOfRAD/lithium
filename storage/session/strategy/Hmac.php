@@ -8,6 +8,7 @@
 
 namespace lithium\storage\session\strategy;
 
+use lithium\core\Filterable;
 use RuntimeException;
 use lithium\core\ConfigException;
 use lithium\storage\session\strategy\MissingSignatureException;
@@ -40,6 +41,7 @@ use lithium\security\Hash;
  * @link http://en.wikipedia.org/wiki/HMAC Wikipedia: Hash-based Message Authentication Code
  */
 class Hmac extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * The HMAC secret.

@@ -8,10 +8,13 @@
 
 namespace lithium\storage\cache\strategy;
 
+use lithium\core\Filterable;
+
 /**
  * An PHP Serialization strategy.
  */
 class Serializer extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Write strategy method.

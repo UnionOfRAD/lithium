@@ -8,6 +8,7 @@
 
 namespace lithium\template\view;
 
+use lithium\core\Filterable;
 use RuntimeException;
 use lithium\core\Libraries;
 use lithium\core\ClassNotFoundException;
@@ -26,6 +27,7 @@ use lithium\core\ClassNotFoundException;
  * @see lithium\template\adapter\Simple
  */
 abstract class Renderer extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * These configuration variables will automatically be assigned to their corresponding protected

@@ -8,6 +8,7 @@
 
 namespace lithium\data\model;
 
+use lithium\core\Filterable;
 use lithium\util\Set;
 use lithium\data\Source;
 use lithium\core\ConfigException;
@@ -28,6 +29,7 @@ use InvalidArgumentException;
  * @see lithium\data\Source
  */
 class Query extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Array containing mappings of relationship and field names, which allow database results to

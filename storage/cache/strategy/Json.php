@@ -8,10 +8,13 @@
 
 namespace lithium\storage\cache\strategy;
 
+use lithium\core\Filterable;
+
 /**
  * A JSON encoder/decoder strategy.
  */
 class Json extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Write strategy method.

@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\g11n\multibyte\adapter;
 
+use lithium\core\Filterable;
+
 class MockAdapter extends \lithium\core\Object {
+	use Filterable;
 
 	public $testStrlenArgs = array();
 

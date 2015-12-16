@@ -8,6 +8,8 @@
 
 namespace lithium\analysis\logger\adapter;
 
+use lithium\core\Filterable;
+
 /**
  * The `FirePhp` log adapter allows you to log messages to FirePHP.
  *
@@ -71,7 +73,7 @@ namespace lithium\analysis\logger\adapter;
  * @link http://php.net/function.json-encode.php PHP Manual: `json_encode()`
  */
 class FirePhp extends \lithium\core\Object {
-
+	use Filterable;
 	/**
 	 * These headers are specified by FirePHP and get added as headers to the response.
 	 *

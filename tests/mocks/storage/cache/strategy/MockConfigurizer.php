@@ -8,11 +8,14 @@
 
 namespace lithium\tests\mocks\storage\cache\strategy;
 
+use lithium\core\Filterable;
+
 /**
  * Mock strategy.
  * For testing strategies that need construct-time parameters.
  */
 class MockConfigurizer extends \lithium\core\Object {
+	use Filterable;
 
 	public static $parameters = array();
 

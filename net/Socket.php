@@ -8,12 +8,15 @@
 
 namespace lithium\net;
 
+use lithium\core\Filterable;
+
 /**
  * Abstract class for connecting to sockets with various adapters.
  *
  * Currently, Curl, Stream and Context adapters are available.
  */
 abstract class Socket extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * The resource for the current connection.

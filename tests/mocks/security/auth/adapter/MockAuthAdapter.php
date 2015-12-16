@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\security\auth\adapter;
 
+use lithium\core\Filterable;
+
 class MockAuthAdapter extends \lithium\core\Object {
+	use Filterable;
 
 	public function check($credentials, array $options = array()) {
 		switch (true) {

@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\core;
 
+use lithium\core\Filterable;
+
 class MockExposed extends \lithium\core\Object {
+	use Filterable;
 
 	protected $_internal = 'secret';
 

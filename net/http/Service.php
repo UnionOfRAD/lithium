@@ -8,6 +8,7 @@
 
 namespace lithium\net\http;
 
+use lithium\core\Filterable;
 use lithium\core\Libraries;
 use lithium\core\ClassNotFoundException;
 
@@ -16,6 +17,7 @@ use lithium\core\ClassNotFoundException;
  *
  */
 class Service extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * The `Socket` instance used to send `Service` calls.

@@ -9,6 +9,7 @@
 namespace lithium\storage\session\strategy;
 
 use lithium\core\ConfigException;
+use lithium\core\Filterable;
 
 /**
  * This strategy allows you to encrypt your `Session` and / or `Cookie` data so that it
@@ -57,6 +58,7 @@ use lithium\core\ConfigException;
  * @link http://php.net/mcrypt.constants.php List of supported modes.
  */
 class Encrypt extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Holds the initialization vector.

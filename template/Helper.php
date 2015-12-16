@@ -8,6 +8,7 @@
 
 namespace lithium\template;
 
+use lithium\core\Filterable;
 use lithium\util\Text;
 
 /**
@@ -17,6 +18,7 @@ use lithium\util\Text;
  *
  */
 abstract class Helper extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Maps helper method names to content types as defined by the `Media` class, where key are

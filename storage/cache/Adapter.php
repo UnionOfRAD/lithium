@@ -8,6 +8,8 @@
 
 namespace lithium\storage\cache;
 
+use lithium\core\Filterable;
+
 /**
  * This is the foundation class for all cache adapters.
  *
@@ -32,6 +34,7 @@ namespace lithium\storage\cache;
  * Adapters may handle serialization and/or multi-keys natively others only synthetically.
  */
 abstract class Adapter extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Write values to the cache. All items to be cached will receive an

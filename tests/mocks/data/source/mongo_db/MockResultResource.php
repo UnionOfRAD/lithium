@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\data\source\mongo_db;
 
+use lithium\core\Filterable;
+
 class MockResultResource extends \lithium\core\Object {
+	use Filterable;
 
 	protected $_data = array();
 
