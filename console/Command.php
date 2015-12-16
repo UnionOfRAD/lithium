@@ -121,10 +121,6 @@ class Command extends \lithium\core\Object {
 		$params = array_diff_key((array) $this->request->params, $default);
 
 		foreach ($params as $key => $param) {
-			if($key == 'no-color') {
-				$key = 'noColor';
-			}
-
 			$this->{$key} = $param;
 		}
 
