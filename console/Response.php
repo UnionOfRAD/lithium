@@ -140,9 +140,7 @@ class Response extends \lithium\core\Object {
 		if ($styles === false || $this->noColor || strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 			return array_combine(array_keys($defaults), array_pad(array(), count($defaults), null));
 		}
-		$styles += $defaults;
-
-		return $styles;
+		return $styles + $defaults;
 	}
 }
 
