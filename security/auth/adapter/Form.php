@@ -8,6 +8,7 @@
 
 namespace lithium\security\auth\adapter;
 
+use lithium\core\Filterable;
 use lithium\core\Libraries;
 use UnexpectedValueException;
 use lithium\security\Password;
@@ -140,6 +141,7 @@ use lithium\util\Inflector;
  * @see lithium\security\Hash::calculate()
  */
 class Form extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * The name of the model class to query against. This can either be a model name (i.e.

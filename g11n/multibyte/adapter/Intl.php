@@ -8,6 +8,8 @@
 
 namespace lithium\g11n\multibyte\adapter;
 
+use lithium\core\Filterable;
+
 /**
  * The `Intl` class is an adapter which uses certain string functions from
  * `ext/intl`. You will need to have the extension installed to use this adapter.
@@ -20,6 +22,7 @@ namespace lithium\g11n\multibyte\adapter;
  * @link http://php.net/book.intl.php
  */
 class Intl extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Determines if this adapter is enabled by checking if the `intl` extension is loaded.

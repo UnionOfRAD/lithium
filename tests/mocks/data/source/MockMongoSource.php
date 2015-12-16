@@ -8,10 +8,12 @@
 
 namespace lithium\tests\mocks\data\source;
 
+use lithium\core\Filterable;
 use MongoId;
 use lithium\tests\mocks\data\source\mongo_db\MockResultResource;
 
 class MockMongoSource extends \lithium\core\Object {
+	use Filterable;
 
 	public $resultSets = array();
 

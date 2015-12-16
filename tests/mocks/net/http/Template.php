@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\net\http;
 
+use lithium\core\Filterable;
+
 class Template extends \lithium\core\Object {
+	use Filterable;
 
 	public function __construct(array $config = array()) {
 		$config['response']->headers('Custom', 'Value');

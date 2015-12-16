@@ -8,6 +8,8 @@
 
 namespace lithium\test;
 
+use lithium\core\Filterable;
+
 /**
  * Mocker chain is used to aid in assertion of method calls.
  *
@@ -39,6 +41,7 @@ namespace lithium\test;
  * ```
  */
 class MockerChain extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Data to be used in the class.

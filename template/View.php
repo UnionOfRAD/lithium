@@ -8,6 +8,7 @@
 
 namespace lithium\template;
 
+use lithium\core\Filterable;
 use lithium\core\Libraries;
 use lithium\template\TemplateException;
 
@@ -75,6 +76,7 @@ use lithium\template\TemplateException;
  * @see lithium\net\http\Media
  */
 class View extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Output filters for view rendering.

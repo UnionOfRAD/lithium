@@ -8,10 +8,13 @@
 
 namespace lithium\storage\cache\strategy;
 
+use lithium\core\Filterable;
+
 /**
  * A PHP base64-encoding strategy.
  */
 class Base64 extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Write strategy method.

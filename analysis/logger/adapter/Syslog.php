@@ -8,6 +8,8 @@
 
 namespace lithium\analysis\logger\adapter;
 
+use lithium\core\Filterable;
+
 /**
  * The Syslog adapter facilitates logging messages to a `syslogd` backend. See the constructor for
  * information on configuring this adapter.
@@ -15,7 +17,7 @@ namespace lithium\analysis\logger\adapter;
  * @see lithium\analysis\logger\adapter\Syslog::__construct()
  */
 class Syslog extends \lithium\core\Object {
-
+	use Filterable;
 	/**
 	 * Flag indicating whether or not the connection to `syslogd` has been opened yet.
 	 *

@@ -8,8 +8,11 @@
 
 namespace lithium\tests\mocks\core;
 
-class MockObjectConfiguration extends \lithium\core\Object {
+use lithium\core\Filterable;
 
+class MockObjectConfiguration extends \lithium\core\Object {
+	use Filterable;
+	
 	protected $_testScalar = 'default';
 
 	protected $_testArray = array('default');

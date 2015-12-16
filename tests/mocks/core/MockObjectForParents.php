@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\core;
 
+use lithium\core\Filterable;
+
 class MockObjectForParents extends \lithium\core\Object {
+	use Filterable;
 
 	public static function parents() {
 		return static::_parents();

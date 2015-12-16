@@ -8,7 +8,11 @@
 
 namespace lithium\tests\mocks\test;
 
+use lithium\core\Filterable;
+
 class MockFilterClass extends \lithium\core\Object {
+	use Filterable;
+
 	public function __construct($all = false) {
 		if ($all) {
 			return true;

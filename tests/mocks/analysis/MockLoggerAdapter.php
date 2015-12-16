@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\analysis;
 
+use lithium\core\Filterable;
+
 class MockLoggerAdapter extends \lithium\core\Object {
+	use Filterable;
 
 	public function write($name, $value) {
 		return function($self, $params, $chain) {

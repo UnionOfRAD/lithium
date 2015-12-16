@@ -8,6 +8,7 @@
 
 namespace lithium\data;
 
+use lithium\core\Filterable;
 use RuntimeException;
 
 /**
@@ -15,6 +16,7 @@ use RuntimeException;
  * of named fields and types.
  */
 class Schema extends \lithium\core\Object implements \ArrayAccess {
+	use Filterable;
 
 	protected $_fields = array();
 

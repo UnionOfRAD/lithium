@@ -8,6 +8,7 @@
 
 namespace lithium\net;
 
+use lithium\core\Filterable;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -18,6 +19,7 @@ use ReflectionProperty;
  * @see http://en.wikipedia.org/wiki/URI_scheme#Generic_syntax
  */
 class Message extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * The URI scheme.

@@ -8,6 +8,7 @@
 
 namespace lithium\test;
 
+use lithium\core\Filterable;
 use lithium\core\Libraries;
 use lithium\util\Inflector;
 use lithium\core\ClassNotFoundException;
@@ -60,6 +61,7 @@ use lithium\core\ClassNotFoundException;
  * @see lithium\test\templates
  */
 class Report extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Contains an instance of `lithium\test\Group`, which contains all unit tests to be executed

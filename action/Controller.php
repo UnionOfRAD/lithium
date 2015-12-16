@@ -8,6 +8,7 @@
 
 namespace lithium\action;
 
+use lithium\core\Filterable;
 use lithium\util\Inflector;
 use lithium\action\DispatchException;
 use lithium\core\Libraries;
@@ -40,6 +41,7 @@ use lithium\core\Libraries;
  * @see lithium\action\Controller::$_render
  */
 class Controller extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Contains an instance of the `Request` object with all the details of the HTTP request that

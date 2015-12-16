@@ -9,6 +9,7 @@
 namespace lithium\data;
 
 use BadMethodCallException;
+use lithium\core\Filterable;
 use UnexpectedValueException;
 use lithium\data\Collection;
 use lithium\analysis\Inspector;
@@ -29,6 +30,7 @@ use lithium\analysis\Inspector;
  * @see lithium\data\Entity::serialize()
  */
 class Entity extends \lithium\core\Object implements \Serializable {
+	use Filterable;
 
 	/**
 	 * Fully-namespaced class name of model that this record is bound to. Instance methods declared

@@ -8,6 +8,7 @@
 
 namespace lithium\test;
 
+use lithium\core\Filterable;
 use lithium\test\Dispatcher;
 use lithium\core\Libraries;
 use lithium\test\Group;
@@ -19,6 +20,7 @@ use lithium\net\http\Router;
  *
  */
 class Controller extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Saved context.

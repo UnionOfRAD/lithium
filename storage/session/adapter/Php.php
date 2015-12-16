@@ -8,6 +8,7 @@
 
 namespace lithium\storage\session\adapter;
 
+use lithium\core\Filterable;
 use lithium\util\Set;
 use RuntimeException;
 use lithium\core\ConfigException;
@@ -21,6 +22,7 @@ use lithium\core\Libraries;
  * per the Lithium filtering system.
  */
 class Php extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Default ini settings for this session adapter. Will disabl cookie lifetime,

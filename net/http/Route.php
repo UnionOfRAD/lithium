@@ -8,6 +8,8 @@
 
 namespace lithium\net\http;
 
+use lithium\core\Filterable;
+
 /**
  * The `Route` class represents a single URL pattern which is matched against incoming requests, in
  * order to determine the correct controller and action that an HTTP request should be dispatched
@@ -51,6 +53,7 @@ namespace lithium\net\http;
  * @see lithium\net\http\Router
  */
 class Route extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * The URL template string that the route matches, i.e.

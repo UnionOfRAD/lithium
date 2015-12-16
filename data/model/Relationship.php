@@ -9,6 +9,7 @@
 namespace lithium\data\model;
 
 use Countable;
+use lithium\core\Filterable;
 use lithium\util\Set;
 use lithium\core\Libraries;
 use lithium\core\ConfigException;
@@ -19,6 +20,7 @@ use lithium\core\ClassNotFoundException;
  * classes together.
  */
 class Relationship extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Class dependencies.

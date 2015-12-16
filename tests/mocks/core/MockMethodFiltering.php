@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\core;
 
+use lithium\core\Filterable;
+
 class MockMethodFiltering extends \lithium\core\Object {
+	use Filterable;
 
 	public function method($data) {
 		$data[] = 'Starting outer method call';

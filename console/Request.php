@@ -8,6 +8,8 @@
 
 namespace lithium\console;
 
+use lithium\core\Filterable;
+
 /**
  * The `Request` class represents a console request and holds information about its
  * environment as well as passed arguments.
@@ -15,6 +17,7 @@ namespace lithium\console;
  * @see lithium\console\Dispatcher
  */
 class Request extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * The raw data passed from the command line

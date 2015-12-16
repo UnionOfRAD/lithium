@@ -8,6 +8,8 @@
 
 namespace lithium\data\source;
 
+use lithium\core\Filterable;
+
 /**
  * The `Result` class is a wrapper around a forward-only data soure result cursor and can be
  * used to iterate over it.
@@ -38,6 +40,7 @@ namespace lithium\data\source;
  * @link http://php.net/manual/norewinditerator.rewind.php
  */
 abstract class Result extends \lithium\core\Object implements \Iterator {
+	use Filterable;
 
 	/**
 	 * The current position of the iterator.

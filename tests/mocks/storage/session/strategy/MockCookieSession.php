@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\storage\session\strategy;
 
+use lithium\core\Filterable;
+
 class MockCookieSession extends \lithium\core\Object {
+	use Filterable;
 
 	protected static $_secret = 'foobar';
 

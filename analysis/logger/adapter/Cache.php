@@ -8,6 +8,7 @@
 
 namespace lithium\analysis\logger\adapter;
 
+use lithium\core\Filterable;
 use lithium\util\Text;
 
 /**
@@ -34,6 +35,7 @@ use lithium\util\Text;
  * @see lithium\storage\Cache
  */
 class Cache extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Classes used by `Cache`.

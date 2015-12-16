@@ -10,6 +10,7 @@ namespace lithium\console;
 
 use Exception;
 use lithium\console\command\Help;
+use lithium\core\Filterable;
 
 /**
  * All Commands to be run from the Lithium console must extend this class.
@@ -24,7 +25,7 @@ use lithium\console\command\Help;
  *
  */
 class Command extends \lithium\core\Object {
-
+	use Filterable;
 	/**
 	 * If -h or --help param exists a help screen will be returned.
 	 * Similar to running `li3 help COMMAND`.

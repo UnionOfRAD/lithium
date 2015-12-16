@@ -8,12 +8,15 @@
 
 namespace lithium\tests\mocks\storage\cache\strategy;
 
+use lithium\core\Filterable;
+
 /**
  * Mock strategy.
  * Simulates the 'Serializer' strategy.
  */
 class MockSerializer extends \lithium\core\Object {
-
+	use Filterable;
+	
 	/**
 	 * Write strategy method.
 	 * Serializes the passed data.

@@ -8,6 +8,8 @@
 
 namespace lithium\util;
 
+use lithium\core\Filterable;
+
 /**
  * The parent class for all collection objects. Contains methods for collection iteration,
  * conversion, and filtering. Implements `ArrayAccess`, `Iterator`, and `Countable`.
@@ -75,6 +77,7 @@ namespace lithium\util;
  * @link http://php.net/class.countable.php PHP Manual: Countable Interface
  */
 class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator, \Countable {
+	use Filterable;
 
 	/**
 	 * A central registry of global format handlers for `Collection` objects and subclasses.

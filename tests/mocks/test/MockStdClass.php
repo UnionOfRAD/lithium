@@ -2,7 +2,10 @@
 
 namespace lithium\tests\mocks\test;
 
+use lithium\core\Filterable;
+
 class MockStdClass extends \lithium\core\Object {
+	use Filterable;
 
 	protected $_data = array();
 

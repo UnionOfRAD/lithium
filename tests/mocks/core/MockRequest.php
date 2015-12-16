@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\core;
 
+use lithium\core\Filterable;
+
 class MockRequest extends \lithium\core\Object {
+	use Filterable;
 
 	public $url = null;
 

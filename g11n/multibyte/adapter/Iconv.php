@@ -8,6 +8,8 @@
 
 namespace lithium\g11n\multibyte\adapter;
 
+use lithium\core\Filterable;
+
 /**
  * The `Iconv` class is an adapter which uses certain string functions from
  * `ext/iconv`. You will need to have the extension installed to use this adapter.
@@ -18,6 +20,7 @@ namespace lithium\g11n\multibyte\adapter;
  * @link http://php.net/book.iconv.php
  */
 class Iconv extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Determines if this adapter is enabled by checking if the `iconv` extension is loaded.

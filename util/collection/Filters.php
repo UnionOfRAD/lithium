@@ -66,9 +66,9 @@ namespace lithium\util\collection;
  *
  * @link http://php.net/functions.anonymous.php
  * @see lithium\util\collection\Filters::run()
- * @see lithium\core\Object::_filter()
+ * @see lithium\core\Filterable::_filter()
  * @see lithium\core\StaticObject::_filter()
- * @see lithium\core\Object::applyFilter()
+ * @see lithium\core\Filterable::applyFilter()
  * @see lithium\core\StaticObject::applyFilter()
  */
 class Filters extends \lithium\util\Collection {
@@ -190,8 +190,8 @@ class Filters extends \lithium\util\Collection {
 	/**
 	 * Provides short-hand convenience syntax for filter chaining.
 	 *
-	 * @see lithium\core\Object::applyFilter()
-	 * @see lithium\core\Object::_filter()
+	 * @see lithium\core\Filterable::applyFilter()
+	 * @see lithium\core\Filterable::_filter()
 	 * @param object $self The object instance that owns the filtered method.
 	 * @param array $params An associative array containing the parameters passed to the filtered
 	 *              method.

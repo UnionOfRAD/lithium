@@ -8,7 +8,10 @@
 
 namespace lithium\tests\mocks\core;
 
+use lithium\core\Filterable;
+
 class MockCallable extends \lithium\core\Object {
+	use Filterable;
 
 	public $construct = array();
 

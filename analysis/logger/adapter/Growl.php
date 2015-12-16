@@ -8,6 +8,7 @@
 
 namespace lithium\analysis\logger\adapter;
 
+use lithium\core\Filterable;
 use lithium\util\Inflector;
 use lithium\core\NetworkException;
 use lithium\core\Libraries;
@@ -19,6 +20,7 @@ use lithium\core\Libraries;
  * @link http://growl.info
  */
 class Growl extends \lithium\core\Object {
+	use Filterable;
 
 	/**
 	 * Array that maps `Logger` message priority names to Growl-compatible priority levels.
