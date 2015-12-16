@@ -162,64 +162,6 @@ class Test extends \lithium\console\Command {
 				}
 				return $report;
 			},
-			'plain' => function($runner) use ($command) {
-				$command->out('----');
-				$command->out('Test');
-				$command->out('----');
-				$command->out(null, 1);
-
-				if ($command->verbose) {
-					$reporter = function($result) use ($command) {
-						$command->out(sprintf(
-							'[%s] on line %4s in %s::%s()',
-							sprintf('%9s', $result['result']),
-							isset($result['line']) ? $result['line'] : '??',
-							isset($result['class']) ? $result['class'] : '??',
-							isset($result['method']) ? $result['method'] : '??'
-						));
-					};
-				} else {
-					$i = 0;
-					$columns = 60;
-
-					$reporter = function($result) use ($command, &$i, $columns) {
-						$shorten = array('fail', 'skip', 'exception');
-
-						if ($result['result'] === 'pass') {
-							$symbol = '.';
-						} elseif (in_array($result['result'], $shorten)) {
-							$symbol = strtoupper($result['result'][0]);
-						} else {
-							$symbol = '?';
-						}
-						$command->out($symbol, false);
-
-						$i++;
-						if ($i % $columns === 0) {
-							$command->out();
-						}
-					};
-				}
-				$report = $runner(compact('reporter'));
-
-				if (!$command->plain) {
-					$stats = $report->stats();
-
-					$command->out(null, 2);
-					$command->out($report->render('result', $stats));
-					$command->out($report->render('errors', $stats));
-
-					if ($command->verbose) {
-						$command->out($report->render('skips', $stats));
-					}
-
-					foreach ($report->filters() as $filter => $options) {
-						$data = $report->results['filters'][$filter];
-						$command->out($report->render($options['name'], compact('data')));
-					}
-				}
-				return $report;
-			},
 			'json' => function($runner, $path) use ($command) {
 				$report = $runner();
 
