@@ -32,7 +32,7 @@ class Response extends \lithium\core\Object {
 	public $error = null;
 
 	/**
-	 * Don't show color on output
+	 * Disabled colour output. Useful when piping command output into other commands
 	 *
 	 * @var boolean
 	 */

@@ -57,7 +57,7 @@ class Command extends \lithium\core\Object {
 	public $plain = false;
 
 	/**
-	 * Shows text output with color or without
+	 * Disabled colour output. Useful when piping command output into other commands
 	 *
 	 * @var boolean
 	 */
