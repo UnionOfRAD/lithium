@@ -9,6 +9,7 @@
 
 ### Improved
 
+- Reduced `preg_match()` call count in `Router` in favor of `strpos()` for performance reasons.
 - It is now guaranteed that `Random::generate()` will use a cryptographic strong RNG. It 
   no longer falls back to a less strong source. 
 - `Router::match()` now additionaly supports the magic schemes `tel` and `sms`. This
@@ -89,7 +90,12 @@
   ```
 
 ### Changed
-    
+  
+- Multi-word console command arguments are now parsed into camelized versions.
+  `--no-color`, will be available as `noColor` and assigned to a `$noColor` property if
+  present in the command class definition. Previously `--no-color` was made available as
+  `no-color`. This has been deprecated.
+	
 - The String class has been renamed to `Text` while RNG and hashing functionality 
   have been extracted into `lithium\security\Random` and `lithium\security\Hash`. #1184 (David Persson)
 
