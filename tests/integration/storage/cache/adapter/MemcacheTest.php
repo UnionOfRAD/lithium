@@ -136,7 +136,7 @@ class MemcacheTest extends \lithium\test\Integration {
 		$this->_conn->delete('key1');
 	}
 
-	public function testWriteExpiryExpires() {
+	public function testWriteWithExpiry() {
 		$keys = array('key1' => 'data1');
 		$expiry = '+5 seconds';
 		$this->memcache->write($keys, $expiry);
@@ -145,35 +145,22 @@ class MemcacheTest extends \lithium\test\Integration {
 		$this->assertTrue($result);
 
 		$this->_conn->delete('key1');
-
-		$keys = array('key1' => 'data1');
-		$expiry = '+1 second';
-		$this->memcache->write($keys, $expiry);
-
-		sleep(2);
-
-		$result = $this->_conn->get('key1');
-		$this->assertFalse($result);
 	}
 
-	public function testWriteExpiryTtl() {
-		$keys = array('key1' => 'data1');
-		$expiry = 5;
-		$this->memcache->write($keys, $expiry);
-
-		$result = (boolean) $this->_conn->get('key1');
-		$this->assertTrue($result);
-
-		$this->_conn->delete('key1');
-
-		$keys = array('key1' => 'data1');
-		$expiry = 1;
-		$this->memcache->write($keys, $expiry);
+	public function testWriteExpiryExpires() {
+		$this->memcache->write(array('expire0' => 'data0'), '+1 second');
+		$this->memcache->write(array('expire1' => 'data1'), 1);
 
 		sleep(2);
 
-		$result = $this->_conn->get('key1');
+		$result = $this->_conn->get('expire0');
 		$this->assertFalse($result);
+
+		$result = $this->_conn->get('expire1');
+		$this->assertFalse($result);
+
+		$this->_conn->delete('expire0');
+		$this->_conn->delete('expire1');
 	}
 
 	public function testWriteMulti() {
