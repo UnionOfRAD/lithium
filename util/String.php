@@ -19,12 +19,16 @@ $message .= "to the new classes. However it is not possible to use the String ";
 $message .= "class with PHP >=7.0.";
 trigger_error($message, E_USER_DEPRECATED);
 
+if (PHP_VERSION_ID < 70000) {
+    class_alias('StringDeprecated', 'String');
+}
+
 /**
  * String manipulation utility class.
  *
  * @deprecated Replaced by `\lithium\util\Text` and `\lithium\security\{Hash,Random}`.
  */
-class String {
+class StringDeprecated {
 
 	/**
 	 * Option flag used in `String::random()`.
