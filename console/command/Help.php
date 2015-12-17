@@ -27,10 +27,6 @@ class Help extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	public function run($command = null) {
-		$message = 'Lithium console started in the ' . Environment::get() . ' environment.';
-		$message .= ' Use the --env=environment key to alter this.';
-		$this->out($message);
-
 		if (!$command) {
 			$this->_renderCommands();
 			return true;
