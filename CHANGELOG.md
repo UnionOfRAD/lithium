@@ -144,6 +144,7 @@
 
 ### Backwards Incompatible Changes
 
+- To skip decoration in the console test command use `--just-assertions` instead of `--plain`.
 - When no suitable RNG is found (rare), `Random::generate()` will throw an exception.
 - Database encoding, timezone, and searchPath methods may now throw exceptions. Please
   wrap code calling these methods directly in try/catch blocks - if needed. #1172

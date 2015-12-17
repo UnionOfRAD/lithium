@@ -59,6 +59,14 @@ class Test extends \lithium\console\Command {
 	public $verbose = false;
 
 	/**
+	 * Prevent any headers or similar decoration being output.
+	 * Good for command calls embedded into other scripts.
+	 *
+	 * @var boolean
+	 */
+	public $justAssertions = false;
+
+	/**
 	 * An array of closures, mapped by type, which are set up to handle different test output
 	 * formats.
 	 *
@@ -78,7 +86,7 @@ class Test extends \lithium\console\Command {
 
 		$this->_handlers += array(
 			'txt' => function($runner, $path) use ($command) {
-				if (!$command->plain) {
+				if (!$command->justAssertions) {
 					$command->header('Test');
 					$command->out(null, 1);
 				}
@@ -136,7 +144,7 @@ class Test extends \lithium\console\Command {
 				}
 				$report = $runner(compact('reporter'));
 
-				if (!$command->plain) {
+				if (!$command->justAssertions) {
 					$stats = $report->stats();
 
 					$command->out(null, 2);
