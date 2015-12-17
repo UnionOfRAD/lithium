@@ -242,14 +242,6 @@ class CommandTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testOutWithoutStyles() {
-		$command = new MockCommand(array('request' => $this->request));
-		$command->plain = true;
-		$expected = "ok\n";
-		$result = $command->out('ok', 'some-style');
-		$this->assertEqual($expected, $result);
-	}
-
 	public function testOutWithSilent() {
 		$command = new MockCommand(array('request' => $this->request));
 		$command->silent = true;

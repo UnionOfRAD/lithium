@@ -43,15 +43,25 @@ class Response extends \lithium\core\Object {
 	public $status = 0;
 
 	/**
+	 * Disables color output. Useful when piping command output
+	 * into other commands. Colors are by default enabled.
+	 *
+	 * @var boolean
+	 * @see lithium\console\Response::styles()
+	 */
+	public $plain = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array $config Available configuration options are:
 	 *        - `'output'` _resource|null_
 	 *        - `'error'` _resource|null_
+	 *        - `'color'` _boolean_ By default `true`.
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		$defaults = array('output' => null, 'error' => null);
+		$defaults = array('output' => null, 'error' => null, 'plain' => false);
 		$config += $defaults;
 
 		$this->output = $config['output'];
@@ -65,6 +75,8 @@ class Response extends \lithium\core\Object {
 		if (!is_resource($this->error)) {
 			$this->error = fopen('php://stderr', 'r');
 		}
+		$this->plain = $config['plain'];
+
 		parent::__construct($config);
 	}
 
@@ -103,7 +115,8 @@ class Response extends \lithium\core\Object {
 	}
 
 	/**
-	 * Handles styling output.
+	 * Handles styling output. Uses ANSI escape sequences for colorization. These
+	 * may not always be supported (i.e. on Windows).
 	 *
 	 * @param array|boolean $styles
 	 * @return array
@@ -126,15 +139,10 @@ class Response extends \lithium\core\Object {
 			'success' => "\033[0;32m",
 			'bold'    => "\033[1m",
 		);
-		if ($styles === false) {
+		if ($styles === false || $this->plain || strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 			return array_combine(array_keys($defaults), array_pad(array(), count($defaults), null));
 		}
-		$styles += $defaults;
-
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			return $this->styles(false);
-		}
-		return $styles;
+		return $styles + $defaults;
 	}
 }
 

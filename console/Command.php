@@ -108,16 +108,18 @@ class Command extends \lithium\core\Object {
 		if (!is_object($this->request) || !$this->request->params) {
 			return;
 		}
-		$this->response = $this->_config['response'];
-
-		if (!is_object($this->response)) {
-			$this->response = $this->_instance('response', $this->response);
-		}
 		$default = array('command' => null, 'action' => null, 'args' => null);
 		$params = array_diff_key((array) $this->request->params, $default);
 
 		foreach ($params as $key => $param) {
 			$this->{$key} = $param;
+		}
+		$this->response = $this->_config['response'];
+
+		if (!is_object($this->response)) {
+			$this->response = $this->_instance('response', $this->response + array(
+				'plain' => $this->plain
+			));
 		}
 	}
 
@@ -412,7 +414,7 @@ class Command extends \lithium\core\Object {
 			}
 			return;
 		}
-		if ($options['style'] !== null && !$this->plain) {
+		if ($options['style'] !== null) {
 			$string = "{:{$options['style']}}{$string}{:end}";
 		}
 		if ($options['nl']) {
