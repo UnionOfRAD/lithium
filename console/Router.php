@@ -23,6 +23,10 @@ class Router extends \lithium\core\Object {
 	 * XF68-style long options (i.e. `-foo`) are not supported but support
 	 * can be added by extending this class.
 	 *
+	 * If passing through `--foo-bar` this previously (pre 1.1) resulted in
+	 * the option `foo-bar` being available. This has been deprecated in favor
+	 * of `fooBar` being created.
+	 *
 	 * @param \lithium\console\Request $request
 	 * @return array $params
 	 */
