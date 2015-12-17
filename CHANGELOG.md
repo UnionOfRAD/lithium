@@ -9,6 +9,7 @@
 
 ### Improved
 
+- Console command help now shows inherited options i.e. `[--silent] [--plain] [--help]`.
 - Reduced `preg_match()` call count in `Router` in favor of `strpos()` for performance reasons.
 - It is now guaranteed that `Random::generate()` will use a cryptographic strong RNG. It 
   no longer falls back to a less strong source. 

@@ -59,14 +59,6 @@ class Test extends \lithium\console\Command {
 	public $verbose = false;
 
 	/**
-	 * Enable plain mode to prevent any headers or similar decoration being output.
-	 * Good for command calls embedded into other scripts.
-	 *
-	 * @var boolean
-	 */
-	public $plain = false;
-
-	/**
 	 * An array of closures, mapped by type, which are set up to handle different test output
 	 * formats.
 	 *

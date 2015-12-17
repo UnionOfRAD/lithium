@@ -26,14 +26,6 @@ use lithium\console\command\Help;
 class Command extends \lithium\core\Object {
 
 	/**
-	 * If -h or --help param exists a help screen will be returned.
-	 * Similar to running `li3 help COMMAND`.
-	 *
-	 * @var boolean
-	 */
-	public $help = false;
-
-	/**
 	 * A Request object.
 	 *
 	 * @see lithium\console\Request
@@ -50,18 +42,25 @@ class Command extends \lithium\core\Object {
 	public $response;
 
 	/**
-	 * Only shows only text output without styles.
+	 * Surpresses all output except errors.
+	 *
+	 * @var boolean
+	 */
+	public $silent = false;
+
+	/**
+	 * Enables plain output by i.e. disabling colors. Useful when piping into other commands.
 	 *
 	 * @var boolean
 	 */
 	public $plain = false;
 
 	/**
-	 * Only shows error output.
+	 * Shows help for the command. Alternatively `-h` can be used.
 	 *
 	 * @var boolean
 	 */
-	public $silent = false;
+	public $help = false;
 
 	/**
 	 * Dynamic dependencies.

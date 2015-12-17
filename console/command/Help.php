@@ -196,10 +196,13 @@ class Help extends \lithium\console\Command {
 		$defaults = array('name' => null);
 		$options += $defaults;
 
-		$properties = Inspector::properties($class);
+		$properties = Inspector::properties($class, array('self' => false));
 		$results = array();
 
 		foreach ($properties as &$property) {
+			if ($property['name'] === 'request' || $property['name'] === 'response') {
+				continue;
+			}
 			$name = str_replace('_', '-', Inflector::underscore($property['name']));
 
 			$comment = Docblock::comment($property['docComment']);
