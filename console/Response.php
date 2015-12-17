@@ -32,6 +32,13 @@ class Response extends \lithium\core\Object {
 	public $error = null;
 
 	/**
+	 * Disabled colour output. Useful when piping command output into other commands
+	 *
+	 * @var boolean
+	 */
+	public $noColor = false;
+
+	/**
 	 * Status code, most often used for setting an exit status.
 	 *
 	 * It should be expected that only status codes in the range of 0-255
@@ -51,7 +58,7 @@ class Response extends \lithium\core\Object {
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		$defaults = array('output' => null, 'error' => null);
+		$defaults = array('output' => null, 'error' => null, 'noColor' => false);
 		$config += $defaults;
 
 		$this->output = $config['output'];
@@ -65,6 +72,9 @@ class Response extends \lithium\core\Object {
 		if (!is_resource($this->error)) {
 			$this->error = fopen('php://stderr', 'r');
 		}
+
+		$this->noColor = $config['noColor'];
+
 		parent::__construct($config);
 	}
 
@@ -126,15 +136,11 @@ class Response extends \lithium\core\Object {
 			'success' => "\033[0;32m",
 			'bold'    => "\033[1m",
 		);
-		if ($styles === false) {
+
+		if ($styles === false || $this->noColor || strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 			return array_combine(array_keys($defaults), array_pad(array(), count($defaults), null));
 		}
-		$styles += $defaults;
-
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			return $this->styles(false);
-		}
-		return $styles;
+		return $styles + $defaults;
 	}
 }
 
