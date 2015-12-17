@@ -70,6 +70,8 @@ class MediaTest extends \lithium\test\Integration {
 			'template' => 'testTypeFile'
 		));
 		$this->assertEqual("Layout top.\nThis is a type test.Layout bottom.", $response->body());
+
+		Media::type('view-integration-test', false);
 	}
 }
 
