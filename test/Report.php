@@ -231,7 +231,7 @@ class Report extends \lithium\core\Object {
 			'filter' => false, 'type' => 'file', 'suffix' => ".{$config['format']}.php"
 		));
 
-		if($template === null) {
+		if ($template === null) {
 			throw new TemplateException("Templates for format `{$config['format']}` not found in `test/templates`");
 		}
 
