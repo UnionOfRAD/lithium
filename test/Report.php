@@ -11,6 +11,7 @@ namespace lithium\test;
 use lithium\core\Libraries;
 use lithium\util\Inflector;
 use lithium\core\ClassNotFoundException;
+use lithium\template\TemplateException;
 
 /**
  * This `Report` object aggregates tests in a group and allows you to run said tests to
@@ -229,6 +230,11 @@ class Report extends \lithium\core\Object {
 		$template = Libraries::locate('test.templates', $template, array(
 			'filter' => false, 'type' => 'file', 'suffix' => ".{$config['format']}.php"
 		));
+
+		if ($template === null) {
+			$message = "Templates for format `{$config['format']}` not found in `test/templates`.";
+			throw new TemplateException($message);
+		}
 		$params = compact('template', 'data', 'config');
 
 		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
