@@ -151,7 +151,7 @@ class MemcacheTest extends \lithium\test\Integration {
 		$this->memcache->write(array('expire0' => 'data0'), '+1 second');
 		$this->memcache->write(array('expire1' => 'data1'), 1);
 
-		sleep(2);
+		sleep(5);
 
 		$result = $this->_conn->get('expire0');
 		$this->assertFalse($result);
