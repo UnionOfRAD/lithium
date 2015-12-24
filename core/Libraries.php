@@ -502,9 +502,14 @@ class Libraries {
 
 		if ($path && include $path) {
 			static::$_cachedPaths[$class] = $path;
+
 			if (method_exists($class, '__init')) {
-				$msg = "Deprecated `{$class}::__init()` method, needs to be called it manually.";
-				throw new RuntimeException($msg);
+				$message  = "Support for automatic initialization of static classes has been ";
+				$message .= "removed. `{$class}::__init()` exists, please remove it to get rid ";
+				$message .= "of this message. Static classes must now be initialized manually. ";
+				$message .= "i.e. by creating an `init()` method and calling it at the end of ";
+				$message .= "the file and outside of the class.";
+				throw new RuntimeException($message);
 			}
 		} elseif ($require) {
 			throw new RuntimeException("Failed to load class `{$class}` from path `{$path}`.");
