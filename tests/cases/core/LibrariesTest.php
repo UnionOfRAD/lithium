@@ -787,7 +787,7 @@ EOD;
 	}
 
 	public function testDeprectatedInit() {
-		$this->assertException("/Deprecated/", function() {
+		$this->assertException("/has been removed/i", function() {
 			MockInitMethod::li3();
 		});
 	}
