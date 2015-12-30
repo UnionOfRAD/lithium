@@ -10,10 +10,18 @@ namespace lithium\tests\cases\test;
 
 use lithium\test\Mocker;
 
+/**
+ * @deprecated
+ */
 class MockerChainTest extends \lithium\test\Unit {
 
 	public function setUp() {
+		error_reporting(($this->_backup = error_reporting()) & ~E_USER_DEPRECATED);
 		Mocker::register();
+	}
+
+	public function tearDown() {
+		error_reporting($this->_backup);
 	}
 
 	public function testStartSuccessful() {

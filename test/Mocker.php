@@ -16,6 +16,11 @@ use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use Reflection;
 
+$message  = 'lithium\test\Mocker has been deprecated, as alternatives ';
+$message .= 'exist (i.e. Mockery) which take the task of maintaining a ';
+$message .= 'mocking framework from us.';
+trigger_error($message, E_USER_DEPRECATED);
+
 /**
  * The Mocker class aids in the creation of Mocks on the fly, allowing you to
  * use Lithium filters on most methods in a class as close to the test as
@@ -199,6 +204,8 @@ use Reflection;
  * creates that function dynamically, so when its called it delegates back to
  * `Mocker` which will determine if it should call a user-defined function or
  * if it should go back to the original PHP function.
+ *
+ * @deprecated Please use an alternative mocking framework, i.e. Mockery.
  */
 class Mocker {
 

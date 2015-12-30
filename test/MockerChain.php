@@ -8,6 +8,11 @@
 
 namespace lithium\test;
 
+$message  = 'lithium\test\MockerChain has been deprecated, as alternatives ';
+$message .= 'exist (i.e. Mockery) which take the task of maintaining a ';
+$message .= 'mocking framework from us.';
+trigger_error($message, E_USER_DEPRECATED);
+
 /**
  * Mocker chain is used to aid in assertion of method calls.
  *
@@ -37,6 +42,7 @@ namespace lithium\test;
  * 	->called('method2')->with('foo', 'bar')
  * 		->success());
  * ```
+ * @deprecated Please use an alternative mocking framework, i.e. Mockery.
  */
 class MockerChain extends \lithium\core\Object {
 

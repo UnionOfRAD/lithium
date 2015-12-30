@@ -292,6 +292,11 @@
 - Instance filters are now not cleaned up automatically anymore, that
   is when the instance was destroyed, its filters went away with it.
 
+- The builtin mocking framework (`lithium\test\Mocker`) has been deprecated as alternatives
+  exist and it is not needed as a core test dependency. This takes the task of maintaining full
+  blown mocking from us. You might want to have a look at 
+  [Mockery](https://github.com/padraic/mockery).
+
 ### Backwards Incompatible Changes
 
 - When failing to close an established network connection via the `Socket` subclasses 

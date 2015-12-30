@@ -16,16 +16,23 @@ use lithium\tests\mocks\data\mockPost\Mock as MockPost;
 /**
  * WARNING:
  * No unit test should mock the same test as another to avoid conflicting filters.
+ *
+ * @deprecated
  */
 class MockerTest extends \lithium\test\Unit {
 
+	protected $_backup;
+
 	public function setUp() {
+		error_reporting(($this->_backup = error_reporting()) & ~E_USER_DEPRECATED);
 		Mocker::register();
 	}
 
 	public function tearDown() {
 		Filters::clear('lithium\test\Mocker');
 		Filters::clear('lithium\test\Mocker');
+
+		error_reporting($this->_backup);
 	}
 
 	public function testAutoloadRegister() {
