@@ -6,18 +6,17 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-namespace lithium\tests\cases\net\socket;
+namespace lithium\tests\integration\net\socket;
 
 use lithium\net\http\Request;
 use lithium\net\socket\Stream;
-use lithium\test\Mocker;
 
-class StreamTest extends \lithium\test\Unit {
+class StreamTest extends \lithium\test\Integration {
 
 	protected $_testConfig = array(
 		'persistent' => false,
 		'scheme' => 'http',
-		'host' => 'google.com',
+		'host' => 'example.org',
 		'port' => 80,
 		'timeout' => 2,
 		'classes' => array(
@@ -26,40 +25,8 @@ class StreamTest extends \lithium\test\Unit {
 		)
 	);
 
-	public function setUp() {
-		$base = 'lithium\net\socket';
-		Mocker::overwriteFunction("{$base}\\stream_socket_client", function() {
-			return fopen("php://memory", "rw");
-		});
-		Mocker::overwriteFunction("{$base}\\feof", function($resource) {
-			return true;
-		});
-		Mocker::overwriteFunction("{$base}\stream_get_contents", function($resource) {
-			return <<<EOD
-HTTP/1.1 301 Moved Permanently
-Location: http://www.google.com/
-Content-Type: text/html; charset=UTF-8
-Date: Thu, 28 Feb 2013 07:05:10 GMT
-Expires: Sat, 30 Mar 2013 07:05:10 GMT
-Cache-Control: public, max-age=2592000
-Server: gws
-Content-Length: 219
-X-XSS-Protection: 1; mode=block
-X-Frame-Options: SAMEORIGIN
-Connection: close
-
-<HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">
-<TITLE>301 Moved</TITLE></HEAD><BODY>
-<H1>301 Moved</H1>
-The document has moved
-<A HREF="http://www.google.com/">here</A>.
-</BODY></HTML>
-EOD;
-		});
-	}
-
-	public function tearDown() {
-		Mocker::overwriteFunction(false);
+	public function skip() {
+		$this->skipIf(!$this->_hasNetwork(), 'No network connection.');
 	}
 
 	public function testAllMethodsNoConnection() {
@@ -122,7 +89,7 @@ EOD;
 		$this->assertInternalType('resource', $stream->resource());
 
 		$result = $stream->write();
-		$this->assertEqual(83, $result);
+		$this->assertEqual(84, $result);
 		$this->assertPattern("/^HTTP/", (string) $stream->read());
 	}
 
@@ -167,12 +134,12 @@ EOD;
 		$response = $socket->send();
 		$this->assertInstanceOf('lithium\net\http\Response', $response);
 
-		$expected = 'google.com';
+		$expected = 'example.org';
 		$result = $response->host;
 		$this->assertEqual($expected, $result);
 
 		$result = $response->body();
-		$this->assertPattern("/<title[^>]*>301 Moved<\/title>/im", (string) $result);
+		$this->assertPattern("/<title[^>]*>Example Domain<\/title>/im", (string) $result);
 	}
 }
 
