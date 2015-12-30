@@ -8,11 +8,18 @@
 
 namespace lithium\tests\mocks\core;
 
-class MockAdapter extends \lithium\core\Adaptable {
+class MockAdaptable extends \lithium\core\Adaptable {
 
 	protected static $_configurations = array();
 
 	protected static $_adapters = 'adapter.storage.cache';
+
+	protected static $_strategies = 'strategy.storage.cache';
+
+	public static function testInitialized($name) {
+		$config = static::_config($name);
+		return isset($config['object']);
+	}
 }
 
 ?>
