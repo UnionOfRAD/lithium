@@ -28,20 +28,20 @@ env:
 php:
   - 5.5
   - 5.6
+  - 7.0
 
 matrix:
-  include:
-    # We just include one exemplaric job here.
+  exclude:
+    # XCache is not supported on PHP 7
     - php: 7.0
-      env: PHP_EXT=memcached TESTS=all
-    - php: hhvm-nightly
+      env: PHP_EXT=xcache TESTS=storage
+  include:
+    # Just one exemplaric job.
+    - php: hhvm
       env: PHP_EXT=memcached TESTS=all
   allow_failures:
-    # We're aiming for full 7.0 compat, later.
-    - php: 7.0
-      env: PHP_EXT=memcached TESTS=all
     # We do not aim for full HHVM compatibilty now.
-    - php: hhvm-nightly
+    - php: hhvm
       env: PHP_EXT=memcached TESTS=all
   # Mark build as failed as soon as one job failed.
   fast_finish: true
