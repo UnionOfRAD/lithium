@@ -29,9 +29,15 @@ class RedisTest extends \lithium\test\Integration {
 
 	/**
 	 * Skip the test if the Redis extension is unavailable.
+	 *
+	 * @link https://github.com/facebook/hhvm/commit/34de1a279b3b66458ff980d12ef347022f2def04
 	 */
 	public function skip() {
 		$this->skipIf(!Redis::enabled(), 'The redis extension is not installed.');
+		$this->skipIf(
+			defined('HHVM_VERSION') && version_compare(HHVM_VERSION, '3.10', '<'),
+			'Cannot reliably run redis test on HHVM < 3.110 due to HHVM bug.'
+		);
 
 		$redis = new RedisCore();
 		$cfg = $this->_config;

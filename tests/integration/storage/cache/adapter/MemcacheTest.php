@@ -327,17 +327,31 @@ class MemcacheTest extends \lithium\test\Integration {
 	public function testDeprecatedConnectionSettings() {
 		$servers = array(array('127.0.0.1', 11211, 1));
 		$test = new Memcache(compact('servers'));
+
 		$servers[0] = array_combine(array('host', 'port'), array_slice($servers[0], 0, 2));
-		$this->assertEqual($servers, $test->connection->getServerList());
+		$result = $test->connection->getServerList();
+
+		if (defined('HHVM_VERSION')) {
+			$servers[0]['weight'] = 1;
+		}
+		$this->assertEqual($servers, $result);
 	}
 
 	public function testSimpleConnectionSettings() {
 		$test = new Memcache(array('host' => '127.0.0.1'));
 		$hosts = array(array('host' => '127.0.0.1', 'port' => 11211));
+
+		if (defined('HHVM_VERSION')) {
+			$hosts['weight'] = 0;
+		}
 		$this->assertEqual($hosts, $test->connection->getServerList());
 
 		$test = new Memcache(array('host' => '127.0.0.1:11222'));
 		$hosts = array(array('host' => '127.0.0.1', 'port' => 11222));
+
+		if (defined('HHVM_VERSION')) {
+			$hosts['weight'] = 0;
+		}
 		$this->assertEqual($hosts, $test->connection->getServerList());
 	}
 

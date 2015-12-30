@@ -40,10 +40,6 @@ class PhpExtensions {
 	}
 
 	protected static function _redis() {
-		if (static::_isHhvm()) {
-			throw new RuntimeException("`redis` cannot be used with HHVM.");
-		}
-
 		static::_ini(array(
 			'extension=redis.so'
 		));
