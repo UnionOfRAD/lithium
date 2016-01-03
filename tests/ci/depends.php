@@ -57,7 +57,7 @@ class PhpExtensions {
 
 	protected static function _apcu() {
 		if (!static::_isHhvm()) {
-			static::_pecl('apcu', '4.0.7', true);
+			static::_pecl('apcu', '5.1.2', true);
 			static::_ini(array('extension=apcu.so'));
 		}
 		static::_ini(array(
