@@ -48,10 +48,15 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		$expected = 'Test!';
 		$this->assertEqual($expected, $result['message']);
 
+		$backup = error_reporting();
+		error_reporting($backup | E_WARNING);
+
 		$this->assertException('/Test/', function() {
 			trigger_error('Test warning!', E_USER_WARNING);
 		});
 		$this->assertCount(1, $this->errors);
+
+		error_reporting($backup);
 	}
 
 	public function testExceptionSubclassCatching() {

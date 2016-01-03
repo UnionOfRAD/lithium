@@ -510,6 +510,9 @@ class DatabaseTest extends \lithium\test\Unit {
 	}
 
 	public function testCalculation() {
+		$backup = error_reporting();
+		error_reporting(E_ALL);
+
 		$options = array('type' => 'read', 'model' => $this->_model);
 		$result = null;
 		$db = $this->_db;
@@ -519,6 +522,8 @@ class DatabaseTest extends \lithium\test\Unit {
 		});
 		$expected = 'SELECT COUNT(*) as count FROM {mock_database_posts} AS {MockDatabasePost};';
 		$this->assertEqual($expected, $this->_db->sql);
+
+		error_reporting($backup);
 	}
 
 	public function testReadWithQueryStringReturnArrayWithSchema() {

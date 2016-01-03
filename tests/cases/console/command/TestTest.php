@@ -143,6 +143,9 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testRunMultipleTestsWithAbsolutePath() {
+		$backup = error_reporting();
+		error_reporting(E_ALL);
+
 		$command = new Test(array(
 			'request' => $this->request, 'classes' => $this->classes
 		));
@@ -154,6 +157,8 @@ class TestTest extends \lithium\test\Unit {
 		$expected = preg_quote($expected, '/');
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
+
+		error_reporting($backup);
 	}
 
 	public function testReturnRunTestPasses() {

@@ -14,12 +14,21 @@ class IconvTest extends \lithium\test\Unit {
 
 	public $adapter;
 
+	protected $_backup = array();
+
 	public function skip() {
 		$this->skipIf(!Iconv::enabled(), 'The `Iconv` adapter is not enabled.');
 	}
 
 	public function setUp() {
 		$this->adapter = new Iconv();
+
+		$this->_backup['error_reporting'] = error_reporting();
+		error_reporting(E_ALL);
+	}
+
+	public function tearDown() {
+		error_reporting($this->_backup['error_reporting']);
 	}
 
 	public function testStrlen() {
