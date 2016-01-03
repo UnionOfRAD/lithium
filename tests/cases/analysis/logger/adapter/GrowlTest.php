@@ -12,6 +12,17 @@ use lithium\analysis\logger\adapter\Growl;
 
 class GrowlTest extends \lithium\test\Unit {
 
+	protected $_backup = array();
+
+	public function setUp() {
+		$this->_backup['error_reporting'] = error_reporting();
+		error_reporting(E_ALL);
+	}
+
+	public function tearDown() {
+		error_reporting($this->_backup['error_reporting']);
+	}
+
 	public function testGrowlWrite() {
 		$connection = fopen('php://memory', 'w+');
 

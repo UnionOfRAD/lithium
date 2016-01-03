@@ -133,6 +133,9 @@ class MbstringTest extends \lithium\test\Unit {
 	}
 
 	public function testStrposInvalidOffset() {
+		$backup = error_reporting();
+		error_reporting(E_ALL);
+
 		$haystack = 'abäab';
 		$needle = 'a';
 		$offset = -1;
@@ -142,6 +145,8 @@ class MbstringTest extends \lithium\test\Unit {
 		$this->assertException($expected, function() use ($adapter, $haystack, $needle, $offset) {
 			$adapter->strpos($haystack, $needle, $offset);
 		});
+
+		error_reporting($backup);
 	}
 
 	public function testStrrpos() {

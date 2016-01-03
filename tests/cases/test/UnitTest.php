@@ -580,6 +580,9 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testErrorHandling() {
+		$backup = error_reporting();
+		error_reporting(E_ALL);
+
 		$test = new MockErrorHandlingTest();
 
 		$test->run();
@@ -590,6 +593,8 @@ class UnitTest extends \lithium\test\Unit {
 
 		$expected = '/Unit::_arrayPermute()/';
 		$this->assertPattern($expected, $results[0]['message']);
+
+		error_reporting($backup);
 	}
 
 	public function testAssertObjects() {

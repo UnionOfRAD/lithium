@@ -97,8 +97,11 @@ class InspectorTest extends \lithium\test\Unit {
 	 * Tests reading specific line numbers of a file.
 	 */
 	public function testLineIntrospection() {
-		$result = Inspector::lines(__FILE__, array(__LINE__ - 1));
-		$expected = array(__LINE__ - 2 => "\tpublic function testLineIntrospection() {");
+		$backup = error_reporting();
+		error_reporting(E_ALL);
+
+		$result = Inspector::lines(__FILE__, array(__LINE__ - 4));
+		$expected = array(__LINE__ - 5 => "\tpublic function testLineIntrospection() {");
 		$this->assertEqual($expected, $result);
 
 		$result = Inspector::lines(__CLASS__, array(16));
@@ -114,6 +117,8 @@ class InspectorTest extends \lithium\test\Unit {
 			Inspector::lines('lithium\core\Foo');
 		});
 		$this->assertNull(Inspector::lines(__CLASS__, array()));
+
+		error_reporting($backup);
 	}
 
 	/**

@@ -72,6 +72,9 @@ class HashTest extends \lithium\test\Unit {
 	}
 
 	public function testCompare() {
+		$backup = error_reporting();
+		error_reporting(E_ALL);
+
 		$this->assertTrue(Hash::compare('Foo', 'Foo'));
 		$this->assertFalse(Hash::compare('Foo', 'foo'));
 		$this->assertFalse(Hash::compare('Foo', 'Bar'));
@@ -97,6 +100,8 @@ class HashTest extends \lithium\test\Unit {
 		$this->assertException('/to be (a )?string/', function() {
 			Hash::compare(1, '1');
 		});
+
+		error_reporting($backup);
 	}
 }
 

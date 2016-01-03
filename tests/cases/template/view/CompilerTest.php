@@ -80,6 +80,9 @@ class CompilerTest extends \lithium\test\Unit {
 	}
 
 	public function testFallbackWithNonWritableDirectory() {
+		$backup = error_reporting();
+		error_reporting(E_ALL);
+
 		$path = $this->_path;
 		$file = $this->_file;
 
@@ -97,6 +100,8 @@ class CompilerTest extends \lithium\test\Unit {
 				'fallback' => false
 			));
 		});
+
+		error_reporting($backup);
 	}
 
 	public function testTemplateCacheHit() {
