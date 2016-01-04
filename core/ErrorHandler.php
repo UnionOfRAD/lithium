@@ -295,6 +295,16 @@ class ErrorHandler extends \lithium\core\StaticObject {
 		}
 		return $result;
 	}
+
+	/**
+	 * Exit immediately. Primarily used for overrides during testing.
+	 *
+	 * @param integer|string $status integer range 0 to 254, string printed on exit
+	 * @return void
+	 */
+	protected static function _stop($status = 0) {
+		exit($status);
+	}
 }
 
 ErrorHandler::reset();

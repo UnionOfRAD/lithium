@@ -65,6 +65,7 @@
   | old | new |
   | --- | --- |
   | `*Object::_parents()` | _no replacement_, for inheritance use `lithium\core\MergeInheritable::_inherit()` |
+  | `*Object::_stop()` | _no replacement_, must reimplement |
 
 ### Fixed
 
