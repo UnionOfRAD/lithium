@@ -1868,8 +1868,8 @@ class Unit extends \lithium\core\Object {
 			$data['result'] = get_object_vars($data['result']);
 		}
 		return $message . sprintf("expected: %s\nresult: %s\n",
-			var_export($data['expected'], true),
-			var_export($data['result'], true)
+			print_r($data['expected'], true),
+			print_r($data['result'], true)
 		);
 	}
 

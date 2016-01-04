@@ -114,7 +114,10 @@
   ```
 
 ### Changed
-  
+ 
+- The bulitin test framework now handles circular references in expectations or results
+  correctly. The display format of fails has been changed to that of `print_r()`.
+
 - Multi-word console command arguments are now parsed into camelized versions.
   `--no-color`, will be available as `noColor` and assigned to a `$noColor` property if
   present in the command class definition. Previously `--no-color` was made available as
