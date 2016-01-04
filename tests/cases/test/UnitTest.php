@@ -75,7 +75,7 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = 'fail';
 		$this->assertEqual($expected, $results[0]['result']);
 
-		$expected = "trace: [2]\nexpected: 3\nresult: NULL\n";
+		$expected = "trace: [2]\nexpected: 3\nresult: \n";
 		$this->assertEqual($expected, $results[0]['message']);
 
 		$expected = array(
@@ -134,8 +134,8 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = 'fail';
 		$this->assertEqual($expected, $results[0]['result']);
 
-		$expected  = "trace: [0][1][1]\nexpected: 2\nresult: NULL\n";
-		$expected .= "trace: [1][1][1]\nexpected: 2\nresult: NULL\n";
+		$expected  = "trace: [0][1][1]\nexpected: 2\nresult: \n";
+		$expected .= "trace: [1][1][1]\nexpected: 2\nresult: \n";
 		$this->assertEqual($expected, $results[0]['message']);
 
 		$expected = array(
@@ -179,7 +179,7 @@ class UnitTest extends \lithium\test\Unit {
 			'result' => 'pass',
 			'class' => 'lithium\tests\mocks\test\MockUnitTest',
 			'method' => 'testNothing',
-			'message' => "expected: true\nresult: true\n",
+			'message' => "expected: 1\nresult: 1\n",
 			'data' => array('expected' => true, 'result' => true),
 			'file' => realpath($file),
 			'line' => 14,
@@ -239,7 +239,7 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = 'fail';
 		$this->assertEqual($expected, $results[0]['result']);
 
-		$expected = "trace: [1]\nexpected: '2'\nresult: '3'\n";
+		$expected = "trace: [1]\nexpected: 2\nresult: 3\n";
 		$this->assertEqual($expected, $results[0]['message']);
 	}
 
@@ -409,7 +409,7 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = 'fail';
 		$this->assertEqual($expected, $results[0]['result']);
 
-		$expected = "trace: [0]\nexpected: '(string) 1'\nresult: '(integer) 1'\n";
+		$expected = "trace: [0]\nexpected: (string) 1\nresult: (integer) 1\n";
 		$this->assertEqual($expected, $results[0]['message']);
 	}
 
@@ -1610,6 +1610,18 @@ class UnitTest extends \lithium\test\Unit {
 		}));
 	}
 
+	public function testRecursivenessHandled() {
+		$test = $this->test;
+
+		$this->assertNotException('Exception', function() use ($test) {
+			$expected = array('bar' => 'foobarnotmatching');
+
+			$result = array('foo');
+			$result = array('bar' => &$result);
+
+			$test->assertEqual($expected, $result);
+		});
+	}
 }
 
 ?>
