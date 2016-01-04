@@ -4,6 +4,8 @@
 
 ### Fixed
 
+- Fixed possible infinite retry loop when failing to close an established network 
+  connection in the `Socket` subclasses `Context`, `Stream` and `Curl`.
 - Fixed slug generation by `Inflector` for strings containing multibyte characters or
   (unprintable) whitespaces.
 
@@ -147,6 +149,9 @@
 
 ### Backwards Incompatible Changes
 
+- When failing to close an established network connection via the `Socket` subclasses 
+  `Context`, `Stream` and `Curl` (i.e. `$socket->close()`), the close operation will
+  not be retried anymore. Instead `false` is returned.
 - To skip decoration in the console test command use `--just-assertions` instead of `--plain`.
 - When no suitable RNG is found (rare), `Random::generate()` will throw an exception.
 - Database encoding, timezone, and searchPath methods may now throw exceptions. Please

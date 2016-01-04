@@ -98,11 +98,7 @@ class Curl extends \lithium\net\Socket {
 			return true;
 		}
 		curl_close($this->_resource);
-
-		if (is_resource($this->_resource)) {
-			$this->close();
-		}
-		return true;
+		return !is_resource($this->_resource);
 	}
 
 	/**

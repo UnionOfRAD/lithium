@@ -73,14 +73,7 @@ class Context extends \lithium\net\Socket {
 	 * @return boolean Success.
 	 */
 	public function close() {
-		if (!is_resource($this->_resource)) {
-			return true;
-		}
-		fclose($this->_resource);
-		if (is_resource($this->_resource)) {
-			$this->close();
-		}
-		return true;
+		return !is_resource($this->_resource) || fclose($this->_resource);
 	}
 
 	/**
