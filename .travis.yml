@@ -39,9 +39,13 @@ matrix:
     # Just one exemplaric job.
     - php: hhvm
       env: PHP_EXT=memcached TESTS=all
+    - php: nightly
+      env: PHP_EXT=memcached TESTS=all
   allow_failures:
     # We do not aim for full HHVM compatibilty now.
     - php: hhvm
+      env: PHP_EXT=memcached TESTS=all
+    - php: nightly
       env: PHP_EXT=memcached TESTS=all
   # Mark build as failed as soon as one job failed.
   fast_finish: true
