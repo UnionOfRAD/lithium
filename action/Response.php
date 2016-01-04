@@ -197,6 +197,8 @@ class Response extends \lithium\net\http\Response {
 		}
 	}
 
+	/* Deprecated / BC */
+
 	/**
 	 * Expands on `\net\http\Message::headers()` with some magic conversions for shorthand headers.
 	 *
