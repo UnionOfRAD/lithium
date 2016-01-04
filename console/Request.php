@@ -67,10 +67,16 @@ class Request extends \lithium\core\Object {
 	 * @param array $config Available configuration options are:
 	 *        - `'args'` _array_
 	 *        - `'input'` _resource|null_
+	 *        - `'globals'` _boolean_: Use global variables for populating
+	 *          the request's environment and data; defaults to `true`.
 	 * @return void
 	 */
 	public function __construct($config = array()) {
-		$defaults = array('args' => array(), 'input' => null);
+		$defaults = array(
+			'args' => array(),
+			'input' => null,
+			'globals' => true
+		);
 		$config += $defaults;
 		parent::__construct($config);
 	}
@@ -86,7 +92,9 @@ class Request extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _init() {
-		$this->_env += (array) $_SERVER + (array) $_ENV;
+		if ($this->_config['globals']) {
+			$this->_env += (array) $_SERVER + (array) $_ENV;
+		}
 		$this->_env['working'] = str_replace('\\', '/', getcwd()) ?: null;
 		$argv = (array) $this->env('argv');
 		$this->_env['script'] = array_shift($argv);

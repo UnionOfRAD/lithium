@@ -269,44 +269,68 @@ class LocaleTest extends \lithium\test\Unit {
 	}
 
 	public function testPreferredFromConsoleRequestLcAll() {
-		$request = new ConsoleRequest(array('env' => array('LC_ALL' => 'es_ES@euro')));
+		$request = new ConsoleRequest(array(
+			'env' => array('LC_ALL' => 'es_ES@euro'),
+			'globals' => false
+		));
 		$result = Locale::preferred($request);
 		$this->assertEqual('es_ES', $result);
 
-		$request = new ConsoleRequest(array('env' => array('LC_ALL' => 'en_US.UTF-8')));
+		$request = new ConsoleRequest(array(
+			'env' => array('LC_ALL' => 'en_US.UTF-8'),
+			'globals' => false
+		));
 		$result = Locale::preferred($request);
 		$this->assertEqual('en_US', $result);
 
-		$request = new ConsoleRequest(array('env' => array('LC_ALL' => 'en_US')));
+		$request = new ConsoleRequest(array(
+			'env' => array('LC_ALL' => 'en_US'),
+			'globals' => false
+		));
 		$result = Locale::preferred($request);
 		$this->assertEqual('en_US', $result);
 	}
 
 	public function testPreferredFromConsoleRequestLanguage() {
-		$request = new ConsoleRequest(array('env' => array('LANGUAGE' => 'sv_SE:nn_NO:de_DE')));
+		$request = new ConsoleRequest(array(
+			'env' => array('LANGUAGE' => 'sv_SE:nn_NO:de_DE'),
+			'globals' => false
+		));
 		$result = Locale::preferred($request);
 		$this->assertEqual('sv_SE', $result);
 	}
 
 	public function testPreferredFromConsoleRequestLang() {
-		$request = new ConsoleRequest(array('env' => array(
-			'LANG' => 'es_ES@euro', 'LANGUAGE' => null, 'LC_ALL' => null
-		)));
+		$request = new ConsoleRequest(array(
+			'env' => array(
+				'LANG' => 'es_ES@euro',
+				'LANGUAGE' => null,
+				'LC_ALL' => null
+			),
+			'globals' => false
+		));
 		$result = Locale::preferred($request);
 		$this->assertEqual('es_ES', $result);
 	}
 
 	public function testPreferredFromConsoleRequestPrecedence() {
-		$request = new ConsoleRequest(array('env' => array(
-			'LANGUAGE' => 'da_DK:ja_JP',
-			'LC_ALL' => 'fr_CA',
-			'LANG' => 'de_DE'
-		)));
+		$request = new ConsoleRequest(array(
+			'env' => array(
+				'LANGUAGE' => 'da_DK:ja_JP',
+				'LC_ALL' => 'fr_CA',
+				'LANG' => 'de_DE'
+			),
+			'globals' => false
+		));
 		$result = Locale::preferred($request);
 		$this->assertEqual('da_DK', $result);
 
 		$request = new ConsoleRequest(array(
-			'env' => array('LC_ALL' => 'fr_CA', 'LANG' => 'de_DE')
+			'env' => array(
+				'LC_ALL' => 'fr_CA',
+				'LANG' => 'de_DE'
+			),
+			'globals' => false
 		));
 		$result = Locale::preferred($request);
 		$this->assertEqual('fr_CA', $result);
@@ -314,17 +338,20 @@ class LocaleTest extends \lithium\test\Unit {
 
 	public function testPreferredFromConsoleRequestEmptyLocales() {
 		$request = new ConsoleRequest(array(
-			'env' => array('LC_ALL' => 'C', 'LANG' => null, 'LANGUAGE' => null)
+			'env' => array('LC_ALL' => 'C', 'LANG' => null, 'LANGUAGE' => null),
+			'globals' => false
 		));
 		$this->assertNull(Locale::preferred($request));
 
 		$request = new ConsoleRequest(array(
-			'env' => array('LC_ALL' => 'POSIX', 'LANG' => null, 'LANGUAGE' => null)
+			'env' => array('LC_ALL' => 'POSIX', 'LANG' => null, 'LANGUAGE' => null),
+			'globals' => false
 		));
 		$this->assertNull(Locale::preferred($request));
 
 		$request = new ConsoleRequest(array(
-			'env' => array('LC_ALL' => '', 'LANG' => null, 'LANGUAGE' => null)
+			'env' => array('LC_ALL' => '', 'LANG' => null, 'LANGUAGE' => null),
+			'globals' => false
 		));
 		$this->assertNull(Locale::preferred($request));
 	}
