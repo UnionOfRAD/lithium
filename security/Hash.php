@@ -77,15 +77,14 @@ class Hash {
 			trigger_error('Expected `$known` & `$user` parameters to be strings.', E_USER_WARNING);
 			return false;
 		}
-		$result = true;
 
 		if (($length = strlen($known)) !== strlen($user)) {
 			return false;
 		}
-		for ($i = 0; $i < $length; $i++) {
-			$result = $result && ($known[$i] === $user[$i]);
+		for ($i = 0, $result = 0; $i < $length; $i++) {
+			$result |= ord($left[$i]) ^ ord($right[$i]);
 		}
-		return $result;
+		return $result === 0;
 	}
 }
 
