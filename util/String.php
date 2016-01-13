@@ -218,7 +218,7 @@ class String {
 			return false;
 		}
 		for ($i = 0, $result = 0; $i < $length; $i++) {
-			$result |= ord($left[$i]) ^ ord($right[$i]);
+			$result |= ord($known[$i]) ^ ord($user[$i]);
 		}
 		return $result === 0;
 	}
