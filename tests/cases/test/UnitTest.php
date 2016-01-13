@@ -880,8 +880,8 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual(array(
 			'expected' => 'foobar',
 			'result' => array(
-				new \ReflectionProperty('lithium\core\StaticObject', '_methodFilters'),
-				new \ReflectionProperty('lithium\core\StaticObject', '_parents')
+				new \ReflectionProperty('lithium\core\StaticObject', '_parents'),
+				new \ReflectionProperty('lithium\core\StaticObject', '_methodFilters')
 			)
 		), $result['data']);
 	}
@@ -914,8 +914,8 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual(array(
 			'expected' => '_methodFilters',
 			'result' => array(
-				new \ReflectionProperty('lithium\core\StaticObject', '_methodFilters'),
-				new \ReflectionProperty('lithium\core\StaticObject', '_parents')
+				new \ReflectionProperty('lithium\core\StaticObject', '_parents'),
+				new \ReflectionProperty('lithium\core\StaticObject', '_methodFilters')
 			)
 		), $result['data']);
 	}

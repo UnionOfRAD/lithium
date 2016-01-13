@@ -9,6 +9,7 @@
 namespace lithium\template\view;
 
 use RuntimeException;
+use lithium\aop\Filters;
 use lithium\core\Libraries;
 use lithium\core\ClassNotFoundException;
 
@@ -262,20 +263,16 @@ abstract class Renderer extends \lithium\core\Object {
 	 * @filter
 	 */
 	public function __get($property) {
-		$context = $this->_context;
-		$helpers = $this->_helpers;
-
-		$filter = function($self, $params, $chain) use ($context, $helpers) {
+		return Filters::run($this, __FUNCTION__, compact('property'), function($params) {
 			$property = $params['property'];
 
 			foreach (array('context', 'helpers') as $key) {
-				if (isset(${$key}[$property])) {
-					return ${$key}[$property];
+				if (isset($this->{"_{$key}"}[$property])) {
+					return $this->{"_{$key}"}[$property];
 				}
 			}
-			return $self->helper($property);
-		};
-		return $this->_filter(__METHOD__, compact('property'), $filter);
+			return $this->helper($property);
+		});
 	}
 
 	/**

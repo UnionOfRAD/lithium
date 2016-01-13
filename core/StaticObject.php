@@ -9,24 +9,16 @@
 namespace lithium\core;
 
 use lithium\core\Libraries;
-use lithium\util\collection\Filters;
+use lithium\aop\Filters;
 use lithium\analysis\Inspector;
 
 /**
  * Provides a base class for all static classes in the Lithium framework. Similar to its
- * counterpart, the `Object` class, `StaticObject` defines some utility methods for working with
- * the filters system, and methods useful for testing purposes.
+ * counterpart, the `Object` class, `StaticObject` defines some utility useful for testing purposes.
  *
  * @see lithium\core\Object
  */
 class StaticObject {
-
-	/**
-	 * Stores the closures that represent the method filters. They are indexed by called class.
-	 *
-	 * @var array Method filters, indexed by `get_called_class()`.
-	 */
-	protected static $_methodFilters = array();
 
 	/**
 	 * Keeps a cached list of each class' inheritance tree.
@@ -34,34 +26,6 @@ class StaticObject {
 	 * @var array
 	 */
 	protected static $_parents = array();
-
-	/**
-	 * Apply a closure to a method of the current static object.
-	 *
-	 * @see lithium\core\StaticObject::_filter()
-	 * @see lithium\util\collection\Filters
-	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
-	 *        method name as a string, or an array of method names. Can also be false to remove
-	 *        all filters on the current object.
-	 * @param \Closure $filter The closure that is used to filter the method(s), can also be false
-	 *        to remove all the current filters for the given method.
-	 * @return void
-	 */
-	public static function applyFilter($method, $filter = null) {
-		$class = get_called_class();
-		if ($method === false) {
-			static::$_methodFilters[$class] = array();
-			return;
-		}
-		foreach ((array) $method as $m) {
-			if (!isset(static::$_methodFilters[$class][$m]) || $filter === false) {
-				static::$_methodFilters[$class][$m] = array();
-			}
-			if ($filter !== false) {
-				static::$_methodFilters[$class][$m][] = $filter;
-			}
-		}
-	}
 
 	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
@@ -121,33 +85,6 @@ class StaticObject {
 	}
 
 	/**
-	 * Executes a set of filters against a method by taking a method's main implementation as a
-	 * callback, and iteratively wrapping the filters around it.
-	 *
-	 * @see lithium\util\collection\Filters
-	 * @param string $method The name of the method being executed.
-	 * @param array $params An associative array containing all the parameters passed into
-	 *        the method.
-	 * @param \Closure $callback The method's implementation, wrapped in a closure.
-	 * @param array $filters Additional filters to apply to the method for this call only.
-	 * @return mixed
-	 */
-	protected static function _filter($method, $params, $callback, $filters = array()) {
-		$class = get_called_class();
-		$hasNoFilters = empty(static::$_methodFilters[$class][$method]);
-
-		if ($hasNoFilters && !$filters && !Filters::hasApplied($class, $method)) {
-			return $callback($class, $params, null);
-		}
-		if (!isset(static::$_methodFilters[$class][$method])) {
-			static::$_methodFilters += array($class => array());
-			static::$_methodFilters[$class][$method] = array();
-		}
-		$data = array_merge(static::$_methodFilters[$class][$method], $filters, array($callback));
-		return Filters::run($class, $params, compact('data', 'class', 'method'));
-	}
-
-	/**
 	 * Gets and caches an array of the parent methods of a class.
 	 *
 	 * @return array Returns an array of parent classes for the current class.
@@ -171,6 +108,78 @@ class StaticObject {
 		exit($status);
 	}
 
+	/* Deprecated / BC */
+
+	/**
+	 * Stores the closures that represent the method filters. They are indexed by called class.
+	 *
+	 * @deprecated Not used anymore.
+	 * @var array Method filters, indexed by `get_called_class()`.
+	 */
+	protected static $_methodFilters = array();
+
+	/**
+	 * Apply a closure to a method of the current static object.
+	 *
+	 * @deprecated Replaced by `\lithium\aop\Filters::apply()` and `::clear()`.
+	 * @see lithium\core\StaticObject::_filter()
+	 * @see lithium\util\collection\Filters
+	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
+	 *        method name as a string, or an array of method names. Can also be false to remove
+	 *        all filters on the current object.
+	 * @param \Closure $filter The closure that is used to filter the method(s), can also be false
+	 *        to remove all the current filters for the given method.
+	 * @return void
+	 */
+	public static function applyFilter($method, $filter = null) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
+		$message .= '`\lithium\aop\Filters::apply()` and `::clear()`.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		$class = get_called_class();
+
+		if ($method === false) {
+			Filters::clear($class);
+			return;
+		}
+		foreach ((array) $method as $m) {
+			if ($filter === false) {
+				Filters::clear($class, $m);
+			} else {
+				Filters::apply($class, $m, $filter);
+			}
+		}
+	}
+
+	/**
+	 * Executes a set of filters against a method by taking a method's main implementation as a
+	 * callback, and iteratively wrapping the filters around it.
+	 *
+	 * @deprecated Replaced by `\lithium\aop\Filters::run()`.
+	 * @see lithium\util\collection\Filters
+	 * @param string $method The name of the method being executed.
+	 * @param array $params An associative array containing all the parameters passed into
+	 *        the method.
+	 * @param \Closure $callback The method's implementation, wrapped in a closure.
+	 * @param array $filters Additional filters to apply to the method for this call only.
+	 * @return mixed
+	 */
+	protected static function _filter($method, $params, $callback, $filters = array()) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
+		$message .= '`\lithium\aop\Filters::run()` and `::apply()`.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		if (strpos($method, '::') !== false) {
+			list($class, $method) = explode('::' , $method);
+		} else {
+			$class = get_called_class();
+		}
+
+		foreach ($filters as $filter) {
+			Filters::apply($class, $method, $filter);
+		}
+		return Filters::run($class, $method, $params, $callback);
+	}
 }
 
 ?>

@@ -8,8 +8,9 @@
 
 namespace lithium\core;
 
-use lithium\core\Environment;
 use SplDoublyLinkedList;
+use lithium\core\Environment;
+use lithium\aop\Filters;
 use lithium\core\ConfigException;
 
 /**
@@ -215,7 +216,9 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	protected static function _initAdapter($class, array $config) {
-		return static::_filter(__FUNCTION__, compact('class', 'config'), function($self, $params) {
+		$params = compact('class', 'config');
+
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			return new $params['class']($params['config']);
 		});
 	}
@@ -278,11 +281,7 @@ class Adaptable extends \lithium\core\StaticObject {
 
 	/**
 	 * Gets an array of settings for the given named configuration in the current
-	 * environment.
-	 *
-	 * The default types of settings for all adapters will contain keys for:
-	 * `adapter` - The class name of the adapter
-	 * `filters` - An array of filters to be applied to the adapter methods
+	 * environment. Each configuration will at least contain an `'adapter'` option.
 	 *
 	 * @see lithium\core\Environment
 	 * @param string $name Named configuration.
@@ -313,6 +312,8 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * accessed. This allows configuration data to be lazy-loaded from adapters or other data
 	 * sources.
 	 *
+	 * @deprecated Per adapter filters have been deprecated, future versions will not add the
+	 *             `'filters'` option to the initial configuration anymore.
 	 * @param string $name The name of the configuration which is being accessed. This is the key
 	 *               name containing the specific set of configuration passed into `config()`.
 	 * @param array $config Contains the configuration assigned to `$name`. If this configuration is
@@ -321,6 +322,9 @@ class Adaptable extends \lithium\core\StaticObject {
 	 * @return array Returns the final array of settings for the given named configuration.
 	 */
 	protected static function _initConfig($name, $config) {
+		if (!empty($config['filters'])) {
+			trigger_error('Per adapter filters have been deprecated.', E_USER_DEPRECATED);
+		}
 		$defaults = array('adapter' => null, 'filters' => array());
 		return (array) $config + $defaults;
 	}

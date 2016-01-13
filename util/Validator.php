@@ -8,6 +8,7 @@
 
 namespace lithium\util;
 
+use lithium\aop\Filters;
 use lithium\util\Set;
 use InvalidArgumentException;
 
@@ -175,7 +176,7 @@ class Validator extends \lithium\core\StaticObject {
 	public static function reset() {
 		$alnum = '[A-Fa-f0-9]';
 		$class = get_called_class();
-		static::$_methodFilters[$class] = array();
+		Filters::clear($class);
 
 		static::$_rules = array(
 			'alphaNumeric' => '/^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]+$/mu',
@@ -324,33 +325,36 @@ class Validator extends \lithium\core\StaticObject {
 			}
 		);
 
-		$isEmpty = function($self, $params, $chain) {
+		$isEmpty = function($params, $next) {
 			extract($params);
-			return (empty($value) && $value !== '0') ? false : $chain->next($self, $params, $chain);
+			return (empty($value) && $value !== '0') ? false : $next($params);
 		};
 
-		static::$_methodFilters[$class]['alphaNumeric'] = array($isEmpty);
-		static::$_methodFilters[$class]['notEmpty'] = array($isEmpty);
+		Filters::apply($class, 'alphaNumeric', $isEmpty);
+		Filters::apply($class, 'notEmpty', $isEmpty);
 
-		static::$_methodFilters[$class]['creditCard'] = array(function($self, $params, $chain) {
+		Filters::apply($class, 'creditCard', function($params, $next) {
 			extract($params);
 			$options += array('deep' => false);
 
 			if (strlen($value = str_replace(array('-', ' '), '', $value)) < 13) {
 				return false;
 			}
-			if (!$chain->next($self, compact('value') + $params, $chain)) {
+			$params['value'] = $value;
+
+			if (!$next($params)) {
 				return false;
 			}
 			return $options['deep'] ? Validator::isLuhn($value) : true;
 		});
 
-		static::$_methodFilters[$class]['email'] = array(function($self, $params, $chain) {
+		Filters::apply($class, 'email', function($params, $next) {
 			extract($params);
+
 			$defaults = array('deep' => false);
 			$options += $defaults;
 
-			if (!$chain->next($self, $params, $chain)) {
+			if (!$next($params)) {
 				return false;
 			}
 			if (!$options['deep']) {
@@ -467,7 +471,7 @@ class Validator extends \lithium\core\StaticObject {
 		$options += $defaults;
 		$params = compact('values', 'rules', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$values = $params['values'];
 			$rules = $params['rules'];
 			$options = $params['options'];
@@ -505,7 +509,7 @@ class Validator extends \lithium\core\StaticObject {
 						continue;
 					}
 
-					if (!$self::rule($name, $values[$field], $rule['format'], $rule + $options)) {
+					if (!static::rule($name, $values[$field], $rule['format'], $rule + $options)) {
 						$errors[$field][$key] = $rule['message'] ?: $key;
 
 						if ($rule['last']) {
@@ -615,7 +619,7 @@ class Validator extends \lithium\core\StaticObject {
 		}
 
 		$params = compact('value', 'format', 'options');
-		return static::_filter($rule, $params, static::_checkFormats($ruleCheck));
+		return Filters::run(get_called_class(), $rule, $params, static::_checkFormats($ruleCheck));
 	}
 
 	/**
@@ -643,7 +647,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * @return \Closure Function returning boolean `true` if validation succeeded, `false` otherwise.
 	 */
 	protected static function _checkFormats($rules) {
-		return function($self, $params, $chain) use ($rules) {
+		return function($params) use ($rules) {
 			$value = $params['value'];
 			$format = $params['format'];
 			$options = $params['options'];

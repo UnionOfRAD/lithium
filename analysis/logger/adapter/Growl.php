@@ -127,17 +127,14 @@ class Growl extends \lithium\core\Object {
 	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
 	public function write($priority, $message, array $options = array()) {
-		$_self =& $this;
-		$_priorities = $this->_priorities;
-
-		return function($self, $params) use (&$_self, $_priorities) {
+		return function($params) {
 			$priority = 0;
 			$options = $params['options'];
 
-			if (isset($options['priority']) && isset($_priorities[$options['priority']])) {
-				$priority = $_priorities[$options['priority']];
+			if (isset($options['priority']) && isset($this->_priorities[$options['priority']])) {
+				$priority = $this->_priorities[$options['priority']];
 			}
-			return $_self->notify($params['message'], compact('priority') + $options);
+			return $this->notify($params['message'], compact('priority') + $options);
 		};
 	}
 

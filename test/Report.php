@@ -8,6 +8,7 @@
 
 namespace lithium\test;
 
+use lithium\aop\Filters;
 use lithium\core\Libraries;
 use lithium\util\Inflector;
 use lithium\core\ClassNotFoundException;
@@ -237,7 +238,7 @@ class Report extends \lithium\core\Object {
 		}
 		$params = compact('template', 'data', 'config');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params, $chain) {
+		return Filters::run(__CLASS__, __FUNCTION__, $params, function($params) {
 			extract($params['data']);
 			ob_start();
 			include $params['template'];

@@ -8,6 +8,9 @@
 
 namespace lithium\tests\mocks\core;
 
+/**
+ * @deprecated
+ */
 class MockStaticMethodFiltering extends \lithium\core\StaticObject {
 
 	public static function method($data) {
@@ -39,21 +42,6 @@ class MockStaticMethodFiltering extends \lithium\core\StaticObject {
 		return static::_filter(__FUNCTION__, array(), function($self, $params, $chain) {
 			return $self::childMethod();
 		});
-	}
-
-	public static function foo() {
-		$args = func_get_args();
-		return $args;
-	}
-
-	public static function parents($get = false) {
-		if ($get === null) {
-			static::$_parents = array();
-		}
-		if ($get) {
-			return static::$_parents;
-		}
-		return static::_parents();
 	}
 }
 

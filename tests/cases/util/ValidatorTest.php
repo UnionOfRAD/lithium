@@ -1213,7 +1213,7 @@ class ValidatorTest extends \lithium\test\Unit {
 	}
 
 	public function testRespondsToParentCall() {
-		$this->assertTrue(Validator::respondsTo('applyFilter'));
+		$this->assertTrue(Validator::respondsTo('invokeMethod'));
 		$this->assertFalse(Validator::respondsTo('fooBarBaz'));
 	}
 

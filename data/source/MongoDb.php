@@ -10,6 +10,7 @@ namespace lithium\data\source;
 
 use MongoCode;
 use MongoRegex;
+use lithium\aop\Filters;
 use lithium\util\Inflector;
 use lithium\core\NetworkException;
 use Exception;
@@ -438,32 +439,34 @@ class MongoDb extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function create($query, array $options = array()) {
-		$_config = $this->_config;
+		$this->_checkConnection();
+
 		$defaults = array(
-			'w' => $_config['w'],
-			'wTimeoutMS' => $_config['wTimeoutMS'],
+			'w' => $this->_config['w'],
+			'wTimeoutMS' => $this->_config['wTimeoutMS'],
 			'fsync' => false
 		);
 		$options += $defaults;
-		$this->_checkConnection();
 
 		$params = compact('query', 'options');
-		$_exp = $this->_classes['exporter'];
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
+			$exporter = $this->_classes['exporter'];
+			$prefix = $this->_config['gridPrefix'];
+
 			$query   = $params['query'];
 			$options = $params['options'];
 
-			$args    = $query->export($self, array('keys' => array('source', 'data')));
-			$data    = $_exp::get('create', $args['data']);
+			$args    = $query->export($this, array('keys' => array('source', 'data')));
+			$data    = $exporter::get('create', $args['data']);
 			$source  = $args['source'];
 
-			if ($source === "{$_config['gridPrefix']}.files" && isset($data['create']['file'])) {
+			if ($source === "{$prefix}.files" && isset($data['create']['file'])) {
 				$result = array('ok' => true);
-				$data['create']['_id'] = $self->invokeMethod('_saveFile', array($data['create']));
+				$data['create']['_id'] = $this->_saveFile($data['create']);
 			} else {
-				$result = $self->connection->{$source}->insert($data['create'], $options);
-				$result = $self->invokeMethod('_ok', array($result));
+				$result = $this->connection->{$source}->insert($data['create'], $options);
+				$result = $this->_ok($result);
 			}
 
 			if ($result === true || isset($result['ok']) && (boolean) $result['ok'] === true) {
@@ -518,28 +521,30 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function read($query, array $options = array()) {
 		$this->_checkConnection();
+
 		$defaults = array('return' => 'resource');
 		$options += $defaults;
 
 		$params = compact('query', 'options');
-		$_config = $this->_config;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
+			$prefix = $this->_config['gridPrefix'];
+
 			$query = $params['query'];
 			$options = $params['options'];
-			$args = $query->export($self);
+			$args = $query->export($this);
 			$source = $args['source'];
 			$model = $query->model();
 
 			if ($group = $args['group']) {
-				$result = $self->invokeMethod('_group', array($group, $args, $options));
+				$result = $this->_group($group, $args, $options);
 				$config = array('class' => 'set', 'defaults' => false) + compact('query') + $result;
 				return $model::create($config['data'], $config);
 			}
-			$collection = $self->connection->{$source};
+			$collection = $this->connection->{$source};
 
-			if ($source === "{$_config['gridPrefix']}.files") {
-				$collection = $self->connection->getGridFS($_config['gridPrefix']);
+			if ($source === "{$prefix}.files") {
+				$collection = $this->connection->getGridFS($prefix);
 			}
 			$result = $collection->find($args['conditions'], $args['fields']);
 
@@ -548,7 +553,7 @@ class MongoDb extends \lithium\data\Source {
 			}
 
 			$resource = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
-			$result = $self->invokeMethod('_instance', array('result', compact('resource')));
+			$result = $this->_instance('result', compact('resource'));
 			$config = compact('result', 'query') + array('class' => 'set', 'defaults' => false);
 			return $model::create(array(), $config);
 		});
@@ -574,43 +579,47 @@ class MongoDb extends \lithium\data\Source {
 	 * @filter
 	 */
 	public function update($query, array $options = array()) {
-		$_config = $this->_config;
+		$this->_checkConnection();
+
 		$defaults = array(
 			'upsert' => false,
 			'multiple' => true,
-			'w' => $_config['w'],
-			'wTimeoutMS' => $_config['wTimeoutMS'],
+			'w' => $this->_config['w'],
+			'wTimeoutMS' => $this->_config['wTimeoutMS'],
 			'fsync' => false
 		);
 		$options += $defaults;
-		$this->_checkConnection();
 
 		$params = compact('query', 'options');
-		$_exp = $this->_classes['exporter'];
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config, $_exp) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
+			$exporter = $this->_classes['exporter'];
+			$prefix = $this->_config['gridPrefix'];
+
 			$options = $params['options'];
 			$query  = $params['query'];
-			$args   = $query->export($self, array('keys' => array('conditions', 'source', 'data')));
+			$args   = $query->export($this, array('keys' => array('conditions', 'source', 'data')));
 			$source = $args['source'];
 			$data   = $args['data'];
 
 			if ($query->entity()) {
-				$data = $_exp::get('update', $data);
+				$data = $exporter::get('update', $data);
 			}
 
-			if ($source === "{$_config['gridPrefix']}.files" && isset($data['update']['file'])) {
-				$args['data']['_id'] = $self->invokeMethod('_saveFile', array($data['update']));
+			if ($source === "{$prefix}.files" && isset($data['update']['file'])) {
+				$args['data']['_id'] = $this->_saveFile($data['update']);
 			}
-			$update = $query->entity() ? $_exp::toCommand($data) : $data;
+			$update = $query->entity() ? $exporter::toCommand($data) : $data;
+
 			if (empty($update)) {
 				return true;
 			}
 			if ($options['multiple'] && !preg_grep('/^\$/', array_keys($update))) {
 				$update = array('$set' => $update);
 			}
-			$result = $self->connection->{$source}->update($args['conditions'], $update, $options);
-			if ($self->invokeMethod('_ok', array($result))) {
+			$result = $this->connection->{$source}->update($args['conditions'], $update, $options);
+
+			if ($this->_ok($result)) {
 				$query->entity() ? $query->entity()->sync() : null;
 				return true;
 			}
@@ -628,27 +637,30 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function delete($query, array $options = array()) {
 		$this->_checkConnection();
-		$_config = $this->_config;
-		$defaults = array('justOne' => false,
-			'w' => $_config['w'],
-			'wTimeoutMS' => $_config['wTimeoutMS'],
+
+		$defaults = array(
+			'justOne' => false,
+			'w' => $this->_config['w'],
+			'wTimeoutMS' => $this->_config['wTimeoutMS'],
 			'fsync' => false
 		);
 		$options = array_intersect_key($options + $defaults, $defaults);
 		$params = compact('query', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
+			$prefix = $this->_config['gridPrefix'];
+
 			$query = $params['query'];
 			$options = $params['options'];
-			$args = $query->export($self, array('keys' => array('source', 'conditions')));
+			$args = $query->export($this, array('keys' => array('source', 'conditions')));
 			$source = $args['source'];
 			$conditions = $args['conditions'];
 
-			if ($source === "{$_config['gridPrefix']}.files") {
-				$result = $self->invokeMethod('_deleteFile', array($conditions));
+			if ($source === "{$prefix}.files") {
+				$result = $this->_deleteFile($conditions);
 			} else {
-				$result = $self->connection->{$args['source']}->remove($conditions, $options);
-				$result = $self->invokeMethod('_ok', array($result));
+				$result = $this->connection->{$args['source']}->remove($conditions, $options);
+				$result = $this->_ok($result);
 			}
 			if ($result && $query->entity()) {
 				$query->entity()->sync(null, array(), array('dematerialize' => true));

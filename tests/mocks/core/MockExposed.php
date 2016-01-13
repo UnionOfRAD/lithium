@@ -8,6 +8,9 @@
 
 namespace lithium\tests\mocks\core;
 
+/**
+ * @deprecated
+ */
 class MockExposed extends \lithium\core\Object {
 
 	protected $_internal = 'secret';

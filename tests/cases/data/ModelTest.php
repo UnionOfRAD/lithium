@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\data;
 
+use lithium\aop\Filters;
 use lithium\data\model\Query;
 use stdClass;
 use lithium\util\Inflector;
@@ -57,13 +58,20 @@ class ModelTest extends \lithium\test\Unit {
 	public function tearDown() {
 		Connections::remove('mocksource');
 		Connections::remove('mockconn');
-		MockPost::reset();
-		MockTag::reset();
-		MockComment::reset();
-		MockCreator::reset();
-		MockSubProduct::reset();
-		MockProduct::reset();
-		MockPostForValidates::reset();
+
+		$models = array(
+			'lithium\tests\mocks\data\MockPost',
+			'lithium\tests\mocks\data\MockTag',
+			'lithium\tests\mocks\data\MockComment',
+			'lithium\tests\mocks\data\MockCreator',
+			'lithium\tests\mocks\data\MockSubProduct',
+			'lithium\tests\mocks\data\MockProduct',
+			'lithium\tests\mocks\data\MockPostForValidates'
+		);
+		foreach ($models as $model) {
+			$model::reset();
+			Filters::clear($model);
+		}
 	}
 
 	public function testOverrideMeta() {
@@ -393,10 +401,9 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertInternalType('array', $result);
 	}
 
-	public function testFilteredFind() {
-		MockComment::applyFilter('find', function($self, $params, $chain) {
-			$result = $chain->next($self, $params, $chain);
-
+	public function testFilteredFindInvokedMagically() {
+		Filters::apply('lithium\tests\mocks\data\MockComment', 'find', function($params, $next) {
+			$result = $next($params);
 			if ($result !== null) {
 				$result->filtered = true;
 			}
@@ -1127,7 +1134,7 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testRespondsToParentCall() {
-		$this->assertTrue(MockPost::respondsTo('applyFilter'));
+		$this->assertTrue(MockPost::respondsTo('invokeMethod'));
 		$this->assertFalse(MockPost::respondsTo('fooBarBaz'));
 	}
 

@@ -8,6 +8,7 @@
 
 namespace lithium\storage;
 
+use lithium\aop\Filters;
 use lithium\core\ConfigException;
 
 /**
@@ -178,7 +179,7 @@ class Cache extends \lithium\core\Adaptable {
 		}
 		$params = compact('keys', 'expiry');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
 			return $adapter->write($params['keys'], $params['expiry']);
 		});
 	}
@@ -240,7 +241,7 @@ class Cache extends \lithium\core\Adaptable {
 		}
 		$params = compact('keys');
 
-		$results = static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+		$results = Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
 			return $adapter->read($params['keys']);
 		});
 
@@ -307,7 +308,7 @@ class Cache extends \lithium\core\Adaptable {
 		}
 		$params = compact('keys');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
 			return $adapter->delete($params['keys']);
 		});
 	}
@@ -339,7 +340,7 @@ class Cache extends \lithium\core\Adaptable {
 		$key = static::key($key);
 		$params = compact('key', 'offset');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
 			return $adapter->increment($params['key'], $params['offset']);
 		});
 	}
@@ -371,7 +372,7 @@ class Cache extends \lithium\core\Adaptable {
 		$key = static::key($key);
 		$params = compact('key', 'offset');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
 			return $adapter->decrement($params['key'], $params['offset']);
 		});
 	}

@@ -22,7 +22,7 @@ class AdaptableTest extends \lithium\test\Unit {
 
 		$items = array(array(
 			'adapter' => 'some\adapter',
-			'filters' => array('filter1', 'filter2')
+			'filters' => array()
 		));
 		$result = MockAdaptable::config($items);
 		$this->assertNull($result);
@@ -33,7 +33,7 @@ class AdaptableTest extends \lithium\test\Unit {
 
 		$items = array(array(
 			'adapter' => 'some\adapter',
-			'filters' => array('filter1', 'filter2')
+			'filters' => array()
 		));
 		MockAdaptable::config($items);
 		$result = MockAdaptable::config();
@@ -44,7 +44,7 @@ class AdaptableTest extends \lithium\test\Unit {
 	public function testReset() {
 		$items = array(array(
 			'adapter' => '\some\adapter',
-			'filters' => array('filter1', 'filter2')
+			'filters' => array()
 		));
 		MockAdaptable::config($items);
 		$result = MockAdaptable::config();
@@ -328,6 +328,49 @@ class AdaptableTest extends \lithium\test\Unit {
 		));
 		MockAdaptable::enabled('default');
 		$this->assertFalse(MockAdaptable::testInitialized('default'));
+	}
+
+	/* Deprecated / BC */
+
+	public function testDeprecatedConfig() {
+		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$items = array(array(
+			'adapter' => 'some\adapter',
+			'filters' => array('filter1', 'filter2')
+		));
+		$result = MockAdaptable::config($items);
+		$this->assertNull($result);
+
+		$expected = $items;
+		$result = MockAdaptable::config();
+		$this->assertEqual($expected, $result);
+
+		$items = array(array(
+			'adapter' => 'some\adapter',
+			'filters' => array('filter1', 'filter2')
+		));
+		MockAdaptable::config($items);
+		$result = MockAdaptable::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		error_reporting($original);
+	}
+
+	public function testDeprecatedReset() {
+		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$items = array(array(
+			'adapter' => '\some\adapter',
+			'filters' => array('filter1', 'filter2')
+		));
+		MockAdaptable::config($items);
+		$result = MockAdaptable::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		error_reporting($original);
 	}
 }
 

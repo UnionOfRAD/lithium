@@ -10,7 +10,7 @@ namespace lithium\core;
 
 use RuntimeException;
 use lithium\util\Text;
-use lithium\util\collection\Filters;
+use lithium\aop\Filters;
 use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
 
@@ -56,13 +56,6 @@ use lithium\core\ClassNotFoundException;
  * @see lithium\core\Libraries::paths()
  */
 class Libraries {
-
-	/**
-	 * Stores the closures that represent the method filters. They are indexed by method name.
-	 *
-	 * @var array
-	 */
-	protected static $_methodFilters = array();
 
 	/**
 	 * The list of class libraries registered with the class loader.
@@ -681,9 +674,8 @@ class Libraries {
 	 */
 	public static function instance($type, $name, array $options = array()) {
 		$params = compact('type', 'name', 'options');
-		$_paths =& static::$_paths;
 
-		$implementation = function($self, $params) use (&$_paths) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$name = $params['name'];
 			$type = $params['type'];
 
@@ -691,10 +683,10 @@ class Libraries {
 				$message = "Invalid class lookup: `\$name` and `\$type` are empty.";
 				throw new ClassNotFoundException($message);
 			}
-			if (!is_string($type) && $type !== null && !isset($_paths[$type])) {
+			if (!is_string($type) && $type !== null && !isset(static::$_paths[$type])) {
 				throw new ClassNotFoundException("Invalid class type `{$type}`.");
 			}
-			if (!$class = $self::locate($type, $name)) {
+			if (!$class = static::locate($type, $name)) {
 				throw new ClassNotFoundException("Class `{$name}` of type `{$type}` not found.");
 			}
 			if (is_object($class)) {
@@ -704,29 +696,7 @@ class Libraries {
 				throw new ClassNotFoundException("Class `{$name}` of type `{$type}` not defined.");
 			}
 			return new $class($params['options']);
-		};
-		if (!isset(static::$_methodFilters[__FUNCTION__])) {
-			return $implementation(get_called_class(), $params);
-		}
-		$class = get_called_class();
-		$method = __FUNCTION__;
-		$data = array_merge(static::$_methodFilters[__FUNCTION__], array($implementation));
-		return Filters::run($class, $params, compact('data', 'class', 'method'));
-	}
-
-	/**
-	 * Apply a closure to a method in `Libraries`.
-	 *
-	 * @see lithium\util\collection\Filters
-	 * @param string $method The name of the method to apply the closure to.
-	 * @param \Closure $filter The closure that is used to filter the method.
-	 * @return void
-	 */
-	public static function applyFilter($method, $filter = null) {
-		if (!isset(static::$_methodFilters[$method])) {
-			static::$_methodFilters[$method] = array();
-		}
-		static::$_methodFilters[$method][] = $filter;
+		});
 	}
 
 	/**
@@ -1082,6 +1052,45 @@ class Libraries {
 			$namespace = $parts ? join('\\', $parts) : "*";
 		}
 		return compact('library', 'namespace', 'type', 'class', 'name');
+	}
+
+	/* Deprecated / BC */
+
+	/**
+	 * Stores the closures that represent the method filters. They are indexed by method name.
+	 *
+	 * @deprecated Not used anymore.
+	 * @var array
+	 */
+	protected static $_methodFilters = array();
+
+	/**
+	 * Apply a closure to a method in `Libraries`.
+	 *
+	 * @deprecated Replaced by `\lithium\aop\Filters::apply()` and `::clear()`.
+	 * @see lithium\util\collection\Filters
+	 * @param string $method The name of the method to apply the closure to.
+	 * @param Closure $filter The closure that is used to filter the method.
+	 * @return void
+	 */
+	public static function applyFilter($method, $filter = null) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
+		$message .= '`\lithium\aop\Filters::apply()` and `::clear()`.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		$class = get_called_class();
+
+		if ($method === false) {
+			Filters::clear($class);
+			return;
+		}
+		foreach ((array) $method as $m) {
+			if ($filter === false) {
+				Filters::clear($class, $m);
+			} else {
+				Filters::apply($class, $m, $filter);
+			}
+		}
 	}
 }
 

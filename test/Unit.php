@@ -12,6 +12,7 @@ use Exception;
 use ErrorException;
 use ReflectionClass;
 use InvalidArgumentException;
+use lithium\aop\Filters;
 use lithium\util\Text;
 use lithium\core\Libraries;
 use lithium\util\Validator;
@@ -1604,13 +1605,13 @@ class Unit extends \lithium\core\Object {
 		}
 		$params = compact('options', 'method');
 
-		$passed = $this->_filter(__CLASS__ . '::run', $params, function($self, $params, $chain) {
+		$passed = Filters::run($this, 'run', $params, function($params) {
 			try {
 				$method = $params['method'];
 				$lineFlag = __LINE__ + 1;
-				$self->{$method}();
+				$this->{$method}();
 			} catch (Exception $e) {
-				$self->invokeMethod('_handleException', array($e));
+				$this->_handleException($e);
 			}
 		});
 

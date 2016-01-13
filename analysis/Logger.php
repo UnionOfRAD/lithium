@@ -8,6 +8,7 @@
 
 namespace lithium\analysis;
 
+use lithium\aop\Filters;
 use UnexpectedValueException;
 
 /**
@@ -118,7 +119,18 @@ class Logger extends \lithium\core\Adaptable {
 		foreach ($methods as $name => $method) {
 			$params = compact('priority', 'message', 'options');
 			$config = static::_config($name);
-			$result &= static::_filter(__FUNCTION__, $params, $method, $config['filters']);
+
+			if (!empty($config['filters'])) {
+				$message  = 'Per adapter filters have been deprecated. Please ';
+				$message .= "filter the manager class' static methods instead.";
+				trigger_error($message, E_USER_DEPRECATED);
+
+				$result &= Filters::bcRun(
+					get_called_class(), __FUNCTION__, $params, $method, $config['filters']
+				);
+			} else {
+				$result &= Filters::run(get_called_class(), __FUNCTION__, $params, $method);
+			}
 		}
 		return $methods ? $result : false;
 	}

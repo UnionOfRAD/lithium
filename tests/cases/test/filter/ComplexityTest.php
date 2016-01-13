@@ -8,6 +8,7 @@
 
 namespace lithium\tests\cases\test\filter;
 
+use lithium\aop\Filters;
 use lithium\test\filter\Complexity;
 use lithium\test\Group;
 use lithium\test\Report;
@@ -34,13 +35,13 @@ class ComplexityTest extends \lithium\test\Unit {
 	 * Helper array which stores the expected results to clean up the tests.
 	 */
 	protected $_metrics = array(
-		'applyFilter' => 5,
 		'invokeMethod' => 7,
 		'respondsTo' => 1,
 		'_instance' => 2,
-		'_filter' => 3,
 		'_parents' => 2,
-		'_stop' => 1
+		'_stop' => 1,
+		'applyFilter' => 4,
+		'_filter' => 3
 	);
 
 	/**
@@ -64,9 +65,12 @@ class ComplexityTest extends \lithium\test\Unit {
 		$this->report->group = $group;
 
 		Complexity::apply($this->report, $group->tests());
+
 		$results = array_pop($this->report->results['filters'][$this->_paths['complexity']]);
 		$expected = array($this->_paths['testClass'] => $this->_metrics);
 		$this->assertEqual($expected, $results);
+
+		Filters::clear($group);
 	}
 
 	/**
@@ -83,7 +87,7 @@ class ComplexityTest extends \lithium\test\Unit {
 		Complexity::apply($this->report, $group->tests());
 
 		$results = Complexity::analyze($this->report);
-		$expected = array('class' => array($this->_paths['testClass'] => 3.0));
+		$expected = array('class' => array($this->_paths['testClass'] => 2.8999999999999999));
 		foreach ($this->_metrics as $method => $metric) {
 			$expected['max'][$this->_paths['testClass'] . '::' . $method . '()'] = $metric;
 		}

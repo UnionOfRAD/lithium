@@ -10,6 +10,7 @@ namespace lithium\console;
 
 use lithium\core\Libraries;
 use lithium\core\Environment;
+use lithium\aop\Filters;
 use UnexpectedValueException;
 
 /**
@@ -89,20 +90,22 @@ class Dispatcher extends \lithium\core\StaticObject {
 	public static function run($request = null, $options = array()) {
 		$defaults = array('request' => array());
 		$options += $defaults;
-		$classes = static::$_classes;
 		$params = compact('request', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($classes) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
+			$classes = static::$_classes;
+
 			$request = $params['request'];
 			$options = $params['options'];
 			$router = $classes['router'];
+
 			$request = $request ?: new $classes['request']($options['request']);
 			$request->params = $router::parse($request);
-			$params = $self::applyRules($request->params);
+			$params = static::applyRules($request->params);
 			Environment::set($request);
 			try {
-				$callable = $self::invokeMethod('_callable', array($request, $params, $options));
-				return $self::invokeMethod('_call', array($callable, $request, $params));
+				$callable = static::_callable($request, $params, $options);
+				return static::_call($callable, $request, $params);
 			} catch (UnexpectedValueException $e) {
 				return (object) array('status' => $e->getMessage() . "\n");
 			}
@@ -120,7 +123,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$request = $params['request'];
 			$params = $params['params'];
 			$name = $params['command'];
@@ -179,7 +182,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			if (is_callable($callable = $params['callable'])) {
 				$request = $params['request'];
 				$params = $params['params'];

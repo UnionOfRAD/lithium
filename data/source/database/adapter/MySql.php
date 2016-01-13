@@ -10,6 +10,7 @@ namespace lithium\data\source\database\adapter;
 
 use PDO;
 use PDOException;
+use lithium\aop\Filters;
 
 /**
  * MySQL database driver. Extends the `Database` class to implement the necessary
@@ -186,13 +187,12 @@ class MySql extends \lithium\data\source\Database {
 	 * @filter
 	 */
 	public function sources($model = null) {
-		$_config = $this->_config;
 		$params = compact('model');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
-			$name = $self->name($_config['database']);
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
+			$name = $this->name($this->_config['database']);
 
-			if (!$result = $self->invokeMethod('_execute', array("SHOW TABLES FROM {$name};"))) {
+			if (!$result = $this->_execute("SHOW TABLES FROM {$name};")) {
 				return null;
 			}
 			$sources = array();
@@ -220,20 +220,21 @@ class MySql extends \lithium\data\source\Database {
 	 */
 	public function describe($entity,  $fields = array(), array $meta = array()) {
 		$params = compact('entity', 'meta', 'fields');
-		return $this->_filter(__METHOD__, $params, function($self, $params) {
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			extract($params);
 
 			if ($fields) {
-				return $self->invokeMethod('_instance', array('schema', compact('fields')));
+				return $this->_instance('schema', compact('fields'));
 			}
-			$name = $self->invokeMethod('_entityName', array($entity, array('quoted' => true)));
-			$columns = $self->read("DESCRIBE {$name}", array('return' => 'array', 'schema' => array(
+			$name = $this->_entityName($entity, array('quoted' => true));
+			$columns = $this->read("DESCRIBE {$name}", array('return' => 'array', 'schema' => array(
 				'field', 'type', 'null', 'key', 'default', 'extra'
 			)));
 			$fields = array();
 
 			foreach ($columns as $column) {
-				$schema = $self->invokeMethod('_column', array($column['type']));
+				$schema = $this->_column($column['type']);
 				$default = $column['default'];
 
 				if ($default === 'CURRENT_TIMESTAMP') {
@@ -246,7 +247,7 @@ class MySql extends \lithium\data\source\Database {
 					'default'  => $default
 				);
 			}
-			return $self->invokeMethod('_instance', array('schema', compact('fields')));
+			return $this->_instance('schema', compact('fields'));
 		});
 	}
 
@@ -356,21 +357,19 @@ class MySql extends \lithium\data\source\Database {
 		$defaults = array('buffered' => true);
 		$options += $defaults;
 
-		$conn = $this->connection;
-
 		$params = compact('sql', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($conn) {
-			$sql = $params['sql'];
-			$options = $params['options'];
-			$conn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, $options['buffered']);
-
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
+			$this->connection->setAttribute(
+				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY,
+				$params['options']['buffered']
+			);
 			try {
-				$resource = $conn->query($sql);
+				$resource = $this->connection->query($params['sql']);
 			} catch (PDOException $e) {
-				$self->invokeMethod('_error', array($sql));
+				$this->_error($params['sql']);
 			};
-			return $self->invokeMethod('_instance', array('result', compact('resource')));
+			return $this->_instance('result', compact('resource'));
 		});
 	}
 

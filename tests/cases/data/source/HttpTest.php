@@ -349,10 +349,9 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testRespondsToParentCall() {
 		$http = new Http();
-		$this->assertTrue($http->respondsTo('applyFilter'));
+		$this->assertTrue($http->respondsTo('invokeMethod'));
 		$this->assertFalse($http->respondsTo('fooBarBaz'));
 	}
-
 }
 
 ?>

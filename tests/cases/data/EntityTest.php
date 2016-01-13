@@ -277,7 +277,7 @@ class EntityTest extends \lithium\test\Unit {
 		$data = array('foo' => true);
 		$entity = new Entity(compact('model', 'data'));
 
-		$this->assertTrue($entity->respondsTo('applyFilter'));
+		$this->assertTrue($entity->respondsTo('invokeMethod'));
 		$this->assertFalse($entity->respondsTo('fooBarBaz'));
 	}
 

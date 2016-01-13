@@ -8,6 +8,7 @@
 
 namespace lithium\tests\mocks\data;
 
+use lithium\aop\Filters;
 use lithium\data\model\Query;
 use lithium\data\entity\Record;
 use lithium\data\collection\RecordSet;
@@ -26,7 +27,7 @@ class MockComment extends \lithium\data\Model {
 		$params = compact('type', 'options');
 		$self = static::_object();
 
-		$filter = function($self, $params) {
+		$implementation = function($params) {
 			$query = new Query(array('type' => 'read') + $params['options']);
 
 			return new RecordSet(array(
@@ -43,8 +44,14 @@ class MockComment extends \lithium\data\Model {
 				)
 			));
 		};
-		$finder = isset($self->_finders[$type]) ? array($self->_finders[$type]) : array();
-		return static::_filter(__METHOD__, $params, $filter, $finder);
+		if (isset($self->_finders[$type])) {
+			$finder = $self->_finders[$type];
+
+			$implementation = function($params) use ($finder, $implementation) {
+				return $finder($params, $implementation);
+			};
+		}
+		return Filters::run(get_called_class(), __FUNCTION__, $params, $implementation);
 	}
 }
 

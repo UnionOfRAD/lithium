@@ -447,7 +447,7 @@ class CollectionTest extends \lithium\test\Unit {
 
 	public function testRespondsToParent() {
 		$collection = new Collection();
-		$this->assertTrue($collection->respondsTo('applyFilter'));
+		$this->assertTrue($collection->respondsTo('invokeMethod'));
 		$this->assertFalse($collection->respondsTo('fooBarBaz'));
 	}
 

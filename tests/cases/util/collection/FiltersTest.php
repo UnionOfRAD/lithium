@@ -9,10 +9,23 @@
 namespace lithium\tests\cases\util\collection;
 
 use lithium\util\collection\Filters;
+use lithium\aop\Filters as NewFilters;
 
+/**
+ * Filters Test
+ *
+ * @deprecated
+ */
 class FiltersTest extends \lithium\test\Unit {
 
+	public function tearDown() {
+		NewFilters::clear('lithium\tests\mocks\util\MockFilters');
+		NewFilters::clear('foo\Bar');
+	}
+
 	public function testRun() {
+		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
+
 		$options = array('method' => __FUNCTION__, 'class' => __CLASS__, 'data' => array(
 			function($self, $params, $chain) {
 				$params['message'] .= 'is a filter chain ';
@@ -26,25 +39,35 @@ class FiltersTest extends \lithium\test\Unit {
 				return $params['message'] . 'of the ' . $self . ' class.';
 			}
 		));
-		$result = Filters::run(__CLASS__, array('message' => 'This '), $options);
+		$result = Filters::run('foo\Bar', array('message' => 'This '), $options);
 		$expected = 'This is a filter chain in the testRun method of the';
-		$expected .= ' lithium\tests\cases\util\collection\FiltersTest class.';
+		$expected .= ' foo\Bar class.';
 		$this->assertEqual($expected, $result);
+
+		error_reporting($original);
 	}
 
 	public function testRunWithoutChain() {
+		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
+
 		$options = array('method' => __FUNCTION__, 'class' => __CLASS__, 'data' => array(
 			function($self, $params, $chain) {
 				return $chain->next($self, $params, null);
 			},
-			'This is a filter chain that calls $chain->next() without the $chain argument.'
+			function() {
+				return 'This is a filter chain that calls $chain->next() without the $chain argument.';
+			}
 		));
-		$result = Filters::run(__CLASS__, array(), $options);
+		$result = Filters::run('foo\Bar', array(), $options);
 		$expected = 'This is a filter chain that calls $chain->next() without the $chain argument.';
 		$this->assertEqual($expected, $result);
+
+		error_reporting($original);
 	}
 
 	public function testLazyApply() {
+		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
+
 		$class = 'lithium\tests\mocks\util\MockFilters';
 
 		Filters::apply($class, 'filteredMethod', function($self, $params, $chain) {
@@ -62,6 +85,8 @@ class FiltersTest extends \lithium\test\Unit {
 		$expected = md5(sha1('Working?'));
 		$result = $class::filteredMethod();
 		$this->assertEqual($expected, $result);
+
+		error_reporting($original);
 	}
 }
 

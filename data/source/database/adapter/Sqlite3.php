@@ -9,6 +9,7 @@
 namespace lithium\data\source\database\adapter;
 
 use PDOException;
+use lithium\aop\Filters;
 use lithium\core\ConfigException;
 
 /**
@@ -170,11 +171,11 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @filter
 	 */
 	public function sources($model = null) {
-		$config = $this->_config;
+		$params = compact('model');
 
-		return $this->_filter(__METHOD__, compact('model'), function($self, $params) use ($config) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
-			$result = $self->invokeMethod('_execute', array($sql));
+			$result = $this->_execute($sql);
 			$sources = array();
 
 			foreach ($result as $row) {
@@ -206,19 +207,19 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 */
 	public function describe($entity, $fields = array(), array $meta = array()) {
 		$params = compact('entity', 'meta', 'fields');
-		$regex = $this->_regex;
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($regex) {
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			extract($params);
 
 			if ($fields) {
-				return $self->invokeMethod('_instance', array('schema', compact('fields')));
+				return $this->_instance('schema', compact('fields'));
 			}
-			$name = $self->invokeMethod('_entityName', array($entity, array('quoted' => true)));
-			$columns = $self->read("PRAGMA table_info({$name})", array('return' => 'array'));
+			$name = $this->_entityName($entity, array('quoted' => true));
+			$columns = $this->read("PRAGMA table_info({$name})", array('return' => 'array'));
 			$fields = array();
 
 			foreach ($columns as $column) {
-				$schema = $self->invokeMethod('_column', array($column['type']));
+				$schema = $this->_column($column['type']);
 				$default = $column['dflt_value'];
 
 				if (preg_match("/^'(.*)'/", $default, $match)) {
@@ -233,7 +234,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 					'default' => $default
 				);
 			}
-			return $self->invokeMethod('_instance', array('schema', compact('fields')));
+			return $this->_instance('schema', compact('fields'));
 		});
 	}
 
@@ -298,18 +299,15 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @filter
 	 */
 	protected function _execute($sql, array $options = array()) {
-		$conn = $this->connection;
 		$params = compact('sql', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($conn) {
-			$sql = $params['sql'];
-
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			try {
-				$resource = $conn->query($sql);
+				$resource = $this->connection->query($params['sql']);
 			} catch (PDOException $e) {
-				$self->invokeMethod('_error', array($sql));
+				$this->_error($params['sql']);
 			};
-			return $self->invokeMethod('_instance', array('result', compact('resource')));
+			return $this->_instance('result', compact('resource'));
 		});
 	}
 

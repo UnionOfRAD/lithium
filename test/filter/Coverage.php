@@ -9,6 +9,7 @@
 namespace lithium\test\filter;
 
 use RuntimeException;
+use lithium\aop\Filters;
 use lithium\core\Libraries;
 use lithium\analysis\Inspector;
 
@@ -41,14 +42,16 @@ class Coverage extends \lithium\test\Filter {
 			throw new RuntimeException($msg);
 		}
 
-		$filter = function($self, $params, $chain) use ($report, $options) {
-			xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
-			$chain->next($self, $params, $chain);
-			$results = xdebug_get_code_coverage();
-			xdebug_stop_code_coverage();
-			$report->collect(__CLASS__, array($self->subject() => $results));
-		};
-		$tests->invoke('applyFilter', array($options['method'], $filter));
+		foreach ($tests as $test) {
+			$filter = function($params, $next) use ($test, $report) {
+				xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
+				$next($params);
+				$results = xdebug_get_code_coverage();
+				xdebug_stop_code_coverage();
+				$report->collect(__CLASS__, array($test->subject() => $results));
+			};
+			Filters::apply($test, $options['method'], $filter);
+		}
 		return $tests;
 	}
 

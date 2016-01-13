@@ -32,7 +32,7 @@ class GrowlTest extends \lithium\test\Unit {
 		));
 		$writer = $growl->write('info', 'info: Test message.', array());
 		$params = array('message' => 'info: Test message.', 'options' => array());
-		$result = $writer('lithium\analysis\Logger', $params, null);
+		$result = $writer($params, null);
 
 		$bytes = array(
 			1, 0, 0, 7, 2, 2, 76, 105, 116, 104, 105, 117, 109, 0, 6, 69, 114, 114, 111, 114, 115,
@@ -60,7 +60,7 @@ class GrowlTest extends \lithium\test\Unit {
 			$params = compact('message') + array('priority' => 'info', 'options' => array());
 
 			$writer = $growl->write('info', $message, array());
-			$writer('lithium\analysis\Logger', $params, null);
+			$writer($params, null);
 		});
 	}
 
@@ -76,7 +76,7 @@ class GrowlTest extends \lithium\test\Unit {
 			$params = compact('message') + array('priority' => 'info', 'options' => array());
 
 			$writer = $growl->write('info', $message, array());
-			$writer('lithium\analysis\Logger', $params, null);
+			$writer($params, null);
 		});
 	}
 
@@ -89,7 +89,7 @@ class GrowlTest extends \lithium\test\Unit {
 		));
 		$writer = $growl->write('info', 'info: Test message.', array());
 		$params = array('message' => 'info: Test message.', 'options' => array('sticky' => true));
-		$result = $writer('lithium\analysis\Logger', $params, null);
+		$result = $writer($params, null);
 
 		$bytes = array(
 			1, 0, 0, 7, 2, 2, 76, 105, 116, 104, 105, 117, 109, 0, 6, 69, 114, 114, 111, 114, 115,
@@ -117,7 +117,7 @@ class GrowlTest extends \lithium\test\Unit {
 		$params = array('message' => 'info: Test message.', 'options' => array(
 			'priority' => 'emergency'
 		));
-		$result = $writer('lithium\analysis\Logger', $params, null);
+		$result = $writer($params, null);
 
 		$bytes = array(
 			1, 0, 0, 7, 2, 2, 76, 105, 116, 104, 105, 117, 109, 0, 6, 69, 114, 114, 111, 114, 115,

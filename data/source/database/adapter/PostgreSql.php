@@ -10,6 +10,7 @@ namespace lithium\data\source\database\adapter;
 
 use PDO;
 use PDOException;
+use lithium\aop\Filters;
 
 /**
  * PostgreSQL database driver. Extends the `Database` class to implement the necessary
@@ -168,16 +169,15 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @filter
 	 */
 	public function sources($model = null) {
-		$_config = $this->_config;
 		$params = compact('model');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
-			$schema = $self->connection->quote($_config['schema']);
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
+			$schema = $this->connection->quote($this->_config['schema']);
 
-			$sql = "SELECT table_name as name FROM INFORMATION_SCHEMA.tables";
+			$sql  = "SELECT table_name as name FROM INFORMATION_SCHEMA.tables";
 			$sql .= " WHERE table_schema = {$schema}";
 
-			if (!$result = $self->invokeMethod('_execute', array($sql))) {
+			if (!$result = $this->_execute($sql)) {
 				return null;
 			}
 			$sources = array();
@@ -206,26 +206,27 @@ class PostgreSql extends \lithium\data\source\Database {
 	public function describe($entity, $fields = array(), array $meta = array()) {
 		$schema = $this->_config['schema'];
 		$params = compact('entity', 'meta', 'fields', 'schema');
-		return $this->_filter(__METHOD__, $params, function($self, $params) {
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			extract($params);
 
 			if ($fields) {
-				return $self->invokeMethod('_instance', array('schema', compact('fields')));
+				return $this->_instance('schema', compact('fields'));
 			}
-			$name = $self->connection->quote($self->invokeMethod('_entityName', array($entity)));
-			$schema = $self->connection->quote($schema);
+			$name = $this->connection->quote($this->_entityName($entity));
+			$schema = $this->connection->quote($schema);
 
-			$sql = 'SELECT "column_name" AS "field", "data_type" AS "type",	';
+			$sql  = 'SELECT "column_name" AS "field", "data_type" AS "type",	';
 			$sql .= '"is_nullable" AS "null", "column_default" AS "default", ';
 			$sql .= '"character_maximum_length" AS "char_length" ';
 			$sql .= 'FROM "information_schema"."columns" WHERE "table_name" = ' . $name;
 			$sql .= ' AND table_schema = ' . $schema . ' ORDER BY "ordinal_position"';
 
-			$columns = $self->connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+			$columns = $this->connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 			$fields = array();
 
 			foreach ($columns as $column) {
-				$schema = $self->invokeMethod('_column', array($column['type']));
+				$schema = $this->_column($column['type']);
 				$default = $column['default'];
 
 				if (preg_match("/^'(.*)'::/", $default, $match)) {
@@ -245,7 +246,7 @@ class PostgreSql extends \lithium\data\source\Database {
 					$fields[$column['field']]['length'] = $column['char_length'];
 				}
 			}
-			return $self->invokeMethod('_instance', array('schema', compact('fields')));
+			return $this->_instance('schema', compact('fields'));
 		});
 	}
 
@@ -366,20 +367,15 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @filter
 	 */
 	protected function _execute($sql, array $options = array()) {
-		$conn = $this->connection;
-
 		$params = compact('sql', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($conn) {
-			$sql = $params['sql'];
-
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			try {
-				$resource = $conn->query($sql);
-			} catch(PDOException $e) {
-				$self->invokeMethod('_error', array($sql));
+				$resource = $this->connection->query($params['sql']);
+			} catch (PDOException $e) {
+				$this->_error($params['sql']);
 			};
-
-			return $self->invokeMethod('_instance', array('result', compact('resource')));
+			return $this->_instance('result', compact('resource'));
 		});
 	}
 
