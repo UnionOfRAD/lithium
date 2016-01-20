@@ -84,10 +84,10 @@ class Encrypt extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = array()) {
 		if (!static::enabled()) {
-			throw new ConfigException("The Mcrypt extension is not installed or enabled.");
+			throw new ConfigException('The mcrypt extension is not installed or enabled.');
 		}
 		if (!isset($config['secret'])) {
-			throw new ConfigException("Encrypt strategy requires a secret key.");
+			throw new ConfigException('Encrypt strategy requires a secret key.');
 		}
 		parent::__construct($config + $this->_defaults);
 

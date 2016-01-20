@@ -380,10 +380,10 @@ class Mocker {
 			'            return call_user_func_array($method, $args);',
 			'        }',
 			'    );',
-			'    if (!isset(self::$staticResults["{:method}"])) {',
-			'        self::$staticResults["{:method}"] = array();',
+			'    if (!isset(static::$staticResults["{:method}"])) {',
+			'        static::$staticResults["{:method}"] = array();',
 			'    }',
-			'    self::$staticResults["{:method}"][] = array(',
+			'    static::$staticResults["{:method}"][] = array(',
 			'        "args" => func_get_args(),',
 			'        "result" => $result,',
 			'        "time" => microtime(true),',
@@ -464,21 +464,21 @@ class Mocker {
 	 * @return void
 	 */
 	public static function create($mockee) {
-		if (!self::_validateMockee($mockee)) {
+		if (!static::_validateMockee($mockee)) {
 			return;
 		}
 
-		$mocker = self::_mocker($mockee);
+		$mocker = static::_mocker($mockee);
 		$isStatic = is_subclass_of($mocker, 'lithium\core\StaticObject');
 
 		$tokens = array(
-			'namespace' => self::_namespace($mockee),
+			'namespace' => static::_namespace($mockee),
 			'mocker' => $mocker,
 			'mockee' => 'MockDelegate',
 			'static' => $isStatic ? 'static' : '',
 		);
-		$mockDelegate = self::_dynamicCode('mockDelegate', 'startClass', $tokens);
-		$mock = self::_dynamicCode('mock', 'startClass', $tokens);
+		$mockDelegate = static::_dynamicCode('mockDelegate', 'startClass', $tokens);
+		$mock = static::_dynamicCode('mock', 'startClass', $tokens);
 
 		$reflectedClass = new ReflectionClass($mocker);
 		$reflecedMethods = $reflectedClass->getMethods();
@@ -486,7 +486,7 @@ class Mocker {
 		$staticApplyFilter = true;
 		$constructor = false;
 		foreach ($reflecedMethods as $methodId => $method) {
-			if (!in_array($method->name, self::$_blackList)) {
+			if (!in_array($method->name, static::$_blackList)) {
 				$key = $method->isStatic() ? 'staticMethod' : 'method';
 				if ($method->name === '__construct') {
 					$key = 'constructor';
@@ -497,15 +497,15 @@ class Mocker {
 					continue;
 				}
 				$tokens = array(
-					'namespace' => self::_namespace($mockee),
+					'namespace' => static::_namespace($mockee),
 					'method' => $method->name,
-					'modifiers' => self::_methodModifiers($method),
-					'args' => self::_methodParams($method),
-					'stringArgs' => self::_stringMethodParams($method),
+					'modifiers' => static::_methodModifiers($method),
+					'args' => static::_methodParams($method),
+					'stringArgs' => static::_stringMethodParams($method),
 					'mocker' => $mocker,
 				);
-				$mockDelegate .= self::_dynamicCode('mockDelegate', $key, $tokens);
-				$mock .= self::_dynamicCode('mock', $key, $tokens);
+				$mockDelegate .= static::_dynamicCode('mockDelegate', $key, $tokens);
+				$mock .= static::_dynamicCode('mock', $key, $tokens);
 			} elseif ($method->name === '__get') {
 				$docs = ReflectionMethod::export($mocker, '__get', true);
 				$getByReference = preg_match('/&__get/', $docs) === 1;
@@ -516,28 +516,28 @@ class Mocker {
 
 		if (!$constructor) {
 			$tokens = array(
-				'namespace' => self::_namespace($mockee),
+				'namespace' => static::_namespace($mockee),
 				'modifiers' => 'public',
 				'args' => null,
 				'stringArgs' => 'array()',
 				'mocker' => $mocker,
 			);
-			$mock .= self::_dynamicCode('mock', 'constructor', $tokens);
-			$mockDelegate .= self::_dynamicCode('mockDelegate', 'constructor', $tokens);
+			$mock .= static::_dynamicCode('mock', 'constructor', $tokens);
+			$mockDelegate .= static::_dynamicCode('mockDelegate', 'constructor', $tokens);
 		}
 
-		$mockDelegate .= self::_dynamicCode('mockDelegate', 'endClass');
-		$mock .= self::_dynamicCode('mock', 'get', array(
+		$mockDelegate .= static::_dynamicCode('mockDelegate', 'endClass');
+		$mock .= static::_dynamicCode('mock', 'get', array(
 			'reference' => $getByReference ? '&' : '',
 		));
-		$mock .= self::_dynamicCode('mock', 'set');
-		$mock .= self::_dynamicCode('mock', 'isset');
-		$mock .= self::_dynamicCode('mock', 'unset');
-		$mock .= self::_dynamicCode('mock', 'applyFilter', array(
+		$mock .= static::_dynamicCode('mock', 'set');
+		$mock .= static::_dynamicCode('mock', 'isset');
+		$mock .= static::_dynamicCode('mock', 'unset');
+		$mock .= static::_dynamicCode('mock', 'applyFilter', array(
 			'static' => $staticApplyFilter ? 'static' : '',
 		));
-		$mock .= self::_dynamicCode('mock', 'destructor');
-		$mock .= self::_dynamicCode('mock', 'endClass');
+		$mock .= static::_dynamicCode('mock', 'destructor');
+		$mock .= static::_dynamicCode('mock', 'endClass');
 
 		eval($mockDelegate . $mock);
 	}
@@ -605,7 +605,7 @@ class Mocker {
 		);
 		$tokens += $defaults;
 		$name = '_' . $type . 'Ingredients';
-		$code = implode("\n", self::${$name}[$key]);
+		$code = implode("\n", static::${$name}[$key]);
 		return Text::insert($code, $tokens) . "\n";
 	}
 
@@ -721,7 +721,7 @@ class Mocker {
 
 		$function = new ReflectionFunction($callback);
 		$pos = strrpos($name, '\\');
-		eval(self::_dynamicCode('mockFunction', 'function', array(
+		eval(static::_dynamicCode('mockFunction', 'function', array(
 			'namespace' => substr($name, 0, $pos),
 			'function' => substr($name, $pos + 1),
 			'args' => static::_methodParams($function),

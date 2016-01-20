@@ -166,7 +166,7 @@ class Router extends \lithium\core\StaticObject {
 	 * @param array|callable $options Either an array of options (`'handler'`, `'formatters'`,
 	 *                      `'modifiers'`, `'unicode'` as well as any options for `Route`) or
 	 *                      a callable that will be used as a route handler.
-	 * @return array Array of routes
+	 * @return \lithium\net\http\Route Instance of the connected route.
 	 */
 	public static function connect($template, $params = array(), $options = array()) {
 		if (is_array($options) && isset($options['scope'])) {
