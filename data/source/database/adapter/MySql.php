@@ -274,7 +274,7 @@ class MySql extends \lithium\data\source\Database {
 
 			return $encoding === 'utf8' ? 'UTF-8' : $encoding;
 		}
-		if (stripos($encoding, 'utf-8') !== false || stripos($encoding, 'utf8') !== false) {
+		if (strcasecmp($encoding, 'utf-8') === 0 || strcasecmp($encoding, 'utf8') === 0) {
 			$encoding = 'utf8';
 		}
 		return $this->connection->exec("SET NAMES '{$encoding}'") !== false;

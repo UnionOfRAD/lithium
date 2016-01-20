@@ -124,6 +124,9 @@ class MySqlTest extends \lithium\tests\integration\data\Base {
 
 		$this->assertTrue($this->_db->encoding('utf-8'));
 		$this->assertEqual('UTF-8', $this->_db->encoding());
+
+		$this->assertTrue($this->_db->encoding('utf8mb4'));
+		$this->assertEqual('utf8mb4', $this->_db->encoding());
 	}
 
 	public function testDatabaseStrictMode() {
