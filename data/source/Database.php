@@ -682,6 +682,11 @@ abstract class Database extends \lithium\data\Source {
 		return $this->_filter(__METHOD__, compact('query', 'options'), function($self, $params) {
 			$query = $params['query'];
 			$params = $query->export($self);
+
+			if ($params['fields'] === null) {
+				return true;
+			}
+
 			$sql = $self->renderCommand('update', $params, $query);
 			$result = (boolean) $self->invokeMethod('_execute', array($sql));
 
@@ -1179,7 +1184,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @param object $context Generally a `data\model\Query` instance.
 	 * @param array $fields
 	 * @param array $schema An array defining the schema of the fields used in the criteria.
-	 * @return string|array
+	 * @return string|array|null
 	 */
 	protected function _fieldsReturn($type, $context, $fields, $schema) {
 		if ($type === 'create' || $type === 'update') {
@@ -1232,7 +1237,8 @@ abstract class Database extends \lithium\data\Source {
 	 * @param array $data
 	 * @param array $schema An array defining the schema of the fields used in the criteria.
 	 * @param object $context Generally a `data\model\Query` instance.
-	 * @return string SQL fragment, with fields separated by comma.
+	 * @return string|null SQL fragment, with fields separated by comma. Null when the fields
+	 *         haven't been changed.
 	 */
 	protected function _updateFields($data, $schema, $context) {
 		$fields = array();
@@ -1249,8 +1255,7 @@ abstract class Database extends \lithium\data\Source {
 			}, array_keys($export['data']));
 
 			if (!$data) {
-				$model = $context->model();
-				$data = $model::key($context->data());
+				return null;
 			}
 		}
 

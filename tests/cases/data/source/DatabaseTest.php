@@ -590,22 +590,6 @@ class DatabaseTest extends \lithium\test\Unit {
 		$expected .= " {count} = {count} + 1 WHERE {id} = 2;";
 		$this->assertEqual($expected, $this->_db->sql);
 
-		$entity = new Record(array(
-			'model' => $this->_model,
-			'data' => array('id' => 3, 'title' => 'the post', 'body' => 'the body'),
-			'exists' => true
-		));
-		$entity->title = 'the post';
-		$query = new Query(compact('entity') + array('type' => 'update'));
-		$result = $this->_db->update($query);
-
-		$this->assertTrue($result);
-		$this->assertEqual(3, $query->entity()->id);
-
-		$expected = "UPDATE {mock_database_posts} SET";
-		$expected .= " {id} = 3 WHERE {id} = 3;";
-		$this->assertEqual($expected, $this->_db->sql);
-
 		$query = new Query(array(
 			'type' => 'update',
 			'data' => array('modified' => (object) 'NOW()'),
