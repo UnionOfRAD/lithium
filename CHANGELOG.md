@@ -8,6 +8,8 @@
   connection in the `Socket` subclasses `Context`, `Stream` and `Curl`.
 - Fixed slug generation by `Inflector` for strings containing multibyte characters or
   (unprintable) whitespaces.
+- Fixed edge case when using `Collection::prev()` and the collection contained
+  a falsey value (i.e. `null`, `false`, `''`).
 
 ### Improved
 

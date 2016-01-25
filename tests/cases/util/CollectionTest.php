@@ -191,10 +191,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertIdentical(8, $cpt);
 	}
 
-	/**
-	 * Tests the `ArrayAccess` interface implementation for traversing values.
-	 */
-	public function testArrayAccessTraversalMethods() {
+	public function testTraversal() {
 		$collection = new Collection(array('data' => array('foo', 'bar', 'baz' => 'dib')));
 		$this->assertEqual('foo', $collection->current());
 		$this->assertEqual('bar', $collection->next());
@@ -232,6 +229,52 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertFalse($collection->current());
 		$this->assertIdentical(4, $collection->prev());
 		$this->assertTrue($collection->valid());
+	}
+
+	public function testTraverseEmptyHomogeneousReturnValues() {
+		$collection = new Collection(array('data' => array()));
+
+		$this->assertFalse($collection->next());
+		$this->assertFalse($collection->prev());
+		$this->assertFalse($collection->current());
+		$this->assertFalse($collection->end());
+		$this->assertFalse($collection->rewind());
+		$this->assertFalse($collection->current());
+	}
+
+	public function testNext() {
+		$collection = new Collection(array('data' => array(1, 2)));
+		$this->assertIdentical(2, $collection->next());
+		$this->assertIdentical(false, $collection->next());
+	}
+
+	public function testNextOverFalsey() {
+		$collection = new Collection(array('data' => array(1, '', 3)));
+		$this->assertIdentical('', $collection->next());
+		$this->assertIdentical(3, $collection->next());
+	}
+
+	public function testPrev() {
+		$collection = new Collection(array('data' => array(1, 2)));
+
+		$collection->end();
+		$this->assertIdentical(1, $collection->prev());
+	}
+
+	public function testPrevOverFalsey() {
+		$collection = new Collection(array('data' => array(1, '', 3)));
+
+		$collection->end();
+		$this->assertIdentical('', $collection->prev());
+		$this->assertIdentical(1, $collection->prev());
+	}
+
+	public function testPrevWraps() {
+		$collection = new Collection(array('data' => array(1, 2)));
+
+		$collection->end();
+		$this->assertIdentical(1, $collection->prev());
+		$this->assertIdentical(2, $collection->prev());
 	}
 
 	/**

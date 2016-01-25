@@ -305,21 +305,21 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	}
 
 	/**
-	 * Returns the first non-empty value in the collection after a filter is applied, or rewinds the
-	 * collection and returns the first value.
+	 * Rewinds the collection and returns the first item or when a filter is used,
+	 * returns the first non-empty item after the filter is applied.
 	 *
 	 * @see lithium\util\Collection::rewind()
-	 * @param callback $filter A closure through which collection values will be passed.
-	 *        If the return value of this function is non-empty, it will be returned as
-	 *        the result of the method call. If `null`, the collection is rewound
-	 *        (see `rewind()`) and the first item is returned.
-	 * @return mixed Returns the first non-empty collection value returned from `$filter`.
+	 * @param callable $filter An optional callable through which items  will be passed.
+	 *        If the return value of this function is trueish, it will be returned as
+	 *        the result of the method call. An example filter function may look like:
+	 *        `function($item) { return $item->year < 2005; }`.
+	 * @return mixed Returns the first item in the collection or when `$filter` is used,
+	 *         the first item where `$filter` returned a trueish result.
 	 */
 	public function first($filter = null) {
 		if (!$filter) {
 			return $this->rewind();
 		}
-
 		foreach ($this as $item) {
 			if ($filter($item)) {
 				return $item;
@@ -447,21 +447,19 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	/**
 	 * Rewinds to the first item.
 	 *
-	 * @return mixed The current item after rewinding.
+	 * @return mixed The current item after rewinding, or `false` if the collection is empty.
 	 */
 	public function rewind() {
-		reset($this->_data);
-		return current($this->_data);
+		return reset($this->_data);
 	}
 
 	/**
 	 * Moves forward to the last item.
 	 *
-	 * @return mixed The current item after moving.
+	 * @return mixed The last item, or `false` if there is no last item or the collection is empty.
 	 */
 	public function end() {
-		end($this->_data);
-		return current($this->_data);
+		return end($this->_data);
 	}
 
 	/**
@@ -492,26 +490,27 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	}
 
 	/**
-	 * Moves backward to the previous item.  If already at the first item,
-	 * moves to the last one.
+	 * Moves backward to the previous item.
 	 *
-	 * @return mixed The current item after moving or the last item on failure.
+	 * Note: When already at the first item, moves to the last one.
+	 *
+	 * @return mixed The previous item or `false` if the collection is empty. Returns the
+	 *         last item, when already at the first item.
 	 */
 	public function prev() {
-		if (!prev($this->_data)) {
-			end($this->_data);
-		}
-		return current($this->_data);
+		$value = prev($this->_data);
+		return key($this->_data) !== null ? $value : end($this->_data);
 	}
 
 	/**
-	 * Move forwards to the next item.
+	 * Moves forward to the next item.
 	 *
-	 * @return The current item after moving or `false` on failure.
+	 * @return mixed The next item or `false`, in case there's no next item or the collection
+	 *         is empty.
 	 */
 	public function next() {
-		next($this->_data);
-		return current($this->_data);
+		$value = next($this->_data);
+		return key($this->_data) !== null ? $value : false;
 	}
 
 	/**
