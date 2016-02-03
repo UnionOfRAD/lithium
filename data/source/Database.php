@@ -828,7 +828,7 @@ abstract class Database extends \lithium\data\Source {
 		}
 		$result = array();
 
-		if (!$resource) {
+		if (!$resource || !$resource->resource()) {
 			return $result;
 		}
 		$count = $resource->resource()->columnCount();
