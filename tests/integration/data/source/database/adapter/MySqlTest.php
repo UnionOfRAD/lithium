@@ -353,6 +353,18 @@ class MySqlTest extends \lithium\tests\integration\data\Base {
 		$this->assertPattern('$\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$', $result['created']);
 		$this->assertTrue(time() - strtotime($result['created']) < 24 * 3600);
 	}
+
+	/**
+	 * Verifies that setting options using a raw SQL string works, when
+	 * the operation returns no result.
+	 *
+	 * @link https://github.com/UnionOfRAD/lithium/issues/1210
+	 */
+	public function testRawOptionSettingWithNoResultResource() {
+		$expected = array();
+		$result = Galleries::connection()->read('SET @TEST = 1;');
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>
