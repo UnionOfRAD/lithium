@@ -1960,6 +1960,106 @@ SQL;
 		$this->assertNull($this->_db->sql);
 	}
 
+	public function testUpdateWithAllFieldsChanged() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('id' => 1, 'title' => 'the post', 'body' => 'the body'),
+			'exists' => true
+		));
+		$entity->title = 'foo';
+		$entity->body = 'bar';
+
+		$query = new Query(compact('entity') + array(
+			'type' => 'update'
+		));
+		$result = $this->_db->update($query);
+
+		$this->assertTrue($result);
+		$this->assertEqual(1, $query->entity()->id);
+		$sql = "UPDATE {mock_database_posts} SET {title} = 'foo', {body} = 'bar' WHERE {id} = 1;";
+		$this->assertEqual($sql, $this->_db->sql);
+	}
+
+	public function testUpdateWithSomeFieldsChanged() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('id' => 1, 'title' => 'the post', 'body' => 'the body'),
+			'exists' => true
+		));
+		$entity->title = 'foo';
+
+		$query = new Query(compact('entity') + array(
+			'type' => 'update'
+		));
+		$result = $this->_db->update($query);
+
+		$this->assertTrue($result);
+		$this->assertEqual(1, $query->entity()->id);
+		$sql = "UPDATE {mock_database_posts} SET {title} = 'foo' WHERE {id} = 1;";
+		$this->assertEqual($sql, $this->_db->sql);
+	}
+
+	public function testUpdateWithNoFieldChanged() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('id' => 1, 'title' => 'the post', 'body' => 'the body'),
+			'exists' => true
+		));
+		$entity->title = 'the post';
+
+		$query = new Query(compact('entity') + array(
+			'type' => 'update'
+		));
+		$result = $this->_db->update($query);
+
+		$this->assertTrue($result);
+		$this->assertEqual(1, $query->entity()->id);
+		$this->assertNull($this->_db->sql);
+	}
+
+
+	public function testUpdateWithAllFieldsChangedAndWhitelist() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('id' => 1, 'title' => 'the post', 'body' => 'the body'),
+			'exists' => true
+		));
+		$entity->title = 'foo';
+		$entity->body = 'bar';
+
+		$query = new Query(compact('entity') + array(
+			'type' => 'update',
+			'whitelist' => array('title', 'body')
+		));
+		$result = $this->_db->update($query);
+
+		$this->assertTrue($result);
+		$this->assertEqual(1, $query->entity()->id);
+		$sql = "UPDATE {mock_database_posts} SET {title} = 'foo', {body} = 'bar' WHERE {id} = 1;";
+		$this->assertEqual($sql, $this->_db->sql);
+	}
+
+	public function testUpdateSomeFieldsViaWhitelist() {
+		$entity = new Record(array(
+			'model' => $this->_model,
+			'data' => array('id' => 1, 'title' => 'the post', 'body' => 'the body'),
+			'exists' => true
+		));
+		$entity->title = 'foo';
+		$entity->body = 'bar';
+
+		$query = new Query(compact('entity') + array(
+			'type' => 'update',
+			'whitelist' => array('title')
+		));
+		$result = $this->_db->update($query);
+
+		$this->assertTrue($result);
+		$this->assertEqual(1, $query->entity()->id);
+		$sql = "UPDATE {mock_database_posts} SET {title} = 'foo' WHERE {id} = 1;";
+		$this->assertEqual($sql, $this->_db->sql);
+	}
+
 	public function testUpdateWithAllChangedFieldsRemovedViaWhitelist() {
 		$entity = new Record(array(
 			'model' => $this->_model,
