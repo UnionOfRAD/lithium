@@ -164,10 +164,20 @@ class MySql extends \lithium\data\source\Database {
 	 */
 	public function connect() {
 		if (!$this->_config['dsn']) {
-			$host = $this->_config['host'];
-			list($host, $port) = explode(':', $host) + array(1 => "3306");
-			$dsn = "mysql:host=%s;port=%s;dbname=%s";
-			$this->_config['dsn'] = sprintf($dsn, $host, $port, $this->_config['database']);
+			$socket = $this->_config['socket'];
+			$port = $this->_config['port'];
+			if (empty($socket)) {
+				if (empty($port)) {
+					$dsn = "mysql:host=%s;dbname=%s";
+					$this->_config['dsn'] = sprintf($dsn, $this->_config['host'], $this->_config['database']);
+				} else {
+					$dsn = "mysql:host=%s;port=%s;dbname=%s";  
+					$this->_config['dsn'] = sprintf($dsn, $this->_config['host'], $port, $this->_config['database']);
+				}
+			} else {
+				$dsn = "mysql:unix_socket=%s;dbname=%s";
+				$this->_config['dsn'] = sprintf($dsn, $socket, $this->_config['database']);
+			}
 		}
 
 		if (!parent::connect()) {
