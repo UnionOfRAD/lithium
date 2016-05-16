@@ -83,11 +83,11 @@ class Connections extends \lithium\core\Adaptable {
 	 *        using `Model::$_meta['connection']`.
 	 * @param array $config Contains all additional configuration information used by the
 	 *        connection, including the name of the adapter class where applicable (i.e. `MySql`),
-	 *        the server name and port or socket to connect to, and (typically) the name of the
-	 *        database or other entity to use. Each adapter has its own specific configuration
-	 *        settings for handling things like connection persistence, data encoding, etc. See the
+	 *        and typcially the server host/socket to connect to, the name of the database or
+	 *        other entity to use. Each adapter has its own specific configuration settings for
+	 *        handling things like connection persistence, data encoding, etc. See the
 	 *        individual adapter or data source class for more information on what configuration
-	 *        settings it supports. Basic / required options supported by most adapters:
+	 *        settings it supports. Basic / required options supported are:
 	 *        - `'type'` _string_: The type of data source that defines this connection; typically a
 	 *          class or namespace name. Relational database data sources, use `'database'`, while
 	 *          CouchDB and other HTTP-related data sources use `'http'`, etc. For classes which
@@ -95,21 +95,13 @@ class Connections extends \lithium\core\Adaptable {
 	 *          name of the class, i.e. `'MongoDb'`.
 	 *        - `'adapter'` _string_: For `type`s such as `'database'` which are adapter-driven,
 	 *          provides the name of the adapter associated with this configuration.
-	 *        - `'host'` _string_: The host name that the database should connect to. Typically
-	 *          defaults to `'localhost'`.
-	 *        - `'login'` _string_: If the connection requires authentication, specifies the login
-	 *          name to use.
-	 *        - `'password'` _string_: If the connection requires authentication, specifies the
-	 *          password to use.
 	 * @return array Returns the final post-processed connection information, as stored in the
 	 *         internal configuration array used by `Connections`.
 	 */
 	public static function add($name, array $config = array()) {
 		$defaults = array(
 			'type'     => null,
-			'adapter'  => null,
-			'login'    => '',
-			'password' => ''
+			'adapter'  => null
 		);
 		return static::$_configurations[$name] = $config + $defaults;
 	}
