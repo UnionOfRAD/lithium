@@ -51,9 +51,9 @@ use lithium\storage\Cache;
 class Memcache extends \lithium\storage\cache\Adapter {
 
 	/**
-	 * The default port used to connect to Memcache servers, if none is specified.
+	 * The default port used to connect to the server.
 	 */
-	const CONN_DEFAULT_PORT = 11211;
+	const DEFAULT_PORT = 11211;
 
 	/**
 	 * `Memcached` object instance used by this adapter.
@@ -167,7 +167,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 				list($host, $port) = explode(':', $host);
 				return array($host, (integer) $port);
 			}
-			return array($host, Memcache::CONN_DEFAULT_PORT);
+			return array($host, Memcache::DEFAULT_PORT);
 		};
 
 		if (is_string($host)) {

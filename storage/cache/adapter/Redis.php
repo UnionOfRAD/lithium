@@ -51,9 +51,9 @@ use Redis as RedisCore;
 class Redis extends \lithium\storage\cache\Adapter {
 
 	/**
-	 * The default port used to connect to Redis servers, if none is specified.
+	 * The default port used to connect to the server.
 	 */
-	const CONN_DEFAULT_PORT = 6379;
+	const DEFAULT_PORT = 6379;
 
 	/**
 	 * Redis object instance used by this adapter.
@@ -167,7 +167,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 			list($address, $port) = explode(':', $host);
 		} else {
 			$address = $host;
-			$port = strpos($host, '/') === 0 ? null : self::CONN_DEFAULT_PORT;
+			$port = strpos($host, '/') === 0 ? null : self::DEFAULT_PORT;
 		}
 		return array($address, $port);
 	}
