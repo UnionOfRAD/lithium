@@ -92,24 +92,6 @@ class Sqlite3 extends \lithium\data\source\Database {
 	);
 
 	/**
-	 * Constructor.
-	 *
-	 * @see lithium\data\source\Database::__construct()
-	 * @see lithium\data\Source::__construct()
-	 * @see lithium\data\Connections::add()
-	 * @param array $config The available configuration options are the following. Further
-	 *        options are inherited from the parent classes. Typically, these parameters are
-	 *        set in `Connections::add()`, when adding the adapter to the list of active
-	 *        connections.
-	 *        - `'database'` _string_: Defaults to in-memory database `':memory:'`.
-	 * @return void
-	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('database' => ':memory:');
-		parent::__construct($config + $defaults);
-	}
-
-	/**
 	 * Check for required PHP extension, or supported database feature.
 	 *
 	 * @param string $feature Test for support for a specific feature, i.e. `'transactions'`.
@@ -129,6 +111,25 @@ class Sqlite3 extends \lithium\data\source\Database {
 			'sources' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
+	}
+
+	/**
+	 * Constructor.
+	 *
+	 * @see lithium\data\source\Database::__construct()
+	 * @see lithium\data\Source::__construct()
+	 * @see lithium\data\Connections::add()
+	 * @param array $config The available configuration options are the following. Further
+	 *        options are inherited from the parent classes. Typically, these parameters are
+	 *        set in `Connections::add()`, when adding the adapter to the list of active
+	 *        connections.
+	 *        - `'database'` _string_: Can be either a path to a database file or the special
+	 *          `':memory'` string. Defaults to in-memory database `':memory:'`.
+	 * @return void
+	 */
+	public function __construct(array $config = array()) {
+		$defaults = array('database' => ':memory:');
+		parent::__construct($config + $defaults);
 	}
 
 	/**

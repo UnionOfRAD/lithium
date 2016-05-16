@@ -93,7 +93,30 @@ class MySql extends \lithium\data\source\Database {
 	protected $_quotes = array('`', '`');
 
 	/**
-	 * Constructor. Constructs the MySQL adapter and sets the default port to 3306.
+	 * Check for required PHP extension, or supported database feature.
+	 *
+	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
+	 *        `"arrays"`.
+	 * @return boolean Returns `true` if the particular feature (or if MySQL) support is enabled,
+	 *         otherwise `false`.
+	 */
+	public static function enabled($feature = null) {
+		if (!$feature) {
+			return extension_loaded('pdo_mysql');
+		}
+		$features = array(
+			'arrays' => false,
+			'transactions' => false,
+			'booleans' => true,
+			'schema' => true,
+			'relationships' => true,
+			'sources' => true
+		);
+		return isset($features[$feature]) ? $features[$feature] : null;
+	}
+
+	/**
+	 * Constructor.
 	 *
 	 * @link http://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-strict
 	 * @see lithium\data\source\Database::__construct()
@@ -130,29 +153,6 @@ class MySql extends \lithium\data\source\Database {
 			'NOT REGEXP' => array(),
 			'SOUNDS LIKE' => array()
 		);
-	}
-
-	/**
-	 * Check for required PHP extension, or supported database feature.
-	 *
-	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
-	 *        `"arrays"`.
-	 * @return boolean Returns `true` if the particular feature (or if MySQL) support is enabled,
-	 *         otherwise `false`.
-	 */
-	public static function enabled($feature = null) {
-		if (!$feature) {
-			return extension_loaded('pdo_mysql');
-		}
-		$features = array(
-			'arrays' => false,
-			'transactions' => false,
-			'booleans' => true,
-			'schema' => true,
-			'relationships' => true,
-			'sources' => true
-		);
-		return isset($features[$feature]) ? $features[$feature] : null;
 	}
 
 	/**

@@ -18,8 +18,7 @@ use Exception;
 /**
  * A data source adapter which allows you to connect to the MongoDB database engine. MongoDB is an
  * Open Source distributed document database which bridges the gap between key/value stores and
- * relational databases. To learn more about MongoDB, see here:
- * [http://www.mongodb.org/](http://www.mongodb.org/).
+ * relational databases.
  *
  * Rather than operating on records and record sets, queries against MongoDB will return nested sets
  * of `Document` objects. A `Document`'s fields can contain both simple and complex data types
@@ -37,6 +36,7 @@ use Exception;
  * @see lithium\data\entity\Document
  * @see lithium\data\Connections::add()
  * @see lithium\data\source\MongoDb::__construct()
+ * @link http://www.mongodb.org/
  */
 class MongoDb extends \lithium\data\Source {
 
@@ -119,6 +119,30 @@ class MongoDb extends \lithium\data\Source {
 	protected $_autoConfig = array('schema', 'classes' => 'merge');
 
 	/**
+	 * With no parameter, checks to see if the `mongo` extension is installed. With a parameter,
+	 * queries for a specific supported feature.
+	 *
+	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
+	 *               `"arrays"`.
+	 * @return boolean Returns `true` if the particular feature (or if MongoDB) support is enabled,
+	 *         otherwise `false`.
+	 */
+	public static function enabled($feature = null) {
+		if (!$feature) {
+			return extension_loaded('mongo');
+		}
+		$features = array(
+			'arrays' => true,
+			'transactions' => false,
+			'booleans' => true,
+			'relationships' => true,
+			'schema' => false,
+			'sources' => true
+		);
+		return isset($features[$feature]) ? $features[$feature] : null;
+	}
+
+	/**
 	 * Constructor.
 	 *
 	 * @see lithium\data\Connections::add()
@@ -146,6 +170,9 @@ class MongoDb extends \lithium\data\Source {
 	 *          `Mongo::setReadPreference()`. Defaults to null.
 	 *          Typically, these parameters are set in `Connections::add()`, when adding the
 	 *          adapter to the list of active connections.
+	 *
+	 *        Disables auto-connect, which is by default enabled in `Source`. Instead before
+	 *        each query execution the connection is checked and if needed (re-)established.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
@@ -231,30 +258,6 @@ class MongoDb extends \lithium\data\Source {
 		if ($this->_isConnected) {
 			$this->disconnect();
 		}
-	}
-
-	/**
-	 * With no parameter, checks to see if the `mongo` extension is installed. With a parameter,
-	 * queries for a specific supported feature.
-	 *
-	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
-	 *               `"arrays"`.
-	 * @return boolean Returns `true` if the particular feature (or if MongoDB) support is enabled,
-	 *         otherwise `false`.
-	 */
-	public static function enabled($feature = null) {
-		if (!$feature) {
-			return extension_loaded('mongo');
-		}
-		$features = array(
-			'arrays' => true,
-			'transactions' => false,
-			'booleans' => true,
-			'relationships' => true,
-			'schema' => false,
-			'sources' => true
-		);
-		return isset($features[$feature]) ? $features[$feature] : null;
 	}
 
 	/**

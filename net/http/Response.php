@@ -176,8 +176,8 @@ class Response extends \lithium\net\http\Message {
 	 *
 	 * @param string $key Optional. Set to `'code'` or `'message'` to return just the code
 	 *        or message of the status, otherwise returns the full status header.
-	 * @param string $status The code or message of the status you wish to set.
-	 * @return string Returns the full HTTP status, with version, code and message or
+	 * @param string|null $status The code or message of the status you wish to set.
+	 * @return string|boolean Returns the full HTTP status, with version, code and message or
 	 *         dending on $key just the code or message.
 	 */
 	public function status($key = null, $status = null) {

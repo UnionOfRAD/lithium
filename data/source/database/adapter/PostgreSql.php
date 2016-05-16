@@ -84,30 +84,6 @@ class PostgreSql extends \lithium\data\source\Database {
 	protected $_quotes = array('"', '"');
 
 	/**
-	 * Constructor. Constructs the PostgreSQL adapter and sets the default port to 5432.
-	 *
-	 * @see lithium\data\source\Database::__construct()
-	 * @see lithium\data\Source::__construct()
-	 * @see lithium\data\Connections::add()
-	 * @param array $config The available configuration options are the following. Further
-	 *        options are inherited from the parent classes. Typically, these parameters are
-	 *        set in `Connections::add()`, when adding the adapter to the list of active
-	 *        connections.
-	 *        - `'host'` _string_: Defaults to `'localhost:5432'`.
-	 *        - `'schema'` _string_: The name of the database schema to use. Defaults to `'public'`.
-	 *        - `'timezone'` _string_: The timezone to use. Defaults to `'null'`
-	 * @return void
-	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
-			'host' => 'localhost:5432',
-			'schema' => 'public',
-			'timezone' => null
-		);
-		parent::__construct($config + $defaults);
-	}
-
-	/**
 	 * Check for required PHP extension, or supported database feature.
 	 *
 	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
@@ -128,6 +104,30 @@ class PostgreSql extends \lithium\data\source\Database {
 			'sources' => true
 		);
 		return isset($features[$feature]) ? $features[$feature] : null;
+	}
+
+	/**
+	 * Constructor.
+	 *
+	 * @see lithium\data\source\Database::__construct()
+	 * @see lithium\data\Source::__construct()
+	 * @see lithium\data\Connections::add()
+	 * @param array $config The available configuration options are the following. Further
+	 *        options are inherited from the parent classes. Typically, these parameters are
+	 *        set in `Connections::add()`, when adding the adapter to the list of active
+	 *        connections.
+	 *        - `'host'` _string_: Defaults to `'localhost:5432'`.
+	 *        - `'schema'` _string_: The name of the database schema to use. Defaults to `'public'`.
+	 *        - `'timezone'` _string_: The timezone to use. Defaults to `'null'`
+	 * @return void
+	 */
+	public function __construct(array $config = array()) {
+		$defaults = array(
+			'host' => 'localhost:5432',
+			'schema' => 'public',
+			'timezone' => null
+		);
+		parent::__construct($config + $defaults);
 	}
 
 	/**
@@ -510,7 +510,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Helper method for `PostgreSql::_quryExport()` to export data
+	 * Helper method for `PostgreSql::_queryExport()` to export data
 	 * for use in distinct query.
 	 *
 	 * @see lithium\data\source\PostgreSql::_quryExport()

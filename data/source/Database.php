@@ -22,12 +22,15 @@ use InvalidArgumentException;
 use UnexpectedValueException;
 
 /**
- * The `Database` class provides the base-level abstraction for SQL-oriented relational databases.
- * It handles all aspects of abstraction, including formatting for basic query types and SQL
- * fragments (i.e. for joins), converting `Query` objects to SQL, and various other functionality
- * which is shared across multiple relational databases.
+ * The `Database` class provides the base-level abstraction for SQL-oriented relational
+ * databases. It handles all aspects of abstraction, including formatting for basic query
+ * types and SQL fragments (i.e. for joins), converting `Query` objects to SQL, and various
+ * other functionality which is shared across multiple relational databases.
+ *
+ * This abstraction is PDO based.
  *
  * @see lithium\data\model\Query
+ * @link http://php.net/pdo
  */
 abstract class Database extends \lithium\data\Source {
 
@@ -176,6 +179,8 @@ abstract class Database extends \lithium\data\Source {
 	 *         - `'password'` _string_: Password to use when connecting to server. Defaults to `''`.
 	 *         - `'persistent'` _boolean_: If true a persistent connection will be attempted,
 	 *           provided the  adapter supports it. Defaults to `true`.
+	 *         - `'options'` _array_: An array with additional PDO options. Maps
+	 *           (driver specific) PDO attribute constants to values.
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
@@ -302,10 +307,10 @@ abstract class Database extends \lithium\data\Source {
 		$config = $this->_config;
 
 		if (!$config['database']) {
-			throw new ConfigException('No Database configured');
+			throw new ConfigException('No database configured.');
 		}
 		if (!$config['dsn']) {
-			throw new ConfigException('No DSN setup for DB Connection');
+			throw new ConfigException('No DSN setup for database connection.');
 		}
 		$dsn = $config['dsn'];
 
@@ -329,7 +334,7 @@ abstract class Database extends \lithium\data\Source {
 					throw new ConfigException($msg, null, $e);
 				break;
 			}
-			throw new ConfigException("An unknown configuration error has occured.", null, $e);
+			throw new ConfigException('An unknown configuration error has occured.', null, $e);
 		}
 		$this->_isConnected = true;
 

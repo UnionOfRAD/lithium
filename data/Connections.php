@@ -48,12 +48,12 @@ class Connections extends \lithium\core\Adaptable {
 	 * For example:
 	 * ```
 	 * Connections::add('default', array(
-	 *     'type' => 'database',
-	 *     'adapter' => 'MySql',
-	 *     'host' => 'localhost',
-	 *     'login' => 'root',
-	 *     'password' => '',
-	 *     'database' => 'my_blog'
+	 *	'type' => 'database',
+	 *	'adapter' => 'MySql',
+	 *	'host' => 'localhost',
+	 *	'login' => 'root',
+	 *	'password' => '',
+	 *	'database' => 'my_blog'
 	 * ));
 	 * ```
 	 *
@@ -61,14 +61,20 @@ class Connections extends \lithium\core\Adaptable {
 	 *
 	 * ```
 	 * Connections::add('couch', array(
-	 * 	'type' => 'http', 'adapter' => 'CouchDb', 'host' => '127.0.0.1', 'port' => 5984
+	 *	'type' => 'http',
+	 *	'adapter' => 'CouchDb',
+	 *	'host' => '127.0.0.1',
+	 *	'port' => 5984
 	 * ));
 	 * ```
 	 *
 	 * or
 	 *
 	 * ```
-	 * Connections::add('mongo', array('type' => 'MongoDb', 'database' => 'my_app'));
+	 * Connections::add('mongo', array(
+	 *	'type' => 'MongoDb',
+	 *	'database' => 'my_app'
+	 * ));
 	 * ```
 	 *
 	 * @see lithium\data\Model::$_meta

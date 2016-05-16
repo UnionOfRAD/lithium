@@ -133,7 +133,7 @@ class Filters {
 	 *
 	 * This method intentionally does not establish class context for closures
 	 * by binding them to the instance or statically to the class. Closures can
-	 * originate from static and instance methods and can PHP does not allow to
+	 * originate from static and instance methods and PHP does not allow to
 	 * rebind a closure from a static method to an instance.
 	 *
 	 * @param string|object $class The fully namespaced name of a static class or
@@ -267,15 +267,11 @@ class Filters {
 		if ($method) {
 			$regex .= "::{$method}$";
 		}
-		foreach (array_keys(static::$_filters) as $id) {
-			if (preg_match("/{$regex}/", $id)) {
-				unset(static::$_filters[$id]);
-			}
+		foreach (preg_grep("/{$regex}/", array_keys(static::$_filters)) as $id) {
+			unset(static::$_filters[$id]);
 		}
-		foreach (array_keys(static::$_chains) as $id) {
-			if (preg_match("/{$regex}/", $id)) {
-				unset(static::$_chains[$id]);
-			}
+		foreach (preg_grep("/{$regex}/", array_keys(static::$_chains)) as $id) {
+			unset(static::$_chains[$id]);
 		}
 	}
 

@@ -69,6 +69,18 @@ abstract class Source extends \lithium\core\Object {
 	protected $_cachedMethods = array();
 
 	/**
+	 * With no parameter, checks a specific supported feature.
+	 *
+	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
+	 *        `"arrays"`.
+	 * @return boolean Returns `true` if the particular feature (or if MongoDB) support is enabled,
+	 *         otherwise `false`.
+	 */
+	public static function enabled($feature = null) {
+		return false;
+	}
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array $config Available options are:
@@ -267,18 +279,6 @@ abstract class Source extends \lithium\core\Object {
 	 * @param object $context A query object to configure
 	 */
 	public function applyStrategy($options, $context) {}
-
-	/**
-	 * With no parameter, checks a specific supported feature.
-	 *
-	 * @param string $feature Test for support for a specific feature, i.e. `"transactions"` or
-	 *        `"arrays"`.
-	 * @return boolean Returns `true` if the particular feature (or if MongoDB) support is enabled,
-	 *         otherwise `false`.
-	 */
-	public static function enabled($feature = null) {
-		return false;
-	}
 
 	/**
 	 * Returns the field name of a relation name (underscore).
