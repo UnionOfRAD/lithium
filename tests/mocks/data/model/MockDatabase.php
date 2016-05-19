@@ -46,7 +46,7 @@ class MockDatabase extends \lithium\data\source\Database {
 	protected $_quotes = array('{', '}');
 
 	public function __construct(array $config = array()) {
-		parent::__construct($config);
+		parent::__construct($config + array('database' => 'mock'));
 		$this->connection = $this;
 	}
 

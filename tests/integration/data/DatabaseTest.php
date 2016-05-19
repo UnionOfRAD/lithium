@@ -82,12 +82,12 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 
 	public function testConnectWithNoDatabase() {
 		$config = $this->_dbConfig;
+		$config['autoConnect'] = false;
 		$config['database'] = null;
 		$config['object'] = null;
 		$connection = 'no_database';
 		Connections::add($connection, $config);
-
-		$this->assertException("/No Database configured/", function() use ($connection) {
+		$this->assertException("/No database configured/", function() use ($connection) {
 			Connections::get($connection)->connect();
 		});
 	}

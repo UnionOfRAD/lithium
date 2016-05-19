@@ -63,13 +63,21 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	 * Tests that the object is initialized with the correct default values.
 	 */
 	public function testConstructorDefaults() {
-		$db = new MockPostgreSql(array('autoConnect' => false));
+		$db = new MockPostgreSql(array('autoConnect' => false, 'init' =>  false));
 		$result = $db->get('_config');
 		$expected = array(
-			'autoConnect' => false, 'encoding' => null,'persistent' => true,
-			'host' => 'localhost:5432', 'login' => 'root', 'password' => '',
-			'database' => null, 'dsn' => null, 'options' => array(),
-			'init' => true, 'schema' => 'public', 'timezone' => null
+			'autoConnect' => false,
+			'encoding' => null,
+			'persistent' => true,
+			'host' => 'localhost:5432',
+			'login' => 'root',
+			'password' => '',
+			'database' => null,
+			'dsn' => null,
+			'options' => array(),
+			'init' => false,
+			'schema' => 'public',
+			'timezone' => null
 		);
 		$this->assertEqual($expected, $result);
 	}

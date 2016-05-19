@@ -208,6 +208,10 @@ abstract class Database extends \lithium\data\Source {
 	protected function _init() {
 		parent::_init();
 
+		if (!$this->_config['database']) {
+			throw new ConfigException('No database configured.');
+		}
+
 		$formatters = $this->_formatters();
 
 		foreach ($this->_columns as $type => $column) {
@@ -306,9 +310,6 @@ abstract class Database extends \lithium\data\Source {
 		$this->_isConnected = false;
 		$config = $this->_config;
 
-		if (!$config['database']) {
-			throw new ConfigException('No database configured.');
-		}
 		if (!$config['dsn']) {
 			throw new ConfigException('No DSN setup for database connection.');
 		}

@@ -63,12 +63,12 @@ class MySqlTest extends \lithium\tests\integration\data\Base {
 	 * Tests that the object is initialized with the correct default values.
 	 */
 	public function testConstructorDefaults() {
-		$db = new MockMySql(array('autoConnect' => false));
+		$db = new MockMySql(array('autoConnect' => false, 'init' => false));
 		$result = $db->get('_config');
 		$expected = array(
 			'autoConnect' => false, 'encoding' => null,'persistent' => true,
 			'host' => 'localhost:3306', 'strict' => null, 'login' => 'root', 'password' => '',
-			'database' => null, 'dsn' => null, 'options' => array(), 'init' => true
+			'database' => null, 'dsn' => null, 'options' => array(), 'init' => false
 		);
 		$this->assertEqual($expected, $result);
 	}

@@ -65,7 +65,7 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 	 * Tests that the object is initialized with the correct default values.
 	 */
 	public function testConstructorDefaults() {
-		$db = new MockSqlite3(array('autoConnect' => false));
+		$db = new MockSqlite3(array('autoConnect' => false, 'init' => false));
 		$result = $db->get('_config');
 		$expected = array(
 			'autoConnect' => false,
@@ -77,7 +77,7 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 			'password' => '',
 			'dsn' => null,
 			'options' => array(),
-			'init' => true
+			'init' => false
 		);
 		$this->assertEqual($expected, $result);
 	}

@@ -42,7 +42,7 @@ class MockAdapter extends \lithium\data\source\Database {
 	protected $_pointer = 0;
 
 	public function __construct(array $config = array()) {
-		$defaults =  array('records' => array(), 'columns' => array());
+		$defaults =  array('records' => array(), 'columns' => array(), 'database' => 'mock');
 		$config['autoConnect'] = false;
 		parent::__construct((array) $config + $defaults);
 	}

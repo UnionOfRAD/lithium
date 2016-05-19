@@ -140,14 +140,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *         otherwise `false`.
 	 */
 	public function connect() {
-		if (!$this->_config['database']) {
-			throw new ConfigException('No Database configured');
-		}
-
-		if (empty($this->_config['dsn'])) {
+		if (!$this->_config['dsn']) {
 			$this->_config['dsn'] = sprintf("sqlite:%s", $this->_config['database']);
 		}
-
 		return parent::connect();
 	}
 

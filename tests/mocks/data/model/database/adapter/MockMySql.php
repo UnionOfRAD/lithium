@@ -11,7 +11,7 @@ namespace lithium\tests\mocks\data\model\database\adapter;
 class MockMySql extends \lithium\data\source\database\adapter\MySql {
 
 	public function __construct(array $config = array()) {
-		parent::__construct($config);
+		parent::__construct($config + array('database' => 'mock'));
 		$this->connection = $this;
 	}
 
