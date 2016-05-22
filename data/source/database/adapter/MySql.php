@@ -157,12 +157,34 @@ class MySql extends \lithium\data\source\Database {
 	 */
 	public function connect() {
 		if (!$this->_config['dsn']) {
-			$host = $this->_config['host'];
-			list($host, $port) = explode(':', $host) + array(1 => "3306");
-			$dsn = "mysql:host=%s;port=%s;dbname=%s";
-			$this->_config['dsn'] = sprintf($dsn, $host, $port, $this->_config['database']);
+			$this->_config['dsn'] = $this->_dsn();
 		}
 		return parent::connect();
+	}
+
+	/**
+	 * Builds DSN string.
+	 *
+	 * @return string
+	 */
+	protected function _dsn() {
+		$host = $this->_config['host'];
+
+		if ($host[0] === '/') {
+			return sprintf(
+				'mysql:unix_socket=%s;dbname=%s',
+				$host,
+				$this->_config['database']
+			);
+		}
+		list($host, $port) = explode(':', $host) + array(1 => "3306");
+
+		return  sprintf(
+			'mysql:host=%s;port=%s;dbname=%s',
+			$host,
+			$port,
+			$this->_config['database']
+		);
 	}
 
 	/**
