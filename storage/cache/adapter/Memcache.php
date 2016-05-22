@@ -11,6 +11,7 @@ namespace lithium\storage\cache\adapter;
 use Memcached;
 use lithium\util\Set;
 use lithium\storage\Cache;
+use lithium\net\HostString;
 
 /**
  * Memcache (libmemcached) cache adapter implementation using `pecl/memcached`.
@@ -51,6 +52,11 @@ use lithium\storage\Cache;
 class Memcache extends \lithium\storage\cache\Adapter {
 
 	/**
+	 * The default host used to connect to the server.
+	 */
+	const DEFAULT_HOST = '127.0.0.1';
+
+	/**
 	 * The default port used to connect to the server.
 	 */
 	const DEFAULT_PORT = 11211;
@@ -64,18 +70,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Constructor. Instantiates the `Memcached` object, adds appropriate servers to the pool,
-	 * and configures any optional settings passed (see the `_init()` method). When adding
-	 * servers, the following formats are valid for the `'host'` key:
-	 *
-	 *   - `'127.0.0.1'`
-	 *      Configure the adapter to connect to one Memcache server on the default port.
-	 *
-	 *   - `'127.0.0.1:11222'`
-	 *      Configure the adapter to connect to one Memcache server on a custom port.
-	 *
-	 *   - `array('167.221.1.5:11222' => 200, '167.221.1.6')`
-	 *      Connect to one server on a custom port with a high selection weight, and
-	 *      a second server on the default port with the default selection weight.
+	 * and configures any optional settings passed (see the `_init()` method).
 	 *
 	 * @see lithium\storage\Cache::config()
 	 * @param array $config Configuration for this cache adapter. These settings are queryable
@@ -85,15 +80,19 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 *          is otherwise set. Can be either a `strtotime()` compatible tring or TTL in
 	 *          seconds. To indicate items should not expire use `Cache::PERSIST`. Defaults
 	 *          to `+1 hour`.
-	 *        - `'host'` _mixed_: Specifies one or more Memcache servers to connect to, with
-	 *          optional server selection weights. See above for example values.
+	 *        - `'host'` _string|array_: A string in the form of `'<host>'`, `'<host>:<port>'` or
+	 *          `':<port>'` indicating the host and/or port to connect to. When one or both are
+	 *          not provided uses general server defaults.
+	 *          Use the array format for multiple hosts (optionally with server selection weights):
+	 *          `array('167.221.1.5:11222', '167.221.1.6')`
+	 *          `array('167.221.1.5:11222' => 200, '167.221.1.6')`
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
 			'scope' => null,
 			'expiry' => '+1 hour',
-			'host' => '127.0.0.1'
+			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT
 		);
 		parent::__construct(Set::merge($defaults, $config));
 	}
@@ -162,29 +161,21 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * @return array Returns an array of `Memcached` server definitions.
 	 */
 	protected function _formatHostList($host) {
-		$fromString = function($host) {
-			if (strpos($host, ':')) {
-				list($host, $port) = explode(':', $host);
-				return array($host, (integer) $port);
-			}
-			return array($host, Memcache::DEFAULT_PORT);
-		};
+		$hosts = array();
 
-		if (is_string($host)) {
-			return array($fromString($host));
-		}
-		$servers = array();
+		foreach ((array) $this->_config['host'] as $host => $weight) {
+			$host = HostString::parse(($hasWeight = is_integer($weight)) ? $host : $weight) + array(
+				'host' => static::DEFAULT_HOST,
+				'port' => static::DEFAULT_PORT
+			);
+			$host = array($host['host'], $host['port']);
 
-		while (list($server, $weight) = each($this->_config['host'])) {
-			if (is_string($weight)) {
-				$servers[] = $fromString($weight);
-				continue;
+			if ($hasWeight) {
+				$host[] = $weight;
 			}
-			$server = $fromString($server);
-			$server[] = $weight;
-			$servers[] = $server;
+			$hosts[] = $host;
 		}
-		return $servers;
+		return $hosts;
 	}
 
 	/**

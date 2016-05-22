@@ -11,6 +11,8 @@ namespace lithium\data\source\database\adapter;
 use PDO;
 use PDOException;
 use lithium\aop\Filters;
+use lithium\core\ConfigException;
+use lithium\net\HostString;
 
 /**
  * MySQL database driver. Extends the `Database` class to implement the necessary
@@ -25,6 +27,16 @@ use lithium\aop\Filters;
  * @see lithium\data\source\database\adapter\MySql::strict()
  */
 class MySql extends \lithium\data\source\Database {
+
+	/**
+	 * The default host used to connect to the server.
+	 */
+	const DEFAULT_HOST = 'localhost';
+
+	/**
+	 * The default port used to connect to the server.
+	 */
+	const DEFAULT_PORT = 3306;
 
 	/**
 	 * MySQL column type definitions.
@@ -126,7 +138,10 @@ class MySql extends \lithium\data\source\Database {
 	 *        options are inherited from the parent classes. Typically, these parameters are
 	 *        set in `Connections::add()`, when adding the adapter to the list of active
 	 *        connections.
-	 *        - `'host'` _string_: Defaults to `'localhost:3306'`.
+	 *        - `'host'` _string_: A string in the form of `'<host>'`, `'<host>:<port>'` or
+	 *          `':<port>'` indicating the host and/or port to connect to. When one or both are
+	 *          not provided uses general server defaults.
+	 *          To use Unix sockets specify the path to the socket (i.e. `'/path/to/socket'`).
 	 *        - `'strict'` _boolean|null_: When `true` will enable strict mode by setting
 	 *          sql-mode to `STRICT_ALL_TABLES`. When `false` will disable strict mode
 	 *          explictly by settings sql-mode to an empty value ``. A value of `null`
@@ -135,17 +150,44 @@ class MySql extends \lithium\data\source\Database {
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		$defaults = array('host' => 'localhost:3306', 'strict' => null);
+		$defaults = array(
+			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT,
+			'strict' => null
+		);
 		parent::__construct($config + $defaults);
 	}
 
 	/**
-	 * Initializer. Adds MySQL-specific operators to `$_operators`.
+	 * Initializer. Adds MySQL-specific operators to `$_operators`. Constructs
+	 * a DSN from configuration.
 	 *
 	 * @see lithium\data\source\database\adapter\MySql::$_operators
 	 * @see lithium\data\source\Database::$_operators
+	 * @return void
 	 */
 	protected function _init() {
+		if (!$this->_config['host']) {
+			throw new ConfigException('No host configured.');
+		}
+
+		if (HostString::isSocket($this->_config['host'])) {
+			$this->_config['dsn'] = sprintf(
+				'mysql:unix_socket=%s;dbname=%s',
+				$this->_config['host'],
+				$this->_config['database']
+			);
+		} else {
+			$host = HostString::parse($this->_config['host']) + array(
+				'host' => static::DEFAULT_HOST,
+				'port' => static::DEFAULT_PORT
+			);
+			$this->_config['dsn'] = sprintf(
+				'mysql:host=%s;port=%s;dbname=%s',
+				$host['host'],
+				$host['port'],
+				$this->_config['database']
+			);
+		}
 		parent::_init();
 
 		$this->_operators += array(
@@ -156,17 +198,13 @@ class MySql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Connects to the database by constructing DSN string and creating a PDO intance using
-	 * the parent class. Will set specific options on the connection as provided.
+	 * Connects to the database by creating a PDO intance using the constructed DSN string.
+	 * Will set specific options on the connection as provided.
 	 *
 	 * @return boolean Returns `true` if a database connection could be established,
 	 *         otherwise `false`.
 	 */
 	public function connect() {
-		if (!$this->_config['dsn']) {
-			$this->_config['dsn'] = $this->_dsn();
-		}
-
 		if (!parent::connect()) {
 			return false;
 		}
@@ -174,31 +212,6 @@ class MySql extends \lithium\data\source\Database {
 			return false;
 		}
 		return true;
-	}
-
-	/**
-	 * Builds DSN string.
-	 *
-	 * @return string
-	 */
-	protected function _dsn() {
-		$host = $this->_config['host'];
-
-		if ($host[0] === '/') {
-			return sprintf(
-				'mysql:unix_socket=%s;dbname=%s',
-				$host,
-				$this->_config['database']
-			);
-		}
-		list($host, $port) = explode(':', $host) + array(1 => "3306");
-
-		return  sprintf(
-			'mysql:host=%s;port=%s;dbname=%s',
-			$host,
-			$port,
-			$this->_config['database']
-		);
 	}
 
 	/**

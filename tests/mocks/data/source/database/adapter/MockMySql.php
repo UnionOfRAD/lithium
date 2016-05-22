@@ -17,10 +17,6 @@ class MockMySql extends \lithium\data\source\database\adapter\MySql {
 	protected function _execute($sql) {
 		return $sql;
 	}
-
-	public function dsn() {
-		return $this->_dsn();
-	}
 }
 
 ?>

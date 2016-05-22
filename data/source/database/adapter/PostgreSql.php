@@ -11,6 +11,8 @@ namespace lithium\data\source\database\adapter;
 use PDO;
 use PDOException;
 use lithium\aop\Filters;
+use lithium\core\ConfigException;
+use lithium\net\HostString;
 
 /**
  * PostgreSQL database driver. Extends the `Database` class to implement the necessary
@@ -27,6 +29,17 @@ use lithium\aop\Filters;
  * @see lithium\data\source\database\adapter\PostgreSql::__construct()
  */
 class PostgreSql extends \lithium\data\source\Database {
+
+	/**
+	 * The default host used to connect to the server.
+	 */
+	const DEFAULT_HOST = 'localhost';
+
+	/**
+	 * The default port used to connect to the server.
+	 */
+	const DEFAULT_PORT = 5432;
+
 
 	/**
 	 * PostgreSQL column type definitions.
@@ -116,14 +129,17 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *        options are inherited from the parent classes. Typically, these parameters are
 	 *        set in `Connections::add()`, when adding the adapter to the list of active
 	 *        connections.
-	 *        - `'host'` _string_: Defaults to `'localhost:5432'`.
+	 *        - `'host'` _string|boolean_: A string in the form of `'<host>'`, `'<host>:<port>'` or
+	 *          `':<port>'` indicating the host and/or port to connect to. When one or both are
+	 *          not provided uses general server defaults.
+	 *          To use Unix sockets set this to `false`.
 	 *        - `'schema'` _string_: The name of the database schema to use. Defaults to `'public'`.
 	 *        - `'timezone'` _string_: The timezone to use. Defaults to `'null'`
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
 		$defaults = array(
-			'host' => 'localhost:5432',
+			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT,
 			'schema' => 'public',
 			'timezone' => null
 		);
@@ -131,30 +147,50 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Connects to the database by constructing DSN string and creating a PDO intance using
-	 * the parent class. Will set specific options on the connection as provided (timezone,
-	 * schema).
+	 * Initializer. Constructs a DSN from configuration.
+	 *
+	 * @return void
+	 */
+	protected function _init() {
+		if (!$this->_config['host'] && $this->_config['host'] !== false) {
+			throw new ConfigException('No host configured.');
+		}
+
+		if ($this->_config['host'] === false) {
+			$this->_config['dsn'] = sprintf(
+				'pgsql:dbname=%s',
+				$this->_config['database']
+			);
+		} else {
+			$host = HostString::parse($this->_config['host']) + array(
+				'host' => static::DEFAULT_HOST,
+				'port' => static::DEFAULT_PORT
+			);
+			$this->_config['dsn'] = sprintf(
+				'pgsql:host=%s;port=%s;dbname=%s',
+				$host['host'],
+				$host['port'],
+				$this->_config['database']
+			);
+		}
+		parent::_init();
+	}
+
+	/**
+	 * Connects to the database by creating a PDO intance using the constructed DSN string.
+	 * Will set specific options on the connection as provided (timezone, schema).
 	 *
 	 * @see lithium\data\source\dataase\adapter\PostgreSql::timezone()
 	 * @return boolean Returns `true` if a database connection could be established,
 	 *         otherwise `false`.
 	 */
 	public function connect() {
-		if (!$this->_config['dsn']) {
-			$host = $this->_config['host'];
-			list($host, $port) = explode(':', $host) + array(1 => "5432");
-			$dsn = "pgsql:host=%s;port=%s;dbname=%s";
-			$this->_config['dsn'] = sprintf($dsn, $host, $port, $this->_config['database']);
-		}
-
 		if (!parent::connect()) {
 			return false;
 		}
-
 		if ($this->_config['schema']) {
 			$this->searchPath($this->_config['schema']);
 		}
-
 		if ($this->_config['timezone']) {
 			$this->timezone($this->_config['timezone']);
 		}

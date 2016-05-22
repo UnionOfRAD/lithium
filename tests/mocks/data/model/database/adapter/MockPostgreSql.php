@@ -35,6 +35,10 @@ class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 		}
 		return new MockResult();
 	}
+
+	public function dsn() {
+		return $this->_config['dsn'];
+	}
 }
 
 ?>

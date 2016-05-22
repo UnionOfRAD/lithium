@@ -133,17 +133,13 @@ class Sqlite3 extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Connects to the database by constructing DSN string and creating a PDO intance using
-	 * the parent class. Will set specific options on the connection as provided.
+	 * Initializer. Constructs a DSN from configuration.
 	 *
-	 * @return boolean Returns `true` if a database connection could be established,
-	 *         otherwise `false`.
+	 * @return void
 	 */
-	public function connect() {
-		if (!$this->_config['dsn']) {
-			$this->_config['dsn'] = sprintf("sqlite:%s", $this->_config['database']);
-		}
-		return parent::connect();
+	protected function _init() {
+		$this->_config['dsn'] = sprintf("sqlite:%s", $this->_config['database']);
+		parent::_init();
 	}
 
 	/**

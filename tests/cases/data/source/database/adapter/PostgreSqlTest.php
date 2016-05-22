@@ -79,6 +79,39 @@ SQL;
 		}, $expected);
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testDsnWithHostPort() {
+		$db = new MockPostgreSql(array(
+			'autoConnect' => false,
+			'database' => 'test',
+			'host' => 'localhost:1234',
+		));
+		$expected = 'pgsql:host=localhost;port=1234;dbname=test';
+		$result = $db->dsn();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDsnWithHost() {
+		$db = new MockPostgreSql(array(
+			'autoConnect' => false,
+			'database' => 'test',
+			'host' => 'localhost',
+		));
+		$expected = 'pgsql:host=localhost;port=5432;dbname=test';
+		$result = $db->dsn();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDsnWithPort() {
+		$db = new MockPostgreSql(array(
+			'autoConnect' => false,
+			'database' => 'test',
+			'host' => ':1234',
+		));
+		$expected = 'pgsql:host=localhost;port=1234;dbname=test';
+		$result = $db->dsn();
+		$this->assertEqual($expected, $result);
+	}
 }
 
 ?>

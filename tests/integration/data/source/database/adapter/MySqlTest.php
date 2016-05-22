@@ -101,30 +101,6 @@ class MySqlTest extends \lithium\tests\integration\data\Base {
 		$this->assertFalse($db->isConnected());
 	}
 
-	public function testDsnHostPort() {
-		$db = new MockMySql(array(
-			'autoConnect' => false,
-			'host' => 'localhost:3306',
-			'database' => 'test'
-		) + $this->_dbConfig);
-
-		$expected = 'mysql:host=localhost;port=3306;dbname=test';
-		$result = $db->dsn();
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testDsnSocket() {
-		$db = new MockMySql(array(
-			'autoConnect' => false,
-			'host' => '/tmp/foo/bar.socket',
-			'database' => 'test'
-		) + $this->_dbConfig);
-
-		$expected = 'mysql:unix_socket=/tmp/foo/bar.socket;dbname=test';
-		$result = $db->dsn();
-		$this->assertEqual($expected, $result);
-	}
-
 	public function testDatabaseEncoding() {
 		$this->assertTrue($this->_db->isConnected());
 

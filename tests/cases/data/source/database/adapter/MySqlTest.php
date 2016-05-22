@@ -33,6 +33,50 @@ class MySqlTest extends \lithium\test\Unit {
 		MockDatabasePost::reset();
 	}
 
+	public function testDsnWithHostPort() {
+		$db = new MockMySql(array(
+			'autoConnect' => false,
+			'database' => 'test',
+			'host' => 'localhost:1234',
+		));
+		$expected = 'mysql:host=localhost;port=1234;dbname=test';
+		$result = $db->dsn();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDsnWithHost() {
+		$db = new MockMySql(array(
+			'autoConnect' => false,
+			'database' => 'test',
+			'host' => 'localhost',
+		));
+		$expected = 'mysql:host=localhost;port=3306;dbname=test';
+		$result = $db->dsn();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDsnWithPort() {
+		$db = new MockMySql(array(
+			'autoConnect' => false,
+			'database' => 'test',
+			'host' => ':1234',
+		));
+		$expected = 'mysql:host=localhost;port=1234;dbname=test';
+		$result = $db->dsn();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDsnWithSocket() {
+		$db = new MockMySql(array(
+			'autoConnect' => false,
+			'database' => 'test',
+			'host' => '/tmp/foo/bar.socket',
+		));
+		$expected = 'mysql:unix_socket=/tmp/foo/bar.socket;dbname=test';
+		$result = $db->dsn();
+		$this->assertEqual($expected, $result);
+	}
+
 	/**
 	 * We test only the operators that are added/removed/modified from the
 	 * `Database::$_operators`. The latter are already tested in the Database case.

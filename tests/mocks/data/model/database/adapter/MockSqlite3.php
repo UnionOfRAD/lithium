@@ -8,16 +8,7 @@
 
 namespace lithium\tests\mocks\data\model\database\adapter;
 
-class MockMySql extends \lithium\data\source\database\adapter\MySql {
-
-	public function __construct(array $config = array()) {
-		parent::__construct($config + array('database' => 'mock'));
-		$this->connection = $this;
-	}
-
-	public function quote($value) {
-		return "'{$value}'";
-	}
+class MockSqlite3 extends \lithium\data\source\database\adapter\Sqlite3 {
 
 	public function connect() {
 		return true;

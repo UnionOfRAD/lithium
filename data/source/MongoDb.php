@@ -13,6 +13,7 @@ use MongoRegex;
 use lithium\aop\Filters;
 use lithium\util\Inflector;
 use lithium\core\NetworkException;
+use lithium\net\HostString;
 use Exception;
 
 /**
@@ -39,6 +40,16 @@ use Exception;
  * @link http://www.mongodb.org/
  */
 class MongoDb extends \lithium\data\Source {
+
+	/**
+	 * The default host used to connect to the server.
+	 */
+	const DEFAULT_HOST = 'localhost';
+
+	/**
+	 * The default port used to connect to the server.
+	 */
+	const DEFAULT_PORT = 27017;
 
 	/**
 	 * The Mongo class instance.
@@ -149,9 +160,13 @@ class MongoDb extends \lithium\data\Source {
 	 * @see lithium\data\source\MongoDb::$_schema
 	 * @link http://php.net/mongo.construct.php PHP Manual: Mongo::__construct()
 	 * @param array $config Configuration options required to connect to the database, including:
+	 *        - `'host'` _string|array_: A string in the form of `'<host>'`, `'<host>:<port>'` or
+	 *          `':<port>'` indicating the host and/or port to connect to. When one or both are
+	 *          not provided uses general server defaults (if possible retrieved from the client
+	 *          implementation).
+	 *          Use the array format for multiple hosts:
+	 *          `array('167.221.1.5:11222', '167.221.1.6')`
 	 *        - `'database'` _string_: The name of the database to connect to. Defaults to `null`.
-	 *        - `'host'` _string_: The IP or machine name where Mongo is running, followed by a
-	 *           colon, and the port number. Defaults to `'localhost:27017'`.
 	 *        - `'persistent'` _mixed_: Determines a persistent connection to attach to. See the
 	 *           `$options` parameter of
 	 *            [`Mongo::__construct()`](http://php.net/mongo.construct.php) for
@@ -176,13 +191,13 @@ class MongoDb extends \lithium\data\Source {
 	 * @return void
 	 */
 	public function __construct(array $config = array()) {
-		$host = 'localhost:27017';
-
-		$server = $this->_classes['server'];
-		if (class_exists($server, false)) {
-			$host = $server::DEFAULT_HOST . ':' . $server::DEFAULT_PORT;
+		if (class_exists($server = $this->_classes['server'], false)) {
+			$defaultHost = $server::DEFAULT_HOST . ':' . $server::DEFAULT_PORT;
+		} else {
+			$defaultHost = static::DEFAULT_HOST . ':' . static::DEFAULT_PORT;
 		}
-		$defaults = compact('host') + array(
+		$defaults = array(
+			'host' => $defaultHost,
 			'persistent' => false,
 			'login'      => null,
 			'password'   => null,
@@ -194,20 +209,43 @@ class MongoDb extends \lithium\data\Source {
 			'w'          => 1,
 			'wTimeoutMS' => 10000,
 			'readPreference' => null,
-			'autoConnect' => false
+			'autoConnect' => false,
+			'dsn' => null
 		);
 		parent::__construct($config + $defaults);
 	}
 
 	/**
-	 * Initializer. Adds operator handlers which will
-	 * later allow to correctly cast any values.
+	 * Initializer. Adds operator handlers which will later allow to correctly cast any
+	 * values. Constructs a DSN from configuration.
 	 *
 	 * @see lithium\data\source\MongoDb::$_operators
 	 * @see lithium\data\source\MongoDb::_operators()
 	 * @return void
 	 */
 	protected function _init() {
+		$hosts = array();
+		foreach ((array) $this->_config['host'] as $host) {
+			$host = HostString::parse($host) + array(
+				'host' => static::DEFAULT_HOST,
+				'port' => static::DEFAULT_PORT
+			);
+			$hosts[] = "{$host['host']}:{$host['port']}";
+		}
+		if ($this->_config['login']) {
+			$this->_config['dsn'] = sprintf(
+				'mongodb://%s:%s@%s/%s',
+				$this->_config['login'],
+				$this->_config['password'],
+				implode(',', $hosts),
+				$this->_config['database']
+			);
+		} else {
+			$this->_config['dsn'] = sprintf(
+				'mongodb://%s',
+				implode(',', $hosts)
+			);
+		}
 		parent::_init();
 
 		$this->_operators += array(
@@ -287,35 +325,28 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean Returns `true` the connection attempt was successful, otherwise `false`.
 	 */
 	public function connect() {
+		$server = $this->_classes['server'];
+
 		if ($this->server && $this->server->getConnections() && $this->connection) {
 			return $this->_isConnected = true;
 		}
-
-		$cfg = $this->_config;
 		$this->_isConnected = false;
-
-		$host = is_array($cfg['host']) ? join(',', $cfg['host']) : $cfg['host'];
-		$login = $cfg['login'] ? "{$cfg['login']}:{$cfg['password']}@" : '';
-		$connection = "mongodb://{$login}{$host}" . ($login ? "/{$cfg['database']}" : '');
 
 		$options = array(
 			'connect' => true,
-			'connectTimeoutMS' => $cfg['timeout'],
-			'replicaSet' => $cfg['replicaSet']
+			'connectTimeoutMS' => $this->_config['timeout'],
+			'replicaSet' => $this->_config['replicaSet'],
+			'persist' => $this->_config['persistent'] === true ? 'default' : $this->_config['persistent']
 		);
 
 		try {
-			if ($persist = $cfg['persistent']) {
-				$options['persist'] = $persist === true ? 'default' : $persist;
-			}
-			$server = $this->_classes['server'];
-			$this->server = new $server($connection, $options);
+			$this->server = new $server($this->_config['dsn'], $options);
 
-			if ($this->connection = $this->server->{$cfg['database']}) {
+			if ($this->connection = $this->server->{$this->_config['database']}) {
 				$this->_isConnected = true;
 			}
 
-			if ($prefs = $cfg['readPreference']) {
+			if ($prefs = $this->_config['readPreference']) {
 				$prefs = !is_array($prefs) ? array($prefs, array()) : $prefs;
 				$this->server->setReadPreference($prefs[0], $prefs[1]);
 			}

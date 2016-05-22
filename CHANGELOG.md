@@ -13,6 +13,11 @@
 
 ### Improved
 
+- Due to a new host string parser implementation and framework wide rollout, first 
+  any class accepting a host string in the form of `<host>` or `<host>:<port>` now
+  also accepts the port only notation `:<port>`. This allows to change just the
+  port but keep using the default host name. Second, host strings will now also handle 
+  IPv6 addresses correctly.
 - Console command help now shows inherited options i.e. `[--silent] [--plain] [--help]`.
 - Reduced `preg_match()` call count in `Router` in favor of `strpos()` for performance reasons.
 - It is now guaranteed that `Random::generate()` will use a cryptographic strong RNG. It 
@@ -114,6 +119,8 @@
   filterable.
 
 ### Added
+
+- Introduced new `lithium\net\HostString` class to help parse `<host>:<port>` strings.
 
 - `Cache` together with the `File` adapter can now be used to store BLOBs. 
 
