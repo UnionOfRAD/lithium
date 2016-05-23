@@ -309,8 +309,11 @@ class Environment {
 			return;
 		}
 		$env = ($env === true) ? static::$_current : $env;
-		$base = isset(static::$_configurations[$env]) ? static::$_configurations[$env] : array();
-		return static::$_configurations[$env] = Set::merge($base, $config);
+
+		if (isset(static::$_configurations[$env])) {
+			$config = Set::merge(static::$_configurations[$env], $config);
+		}
+		return static::$_configurations[$env] = $config;
 	}
 
 	/**
