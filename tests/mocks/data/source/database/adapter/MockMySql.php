@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2015, Union of RAD,http://union-of-rad.org)
+ * @copyright     Copyright 2016, Union of RAD,http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -16,6 +16,10 @@ class MockMySql extends \lithium\data\source\database\adapter\MySql {
 
 	protected function _execute($sql) {
 		return $sql;
+	}
+
+	public function dsn() {
+		return $this->_dsn();
 	}
 }
 
