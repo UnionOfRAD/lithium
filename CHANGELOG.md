@@ -2,34 +2,10 @@
 
 ## v1.1.0
 
-### Fixed
+### Added
 
-- Fixed possible infinite retry loop when failing to close an established network 
-  connection in the `Socket` subclasses `Context`, `Stream` and `Curl`.
-- Fixed slug generation by `Inflector` for strings containing multibyte characters or
-  (unprintable) whitespaces.
-- Fixed edge case when using `Collection::prev()` and the collection contained
-  a falsey value (i.e. `null`, `false`, `''`).
-
-### Improved
-
-- `Model::save()` using a relational database adapter will now only save updated fields,
-  instead of blindly saving all. #1121 (Hamid Reza Koushki)
-- `Hash::calculate()` learned to hash over arbitrary data (scalar and non-scalar, closures). 
-  #1196 (David Persson)
-- Due to a new host string parser implementation and framework wide rollout, first 
-  any class accepting a host string in the form of `<host>` or `<host>:<port>` now
-  also accepts the port only notation `:<port>`. This allows to change just the
-  port but keep using the default host name. Second, host strings will now also handle 
-  IPv6 addresses correctly.
-- Console command help now shows inherited options i.e. `[--silent] [--plain] [--help]`.
-- Reduced `preg_match()` call count in `Router` in favor of `strpos()` for performance reasons.
-- It is now guaranteed that `Random::generate()` will use a cryptographic strong RNG. It 
-  no longer falls back to a less strong source. 
-- `Router::match()` now additionaly supports the magic schemes `tel` and `sms`. This
-  allows to create `tel:+49401234567` style links.
-- Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
 - `Database` now supports the `NOT BETWEEN` operator. #1208 (Eric Cholis)
+
 - Restrictions on library search paths for i.e. adapters inside non-core libraries have been
   relaxed. This fixes an inconvenience where adapters (and other classes) always had to be placed
   under the `extensions` directory. Even in cases where it didn't feel natural to put them there.
@@ -122,7 +98,13 @@
   has been improved, so that there is only a minimal penality for making a method
   filterable.
 
-### Added
+- `Router::match()` now additionaly supports the magic schemes `tel` and `sms`. This
+  allows to create `tel:+49401234567` style links.
+
+- `Model::save()` using a relational database adapter will now only save updated fields,
+  instead of blindly saving all. #1121 (Hamid Reza Koushki)
+
+- `Hash::calculate()` learned to hash over arbitrary data (scalar and non-scalar, closures). #1196 (David Persson)
 
 - Introduced new `lithium\net\HostString` class to help parse `<host>:<port>` strings.
 
@@ -150,13 +132,15 @@
   ```
 
 - `mcrypt_create_iv()` and PHP7's `random_bytes()` have been added as new RNG sources.
+
 - Enable custom error messages in form helper. This feature allows to provide messages
   for validation error inside the template. This allows easier translation of messages and
   customization in case there is no control over the model (i.e. developing a "theme" for a
   customer without changing the basic functionality). #1167 (David Persson)
+
 - Strict mode can now be enabled for MySQL via the `'strict'` option. Read more about the
-  feature at http://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-strict.
-  #1171 (David Persson)
+  feature at http://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-strict. #1171 (David Persson)
+
 - Added drain option to action request allowing to disable auto stream reading. When the
   drain option is disabled, action request will not drain stream data - when sent. This reduces
   memory usage and is a first step in enabling streaming very large files (i.e. uploading video
@@ -177,6 +161,7 @@
   ```php
   $data = Media::decode($request->type, stream_get_contents($stream));
   ```
+
 - Text form fields now support generating corresponding `<datalist>` elements for autocompletion.
 
   ```php
@@ -186,16 +171,82 @@
   ));
   ```
 
-### Changed
- 
-- The bulitin test framework now handles circular references in expectations or results
-  correctly. The display format of fails has been changed to that of `print_r()`.
+- It is now guaranteed that `Random::generate()` will use a cryptographic strong RNG. It 
+  no longer falls back to a less strong source. 
+
+- Due to a new host string parser implementation and framework wide rollout, first 
+  any class accepting a host string in the form of `<host>` or `<host>:<port>` now
+  also accepts the port only notation `:<port>`. This allows to change just the
+  port but keep using the default host name. Second, host strings will now also handle 
+  IPv6 addresses correctly.
+
+- Console command help now shows inherited options i.e. `[--silent] [--plain] [--help]`.
+
+- Reduced `preg_match()` call count in `Router` in favor of `strpos()` for performance reasons.
+
+- Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
 
 - Multi-word console command arguments are now parsed into camelized versions.
   `--no-color`, will be available as `noColor` and assigned to a `$noColor` property if
   present in the command class definition. Previously `--no-color` was made available as
   `no-color`. This has been deprecated.
-	
+
+- New `lithium\util\Text`, `lithium\security\Random` and `lithium\security\Hash` 
+  classes which were extracted from `String`. #1184 (David Persson)
+
+- The bulitin test framework now handles circular references in expectations or results
+  correctly. The display format of fails has been changed to that of `print_r()`.
+
+### Changed
+
+- When failing to close an established network connection via the `Socket` subclasses 
+  `Context`, `Stream` and `Curl` (i.e. `$socket->close()`), the close operation will
+  not be retried anymore. Instead `false` is returned.
+
+- To skip decoration in the console test command use `--just-assertions` instead of `--plain`.
+
+- When no suitable RNG is found (rare), `Random::generate()` will throw an exception.
+
+- Database encoding, timezone, and searchPath methods may now throw exceptions. Please
+  wrap code calling these methods directly in try/catch blocks - if needed. #1172
+  (David Persson)
+
+- Instance filters are now not cleaned up automatically anymore, that
+  is when the instance was destroyed, its filters went away with it.
+
+### Deprecated
+
+- Multi-word console command arguments i.e. `--no-color` were made available as
+  `no-color`. This has been deprecated. 
+
+- The XCache caching adapter has been deprecated as it is not compatible with the wildly
+  deployed OPcache and does not perform better.
+
+- The builtin mocking framework (`lithium\test\Mocker`) has been deprecated as alternatives
+  exist and it is not needed as a core test dependency. This takes the task of maintaining full
+  blown mocking from us. You might want to have a look at 
+  [Mockery](https://github.com/padraic/mockery).
+
+- Per adapter filters in `Logger` and `Session` have been deprecated. Please apply filters 
+  directly to the static `Logger::*` and `Session::*` methods instead.
+
+  ```php
+  // deprecated usage
+  Session::config(array(
+    'default' => array(
+       'filters' => array(function($self, $params, $chain) { /* ... */ })
+    )
+  ));
+
+  // always use this
+  Filters::apply('lithium\storage\Session', 'write', function($params, $next) { 
+    /* ... */ 
+  });
+  ```
+
+-  Methods in an adapter of `Logger` and `Session`, which returned a closure taking
+  `$self` as the first parameter, should now drop that parameter expectation.
+
 - The String class has been renamed to `Text` while RNG and hashing functionality
   have been extracted into `lithium\security\Random` and `lithium\security\Hash`. #1184 (David Persson)
 
@@ -269,47 +320,18 @@
   Accessing the currently filtered class/method from inside a filter function
   (via `$chain->method()`) has been deprecated. 
 
-- Per adapter filters in `Logger` and `Session` have been deprecated. Please apply filters 
-  directly to the static `Logger::*` and `Session::*` methods instead.
+### Fixed
 
-  ```php
-  // deprecated usage
-  Session::config(array(
-    'default' => array(
-       'filters' => array(function($self, $params, $chain) { /* ... */ })
-    )
-  ));
+- Fixed possible infinite retry loop when failing to close an established network 
+  connection in the `Socket` subclasses `Context`, `Stream` and `Curl`.
 
-  // always use this
-  Filters::apply('lithium\storage\Session', 'write', function($params, $next) { 
-    /* ... */ 
-  });
-  ```
+- Fixed slug generation by `Inflector` for strings containing multibyte characters or
+  (unprintable) whitespaces.
 
--  Methods in an adapter of `Logger` and `Session`, which returned a closure taking
-  `$self` as the first parameter, should now drop that parameter expectation.
+- Fixed edge case when using `Collection::prev()` and the collection contained
+  a falsey value (i.e. `null`, `false`, `''`).
 
-- Instance filters are now not cleaned up automatically anymore, that
-  is when the instance was destroyed, its filters went away with it.
-
-- The builtin mocking framework (`lithium\test\Mocker`) has been deprecated as alternatives
-  exist and it is not needed as a core test dependency. This takes the task of maintaining full
-  blown mocking from us. You might want to have a look at 
-  [Mockery](https://github.com/padraic/mockery).
-
-- The XCache caching adapter has been deprecated as it is not compatible with the wildly
-  deployed OPcache and does not perform better.
-
-### Backwards Incompatible Changes
-
-- When failing to close an established network connection via the `Socket` subclasses 
-  `Context`, `Stream` and `Curl` (i.e. `$socket->close()`), the close operation will
-  not be retried anymore. Instead `false` is returned.
-- To skip decoration in the console test command use `--just-assertions` instead of `--plain`.
-- When no suitable RNG is found (rare), `Random::generate()` will throw an exception.
-- Database encoding, timezone, and searchPath methods may now throw exceptions. Please
-  wrap code calling these methods directly in try/catch blocks - if needed. #1172
-  (David Persson)
+- Fixed parsing certain exception details in `Database` i.e. `pgsql unknown role exception`.
 
 ## v1.0.0
 
