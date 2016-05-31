@@ -10,6 +10,9 @@ namespace lithium\net\socket;
 
 /**
  * A socket adapter that uses PHP stream contexts.
+ *
+ * @link http://php.net/context.http
+ * @see lithium\net\socket\Stream
  */
 class Context extends \lithium\net\Socket {
 

@@ -20,7 +20,6 @@ use lithium\core\ConfigException;
  * For more information on configuring the database connection, see
  * the `__construct()` method.
  *
- * @todo fix encoding methods to use class query methods instead of sqlite3 natives
  * @see lithium\data\source\database\adapter\Sqlite::__construct()
  */
 class Sqlite3 extends \lithium\data\source\Database {
