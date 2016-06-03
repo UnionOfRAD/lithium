@@ -167,10 +167,6 @@ class MongoDb extends \lithium\data\Source {
 	 *          Use the array format for multiple hosts:
 	 *          `array('167.221.1.5:11222', '167.221.1.6')`
 	 *        - `'database'` _string_: The name of the database to connect to. Defaults to `null`.
-	 *        - `'persistent'` _mixed_: Determines a persistent connection to attach to. See the
-	 *           `$options` parameter of
-	 *            [`Mongo::__construct()`](http://php.net/mongo.construct.php) for
-	 *            more information. Defaults to `false`, meaning no persistent connection is made.
 	 *        - `'timeout'` _integer_: The number of milliseconds a connection attempt will wait
 	 *          before timing out and throwing an exception. Defaults to `100`.
 	 *        - `'schema'` _\Closure_: A closure or anonymous function which returns the schema
@@ -198,7 +194,6 @@ class MongoDb extends \lithium\data\Source {
 		}
 		$defaults = array(
 			'host' => $defaultHost,
-			'persistent' => false,
 			'login'      => null,
 			'password'   => null,
 			'database'   => null,
@@ -335,8 +330,7 @@ class MongoDb extends \lithium\data\Source {
 		$options = array(
 			'connect' => true,
 			'connectTimeoutMS' => $this->_config['timeout'],
-			'replicaSet' => $this->_config['replicaSet'],
-			'persist' => $this->_config['persistent'] === true ? 'default' : $this->_config['persistent']
+			'replicaSet' => $this->_config['replicaSet']
 		);
 
 		try {
