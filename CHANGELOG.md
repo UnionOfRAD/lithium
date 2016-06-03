@@ -199,6 +199,11 @@
 
 ### Changed
 
+- The `persist` option for the MongoDb adapter has been removed. Persistent connection
+  configuration is not compatible with mongo ext >= 1.2.0. 1.2.0 was released in 
+  2011 and it is expected that almost all users already have a more recent 
+  version. (Eric Cholis)
+
 - When failing to close an established network connection via the `Socket` subclasses 
   `Context`, `Stream` and `Curl` (i.e. `$socket->close()`), the close operation will
   not be retried anymore. Instead `false` is returned.

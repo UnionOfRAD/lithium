@@ -34,9 +34,12 @@ use Exception;
  * By default, it will attempt to connect to a Mongo instance running on `localhost` on port
  * 27017. See `__construct()` for details on the accepted configuration settings.
  *
+ * Needs the mongo pecl extension version 1.2.0 or later.
+ *
  * @see lithium\data\entity\Document
  * @see lithium\data\Connections::add()
  * @see lithium\data\source\MongoDb::__construct()
+ * @link https://pecl.php.net/package/mongo
  * @link http://www.mongodb.org/
  */
 class MongoDb extends \lithium\data\Source {
