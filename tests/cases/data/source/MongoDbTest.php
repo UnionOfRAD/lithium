@@ -38,7 +38,6 @@ class MongoDbTest extends \lithium\test\Unit {
 		'database' => 'test',
 		'host' => 'localhost',
 		'port' => '27017',
-		'persistent' => null,
 		'autoConnect' => false
 	);
 
