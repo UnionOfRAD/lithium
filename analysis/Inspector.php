@@ -14,6 +14,7 @@ use ReflectionProperty;
 use ReflectionException;
 use SplFileObject;
 use lithium\core\Libraries;
+use lithium\analysis\Docblock;
 
 /**
  * General source code inspector.

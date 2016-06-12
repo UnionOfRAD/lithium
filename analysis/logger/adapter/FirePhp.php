@@ -10,6 +10,10 @@ namespace lithium\analysis\logger\adapter;
 
 use lithium\aop\Filters;
 
+$message  = 'The FirePhp logger adapter has been deprecated as Firebug is ';
+$message .= 'not in use that often anymore.';
+trigger_error($message, E_USER_DEPRECATED);
+
 /**
  * The `FirePhp` log adapter allows you to log messages to FirePHP.
  *
@@ -66,6 +70,7 @@ use lithium\aop\Filters;
  * Logger::debug(new \lithium\action\Response());
  * ```
  *
+ * @deprecated
  * @see lithium\action\Response
  * @see lithium\net\http\Message::headers()
  * @link http://www.firephp.org/ FirePHP

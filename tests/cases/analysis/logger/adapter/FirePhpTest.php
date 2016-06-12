@@ -14,15 +14,25 @@ use lithium\action\Response;
 
 /**
  * This tests make sure that the FirePhp log adapter works as expected.
+ *
+ * @deprecated
  */
 class FirePhpTest extends \lithium\test\Unit {
+
+	protected $_backup = null;
 
 	/**
 	 * Sets up and configures the logger and also the cache storage for testing.
 	 */
 	public function setUp() {
+		error_reporting(($this->_backup = error_reporting()) & ~E_USER_DEPRECATED);
+
 		$this->firephp = new FirePhp();
 		Logger::config(array('firephp' => array('adapter' => $this->firephp)));
+	}
+
+	public function tearDown() {
+		error_reporting($this->_backup);
 	}
 
 	/**
