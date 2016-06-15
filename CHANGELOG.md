@@ -227,8 +227,8 @@
 - The XCache caching adapter has been deprecated as it is not compatible with the wildly
   deployed OPcache and does not perform better.
 
- - The FirePhp logging adapter has been deprecated as it Firebug is not used by many
-   developers anymore.
+ - The FirePhp logging adapter has been deprecated as Firebug's usage share is shrinking
+   in favor of builtin developer tools.
 
 - The builtin mocking framework (`lithium\test\Mocker`) has been deprecated as alternatives
   exist and it is not needed as a core test dependency. This takes the task of maintaining full
