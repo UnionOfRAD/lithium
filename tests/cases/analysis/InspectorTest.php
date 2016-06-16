@@ -220,7 +220,7 @@ class InspectorTest extends \lithium\test\Unit {
 	public function testClassDependencies() {
 		$expected = array(
 			'Exception', 'ReflectionClass', 'ReflectionProperty', 'ReflectionException',
-			'SplFileObject', 'lithium\\core\\Libraries'
+			'SplFileObject', 'lithium\\core\\Libraries', 'lithium\\analysis\\Docblock'
 		);
 
 		$result = Inspector::dependencies($this->subject(), array('type' => 'static'));
