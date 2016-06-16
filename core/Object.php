@@ -144,25 +144,6 @@ class Object {
 	}
 
 	/**
-	 * PHP magic method used in conjunction with `var_export()` to allow objects to be
-	 * re-instantiated with their pre-existing properties and values intact. This method can be
-	 * called statically on any class that extends `Object` to return an instance of it.
-	 *
-	 * @param array $data An array of properties and values with which to re-instantiate the object.
-	 *        These properties can be both public and protected.
-	 * @return object Returns an instance of the requested object with the given properties set.
-	 */
-	public static function __set_state($data) {
-		$class = get_called_class();
-		$object = new $class();
-
-		foreach ($data as $property => $value) {
-			$object->{$property} = $value;
-		}
-		return $object;
-	}
-
-	/**
 	 * Determines if a given method can be called.
 	 *
 	 * @param string $method Name of the method.
@@ -212,6 +193,26 @@ class Object {
 	 * @var array
 	 */
 	protected $_methodFilters = [];
+
+	/**
+	 * PHP magic method used in conjunction with `var_export()` to allow objects to be
+	 * re-instantiated with their pre-existing properties and values intact. This method can be
+	 * called statically on any class that extends `Object` to return an instance of it.
+	 *
+	 * @deprecated
+	 * @param array $data An array of properties and values with which to re-instantiate the object.
+	 *        These properties can be both public and protected.
+	 * @return object Returns an instance of the requested object with the given properties set.
+	 */
+	public static function __set_state($data) {
+		$class = get_called_class();
+		$object = new $class();
+
+		foreach ($data as $property => $value) {
+			$object->{$property} = $value;
+		}
+		return $object;
+	}
 
 	/**
 	 * Exit immediately. Primarily used for overrides during testing.

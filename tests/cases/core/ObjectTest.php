@@ -103,19 +103,6 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $config->getConfig());
 	}
 
-	/**
-	 * Tests that an object can be instantiated using the magic `__set_state()` method.
-	 */
-	public function testStateBasedInstantiation() {
-		$result = MockObjectConfiguration::__set_state([
-			'key' => 'value', '_protected' => 'test'
-		]);
-		$expected = 'lithium\tests\mocks\core\MockObjectConfiguration';
-		$this->assertEqual($expected, get_class($result));
-
-		$this->assertEqual('test', $result->getProtected());
-	}
-
 	public function testInstanceWithClassesKey() {
 		$object = new MockInstantiator();
 		$expected = 'lithium\tests\mocks\core\MockRequest';
@@ -167,6 +154,21 @@ class ObjectTest extends \lithium\test\Unit {
 
 		$result = MockObjectForParents::parents();
 		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * Tests that an object can be instantiated using the magic `__set_state()` method.
+	 *
+	 * @deprecated
+	 */
+	public function testStateBasedInstantiation() {
+		$result = MockObjectConfiguration::__set_state([
+			'key' => 'value', '_protected' => 'test'
+		]);
+		$expected = 'lithium\tests\mocks\core\MockObjectConfiguration';
+		$this->assertEqual($expected, get_class($result));
+
+		$this->assertEqual('test', $result->getProtected());
 	}
 
 	public function testMethodFiltering() {
