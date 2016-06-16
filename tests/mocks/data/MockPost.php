@@ -15,6 +15,10 @@ class MockPost extends \lithium\data\Model {
 
 	protected $_meta = ['connection' => false, 'key' => 'id'];
 
+	public static function initialize($class) {
+		return parent::_initialize($class);
+	}
+
 	public static function instances() {
 		return array_keys(static::$_instances);
 	}

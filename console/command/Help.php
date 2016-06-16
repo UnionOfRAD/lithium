@@ -130,10 +130,7 @@ class Help extends \lithium\console\Command {
 			if ($item->name[0] === '_') {
 				return;
 			}
-			$modifiers = array_values(Inspector::invokeMethod('_modifiers', [$item]));
-			$setAccess = array_intersect($modifiers, ['private', 'protected']) != [];
-
-			if ($setAccess) {
+			if ($setAccess = !$item->isPublic()) {
 				$item->setAccessible(true);
 			}
 			$args = [];

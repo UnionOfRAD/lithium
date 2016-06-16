@@ -26,7 +26,7 @@ class MockComment extends \lithium\data\Model {
 		];
 		$options += $defaults;
 		$params = compact('type', 'options');
-		$self = static::_object();
+		$self = static::object();
 
 		$implementation = function($params) {
 			$query = new Query(['type' => 'read'] + $params['options']);

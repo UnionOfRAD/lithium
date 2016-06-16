@@ -119,7 +119,7 @@ class Http extends \lithium\data\Source {
 	public function __call($method, $params) {
 		if (!isset($this->_methods[$method])) {
 			if (method_exists($this->connection, $method)) {
-				return $this->connection->invokeMethod($method, $params);
+				return call_user_func_array(array($this->connection, $method), $params);
 			}
 			$this->_methods[$method] = ['path' => "/{$method}"];
 		}

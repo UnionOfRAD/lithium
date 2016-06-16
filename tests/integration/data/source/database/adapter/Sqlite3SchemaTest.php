@@ -8,8 +8,9 @@
  */
 namespace lithium\tests\integration\data\source\database\adapter;
 
-use lithium\data\Schema;
+use ReflectionMethod;
 use lithium\data\Connections;
+use lithium\data\Schema;
 use lithium\tests\mocks\data\source\database\adapter\MockSqlite3;
 
 class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
@@ -26,43 +27,52 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testColumnMeta() {
+		$method = new ReflectionMethod($this->_db, '_meta');
+		$method->setAccessible(true);
+
 		$data = ['collate' => 'NOCASE'];
 		$result = [];
 		foreach ($data as $key => $value) {
-			$result[] = $this->_db->invokeMethod('_meta', ['column', $key, $value]);
+			$result[] = $method->invoke($this->_db, 'column', $key, $value);
 		}
 		$expected = ['COLLATE \'NOCASE\''];
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testPrimaryKeyConstraint() {
+		$method = new ReflectionMethod($this->_db, '_constraint');
+		$method->setAccessible(true);
+
 		$data = [
 			'column' => 'id'
 		];
-		$result = $this->_db->invokeMethod('_constraint', ['primary', $data]);
+		$result = $method->invoke($this->_db, 'primary', $data);
 		$expected = 'PRIMARY KEY ("id")';
 		$this->assertEqual($expected, $result);
 
 		$data = [
 			'column' => ['id', 'name']
 		];
-		$result = $this->_db->invokeMethod('_constraint', ['primary', $data]);
+		$result = $method->invoke($this->_db, 'primary', $data);
 		$expected = 'PRIMARY KEY ("id", "name")';
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testUniqueConstraint() {
+		$method = new ReflectionMethod($this->_db, '_constraint');
+		$method->setAccessible(true);
+
 		$data = [
 			'column' => 'id'
 		];
-		$result = $this->_db->invokeMethod('_constraint', ['unique', $data]);
+		$result = $method->invokeArgs($this->_db, ['unique', $data]);
 		$expected = 'UNIQUE ("id")';
 		$this->assertEqual($expected, $result);
 
 		$data = [
 			'column' => ['id', 'name']
 		];
-		$result = $this->_db->invokeMethod('_constraint', ['unique', $data]);
+		$result = $method->invokeArgs($this->_db, ['unique', $data]);
 		$expected = 'UNIQUE ("id", "name")';
 		$this->assertEqual($expected, $result);
 
@@ -70,12 +80,14 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 			'column' => ['id', 'name'],
 			'index' => true
 		];
-		$result = $this->_db->invokeMethod('_constraint', ['unique', $data]);
+		$result = $method->invokeArgs($this->_db, ['unique', $data]);
 		$expected = 'UNIQUE ("id", "name")';
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCheckConstraint() {
+		$method = new ReflectionMethod($this->_db, '_constraint');
+		$method->setAccessible(true);
 
 		$schema = new Schema([
 			'fields' => [
@@ -94,19 +106,22 @@ class Sqlite3SchemaTest extends \lithium\tests\integration\data\Base {
 				'city' => 'Sandnes'
 			]
 		];
-		$result = $this->_db->invokeMethod('_constraint', ['check', $data, $schema]);
+		$result = $method->invokeArgs($this->_db, ['check', $data, $schema]);
 		$expected = 'CHECK (("value" > 0) AND "city" = \'Sandnes\')';
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testForeignKeyConstraint() {
+		$method = new ReflectionMethod($this->_db, '_constraint');
+		$method->setAccessible(true);
+
 		$data = [
 			'column' => 'table_id',
 			'to' => 'table',
 			'toColumn' => 'id',
 			'on' => 'DELETE CASCADE'
 		];
-		$result = $this->_db->invokeMethod('_constraint', ['foreign_key', $data]);
+		$result = $method->invokeArgs($this->_db, ['foreign_key', $data]);
 		$expected = 'FOREIGN KEY ("table_id") REFERENCES "table" ("id") ON DELETE CASCADE';
 		$this->assertEqual($expected, $result);
 	}

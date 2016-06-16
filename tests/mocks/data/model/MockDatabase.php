@@ -127,6 +127,10 @@ class MockDatabase extends \lithium\data\source\Database {
 		];
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
+
+	public function splitFieldname($field) {
+		return parent::_splitFieldname($field);
+	}
 }
 
 ?>

@@ -26,39 +26,6 @@ class StaticObjectTest extends \lithium\test\Unit {
 		error_reporting($this->_backup);
 	}
 
-	/**
-	 * Tests that the correct parameters are always passed in `StaticObject::invokeMethod()`,
-	 * regardless of the number.
-	 */
-	public function testMethodInvocationWithParameters() {
-		$this->assertEqual(MockStaticObject::invokeMethod('foo'), []);
-		$this->assertEqual(MockStaticObject::invokeMethod('foo', ['bar']), ['bar']);
-
-		$params = ['one', 'two'];
-		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
-
-		$params = ['short', 'parameter', 'list'];
-		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
-
-		$params = ['a', 'longer', 'parameter', 'list'];
-		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
-
-		$params = ['a', 'much', 'longer', 'parameter', 'list'];
-		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
-
-		$params = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
-		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
-
-		$params = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
-		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
-
-		$params = [
-			'if', 'you', 'have', 'a', 'parameter', 'list', 'this',
-			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
-		];
-		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
-	}
-
 	public function testInstanceWithClassesKey() {
 		$expected = 'lithium\tests\mocks\core\MockRequest';
 		$result = get_class(MockStaticInstantiator::instance('request'));
@@ -253,6 +220,41 @@ class StaticObjectTest extends \lithium\test\Unit {
 
 		Filters::clear('lithium\tests\mocks\core\MockStaticMethodFiltering');
 		error_reporting($original);
+	}
+
+	/**
+	 * Tests that the correct parameters are always passed in `StaticObject::invokeMethod()`,
+	 * regardless of the number.
+	 *
+	 * @deprecated
+	 */
+	public function testMethodInvocationWithParameters() {
+		$this->assertEqual(MockStaticObject::invokeMethod('foo'), []);
+		$this->assertEqual(MockStaticObject::invokeMethod('foo', ['bar']), ['bar']);
+
+		$params = ['one', 'two'];
+		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
+
+		$params = ['short', 'parameter', 'list'];
+		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
+
+		$params = ['a', 'longer', 'parameter', 'list'];
+		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
+
+		$params = ['a', 'much', 'longer', 'parameter', 'list'];
+		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
+
+		$params = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
+		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
+
+		$params = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
+		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
+
+		$params = [
+			'if', 'you', 'have', 'a', 'parameter', 'list', 'this',
+			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
+		];
+		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
 	}
 }
 

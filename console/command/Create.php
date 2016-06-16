@@ -282,6 +282,18 @@ class Create extends \lithium\console\Command {
 		}
 		return false;
 	}
+
+	/**
+	 * Helper method to access sub-command information from the main command,
+	 * without exposing sub-command information publicly.
+	 *
+	 * @param string $method Name of the method to call
+	 * @param array $param Parameter list to use when calling $method
+	 * @return mixed Returns the result of the method call
+	 */
+	public function invokeMethod($method, $params = []) {
+		return call_user_func_array([$this, $method], $params);
+	}
 }
 
 ?>

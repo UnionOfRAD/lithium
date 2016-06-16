@@ -203,7 +203,7 @@ class Controller extends \lithium\core\Object {
 			}
 			$this->_render['template'] = $this->_render['template'] ?: $action;
 
-			if ($result = $this->invokeMethod($action, $args)) {
+			if ($result = call_user_func_array(array($this, $action), $args)) {
 				if (is_string($result)) {
 					$this->render(['text' => $result]);
 					return $this->response;

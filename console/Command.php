@@ -137,7 +137,7 @@ class Command extends \lithium\core\Object {
 	public function __invoke($action, $args = []) {
 		try {
 			$this->response->status = 1;
-			$result = $this->invokeMethod($action, $args);
+			$result = call_user_func_array(array($this, $action), $args);
 
 			if (is_int($result)) {
 				$this->response->status = $result;

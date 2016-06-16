@@ -183,9 +183,10 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	}
 
 	/**
-	 * Magic method that allows calling of model methods on this record instance, i.e.:
+	 * Magic method that allows calling of model methods on this record instance.
+	 *
 	 * ```
-	 * $record->validates();
+	 * $post->validates();
 	 * ```
 	 *
 	 * @param string $method Method name caught by `__call()`.
@@ -193,10 +194,9 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * @return mixed
 	 */
 	public function __call($method, $params) {
-		if (($model = $this->_model) && method_exists($model, '_object')) {
+		if (($model = $this->_model) && method_exists($model, 'object')) {
 			array_unshift($params, $this);
-			$class = $model::invokeMethod('_object');
-			return call_user_func_array([&$class, $method], $params);
+			return call_user_func_array([$model::object(), $method], $params);
 		}
 		$message = "No model bound to call `{$method}`.";
 		throw new BadMethodCallException($message);
@@ -212,8 +212,8 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
-		if (method_exists($class = $this->_model, '_object')) {
-			$result = $class::invokeMethod('_object')->respondsTo($method);
+		if (method_exists($class = $this->_model, 'object')) {
+			$result = $class::object()->respondsTo($method);
 		} else {
 			$result = Inspector::isCallable($class, $method, $internal);
 		}

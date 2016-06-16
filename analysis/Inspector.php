@@ -352,7 +352,7 @@ class Inspector {
 		$options += ['names' => $options['properties']];
 
 		return static::_items($reflClass, 'getProperties', $options)->map(function($item) use ($class) {
-			$modifiers = array_values(Inspector::invokeMethod('_modifiers', [$item]));
+			$modifiers = array_values(static::_modifiers($item));
 			$setAccess = (
 				array_intersect($modifiers, ['private', 'protected']) !== []
 			);
@@ -632,18 +632,23 @@ class Inspector {
 		return Libraries::instance(null, $name, $options);
 	}
 
+	/* Deprecated / BC */
+
 	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
 	 * `forward_static_call_array()`.
 	 *
+	 * @deprecated
 	 * @param string $method Name of the method to call.
 	 * @param array $params Parameter list to use when calling `$method`.
 	 * @return mixed Returns the result of the method call.
 	 */
 	public static function invokeMethod($method, $params = []) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated.';
+		trigger_error($message, E_USER_DEPRECATED);
+
 		return forward_static_call_array([get_called_class(), $method], $params);
 	}
-
 }
 
 ?>

@@ -234,7 +234,7 @@ abstract class Renderer extends \lithium\core\Object {
 				$path = $classes['media']::asset($path, $type, $options + $defaults);
 				return $h ? $h($path) : $path;
 			},
-			'options' => '_attributes',
+			'options' => 'attributes',
 			'title'   => 'escape',
 			'value'   => 'escape',
 			'scripts' => function($scripts) use (&$ctx) {
@@ -416,7 +416,9 @@ abstract class Renderer extends \lithium\core\Object {
 	}
 
 	/**
-	 * Filters a piece of content through a content handler.  A handler can be:
+	 * Filters a piece of content through a content handler.
+	 *
+	 * A handler can be:
 	 * - a string containing the name of a method defined in `$helper`. The method is called with 3
 	 *   parameters: the value to be handled, the helper method called (`$method`) and the
 	 *   `$options` that were passed into `applyHandler`.
@@ -425,6 +427,7 @@ abstract class Renderer extends \lithium\core\Object {
 	 *   above.
 	 * - a closure, which takes the value as the first parameter, an array containing an instance of
 	 *   the calling helper and the calling method name as the second, and `$options` as the third.
+	 *
 	 * In all cases, handlers should return the transformed version of `$value`.
 	 *
 	 * @see lithium\template\view\Renderer::handlers()
@@ -446,10 +449,9 @@ abstract class Renderer extends \lithium\core\Object {
 			case is_string($handler) && !$helper:
 				$helper = $this->helper('html');
 			case is_string($handler) && is_object($helper):
-				return $helper->invokeMethod($handler, [$value, $method, $options]);
+				return $helper->{$handler}($value, $method, $options);
 			case is_array($handler) && is_object($handler[0]):
-				list($object, $func) = $handler;
-				return $object->invokeMethod($func, [$value, $method, $options]);
+				return $handler[0]->{$handler[1]}($value, $method, $options);
 			case is_callable($handler):
 				return $handler($value, [$helper, $method], $options);
 			default:

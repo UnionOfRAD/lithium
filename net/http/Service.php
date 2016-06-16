@@ -127,7 +127,7 @@ class Service extends \lithium\core\Object {
 	 */
 	public function __call($method, $params = []) {
 		array_unshift($params, $method);
-		return $this->invokeMethod('send', $params);
+		return call_user_func_array(array($this, 'send'), $params);
 	}
 
 	/**

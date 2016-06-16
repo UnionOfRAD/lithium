@@ -116,34 +116,6 @@ class Object {
 	}
 
 	/**
-	 * Calls a method on this object with the given parameters. Provides an OO wrapper
-	 * for call_user_func_array, and improves performance by using straight method calls
-	 * in most cases.
-	 *
-	 * @param string $method  Name of the method to call
-	 * @param array $params  Parameter list to use when calling $method
-	 * @return mixed  Returns the result of the method call
-	 */
-	public function invokeMethod($method, $params = []) {
-		switch (count($params)) {
-			case 0:
-				return $this->{$method}();
-			case 1:
-				return $this->{$method}($params[0]);
-			case 2:
-				return $this->{$method}($params[0], $params[1]);
-			case 3:
-				return $this->{$method}($params[0], $params[1], $params[2]);
-			case 4:
-				return $this->{$method}($params[0], $params[1], $params[2], $params[3]);
-			case 5:
-				return $this->{$method}($params[0], $params[1], $params[2], $params[3], $params[4]);
-			default:
-				return call_user_func_array([&$this, $method], $params);
-		}
-	}
-
-	/**
 	 * Determines if a given method can be called.
 	 *
 	 * @param string $method Name of the method.
@@ -212,6 +184,38 @@ class Object {
 			$object->{$property} = $value;
 		}
 		return $object;
+	}
+
+	/**
+	 * Calls a method on this object with the given parameters. Provides an OO wrapper
+	 * for call_user_func_array, and improves performance by using straight method calls
+	 * in most cases.
+	 *
+	 * @deprecated
+	 * @param string $method  Name of the method to call
+	 * @param array $params  Parameter list to use when calling $method
+	 * @return mixed  Returns the result of the method call
+	 */
+	public function invokeMethod($method, $params = []) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		switch (count($params)) {
+			case 0:
+				return $this->{$method}();
+			case 1:
+				return $this->{$method}($params[0]);
+			case 2:
+				return $this->{$method}($params[0], $params[1]);
+			case 3:
+				return $this->{$method}($params[0], $params[1], $params[2]);
+			case 4:
+				return $this->{$method}($params[0], $params[1], $params[2], $params[3]);
+			case 5:
+				return $this->{$method}($params[0], $params[1], $params[2], $params[3], $params[4]);
+			default:
+				return call_user_func_array([&$this, $method], $params);
+		}
 	}
 
 	/**

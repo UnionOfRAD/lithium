@@ -21,35 +21,6 @@ use lithium\analysis\Inspector;
  */
 class StaticObject {
 
-
-	/**
-	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
-	 * `forward_static_call_array()`, and improves performance by using straight method calls
-	 * in most cases.
-	 *
-	 * @param string $method Name of the method to call.
-	 * @param array $params Parameter list to use when calling `$method`.
-	 * @return mixed Returns the result of the method call.
-	 */
-	public static function invokeMethod($method, $params = []) {
-		switch (count($params)) {
-			case 0:
-				return static::$method();
-			case 1:
-				return static::$method($params[0]);
-			case 2:
-				return static::$method($params[0], $params[1]);
-			case 3:
-				return static::$method($params[0], $params[1], $params[2]);
-			case 4:
-				return static::$method($params[0], $params[1], $params[2], $params[3]);
-			case 5:
-				return static::$method($params[0], $params[1], $params[2], $params[3], $params[4]);
-			default:
-				return forward_static_call_array([get_called_class(), $method], $params);
-		}
-	}
-
 	/**
 	 * Determines if a given method can be called.
 	 *
@@ -96,6 +67,38 @@ class StaticObject {
 	 * @var array Method filters, indexed by `get_called_class()`.
 	 */
 	protected static $_methodFilters = [];
+
+	/**
+	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
+	 * `forward_static_call_array()`, and improves performance by using straight method calls
+	 * in most cases.
+	 *
+	 * @deprecated
+	 * @param string $method Name of the method to call.
+	 * @param array $params Parameter list to use when calling `$method`.
+	 * @return mixed Returns the result of the method call.
+	 */
+	public static function invokeMethod($method, $params = []) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		switch (count($params)) {
+			case 0:
+				return static::$method();
+			case 1:
+				return static::$method($params[0]);
+			case 2:
+				return static::$method($params[0], $params[1]);
+			case 3:
+				return static::$method($params[0], $params[1], $params[2]);
+			case 4:
+				return static::$method($params[0], $params[1], $params[2], $params[3]);
+			case 5:
+				return static::$method($params[0], $params[1], $params[2], $params[3], $params[4]);
+			default:
+				return forward_static_call_array([get_called_class(), $method], $params);
+		}
+	}
 
 	/**
 	 * Exit immediately. Primarily used for overrides during testing.

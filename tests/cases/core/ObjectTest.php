@@ -31,61 +31,6 @@ class ObjectTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests that the correct parameters are always passed in Object::invokeMethod(), regardless of
-	 * the number.
-	 */
-	public function testMethodInvocationWithParameters() {
-		$callable = new MockCallable();
-
-		$result = $callable->invokeMethod('foo');
-		$this->assertEqual($result['method'], 'foo');
-		$this->assertEqual($result['params'], []);
-
-		$expected = ['bar'];
-		$result = $callable->invokeMethod('foo', $expected);
-		$this->assertEqual($result['method'], 'foo');
-		$this->assertEqual($result['params'], $expected);
-
-		$expected = ['one', 'two'];
-		$result = $callable->invokeMethod('foo', $expected);
-		$this->assertEqual($result['method'], 'foo');
-		$this->assertEqual($result['params'], $expected);
-
-		$expected = ['short', 'parameter', 'list'];
-		$result = $callable->invokeMethod('foo', $expected);
-		$this->assertEqual($result['method'], 'foo');
-		$this->assertEqual($result['params'], $expected);
-
-		$expected = ['a', 'longer', 'parameter', 'list'];
-		$result = $callable->invokeMethod('foo', $expected);
-		$this->assertEqual($result['method'], 'foo');
-		$this->assertEqual($result['params'], $expected);
-
-		$expected = ['a', 'much', 'longer', 'parameter', 'list'];
-		$result = $callable->invokeMethod('foo', $expected);
-		$this->assertEqual($result['method'], 'foo');
-		$this->assertEqual($result['params'], $expected);
-
-		$expected = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
-		$result = $callable->invokeMethod('foo', $expected);
-		$this->assertEqual($result['method'], 'foo');
-		$this->assertEqual($result['params'], $expected);
-
-		$expected = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
-		$result = $callable->invokeMethod('bar', $expected);
-		$this->assertEqual($result['method'], 'bar');
-		$this->assertEqual($result['params'], $expected);
-
-		$expected = [
-			'if', 'you', 'have', 'a', 'parameter', 'list', 'this',
-			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
-		];
-		$result = $callable->invokeMethod('foo', $expected);
-		$this->assertEqual($result['method'], 'foo');
-		$this->assertEqual($result['params'], $expected);
-	}
-
-	/**
 	 * Test configuration handling
 	 */
 	public function testObjectConfiguration() {
@@ -320,6 +265,63 @@ class ObjectTest extends \lithium\test\Unit {
 
 		Filters::clear('lithium\tests\mocks\core\MockMethodFiltering');
 		error_reporting($original);
+	}
+
+	/**
+	 * Tests that the correct parameters are always passed in Object::invokeMethod(), regardless of
+	 * the number.
+	 *
+	 * @deprecated
+	 */
+	public function testMethodInvocationWithParameters() {
+		$callable = new MockCallable();
+
+		$result = $callable->invokeMethod('foo');
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], []);
+
+		$expected = ['bar'];
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
+
+		$expected = ['one', 'two'];
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
+
+		$expected = ['short', 'parameter', 'list'];
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
+
+		$expected = ['a', 'longer', 'parameter', 'list'];
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
+
+		$expected = ['a', 'much', 'longer', 'parameter', 'list'];
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
+
+		$expected = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
+
+		$expected = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
+		$result = $callable->invokeMethod('bar', $expected);
+		$this->assertEqual($result['method'], 'bar');
+		$this->assertEqual($result['params'], $expected);
+
+		$expected = [
+			'if', 'you', 'have', 'a', 'parameter', 'list', 'this',
+			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
+		];
+		$result = $callable->invokeMethod('foo', $expected);
+		$this->assertEqual($result['method'], 'foo');
+		$this->assertEqual($result['params'], $expected);
 	}
 }
 

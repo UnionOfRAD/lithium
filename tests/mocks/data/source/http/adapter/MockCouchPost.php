@@ -26,9 +26,9 @@ class MockCouchPost extends \lithium\data\Model {
 
 	public static function resetSchema($array = false) {
 		if ($array) {
-			return static::_object()->_schema = [];
+			return static::object()->_schema = [];
 		}
-		static::_object()->_schema = new DocumentSchema();
+		static::object()->_schema = new DocumentSchema();
 	}
 }
 

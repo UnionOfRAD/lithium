@@ -437,7 +437,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return object
 	 */
 	protected static function _instance($name, array $options = []) {
-		$self = static::_object();
+		$self = static::object();
 		if (is_string($name) && isset($self->_classes[$name])) {
 			$name = $self->_classes[$name];
 		}
@@ -472,7 +472,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return mixed Results of dispatched `Model::find()` call.
 	 */
 	public static function __callStatic($method, $params) {
-		$self = static::_object();
+		$self = static::object();
 
 		if (isset($self->_finders[$method])) {
 			if (count($params) === 2 && is_array($params[1])) {
@@ -527,7 +527,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public static function respondsTo($method, $internal = false) {
-		$self = static::_object();
+		$self = static::object();
 		$methods = static::instanceMethods();
 		$isFinder = isset($self->_finders[$method]);
 		preg_match('/^findBy(?P<field>\w+)$|^find(?P<type>\w+)By(?P<fields>\w+)$/', $method, $args);
@@ -609,7 +609,7 @@ class Model extends \lithium\core\StaticObject {
 	 *         or after i.e. for caching results.
 	 */
 	public static function find($type, array $options = []) {
-		$self = static::_object();
+		$self = static::object();
 
 		if (is_object($type) || !isset($self->_finders[$type])) {
 			$options['conditions'] = static::key($type);
@@ -693,7 +693,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return callable|void Returns finder definition if querying, or void if setting.
 	 */
 	public static function finder($name, $finder = null) {
-		$self = static::_object();
+		$self = static::object();
 
 		if ($finder === null) {
 			return isset($self->_finders[$name]) ? $self->_finders[$name] : null;
@@ -714,7 +714,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return array
 	 */
 	protected static function _finders() {
-		$self = static::_object();
+		$self = static::object();
 
 		return [
 			'all' => function($params, $next) {
@@ -753,7 +753,7 @@ class Model extends \lithium\core\StaticObject {
 					$options = $params['options'];
 				}
 				$options += ['type' => 'read', 'model' => $self];
-				$query = $self::invokeMethod('_instance', ['query', $options]);
+				$query = $self::_instance('query', $options);
 				return $self::connection()->calculation('count', $query, $options);
 			}
 		];
@@ -774,7 +774,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return mixed Returns the query definition if querying, or `null` if setting.
 	 */
 	public static function query($query = null) {
-		$self = static::_object();
+		$self = static::object();
 
 		if (!$query) {
 			return $self->_query;
@@ -791,7 +791,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return mixed Metadata value for a given key.
 	 */
 	public static function meta($key = null, $value = null) {
-		$self = static::_object();
+		$self = static::object();
 		$isArray = is_array($key);
 
 		if ($value || $isArray) {
@@ -857,7 +857,7 @@ class Model extends \lithium\core\StaticObject {
 			return $key;
 		}
 
-		$self = static::_object();
+		$self = static::object();
 		$entity = $self->_classes['entity'];
 		if (is_object($values) && is_string($key)) {
 			return static::_key($key, $values, $entity);
@@ -907,7 +907,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return array|object|void An array of relation instances or an instance of relation.
 	 */
 	public static function relations($type = null) {
-		$self = static::_object();
+		$self = static::object();
 
 		if ($type === null) {
 			return static::_relations();
@@ -936,7 +936,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return An array of relation instances or an instance of relation.
 	 */
 	protected static function _relations($type = null, $name = null) {
-		$self = static::_object();
+		$self = static::object();
 
 		if ($name) {
 			if (isset($self->_relationsToLoad[$name])) {
@@ -978,7 +978,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return object Returns an instance of the `Relationship` class that defines the connection.
 	 */
 	public static function bind($type, $name, array $config = []) {
-		$self = static::_object();
+		$self = static::object();
 		if (!isset($config['fieldName'])) {
 			$config['fieldName'] = $self->_relationFieldName($type, $name);
 		}
@@ -1002,7 +1002,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @return array|lithium\data\Schema
 	 */
 	public static function schema($field = null) {
-		$self = static::_object();
+		$self = static::object();
 
 		if (!is_object($self->_schema)) {
 			$self->_schema = static::connection()->describe(
@@ -1200,7 +1200,7 @@ class Model extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public function save($entity, $data = null, array $options = []) {
-		$self = static::_object();
+		$self = static::object();
 		$_meta = ['model' => get_called_class()] + $self->_meta;
 		$_schema = $self->schema();
 
@@ -1313,7 +1313,7 @@ class Model extends \lithium\core\StaticObject {
 		if ($options['required'] === null) {
 			$options['required'] = !$entity->exists();
 		}
-		$self = static::_object();
+		$self = static::object();
 		$validator = $self->_classes['validator'];
 		$entity->errors(false);
 		$params = compact('entity', 'options');
@@ -1426,7 +1426,7 @@ class Model extends \lithium\core\StaticObject {
 	 *         to which this model is bound.
 	 */
 	public static function &connection() {
-		$self = static::_object();
+		$self = static::object();
 		$connections = $self->_classes['connections'];
 		$name = isset($self->_meta['connection']) ? $self->_meta['connection'] : null;
 
@@ -1438,7 +1438,14 @@ class Model extends \lithium\core\StaticObject {
 		throw new ConfigException($msg);
 	}
 
-	protected static function &_object() {
+	/**
+	 * Retrieves a configured and initialized instance of the class.
+	 *
+	 * @see lithium\data\Model::$_instances
+	 * @see lithium\data\Model::reset()
+	 * @return \lithium\data\Model An instance of the class.
+	 */
+	public static function &object() {
 		$class = get_called_class();
 
 		if (!isset(static::$_instances[$class])) {
@@ -1468,7 +1475,7 @@ class Model extends \lithium\core\StaticObject {
 			return;
 		}
 
-		$self = static::_object();
+		$self = static::object();
 
 		foreach ($self->_relationTypes as $type) {
 			$self->$type = Set::normalize($self->$type);
@@ -1517,11 +1524,32 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Resetting the model.
+	 * Resets the model.
+	 *
+	 * @see lithium\data\Model::$_instances
+	 * @return void
 	 */
 	public static function reset() {
 		$class = get_called_class();
 		unset(static::$_instances[$class]);
+	}
+
+	/* Deprecated / BC */
+
+	/**
+	 * Retrieves a configured and initialized instance of the class.
+	 *
+	 * @deprecated
+	 * @see lithium\data\Model::$_instances
+	 * @see lithium\data\Model::reset()
+	 * @return \lithium\data\Model An instance of the class.
+	 */
+	protected static function &_object() {
+		$message  = '`' . __METHOD__ . '()` has been made public. ';
+		$message .= 'Use `\lithium\data\Model::object()` instead.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		return static::object();
 	}
 }
 

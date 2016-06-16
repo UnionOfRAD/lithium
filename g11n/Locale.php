@@ -74,7 +74,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * @return mixed
 	 */
 	public static function __callStatic($method, $params = []) {
-		$tags = static::invokeMethod('decompose', $params);
+		$tags = static::decompose(current($params));
 
 		if (!isset(static::$_tags[$method])) {
 			throw new BadMethodCallException("Invalid locale tag `{$method}`.");

@@ -1086,10 +1086,10 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testLazyLoad() {
-		$object = MockPost::invokeMethod('_object');
+		$object = MockPost::object();
 		$object->belongsTo = ['Unexisting'];
 		MockPost::config();
-		MockPost::invokeMethod('_initialize', ['lithium\tests\mocks\data\MockPost']);
+		MockPost::initialize('lithium\tests\mocks\data\MockPost');
 		$exception = 'Related model class \'lithium\tests\mocks\data\Unexisting\' not found.';
 		$this->assertException($exception, function() {
 			MockPost::relations('Unexisting');

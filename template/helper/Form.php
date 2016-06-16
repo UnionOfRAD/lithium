@@ -195,7 +195,7 @@ class Form extends \lithium\template\Helper {
 		parent::_init();
 
 		if ($this->_context) {
-			$this->_context->handlers(['wrap' => '_attributes']);
+			$this->_context->handlers(['wrap' => 'attributes']);
 		}
 	}
 

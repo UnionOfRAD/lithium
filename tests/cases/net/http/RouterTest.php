@@ -13,6 +13,7 @@ use lithium\action\Request;
 use lithium\net\http\Router;
 use lithium\action\Response;
 use lithium\tests\mocks\action\MockDispatcher;
+use lithium\tests\mocks\net\http\MockRouter;
 
 class RouterTest extends \lithium\test\Unit {
 
@@ -918,9 +919,9 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	public function testCompileScopeAbsolute() {
-		$result = Router::invokeMethod('_compileScope', [[
+		$result = MockRouter::compileScope([
 			'absolute' => true
-		]]);
+		]);
 		$expected = [
 			'absolute' => true,
 			'host' => null,
@@ -934,12 +935,12 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	public function testCompileScopeAbsoluteWithPrefix() {
-		$result = Router::invokeMethod('_compileScope', [[
+		$result = MockRouter::compileScope([
 			'absolute' => true,
 			'host' => 'www.hostname.com',
 			'scheme' => 'http',
 			'prefix' => 'web/tests'
-		]]);
+		]);
 
 		$expected = [
 			'absolute' => true,
@@ -954,12 +955,12 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	public function testCompileScopeAbsoluteWithVariables() {
-		$result = Router::invokeMethod('_compileScope', [[
+		$result = MockRouter::compileScope([
 			'absolute' => true,
 			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
 			'scheme' => 'http',
 			'prefix' => 'web/tests'
-		]]);
+		]);
 
 		$expected = [
 			'absolute' => true,
@@ -973,12 +974,12 @@ class RouterTest extends \lithium\test\Unit {
 		];
 		$this->assertEqual($expected, $result);
 
-		$result = Router::invokeMethod('_compileScope', [[
+		$result = MockRouter::compileScope([
 			'absolute' => true,
 			'host' => '{:subdomain:[a-z]+}.{:domain}.{:tld}',
 			'scheme' => '{:scheme:https}',
 			'prefix' => ''
-		]]);
+		]);
 
 		$expected = [
 			'absolute' => true,
@@ -1004,7 +1005,7 @@ class RouterTest extends \lithium\test\Unit {
 			'host' => 'www.atari.com',
 			'scheme' => 'http'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertIdentical('/', $result);
 	}
 
@@ -1019,7 +1020,7 @@ class RouterTest extends \lithium\test\Unit {
 			'host' => 'www.atari.com',
 			'scheme' => 'http'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertFalse($result);
 
 		Router::attach('app', [
@@ -1027,7 +1028,7 @@ class RouterTest extends \lithium\test\Unit {
 			'host' => 'www.amiga.com',
 			'scheme' => 'http'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertIdentical('/', $result);
 	}
 
@@ -1043,7 +1044,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => '/web'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertIdentical('/', $result);
 	}
 
@@ -1059,7 +1060,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => '/web'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertFalse($result);
 
 		Router::attach('app', [
@@ -1068,7 +1069,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => '/web'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertIdentical('/', $result);
 	}
 
@@ -1085,7 +1086,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => '/web'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertIdentical('/', $result);
 
 		Router::attach('app', [
@@ -1094,7 +1095,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => '/web2'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertFalse($result);
 	}
 
@@ -1115,7 +1116,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => '/web'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertFalse($result);
 
 		$request = new Request([
@@ -1134,7 +1135,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => '/web'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertIdentical('/', $result);
 	}
 
@@ -1155,7 +1156,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => '/web'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertFalse($result);
 
 		Router::attach('app', [
@@ -1164,7 +1165,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => '/web'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertIdentical('/', $result);
 
 		Router::attach('app', [
@@ -1173,7 +1174,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => '/web2'
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertFalse($result);
 	}
 
@@ -1194,7 +1195,7 @@ class RouterTest extends \lithium\test\Unit {
 			'scheme' => 'http',
 			'prefix' => ''
 		]);
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertFalse($result);
 
 		$request = new Request([
@@ -1214,7 +1215,7 @@ class RouterTest extends \lithium\test\Unit {
 			'prefix' => ''
 		]);
 
-		$result = Router::invokeMethod('_parseScope', ['app', $request]);
+		$result = MockRouter::parseScope('app', $request);
 		$this->assertIdentical('/', $result);
 	}
 
