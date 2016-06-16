@@ -43,6 +43,8 @@ use lithium\aop\Filters;
  */
 class Controller extends \lithium\core\Object {
 
+	use \lithium\core\MergeInheritable;
+
 	/**
 	 * Contains an instance of the `Request` object with all the details of the HTTP request that
 	 * was dispatched to the controller object. Any parameters captured in routing, such as
@@ -158,16 +160,7 @@ class Controller extends \lithium\core\Object {
 	protected function _init() {
 		parent::_init();
 
-		foreach (static::_parents() as $parent) {
-			$inherit = get_class_vars($parent);
-
-			if (isset($inherit['_render'])) {
-				$this->_render += $inherit['_render'];
-			}
-			if ($parent === __CLASS__) {
-				break;
-			}
-		}
+		$this->_inherit(['_render']);
 
 		$this->request = $this->request ?: $this->_config['request'];
 		$this->response = $this->_instance('response', $this->_config['response']);

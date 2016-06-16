@@ -33,6 +33,11 @@
 
 - `openssl_random_pseudo_bytes()` has been added as a new RNG source.
 
+- Added `core\MergeInheritable` trait which allows classes to merge their array
+  properties with such properties defined in class parents. Used mainly for
+  merging `action\Controller::$_render` and `data\Model` properties. Also 
+  slightly optimizes memory usage in said classes.
+
 ### Changed
 
 - The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 
@@ -52,6 +57,14 @@
   ['template' => '/path/to/template'] // short deprecated syntax
   ['template' => ['path' => '/path/to/template']] // full valid syntax
   ```
+
+- `Object` and `StaticObject` are beeing step by step deprecated, as
+  `Object` is soft-reserved in PHP >=7. Chance is taken for a cleanup of the
+  class-hirarchy and unused/obsolete methods.
+
+  | old | new |
+  | --- | --- |
+  | `*Object::_parents()` | _no replacement_, for inheritance use `lithium\core\MergeInheritable::_inherit()` |
 
 ### Fixed
 

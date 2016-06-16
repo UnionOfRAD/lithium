@@ -77,6 +77,8 @@ use BadMethodCallException;
  */
 class Model extends \lithium\core\StaticObject {
 
+	use \lithium\core\MergeInheritable;
+
 	/**
 	 * Criteria for data validation.
 	 *
@@ -305,7 +307,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Holds an array of attributes to be inherited.
 	 *
-	 * @see lithium\data\Model::_inherited()
+	 * @see lithium\data\Model::_initialize()
 	 * @var array
 	 */
 	protected $_inherits = [];
@@ -360,7 +362,24 @@ class Model extends \lithium\core\StaticObject {
 		}
 		static::$_initialized[$class] = true;
 
-		$self->_inherit();
+		$properties = [
+			'validates',
+			'belongsTo',
+			'hasMany',
+			'hasOne',
+			'_meta',
+			'_finders',
+			'_query',
+			'_classes',
+			'_initializers'
+		];
+		if (is_array($self->_schema)) {
+			$properties[] = '_schema';
+		}
+		if ($self->_inherits) {
+			$properties = array_merge($self->_inherits, $properties);
+		}
+		$self->_inherit($properties);
 
 		$source = [
 			'classes' => [], 'meta' => [], 'finders' => [], 'schema' => []
@@ -406,57 +425,6 @@ class Model extends \lithium\core\StaticObject {
 
 		static::_relationsToLoad();
 		return $self;
-	}
-
-	/**
-	 * Merge parent class attributes to the current instance.
-	 */
-	protected function _inherit() {
-
-		$inherited = array_fill_keys($this->_inherited(), []);
-
-		foreach (static::_parents() as $parent) {
-			$parentConfig = get_class_vars($parent);
-
-			foreach ($inherited as $key => $value) {
-				if (isset($parentConfig["{$key}"])) {
-					$val = $parentConfig["{$key}"];
-					if (is_array($val)) {
-						$inherited[$key] += $val;
-					}
-				}
-			}
-
-			if ($parent === __CLASS__) {
-				break;
-			}
-		}
-
-		foreach ($inherited as $key => $value) {
-			if (is_array($this->{$key})) {
-				$this->{$key} += $value;
-			}
-		}
-	}
-
-	/**
-	 * Return inherited attributes.
-	 *
-	 * @param array
-	 */
-	protected function _inherited() {
-		return array_merge($this->_inherits, [
-			'validates',
-			'belongsTo',
-			'hasMany',
-			'hasOne',
-			'_meta',
-			'_finders',
-			'_query',
-			'_schema',
-			'_classes',
-			'_initializers'
-		]);
 	}
 
 	/**

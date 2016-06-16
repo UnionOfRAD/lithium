@@ -20,6 +20,16 @@ use lithium\tests\mocks\core\MockInstantiator;
 
 class ObjectTest extends \lithium\test\Unit {
 
+	protected $_backup = null;
+
+	public function setUp() {
+		error_reporting(($this->_backup = error_reporting()) & ~E_USER_DEPRECATED);
+	}
+
+	public function tearDown() {
+		error_reporting($this->_backup);
+	}
+
 	/**
 	 * Tests that the correct parameters are always passed in Object::invokeMethod(), regardless of
 	 * the number.
@@ -73,16 +83,6 @@ class ObjectTest extends \lithium\test\Unit {
 		$result = $callable->invokeMethod('foo', $expected);
 		$this->assertEqual($result['method'], 'foo');
 		$this->assertEqual($result['params'], $expected);
-	}
-
-	public function testParents() {
-		$expected = ['lithium\core\Object' => 'lithium\core\Object'];
-
-		$result = MockObjectForParents::parents();
-		$this->assertEqual($expected, $result);
-
-		$result = MockObjectForParents::parents();
-		$this->assertEqual($expected, $result);
 	}
 
 	/**
@@ -158,6 +158,16 @@ class ObjectTest extends \lithium\test\Unit {
 	}
 
 	/* Deprecated / BC */
+
+	public function testParents() {
+		$expected = ['lithium\core\Object' => 'lithium\core\Object'];
+
+		$result = MockObjectForParents::parents();
+		$this->assertEqual($expected, $result);
+
+		$result = MockObjectForParents::parents();
+		$this->assertEqual($expected, $result);
+	}
 
 	public function testMethodFiltering() {
 		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);

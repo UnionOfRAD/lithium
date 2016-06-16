@@ -56,14 +56,6 @@ class Object {
 	protected $_autoConfig = [];
 
 	/**
-	 * Parents of the current class.
-	 *
-	 * @see lithium\core\Object::_parents()
-	 * @var array
-	 */
-	protected static $_parents = [];
-
-	/**
 	 * Constructor. Initializes class configuration (`$_config`), and assigns object properties
 	 * using the `_init()` method, unless otherwise specified by configuration. See below for
 	 * details.
@@ -200,20 +192,6 @@ class Object {
 	}
 
 	/**
-	 * Gets and caches an array of the parent methods of a class.
-	 *
-	 * @return array Returns an array of parent classes for the current class.
-	 */
-	protected static function _parents() {
-		$class = get_called_class();
-
-		if (!isset(static::$_parents[$class])) {
-			static::$_parents[$class] = class_parents($class);
-		}
-		return static::$_parents[$class];
-	}
-
-	/**
 	 * Exit immediately. Primarily used for overrides during testing.
 	 *
 	 * @param integer|string $status integer range 0 to 254, string printed on exit
@@ -226,6 +204,15 @@ class Object {
 	/* Deprecated / BC */
 
 	/**
+	 * Parents of the current class.
+	 *
+	 * @deprecated
+	 * @see lithium\core\Object::_parents()
+	 * @var array
+	 */
+	protected static $_parents = [];
+
+	/**
 	 * Contains a 2-dimensional array of filters applied to this object's methods, indexed by method
 	 * name. See the associated methods for more details.
 	 *
@@ -235,6 +222,25 @@ class Object {
 	 * @var array
 	 */
 	protected $_methodFilters = [];
+
+	/**
+	 * Gets and caches an array of the parent methods of a class.
+	 *
+	 * @deprecated
+	 * @return array Returns an array of parent classes for the current class.
+	 */
+	protected static function _parents() {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. For property merging ';
+		$message .= 'use `\lithium\core\MergeInheritable::_inherit()`';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		$class = get_called_class();
+
+		if (!isset(self::$_parents[$class])) {
+			static::$_parents[$class] = class_parents($class);
+		}
+		return static::$_parents[$class];
+	}
 
 	/**
 	 * Apply a closure to a method of the current object instance.
