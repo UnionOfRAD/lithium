@@ -509,21 +509,33 @@ class DatabaseTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $this->_db->sql);
 	}
 
+	/**
+	 * @link https://github.com/UnionOfRAD/lithium/issues/1281
+	 */
 	public function testCalculation() {
-		$backup = error_reporting();
-		error_reporting(E_ALL);
+		$options = array(
+			'type' => 'read',
+			'model' => $this->_model
+		);
 
-		$options = array('type' => 'read', 'model' => $this->_model);
-		$result = null;
-		$db = $this->_db;
+		$this->_db->return['_execute'] = new MockResult(array(
+			'records' => array(
+				array(23)
+			)
+		));
+		$expected = 23;
+		$result = $this->_db->calculation('count', new Query($options), $options);
+		$this->assertEqual($expected, $result);
 
-		$this->assertException('Undefined offset: 0', function() use (&$result, $options, $db) {
-			$result = $db->calculation('count', new Query($options), $options);
-		});
 		$expected = 'SELECT COUNT(*) as count FROM {mock_database_posts} AS {MockDatabasePost};';
-		$this->assertEqual($expected, $this->_db->sql);
+		$result = $this->_db->sql;
+		$this->assertEqual($expected, $result);
 
-		error_reporting($backup);
+		$this->_db->return['_execute'] = new MockResult(array(
+			'records' => array()
+		));
+		$result = $this->_db->calculation('count', new Query($options), $options);
+		$this->assertNull($result);
 	}
 
 	public function testReadWithQueryStringReturnArrayWithSchema() {

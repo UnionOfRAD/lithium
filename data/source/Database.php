@@ -729,7 +729,7 @@ abstract class Database extends \lithium\data\Source {
 	 * @param mixed $query The query to be executed.
 	 * @param array $options Optional arguments for the `read()` query that will be executed
 	 *        to obtain the calculation result.
-	 * @return integer Result of the calculation.
+	 * @return integer|null Result of the calculation or `null` if the calculation failed.
 	 */
 	public function calculation($type, $query, array $options = array()) {
 		$query->calculate($type);
@@ -741,8 +741,13 @@ abstract class Database extends \lithium\data\Source {
 				}
 				$query->fields("COUNT({$fields}) as count", true);
 				$query->map(array($query->alias() => array('count')));
-				list($record) = $this->read($query, $options)->data();
-				return isset($record['count']) ? (integer) $record['count'] : null;
+
+				$result = $this->read($query, $options)->data();
+
+				if (!$result || !isset($result[0]['count'])) {
+					return null;
+				}
+				return (integer) $result[0]['count'];
 		}
 	}
 
