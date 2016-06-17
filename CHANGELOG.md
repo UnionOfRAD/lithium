@@ -341,6 +341,21 @@
 
 - Fixed parsing certain exception details in `Database` i.e. `pgsql unknown role exception`.
 
+## v1.0.1
+
+### Fixed
+
+- Result-less queries produced by performing a raw query 
+  i.e. `'SET SESSION group_concat_max_len = 1000000;'` are now handled correcly.
+
+- Fixes MySQL DSN socket support when a socket path is given in `'host'`. 
+
+- When using the model `count` finder without a `'conditions'` key, options
+  like `having`, `offset`, `group` were mistakenly interpreted as conditions.
+
+- Calculation queries returning no results at all, do not error out, but
+  return `null` now.
+
 ## v1.0.0
 
 (This includes changes from 1.0.0-beta on only.)

@@ -287,12 +287,16 @@ class Model extends \lithium\core\StaticObject {
 	 * @var array
 	 */
 	protected $_query = array(
-		'conditions' => null,
 		'fields'     => null,
+		'conditions' => null,
+		'having'     => null,
+		'group'      => null,
 		'order'      => null,
 		'limit'      => null,
+		'offset'     => null,
 		'page'       => null,
-		'with'       => array()
+		'with'       => array(),
+		'joins'      => array()
 	);
 
 	/**

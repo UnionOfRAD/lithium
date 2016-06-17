@@ -16,7 +16,7 @@ use lithium\core\NetworkException;
  * This stream adapter provides the required method implementations of the abstract `Socket` class
  * for the `open()`, `close()`, `read()`, `write()`, `timeout()` `eof()` and `encoding()` methods.
  *
- * @link http://php.net/book.stream.php PHP Manual: Streams
+ * @link http://php.net/book.stream.php
  * @see lithium\net\socket\Stream
  */
 class Stream extends \lithium\net\Socket {

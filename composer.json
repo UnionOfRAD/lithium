@@ -18,7 +18,7 @@
         "composer/installers": "1.*"
     },
     "require-dev": {
-        "unionofrad/li3_fixtures": "1.0.*@RC"
+        "unionofrad/li3_fixtures": "1.0.*"
     },
     "bin" : ["console/li3"]
 }
