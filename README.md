@@ -2,7 +2,7 @@
 
 ### You asked for a better framework. Here it is.
 
-li₃ is fast, flexible and the most RAD development framework for PHP.
+li₃ is the fast, flexible and the most RAD development framework for PHP.
 
 ### A framework of firsts
 
