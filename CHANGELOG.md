@@ -364,6 +364,9 @@
 - Calculation queries returning no results at all, do not error out, but
   return `null` now.
 
+- Extraction of translation tokens using context together with short array syntax
+  is now fully supported.
+
 ## v1.0.0
 
 (This includes changes from 1.0.0-beta on only.)
