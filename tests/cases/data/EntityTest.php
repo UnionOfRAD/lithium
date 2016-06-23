@@ -78,7 +78,7 @@ class EntityTest extends \lithium\test\Unit {
 		$entity->bar = 'blah';
 		$entity->sync();
 
-		$this->assertException("/^Field 'bar' cannot be incremented.$/", function() use ($entity) {
+		$this->assertException("/^Field `'bar'` cannot be incremented.$/", function() use ($entity) {
 			$entity->increment('bar');
 		});
 	}

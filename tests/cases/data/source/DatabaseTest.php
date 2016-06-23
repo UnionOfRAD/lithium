@@ -1848,7 +1848,7 @@ SQL;
 		$expected = "UPDATE {mock_database_posts} SET {balance} = 20 WHERE {id} = 1;";
 		$this->assertEqual($expected, $this->_db->sql);
 
-		$this->assertException("Field 'name' cannot be incremented.", function() use ($entity) {
+		$this->assertException("Field `'name'` cannot be incremented.", function() use ($entity) {
 			$entity->name = 'Ali';
 			$entity->increment('name', 10);
 		});

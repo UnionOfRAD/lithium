@@ -13,19 +13,19 @@ class TestRenderer extends \lithium\template\view\adapter\File implements \Array
 			if (!file_exists($path = Text::insert($path, $params))) {
 				continue;
 			}
-			self::$templateData[] = compact('type', 'params') + array(
+			static::$templateData[] = compact('type', 'params') + array(
 				'return' => $path
 			);
 			return $path;
 		}
-		self::$templateData[] = compact('type', 'params') + array(
+		static::$templateData[] = compact('type', 'params') + array(
 			'return' => false
 		);
 		return false;
 	}
 
 	public function render($template, $data = array(), array $options = array()) {
-		self::$renderData[] = compact('template', 'data', 'options');
+		static::$renderData[] = compact('template', 'data', 'options');
 		ob_start();
 		include $template;
 		return ob_get_clean();

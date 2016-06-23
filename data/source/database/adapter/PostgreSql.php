@@ -40,7 +40,6 @@ class PostgreSql extends \lithium\data\source\Database {
 	 */
 	const DEFAULT_PORT = 5432;
 
-
 	/**
 	 * PostgreSQL column type definitions.
 	 *

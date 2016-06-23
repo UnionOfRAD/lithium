@@ -112,15 +112,55 @@ class MongoDb extends \lithium\data\Source {
 	protected $_boolean = array('&&', '||', 'and', '$and', 'or', '$or', 'nor', '$nor');
 
 	/**
-	 * A closure or anonymous function which receives an instance of this class, a collection name
-	 * and associated meta information, and returns an array defining the schema for an associated
-	 * model, where the keys are field names, and the values are arrays defining the type
-	 * information for each field. At a minimum, type arrays must contain a `'type'` key. For more
-	 * information on schema definitions, and an example schema callback implementation, see the
+	 * A closure or anonymous function which receives an instance of this class, a
+	 * collection name and associated meta information, and returns an array defining the
+	 * schema for an associated model, where the keys are field names, and the values are
+	 * arrays defining the type information for each field. At a minimum, type arrays
+	 * must contain a `'type'` key. For more information on schema definitions see the
 	 * `$_schema` property of the `Model` class.
 	 *
+	 * This example shows how to implement a schema callback in your database connection
+	 * configuration that fetches and returns the schema data. It defines an optional
+	 * MongoDB convention in which the schema for each individual collection is stored
+	 * in a `schemas` collection, where each document contains the name of a collection,
+	 * along with a `'data'` key, which contains the schema for that collection.
+	 *
+	 * ```
+	 * Connections::add('default', array(
+	 *  'type' => 'MongoDb',
+	 *  'host' => 'localhost',
+	 *  'database' => 'app',
+	 *  'schema' => function($db, $collection, $meta) {
+	 *      $result = $db->connection->schemas->findOne(compact('collection'));
+	 *      return $result ? $result['data'] : array();
+	 *  }
+	 * ));
+	 * ```
+	 *
+	 * A complete schema defintion looks like:
+	 * ```
+	 * array(
+	 *     '_id'  => array('type' => 'id'),
+	 *     'name' => array('type' => 'string', 'default' => 'Moe', 'null' => false),
+	 *     'sign' => array('type' => 'string', 'default' => 'bar', 'null' => false),
+	 *     'age'  => array('type' => 'integer', 'default' => 0, 'null' => false)
+	 * );
+	 * ```
+	 *
+	 * The tyes in the schema map to database native type like this:
+	 * ```
+	 *  id      => MongoId
+	 *  date    => MongoDate
+	 *  regex   => MongoRegex
+	 *  integer => integer
+	 *  float   => float
+	 *  boolean => boolean
+	 *  code    => MongoCode
+	 *  binary  => MongoBinData
+	 * ```
+	 *
 	 * @see lithium\data\Model::$_schema
-	 * @var Closure
+	 * @var Closure|null
 	 */
 	protected $_schema = null;
 

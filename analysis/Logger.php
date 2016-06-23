@@ -106,7 +106,7 @@ class Logger extends \lithium\core\Adaptable {
 		$options += $defaults;
 		$result = true;
 
-		if (isset(self::$_configurations[$options['name']])) {
+		if (isset(static::$_configurations[$options['name']])) {
 			$name = $options['name'];
 			$methods = array($name => static::adapter($name)->write($priority, $message, $options));
 		} elseif (!isset(static::$_priorities[$priority])) {

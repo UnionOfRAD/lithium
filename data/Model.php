@@ -162,7 +162,6 @@ class Model extends \lithium\core\StaticObject {
 	 * List of relation types.
 	 *
 	 * Valid relation types are:
-	 *
 	 * - `belongsTo`
 	 * - `hasOne`
 	 * - `hasMany`
@@ -212,78 +211,49 @@ class Model extends \lithium\core\StaticObject {
 	protected $_initializers = array();
 
 	/**
-	 * Stores the data schema.
+	 * Defines the data schema in array notation or, after initialization, holds the
+	 * schema object.
 	 *
-	 * The schema is lazy-loaded by the first call to `Model::schema()`, unless it has been
-	 * manually defined in the `Model` subclass.
+	 * `Model` subclasses can manually define a schema in array notation. The array
+	 * notation will then be lazily converted to a schema object by the first call to
+	 * `Model::schema()`.
 	 *
-	 * For schemaless persistent storage (e.g. MongoDB), this is never populated automatically - if
-	 * you desire a fixed schema to interact with in those cases, you will be required to define it
-	 * yourself.
+	 * The schema should only be defined in subclasses for schemaless persistent data
+	 * sources (e.g. MongoDB), for all other data sources this is done automatically. If
+	 * you desire a fixed schema for a schemaless data source, the following example shows
+	 * how you'd define one manually.
 	 *
-	 * Example:
+	 * For MongoDB specifically, you can also automate schema definition. Please see
+	 * lithium\data\soure\MondoDb::$_schema for more information.
+	 *
 	 * ```
 	 * protected $_schema = array(
-	 *     '_id'  => array('type' => 'id'), // required for Mongo
+	 *     '_id'  => array('type' => 'id'),
 	 *     'name' => array('type' => 'string', 'default' => 'Moe', 'null' => false),
 	 *     'sign' => array('type' => 'string', 'default' => 'bar', 'null' => false),
 	 *     'age'  => array('type' => 'integer', 'default' => 0, 'null' => false)
 	 * );
 	 * ```
 	 *
-	 * For MongoDB specifically, you can also implement a callback in your database connection
-	 * configuration that fetches and returns the schema data, as in the following:
-	 *
-	 * ```
-	 * // config/bootstrap/connections.php:
-	 * Connections::add('default', array(
-	 *  'type' => 'MongoDb',
-	 *  'host' => 'localhost',
-	 *  'database' => 'app_name',
-	 *  'schema' => function($db, $collection, $meta) {
-	 *      $result = $db->connection->schemas->findOne(compact('collection'));
-	 *      return $result ? $result['data'] : array();
-	 *  }
-	 * ));
-	 * ```
-	 *
-	 * This example defines an optional MongoDB convention in which the schema for each individual
-	 * collection is stored in a "schemas" collection, where each document contains the name of
-	 * a collection, along with a `'data'` key, which contains the schema for that collection, in
-	 * the format specified above.
-	 *
-	 * When defining `'$_schema'` where the data source is MongoDB, the types map to database
-	 * types as follows:
-	 *
-	 * ```
-	 *  id      => MongoId
-	 *  date    => MongoDate
-	 *  regex   => MongoRegex
-	 *  integer => integer
-	 *  float   => float
-	 *  boolean => boolean
-	 *  code    => MongoCode
-	 *  binary  => MongoBinData
-	 * ```
-	 *
 	 * @see lithium\data\source\MongoDb::$_schema
-	 * @var array
+	 * @see lithium\data\Model::schema()
+	 * @see lithium\data\Schema
+	 * @var array|\lithium\data\Schema
 	 */
 	protected $_schema = array();
 
 	/**
 	 * Default query parameters for the model finders.
 	 *
-	 * - `'conditions'`: The conditional query elements,
-	 *   e.g. `array('published' => true)`.
-	 * - `'fields'`: The fields that should be retrieved. When unset or explitily set to
-	 *   `null`, `'*'` or left unset, defaults to all fields.
-	 * - `'order'`: The order in which the data will be returned,
-	 *   e.g. `array('id' => 'ASC')` or `array('modified' => 'DESC')`.
-	 * - `'limit'`: The maximum number of records to return.
-	 * - `'page'`: For pagination of data (equals limit * offset).
-	 * - `'with'`: An array of relationship names to be included in the query.
+	 * Can be either redefined in a model subclass or changed during runtime
+	 * using `Model::query()`.
 	 *
+	 * For a detailed description of the available query options below see
+	 * the description of the `$options` parameter of `Model::find()`.
+	 *
+	 * @see lithium\data\Model::find()
+	 * @see lithium\data\Model::query()
+	 * @see lithium\data\model\Query::__construct()
 	 * @var array
 	 */
 	protected $_query = array(
@@ -641,19 +611,26 @@ class Model extends \lithium\core\StaticObject {
 	 *
 	 *        Note: When an undefined finder is tried to be used, the method will not error out, but
 	 *        fallback to the `'all'` finder.
-	 * @param array $options Options for the query. By default, accepts:
+	 * @param array $options Options for the query.
+	 *        Common options accepted are:
 	 *        - `'conditions'` _array_: The conditions for the query
 	 *           i.e. `'array('is_published' => true)`.
 	 *        - `'fields'` _array|null_: The fields that should be retrieved. When set to
-	 *          `null` and by default, uses all fields. To optimize query performance, limit
-	 *          the fields to just the ones actually needed.
+	 *          `null` or `'*'` and by default, uses all fields. To optimize query performance,
+	 *          limit the fields to just the ones actually needed.
 	 *        - `'order'` _array|string_: The order in which the data will be returned,
 	 *           i.e. `'created ASC'` sorts by created date in ascending order. To sort by
 	 *           multiple fields use the array syntax `array('title' => 'ASC', 'id' => 'ASC)`.
 	 *        - `'limit'` _integer_: The maximum number of records to return.
 	 *        - `'page'` _integer_: Allows to paginate data sets. Specifies the page of the set
 	 *          together with the limit option specifying the number of records per page. The first
-	 *          page starts at `1`.
+	 *          page starts at `1`. Equals limit * offset.
+	 *        - `'with'` _array_: Relationship names to be included in the query.
+	 *        Also supported are:
+	 *        - `'offset'` _integer_
+	 *        - `'having'` _array|string_
+	 *        - `'group'` _array|string_
+	 *        - `'joins'` _array_
 	 * @return mixed The result/s of the find. Actual result depends on the finder being used. Most
 	 *         often this is an instance of `lithium\data\Collection` or `lithium\data\Entity`.
 	 * @filter Allows to execute logic before querying (i.e. for rewriting of $options)
@@ -803,8 +780,8 @@ class Model extends \lithium\core\StaticObject {
 				} else {
 					$options = $params['options'];
 				}
-				$options += array('type' => 'read', 'model' => $self);
-				$query = $self::invokeMethod('_instance', array('query', $options));
+				$options += ['type' => 'read', 'model' => $self];
+				$query = $self::invokeMethod('_instance', ['query', $options]);
 				return $self::connection()->calculation('count', $query, $options);
 			}
 		);

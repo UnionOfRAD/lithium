@@ -12,9 +12,10 @@ use RuntimeException;
 
 /**
  * `Document` is an alternative to the `entity\Record` class, which is optimized for
- * organizing collections of entities from document-oriented databases such as CouchDB or MongoDB.
- * A `Document` object's fields can represent a collection of both simple and complex data types,
- * as well as other `Document` objects. Given the following data (document) structure:
+ * organizing collections of entities from document-oriented databases such as CouchDB
+ * or MongoDB. A `Document` object's fields can represent a collection of both simple
+ * and complex data types, as well as other `Document` objects. Given the following data
+ * (document) structure:
  *
  * ```json
  * {
@@ -285,9 +286,10 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 
 	/**
 	 * PHP magic method used when unset() is called on a `Document` instance.
+	 *
 	 * Use case for this would be when you wish to edit a document and remove a field, ie.:
 	 * ```
-	 * $doc = Post::find($id);
+	 * $doc = Posts::find($id);
 	 * unset($doc->fieldName);
 	 * $doc->save();
 	 * ```

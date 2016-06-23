@@ -92,10 +92,10 @@ class StaticObject {
 	protected static function _parents() {
 		$class = get_called_class();
 
-		if (!isset(self::$_parents[$class])) {
-			self::$_parents[$class] = class_parents($class);
+		if (!isset(static::$_parents[$class])) {
+			static::$_parents[$class] = class_parents($class);
 		}
-		return self::$_parents[$class];
+		return static::$_parents[$class];
 	}
 
 	/**

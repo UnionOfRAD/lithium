@@ -1072,7 +1072,7 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertContainsOnly($type, $haystack, $message = '{:message}') {
-		$method = self::$_internalTypes[$type];
+		$method = static::$_internalTypes[$type];
 		foreach ($haystack as $key => $value) {
 			if (!$method($value)) {
 				return $this->assert(false, $message, array(
@@ -1103,7 +1103,7 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNotContainsOnly($type, $haystack, $message = '{:message}') {
-		$method = self::$_internalTypes[$type];
+		$method = static::$_internalTypes[$type];
 		foreach ($haystack as $key => $value) {
 			if (!$method($value)) {
 				return $this->assert(true, $message, array(
@@ -1288,7 +1288,7 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertInternalType($expected, $actual, $message = '{:message}') {
-		$method = self::$_internalTypes[$expected];
+		$method = static::$_internalTypes[$expected];
 		return $this->assert($method($actual), $message, array(
 			'expected' => $expected,
 			'result' => gettype($actual)
@@ -1311,7 +1311,7 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNotInternalType($expected, $actual, $message = '{:message}') {
-		$method = self::$_internalTypes[$expected];
+		$method = static::$_internalTypes[$expected];
 		return $this->assert(!$method($actual), $message, array(
 			'expected' => $expected,
 			'result' => gettype($actual)

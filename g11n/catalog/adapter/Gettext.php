@@ -103,6 +103,9 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	/**
 	 * Reads data.
 	 *
+	 * MO files are preferred over PO files when existent.
+	 *
+	 * @see lithium\g11n\catalog\adapter\Gettext::_files()
 	 * @param string $category A category.
 	 * @param string $locale A locale identifier.
 	 * @param string $scope The scope for the current operation.
@@ -268,6 +271,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 * Parses machine object (MO) format, independent of the machine's endian it
 	 * was created on. Both 32bit and 64bit systems are supported.
 	 *
+	 * @link https://www.gnu.org/software/gettext/manual/html_node/MO-Files.html
 	 * @param resource $stream
 	 * @return array
 	 * @throws RangeException If stream content has an invalid format.

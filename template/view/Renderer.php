@@ -101,13 +101,20 @@ abstract class Renderer extends \lithium\core\Object {
 	protected $_response = null;
 
 	/**
-	 * Automatically matches up template strings by name to output handlers.  A handler can either
-	 * be a string, which represents a method name of the helper, or it can be a closure or callable
-	 * object.  A handler takes 3 parameters: the value to be filtered, the name of the helper
-	 * method that triggered the handler, and the array of options passed to the `_render()`. These
-	 * handlers are shared among all helper objects, and are automatically triggered whenever a
-	 * helper method renders a template string (using `_render()`) and a key which is to be embedded
-	 * in the template string matches an array key of a corresponding handler.
+	 * Automatically matches up template strings by name to output handlers.
+	 *
+	 * A handler can either be a string, which represents a method name of the helper, or
+	 * it can be a closure or callable object.
+	 *
+	 * A handler takes 3 parameters:
+	 * 1. the value to be filtered
+	 * 2. the name of the helper method that triggered the handler
+	 * 3. the array of options passed to the `_render()`
+	 *
+	 * These handlers are shared among all helper objects, and are automatically triggered
+	 * whenever a helper method renders a template string (using `_render()`) and a
+	 * key which is to be embedded in the template string matches an array key of a
+	 * corresponding handler.
 	 *
 	 * @see lithium\template\view\Renderer::applyHandler()
 	 * @see lithium\template\view\Renderer::handlers()

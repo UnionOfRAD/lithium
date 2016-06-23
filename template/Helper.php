@@ -174,18 +174,18 @@ abstract class Helper extends \lithium\core\Object {
 	 *
 	 * @see lithium\template\view\Renderer::__call()
 	 * @param array|string $params The parameters where key is the attribute name and
-	 *                     the value the attribute value. When string will simply prepend
-	 *                     with the prepend-string (by default `' '`) unless $params is
-	 *                     falsey in which case an empty string is returned. This
-	 *                     alternative syntax is used by the method internally.
-	 * @param string $method When used as a context handler, the method the handler was
-	 *               called for I.e. `'wrap'`. Currently not used by the method.
+	 *        the value the attribute value. When string will simply prepend with the
+	 *        prepend-string (by default `' '`) unless $params is falsey in which case
+	 *        an empty string is returned. This alternative syntax is used by the method
+	 *        internally.
+	 * @param string $method When used as a context handler, the method the handler
+	 *        was called for I.e. `'wrap'`. Currently not used by the method.
 	 * @param array $options Available options are:
-	 *              - `'escape'` _boolean_: Indicates whether the output should be
-	 *                HTML-escaped. Defaults to `true`.
-	 *              - `'prepend'` _string_: String to prepend to each attribute pair.
-	 *                and the final result. Defaults to `' '`.
-	 *              - `'append'` _string_: String to append to result. Defaults to `''`.
+	 *        - `'escape'` _boolean_: Indicates whether the output should be HTML-escaped.
+	 *          Defaults to `true`.
+	 *        - `'prepend'` _string_: String to prepend to each attribute pair and the final
+	 *          result. Defaults to `' '`.
+	 *        - `'append'` _string_: String to append to result. Defaults to `''`.
 	 * @return string Attribute string.
 	 */
 	protected function _attributes($params, $method = null, array $options = array()) {

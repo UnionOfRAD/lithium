@@ -39,7 +39,7 @@ class Affected extends \lithium\test\Filter {
 		$testsClasses = $tests->map('get_class', array('collect' => false));
 
 		foreach ($tests as $test) {
-			$affected = array_merge($affected, self::_affected($test->subject()));
+			$affected = array_merge($affected, static::_affected($test->subject()));
 		}
 		$affected = array_unique($affected);
 

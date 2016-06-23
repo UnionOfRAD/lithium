@@ -136,20 +136,6 @@ class Entity extends \lithium\core\Object implements \Serializable {
 		'handlers'
 	);
 
-	/**
-	 * Constructor.
-	 *
-	 * @param array $config Available configuration options are:
-	 *        - `'data'` _array_: Data to enter into the record. Defaults to an empty array.
-	 *        - `'model'` _string_: Class name that provides the data-source for this record.
-	 *           Defaults to `null`.
-	 * @return void
-	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('model' => null, 'data' => array(), 'relationships' => array());
-		parent::__construct($config + $defaults);
-	}
-
 	protected function _init() {
 		parent::_init();
 		$this->_updated = $this->_data;
@@ -385,8 +371,8 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * non-numeric.
 	 *
 	 * @param string $field The name of the field to be incremented.
-	 * @param integer|string $value The value to increment the field by. Defaults to `1` if this
-	 *               parameter is not specified.
+	 * @param integer|string $value The value to increment the field by. Defaults to `1` if
+	 *        this parameter is not specified.
 	 * @return integer Returns the current value of `$field`, based on the value retrieved from the
 	 *         data source when the entity was loaded, plus any increments applied. Note that it may
 	 *         not reflect the most current value in the persistent backend data source.
@@ -397,7 +383,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 		if (!isset($this->_updated[$field])) {
 			$this->_updated[$field] = 0;
 		} elseif (!is_numeric($this->_updated[$field])) {
-			throw new UnexpectedValueException("Field '{$field}' cannot be incremented.");
+			throw new UnexpectedValueException("Field `'{$field}'` cannot be incremented.");
 		}
 
 		if (!isset($this->_increment[$field])) {

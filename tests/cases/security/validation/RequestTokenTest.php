@@ -17,7 +17,7 @@ class RequestTokenTest extends \lithium\test\Unit {
 	protected static $_storage = array();
 
 	public function setUp() {
-		self::$_storage = array();
+		static::$_storage = array();
 		RequestToken::config(array('classes' => array('session' => __CLASS__)));
 	}
 
@@ -51,7 +51,7 @@ class RequestTokenTest extends \lithium\test\Unit {
 	public function testTokenGeneration() {
 		$token = RequestToken::get();
 		$this->assertPattern('/^[a-f0-9]{128}$/', $token);
-		$this->assertEqual(array('security.token' => $token), self::$_storage);
+		$this->assertEqual(array('security.token' => $token), static::$_storage);
 
 		$newToken = RequestToken::get();
 		$this->assertEqual($token, $newToken);
@@ -59,7 +59,7 @@ class RequestTokenTest extends \lithium\test\Unit {
 		$reallyNewToken = RequestToken::get(array('regenerate' => true));
 		$this->assertPattern('/^[a-f0-9]{128}$/', $reallyNewToken);
 		$this->assertNotEqual($token, $reallyNewToken);
-		$this->assertEqual(array('security.token' => $reallyNewToken), self::$_storage);
+		$this->assertEqual(array('security.token' => $reallyNewToken), static::$_storage);
 	}
 
 	public function testTokenGenerationWithProvidedAlgo() {
