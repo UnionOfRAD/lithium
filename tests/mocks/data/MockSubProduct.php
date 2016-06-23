@@ -10,24 +10,24 @@ namespace lithium\tests\mocks\data;
 
 class MockSubProduct extends \lithium\tests\mocks\data\MockProduct {
 
-	protected $_meta = array('source' => 'mock_products', 'connection' => false);
+	protected $_meta = ['source' => 'mock_products', 'connection' => false];
 
-	protected $_custom = array(
+	protected $_custom = [
 		'prop2' => 'value2'
-	);
+	];
 
-	protected $_schema = array(
-		'refurb' => array('type' => 'boolean')
-	);
+	protected $_schema = [
+		'refurb' => ['type' => 'boolean']
+	];
 
-	public $validates = array(
-		'refurb' => array(
-			array(
+	public $validates = [
+		'refurb' => [
+			[
 				'boolean',
 				'message' => 'Must have a boolean value.'
-			)
-		)
-	);
+			]
+		]
+	];
 }
 
 ?>

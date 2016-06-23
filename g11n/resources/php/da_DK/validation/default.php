@@ -9,8 +9,8 @@
 /**
  * Validation data for `da_DK`.
  */
-return array(
+return [
 	'ssn' => '/\\A\\b[0-9]{6}-[0-9]{4}\\b\\z/i'
-);
+];
 
 ?>

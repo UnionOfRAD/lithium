@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\data;
 
 class MockTag extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => false);
+	protected $_meta = ['connection' => false];
 }
 
 ?>

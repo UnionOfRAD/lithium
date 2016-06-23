@@ -14,16 +14,16 @@ use lithium\util\Validator;
 
 class ResourcesValidatorTest extends \lithium\test\Integration {
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	public function setUp() {
 		$this->_backup['catalogConfig'] = Catalog::config();
-		Catalog::config(array(
-			'lithium' => array(
+		Catalog::config([
+			'lithium' => [
 				'adapter' => 'Php',
 				'path' => Libraries::get('lithium', 'path') . '/g11n/resources/php'
-			)
-		));
+			]
+		]);
 	}
 
 	public function tearDown() {

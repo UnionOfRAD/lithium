@@ -14,14 +14,14 @@ namespace lithium\tests\mocks\storage\cache\strategy;
  */
 class MockConfigurizer extends \lithium\core\Object {
 
-	public static $parameters = array();
+	public static $parameters = [];
 
 	/**
 	 * Constructor.
 	 *
 	 * @param array $config
 	 */
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		static::$parameters = $config;
 	}
 

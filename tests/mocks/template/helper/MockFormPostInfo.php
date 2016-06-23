@@ -10,13 +10,13 @@ namespace lithium\tests\mocks\template\helper;
 
 class MockFormPostInfo extends \lithium\data\Model {
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'section' => array('type' => 'string'),
-		'notes' => array('type' => 'text'),
-		'created' => array('type' => 'datetime'),
-		'updated' => array('type' => 'datetime')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer'],
+		'section' => ['type' => 'string'],
+		'notes' => ['type' => 'text'],
+		'created' => ['type' => 'datetime'],
+		'updated' => ['type' => 'datetime']
+	];
 }
 
 ?>

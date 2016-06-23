@@ -14,15 +14,15 @@ use lithium\security\validation\RequestToken;
 
 class RequestTokenTest extends \lithium\test\Unit {
 
-	protected static $_storage = array();
+	protected static $_storage = [];
 
 	public function setUp() {
-		static::$_storage = array();
-		RequestToken::config(array('classes' => array('session' => __CLASS__)));
+		static::$_storage = [];
+		RequestToken::config(['classes' => ['session' => __CLASS__]]);
 	}
 
 	public function tearDown() {
-		RequestToken::config(array('classes' => array('session' => 'lithium\storage\Session')));
+		RequestToken::config(['classes' => ['session' => 'lithium\storage\Session']]);
 	}
 
 	public static function read($key) {
@@ -37,10 +37,10 @@ class RequestTokenTest extends \lithium\test\Unit {
 	 * Tests that class dependencies can be reconfigured.
 	 */
 	public function testConfiguration() {
-		$expected = array('classes' => array('session' => __CLASS__));
+		$expected = ['classes' => ['session' => __CLASS__]];
 		$this->assertEqual($expected, RequestToken::config());
 
-		$new = array('classes' => array('session' => 'lithium\storage\Session'));
+		$new = ['classes' => ['session' => 'lithium\storage\Session']];
 		RequestToken::config($new);
 		$this->assertEqual($new, RequestToken::config());
 	}
@@ -51,22 +51,22 @@ class RequestTokenTest extends \lithium\test\Unit {
 	public function testTokenGeneration() {
 		$token = RequestToken::get();
 		$this->assertPattern('/^[a-f0-9]{128}$/', $token);
-		$this->assertEqual(array('security.token' => $token), static::$_storage);
+		$this->assertEqual(['security.token' => $token], static::$_storage);
 
 		$newToken = RequestToken::get();
 		$this->assertEqual($token, $newToken);
 
-		$reallyNewToken = RequestToken::get(array('regenerate' => true));
+		$reallyNewToken = RequestToken::get(['regenerate' => true]);
 		$this->assertPattern('/^[a-f0-9]{128}$/', $reallyNewToken);
 		$this->assertNotEqual($token, $reallyNewToken);
-		$this->assertEqual(array('security.token' => $reallyNewToken), static::$_storage);
+		$this->assertEqual(['security.token' => $reallyNewToken], static::$_storage);
 	}
 
 	public function testTokenGenerationWithProvidedAlgo() {
-		$token = RequestToken::get(array('type' => 'sha512', 'regenerate' => true));
+		$token = RequestToken::get(['type' => 'sha512', 'regenerate' => true]);
 		$this->assertPattern('/^[a-f0-9]{128}$/', $token);
 
-		$token = RequestToken::get(array('type' => 'md5', 'regenerate' => true));
+		$token = RequestToken::get(['type' => 'md5', 'regenerate' => true]);
 		$this->assertPattern('/^[a-f0-9]{32}$/', $token);
 	}
 
@@ -75,7 +75,7 @@ class RequestTokenTest extends \lithium\test\Unit {
 	 */
 	public function testKeyMatching() {
 		for ($i = 0; $i < 4; $i++) {
-			$token = RequestToken::get(array('regenerate' => true));
+			$token = RequestToken::get(['regenerate' => true]);
 
 			for ($j = 0; $j < 4; $j++) {
 				$key = Password::hash($token);
@@ -88,9 +88,9 @@ class RequestTokenTest extends \lithium\test\Unit {
 	 * Tests extracting a key from a `Request` object and matching it against a token.
 	 */
 	public function testTokenFromRequestObject() {
-		$request = new Request(array('data' => array(
-			'security' => array('token' => RequestToken::key())
-		)));
+		$request = new Request(['data' => [
+			'security' => ['token' => RequestToken::key()]
+		]]);
 		$this->assertTrue(RequestToken::check($request));
 	}
 }

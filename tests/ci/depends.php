@@ -9,7 +9,7 @@
 
 use \RuntimeException;
 
-foreach (explode(' ', getenv('PHP_EXT')) ?: array() as $extension) {
+foreach (explode(' ', getenv('PHP_EXT')) ?: [] as $extension) {
 	PhpExtensions::install($extension);
 }
 
@@ -40,35 +40,35 @@ class PhpExtensions {
 	}
 
 	protected static function _redis() {
-		static::_ini(array(
+		static::_ini([
 			'extension=redis.so'
-		));
+		]);
 	}
 
 	protected static function _opcache() {
 		if (static::_isHhvm()) {
 			throw new RuntimeException("`opcache` cannot be used with HHVM.");
 		}
-		static::_ini(array(
+		static::_ini([
 			'opcache.enable=1',
 			'opcache.enable_cli=1'
-		));
+		]);
 	}
 
 	protected static function _apcu() {
 		if (!static::_isHhvm()) {
 			static::_pecl('apcu', '5.1.2', true);
-			static::_ini(array('extension=apcu.so'));
+			static::_ini(['extension=apcu.so']);
 		}
-		static::_ini(array(
+		static::_ini([
 			'apc.enabled=1',
 			'apc.enable_cli=1'
-		));
+		]);
 	}
 
 	protected static function _memcached() {
 		if (!static::_isHhvm()) {
-			static::_ini(array('extension=memcached.so'));
+			static::_ini(['extension=memcached.so']);
 		}
 	}
 
@@ -76,23 +76,23 @@ class PhpExtensions {
 		if (static::_isHhvm()) {
 			throw new RuntimeException("`xcache` cannot be used with HHVM.");
 		}
-		static::_build(array(
+		static::_build([
 			'url' => 'http://xcache.lighttpd.net/pub/Releases/3.2.0/xcache-3.2.0.tar.gz',
-			'configure' => array('--enable-xcache'),
-		));
-		static::_ini(array(
+			'configure' => ['--enable-xcache'],
+		]);
+		static::_ini([
 			'extension=xcache.so',
 			'xcache.cacher=false',
 			'xcache.admin.enable_auth=0',
 			'xcache.var_size=1M'
-		));
+		]);
 	}
 
 	protected static function _mongo() {
 		if (static::_isHhvm()) {
 			throw new RuntimeException("`mongo` cannot be used with HHVM.");
 		}
-		static::_ini(array('extension=mongo.so'));
+		static::_ini(['extension=mongo.so']);
 	}
 
 	/**

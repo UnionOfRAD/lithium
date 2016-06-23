@@ -20,31 +20,31 @@ class StaticObjectTest extends \lithium\test\Unit {
 	 * regardless of the number.
 	 */
 	public function testMethodInvocationWithParameters() {
-		$this->assertEqual(MockStaticObject::invokeMethod('foo'), array());
-		$this->assertEqual(MockStaticObject::invokeMethod('foo', array('bar')), array('bar'));
+		$this->assertEqual(MockStaticObject::invokeMethod('foo'), []);
+		$this->assertEqual(MockStaticObject::invokeMethod('foo', ['bar']), ['bar']);
 
-		$params = array('one', 'two');
+		$params = ['one', 'two'];
 		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
 
-		$params = array('short', 'parameter', 'list');
+		$params = ['short', 'parameter', 'list'];
 		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
 
-		$params = array('a', 'longer', 'parameter', 'list');
+		$params = ['a', 'longer', 'parameter', 'list'];
 		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
 
-		$params = array('a', 'much', 'longer', 'parameter', 'list');
+		$params = ['a', 'much', 'longer', 'parameter', 'list'];
 		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
 
-		$params = array('an', 'extremely', 'long', 'list', 'of', 'parameters');
+		$params = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
 		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
 
-		$params = array('an', 'extremely', 'long', 'list', 'of', 'parameters');
+		$params = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
 		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
 
-		$params = array(
+		$params = [
 			'if', 'you', 'have', 'a', 'parameter', 'list', 'this',
 			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
-		);
+		];
 		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
 	}
 
@@ -53,11 +53,11 @@ class StaticObjectTest extends \lithium\test\Unit {
 		$class::parents(null);
 
 		$result = $class::parents();
-		$expected = array('lithium\core\StaticObject' => 'lithium\core\StaticObject');
+		$expected = ['lithium\core\StaticObject' => 'lithium\core\StaticObject'];
 		$this->assertEqual($expected, $result);
 
 		$cache = $class::parents(true);
-		$this->assertEqual(array($class => $expected), $cache);
+		$this->assertEqual([$class => $expected], $cache);
 	}
 
 	public function testInstanceWithClassesKey() {
@@ -104,13 +104,13 @@ class StaticObjectTest extends \lithium\test\Unit {
 
 		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
 
-		$result = $class::method(array('Starting test'));
-		$expected = array(
+		$result = $class::method(['Starting test']);
+		$expected = [
 			'Starting test',
 			'Starting outer method call',
 			'Inside method implementation of ' . $class,
 			'Ending outer method call'
-		);
+		];
 		$this->assertEqual($expected, $result);
 
 		$class::applyFilter('method', function($self, $params, $chain) {
@@ -120,15 +120,15 @@ class StaticObjectTest extends \lithium\test\Unit {
 			return $result;
 		});
 
-		$result = $class::method(array('Starting test'));
-		$expected = array(
+		$result = $class::method(['Starting test']);
+		$expected = [
 			'Starting test',
 			'Starting outer method call',
 			'Starting filter',
 			'Inside method implementation of ' . $class,
 			'Ending filter',
 			'Ending outer method call'
-		);
+		];
 		$this->assertEqual($expected, $result);
 
 		$class::applyFilter('method', function($self, $params, $chain) {
@@ -137,8 +137,8 @@ class StaticObjectTest extends \lithium\test\Unit {
 			$result[] = 'Ending inner filter';
 			return $result;
 		});
-		$result = $class::method(array('Starting test'));
-		$expected = array(
+		$result = $class::method(['Starting test']);
+		$expected = [
 			'Starting test',
 			'Starting outer method call',
 			'Starting filter',
@@ -147,7 +147,7 @@ class StaticObjectTest extends \lithium\test\Unit {
 			'Ending inner filter',
 			'Ending filter',
 			'Ending outer method call'
-		);
+		];
 		$this->assertEqual($expected, $result);
 
 		Filters::clear('lithium\tests\mocks\core\MockStaticMethodFiltering');
@@ -161,9 +161,9 @@ class StaticObjectTest extends \lithium\test\Unit {
 		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
 
 		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
-		$result = $class::manual(array(function($self, $params, $chain) {
+		$result = $class::manual([function($self, $params, $chain) {
 			return '-' . $chain->next($self, $params, $chain) . '-';
-		}));
+		}]);
 		$expected = '-Working-';
 		$this->assertEqual($expected, $result);
 
@@ -207,17 +207,17 @@ class StaticObjectTest extends \lithium\test\Unit {
 
 		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
 		$class::applyFilter(false);
-		$class::applyFilter(array('method2', 'manual'), function($self, $params, $chain) {
+		$class::applyFilter(['method2', 'manual'], function($self, $params, $chain) {
 			return false;
 		});
 
 		$this->assertFalse($class::method2());
-		$this->assertFalse($class::manual(array()));
+		$this->assertFalse($class::manual([]));
 
 		$class::applyFilter('method2', false);
 
 		$this->assertNotIdentical($class::method2(), false);
-		$this->assertFalse($class::manual(array()));
+		$this->assertFalse($class::manual([]));
 
 		Filters::clear('lithium\tests\mocks\core\MockStaticMethodFiltering');
 		error_reporting($original);
@@ -228,17 +228,17 @@ class StaticObjectTest extends \lithium\test\Unit {
 
 		$class = 'lithium\tests\mocks\core\MockStaticMethodFiltering';
 		$class::applyFilter(false);
-		$class::applyFilter(array('method2', 'manual'), function($self, $params, $chain) {
+		$class::applyFilter(['method2', 'manual'], function($self, $params, $chain) {
 			return false;
 		});
 
 		$this->assertFalse($class::method2());
-		$this->assertFalse($class::manual(array()));
+		$this->assertFalse($class::manual([]));
 
 		$class::applyFilter(false);
 
 		$this->assertNotIdentical($class::method2(), false);
-		$this->assertNotIdentical($class::manual(array()), false);
+		$this->assertNotIdentical($class::manual([]), false);
 
 		Filters::clear('lithium\tests\mocks\core\MockStaticMethodFiltering');
 		error_reporting($original);

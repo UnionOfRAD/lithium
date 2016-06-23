@@ -10,18 +10,18 @@ namespace lithium\tests\mocks\data\model;
 
 class MockQueryPost extends \lithium\data\Model {
 
-	public $hasMany = array('MockQueryComment');
+	public $hasMany = ['MockQueryComment'];
 
-	protected $_meta = array('connection' => false, 'key' => 'id');
+	protected $_meta = ['connection' => false, 'key' => 'id'];
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'author_id' => array('type' => 'integer'),
-		'title' => array('type' => 'string', 'length' => 255),
-		'body' => array('type' => 'text'),
-		'created' => array('type' => 'datetime'),
-		'updated' => array('type' => 'datetime')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer'],
+		'author_id' => ['type' => 'integer'],
+		'title' => ['type' => 'string', 'length' => 255],
+		'body' => ['type' => 'text'],
+		'created' => ['type' => 'datetime'],
+		'updated' => ['type' => 'datetime']
+	];
 }
 
 ?>

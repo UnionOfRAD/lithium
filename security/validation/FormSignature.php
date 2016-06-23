@@ -33,9 +33,9 @@ class FormSignature {
 	 *
 	 * @var array
 	 */
-	protected static $_classes = array(
+	protected static $_classes = [
 		'hash' => 'lithium\security\Hash'
-	);
+	];
 
 	/**
 	 * Must be set manually to a unique string i.e.
@@ -53,12 +53,12 @@ class FormSignature {
 	 *        - `'secret'` _string_: *Must* be provided.
 	 * @return array|void If `$config` is empty, returns an array with the current configurations.
 	 */
-	public static function config(array $config = array()) {
+	public static function config(array $config = []) {
 		if (!$config) {
-			return array(
+			return [
 				'classes' => static::$_classes,
 				'secret' => static::$_secret
-			);
+			];
 		}
 		if (isset($config['classes'])) {
 			static::$_classes = $config['classes'] + static::$_classes;
@@ -75,11 +75,11 @@ class FormSignature {
 	 * @return string The form signature string.
 	 */
 	public static function key(array $data) {
-		$data += array(
-			'fields' => array(),
-			'locked' => array(),
-			'excluded' => array()
-		);
+		$data += [
+			'fields' => [],
+			'locked' => [],
+			'excluded' => []
+		];
 		return static::_compile(
 			array_keys(Set::flatten($data['fields'])),
 			$data['locked'],
@@ -143,7 +143,7 @@ class FormSignature {
 		ksort($locked, SORT_STRING);
 		sort($excluded, SORT_STRING);
 
-		foreach (array('fields', 'excluded', 'locked') as $list) {
+		foreach (['fields', 'excluded', 'locked'] as $list) {
 			${$list} = urlencode(serialize(${$list}));
 		}
 		$hash = $hash::calculate($fields);
@@ -181,10 +181,10 @@ class FormSignature {
 			throw new ConfigException($message);
 		}
 		$key = 'li3,1' . static::$_secret;
-		$key = $hash::calculate(date('YMD'), array('key' => $key, 'raw' => true));
-		$key = $hash::calculate('li3,1_form', array('key' => $key, 'raw' => true));
+		$key = $hash::calculate(date('YMD'), ['key' => $key, 'raw' => true]);
+		$key = $hash::calculate('li3,1_form', ['key' => $key, 'raw' => true]);
 
-		return $hash::calculate($data, array('key' => $key));
+		return $hash::calculate($data, ['key' => $key]);
 	}
 
 	/**
@@ -203,10 +203,10 @@ class FormSignature {
 		}
 		list($locked, $excluded) = explode('::', $string, 3);
 
-		return array(
+		return [
 			'locked' => unserialize(urldecode($locked)),
 			'excluded' => unserialize(urldecode($excluded))
-		);
+		];
 	}
 }
 

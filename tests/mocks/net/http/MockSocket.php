@@ -12,13 +12,13 @@ class MockSocket extends \lithium\net\Socket {
 
 	public $data = null;
 
-	public $configs = array();
+	public $configs = [];
 
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		parent::__construct((array) $config);
 	}
 
-	public function open(array $options = array()) {
+	public function open(array $options = []) {
 		parent::open($options);
 		return true;
 	}
@@ -55,7 +55,7 @@ class MockSocket extends \lithium\net\Socket {
 			$header .= 'opaque="d3fb67a7aa4d887ec4bf83040a820a46";';
 			$this->data->headers('WWW-Authenticate', $header);
 			$status = "GET HTTP/1.1 401 Authorization Required";
-			$response = array($status, join("\r\n", $this->data->headers()), "", "not authorized");
+			$response = [$status, join("\r\n", $this->data->headers()), "", "not authorized"];
 			return join("\r\n", $response);
 		}
 		return (string) $this->data;

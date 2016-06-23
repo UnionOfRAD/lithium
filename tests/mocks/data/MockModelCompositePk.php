@@ -12,21 +12,21 @@ use lithium\tests\mocks\data\source\database\adapter\MockAdapter;
 
 class MockModelCompositePk extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => false);
+	protected $_meta = ['connection' => false];
 
 	public static function &connection($records = null) {
-		$mock = new MockAdapter(compact('records') + array(
-			'columns' => array(
-				'lithium\tests\mocks\data\MockModelCompositePk' => array(
+		$mock = new MockAdapter(compact('records') + [
+			'columns' => [
+				'lithium\tests\mocks\data\MockModelCompositePk' => [
 					'client_id', 'invoice_id', 'payment'
-				)
-			),
+				]
+			],
 			'autoConnect' => false
-		));
-		static::meta(array(
-			'key' => array('client_id', 'invoice_id'),
+		]);
+		static::meta([
+			'key' => ['client_id', 'invoice_id'],
 			'locked' => true
-		));
+		]);
 		return $mock;
 	}
 }

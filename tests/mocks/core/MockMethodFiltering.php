@@ -28,14 +28,14 @@ class MockMethodFiltering extends \lithium\core\Object {
 		$method = function($self, $params, $chain) use (&$filters) {
 			return $filters;
 		};
-		return $this->_filter(__METHOD__, array(), $method);
+		return $this->_filter(__METHOD__, [], $method);
 	}
 
 	public function manual($filters) {
 		$method = function($self, $params, $chain) {
 			return "Working";
 		};
-		return $this->_filter(__METHOD__, array(), $method, $filters);
+		return $this->_filter(__METHOD__, [], $method, $filters);
 	}
 
 }

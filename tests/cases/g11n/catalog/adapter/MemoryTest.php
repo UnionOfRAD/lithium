@@ -22,20 +22,20 @@ class MemoryTest extends \lithium\test\Unit {
 	}
 
 	public function testReadAndWrite() {
-		$data = array(
-			'singular 1' => array(
+		$data = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
-				'flags' => array('fuzzy' => true),
-				'translated' => array(),
-				'occurrences' => array(
-					array('file' => 'test.php', 'line' => 1)
-				),
-				'comments' => array(
+				'ids' => ['singular' => 'singular 1', 'plural' => 'plural 1'],
+				'flags' => ['fuzzy' => true],
+				'translated' => [],
+				'occurrences' => [
+					['file' => 'test.php', 'line' => 1]
+				],
+				'comments' => [
 					'comment 1'
-				)
-			)
-		);
+				]
+			]
+		];
 		$result = $this->adapter->write('category', 'ja', 'default', $data);
 		$this->assertEqual($data, $this->adapter->read('category', 'ja', 'default'));
 	}

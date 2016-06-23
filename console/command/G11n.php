@@ -28,7 +28,7 @@ class G11n extends \lithium\console\Command {
 	 * @return integer|boolean|void
 	 */
 	public function extract() {
-		$extract = new Extract(array('request' => $this->request));
+		$extract = new Extract(['request' => $this->request]);
 		return $extract->run();
 	}
 }

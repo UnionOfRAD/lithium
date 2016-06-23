@@ -29,17 +29,17 @@ class CodeTest extends \lithium\test\Unit {
 <?php
 $t('simple 1');
 
-$t('options 1', null, array('locale' => 'en'));
+$t('options 1', null, ['locale' => 'en']);
 
-$t('replace 1 {:a}', array('a' => 'b'));
+$t('replace 1 {:a}', ['a' => 'b']);
 
-$t('simple context', array('context' => 'foo'));
-$t('simple context', array('context' => 'bar'));
+$t('simple context', ['context' => 'foo']);
+$t('simple context', ['context' => 'bar']);
 
-$t('replace context 1 {:a}', array('a' => 'b', 'context' => 'foo'));
-$t('replace context 1 {:a}', array('a' => 'b', 'context' => 'bar'));
-$t('replace context 2 {:a}', array('context' => 'foo', 'a' => 'b'));
-$t('replace context 2 {:a}', array('context' => 'bar', 'a' => 'b'));
+$t('replace context 1 {:a}', ['a' => 'b', 'context' => 'foo']);
+$t('replace context 1 {:a}', ['a' => 'b', 'context' => 'bar']);
+$t('replace context 2 {:a}', ['context' => 'foo', 'a' => 'b']);
+$t('replace context 2 {:a}', ['context' => 'bar', 'a' => 'b']);
 
 $t($test['invalid']);
 $t(32203);
@@ -84,7 +84,7 @@ EOD;
 		$path = Libraries::get(true, 'resources') . '/tmp/tests';
 
 		try {
-			new Code(array('path' => $this->_path));
+			new Code(['path' => $this->_path]);
 			$result = true;
 		} catch (Exception $e) {
 			$result = false;
@@ -92,7 +92,7 @@ EOD;
 		$this->assert($result);
 
 		try {
-			new Code(array('path' => "{$path}/i_do_not_exist"));
+			new Code(['path' => "{$path}/i_do_not_exist"]);
 			$result = false;
 		} catch (Exception $e) {
 			$result = true;
@@ -103,7 +103,7 @@ EOD;
 	public function testReadMessageTemplateTSimple() {
 		$results = $this->adapter->read('messageTemplate', 'root', null);
 
-		$expected = array('singular' => 'simple 1');
+		$expected = ['singular' => 'simple 1'];
 		$result = $results['simple 1']['ids'];
 		$this->assertEqual($expected, $result);
 	}
@@ -111,7 +111,7 @@ EOD;
 	public function testReadMessageTemplateTSimpleShort() {
 		$results = $this->adapter->read('messageTemplate', 'root', null);
 
-		$expected = array('singular' => 'simple 1 short');
+		$expected = ['singular' => 'simple 1 short'];
 		$result = $results['simple 1 short']['ids'];
 		$this->assertEqual($expected, $result);
 	}
@@ -119,7 +119,7 @@ EOD;
 	public function testReadMessageTemplateTOptions() {
 		$results = $this->adapter->read('messageTemplate', 'root', null);
 
-		$expected = array('singular' => 'options 1');
+		$expected = ['singular' => 'options 1'];
 		$result = $results['options 1']['ids'];
 		$this->assertEqual($expected, $result);
 	}
@@ -127,7 +127,7 @@ EOD;
 	public function testReadMessageTemplateTReplace() {
 		$results = $this->adapter->read('messageTemplate', 'root', null);
 
-		$expected = array('singular' => 'replace 1 {:a}');
+		$expected = ['singular' => 'replace 1 {:a}'];
 		$result = $results['replace 1 {:a}']['ids'];
 		$this->assertEqual($expected, $result);
 	}
@@ -144,24 +144,24 @@ EOD;
 		$this->assertArrayHasKey('replace context 2 {:a}|foo', $results);
 		$this->assertArrayHasKey('replace context 2 {:a}|bar', $results);
 
-		$expected = array('ids' => array('singular' => 'simple context'), 'context' => 'foo');
+		$expected = ['ids' => ['singular' => 'simple context'], 'context' => 'foo'];
 		$key = 'simple context|foo';
-		$result = array('ids' => $results[$key]['ids'],	'context' => 'foo');
+		$result = ['ids' => $results[$key]['ids'],	'context' => 'foo'];
 		$this->assertEqual($expected, $result);
 
-		$expected = array('ids' => array('singular' => 'simple context'), 'context' => 'bar');
+		$expected = ['ids' => ['singular' => 'simple context'], 'context' => 'bar'];
 		$key = 'simple context|bar';
-		$result = array('ids' => $results[$key]['ids'],	'context' => 'bar');
+		$result = ['ids' => $results[$key]['ids'],	'context' => 'bar'];
 		$this->assertEqual($expected, $result);
 
-		$expected = array('ids' => array('singular' => 'replace context 1 {:a}'), 'context' => 'foo');
+		$expected = ['ids' => ['singular' => 'replace context 1 {:a}'], 'context' => 'foo'];
 		$key = 'replace context 1 {:a}|foo';
-		$result = array('ids' => $results[$key]['ids'],	'context' => 'foo');
+		$result = ['ids' => $results[$key]['ids'],	'context' => 'foo'];
 		$this->assertEqual($expected, $result);
 
-		$expected = array('ids' => array('singular' => 'replace context 1 {:a}'), 'context' => 'bar');
+		$expected = ['ids' => ['singular' => 'replace context 1 {:a}'], 'context' => 'bar'];
 		$key = 'replace context 1 {:a}|bar';
-		$result = array('ids' => $results[$key]['ids'],	'context' => 'bar');
+		$result = ['ids' => $results[$key]['ids'],	'context' => 'bar'];
 		$this->assertEqual($expected, $result);
 	}
 
@@ -174,15 +174,15 @@ EOD;
 		$result = isset($results[32203]);
 		$this->assertFalse($result);
 
-		$expected = array('singular' => 'invalid 1');
+		$expected = ['singular' => 'invalid 1'];
 		$result = $results['invalid 1']['ids'];
 		$this->assertEqual($expected, $result);
 
-		$expected = array('singular' => 'invalid 2');
+		$expected = ['singular' => 'invalid 2'];
 		$result = $results['invalid 2']['ids'];
 		$this->assertEqual($expected, $result);
 
-		$expected = array('singular' => 'invalid 3');
+		$expected = ['singular' => 'invalid 3'];
 		$result = $results['invalid 3']['ids'];
 		$this->assertEqual($expected, $result);
 	}
@@ -276,13 +276,13 @@ EOD;
 	}
 
 	public function testReadWithScope() {
-		$this->adapter = new Code(array('path' => $this->_path, 'scope' => 'li3_bot'));
+		$this->adapter = new Code(['path' => $this->_path, 'scope' => 'li3_bot']);
 
 		$results = $this->adapter->read('messageTemplate', 'root', null);
 		$this->assertEmpty($results);
 
 		$results = $this->adapter->read('messageTemplate', 'root', 'li3_bot');
-		$expected = array('singular' => 'simple 1');
+		$expected = ['singular' => 'simple 1'];
 		$result = $results['simple 1']['ids'];
 		$this->assertEqual($expected, $result);
 	}

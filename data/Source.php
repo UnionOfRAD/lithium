@@ -31,18 +31,18 @@ abstract class Source extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('classes' => 'merge');
+	protected $_autoConfig = ['classes' => 'merge'];
 
 	/**
 	 * Default entity and set classes used by subclasses of `Source`.
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'entity' => 'lithium\data\Entity',
 		'set' => 'lithium\data\Collection',
 		'relationship' => 'lithium\data\model\Relationship'
-	);
+	];
 
 	/**
 	 * Stores a connection to a remote resource. Usually a database connection (`resource` type),
@@ -66,7 +66,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @see lithium\data\Source::methods();
 	 * @var array
 	 */
-	protected $_cachedMethods = array();
+	protected $_cachedMethods = [];
 
 	/**
 	 * With no parameter, checks a specific supported feature.
@@ -88,8 +88,8 @@ abstract class Source extends \lithium\core\Object {
 	 *           initialization. Defaults to `true`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('autoConnect' => true);
+	public function __construct(array $config = []) {
+		$defaults = ['autoConnect' => true];
 		parent::__construct($config + $defaults);
 	}
 
@@ -124,8 +124,8 @@ abstract class Source extends \lithium\core\Object {
 	 *         as the connection could have timed out or otherwise been dropped by the remote
 	 *         resource during the course of the request.
 	 */
-	public function isConnected(array $options = array()) {
-		$defaults = array('autoConnect' => false);
+	public function isConnected(array $options = []) {
+		$defaults = ['autoConnect' => false];
 		$options += $defaults;
 
 		if (!$this->_isConnected && $options['autoConnect']) {
@@ -181,7 +181,7 @@ abstract class Source extends \lithium\core\Object {
 	 *         field, containing the following keys:
 	 *         - `'type'`: The field type name
 	 */
-	abstract public function describe($entity, $schema = array(), array $meta = array());
+	abstract public function describe($entity, $schema = [], array $meta = []);
 
 	/**
 	 * Defines or modifies the default settings of a relationship between two models.
@@ -192,7 +192,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @param array $options relationship options
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
-	abstract public function relationship($class, $type, $name, array $options = array());
+	abstract public function relationship($class, $type, $name, array $options = []);
 
 	/**
 	 * Create a record. This is the abstract method that is implemented by specific data sources.
@@ -210,7 +210,7 @@ abstract class Source extends \lithium\core\Object {
 	 *              - `locked` _boolean_ default: true
 	 * @return boolean Returns true if the operation was a success, otherwise false.
 	 */
-	abstract public function create($query, array $options = array());
+	abstract public function create($query, array $options = []);
 
 	/**
 	 * Abstract. Must be defined by child classes.
@@ -219,7 +219,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @param array $options
 	 * @return boolean Returns true if the operation was a success, otherwise false.
 	 */
-	abstract public function read($query, array $options = array());
+	abstract public function read($query, array $options = []);
 
 	/**
 	 * Updates a set of records in a concrete data store.
@@ -231,7 +231,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @param array $options Options to execute, which are defined by the concrete implementation.
 	 * @return boolean Returns true if the update operation was a success, otherwise false.
 	 */
-	abstract public function update($query, array $options = array());
+	abstract public function update($query, array $options = []);
 
 	/**
 	 * Abstract. Must be defined by child classes.
@@ -240,7 +240,7 @@ abstract class Source extends \lithium\core\Object {
 	 * @param array $options
 	 * @return boolean Returns true if the operation was a success, otherwise false.
 	 */
-	abstract public function delete($query, array $options = array());
+	abstract public function delete($query, array $options = []);
 
 	/**
 	 * Returns the list of methods which format values imported from `Query` objects. Should be
@@ -266,10 +266,10 @@ abstract class Source extends \lithium\core\Object {
 	 *         dependencies.
 	 */
 	public function configureClass($class) {
-		return array(
+		return [
 			'classes' => $this->_classes,
-			'meta' => array('key' => 'id', 'locked' => true)
-		);
+			'meta' => ['key' => 'id', 'locked' => true]
+		];
 	}
 
 	/**

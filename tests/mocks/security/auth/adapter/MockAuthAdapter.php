@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\security\auth\adapter;
 
 class MockAuthAdapter extends \lithium\core\Object {
 
-	public function check($credentials, array $options = array()) {
+	public function check($credentials, array $options = []) {
 		switch (true) {
 			case isset($options['success']):
 				return $credentials;
@@ -20,14 +20,14 @@ class MockAuthAdapter extends \lithium\core\Object {
 		return false;
 	}
 
-	public function set($data, array $options = array()) {
+	public function set($data, array $options = []) {
 		if (isset($options['fail'])) {
 			return false;
 		}
 		return $data;
 	}
 
-	public function clear(array $options = array()) {
+	public function clear(array $options = []) {
 	}
 }
 

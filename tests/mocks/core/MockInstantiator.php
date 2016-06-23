@@ -10,9 +10,9 @@ namespace lithium\tests\mocks\core;
 
 class MockInstantiator extends \lithium\core\Object {
 
-	protected $_classes = array('request' => 'lithium\tests\mocks\core\MockRequest');
+	protected $_classes = ['request' => 'lithium\tests\mocks\core\MockRequest'];
 
-	public function instance($name, array $config = array()) {
+	public function instance($name, array $config = []) {
 		return $this->_instance($name, $config);
 	}
 }

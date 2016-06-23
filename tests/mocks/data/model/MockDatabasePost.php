@@ -10,21 +10,21 @@ namespace lithium\tests\mocks\data\model;
 
 class MockDatabasePost extends \lithium\data\Model {
 
-	public $hasMany = array(
+	public $hasMany = [
 		'MockDatabaseComment',
-		'MockDatabasePostRevision' => array(
-			'constraints' => array('MockDatabasePostRevision.deleted' => null)
-		)
-	);
+		'MockDatabasePostRevision' => [
+			'constraints' => ['MockDatabasePostRevision.deleted' => null]
+		]
+	];
 
-	protected $_meta = array('connection' => false, 'key' => 'id');
+	protected $_meta = ['connection' => false, 'key' => 'id'];
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'author_id' => array('type' => 'integer'),
-		'title' => array('type' => 'string'),
-		'created' => array('type' => 'datetime')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer'],
+		'author_id' => ['type' => 'integer'],
+		'title' => ['type' => 'string'],
+		'created' => ['type' => 'datetime']
+	];
 }
 
 ?>

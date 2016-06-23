@@ -16,7 +16,7 @@ class MockResponse extends \lithium\console\Response {
 
 	public $testParam;
 
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		parent::__construct($config);
 		$this->output = null;
 		$this->error = null;

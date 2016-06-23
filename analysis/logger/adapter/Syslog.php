@@ -28,7 +28,7 @@ class Syslog extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_priorities = array(
+	protected $_priorities = [
 		'emergency' => LOG_EMERG,
 		'alert'     => LOG_ALERT,
 		'critical'  => LOG_CRIT,
@@ -37,7 +37,7 @@ class Syslog extends \lithium\core\Object {
 		'notice'    => LOG_NOTICE,
 		'info'      => LOG_INFO,
 		'debug'     => LOG_DEBUG
-	);
+	];
 
 	/**
 	 * Constructor. Configures the `Syslog` adapter instance with the default settings. For
@@ -55,8 +55,8 @@ class Syslog extends \lithium\core\Object {
 	 *          `LOG_USER`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('identity' => false, 'options'  => LOG_ODELAY, 'facility' => LOG_USER);
+	public function __construct(array $config = []) {
+		$defaults = ['identity' => false, 'options'  => LOG_ODELAY, 'facility' => LOG_USER];
 		parent::__construct($config + $defaults);
 	}
 

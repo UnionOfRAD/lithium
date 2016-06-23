@@ -10,11 +10,11 @@ namespace lithium\tests\mocks\console\command;
 
 class MockCreate extends \lithium\console\command\Create {
 
-	protected $_classes = array(
+	protected $_classes = [
 		'response' => 'lithium\tests\mocks\console\MockResponse'
-	);
+	];
 
-	public function save($template, $params = array()) {
+	public function save($template, $params = []) {
 		return $this->_save($template, $params);
 	}
 }

@@ -18,12 +18,12 @@ class PostgreSqlTest extends \lithium\test\Unit {
 	protected $_db = null;
 
 	public function setUp() {
-		Connections::add('mock', array(
+		Connections::add('mock', [
 			'object' => $this->_db = new MockPostgreSql()
-		));
-		MockDatabasePost::config(array(
-			'meta' => array('connection' => 'mock')
-		));
+		]);
+		MockDatabasePost::config([
+			'meta' => ['connection' => 'mock']
+		]);
 	}
 
 	public function tearDown() {
@@ -33,22 +33,22 @@ class PostgreSqlTest extends \lithium\test\Unit {
 
 	public function testHasManyRelationWithLimitAndOrder() {
 		$this->_db->log = true;
-		$this->_db->return['_execute'] = new MockResult(array(
-			'records' => array(
-				array(0 => 5)
-			)
-		));
+		$this->_db->return['_execute'] = new MockResult([
+			'records' => [
+				[0 => 5]
+			]
+		]);
 
-		MockDatabasePost::first(array(
-			'with' => array(
+		MockDatabasePost::first([
+			'with' => [
 				'MockDatabaseComment',
-			),
-			'order' => array(
+			],
+			'order' => [
 				'title',
 				'id',
 				'MockDatabaseComment.body' => 'DESC'
-			)
-		));
+			]
+		]);
 		$this->_db->log = false;
 
 		$result = $this->_db->logs;
@@ -81,33 +81,33 @@ SQL;
 	}
 
 	public function testDsnWithHostPort() {
-		$db = new MockPostgreSql(array(
+		$db = new MockPostgreSql([
 			'autoConnect' => false,
 			'database' => 'test',
 			'host' => 'localhost:1234',
-		));
+		]);
 		$expected = 'pgsql:host=localhost;port=1234;dbname=test';
 		$result = $db->dsn();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testDsnWithHost() {
-		$db = new MockPostgreSql(array(
+		$db = new MockPostgreSql([
 			'autoConnect' => false,
 			'database' => 'test',
 			'host' => 'localhost',
-		));
+		]);
 		$expected = 'pgsql:host=localhost;port=5432;dbname=test';
 		$result = $db->dsn();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testDsnWithPort() {
-		$db = new MockPostgreSql(array(
+		$db = new MockPostgreSql([
 			'autoConnect' => false,
 			'database' => 'test',
 			'host' => ':1234',
-		));
+		]);
 		$expected = 'pgsql:host=localhost;port=1234;dbname=test';
 		$result = $db->dsn();
 		$this->assertEqual($expected, $result);

@@ -20,16 +20,16 @@ class SimpleTest extends \lithium\test\Unit {
 	}
 
 	public function testBasicRender() {
-		$result = $this->subject->template('layout', array('layout' => '{:content}'));
+		$result = $this->subject->template('layout', ['layout' => '{:content}']);
 		$expected = '{:content}';
 		$this->assertEqual($expected, $result);
 
 		$message = new MockTextObject();
 		$message->message = 'Lithium is about to rock you.';
 
-		$result = $this->subject->render('Hello {:name}! {:message}', compact('message') + array(
+		$result = $this->subject->render('Hello {:name}! {:message}', compact('message') + [
 			'name' => 'World'
-		));
+		]);
 		$expected = 'Hello World! Lithium is about to rock you.';
 		$this->assertEqual($expected, $result);
 	}

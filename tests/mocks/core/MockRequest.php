@@ -12,9 +12,9 @@ class MockRequest extends \lithium\core\Object {
 
 	public $url = null;
 
-	public $params = array();
+	public $params = [];
 
-	public $argv = array();
+	public $argv = [];
 
 	public function __get($key) {
 		if (isset($this->params[$key])) {

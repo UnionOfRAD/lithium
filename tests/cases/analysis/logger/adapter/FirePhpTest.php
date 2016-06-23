@@ -28,7 +28,7 @@ class FirePhpTest extends \lithium\test\Unit {
 		error_reporting(($this->_backup = error_reporting()) & ~E_USER_DEPRECATED);
 
 		$this->firephp = new FirePhp();
-		Logger::config(array('firephp' => array('adapter' => $this->firephp)));
+		Logger::config(['firephp' => ['adapter' => $this->firephp]]);
 	}
 
 	public function tearDown() {
@@ -39,7 +39,7 @@ class FirePhpTest extends \lithium\test\Unit {
 	 * Test the initialization of the FirePhp log adapter.
 	 */
 	public function testConstruct() {
-		$expected = array('init' => true);
+		$expected = ['init' => true];
 		$this->assertEqual($expected, $this->firephp->_config);
 	}
 
@@ -59,21 +59,21 @@ class FirePhpTest extends \lithium\test\Unit {
 	 */
 	public function testWrite() {
 		$response = new Response();
-		$result = Logger::write('debug', 'FirePhp to the rescue!', array('name' => 'firephp'));
+		$result = Logger::write('debug', 'FirePhp to the rescue!', ['name' => 'firephp']);
 		$this->assertNotEmpty($result);
 		$this->assertEmpty($response->headers());
 
 		$host = 'meta.firephp.org';
-		$expected = array(
+		$expected = [
 			"X-Wf-Protocol-1: http://meta.wildfirehq.org/Protocol/JsonStream/0.2",
 			"X-Wf-1-Plugin-1: http://{$host}/Wildfire/Plugin/FirePHP/Library-FirePHPCore/0.3",
 			"X-Wf-1-Structure-1: http://{$host}/Wildfire/Structure/FirePHP/FirebugConsole/0.1",
 			"X-Wf-1-1-1-1: 41|[{\"Type\":\"LOG\"},\"FirePhp to the rescue!\"]|"
-		);
+		];
 		Logger::adapter('firephp')->bind($response);
 		$this->assertEqual($expected, $response->headers());
 
-		$result = Logger::write('debug', 'Add this immediately.', array('name' => 'firephp'));
+		$result = Logger::write('debug', 'Add this immediately.', ['name' => 'firephp']);
 		$this->assertNotEmpty($result);
 		$expected[] = 'X-Wf-1-1-1-2: 40|[{"Type":"LOG"},"Add this immediately."]|';
 		$this->assertEqual($expected, $response->headers());

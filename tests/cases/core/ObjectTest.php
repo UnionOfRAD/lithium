@@ -28,54 +28,54 @@ class ObjectTest extends \lithium\test\Unit {
 
 		$result = $callable->invokeMethod('foo');
 		$this->assertEqual($result['method'], 'foo');
-		$this->assertEqual($result['params'], array());
+		$this->assertEqual($result['params'], []);
 
-		$expected = array('bar');
+		$expected = ['bar'];
 		$result = $callable->invokeMethod('foo', $expected);
 		$this->assertEqual($result['method'], 'foo');
 		$this->assertEqual($result['params'], $expected);
 
-		$expected = array('one', 'two');
+		$expected = ['one', 'two'];
 		$result = $callable->invokeMethod('foo', $expected);
 		$this->assertEqual($result['method'], 'foo');
 		$this->assertEqual($result['params'], $expected);
 
-		$expected = array('short', 'parameter', 'list');
+		$expected = ['short', 'parameter', 'list'];
 		$result = $callable->invokeMethod('foo', $expected);
 		$this->assertEqual($result['method'], 'foo');
 		$this->assertEqual($result['params'], $expected);
 
-		$expected = array('a', 'longer', 'parameter', 'list');
+		$expected = ['a', 'longer', 'parameter', 'list'];
 		$result = $callable->invokeMethod('foo', $expected);
 		$this->assertEqual($result['method'], 'foo');
 		$this->assertEqual($result['params'], $expected);
 
-		$expected = array('a', 'much', 'longer', 'parameter', 'list');
+		$expected = ['a', 'much', 'longer', 'parameter', 'list'];
 		$result = $callable->invokeMethod('foo', $expected);
 		$this->assertEqual($result['method'], 'foo');
 		$this->assertEqual($result['params'], $expected);
 
-		$expected = array('an', 'extremely', 'long', 'list', 'of', 'parameters');
+		$expected = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
 		$result = $callable->invokeMethod('foo', $expected);
 		$this->assertEqual($result['method'], 'foo');
 		$this->assertEqual($result['params'], $expected);
 
-		$expected = array('an', 'extremely', 'long', 'list', 'of', 'parameters');
+		$expected = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
 		$result = $callable->invokeMethod('bar', $expected);
 		$this->assertEqual($result['method'], 'bar');
 		$this->assertEqual($result['params'], $expected);
 
-		$expected = array(
+		$expected = [
 			'if', 'you', 'have', 'a', 'parameter', 'list', 'this',
 			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
-		);
+		];
 		$result = $callable->invokeMethod('foo', $expected);
 		$this->assertEqual($result['method'], 'foo');
 		$this->assertEqual($result['params'], $expected);
 	}
 
 	public function testParents() {
-		$expected = array('lithium\core\Object' => 'lithium\core\Object');
+		$expected = ['lithium\core\Object' => 'lithium\core\Object'];
 
 		$result = MockObjectForParents::parents();
 		$this->assertEqual($expected, $result);
@@ -88,17 +88,17 @@ class ObjectTest extends \lithium\test\Unit {
 	 * Test configuration handling
 	 */
 	public function testObjectConfiguration() {
-		$expected = array('testScalar' => 'default', 'testArray' => array('default'));
+		$expected = ['testScalar' => 'default', 'testArray' => ['default']];
 		$config = new MockObjectConfiguration();
 		$this->assertEqual($expected, $config->getConfig());
 
-		$config = new MockObjectConfiguration(array('autoConfig' => array('testInvalid')));
+		$config = new MockObjectConfiguration(['autoConfig' => ['testInvalid']]);
 		$this->assertEqual($expected, $config->getConfig());
 
-		$expected = array('testScalar' => 'override', 'testArray' => array('default', 'override'));
-		$config = new MockObjectConfiguration(array('autoConfig' => array(
+		$expected = ['testScalar' => 'override', 'testArray' => ['default', 'override']];
+		$config = new MockObjectConfiguration(['autoConfig' => [
 			'testScalar', 'testArray' => 'merge'
-		)) + $expected);
+		]] + $expected);
 		$this->assertEqual($expected, $config->getConfig());
 	}
 
@@ -106,9 +106,9 @@ class ObjectTest extends \lithium\test\Unit {
 	 * Tests that an object can be instantiated using the magic `__set_state()` method.
 	 */
 	public function testStateBasedInstantiation() {
-		$result = MockObjectConfiguration::__set_state(array(
+		$result = MockObjectConfiguration::__set_state([
 			'key' => 'value', '_protected' => 'test'
-		));
+		]);
 		$expected = 'lithium\tests\mocks\core\MockObjectConfiguration';
 		$this->assertEqual($expected, get_class($result));
 
@@ -162,13 +162,13 @@ class ObjectTest extends \lithium\test\Unit {
 		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
 
 		$test = new MockMethodFiltering();
-		$result = $test->method(array('Starting test'));
-		$expected = array(
+		$result = $test->method(['Starting test']);
+		$expected = [
 			'Starting test',
 			'Starting outer method call',
 			'Inside method implementation',
 			'Ending outer method call'
-		);
+		];
 		$this->assertEqual($expected, $result);
 
 		$test->applyFilter('method', function($self, $params, $chain) {
@@ -178,15 +178,15 @@ class ObjectTest extends \lithium\test\Unit {
 			return $result;
 		});
 
-		$result = $test->method(array('Starting test'));
-		$expected = array(
+		$result = $test->method(['Starting test']);
+		$expected = [
 			'Starting test',
 			'Starting outer method call',
 			'Starting filter',
 			'Inside method implementation',
 			'Ending filter',
 			'Ending outer method call'
-		);
+		];
 		$this->assertEqual($expected, $result);
 
 		$test->applyFilter('method', function($self, $params, $chain) {
@@ -195,8 +195,8 @@ class ObjectTest extends \lithium\test\Unit {
 			$result[] = 'Ending inner filter';
 			return $result;
 		});
-		$result = $test->method(array('Starting test'));
-		$expected = array(
+		$result = $test->method(['Starting test']);
+		$expected = [
 			'Starting test',
 			'Starting outer method call',
 			'Starting filter',
@@ -205,7 +205,7 @@ class ObjectTest extends \lithium\test\Unit {
 			'Ending inner filter',
 			'Ending filter',
 			'Ending outer method call'
-		);
+		];
 		$this->assertEqual($expected, $result);
 
 		Filters::clear('lithium\tests\mocks\core\MockMethodFiltering');
@@ -235,11 +235,11 @@ class ObjectTest extends \lithium\test\Unit {
 		$object = new MockMethodFiltering();
 
 		$count = 0;
-		$object->applyFilter(array('method', 'method2'), function($s, $p, $c) use (&$count) {
+		$object->applyFilter(['method', 'method2'], function($s, $p, $c) use (&$count) {
 			$count++;
 			return $c->next($s, $p, $c);
 		});
-		$object->method(array('foo' => 'bar'));
+		$object->method(['foo' => 'bar']);
 		$object->method2();
 
 		$this->assertIdentical(2, $count);
@@ -272,17 +272,17 @@ class ObjectTest extends \lithium\test\Unit {
 
 		$obj = new MockMethodFiltering();
 		$obj->applyFilter(false);
-		$obj->applyFilter(array('method2', 'manual'), function($self, $params, $chain) {
+		$obj->applyFilter(['method2', 'manual'], function($self, $params, $chain) {
 			return false;
 		});
 
 		$this->assertFalse($obj->method2());
-		$this->assertFalse($obj->manual(array()));
+		$this->assertFalse($obj->manual([]));
 
 		$obj->applyFilter('method2', false);
 
 		$this->assertNotIdentical($obj->method2(), false);
-		$this->assertFalse($obj->manual(array()));
+		$this->assertFalse($obj->manual([]));
 
 		Filters::clear('lithium\tests\mocks\core\MockMethodFiltering');
 		error_reporting($original);
@@ -293,17 +293,17 @@ class ObjectTest extends \lithium\test\Unit {
 
 		$obj = new MockMethodFiltering();
 		$obj->applyFilter(false);
-		$obj->applyFilter(array('method2', 'manual'), function($self, $params, $chain) {
+		$obj->applyFilter(['method2', 'manual'], function($self, $params, $chain) {
 			return false;
 		});
 
 		$this->assertFalse($obj->method2());
-		$this->assertFalse($obj->manual(array()));
+		$this->assertFalse($obj->manual([]));
 
 		$obj->applyFilter(false);
 
 		$this->assertNotIdentical($obj->method2(), false);
-		$this->assertNotIdentical($obj->manual(array()), false);
+		$this->assertNotIdentical($obj->manual([]), false);
 
 		Filters::clear('lithium\tests\mocks\core\MockMethodFiltering');
 		error_reporting($original);

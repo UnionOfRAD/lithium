@@ -10,27 +10,27 @@ namespace lithium\data;
 
 class DocumentSchema extends \lithium\data\Schema {
 
-	protected $_classes = array(
+	protected $_classes = [
 		'entity' => 'lithium\data\entity\Document',
 		'set'    => 'lithium\data\collection\DocumentSet'
-	);
+	];
 
-	protected $_handlers = array();
+	protected $_handlers = [];
 
 	protected function _init() {
 		$this->_autoConfig[] = 'handlers';
 		parent::_init();
 	}
 
-	public function cast($object, $key, $data, array $options = array()) {
-		$defaults = array(
+	public function cast($object, $key, $data, array $options = []) {
+		$defaults = [
 			'parent' => null,
 			'pathKey' => null,
 			'model' => null,
 			'wrap' => true,
 			'asContent' => false,
 			'first' => false
-		);
+		];
 		$options += $defaults;
 
 		$basePathKey = $options['pathKey'];
@@ -73,28 +73,28 @@ class DocumentSchema extends \lithium\data\Schema {
 		}
 
 		if ($isArray || ($numericArray && !$isObject)) {
-			$val = $valIsArray ? $val : array($val);
+			$val = $valIsArray ? $val : [$val];
 			$class = 'set';
 		}
 
 		if ($options['wrap']) {
-			$config = array(
+			$config = [
 				'parent' => $options['parent'],
 				'model' => (!$options['model'] && $object) ? $object->model() : $options['model'],
 				'schema' => $this
-			);
+			];
 			$config += compact('pathKey') + array_diff_key($options, $defaults);
 
 			if (!$pathKey && $model = $options['model']) {
 				$exists = is_object($object) ? $object->exists() : false;
-				$config += array('class' => $class, 'exists' => $exists, 'defaults' => false);
+				$config += ['class' => $class, 'exists' => $exists, 'defaults' => false];
 				$val = $model::create($val, $config);
 			} else {
 				$config['data'] = $val;
 				$val = $this->_instance($class, $config);
 			}
 		} elseif ($class === 'set') {
-			$val = $val ?: array();
+			$val = $val ?: [];
 			foreach ($val as &$value) {
 				$value = $this->_castType($value, $pathKey);
 			}

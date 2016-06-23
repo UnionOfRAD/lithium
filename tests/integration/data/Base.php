@@ -18,9 +18,9 @@ class Base extends \lithium\test\Integration {
 
 	protected $_dbConfig = null;
 
-	public function connect($connection, $options = array()) {
-		$options += array('autoConnect' => true);
-		$this->_dbConfig = Connections::get($connection, array('config' => true));
+	public function connect($connection, $options = []) {
+		$options += ['autoConnect' => true];
+		$this->_dbConfig = Connections::get($connection, ['config' => true]);
 		$db = $this->_db = Connections::get($connection);
 
 		$this->skipIf(!$db, "The `{$connection}` connection is not correctly configured.");

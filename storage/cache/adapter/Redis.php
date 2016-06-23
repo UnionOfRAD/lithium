@@ -33,13 +33,13 @@ use Redis as RedisCore;
  * A simple configuration can be accomplished as follows:
  *
  * ```
- * Cache::config(array(
- *     'cache-config-name' => array(
+ * Cache::config([
+ *     'cache-config-name' => [
  *         'adapter' => 'Redis',
  *         'host' => '127.0.0.1:6379',
- *         'strategies => array('Serializer')
- *     )
- * ));
+ *         'strategies => ['Serializer']
+ *     ]
+ * ]);
  * ```
  *
  * The `'host'` key accepts a string argument in the format of ip:port where
@@ -91,13 +91,13 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 *          not close when the request is terminated. Defaults to `false`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'scope' => null,
 			'expiry' => '+1 hour',
 			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT,
 			'persistent' => false
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -116,10 +116,10 @@ class Redis extends \lithium\storage\cache\Adapter {
 		if (HostString::isSocket($this->_config['host'])) {
 			$this->connection->{$method}($this->_config['host']);
 		} else {
-			$host = HostString::parse($this->_config['host']) + array(
+			$host = HostString::parse($this->_config['host']) + [
 				'host' => static::DEFAULT_HOST,
 				'port' => static::DEFAULT_PORT
-			);
+			];
 			$this->connection->{$method}($host['host'], $host['port']);
 		}
 
@@ -148,8 +148,8 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 * @param array $params Parameter list to use when calling $method.
 	 * @return mixed Returns the result of the method call.
 	 */
-	public function __call($method, $params = array()) {
-		return call_user_func_array(array(&$this->connection, $method), $params);
+	public function __call($method, $params = []) {
+		return call_user_func_array([&$this->connection, $method], $params);
 	}
 
 	/**
@@ -165,7 +165,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 		if (parent::respondsTo($method, $internal)) {
 			return true;
 		}
-		return is_callable(array($this->connection, $method));
+		return is_callable([$this->connection, $method]);
 	}
 
 	/**
@@ -222,7 +222,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 */
 	public function read(array $keys) {
 		if (count($keys) > 1) {
-			$results = array();
+			$results = [];
 			$data = $this->connection->mGet($keys);
 
 			foreach ($data as $key => $item) {
@@ -236,7 +236,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 			return $results;
 		}
 		$result = $this->connection->get($key = current($keys));
-		return $result === false ? array() : array($key => $result);
+		return $result === false ? [] : [$key => $result];
 	}
 
 	/**

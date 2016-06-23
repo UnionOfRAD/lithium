@@ -9,8 +9,8 @@
 /**
  * Validation data for `fr_BE`.
  */
-return array(
+return [
 	'postalCode' => '/^[1-9]{1}[0-9]{3}$/i'
-);
+];
 
 ?>

@@ -25,9 +25,9 @@ class Relationship extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'entity' => 'lithium\data\Entity'
-	);
+	];
 
 	/**
 	 * A relationship linking type defined by one document or record (or multiple) being embedded
@@ -67,7 +67,7 @@ class Relationship extends \lithium\core\Object {
 	 *        - `'name'` _string_: The name of the relationship in the context of the
 	 *          originating model. For example, a `Posts` model might define a relationship to
 	 *          a `Users` model like so:
-	 *          `public $hasMany = array('Author' => array('to' => 'Users'));`
+	 *          `public $hasMany = ['Author' => ['to' => 'Users']];`
 	 *          In this case, the relationship is bound to the `Users` model, but `'Author'` would
 	 *          be the relationship name. This is the name with which the relationship is
 	 *          referenced in the originating model.
@@ -105,19 +105,19 @@ class Relationship extends \lithium\core\Object {
 	 *          the `Relationship` instance has finished configuring itself.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'name'        => null,
-			'key'         => array(),
+			'key'         => [],
 			'type'        => null,
 			'to'          => null,
 			'from'        => null,
 			'link'        => static::LINK_KEY,
 			'fields'      => true,
 			'fieldName'   => null,
-			'constraints' => array(),
+			'constraints' => [],
 			'strategy'    => null
-		);
+		];
 		$config += $defaults;
 
 		if (!$config['type'] || !$config['fieldName']) {
@@ -174,7 +174,7 @@ class Relationship extends \lithium\core\Object {
 	 * @param array $args Unused.
 	 * @return mixed Returns the value of the given configuration item.
 	 */
-	public function __call($name, $args = array()) {
+	public function __call($name, $args = []) {
 		return $this->data($name);
 	}
 
@@ -186,7 +186,7 @@ class Relationship extends \lithium\core\Object {
 	 *              applicable.
 	 * @return object Returns the object(s) for this relationship.
 	 */
-	public function get($object, array $options = array()) {
+	public function get($object, array $options = []) {
 		$link = $this->link();
 		$strategies = $this->_strategies();
 
@@ -231,7 +231,7 @@ class Relationship extends \lithium\core\Object {
 	 *               the associated values of foreign keys.
 	 */
 	public function foreignKey($primaryKey) {
-		$result = array();
+		$result = [];
 		$entity = $this->_classes['entity'];
 		$keys = ($this->type() === 'belongsTo') ? array_flip($this->key()) : $this->key();
 		$primaryKey = ($primaryKey instanceof $entity) ? $primaryKey->to('array') : $primaryKey;
@@ -252,7 +252,7 @@ class Relationship extends \lithium\core\Object {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
-		return is_callable(array($this, $method), true);
+		return is_callable([$this, $method], true);
 	}
 
 	/**
@@ -261,7 +261,7 @@ class Relationship extends \lithium\core\Object {
 	 */
 	protected function _keys($keys) {
 		if (!$keys) {
-			return array();
+			return [];
 		}
 		$config = $this->_config;
 		$hasType = ($config['type'] === 'hasOne' || $config['type'] === 'hasMany');
@@ -288,7 +288,7 @@ class Relationship extends \lithium\core\Object {
 	 * Strategies used to query related objects, indexed by key.
 	 */
 	protected function _strategies() {
-		return array(
+		return [
 			static::LINK_EMBEDDED => function($object, $relationship) {
 				$fieldName = $relationship->fieldName();
 				return $object->{$fieldName};
@@ -310,7 +310,7 @@ class Relationship extends \lithium\core\Object {
 				$query = $relationship->query($object);
 				return $model::all(Set::merge($query, $options));
 			}
-		);
+		];
 	}
 }
 

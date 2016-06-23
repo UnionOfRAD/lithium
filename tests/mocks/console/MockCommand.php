@@ -36,9 +36,9 @@ class MockCommand extends \lithium\console\Command {
 
 	protected $_dontShow = null;
 
-	protected $_classes = array(
+	protected $_classes = [
 		'response' => 'lithium\tests\mocks\console\MockResponse'
-	);
+	];
 
 	public function testRun() {
 		$this->response->testAction = __FUNCTION__;
@@ -75,11 +75,11 @@ class MockCommand extends \lithium\console\Command {
 	}
 
 	public function testReturnEmptyArray() {
-		return array();
+		return [];
 	}
 
 	public function testReturnArray() {
-		return array('a' => 'b');
+		return ['a' => 'b'];
 	}
 }
 

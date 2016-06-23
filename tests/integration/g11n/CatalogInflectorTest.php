@@ -14,13 +14,13 @@ use lithium\util\Inflector;
 
 class CatalogInflectorTest extends \lithium\test\Integration {
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	public function setUp() {
 		$this->_backup['catalogConfig'] = Catalog::config();
-		Catalog::config(array(
-			'runtime' => array('adapter' => new Memory())
-		));
+		Catalog::config([
+			'runtime' => ['adapter' => new Memory()]
+		]);
 	}
 
 	public function tearDown() {
@@ -30,12 +30,12 @@ class CatalogInflectorTest extends \lithium\test\Integration {
 	}
 
 	public function testTransliteration() {
-		$data = array(
-			'transliteration' => array(
+		$data = [
+			'transliteration' => [
 				'\$' => 'dollar',
 				'&' => 'and'
-			)
-		);
+			]
+		];
 		Catalog::write('runtime', 'inflection', 'en', $data);
 
 		Inflector::rules(
@@ -46,12 +46,12 @@ class CatalogInflectorTest extends \lithium\test\Integration {
 		$expected = 'this-and-that';
 		$this->assertEqual($expected, $result);
 
-		$data = array(
-			'transliteration' => array(
+		$data = [
+			'transliteration' => [
 				't' => 'd',
 				'&' => 'und'
-			)
-		);
+			]
+		];
 		Catalog::write('runtime', 'inflection', 'de', $data);
 
 		Inflector::rules(

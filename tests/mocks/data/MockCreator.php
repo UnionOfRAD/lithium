@@ -10,25 +10,25 @@ namespace lithium\tests\mocks\data;
 
 class MockCreator extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => false);
+	protected $_meta = ['connection' => false];
 
-	protected $_schema = array(
-		'name' => array(
+	protected $_schema = [
+		'name' => [
 			'default' => 'Moe',
 			'type' => 'string',
 			'null' => false
-		),
-		'sign' => array(
+		],
+		'sign' => [
 			'default' => 'bar',
 			'type' => 'string',
 			'null' => false
-		),
-		'age' => array(
+		],
+		'age' => [
 			'default' => 0,
 			'type' => 'number',
 			'null' => false
-		)
-	);
+		]
+	];
 }
 
 ?>

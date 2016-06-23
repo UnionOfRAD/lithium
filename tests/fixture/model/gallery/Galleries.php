@@ -10,9 +10,9 @@ namespace lithium\tests\fixture\model\gallery;
 
 class Galleries extends \lithium\data\Model {
 
-	public $hasMany = array('Images');
+	public $hasMany = ['Images'];
 
-	protected $_meta = array('connection' => 'test');
+	protected $_meta = ['connection' => 'test'];
 }
 
 ?>

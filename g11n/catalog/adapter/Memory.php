@@ -21,7 +21,7 @@ class Memory extends \lithium\g11n\catalog\Adapter {
 	 *
 	 * @var array
 	 */
-	protected $_data = array();
+	protected $_data = [];
 
 	/**
 	 * Reads data.
@@ -52,7 +52,7 @@ class Memory extends \lithium\g11n\catalog\Adapter {
 		$scope = $scope ?: 'default';
 
 		if (!isset($this->_data[$scope][$category][$locale])) {
-			$this->_data[$scope][$category][$locale] = array();
+			$this->_data[$scope][$category][$locale] = [];
 		}
 		foreach ($data as $item) {
 			$this->_data[$scope][$category][$locale] = $this->_merge(

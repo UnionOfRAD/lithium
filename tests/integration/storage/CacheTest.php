@@ -36,24 +36,24 @@ class CacheTest extends \lithium\test\Integration {
 	public function testFileAdapterCacheConfig() {
 		$result = Cache::config();
 		$this->assertEmpty($result);
-		$config = array('default' => array('adapter' => 'File', 'filters' => array()));
+		$config = ['default' => ['adapter' => 'File', 'filters' => []]];
 
 		Cache::config($config);
 		$this->assertEqual($config, Cache::config());
 	}
 
 	public function testReadThroughWithStrategies() {
-		Cache::config(array(
-			'default' => array(
+		Cache::config([
+			'default' => [
 				'adapter' => 'Memory',
-				'strategies' => array('Serializer')
-			)
-		));
+				'strategies' => ['Serializer']
+			]
+		]);
 
 		$expected = 'bar';
-		$result = Cache::read('default', 'foo', array(
-			'write' => array('+5 seconds' => 'bar')
-		));
+		$result = Cache::read('default', 'foo', [
+			'write' => ['+5 seconds' => 'bar']
+		]);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -62,19 +62,19 @@ class CacheTest extends \lithium\test\Integration {
 		$path = "{$resources}/tmp/cache";
 		$this->skipIf(!$this->_checkPath(), "{$path} does not have the proper permissions.");
 
-		Cache::config(array(
-			'default' => array(
+		Cache::config([
+			'default' => [
 				'adapter' => 'File',
-				'strategies' => array('Serializer'),
-				'filters' => array(),
+				'strategies' => ['Serializer'],
+				'filters' => [],
 				'path' => $path
-			)
-		));
+			]
+		]);
 
 		$expected = 'bar';
-		$result = Cache::read('default', 'foo', array(
-			'write' => array('+5 seconds' => 'bar')
-		));
+		$result = Cache::read('default', 'foo', [
+			'write' => ['+5 seconds' => 'bar']
+		]);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'bar';
@@ -83,53 +83,53 @@ class CacheTest extends \lithium\test\Integration {
 	}
 
 	public function testMultiWriteReadWithStrategies() {
-		Cache::config(array(
-			'default' => array(
+		Cache::config([
+			'default' => [
 				'adapter' => 'Memory',
-				'strategies' => array('Serializer')
-			)
-		));
-		$keys = array(
+				'strategies' => ['Serializer']
+			]
+		]);
+		$keys = [
 			'key1' => 'data1',
 			'key2' => 'data2'
-		);
+		];
 		$result = Cache::write('default', $keys, null);
 		$this->assertTrue($result);
 
-		$expected = array(
+		$expected = [
 			'key1' => 'data1',
 			'key2' => 'data2'
-		);
-		$keys = array(
+		];
+		$keys = [
 			'key1',
 			'key2'
-		);
+		];
 		$result = Cache::read('default', $keys);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMultiWriteReadWithMultipleStrategies() {
-		Cache::config(array(
-			'default' => array(
+		Cache::config([
+			'default' => [
 				'adapter' => 'Memory',
-				'strategies' => array('Serializer', 'Base64')
-			)
-		));
-		$keys = array(
+				'strategies' => ['Serializer', 'Base64']
+			]
+		]);
+		$keys = [
 			'key1' => 'data1',
 			'key2' => 'data2'
-		);
+		];
 		$result = Cache::write('default', $keys, null);
 		$this->assertTrue($result);
 
-		$expected = array(
+		$expected = [
 			'key1' => 'data1',
 			'key2' => 'data2'
-		);
-		$keys = array(
+		];
+		$keys = [
 			'key1',
 			'key2'
-		);
+		];
 		$result = Cache::read('default', $keys);
 		$this->assertEqual($expected, $result);
 	}
@@ -139,10 +139,10 @@ class CacheTest extends \lithium\test\Integration {
 		$path = "{$resources}/tmp/cache";
 		$this->skipIf(!$this->_checkPath(), "{$path} does not have the proper permissions.");
 
-		$config = array('default' => compact('path') + array(
+		$config = ['default' => compact('path') + [
 			'adapter' => 'File',
-			'filters' => array()
-		));
+			'filters' => []
+		]];
 		Cache::config($config);
 
 		$time = time();
@@ -164,14 +164,14 @@ class CacheTest extends \lithium\test\Integration {
 		$path = "{$resources}/tmp/cache";
 		$this->skipIf(!$this->_checkPath(), "{$path} does not have the proper permissions.");
 
-		$config = array('default' => compact('path') + array(
+		$config = ['default' => compact('path') + [
 			'adapter' => 'File',
-			'filters' => array(),
-			'strategies' => array('Serializer')
-		));
+			'filters' => [],
+			'strategies' => ['Serializer']
+		]];
 		Cache::config($config);
 
-		$data = array('some' => 'data');
+		$data = ['some' => 'data'];
 		$time = time();
 		$result = Cache::write('default', 'key', $data, "@{$time} +1 minute");
 		$this->assertNotEmpty($result);
@@ -195,14 +195,14 @@ class CacheTest extends \lithium\test\Integration {
 		$path = "{$resources}/tmp/cache";
 		$this->skipIf(!$this->_checkPath(), "{$path} does not have the proper permissions.");
 
-		$config = array('default' => compact('path') + array(
+		$config = ['default' => compact('path') + [
 			'adapter' => 'File',
-			'filters' => array(),
-			'strategies' => array('Serializer', 'Base64')
-		));
+			'filters' => [],
+			'strategies' => ['Serializer', 'Base64']
+		]];
 		Cache::config($config);
 
-		$data = array('some' => 'data');
+		$data = ['some' => 'data'];
 		$time = time();
 		$result = Cache::write('default', 'key', $data, "@{$time} +1 minute");
 		$this->assertNotEmpty($result);

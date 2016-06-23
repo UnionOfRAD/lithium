@@ -16,10 +16,10 @@ class ResponseTest extends \lithium\test\Unit {
 	public $streams;
 
 	public function setUp() {
-		$this->streams = array(
+		$this->streams = [
 			'output' => Libraries::get(true, 'resources') . '/tmp/tests/output.txt',
 			'error' => Libraries::get(true, 'resources') . '/tmp/tests/error.txt'
-		);
+		];
 	}
 
 	public function tearDown() {
@@ -41,9 +41,9 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 		$stream = fopen($this->streams['output'], 'w');
 
-		$response = new Response(array(
+		$response = new Response([
 			'output' => $stream
-		));
+		]);
 		$this->assertInternalType('resource', $response->output);
 		$this->assertEqual($stream, $response->output);
 
@@ -54,7 +54,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
 		$stream = fopen($this->streams['error'], 'w');
-		$response = new Response(array('error' => $stream));
+		$response = new Response(['error' => $stream]);
 		$this->assertInternalType('resource', $response->error);
 		$this->assertEqual($stream, $response->error);
 	}
@@ -63,7 +63,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
-		$response = new Response(array('output' => fopen($this->streams['output'], 'w+')));
+		$response = new Response(['output' => fopen($this->streams['output'], 'w+')]);
 		$this->assertInternalType('resource', $response->output);
 
 		$this->assertEqual(2, $response->output('ok'));
@@ -74,8 +74,8 @@ class ResponseTest extends \lithium\test\Unit {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
-		$response = new Response(array('output' => fopen($this->streams['output'], 'w+')));
-		$response->styles(array('heading' => "\033[1;36m"));
+		$response = new Response(['output' => fopen($this->streams['output'], 'w+')]);
+		$response->styles(['heading' => "\033[1;36m"]);
 		$response->output('{:heading}ok');
 
 		$expected = "\033[1;36mok";
@@ -89,7 +89,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$base = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
-		$response = new Response(array('error' => fopen($this->streams['error'], 'w+')));
+		$response = new Response(['error' => fopen($this->streams['error'], 'w+')]);
 		$this->assertInternalType('resource', $response->error);
 		$this->assertEqual(2, $response->error('ok'));
 		$this->assertEqual('ok', file_get_contents($this->streams['error']));

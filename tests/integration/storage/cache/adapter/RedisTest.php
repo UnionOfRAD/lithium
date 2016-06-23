@@ -19,11 +19,11 @@ class RedisTest extends \lithium\test\Integration {
 
 	protected $_redis;
 
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'host' => '127.0.0.1',
 			'port' => 6379
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -79,7 +79,7 @@ class RedisTest extends \lithium\test\Integration {
 		});
 
 		$this->assertNotException('RedisException', function() {
-			$redis = new Redis(array('host' => '127.0.0.1'));
+			$redis = new Redis(['host' => '127.0.0.1']);
 			$redis->info();
 		});
 	}
@@ -88,7 +88,7 @@ class RedisTest extends \lithium\test\Integration {
 		$socketExists = file_exists('/tmp/redis.sock');
 		$this->skipIf(!$socketExists, 'Redis is not listening on socket');
 		$this->assertNotException('RedisException', function() {
-			$redis = new Redis(array('host' => '/tmp/redis.sock'));
+			$redis = new Redis(['host' => '/tmp/redis.sock']);
 			$redis->info();
 		});
 	}
@@ -96,7 +96,7 @@ class RedisTest extends \lithium\test\Integration {
 	public function testSimpleWrite() {
 		$key = 'key';
 		$data = 'value';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
@@ -116,7 +116,7 @@ class RedisTest extends \lithium\test\Integration {
 
 		$key = 'another_key';
 		$data = 'more_data';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = '+1 minute';
 		$time = strtotime($expiry);
 
@@ -136,10 +136,10 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteExpiryDefault() {
-		$redis = new Redis(array('expiry' => '+5 seconds'));
+		$redis = new Redis(['expiry' => '+5 seconds']);
 		$key = 'default_key';
 		$data = 'value';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$time = strtotime('+5 seconds');
 
 		$expected = $data;
@@ -159,9 +159,9 @@ class RedisTest extends \lithium\test\Integration {
 	public function testWriteNoExpiry() {
 		$key = 'default_key';
 		$data = 'value';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 
-		$redis = new Redis(array('expiry' => null));
+		$redis = new Redis(['expiry' => null]);
 		$expiry = null;
 
 		$result = $redis->write($keys, $expiry);
@@ -176,7 +176,7 @@ class RedisTest extends \lithium\test\Integration {
 
 		$this->_redis->delete($key);
 
-		$redis = new Redis(array('expiry' => Cache::PERSIST));
+		$redis = new Redis(['expiry' => Cache::PERSIST]);
 		$expiry = Cache::PERSIST;
 
 		$result = $redis->write($keys, $expiry);
@@ -208,7 +208,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteExpiryExpires() {
-		$keys = array('key1' => 'data1');
+		$keys = ['key1' => 'data1'];
 		$expiry = '+5 seconds';
 		$this->redis->write($keys, $expiry);
 
@@ -217,7 +217,7 @@ class RedisTest extends \lithium\test\Integration {
 
 		$this->_redis->delete('key1');
 
-		$keys = array('key1' => 'data1');
+		$keys = ['key1' => 'data1'];
 		$expiry = '+1 second';
 		$this->redis->write($keys, $expiry);
 
@@ -228,7 +228,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteExpiryTtl() {
-		$keys = array('key1' => 'data1');
+		$keys = ['key1' => 'data1'];
 		$expiry = 5;
 		$this->redis->write($keys, $expiry);
 
@@ -237,7 +237,7 @@ class RedisTest extends \lithium\test\Integration {
 
 		$this->_redis->delete('key1');
 
-		$keys = array('key1' => 'data1');
+		$keys = ['key1' => 'data1'];
 		$expiry = 1;
 		$this->redis->write($keys, $expiry);
 
@@ -248,9 +248,9 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteWithScope() {
-		$adapter = new Redis(array('scope' => 'primary'));
+		$adapter = new Redis(['scope' => 'primary']);
 
-		$keys = array('key1' => 'test1');
+		$keys = ['key1' => 'test1'];
 		$expiry = '+1 minute';
 		$adapter->write($keys, $expiry);
 
@@ -265,12 +265,12 @@ class RedisTest extends \lithium\test\Integration {
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
-		$keys = array($key);
+		$keys = [$key];
 
 		$result = $this->_redis->set($key, $data);
 		$this->assertTrue($result);
 
-		$expected = array($key => $data);
+		$expected = [$key => $data];
 		$result = $this->redis->read($keys);
 		$this->assertEqual($expected, $result);
 
@@ -279,7 +279,7 @@ class RedisTest extends \lithium\test\Integration {
 
 		$key = 'another_read_key';
 		$data = 'read data';
-		$keys = array($key);
+		$keys = [$key];
 		$time = strtotime('+1 minute');
 		$expiry = $time - time();
 
@@ -290,7 +290,7 @@ class RedisTest extends \lithium\test\Integration {
 		$this->assertTrue($result == $expiry || $result == $expiry - 1);
 
 
-		$expected = array($key => $data);
+		$expected = [$key => $data];
 		$result = $this->redis->read($keys);
 		$this->assertEqual($expected, $result);
 
@@ -299,7 +299,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testMultiRead() {
-		$data = array('key1' => 'value1', 'key2' => 'value2');
+		$data = ['key1' => 'value1', 'key2' => 'value2'];
 		$result = $this->_redis->mset($data);
 		$this->assertTrue($result);
 
@@ -314,7 +314,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testMultiWrite() {
-		$keys = array('key1' => 'value1', 'key2' => 'value2');
+		$keys = ['key1' => 'value1', 'key2' => 'value2'];
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
@@ -328,18 +328,18 @@ class RedisTest extends \lithium\test\Integration {
 
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
-		$keys = array($key);
+		$keys = [$key];
 
-		$expected = array();
+		$expected = [];
 		$result = $this->redis->read($keys);
 		$this->assertIdentical($expected, $result);
 	}
 
 	public function testWriteAndReadNull() {
 		$expiry = '+1 minute';
-		$keys = array(
+		$keys = [
 			'key1' => null
-		);
+		];
 		$result = $this->redis->write($keys);
 		$this->assertTrue($result);
 
@@ -350,10 +350,10 @@ class RedisTest extends \lithium\test\Integration {
 
 	public function testWriteAndReadNullMulti() {
 		$expiry = '+1 minute';
-		$keys = array(
+		$keys = [
 			'key1' => null,
 			'key2' => 'data2'
-		);
+		];
 		$result = $this->redis->write($keys);
 		$this->assertTrue($result);
 
@@ -361,22 +361,22 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->redis->read(array_keys($keys));
 		$this->assertEqual($expected, $result);
 
-		$keys = array(
+		$keys = [
 			'key1' => '',
 			'key2' => 'data2'
-		);
+		];
 		$result = $this->redis->write($keys);
 		$this->assertTrue($result);
 	}
 
 	public function testReadWithScope() {
-		$adapter = new Redis(array('scope' => 'primary'));
+		$adapter = new Redis(['scope' => 'primary']);
 
 		$this->_redis->set('primary:key1', 'test1', 60);
 		$this->_redis->set('key1', 'test2', 60);
 
-		$keys = array('key1');
-		$expected = array('key1' => 'test1');
+		$keys = ['key1'];
+		$expected = ['key1' => 'test1'];
 		$result = $adapter->read($keys);
 		$this->assertEqual($expected, $result);
 	}
@@ -384,7 +384,7 @@ class RedisTest extends \lithium\test\Integration {
 	public function testDelete() {
 		$key = 'delete_key';
 		$data = 'data to delete';
-		$keys = array($key);
+		$keys = [$key];
 		$time = strtotime('+1 minute');
 
 		$result = $this->_redis->set($key, $data);
@@ -398,20 +398,20 @@ class RedisTest extends \lithium\test\Integration {
 
 	public function testDeleteNonExistentKey() {
 		$key = 'delete_key';
-		$keys = array($key);
+		$keys = [$key];
 
 		$result = $this->redis->delete($keys);
 		$this->assertFalse($result);
 	}
 
 	public function testDeleteWithScope() {
-		$adapter = new Redis(array('scope' => 'primary'));
+		$adapter = new Redis(['scope' => 'primary']);
 
 		$this->_redis->set('primary:key1', 'test1', 60);
 		$this->_redis->set('key1', 'test2', 60);
 
-		$keys = array('key1');
-		$expected = array('key1' => 'test1');
+		$keys = ['key1'];
+		$expected = ['key1' => 'test1'];
 		$adapter->delete($keys);
 
 		$result = (boolean) $this->_redis->get('key1');
@@ -424,7 +424,7 @@ class RedisTest extends \lithium\test\Integration {
 	public function testWriteReadAndDeleteRoundtrip() {
 		$key = 'write_read_key';
 		$data = 'write/read value';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
@@ -495,7 +495,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testDecrementWithScope() {
-		$adapter = new Redis(array('scope' => 'primary'));
+		$adapter = new Redis(['scope' => 'primary']);
 
 		$this->_redis->set('primary:key1', 1, 60);
 		$this->_redis->set('key1', 1, 60);
@@ -546,7 +546,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testIncrementWithScope() {
-		$adapter = new Redis(array('scope' => 'primary'));
+		$adapter = new Redis(['scope' => 'primary']);
 
 		$this->_redis->set('primary:key1', 1, 60);
 		$this->_redis->set('key1', 1, 60);
@@ -567,7 +567,7 @@ class RedisTest extends \lithium\test\Integration {
 		$this->_redis->set('some_key', 'somevalue');
 
 		$result = $this->redis->keys('*');
-		$this->assertEqual($result, array('some_key'), 'redis method dispatch failed');
+		$this->assertEqual($result, ['some_key'], 'redis method dispatch failed');
 
 		$result = $this->redis->info();
 		$this->assertInternalType('array', $result, 'redis method dispatch failed');

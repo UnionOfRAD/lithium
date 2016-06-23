@@ -13,9 +13,9 @@ use lithium\tests\mocks\data\source\mongo_db\MockResultResource;
 
 class MockMongoSource extends \lithium\core\Object {
 
-	public $resultSets = array();
+	public $resultSets = [];
 
-	public $queries = array();
+	public $queries = [];
 
 	public function __get($name) {
 		return $this;
@@ -31,7 +31,7 @@ class MockMongoSource extends \lithium\core\Object {
 
 	public function find($conditions, $fields) {
 		$this->queries[] = compact('conditions', 'fields');
-		$result = new MockResultResource(array('data' => current($this->resultSets)));
+		$result = new MockResultResource(['data' => current($this->resultSets)]);
 		next($this->resultSets);
 		return $result;
 	}

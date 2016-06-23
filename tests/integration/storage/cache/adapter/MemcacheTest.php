@@ -33,7 +33,7 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function setUp() {
-		$this->server = array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 100);
+		$this->server = ['host' => '127.0.0.1', 'port' => 11211, 'weight' => 100];
 		$this->_conn = new Memcached();
 		$this->_conn->addServer(
 			$this->server['host'], $this->server['port'], $this->server['weight']
@@ -52,7 +52,7 @@ class MemcacheTest extends \lithium\test\Integration {
 	public function testSimpleWrite() {
 		$key = 'key';
 		$data = 'value';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
@@ -65,7 +65,7 @@ class MemcacheTest extends \lithium\test\Integration {
 
 		$key = 'another_key';
 		$data = 'more_data';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = '+1 minute';
 		$time = strtotime($expiry);
 
@@ -82,10 +82,10 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteExpiryDefault() {
-		$memcache = new Memcache(array('expiry' => '+5 seconds'));
+		$memcache = new Memcache(['expiry' => '+5 seconds']);
 		$key = 'default_key';
 		$data = 'value';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 
 		$result = $memcache->write($keys);
 		$expected = $keys;
@@ -100,9 +100,9 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteNoExpiry() {
-		$keys = array('key1' => 'data1');
+		$keys = ['key1' => 'data1'];
 
-		$adapter = new Memcache(array('expiry' => null));
+		$adapter = new Memcache(['expiry' => null]);
 		$expiry = null;
 
 		$result = $adapter->write($keys, $expiry);
@@ -113,7 +113,7 @@ class MemcacheTest extends \lithium\test\Integration {
 
 		$this->_conn->delete('key1');
 
-		$adapter = new Memcache(array('expiry' => Cache::PERSIST));
+		$adapter = new Memcache(['expiry' => Cache::PERSIST]);
 		$expiry = Cache::PERSIST;
 
 		$result = $adapter->write($keys, $expiry);
@@ -137,7 +137,7 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteWithExpiry() {
-		$keys = array('key1' => 'data1');
+		$keys = ['key1' => 'data1'];
 		$expiry = '+5 seconds';
 		$this->memcache->write($keys, $expiry);
 
@@ -148,8 +148,8 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteExpiryExpires() {
-		$this->memcache->write(array('expire0' => 'data0'), '+1 second');
-		$this->memcache->write(array('expire1' => 'data1'), 1);
+		$this->memcache->write(['expire0' => 'data0'], '+1 second');
+		$this->memcache->write(['expire1' => 'data1'], 1);
 
 		sleep(5);
 
@@ -166,11 +166,11 @@ class MemcacheTest extends \lithium\test\Integration {
 	public function testWriteMulti() {
 		$expiry = '+1 minute';
 		$time = strtotime($expiry);
-		$keys = array(
+		$keys = [
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
-		);
+		];
 
 		$result = $this->memcache->write($keys, $expiry);
 		$this->assertTrue($result);
@@ -186,9 +186,9 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteWithScope() {
-		$adapter = new Memcache(array('scope' => 'primary'));
+		$adapter = new Memcache(['scope' => 'primary']);
 
-		$keys = array('key1' => 'test1');
+		$keys = ['key1' => 'test1'];
 		$expiry = '+1 minute';
 		$adapter->write($keys, $expiry);
 
@@ -203,13 +203,13 @@ class MemcacheTest extends \lithium\test\Integration {
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
-		$keys = array($key);
+		$keys = [$key];
 		$time = strtotime('+1 minute');
 
 		$result = $this->_conn->set($key, $data, $time);
 		$this->assertTrue($result);
 
-		$expected = array($key => $data);
+		$expected = [$key => $data];
 		$result = $this->memcache->read($keys);
 		$this->assertEqual($expected, $result);
 
@@ -218,13 +218,13 @@ class MemcacheTest extends \lithium\test\Integration {
 
 		$key = 'another_read_key';
 		$data = 'read data';
-		$keys = array($key);
+		$keys = [$key];
 		$time = strtotime('+1 minute');
 
 		$result = $this->_conn->set($key, $data, $time);
 		$this->assertTrue($result);
 
-		$expected = array($key => $data);
+		$expected = [$key => $data];
 		$result = $this->memcache->read($keys);
 		$this->assertEqual($expected, $result);
 
@@ -235,21 +235,21 @@ class MemcacheTest extends \lithium\test\Integration {
 	public function testReadMulti() {
 		$expiry = '+1 minute';
 		$time = strtotime($expiry);
-		$keys = array(
+		$keys = [
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
-		);
+		];
 
 		$result = $this->_conn->setMulti($keys, $time);
 		$this->assertTrue($result);
 
 		$result = $this->memcache->read(array_keys($keys));
-		$expected = array(
+		$expected = [
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
-		);
+		];
 		$this->assertEqual($expected, $result);
 
 		foreach ($keys as $name => &$value) {
@@ -260,21 +260,21 @@ class MemcacheTest extends \lithium\test\Integration {
 
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
-		$keys = array($key);
+		$keys = [$key];
 
-		$expected = array();
+		$expected = [];
 		$result = $this->memcache->read($keys);
 		$this->assertIdentical($expected, $result);
 	}
 
 	public function testReadWithScope() {
-		$adapter = new Memcache(array('scope' => 'primary'));
+		$adapter = new Memcache(['scope' => 'primary']);
 
 		$this->_conn->set('primary:key1', 'test1', 60);
 		$this->_conn->set('key1', 'test2', 60);
 
-		$keys = array('key1');
-		$expected = array('key1' => 'test1');
+		$keys = ['key1'];
+		$expected = ['key1' => 'test1'];
 		$result = $adapter->read($keys);
 		$this->assertEqual($expected, $result);
 	}
@@ -282,25 +282,25 @@ class MemcacheTest extends \lithium\test\Integration {
 	public function testDelete() {
 		$key = 'delete_key';
 		$data = 'data to delete';
-		$keys = array($key);
+		$keys = [$key];
 		$time = strtotime('+1 minute');
 		$this->_conn->set($key, $data, $time);
 
-		$expected = array($key => $data);
+		$expected = [$key => $data];
 		$result = $this->memcache->read($keys);
 		$this->assertEqual($expected, $result);
 
 		$result = $this->memcache->delete($keys);
 		$this->assertTrue($result);
 
-		$expected = array();
+		$expected = [];
 		$result = $this->memcache->read($keys);
 		$this->assertIdentical($expected, $result);
 	}
 
 	public function testDeleteNonExistentKey() {
 		$key = 'delete_key';
-		$keys = array($key);
+		$keys = [$key];
 
 		$params = compact('keys');
 		$result = $this->memcache->delete($keys);
@@ -308,13 +308,13 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testDeleteWithScope() {
-		$adapter = new Memcache(array('scope' => 'primary'));
+		$adapter = new Memcache(['scope' => 'primary']);
 
 		$this->_conn->set('primary:key1', 'test1', 60);
 		$this->_conn->set('key1', 'test2', 60);
 
-		$keys = array('key1');
-		$expected = array('key1' => 'test1');
+		$keys = ['key1'];
+		$expected = ['key1' => 'test1'];
 		$adapter->delete($keys);
 
 		$result = (boolean) $this->_conn->get('key1');
@@ -325,10 +325,10 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testDeprecatedConnectionSettings() {
-		$servers = array(array('127.0.0.1', 11211, 1));
+		$servers = [['127.0.0.1', 11211, 1]];
 		$test = new Memcache(compact('servers'));
 
-		$servers[0] = array_combine(array('host', 'port'), array_slice($servers[0], 0, 2));
+		$servers[0] = array_combine(['host', 'port'], array_slice($servers[0], 0, 2));
 		$result = $test->connection->getServerList();
 
 		if (defined('HHVM_VERSION')) {
@@ -338,16 +338,16 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testSimpleConnectionSettings() {
-		$test = new Memcache(array('host' => '127.0.0.1'));
-		$hosts = array(array('host' => '127.0.0.1', 'port' => 11211));
+		$test = new Memcache(['host' => '127.0.0.1']);
+		$hosts = [['host' => '127.0.0.1', 'port' => 11211]];
 
 		if (defined('HHVM_VERSION')) {
 			$hosts['weight'] = 0;
 		}
 		$this->assertEqual($hosts, $test->connection->getServerList());
 
-		$test = new Memcache(array('host' => '127.0.0.1:11222'));
-		$hosts = array(array('host' => '127.0.0.1', 'port' => 11222));
+		$test = new Memcache(['host' => '127.0.0.1:11222']);
+		$hosts = [['host' => '127.0.0.1', 'port' => 11222]];
 
 		if (defined('HHVM_VERSION')) {
 			$hosts['weight'] = 0;
@@ -356,23 +356,23 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testMultiServerConnectionSettings() {
-		$test = new Memcache(array('host' => array(
+		$test = new Memcache(['host' => [
 			'127.0.0.1:11222' => 1,
 			'127.0.0.2:11223' => 2,
 			'127.0.0.3:11224'
-		)));
-		$hosts = array(
-			array('host' => '127.0.0.1', 'port' => 11222),
-			array('host' => '127.0.0.2', 'port' => 11223),
-			array('host' => '127.0.0.3', 'port' => 11224)
-		);
+		]]);
+		$hosts = [
+			['host' => '127.0.0.1', 'port' => 11222],
+			['host' => '127.0.0.2', 'port' => 11223],
+			['host' => '127.0.0.3', 'port' => 11224]
+		];
 		$this->assertEqual($hosts, $test->connection->getServerList());
 	}
 
 	public function testWriteReadAndDeleteRoundtrip() {
 		$key = 'write_read_key';
 		$data = 'write/read value';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = '+5 seconds';
 		$time = strtotime($expiry);
 
@@ -393,9 +393,9 @@ class MemcacheTest extends \lithium\test\Integration {
 
 	public function testWriteAndReadNull() {
 		$expiry = '+1 minute';
-		$keys = array(
+		$keys = [
 			'key1' => null
-		);
+		];
 		$result = $this->memcache->write($keys);
 		$this->assertTrue($result);
 
@@ -406,10 +406,10 @@ class MemcacheTest extends \lithium\test\Integration {
 
 	public function testWriteAndReadNullMulti() {
 		$expiry = '+1 minute';
-		$keys = array(
+		$keys = [
 			'key1' => null,
 			'key2' => 'data2'
-		);
+		];
 		$result = $this->memcache->write($keys);
 		$this->assertTrue($result);
 
@@ -417,10 +417,10 @@ class MemcacheTest extends \lithium\test\Integration {
 		$result = $this->memcache->read(array_keys($keys));
 		$this->assertEqual($expected, $result);
 
-		$keys = array(
+		$keys = [
 			'key1' => null,
 			'key2' => null
-		);
+		];
 		$result = $this->memcache->write($keys);
 		$this->assertTrue($result);
 	}
@@ -477,7 +477,7 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testDecrementWithScope() {
-		$adapter = new Memcache(array('scope' => 'primary'));
+		$adapter = new Memcache(['scope' => 'primary']);
 
 		$this->_conn->set('primary:key1', 1, 60);
 		$this->_conn->set('key1', 1, 60);
@@ -526,7 +526,7 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testIncrementWithScope() {
-		$adapter = new Memcache(array('scope' => 'primary'));
+		$adapter = new Memcache(['scope' => 'primary']);
 
 		$this->_conn->set('primary:key1', 1, 60);
 		$this->_conn->set('key1', 1, 60);

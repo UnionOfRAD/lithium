@@ -10,11 +10,11 @@ namespace lithium\tests\mocks\data;
 
 class MockCouchModel extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => false);
+	protected $_meta = ['connection' => false];
 
-	protected $_schema = array(
-		'someKey' => array()
-	);
+	protected $_schema = [
+		'someKey' => []
+	];
 }
 
 ?>

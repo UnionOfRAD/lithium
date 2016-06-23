@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\data;
 
 class MockBadConnection extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => 'bad_connection');
+	protected $_meta = ['connection' => 'bad_connection'];
 }
 
 ?>

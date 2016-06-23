@@ -62,7 +62,7 @@ trigger_error($message, E_USER_DEPRECATED);
  * use lithium\console\dispatcher\Mock as DispatcherMock;
  * $dispatcher = new DispatcherMock();
  * $dispatcher->applyFilter('config', function($params, $next) {
- * 	return array();
+ * 	return [];
  * });
  * $results = $dispatcher->config();
  * ```
@@ -70,9 +70,9 @@ trigger_error($message, E_USER_DEPRECATED);
  * use lithium\analysis\parser\Mock as ParserMock;
  * $code = 'echo "foobar";';
  * ParserMock::applyFilter('config', function($params, $next) {
- *   return array();
+ *   return [];
  * });
- * $tokens = ParserMock::tokenize($code, array('wrap' => true));
+ * $tokens = ParserMock::tokenize($code, ['wrap' => true]);
  * ```
  *
  * Mocker also gives the ability, if used correctly, to stub build in php
@@ -170,7 +170,7 @@ trigger_error($message, E_USER_DEPRECATED);
  *   public function speak() {
  *     $params = compact();
  *     $person = $this->person;
- *     return Filters::run($this, __FUNCTION__, array(), function($params) use (&$person) {
+ *     return Filters::run($this, __FUNCTION__, [], function($params) use (&$person) {
  *       return $person->speak();
  *     };
  *   }
@@ -216,14 +216,14 @@ class Mocker {
 	 *
 	 * @var array
 	 */
-	protected static $_functionCallbacks = array();
+	protected static $_functionCallbacks = [];
 
 	/**
 	 * Results of function calls for later assertion in `MockerChain`.
 	 *
 	 * @var array
 	 */
-	protected static $_functionResults = array();
+	protected static $_functionResults = [];
 
 	/**
 	 * A list of code to be generated for the `Delegate`.
@@ -237,13 +237,13 @@ class Mocker {
 	 *                          from a parent class.
 	 * @var array
 	 */
-	protected static $_mockDelegateIngredients = array(
-		'startClass' => array(
+	protected static $_mockDelegateIngredients = [
+		'startClass' => [
 			'namespace {:namespace};',
 			'class MockDelegate extends \{:mocker} {',
 			'    public $parent = null;',
-		),
-		'constructor' => array(
+		],
+		'constructor' => [
 			'{:modifiers} function __construct({:args}) {',
 			'    $args = compact({:stringArgs});',
 			'    $argCount = func_num_args();',
@@ -257,19 +257,19 @@ class Mocker {
 			'        call_user_func_array("parent::__construct", $args);',
 			'    }',
 			'}',
-		),
-		'method' => array(
+		],
+		'method' => [
 			'{:modifiers} function {:method}({:args}) {',
 			'    $args = compact({:stringArgs});',
 			'    $token = spl_object_hash($this);',
 			'    if (func_num_args() > 0 && func_get_arg(func_num_args() - 1) === $token) {',
 			'        return call_user_func_array("parent::{:method}", compact({:stringArgs}));',
 			'    }',
-			'    $method = array($this->parent, "{:method}");',
+			'    $method = [$this->parent, "{:method}"];',
 			'    return call_user_func_array($method, $args);',
 			'}',
-		),
-		'staticMethod' => array(
+		],
+		'staticMethod' => [
 			'{:modifiers} function {:method}({:args}) {',
 			'    $args = compact({:stringArgs});',
 			'    $token = "1f3870be274f6c49b3e31a0c6728957f";',
@@ -279,32 +279,32 @@ class Mocker {
 			'    $method = \'{:namespace}\Mock::{:method}\';',
 			'    return call_user_func_array($method, $args);',
 			'}',
-		),
-		'endClass' => array(
+		],
+		'endClass' => [
 			'}',
-		),
-	);
+		],
+	];
 
 	/**
 	 * List of code to be generated for overwriting php functions.
 	 *
 	 * @var array
 	 */
-	protected static $_mockFunctionIngredients = array(
-		'function' => array(
+	protected static $_mockFunctionIngredients = [
+		'function' => [
 			'namespace {:namespace};',
 			'use lithium\test\Mocker;',
 			'function {:function}({:args}) {',
-			'    $params = array();',
-			'    foreach (array({:stringArgs}) as $value) {',
+			'    $params = [];',
+			'    foreach ([{:stringArgs}] as $value) {',
 			'        if (!empty($value)) {',
 			'            $params[] =& ${$value};',
 			'        }',
 			'    }',
 			'    return Mocker::callFunction(__FUNCTION__, $params);',
 			'}',
-		),
-	);
+		],
+	];
 
 	/**
 	 * A list of code to be generated for the `Mock`.
@@ -323,45 +323,45 @@ class Mocker {
 	 *                             PHP magic methods on `Mock`.
 	 * @var array
 	 */
-	protected static $_mockIngredients = array(
-		'startClass' => array(
+	protected static $_mockIngredients = [
+		'startClass' => [
 			'namespace {:namespace};',
 			'use lithium\aop\Filters as _Filters;',
 			'class Mock extends \{:mocker} {',
 			'    public $mocker;',
-			'    public $results = array();',
-			'    public static $staticResults = array();',
-			'    protected $_safeVars = array(',
+			'    public $results = [];',
+			'    public static $staticResults = [];',
+			'    protected $_safeVars = [',
 			'        "_classes",',
 			'        "mocker",',
 			'        "_safeVars",',
 			'        "results",',
 			'        "staticResults",',
 			'        "_methodFilters",',
-			'    );',
-		),
-		'get' => array(
+			'    ];',
+		],
+		'get' => [
 			'public function {:reference}__get($name) {',
 			'    $data ={:reference} $this->mocker->$name;',
 			'    return $data;',
 			'}',
-		),
-		'set' => array(
+		],
+		'set' => [
 			'public function __set($name, $value = null) {',
 			'    return $this->mocker->$name = $value;',
 			'}',
-		),
-		'isset' => array(
+		],
+		'isset' => [
 			'public function __isset($name) {',
 			'    return isset($this->mocker->$name);',
 			'}',
-		),
-		'unset' => array(
+		],
+		'unset' => [
 			'public function __unset($name) {',
 			'    unset($this->mocker->$name);',
 			'}',
-		),
-		'constructor' => array(
+		],
+		'constructor' => [
 			'{:modifiers} function __construct({:args}) {',
 			'    $args = compact({:stringArgs});',
 			'    array_push($args, $this);',
@@ -373,11 +373,11 @@ class Mocker {
 			'    $class = new \ReflectionClass(\'{:namespace}\MockDelegate\');',
 			'    $class->newInstanceArgs($args);',
 			'}',
-		),
-		'destructor' => array(
+		],
+		'destructor' => [
 			'public function __destruct() {}',
-		),
-		'staticMethod' => array(
+		],
+		'staticMethod' => [
 			'{:modifiers} function {:method}({:args}) {',
 			'    $args = compact({:stringArgs});',
 			'    $args["hash"] = "1f3870be274f6c49b3e31a0c6728957f";',
@@ -388,38 +388,38 @@ class Mocker {
 			'        }',
 			'    );',
 			'    if (!isset(static::$staticResults["{:method}"])) {',
-			'        static::$staticResults["{:method}"] = array();',
+			'        static::$staticResults["{:method}"] = [];',
 			'    }',
-			'    static::$staticResults["{:method}"][] = array(',
+			'    static::$staticResults["{:method}"][] = [',
 			'        "args" => func_get_args(),',
 			'        "result" => $result,',
 			'        "time" => microtime(true),',
-			'    );',
+			'    ];',
 			'    return $result;',
 			'}',
-		),
-		'method' => array(
+		],
+		'method' => [
 			'{:modifiers} function {:method}({:args}) {',
 			'    $args = compact({:stringArgs});',
 			'    $args["hash"] = spl_object_hash($this->mocker);',
-			'    $_method = array($this->mocker, "{:method}");',
+			'    $_method = [$this->mocker, "{:method}"];',
 			'    $result = _Filters::run(__CLASS__, "{:method}", $args,',
 			'        function($args) use(&$_method) {',
 			'           return call_user_func_array($_method, $args);',
 			'        }',
 			'    );',
 			'    if (!isset($this->results["{:method}"])) {',
-			'        $this->results["{:method}"] = array();',
+			'        $this->results["{:method}"] = [];',
 			'    }',
-			'    $this->results["{:method}"][] = array(',
+			'    $this->results["{:method}"][] = [',
 			'        "args" => func_get_args(),',
 			'        "result" => $result,',
 			'        "time" => microtime(true),',
-			'    );',
+			'    ];',
 			'    return $result;',
 			'}',
-		),
-		'applyFilter' => array(
+		],
+		'applyFilter' => [
 			'public {:static} function applyFilter($method, $filter = null) {',
 			'    $message  = "<mocked class>::applyFilter() is deprecated. ";',
 			'    $message .= "Use Filters::applyFilter(" . __CLASS__ .", ...) instead.";',
@@ -432,11 +432,11 @@ class Mocker {
 			'        }',
 			'    }',
 			'}',
-		),
-		'endClass' => array(
+		],
+		'endClass' => [
 			'}',
-		),
-	);
+		],
+	];
 
 	/**
 	 * A list of methods we should not overwrite in our mock class.
@@ -446,14 +446,14 @@ class Mocker {
 	 *
 	 * @var array
 	 */
-	protected static $_blackList = array(
+	protected static $_blackList = [
 		'__destruct', '_parents',
 		'__get', '__set', '__isset', '__unset', '__sleep',
 		'__wakeup', '__toString', '__clone', '__invoke',
 		'_stop', '_init', 'invokeMethod', '__set_state',
 		'_instance', '_object', '_initialize',
 		'_filter', 'applyFilter',
-	);
+	];
 
 	/**
 	 * Will register this class into the autoloader.
@@ -461,7 +461,7 @@ class Mocker {
 	 * @return void
 	 */
 	public static function register() {
-		spl_autoload_register(array(__CLASS__, 'create'));
+		spl_autoload_register([__CLASS__, 'create']);
 	}
 
 	/**
@@ -478,12 +478,12 @@ class Mocker {
 		$mocker = static::_mocker($mockee);
 		$isStatic = is_subclass_of($mocker, 'lithium\core\StaticObject');
 
-		$tokens = array(
+		$tokens = [
 			'namespace' => static::_namespace($mockee),
 			'mocker' => $mocker,
 			'mockee' => 'MockDelegate',
 			'static' => $isStatic ? 'static' : '',
-		);
+		];
 		$mockDelegate = static::_dynamicCode('mockDelegate', 'startClass', $tokens);
 		$mock = static::_dynamicCode('mock', 'startClass', $tokens);
 
@@ -503,14 +503,14 @@ class Mocker {
 				if (preg_match('/&' . $method->name . '/', $docs) === 1) {
 					continue;
 				}
-				$tokens = array(
+				$tokens = [
 					'namespace' => static::_namespace($mockee),
 					'method' => $method->name,
 					'modifiers' => static::_methodModifiers($method),
 					'args' => static::_methodParams($method),
 					'stringArgs' => static::_stringMethodParams($method),
 					'mocker' => $mocker,
-				);
+				];
 				$mockDelegate .= static::_dynamicCode('mockDelegate', $key, $tokens);
 				$mock .= static::_dynamicCode('mock', $key, $tokens);
 			} elseif ($method->name === '__get') {
@@ -522,27 +522,27 @@ class Mocker {
 		}
 
 		if (!$constructor) {
-			$tokens = array(
+			$tokens = [
 				'namespace' => static::_namespace($mockee),
 				'modifiers' => 'public',
 				'args' => null,
 				'stringArgs' => 'array()',
 				'mocker' => $mocker,
-			);
+			];
 			$mock .= static::_dynamicCode('mock', 'constructor', $tokens);
 			$mockDelegate .= static::_dynamicCode('mockDelegate', 'constructor', $tokens);
 		}
 
 		$mockDelegate .= static::_dynamicCode('mockDelegate', 'endClass');
-		$mock .= static::_dynamicCode('mock', 'get', array(
+		$mock .= static::_dynamicCode('mock', 'get', [
 			'reference' => $getByReference ? '&' : '',
-		));
+		]);
 		$mock .= static::_dynamicCode('mock', 'set');
 		$mock .= static::_dynamicCode('mock', 'isset');
 		$mock .= static::_dynamicCode('mock', 'unset');
-		$mock .= static::_dynamicCode('mock', 'applyFilter', array(
+		$mock .= static::_dynamicCode('mock', 'applyFilter', [
 			'static' => $staticApplyFilter ? 'static' : '',
-		));
+		]);
 		$mock .= static::_dynamicCode('mock', 'destructor');
 		$mock .= static::_dynamicCode('mock', 'endClass');
 
@@ -561,7 +561,7 @@ class Mocker {
 		$modifierKey = $method->getModifiers();
 		$modifierArray = Reflection::getModifierNames($modifierKey);
 		$modifiers = implode(' ', $modifierArray);
-		return str_replace(array('private', 'protected'), 'public', $modifiers);
+		return str_replace(['private', 'protected'], 'public', $modifiers);
 	}
 
 	/**
@@ -574,10 +574,10 @@ class Mocker {
 	 */
 	protected static function _methodParams(ReflectionFunctionAbstract $method) {
 		$pattern = '/Parameter #[0-9]+ \[ [^\>]+>([^\]]+) \]/';
-		$replace = array(
-			'from' => array(' Array', 'or NULL'),
-			'to' => array(' array()', ''),
-		);
+		$replace = [
+			'from' => [' Array', 'or NULL'],
+			'to' => [' array()', ''],
+		];
 		preg_match_all($pattern, $method, $matches);
 		$params = implode(', ', $matches[1]);
 		return str_replace($replace['from'], $replace['to'], $params);
@@ -606,10 +606,10 @@ class Mocker {
 	 * @param  array  $tokens Tokens, if any, that should be inserted
 	 * @return string
 	 */
-	protected static function _dynamicCode($type, $key, $tokens = array()) {
-		$defaults = array(
+	protected static function _dynamicCode($type, $key, $tokens = []) {
+		$defaults = [
 			'master' => '\lithium\test\Mocker',
-		);
+		];
 		$tokens += $defaults;
 		$name = '_' . $type . 'Ingredients';
 		$code = implode("\n", static::${$name}[$key]);
@@ -636,7 +636,7 @@ class Mocker {
 	 * @return string
 	 */
 	protected static function _namespace($mockee) {
-		$matches = array();
+		$matches = [];
 		preg_match_all('/^(.*)\\\\Mock$/', $mockee, $matches);
 		return isset($matches[1][0]) ? $matches[1][0] : null;
 	}
@@ -661,14 +661,14 @@ class Mocker {
 	 * @return object       MockerChain instance
 	 */
 	public static function chain($mock) {
-		$results = array();
+		$results = [];
 		$string = is_string($mock);
 		if (is_object($mock) && isset($mock->results)) {
 			$results = static::mergeResults($mock->results, $mock::$staticResults);
 		} elseif ($string && class_exists($mock) && isset($mock::$staticResults)) {
 			$results = $mock::$staticResults;
 		} elseif ($string && function_exists($mock) && isset(static::$_functionResults[$mock])) {
-			$results = array($mock => static::$_functionResults[$mock]);
+			$results = [$mock => static::$_functionResults[$mock]];
 		}
 		return new MockerChain($results);
 	}
@@ -701,8 +701,8 @@ class Mocker {
 	 * @param array $params Parameter list to use when calling `$method`.
 	 * @return mixed Returns the result of the method call.
 	 */
-	public static function invokeMethod($method, $params = array()) {
-		return forward_static_call_array(array(get_called_class(), $method), $params);
+	public static function invokeMethod($method, $params = []) {
+		return forward_static_call_array([get_called_class(), $method], $params);
 	}
 
 	/**
@@ -714,11 +714,11 @@ class Mocker {
 	 */
 	public static function overwriteFunction($name, $callback = null) {
 		if ($name === false) {
-			static::$_functionResults = array();
-			return static::$_functionCallbacks = array();
+			static::$_functionResults = [];
+			return static::$_functionCallbacks = [];
 		}
 		if ($callback === false) {
-			static::$_functionResults[$name] = array();
+			static::$_functionResults[$name] = [];
 			return static::$_functionCallbacks[$name] = false;
 		}
 		static::$_functionCallbacks[$name] = $callback;
@@ -728,12 +728,12 @@ class Mocker {
 
 		$function = new ReflectionFunction($callback);
 		$pos = strrpos($name, '\\');
-		eval(static::_dynamicCode('mockFunction', 'function', array(
+		eval(static::_dynamicCode('mockFunction', 'function', [
 			'namespace' => substr($name, 0, $pos),
 			'function' => substr($name, $pos + 1),
 			'args' => static::_methodParams($function),
 			'stringArgs' => static::_stringMethodParams($function),
-		)));
+		]));
 		return;
 	}
 
@@ -748,7 +748,7 @@ class Mocker {
 	 * @param  array  $params Params to be passed to the function.
 	 * @return mixed
 	 */
-	public static function callFunction($name, array &$params = array()) {
+	public static function callFunction($name, array &$params = []) {
 		$function = substr($name, strrpos($name, '\\'));
 		$exists = isset(static::$_functionCallbacks[$name]);
 		if ($exists && is_callable(static::$_functionCallbacks[$name])) {
@@ -756,13 +756,13 @@ class Mocker {
 		}
 		$result = call_user_func_array($function, $params);
 		if (!isset(static::$_functionResults[$name])) {
-			static::$_functionResults[$name] = array();
+			static::$_functionResults[$name] = [];
 		}
-		static::$_functionResults[$name][] = array(
+		static::$_functionResults[$name][] = [
 			'args' => $params,
 			'result' => $result,
 			'time' => microtime(true),
-		);
+		];
 		return $result;
 	}
 
@@ -774,7 +774,7 @@ class Mocker {
 	 * @deprecated
 	 * @var array Method filters, indexed by class.
 	 */
-	protected static $_methodFilters = array();
+	protected static $_methodFilters = [];
 
 	/**
 	 * Apply a closure to a method of the current static object.
@@ -825,7 +825,7 @@ class Mocker {
 	 * @param array $filters Additional filters to apply to the method for this call only.
 	 * @return mixed
 	 */
-	protected static function _filter($class, $method, $params, $callback, $filters = array()) {
+	protected static function _filter($class, $method, $params, $callback, $filters = []) {
 		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
 		$message .= '`\lithium\aop\Filters::run()` and `::apply()`.';
 		trigger_error($message, E_USER_DEPRECATED);

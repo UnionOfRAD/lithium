@@ -30,13 +30,13 @@ use lithium\core\ConfigException;
  * example). You can also be very specific on what you want to store in the session:
  *
  * ```
- * Auth::config(array(
- *   'default' => array(
- *      'session' => array(
- *        'persist' => array('username', 'email')
- *      )
- *   )
- * ));
+ * Auth::config([
+ *   'default' => [
+ *      'session' => [
+ *        'persist' => ['username', 'email']
+ *      ]
+ *   ]
+ * ]);
  * ```
  *
  * You can also pass an optional `persist` param to the `check` method to override this default.
@@ -52,7 +52,7 @@ class Auth extends \lithium\core\Adaptable {
 	 *
 	 * @var object `Collection` of authentication configurations.
 	 */
-	protected static $_configurations = array();
+	protected static $_configurations = [];
 
 	/**
 	 * Libraries::locate() compatible path to adapters for this class.
@@ -67,9 +67,9 @@ class Auth extends \lithium\core\Adaptable {
 	 *
 	 * @var array Associative array of class names & their namespaces.
 	 */
-	protected static $_classes = array(
+	protected static $_classes = [
 		'session' => 'lithium\storage\Session'
-	);
+	];
 
 	/**
 	 * Called when an adapter configuration is first accessed, this method sets the default
@@ -83,12 +83,12 @@ class Auth extends \lithium\core\Adaptable {
 	 *         generated default values.
 	 */
 	protected static function _initConfig($name, $config) {
-		$defaults = array('session' => array(
+		$defaults = ['session' => [
 			'key' => $name,
 			'class' => static::$_classes['session'],
-			'options' => array(),
-			'persist' => array()
-		));
+			'options' => [],
+			'persist' => []
+		]];
 		$config = parent::_initConfig($name, $config) + $defaults;
 		$config['session'] += $defaults['session'];
 		return $config;
@@ -125,13 +125,13 @@ class Auth extends \lithium\core\Adaptable {
 	 *         storage backend used by the configured adapter.
 	 * @filter
 	 */
-	public static function check($name, $credentials = null, array $options = array()) {
+	public static function check($name, $credentials = null, array $options = []) {
 		$config = static::config($name);
-		$defaults = array(
+		$defaults = [
 			'checkSession' => true,
 			'writeSession' => true,
 			'persist' => $config['session']['persist'] ?: static::_config('persist')
-		);
+		];
 
 		$options += $defaults;
 		$params = compact('name', 'credentials', 'options');
@@ -180,7 +180,7 @@ class Auth extends \lithium\core\Adaptable {
 	 *         rejects the data.
 	 * @filter
 	 */
-	public static function set($name, $data, array $options = array()) {
+	public static function set($name, $data, array $options = []) {
 		$params = compact('name', 'data', 'options');
 
 		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
@@ -210,8 +210,8 @@ class Auth extends \lithium\core\Adaptable {
 	 * @return void
 	 * @filter
 	 */
-	public static function clear($name, array $options = array()) {
-		$defaults = array('clearSession' => true);
+	public static function clear($name, array $options = []) {
+		$defaults = ['clearSession' => true];
 		$options += $defaults;
 
 		$params = compact('name', 'options');

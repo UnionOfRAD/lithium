@@ -16,15 +16,15 @@ use RuntimeException;
  */
 class Schema extends \lithium\core\Object implements \ArrayAccess {
 
-	protected $_fields = array();
+	protected $_fields = [];
 
-	protected $_meta = array();
+	protected $_meta = [];
 
 	protected $_locked = false;
 
-	protected $_types = array();
+	protected $_types = [];
 
-	protected $_autoConfig = array('fields', 'meta', 'locked', 'types');
+	protected $_autoConfig = ['fields', 'meta', 'locked', 'types'];
 
 	/**
 	 * Constructor.
@@ -33,8 +33,8 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 	 *        - `'fields'` _array_
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('fields' => array());
+	public function __construct(array $config = []) {
+		$defaults = ['fields' => []];
 		parent::__construct($config + $defaults);
 	}
 
@@ -76,7 +76,7 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 			}
 			return null;
 		}
-		$defaults = array();
+		$defaults = [];
 
 		foreach ($this->_fields as $key => $value) {
 			if (isset($value['default'])) {
@@ -124,12 +124,12 @@ class Schema extends \lithium\core\Object implements \ArrayAccess {
 		return isset($this->_types[$type]) ? $this->_types[$type] : $type;
 	}
 
-	public function cast($object, $key, $data, array $options = array()) {
+	public function cast($object, $key, $data, array $options = []) {
 		return $data;
 	}
 
 	public function reset() {
-		$this->_fields = array();
+		$this->_fields = [];
 	}
 
 	/**

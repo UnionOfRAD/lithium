@@ -62,7 +62,7 @@ class Chain {
 	 *
 	 * @var array
 	 */
-	protected $_filters = array();
+	protected $_filters = [];
 
 	/**
 	 * The current implementation.
@@ -81,12 +81,12 @@ class Chain {
 	 *         - `'method'` _array_: Depreacted. Here for BC.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$config += array(
-			'filters' => array(),
+	public function __construct(array $config = []) {
+		$config += [
+			'filters' => [],
 			'class' => null,
 			'method' => null
-		);
+		];
 		$this->_filters = $config['filters'];
 		$this->_class = $config['class'];
 		$this->_method = $config['method'];

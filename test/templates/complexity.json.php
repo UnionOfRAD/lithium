@@ -1,7 +1,7 @@
 <?php
 
 $worstOffender = null;
-$averages = array();
+$averages = [];
 
 foreach (array_slice($data['max'], 0, 10) as $method => $count) {
 	if ($count <= 7) {

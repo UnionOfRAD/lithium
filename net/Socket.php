@@ -27,17 +27,17 @@ abstract class Socket extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'request' => 'lithium\net\Message',
 		'response' => 'lithium\net\Message'
-	);
+	];
 
 	/**
 	 * Auto config.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('classes' => 'merge');
+	protected $_autoConfig = ['classes' => 'merge'];
 
 	/**
 	 * Constructor.
@@ -52,14 +52,14 @@ abstract class Socket extends \lithium\core\Object {
 	 *        - `'timeout'`: Seconds after opening the socket times out (defaults to `30`).
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'persistent' => false,
 			'scheme'     => 'tcp',
 			'host'       => 'localhost',
 			'port'       => 80,
 			'timeout'    => 30
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -69,7 +69,7 @@ abstract class Socket extends \lithium\core\Object {
 	 * @param array $options Update the config settings.
 	 * @return mixed The open resource on success, `false` otherwise.
 	 */
-	public function open(array $options = array()) {
+	public function open(array $options = []) {
 		parent::__construct($options + $this->_config);
 		return false;
 	}
@@ -139,12 +139,12 @@ abstract class Socket extends \lithium\core\Object {
 	 *              - '`response`': a fully-namespaced string for the response object
 	 * @return object a response object based on `\lithium\net\Message`
 	 */
-	public function send($message = null, array $options = array()) {
-		$defaults = array('response' => $this->_classes['response']);
+	public function send($message = null, array $options = []) {
+		$defaults = ['response' => $this->_classes['response']];
 		$options += $defaults;
 
 		if ($this->write($message)) {
-			$config = array('message' => $this->read()) + $this->_config;
+			$config = ['message' => $this->read()] + $this->_config;
 			return $this->_instance($options['response'], $config);
 		}
 	}

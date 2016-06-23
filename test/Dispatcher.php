@@ -26,10 +26,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *
 	 * @var array Key/value array of short identifier for the fully-namespaced class.
 	 */
-	protected static $_classes = array(
+	protected static $_classes = [
 		'group' => 'lithium\test\Group',
 		'report' => 'lithium\test\Report'
-	);
+	];
 
 	/**
 	 * Runs a test group or a specific test file based on the passed
@@ -48,16 +48,16 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *         have been applied.
 	 * @filter
 	 */
-	public static function run($group = null, array $options = array()) {
-		$defaults = array(
+	public static function run($group = null, array $options = []) {
+		$defaults = [
 			'title' => $group,
-			'filters' => array(),
+			'filters' => [],
 			'format' => 'txt',
 			'reporter' => null
-		);
+		];
 		$options += $defaults;
 		$isCase = is_string($group) && preg_match('/Test$/', $group);
-		$items = ($isCase) ? array(new $group()) : (array) $group;
+		$items = ($isCase) ? [new $group()] : (array) $group;
 
 		$options['filters'] = Set::normalize($options['filters']);
 		$group = static::_group($items);

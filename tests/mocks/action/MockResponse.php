@@ -10,12 +10,12 @@ namespace lithium\tests\mocks\action;
 
 class MockResponse extends \lithium\action\Response {
 
-	public $testHeaders = array();
+	public $testHeaders = [];
 
 	public function render() {
-		$this->testHeaders = array();
+		$this->testHeaders = [];
 		parent::render();
-		$this->headers = array();
+		$this->headers = [];
 	}
 
 	protected function _writeHeaders($header, $code = null) {

@@ -28,36 +28,36 @@ use lithium\util\Set;
  * configurations for database servers, cache adapters, and other environment-specific classes, for
  * example:
  * ```
- * Connections::add('default', array(
- * 	'production' => array(
+ * Connections::add('default', [
+ * 	'production' => [
  * 		'type'     => 'database',
  * 		'adapter'  => 'MySql',
  * 		'host'     => 'db1.application.local',
  * 		'login'    => 'secure',
  * 		'password' => 'secret',
  * 		'database' => 'app-production'
- * 	),
- * 	'development' => array(
+ * 	],
+ * 	'development' => [
  * 		'type'     => 'database',
  * 		'adapter'  => 'MySql',
  * 		'host'     => 'localhost',
  * 		'login'    => 'root',
  * 		'password' => '',
  * 		'database' => 'app'
- * 	)
- * ));
+ * 	]
+ * ]);
  * ```
  *
  * This allows the database connection named `'default'` to be connected to a local database in
  * development, and a production database in production. You can define environment-specific
  * configurations for caching, logging, even session storage, i.e.:
  * ```
- * Cache::config(array(
- * 	'userData' => array(
- * 		'development' => array('adapter' => 'File'),
- * 		'production' => array('adapter' => 'Memcache')
- * 	)
- * ));
+ * Cache::config([
+ * 	'userData' => [
+ * 		'development' => ['adapter' => 'File'],
+ * 		'production' => ['adapter' => 'Memcache']
+ * 	]
+ * ]);
  * ```
  *
  * When the cache configuration is accessed in the application's code, the correct configuration is
@@ -83,11 +83,11 @@ use lithium\util\Set;
  */
 class Environment {
 
-	protected static $_configurations = array(
-		'production' => array(),
-		'development' => array(),
-		'test' => array()
-	);
+	protected static $_configurations = [
+		'production' => [],
+		'development' => [],
+		'test' => []
+	];
 
 	/**
 	 * Holds the name of the current environment under which the application is running. Set by
@@ -127,11 +127,11 @@ class Environment {
 		}
 		static::$_current = '';
 		static::$_detector = null;
-		static::$_configurations = array(
-			'production' => array(),
-			'development' => array(),
-			'test' => array()
-		);
+		static::$_configurations = [
+			'production' => [],
+			'development' => [],
+			'test' => []
+		];
 	}
 
 	/**
@@ -332,7 +332,7 @@ class Environment {
 	 */
 	protected static function _detector() {
 		return static::$_detector ?: function($request) {
-			$isLocal = in_array($request->env('SERVER_ADDR'), array('::1', '127.0.0.1'));
+			$isLocal = in_array($request->env('SERVER_ADDR'), ['::1', '127.0.0.1']);
 			switch (true) {
 				case (isset($request->env)):
 					return $request->env;

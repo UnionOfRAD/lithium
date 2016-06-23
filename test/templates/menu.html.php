@@ -1,7 +1,7 @@
 <?php
 
 $render = function($self, $path, $parent = null) use ($base) {
-	$result = array("<ul class='menu'>");
+	$result = ["<ul class='menu'>"];
 
 	foreach ($path as $current => $value) {
 		$path = trim(str_replace("//", "/", "{$parent}/{$current}"), "/");

@@ -12,9 +12,9 @@ use MongoId;
 
 class MockMongoConnection {
 
-	public $queries = array();
+	public $queries = [];
 
-	public $results = array();
+	public $results = [];
 
 	protected $_collection = null;
 
@@ -30,23 +30,23 @@ class MockMongoConnection {
 	}
 
 	public function listDBs() {
-		return array();
+		return [];
 	}
 
 	public function getConnections() {
-		return array(array(
+		return [[
 			'hash' => 'localhost:27017;-;X;56052',
-			'server' => array(),
-			'connection' => array()
-		));
+			'server' => [],
+			'connection' => []
+		]];
 	}
 
-	public function insert(array &$data, array $options = array()) {
+	public function insert(array &$data, array $options = []) {
 		$data['_id'] = new MongoId();
 		return $this->_record(__FUNCTION__, compact('data', 'options'));
 	}
 
-	protected function _record($type, array $data = array()) {
+	protected function _record($type, array $data = []) {
 		$collection = $this->_collection;
 		$this->queries[] = compact('type', 'collection') + $data;
 		$result = array_pop($this->results);
@@ -74,7 +74,7 @@ class MockMongoConnection {
 		return $this;
 	}
 
-	public function storeBytes($bytes = null, array $extra = array(), array $options = array()) {
+	public function storeBytes($bytes = null, array $extra = [], array $options = []) {
 		return;
 	}
 }

@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\template;
 
 class MockHelper extends \lithium\template\Helper {
 
-	protected $_strings = array('link' => '<a href="{:url}"{:options}>{:title}</a>');
+	protected $_strings = ['link' => '<a href="{:url}"{:options}>{:title}</a>'];
 
 	/**
 	 * Hack to expose protected properties for testing.
@@ -26,11 +26,11 @@ class MockHelper extends \lithium\template\Helper {
 		return $this->_options($defaults, $options);
 	}
 
-	public function testAttributes($params, $method = null, array $options = array()) {
+	public function testAttributes($params, $method = null, array $options = []) {
 		return $this->_attributes($params, $method, $options);
 	}
 
-	public function testRender($method, $string, $params, array $options = array()) {
+	public function testRender($method, $string, $params, array $options = []) {
 		return $this->_render($method, $string, $params, $options);
 	}
 }

@@ -74,13 +74,13 @@ class Adapter extends \lithium\core\Object {
 		}
 		$id = $item['id'];
 
-		$defaults = array(
-			'ids' => array(),
+		$defaults = [
+			'ids' => [],
 			'translated' => null,
-			'flags' => array(),
-			'comments' => array(),
-			'occurrences' => array()
-		);
+			'flags' => [],
+			'comments' => [],
+			'occurrences' => []
+		];
 		$item += $defaults;
 
 		if (isset($item['context']) && $item['context']) {
@@ -91,7 +91,7 @@ class Adapter extends \lithium\core\Object {
 			$data[$id] = $item;
 			return $data;
 		}
-		foreach (array('ids', 'flags', 'comments', 'occurrences') as $field) {
+		foreach (['ids', 'flags', 'comments', 'occurrences'] as $field) {
 			$data[$id][$field] = array_merge($data[$id][$field], $item[$field]);
 		}
 		if (!isset($data[$id]['translated'])) {

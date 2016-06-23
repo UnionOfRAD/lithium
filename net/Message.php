@@ -81,8 +81,8 @@ class Message extends \lithium\core\Object {
 	 *        - `'body'` _mixed_: null
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'scheme' => 'tcp',
 			'host' => 'localhost',
 			'port' => null,
@@ -90,7 +90,7 @@ class Message extends \lithium\core\Object {
 			'password' => null,
 			'path' => null,
 			'body' => null
-		);
+		];
 		$config += $defaults;
 
 		foreach (array_intersect_key(array_filter($config), $defaults) as $key => $value) {
@@ -107,8 +107,8 @@ class Message extends \lithium\core\Object {
 	 *        - `'buffer'` _integer_: split the body string
 	 * @return array
 	 */
-	public function body($data = null, $options = array()) {
-		$default = array('buffer' => null);
+	public function body($data = null, $options = []) {
+		$default = ['buffer' => null];
 		$options += $default;
 		$this->body = array_merge((array) $this->body, (array) $data);
 		$body = join("\r\n", $this->body);
@@ -123,10 +123,10 @@ class Message extends \lithium\core\Object {
 	 * @param array $options
 	 * @return mixed
 	 */
-	public function to($format, array $options = array()) {
+	public function to($format, array $options = []) {
 		switch ($format) {
 			case 'array':
-				$array = array();
+				$array = [];
 				$class = new ReflectionClass(get_class($this));
 
 				foreach ($class->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
@@ -137,8 +137,8 @@ class Message extends \lithium\core\Object {
 				$host = $this->host . ($this->port ? ":{$this->port}" : '');
 				return "{$this->scheme}://{$host}{$this->path}";
 			case 'context':
-				$defaults = array('content' => $this->body(), 'ignore_errors' => true);
-				return array($this->scheme => $options + $defaults);
+				$defaults = ['content' => $this->body(), 'ignore_errors' => true];
+				return [$this->scheme => $options + $defaults];
 			case 'string':
 			default:
 				return (string) $this;

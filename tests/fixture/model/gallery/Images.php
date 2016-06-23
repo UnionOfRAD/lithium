@@ -10,11 +10,11 @@ namespace lithium\tests\fixture\model\gallery;
 
 class Images extends \lithium\data\Model {
 
-	public $belongsTo = array('Galleries');
+	public $belongsTo = ['Galleries'];
 
-	public $hasMany = array('ImagesTags', 'Comments');
+	public $hasMany = ['ImagesTags', 'Comments'];
 
-	protected $_meta = array('connection' => 'test');
+	protected $_meta = ['connection' => 'test'];
 }
 
 ?>

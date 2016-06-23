@@ -85,8 +85,8 @@ class MemoryTest extends \lithium\test\Unit {
 		$closure = $this->Memory->read();
 		$this->assertInternalType('callable', $closure);
 
-		$result = $closure(array('key' => null), null);
-		$expected = array('read_test' => 'value to be read');
+		$result = $closure(['key' => null], null);
+		$expected = ['read_test' => 'value to be read'];
 		$this->assertEqual($expected, $result);
 	}
 
@@ -165,7 +165,7 @@ class MemoryTest extends \lithium\test\Unit {
 		$this->Memory->_session['foobar'] = 'foo';
 		$closure = $this->Memory->clear();
 		$this->assertInternalType('callable', $closure);
-		$result = $closure(array(), null);
+		$result = $closure([], null);
 		$this->assertEmpty($this->Memory->_session);
 	}
 }

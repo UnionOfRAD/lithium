@@ -20,12 +20,12 @@ class MySqlTest extends \lithium\test\Unit {
 	protected $_model = 'lithium\tests\mocks\data\model\MockDatabasePost';
 
 	public function setUp() {
-		Connections::add('mock', array(
+		Connections::add('mock', [
 			'object' => $this->_db = new MockMySql()
-		));
-		MockDatabasePost::config(array(
-			'meta' => array('connection' => 'mock')
-		));
+		]);
+		MockDatabasePost::config([
+			'meta' => ['connection' => 'mock']
+		]);
 	}
 
 	public function tearDown() {
@@ -34,44 +34,44 @@ class MySqlTest extends \lithium\test\Unit {
 	}
 
 	public function testDsnWithHostPort() {
-		$db = new MockMySql(array(
+		$db = new MockMySql([
 			'autoConnect' => false,
 			'database' => 'test',
 			'host' => 'localhost:1234',
-		));
+		]);
 		$expected = 'mysql:host=localhost;port=1234;dbname=test';
 		$result = $db->dsn();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testDsnWithHost() {
-		$db = new MockMySql(array(
+		$db = new MockMySql([
 			'autoConnect' => false,
 			'database' => 'test',
 			'host' => 'localhost',
-		));
+		]);
 		$expected = 'mysql:host=localhost;port=3306;dbname=test';
 		$result = $db->dsn();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testDsnWithPort() {
-		$db = new MockMySql(array(
+		$db = new MockMySql([
 			'autoConnect' => false,
 			'database' => 'test',
 			'host' => ':1234',
-		));
+		]);
 		$expected = 'mysql:host=localhost;port=1234;dbname=test';
 		$result = $db->dsn();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testDsnWithSocket() {
-		$db = new MockMySql(array(
+		$db = new MockMySql([
 			'autoConnect' => false,
 			'database' => 'test',
 			'host' => '/tmp/foo/bar.socket',
-		));
+		]);
 		$expected = 'mysql:unix_socket=/tmp/foo/bar.socket;dbname=test';
 		$result = $db->dsn();
 		$this->assertEqual($expected, $result);
@@ -82,25 +82,25 @@ class MySqlTest extends \lithium\test\Unit {
 	 * `Database::$_operators`. The latter are already tested in the Database case.
 	 */
 	public function testQueryOperators() {
-		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => array(
-			'title' => array('regexp' => '^[a-z0-9]+(\w)*$')
-		)));
+		$query = new Query(['type' => 'read', 'model' => $this->_model, 'conditions' => [
+			'title' => ['regexp' => '^[a-z0-9]+(\w)*$']
+		]]);
 		$expected  = "SELECT * FROM `mock_database_posts` AS `MockDatabasePost` WHERE ";
 		$expected .= "(`title` REGEXP '^[a-z0-9]+(\\w)*$');";
 		$result = $this->_db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 
-		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => array(
-			'title' => array('not regexp' => '^[a-z0-9]+(\w)*$')
-		)));
+		$query = new Query(['type' => 'read', 'model' => $this->_model, 'conditions' => [
+			'title' => ['not regexp' => '^[a-z0-9]+(\w)*$']
+		]]);
 		$expected  = "SELECT * FROM `mock_database_posts` AS `MockDatabasePost` WHERE ";
 		$expected .= "(`title` NOT REGEXP '^[a-z0-9]+(\\w)*$');";
 		$result = $this->_db->renderCommand($query);
 		$this->assertEqual($expected, $result);
 
-		$query = new Query(array('type' => 'read', 'model' => $this->_model, 'conditions' => array(
-			'title' => array('sounds like' => 'foo')
-		)));
+		$query = new Query(['type' => 'read', 'model' => $this->_model, 'conditions' => [
+			'title' => ['sounds like' => 'foo']
+		]]);
 		$expected  = "SELECT * FROM `mock_database_posts` AS `MockDatabasePost` WHERE ";
 		$expected .= "(`title` SOUNDS LIKE 'foo');";
 		$result = $this->_db->renderCommand($query);

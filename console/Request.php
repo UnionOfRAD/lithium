@@ -21,7 +21,7 @@ class Request extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	public $argv = array();
+	public $argv = [];
 
 	/**
 	 * Parameters parsed from arguments.
@@ -29,9 +29,9 @@ class Request extends \lithium\core\Object {
 	 * @see lithium\console\Router
 	 * @var array
 	 */
-	public $params = array(
-		'command' => null, 'action' => 'run', 'args' => array()
-	);
+	public $params = [
+		'command' => null, 'action' => 'run', 'args' => []
+	];
 
 	/**
 	 * Input (STDIN).
@@ -45,7 +45,7 @@ class Request extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_env = array();
+	protected $_env = [];
 
 	/**
 	 * Holds the value of the current locale, set through the `locale()` method.
@@ -59,7 +59,7 @@ class Request extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('env' => 'merge');
+	protected $_autoConfig = ['env' => 'merge'];
 
 	/**
 	 * Constructor.
@@ -71,12 +71,12 @@ class Request extends \lithium\core\Object {
 	 *          the request's environment and data; defaults to `true`.
 	 * @return void
 	 */
-	public function __construct($config = array()) {
-		$defaults = array(
-			'args' => array(),
+	public function __construct($config = []) {
+		$defaults = [
+			'args' => [],
 			'input' => null,
 			'globals' => true
-		);
+		];
 		$config += $defaults;
 		parent::__construct($config);
 	}

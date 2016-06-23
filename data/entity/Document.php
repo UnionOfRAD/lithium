@@ -39,15 +39,15 @@ use RuntimeException;
  * print_r($acme->to('array'));
  *
  * // Yields:
- * //	array(
+ * //	[
  * //	'_id' => 12345,
  * //	'name' => 'Acme, Inc.',
- * //	'employees' => array(
- * //		'Larry' => array('email' => 'larry@acme.com'),
- * //		'Curly' => array('email' => 'curly@acme.com'),
- * //		'Moe' => array('email' => 'moe@acme.com')
- * //	)
- * //)
+ * //	'employees' => [
+ * //		'Larry' => ['email' => 'larry@acme.com'],
+ * //		'Curly' => ['email' => 'curly@acme.com'],
+ * //		'Moe' => ['email' => 'moe@acme.com']
+ * //	]
+ * //]
  * ```
  *
  * As with other database objects, a `Document` exposes its fields as object properties, like so:
@@ -80,7 +80,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @see lithium\data\collection\DocumentSet::stats()
 	 * @var array
 	 */
-	protected $_stats = array();
+	protected $_stats = [];
 
 	/**
 	 * Holds the current iteration state. Used by `Document::valid()` to terminate `foreach` loops
@@ -95,23 +95,23 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *
 	 * @var array
 	 */
-	protected $_removed = array();
+	protected $_removed = [];
 
 	protected function _init() {
 		parent::_init();
 
 		$data = (array) $this->_data;
-		$this->_data = array();
-		$this->_updated = array();
-		$this->_removed = array();
+		$this->_data = [];
+		$this->_updated = [];
+		$this->_removed = [];
 
-		$this->_handlers += array(
+		$this->_handlers += [
 			'MongoId' => function($value) { return (string) $value; },
 			'MongoDate' => function($value) { return $value->sec; }
-		);
+		];
 
-		$this->set($data, array('init' => true));
-		$this->sync(null, array(), array('materialize' => $this->_exists));
+		$this->set($data, ['init' => true]);
+		$this->sync(null, [], ['materialize' => $this->_exists]);
 		unset($this->_autoConfig);
 	}
 
@@ -138,18 +138,18 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 
 		if ($field = $this->schema($name)) {
 			if (isset($field['default'])) {
-				$this->set(array($name => $field['default']));
+				$this->set([$name => $field['default']]);
 				return $this->_updated[$name];
 			}
 			if (isset($field['array']) && $field['array'] && ($model = $this->_model)) {
-				$this->_updated[$name] = $model::create(array(), array(
+				$this->_updated[$name] = $model::create([], [
 					'class' => 'set',
 					'schema' => $this->schema(),
 					'pathKey' => $this->_pathKey ? $this->_pathKey . '.' . $name : $name,
 					'parent' => $this,
 					'model' => $this->_model,
 					'defaults' => false
-				));
+				]);
 				return $this->_updated[$name];
 			}
 		}
@@ -157,17 +157,17 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 		return $null;
 	}
 
-	public function export(array $options = array()) {
+	public function export(array $options = []) {
 		foreach ($this->_updated as $key => $val) {
 			if ($val instanceof self) {
 				$path = $this->_pathKey ? "{$this->_pathKey}." : '';
 				$this->_updated[$key]->_pathKey = "{$path}{$key}";
 			}
 		}
-		return parent::export($options) + array(
+		return parent::export($options) + [
 			'key' => $this->_pathKey,
 			'remove' => $this->_removed
-		);
+		];
 	}
 
 	/**
@@ -180,8 +180,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *                Otherwise, only syncs the current object. Defaults to `true`.
 	 * @return void
 	 */
-	public function sync($id = null, array $data = array(), array $options = array()) {
-		$defaults = array('recursive' => true);
+	public function sync($id = null, array $data = [], array $options = []) {
+		$defaults = ['recursive' => true];
 		$options += $defaults;
 
 		if (!$options['recursive']) {
@@ -190,7 +190,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 
 		foreach ($this->_updated as $key => $val) {
 			if (is_object($val) && method_exists($val, 'sync')) {
-				$nested = isset($data[$key]) ? $data[$key] : array();
+				$nested = isset($data[$key]) ? $data[$key] : [];
 				$this->_updated[$key]->sync(null, $nested, $options);
 			}
 		}
@@ -207,8 +207,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @param array $options Any other options to pass when instantiating the related object.
 	 * @return object Returns a new `Document` object instance.
 	 */
-	protected function _relation($classType, $key, $data, $options = array()) {
-		return parent::_relation($classType, $key, $data, array('exists' => false) + $options);
+	protected function _relation($classType, $key, $data, $options = []) {
+		return parent::_relation($classType, $key, $data, ['exists' => false] + $options);
 	}
 
 	protected function &_getNested($name) {
@@ -240,7 +240,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @return void
 	 */
 	public function __set($name, $value = null) {
-		$this->set(array($name => $value));
+		$this->set([$name => $value]);
 	}
 
 	protected function _setNested($name, $value) {
@@ -259,14 +259,14 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			}
 
 			if ($next === null && ($model = $this->_model)) {
-				$current->set(array($key => $model::create(array(), array('defaults' => false))));
+				$current->set([$key => $model::create([], ['defaults' => false])]);
 				$next =& $current->{$key};
 			}
 			$current =& $next;
 		}
 
 		if (is_object($current)) {
-			$current->set(array(end($path) => $value));
+			$current->set([end($path) => $value]);
 		}
 	}
 
@@ -313,15 +313,15 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *
 	 * For example:
 	 * ```
-	 * $doc->set(array('title' => 'Lorem Ipsum', 'value' => 42));
+	 * $doc->set(['title' => 'Lorem Ipsum', 'value' => 42]);
 	 * ```
 	 *
 	 * @param array $data An associative array of fields and values to assign to the `Document`.
 	 * @param array $options
 	 * @return void
 	 */
-	public function set(array $data, array $options = array()) {
-		$defaults = array('init' => false);
+	public function set(array $data, array $options = []) {
+		$defaults = ['init' => false];
 		$options += $defaults;
 
 		$cast = ($schema = $this->schema());
@@ -368,7 +368,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @return void
 	 */
 	public function offsetSet($offset, $value) {
-		return $this->set(array($offset => $value));
+		return $this->set([$offset => $value]);
 	}
 
 	/**
@@ -431,7 +431,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @param array $options
 	 * @return mixed
 	 */
-	public function to($format, array $options = array()) {
+	public function to($format, array $options = []) {
 		$options['internal'] = false;
 		return parent::to($format, $options);
 	}

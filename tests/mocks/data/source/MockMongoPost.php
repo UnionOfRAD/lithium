@@ -12,7 +12,7 @@ use lithium\data\source\mongo_db\Schema;
 
 class MockMongoPost extends \lithium\data\Model {
 
-	protected $_meta = array('source' => 'posts', 'connection' => false, 'key' => '_id');
+	protected $_meta = ['source' => 'posts', 'connection' => false, 'key' => '_id'];
 
 	public static $connection;
 
@@ -20,7 +20,7 @@ class MockMongoPost extends \lithium\data\Model {
 		$result = parent::schema($field);
 
 		if (is_object($result) && get_class($result) === 'lithium\data\Schema') {
-			return new Schema(array('fields' => $result->fields(), 'meta'   => $result->meta()));
+			return new Schema(['fields' => $result->fields(), 'meta'   => $result->meta()]);
 		}
 		return $result;
 	}

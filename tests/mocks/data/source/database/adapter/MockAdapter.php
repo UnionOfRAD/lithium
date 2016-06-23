@@ -18,21 +18,21 @@ class MockAdapter extends \lithium\data\source\Database {
 	 *
 	 * @var array
 	 */
-	protected $_records = array();
+	protected $_records = [];
 
 	/**
 	 * A list of columns for the current test
 	 *
 	 * @var array
 	 */
-	protected $_columns = array();
+	protected $_columns = [];
 
 	/**
 	 * Holds an array of values that should be processed on initialisation.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('records', 'columns');
+	protected $_autoConfig = ['records', 'columns'];
 
 	/**
 	 * Internal pointer to indicate the current record.
@@ -41,8 +41,8 @@ class MockAdapter extends \lithium\data\source\Database {
 	 */
 	protected $_pointer = 0;
 
-	public function __construct(array $config = array()) {
-		$defaults =  array('records' => array(), 'columns' => array(), 'database' => 'mock');
+	public function __construct(array $config = []) {
+		$defaults =  ['records' => [], 'columns' => [], 'database' => 'mock'];
 		$config['autoConnect'] = false;
 		parent::__construct((array) $config + $defaults);
 	}
@@ -62,23 +62,23 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $encoding ?: '';
 	}
 
-	public function describe($entity, $fields = array(), array $meta = array()) {
+	public function describe($entity, $fields = [], array $meta = []) {
 		return $this->_instance('schema', compact('fields', 'meta'));
 	}
 
-	public function create($record, array $options = array()) {
+	public function create($record, array $options = []) {
 		return true;
 	}
 
-	public function read($query, array $options = array()) {
+	public function read($query, array $options = []) {
 		return true;
 	}
 
-	public function update($query, array $options = array()) {
+	public function update($query, array $options = []) {
 		return true;
 	}
 
-	public function delete($query, array $options = array()) {
+	public function delete($query, array $options = []) {
 		return true;
 	}
 
@@ -98,7 +98,7 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $name;
 	}
 
-	public function value($value, array $schema = array()) {
+	public function value($value, array $schema = []) {
 		if (is_array($value)) {
 			return parent::value($value, $schema);
 		}
@@ -109,7 +109,7 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $this->_columns;
 	}
 
-	public function conditions($conditions, $context, array $options = array()) {
+	public function conditions($conditions, $context, array $options = []) {
 		return $conditions;
 	}
 
@@ -151,14 +151,14 @@ class MockAdapter extends \lithium\data\source\Database {
 		if (!$feature) {
 			return true;
 		}
-		$features = array(
+		$features = [
 			'arrays' => false,
 			'transactions' => true,
 			'booleans' => true,
 			'schema' => true,
 			'relationships' => true,
 			'sources' => true
-		);
+		];
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
 }

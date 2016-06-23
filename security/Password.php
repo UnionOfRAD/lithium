@@ -219,7 +219,7 @@ class Password {
 
 		$output = '_' . $base64[$count & 0x3f] . $base64[($count >> 6) & 0x3f];
 		$output .= $base64[($count >> 12) & 0x3f] . $base64[($count >> 18) & 0x3f];
-		$output .= Random::generate(3, array('encode' => Random::ENCODE_BASE_64));
+		$output .= Random::generate(3, ['encode' => Random::ENCODE_BASE_64]);
 
 		return $output;
 	}
@@ -230,7 +230,7 @@ class Password {
 	 * @return string The MD5 salt.
 	 */
 	protected static function _generateSaltMd5() {
-		return '$1$' . Random::generate(6, array('encode' => Random::ENCODE_BASE_64));
+		return '$1$' . Random::generate(6, ['encode' => Random::ENCODE_BASE_64]);
 	}
 }
 

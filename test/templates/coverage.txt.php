@@ -1,15 +1,15 @@
 {:heading}Code Coverage{:end}
 <?php
 
-	$summary = array(
+	$summary = [
 		'classes' => 0, 'executable' => 0, 'covered' => 0, 'uncovered' => 0, 'percentage' => 0
-	);
+	];
 
-	$colorMap = array(
+	$colorMap = [
 		'ignored' => 'white',
 		'covered' => 'success',
 		'uncovered' => 'error',
-	);
+	];
 
 	foreach ($data as $class => $coverage) {
 		$summary['classes']++;

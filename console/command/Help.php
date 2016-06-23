@@ -97,10 +97,10 @@ class Help extends \lithium\console\Command {
 		switch ($type) {
 			default:
 				$info = Inspector::info($class);
-				$result = array('class' => array(
+				$result = ['class' => [
 					'name' => $info['shortName'],
 					'description' => trim($info['description'] . PHP_EOL . PHP_EOL . $info['text'])
-				));
+				]];
 			break;
 			case 'method':
 				$result = $this->_methods($class, compact('name'));
@@ -119,41 +119,41 @@ class Help extends \lithium\console\Command {
 	 * @param array $options
 	 * @return array
 	 */
-	protected function _methods($class, $options = array()) {
-		$defaults = array('name' => null);
+	protected function _methods($class, $options = []) {
+		$defaults = ['name' => null];
 		$options += $defaults;
 
 		$map = function($item) {
 			if ($item->name[0] === '_') {
 				return;
 			}
-			$modifiers = array_values(Inspector::invokeMethod('_modifiers', array($item)));
-			$setAccess = array_intersect($modifiers, array('private', 'protected')) != array();
+			$modifiers = array_values(Inspector::invokeMethod('_modifiers', [$item]));
+			$setAccess = array_intersect($modifiers, ['private', 'protected']) != [];
 
 			if ($setAccess) {
 				$item->setAccessible(true);
 			}
-			$args = array();
+			$args = [];
 
 			foreach ($item->getParameters() as $arg) {
-				$args[] = array(
+				$args[] = [
 					'name' => $arg->getName(),
 					'optional' => $arg->isOptional(),
 					'description' => null
-				);
+				];
 			}
-			$result = compact('modifiers', 'args') + array(
+			$result = compact('modifiers', 'args') + [
 				'docComment' => $item->getDocComment(),
 				'name' => $item->getName()
-			);
+			];
 			if ($setAccess) {
 				$item->setAccessible(false);
 			}
 			return $result;
 		};
 
-		$methods = Inspector::methods($class)->map($map, array('collect' => false));
-		$results = array();
+		$methods = Inspector::methods($class)->map($map, ['collect' => false]);
+		$results = [];
 
 		foreach (array_filter($methods) as $method) {
 			$comment = Docblock::comment($method['docComment']);
@@ -175,7 +175,7 @@ class Help extends \lithium\console\Command {
 			$results[$name] = compact('name', 'description', 'return', 'args');
 
 			if ($name && $name == $options['name']) {
-				return array($name => $results[$name]);
+				return [$name => $results[$name]];
 			}
 		}
 		return $results;
@@ -188,12 +188,12 @@ class Help extends \lithium\console\Command {
 	 * @param array $options
 	 * @return array
 	 */
-	protected function _properties($class, $options = array()) {
-		$defaults = array('name' => null);
+	protected function _properties($class, $options = []) {
+		$defaults = ['name' => null];
 		$options += $defaults;
 
-		$properties = Inspector::properties($class, array('self' => false));
-		$results = array();
+		$properties = Inspector::properties($class, ['self' => false]);
+		$results = [];
 
 		foreach ($properties as &$property) {
 			if ($property['name'] === 'request' || $property['name'] === 'response') {
@@ -215,7 +215,7 @@ class Help extends \lithium\console\Command {
 			$results[$name] = compact('name', 'description', 'type', 'usage');
 
 			if ($name == $options['name']) {
-				return array($name => $results[$name]);
+				return [$name => $results[$name]];
 			}
 		}
 		return $results;
@@ -250,7 +250,7 @@ class Help extends \lithium\console\Command {
 	 * @return void
 	 */
 	protected function _renderCommands() {
-		$commands = Libraries::locate('command', null, array('recursive' => false));
+		$commands = Libraries::locate('command', null, ['recursive' => false]);
 
 		foreach ($commands as $key => $command) {
 			$library = strtok($command, '\\');
@@ -280,7 +280,7 @@ class Help extends \lithium\console\Command {
 	 * @param array $properties From `_properties()`.
 	 * @return void
 	 */
-	protected function _renderUsage($command, $method, $properties = array()) {
+	protected function _renderUsage($command, $method, $properties = []) {
 		$params = array_reduce($properties, function($a, $b) {
 			return "{$a} {$b['usage']}";
 		});

@@ -14,10 +14,10 @@ use lithium\test\Group;
 class ReportTest extends \lithium\test\Unit {
 
 	public function testInit() {
-		$report = new Report(array(
+		$report = new Report([
 			'title' => 'lithium\tests\mocks\test\MockUnitTest',
-			'group' => new Group(array('data' => array('lithium\tests\mocks\test\MockUnitTest')))
-		));
+			'group' => new Group(['data' => ['lithium\tests\mocks\test\MockUnitTest']])
+		]);
 		$report->run();
 
 		$expected = 'lithium\tests\mocks\test\MockUnitTest';
@@ -34,27 +34,27 @@ class ReportTest extends \lithium\test\Unit {
 	}
 
 	public function testFilters() {
-		$report = new Report(array(
+		$report = new Report([
 			'title' => 'lithium\tests\mocks\test\MockFilterClassTest',
 			'group' => new Group(
-				array('data' => array('lithium\tests\mocks\test\MockFilterClassTest'))
+				['data' => ['lithium\tests\mocks\test\MockFilterClassTest']]
 			),
-			'filters' => array("Complexity" => ""),
+			'filters' => ["Complexity" => ""],
 			'format' => 'html'
-		));
+		]);
 
-		$expected = array('lithium\test\filter\Complexity' => array(
-			'name' => 'complexity', 'apply' => array(), 'analyze' => array()
-		));
+		$expected = ['lithium\test\filter\Complexity' => [
+			'name' => 'complexity', 'apply' => [], 'analyze' => []
+		]];
 		$result = $report->filters();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testStats() {
-		$report = new Report(array(
+		$report = new Report([
 			'title' => 'lithium\tests\mocks\test\MockUnitTest',
-			'group' => new Group(array('data' => array('lithium\tests\mocks\test\MockUnitTest')))
-		));
+			'group' => new Group(['data' => ['lithium\tests\mocks\test\MockUnitTest']])
+		]);
 		$report->run();
 
 		$expected = 2;
@@ -65,11 +65,11 @@ class ReportTest extends \lithium\test\Unit {
 	}
 
 	public function testRender() {
-		$report = new Report(array(
+		$report = new Report([
 			'title' => '\lithium\tests\mocks\test\MockUnitTest',
-			'group' => new Group(array('data' => array('\lithium\tests\mocks\test\MockUnitTest'))),
+			'group' => new Group(['data' => ['\lithium\tests\mocks\test\MockUnitTest']]),
 			'format' => 'txt'
-		));
+		]);
 		$report->run();
 
 		$result = $report->render('result', $report->stats());
@@ -77,13 +77,13 @@ class ReportTest extends \lithium\test\Unit {
 	}
 
 	public function testSingleFilter() {
-		$report = new Report(array(
+		$report = new Report([
 			'title' => 'lithium\tests\mocks\test\MockFilterClassTest',
-			'group' => new Group(array(
-				'data' => array('lithium\tests\mocks\test\MockFilterClassTest')
-			)),
-			'filters' => array("Complexity" => "")
-		));
+			'group' => new Group([
+				'data' => ['lithium\tests\mocks\test\MockFilterClassTest']
+			]),
+			'filters' => ["Complexity" => ""]
+		]);
 		$report->run();
 
 		$class = 'lithium\test\filter\Complexity';

@@ -47,13 +47,13 @@ class Text {
 		$uuid[6] = chr(ord($uuid[6]) & static::UUID_CLEAR_VER | static::UUID_VERSION_4);
 		$uuid[8] = chr(ord($uuid[8]) & static::UUID_CLEAR_VAR | static::UUID_VAR_RFC);
 
-		return join('-', array(
+		return join('-', [
 			bin2hex(substr($uuid, 0, 4)),
 			bin2hex(substr($uuid, 4, 2)),
 			bin2hex(substr($uuid, 6, 2)),
 			bin2hex(substr($uuid, 8, 2)),
 			bin2hex(substr($uuid, 10, 6))
-		));
+		]);
 	}
 
 	/**
@@ -64,7 +64,7 @@ class Text {
 	 * ```
 	 * Text::insert(
 	 *     'My name is {:name} and I am {:age} years old.',
-	 *     array('name' => 'Bob', 'age' => '65')
+	 *     ['name' => 'Bob', 'age' => '65']
 	 * ); // returns 'My name is Bob and I am 65 years old.'
 	 * ```
 	 *
@@ -88,14 +88,14 @@ class Text {
 	 *          all other options except `'clean'`.
 	 * @return string
 	 */
-	public static function insert($str, array $data, array $options = array()) {
-		$defaults = array(
+	public static function insert($str, array $data, array $options = []) {
+		$defaults = [
 			'before' => '{:',
 			'after' => '}',
 			'escape' => null,
 			'format' => null,
 			'clean' => false
-		);
+		];
 		$options += $defaults;
 		$format = $options['format'];
 
@@ -109,7 +109,7 @@ class Text {
 		}
 
 		if (!$format && key($data) !== 0) {
-			$replace = array();
+			$replace = [];
 
 			foreach ($data as $key => $value) {
 				if (!is_scalar($value)) {
@@ -169,22 +169,22 @@ class Text {
 	 *          - `'word'`: Regular expression matching words.
 	 * @return string The cleaned string.
 	 */
-	public static function clean($str, array $options = array()) {
+	public static function clean($str, array $options = []) {
 		if (is_array($options['clean'])) {
 			$clean = $options['clean'];
 		} else {
-			$clean = array(
+			$clean = [
 				'method' => is_bool($options['clean']) ? 'text' : $options['clean']
-			);
+			];
 		}
 
 		switch ($clean['method']) {
 			case 'text':
-				$clean += array(
+				$clean += [
 					'word' => '[\w,.]+',
 					'gap' => '[\s]*(?:(?:and|or|,)[\s]*)?',
 					'replacement' => ''
-				);
+				];
 				$before = preg_quote($options['before'], '/');
 				$after = preg_quote($options['after'], '/');
 
@@ -197,11 +197,11 @@ class Text {
 				$str = preg_replace($kleenex, $clean['replacement'], $str);
 			break;
 			case 'html':
-				$clean += array(
+				$clean += [
 					'word' => '[\w,.]+',
 					'andText' => true,
 					'replacement' => ''
-				);
+				];
 				$kleenex = sprintf(
 					'/[\s]*[a-z]+=(")(%s%s%s[\s]*)+\\1/i',
 					preg_quote($options['before'], '/'),
@@ -211,9 +211,9 @@ class Text {
 				$str = preg_replace($kleenex, $clean['replacement'], $str);
 
 				if ($clean['andText']) {
-					return static::clean($str, array(
-						'clean' => array('method' => 'text')
-					) + $options);
+					return static::clean($str, [
+						'clean' => ['method' => 'text']
+					] + $options);
 				}
 			break;
 		}
@@ -247,8 +247,8 @@ class Text {
 	 *              -`'rightBound'` _string_: Right scope-enclosing boundary.
 	 * @return array Returns an array of tokens.
 	 */
-	public static function tokenize($data, array $options = array()) {
-		$options += array('separator' => ',', 'leftBound' => '(', 'rightBound' => ')');
+	public static function tokenize($data, array $options = []) {
+		$options += ['separator' => ',', 'leftBound' => '(', 'rightBound' => ')'];
 
 		if (!$data || is_array($data)) {
 			return $data;
@@ -257,17 +257,17 @@ class Text {
 		$depth = 0;
 		$offset = 0;
 		$buffer = '';
-		$results = array();
+		$results = [];
 		$length = strlen($data);
 		$open = false;
 
 		while ($offset <= $length) {
 			$tmpOffset = -1;
-			$offsets = array(
+			$offsets = [
 				strpos($data, $options['separator'], $offset),
 				strpos($data, $options['leftBound'], $offset),
 				strpos($data, $options['rightBound'], $offset)
-			);
+			];
 
 			for ($i = 0; $i < 3; $i++) {
 				if ($offsets[$i] !== false && ($offsets[$i] < $tmpOffset || $tmpOffset === -1)) {
@@ -310,7 +310,7 @@ class Text {
 		if (!$results && $buffer) {
 			$results[] = $buffer;
 		}
-		return $results ? array_map('trim', $results) : array();
+		return $results ? array_map('trim', $results) : [];
 	}
 }
 

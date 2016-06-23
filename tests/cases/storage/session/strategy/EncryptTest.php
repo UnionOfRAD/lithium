@@ -38,17 +38,17 @@ class EncryptTest extends \lithium\test\Unit {
 	}
 
 	public function testConstruct() {
-		$encrypt = new Encrypt(array('secret' => $this->secret));
+		$encrypt = new Encrypt(['secret' => $this->secret]);
 		$this->assertInstanceOf('lithium\storage\session\strategy\Encrypt', $encrypt);
 	}
 
 	public function testWrite() {
-		$encrypt = new Encrypt(array('secret' => $this->secret));
+		$encrypt = new Encrypt(['secret' => $this->secret]);
 
 		$key = 'fookey';
 		$value = 'barvalue';
 
-		$result = $encrypt->write($value, array('class' => $this->mock, 'key' => $key));
+		$result = $encrypt->write($value, ['class' => $this->mock, 'key' => $key]);
 		$cookie = MockCookieSession::data();
 
 		$this->assertNotEmpty($result);
@@ -58,41 +58,41 @@ class EncryptTest extends \lithium\test\Unit {
 	}
 
 	public function testRead() {
-		$encrypt = new Encrypt(array('secret' => $this->secret));
+		$encrypt = new Encrypt(['secret' => $this->secret]);
 
 		$key = 'fookey';
 		$value = 'barvalue';
 
-		$result = $encrypt->write($value, array('class' => $this->mock, 'key' => $key));
+		$result = $encrypt->write($value, ['class' => $this->mock, 'key' => $key]);
 		$this->assertNotEmpty($result);
 
 		$cookie = MockCookieSession::data();
-		$result = $encrypt->read($key, array('class' => $this->mock, 'key' => $key));
+		$result = $encrypt->read($key, ['class' => $this->mock, 'key' => $key]);
 
 		$this->assertEqual($value, $result);
 		$this->assertNotEqual($cookie['__encrypted'], $result);
 	}
 
 	public function testDelete() {
-		$encrypt = new Encrypt(array('secret' => $this->secret));
+		$encrypt = new Encrypt(['secret' => $this->secret]);
 
 		$key = 'fookey';
 		$value = 'barvalue';
 
-		$result = $encrypt->write($value, array('class' => $this->mock, 'key' => $key));
+		$result = $encrypt->write($value, ['class' => $this->mock, 'key' => $key]);
 		$this->assertNotEmpty($result);
 
 		$cookie = MockCookieSession::data();
-		$result = $encrypt->read($key, array('class' => $this->mock, 'key' => $key));
+		$result = $encrypt->read($key, ['class' => $this->mock, 'key' => $key]);
 
 		$this->assertEqual($value, $result);
 
-		$result = $encrypt->delete($key, array('class' => $this->mock, 'key' => $key));
+		$result = $encrypt->delete($key, ['class' => $this->mock, 'key' => $key]);
 
 		$cookie = MockCookieSession::data();
 		$this->assertEmpty($cookie['__encrypted']);
 
-		$result = $encrypt->read($key, array('class' => $this->mock));
+		$result = $encrypt->read($key, ['class' => $this->mock]);
 		$this->assertEmpty($result);
 	}
 }

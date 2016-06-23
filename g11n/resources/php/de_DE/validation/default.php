@@ -9,8 +9,8 @@
 /**
  * Validation data for `de_DE`.
  */
-return array(
+return [
 	'postalCode' => '/^[0-9]{5}$/i'
-);
+];
 
 ?>

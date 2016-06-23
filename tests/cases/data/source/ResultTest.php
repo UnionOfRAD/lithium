@@ -14,28 +14,28 @@ use lithium\tests\mocks\data\model\database\MockResult;
 class ResultTest extends \lithium\test\Unit {
 
 	public function testIteration() {
-		$iterator = new MockResult(array(
-			'records' => array("one", "two", "three", "four")
-		));
-		$result = array();
-		$expected = array(array(0, "one"), array(1, "two"), array(2, "three"), array(3, "four"));
+		$iterator = new MockResult([
+			'records' => ["one", "two", "three", "four"]
+		]);
+		$result = [];
+		$expected = [[0, "one"], [1, "two"], [2, "three"], [3, "four"]];
 
 		foreach ($iterator as $key => $val) {
-			$result[] = array($key, $val);
+			$result[] = [$key, $val];
 		}
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testIterationWithPeek() {
-		$records = array("one", "two", "three", "four");
+		$records = ["one", "two", "three", "four"];
 		$iterator = new MockResult(compact('records'));
-		$map = array(
+		$map = [
 			"one" => "two",
 			"two" => "three",
 			"three" => "four",
 			"four" => false
-		);
-		$result = array();
+		];
+		$result = [];
 
 		foreach ($iterator as $key => $val) {
 			$result[] = $val;

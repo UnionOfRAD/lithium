@@ -23,7 +23,7 @@ class Html extends \lithium\template\Helper {
 	 *
 	 * @var array
 	 */
-	protected $_strings = array(
+	protected $_strings = [
 		'block'            => '<div{:options}>{:content}</div>',
 		'block-end'        => '</div>',
 		'block-start'      => '<div{:options}>',
@@ -50,18 +50,18 @@ class Html extends \lithium\template\Helper {
 		'tag'              => '<{:name}{:options}>{:content}</{:name}>',
 		'tag-end'          => '</{:name}>',
 		'tag-start'        => '<{:name}{:options}>'
-	);
+	];
 
 	/**
 	 * Data used for custom <meta /> links.
 	 *
 	 * @var array
 	 */
-	protected $_metaLinks = array(
-		'atom' => array('type' => 'application/atom+xml', 'rel' => 'alternate'),
-		'rss'  => array('type' => 'application/rss+xml', 'rel' => 'alternate'),
-		'icon' => array('type' => 'image/x-icon', 'rel' => 'icon')
-	);
+	protected $_metaLinks = [
+		'atom' => ['type' => 'application/atom+xml', 'rel' => 'alternate'],
+		'rss'  => ['type' => 'application/rss+xml', 'rel' => 'alternate'],
+		'icon' => ['type' => 'image/x-icon', 'rel' => 'icon']
+	];
 
 	/**
 	 * List of meta tags to cache and to output.
@@ -69,7 +69,7 @@ class Html extends \lithium\template\Helper {
 	 * @var array
 	 * @see lithium\template\helper\Html::meta()
 	 */
-	protected $_metaList = array();
+	protected $_metaList = [];
 
 	/**
 	 * Used by output handlers to calculate asset paths in conjunction with the `Media` class.
@@ -77,12 +77,12 @@ class Html extends \lithium\template\Helper {
 	 * @var array
 	 * @see lithium\net\http\Media
 	 */
-	public $contentMap = array(
+	public $contentMap = [
 		'script' => 'js',
 		'style'  => 'css',
 		'image' => 'image',
 		'_metaLink' => 'generic'
-	);
+	];
 
 	/**
 	 * Returns a charset meta-tag for declaring the encoding of the document.
@@ -144,8 +144,8 @@ class Html extends \lithium\template\Helper {
 	 *              - any other options specified are rendered as HTML attributes of the element.
 	 * @return string Returns an `<a />` or `<link />` element.
 	 */
-	public function link($title, $url = null, array $options = array()) {
-		$defaults = array('escape' => true, 'type' => null);
+	public function link($title, $url = null, array $options = []) {
+		$defaults = ['escape' => true, 'type' => null];
 		list($scope, $options) = $this->_options($defaults, $options);
 
 		if (isset($scope['type']) && $type = $scope['type']) {
@@ -174,8 +174,8 @@ class Html extends \lithium\template\Helper {
 	 * @return string
 	 * @filter
 	 */
-	public function script($path, array $options = array()) {
-		$defaults = array('inline' => true);
+	public function script($path, array $options = []) {
+		$defaults = ['inline' => true];
 		list($scope, $options) = $this->_options($defaults, $options);
 
 		if (is_array($path)) {
@@ -218,8 +218,8 @@ class Html extends \lithium\template\Helper {
 	 * @return string CSS <link /> or <style /> tag, depending on the type of link.
 	 * @filter
 	 */
-	public function style($path, array $options = array()) {
-		$defaults = array('type' => 'stylesheet', 'inline' => true);
+	public function style($path, array $options = []) {
+		$defaults = ['type' => 'stylesheet', 'inline' => true];
 		list($scope, $options) = $this->_options($defaults, $options);
 
 		if (is_array($path)) {
@@ -285,8 +285,8 @@ class Html extends \lithium\template\Helper {
 	 * @return string Returns a formatted `<img />` tag.
 	 * @filter
 	 */
-	public function image($path, array $options = array()) {
-		$defaults = array('alt' => '');
+	public function image($path, array $options = []) {
+		$defaults = ['alt' => ''];
 		$options += $defaults;
 		$path = is_array($path) ? $this->_context->url($path) : $path;
 
@@ -307,23 +307,23 @@ class Html extends \lithium\template\Helper {
 	 *              is 'html', 'rss', 'atom', or 'icon', the mime-type is returned.
 	 * @return string
 	 */
-	protected function _metaLink($type, $url = null, array $options = array()) {
-		$options += isset($this->_metaLinks[$type]) ? $this->_metaLinks[$type] : array();
+	protected function _metaLink($type, $url = null, array $options = []) {
+		$options += isset($this->_metaLinks[$type]) ? $this->_metaLinks[$type] : [];
 
 		if ($type === 'icon') {
 			$url = $url ?: 'favicon.ico';
-			$standard = $this->_render(__METHOD__, 'meta-link', compact('url', 'options'), array(
-				'handlers' => array('url' => 'path')
-			));
+			$standard = $this->_render(__METHOD__, 'meta-link', compact('url', 'options'), [
+				'handlers' => ['url' => 'path']
+			]);
 			$options['rel'] = 'shortcut icon';
-			$ieFix = $this->_render(__METHOD__, 'meta-link', compact('url', 'options'), array(
-				'handlers' => array('url' => 'path')
-			));
+			$ieFix = $this->_render(__METHOD__, 'meta-link', compact('url', 'options'), [
+				'handlers' => ['url' => 'path']
+			]);
 			return "{$standard}\n\t{$ieFix}";
 		}
-		return $this->_render(__METHOD__, 'meta-link', compact('url', 'options'), array(
-			'handlers' => array()
-		));
+		return $this->_render(__METHOD__, 'meta-link', compact('url', 'options'), [
+			'handlers' => []
+		]);
 	}
 }
 

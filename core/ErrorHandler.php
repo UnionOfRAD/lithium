@@ -29,7 +29,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 *
 	 * @var array Config params
 	 */
-	protected static $_config = array();
+	protected static $_config = [];
 
 	/**
 	 * Types of checks available for sorting & parsing errors/exceptions.
@@ -37,7 +37,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 *
 	 * @var array Array of checks represented as closures, indexed by name.
 	 */
-	protected static $_checks = array();
+	protected static $_checks = [];
 
 	/**
 	 * Currently registered exception handler.
@@ -54,7 +54,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 */
 	protected static $_isRunning = false;
 
-	protected static $_runOptions = array();
+	protected static $_runOptions = [];
 
 	/**
 	 * Configure the `ErrorHandler`.
@@ -62,7 +62,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 * @param array $config Configuration directives.
 	 * @return Current configuration set.
 	 */
-	public static function config($config = array()) {
+	public static function config($config = []) {
 		return (static::$_config = array_merge($config, static::$_config));
 	}
 
@@ -83,8 +83,8 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 *                the stack trace inside a matching `try`/`catch` block, or that has a matching
 	 *                error handler applied using the `apply()` method.
 	 */
-	public static function run(array $config = array()) {
-		$defaults = array('trapErrors' => false, 'convertErrors' => true);
+	public static function run(array $config = []) {
+		$defaults = ['trapErrors' => false, 'convertErrors' => true];
 
 		if (static::$_isRunning) {
 			return;
@@ -135,10 +135,10 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 * when loaded. Mainly used for testing.
 	 */
 	public static function reset() {
-		static::$_config = array();
-		static::$_checks = array();
+		static::$_config = [];
+		static::$_checks = [];
 		static::$_exceptionHandler = null;
-		static::$_checks = array(
+		static::$_checks = [
 			'type'  => function($config, $info) {
 				return (boolean) array_filter((array) $config['type'], function($type) use ($info) {
 					return $type === $info['type'] || is_subclass_of($info['type'], $type);
@@ -153,16 +153,16 @@ class ErrorHandler extends \lithium\core\StaticObject {
 			'message' => function($config, $info) {
 				return preg_match($config['message'], $info['message']);
 			}
-		);
+		];
 		static::$_exceptionHandler = function($exception, $return = false) {
 			if (ob_get_length()) {
 				ob_end_clean();
 			}
-			$info = compact('exception') + array(
+			$info = compact('exception') + [
 				'type' => get_class($exception),
 				'stack' => static::trace($exception->getTrace())
-			);
-			foreach (array('message', 'file', 'line', 'trace') as $key) {
+			];
+			foreach (['message', 'file', 'line', 'trace'] as $key) {
 				$method = 'get' . ucfirst($key);
 				$info[$key] = $exception->{$method}();
 			}
@@ -178,16 +178,16 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 * @param array $scope
 	 * @return boolean True if successfully handled, false otherwise.
 	 */
-	public static function handle($info, $scope = array()) {
+	public static function handle($info, $scope = []) {
 		$checks = static::$_checks;
 		$rules = $scope ?: static::$_config;
 		$handler = static::$_exceptionHandler;
 		$info = is_object($info) ? $handler($info, true) : $info;
 
-		$defaults = array(
+		$defaults = [
 			'type' => null, 'code' => 0, 'message' => null, 'file' => null, 'line' => 0,
-			'trace' => array(), 'context' => null, 'exception' => null
-		);
+			'trace' => [], 'context' => null, 'exception' => null
+		];
 		$info = (array) $info + $defaults;
 
 		$info['stack'] = static::trace($info['trace']);
@@ -235,7 +235,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	}
 
 	public static function apply($object, array $conditions, $handler) {
-		$conditions = $conditions ?: array('type' => 'Exception');
+		$conditions = $conditions ?: ['type' => 'Exception'];
 		list($class, $method) = is_string($object) ? explode('::', $object) : $object;
 
 		Filters::apply($class, $method, function($params, $next) use ($conditions, $handler) {
@@ -281,7 +281,7 @@ class ErrorHandler extends \lithium\core\StaticObject {
 	 * @return array Returns a flat stack array containing class and method references.
 	 */
 	public static function trace(array $stack) {
-		$result = array();
+		$result = [];
 
 		foreach ($stack as $frame) {
 			if (isset($frame['function'])) {

@@ -26,9 +26,9 @@ class Mock extends \lithium\console\command\Create {
 	 * @param array|string $options
 	 * @return string
 	 */
-	protected function _namespace($request, $options = array()) {
+	protected function _namespace($request, $options = []) {
 		$request->params['command'] = $request->action;
-		return parent::_namespace($request, array('prepend' => 'tests.mocks.'));
+		return parent::_namespace($request, ['prepend' => 'tests.mocks.']);
 	}
 
 	/**
@@ -55,7 +55,7 @@ class Mock extends \lithium\console\command\Create {
 
 		if ($command = $this->_instance($type)) {
 			$request->params['action'] = $name;
-			$name = $command->invokeMethod('_class', array($request));
+			$name = $command->invokeMethod('_class', [$request]);
 		}
 		return "Mock{$name}";
 	}

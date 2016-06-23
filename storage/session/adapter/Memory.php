@@ -20,7 +20,7 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @var array "Session" data.
 	 */
-	public $_session = array();
+	public $_session = [];
 
 	/**
 	 * Obtain the session key.
@@ -49,7 +49,7 @@ class Memory extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return \Closure Function returning boolean `true` if the key exists, `false` otherwise.
 	 */
-	public function check($key, array $options = array()) {
+	public function check($key, array $options = []) {
 		return function($params) {
 			return isset($this->_session[$params['key']]);
 		};
@@ -63,7 +63,7 @@ class Memory extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return \Closure Function returning data in the session if successful, `false` otherwise.
 	 */
-	public function read($key = null, array $options = array()) {
+	public function read($key = null, array $options = []) {
 		return function($params) {
 			if (!$params['key']) {
 				return $this->_session;
@@ -80,7 +80,7 @@ class Memory extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $value, array $options = array()) {
+	public function write($key, $value, array $options = []) {
 		return function($params) {
 			return (boolean) ($this->_session[$params['key']] = $params['value']);
 		};
@@ -93,7 +93,7 @@ class Memory extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return \Closure Function returning boolean `true` on successful delete, `false` otherwise
 	 */
-	public function delete($key, array $options = array()) {
+	public function delete($key, array $options = []) {
 		return function($params) {
 			unset($this->_session[$params['key']]);
 			return !isset($this->_session[$params['key']]);
@@ -106,9 +106,9 @@ class Memory extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return \Closure Function that clears the session
 	 */
-	public function clear(array $options = array()) {
+	public function clear(array $options = []) {
 		return function($params) {
-			$this->_session = array();
+			$this->_session = [];
 		};
 	}
 

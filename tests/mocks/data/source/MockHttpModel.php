@@ -12,21 +12,21 @@ use lithium\data\source\Http;
 
 class MockHttpModel extends \lithium\data\Model {
 
-	protected $_meta = array(
+	protected $_meta = [
 		'source' => 'posts',
 		'connection' => false
-	);
+	];
 
 	public static $connection = null;
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer', 'key' => 'primary'),
-		'author_id' => array('type' => 'integer'),
-		'title' => array('type' => 'string', 'length' => 255),
-		'body' => array('type' => 'text'),
-		'created' => array('type' => 'datetime'),
-		'updated' => array('type' => 'datetime')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer', 'key' => 'primary'],
+		'author_id' => ['type' => 'integer'],
+		'title' => ['type' => 'string', 'length' => 255],
+		'body' => ['type' => 'text'],
+		'created' => ['type' => 'datetime'],
+		'updated' => ['type' => 'datetime']
+	];
 
 	public static function &connection() {
 		if (static::$connection) {

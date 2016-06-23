@@ -14,41 +14,41 @@ class MockPostsController extends \lithium\action\Controller {
 
 	public function index($test = false) {
 		if ($test) {
-			return array('foo' => 'bar');
+			return ['foo' => 'bar'];
 		}
 		return 'List of posts';
 	}
 
 	public function delete($id = null) {
 		if (empty($id)) {
-			return $this->redirect('/posts', array('exit' => false));
+			return $this->redirect('/posts', ['exit' => false]);
 		}
 		return "Deleted {$id}";
 	}
 
 	public function send() {
-		$this->redirect('/posts', array('exit' => true));
+		$this->redirect('/posts', ['exit' => true]);
 	}
 
 	public function type($raw = false) {
-		return array('data' => 'test');
+		return ['data' => 'test'];
 	}
 
 	public function notFound($id = null) {
 		$this->response->status(404);
-		$this->render(array('json' => $this->response->status));
+		$this->render(['json' => $this->response->status]);
 	}
 
 	public function view($id = null) {
-		$this->render(array('text', 'data' => 'This is a post'));
+		$this->render(['text', 'data' => 'This is a post']);
 	}
 
 	public function view2($id = null) {
-		$this->render(array('template' => 'view'));
+		$this->render(['template' => 'view']);
 	}
 
 	public function view3($id = null) {
-		$this->render(array('layout' => false, 'template' => 'view'));
+		$this->render(['layout' => false, 'template' => 'view']);
 	}
 
 	public function changeTemplate() {

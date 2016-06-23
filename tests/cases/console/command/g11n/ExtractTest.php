@@ -15,7 +15,7 @@ use lithium\g11n\Catalog;
 
 class ExtractTest extends \lithium\test\Unit {
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	protected $_path;
 
@@ -30,10 +30,10 @@ class ExtractTest extends \lithium\test\Unit {
 		$this->_backup['catalogConfig'] = Catalog::config();
 		Catalog::reset();
 
-		$this->command = new Extract(array(
-			'request' => new Request(array('input' => fopen('php://temp', 'w+'))),
-			'classes' => array('response' => 'lithium\tests\mocks\console\MockResponse')
-		));
+		$this->command = new Extract([
+			'request' => new Request(['input' => fopen('php://temp', 'w+')]),
+			'classes' => ['response' => 'lithium\tests\mocks\console\MockResponse']
+		]);
 		mkdir($this->command->source = "{$this->_path}/source");
 		mkdir($this->command->destination = "{$this->_path}/destination");
 	}
@@ -43,7 +43,7 @@ class ExtractTest extends \lithium\test\Unit {
 		$this->_cleanUp();
 	}
 
-	protected function _writeInput(array $input = array()) {
+	protected function _writeInput(array $input = []) {
 		foreach ($input as $input) {
 			fwrite($this->command->request->input, $input . "\n");
 		}
@@ -60,7 +60,7 @@ class ExtractTest extends \lithium\test\Unit {
 	}
 
 	public function testFailRead() {
-		$this->_writeInput(array('', '', '', ''));
+		$this->_writeInput(['', '', '', '']);
 		$result = $this->command->run();
 
 		$expected = 1;
@@ -83,7 +83,7 @@ EOD;
 
 		$configs = Catalog::config();
 		$configKey = key($configs);
-		$this->_writeInput(array($configKey, '', '', '', '', 'y'));
+		$this->_writeInput([$configKey, '', '', '', '', 'y']);
 		$result = $this->command->run();
 		$expected = 1;
 		$this->assertIdentical($expected, $result);
@@ -105,7 +105,7 @@ EOD;
 		$configKey1 = key($configs);
 		next($configs);
 		$configKey2 = key($configs);
-		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$this->_writeInput([$configKey1, $configKey2, '', 'y']);
 		$result = $this->command->run();
 		$expected = 0;
 		$this->assertIdentical($expected, $result);
@@ -132,8 +132,8 @@ EOD;
 		$file = "{$this->_path}/source/a.html.php";
 		$data = <<<EOD
 <h2>Balls</h2>
-<?=\$t('Ball', array('context' => 'Spherical object')); ?>
-<?=\$t('Ball', array('context' => 'Social gathering')); ?>
+<?=\$t('Ball', ['context' => 'Spherical object']); ?>
+<?=\$t('Ball', ['context' => 'Social gathering']); ?>
 <?=\$t('Ball'); ?>
 EOD;
 		file_put_contents($file, $data);
@@ -142,7 +142,7 @@ EOD;
 		$configKey1 = key($configs);
 		next($configs);
 		$configKey2 = key($configs);
-		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$this->_writeInput([$configKey1, $configKey2, '', 'y']);
 		$result = $this->command->run();
 		$expected = 0;
 		$this->assertIdentical($expected, $result);
@@ -183,10 +183,10 @@ EOD;
 		$file = "{$this->_path}/source/a.html.php";
 		$data = <<<EOD
 <h2>Balls</h2>
-<?=\$t('Ball', array('context' => 'Spherical object')); ?>
-<?=\$t('Ball', array('context' => 'Social gathering')); ?>
+<?=\$t('Ball', ['context' => 'Spherical object']); ?>
+<?=\$t('Ball', ['context' => 'Social gathering']); ?>
 <?=\$t('Ball'); ?>
-<?=\$t('Ball', array('context' => 'Social gathering')); ?>
+<?=\$t('Ball', ['context' => 'Social gathering']); ?>
 EOD;
 		file_put_contents($file, $data);
 
@@ -194,7 +194,7 @@ EOD;
 		$configKey1 = key($configs);
 		next($configs);
 		$configKey2 = key($configs);
-		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$this->_writeInput([$configKey1, $configKey2, '', 'y']);
 		$result = $this->command->run();
 		$expected = 0;
 		$this->assertIdentical($expected, $result);
@@ -224,8 +224,8 @@ EOD;
 	public function testContextsWithOtherParams() {
 		$file = "{$this->_path}/source/a.html.php";
 		$data = <<<EOD
-<?=\$t('Ball', array('context' => 'Social gathering', 'foo' => 'bar')); ?>
-<?=\$t('Ball', array('foo' => 123, 'bar' => baz(), 'context' => 'Spherical object')); ?>
+<?=\$t('Ball', ['context' => 'Social gathering', 'foo' => 'bar']); ?>
+<?=\$t('Ball', ['foo' => 123, 'bar' => baz(), 'context' => 'Spherical object']); ?>
 EOD;
 		file_put_contents($file, $data);
 
@@ -233,7 +233,7 @@ EOD;
 		$configKey1 = key($configs);
 		next($configs);
 		$configKey2 = key($configs);
-		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$this->_writeInput([$configKey1, $configKey2, '', 'y']);
 		$result = $this->command->run();
 		$expected = 0;
 		$this->assertIdentical($expected, $result);
@@ -268,8 +268,8 @@ EOD;
 	public function testContextsWithAmbiguousContextTokens() {
 		$file = "{$this->_path}/source/a.html.php";
 		$data = <<<EOD
-<?=\$t('Ball', array('context', 'foo' => 'context', 'context' => 'Spherical object')); ?>
-<?=\$t('Ball', array('foo' => \$t('context'), 'context' => 'Social gathering')); ?>
+<?=\$t('Ball', ['context', 'foo' => 'context', 'context' => 'Spherical object']); ?>
+<?=\$t('Ball', ['foo' => \$t('context'), 'context' => 'Social gathering']); ?>
 EOD;
 		file_put_contents($file, $data);
 
@@ -277,7 +277,7 @@ EOD;
 		$configKey1 = key($configs);
 		next($configs);
 		$configKey2 = key($configs);
-		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$this->_writeInput([$configKey1, $configKey2, '', 'y']);
 		$result = $this->command->run();
 		$expected = 0;
 		$this->assertIdentical($expected, $result);
@@ -308,7 +308,7 @@ EOD;
 	public function testContextsNested() {
 		$file = "{$this->_path}/source/a.html.php";
 		$data = <<<EOD
-<?=\$t('Robin, {:a}', array('a' => \$t('Michael, {:b}', array('b' => \$t('Bruce', array('context' => 'Lee')), 'context' => 'Jackson')), 'context' => 'Hood')); ?>
+<?=\$t('Robin, {:a}', ['a' => \$t('Michael, {:b}', ['b' => \$t('Bruce', ['context' => 'Lee']), 'context' => 'Jackson']), 'context' => 'Hood']); ?>
 EOD;
 		file_put_contents($file, $data);
 
@@ -316,7 +316,7 @@ EOD;
 		$configKey1 = key($configs);
 		next($configs);
 		$configKey2 = key($configs);
-		$this->_writeInput(array($configKey1, $configKey2, '', 'y'));
+		$this->_writeInput([$configKey1, $configKey2, '', 'y']);
 		$result = $this->command->run();
 		$expected = 0;
 		$this->assertIdentical($expected, $result);

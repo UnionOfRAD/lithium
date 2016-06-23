@@ -34,7 +34,7 @@ class Result extends \lithium\data\source\Result {
 		}
 		try {
 			if ($result = $this->_resource->fetch(PDO::FETCH_NUM)) {
-				return array($this->_iterator++, $result);
+				return [$this->_iterator++, $result];
 			}
 		} catch (PDOException $e) {
 			$this->close();

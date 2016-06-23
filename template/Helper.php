@@ -24,14 +24,14 @@ abstract class Helper extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	public $contentMap = array();
+	public $contentMap = [];
 
 	/**
 	 * Holds string templates which will be merged into the rendering context.
 	 *
 	 * @var array
 	 */
-	protected $_strings = array();
+	protected $_strings = [];
 
 	/**
 	 * The Renderer object this Helper is bound to.
@@ -46,24 +46,24 @@ abstract class Helper extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array();
+	protected $_classes = [];
 
 	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('classes' => 'merge', 'context');
+	protected $_autoConfig = ['classes' => 'merge', 'context'];
 
 	/**
 	 * List of minimized HTML attributes.
 	 *
 	 * @var array
 	 */
-	protected $_minimized = array(
+	protected $_minimized = [
 		'compact', 'checked', 'declare', 'readonly', 'disabled', 'selected', 'defer', 'ismap',
 		'nohref', 'noshade', 'nowrap', 'multiple', 'noresize', 'async', 'autofocus'
-	);
+	];
 
 	/**
 	 * Constructor.
@@ -71,8 +71,8 @@ abstract class Helper extends \lithium\core\Object {
 	 * @param array $config Configuration options.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('handlers' => array(), 'context' => null);
+	public function __construct(array $config = []) {
+		$defaults = ['handlers' => [], 'context' => null];
 		parent::__construct($config + $defaults);
 	}
 
@@ -103,15 +103,15 @@ abstract class Helper extends \lithium\core\Object {
 	 * @param array $options
 	 * @return mixed
 	 */
-	public function escape($value, $method = null, array $options = array()) {
-		$defaults = array('escape' => true);
+	public function escape($value, $method = null, array $options = []) {
+		$defaults = ['escape' => true];
 		$options += $defaults;
 
 		if ($options['escape'] === false) {
 			return $value;
 		}
 		if (is_array($value)) {
-			return array_map(array($this, __FUNCTION__), $value);
+			return array_map([$this, __FUNCTION__], $value);
 		}
 		return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 	}
@@ -127,7 +127,7 @@ abstract class Helper extends \lithium\core\Object {
 	protected function _options(array $defaults, array $scope) {
 		$scope += $defaults;
 		$options = array_diff_key($scope, $defaults);
-		return array($scope, $options);
+		return [$scope, $options];
 	}
 
 	/**
@@ -145,11 +145,11 @@ abstract class Helper extends \lithium\core\Object {
 	 *              via `$this->_context->applyHandler()`).
 	 *              The `'handlers'` option allow to set custom mapping beetween `$params`'s key and
 	 *              `$this->_context`'s handlers. e.g. the following handler:
-	 *              `'handlers' => array('url' => 'path')` will make `$params['url']` to be
+	 *              `'handlers' => ['url' => 'path']` will make `$params['url']` to be
 	 *              processed by the `'path'` handler instead of the `'url'` one.
 	 * @return string Rendered HTML
 	 */
-	protected function _render($method, $string, $params, array $options = array()) {
+	protected function _render($method, $string, $params, array $options = []) {
 		$strings = $this->_strings;
 
 		if (isset($params['options']['scope'])) {
@@ -188,10 +188,10 @@ abstract class Helper extends \lithium\core\Object {
 	 *        - `'append'` _string_: String to append to result. Defaults to `''`.
 	 * @return string Attribute string.
 	 */
-	protected function _attributes($params, $method = null, array $options = array()) {
-		$defaults = array('escape' => true, 'prepend' => ' ', 'append' => '');
+	protected function _attributes($params, $method = null, array $options = []) {
+		$defaults = ['escape' => true, 'prepend' => ' ', 'append' => ''];
 		$options += $defaults;
-		$result = array();
+		$result = [];
 
 		if (!is_array($params)) {
 			return !$params ? '' : $options['prepend'] . $params;
@@ -215,8 +215,8 @@ abstract class Helper extends \lithium\core\Object {
 	 *              - `'format'` _string_: The format string. Defaults to `'%s="%s"'`.
 	 * @return string Returns an HTML attribute/value pair, in the form of `'$key="$value"'`.
 	 */
-	protected function _attribute($key, $value, array $options = array()) {
-		$defaults = array('escape' => true, 'format' => '%s="%s"');
+	protected function _attribute($key, $value, array $options = []) {
+		$defaults = ['escape' => true, 'format' => '%s="%s"'];
 		$options += $defaults;
 
 		if (in_array($key, $this->_minimized)) {

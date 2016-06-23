@@ -26,7 +26,7 @@ class Controller extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_context = array();
+	protected $_context = [];
 
 	/**
 	 * Magic method to make Controller callable.
@@ -38,10 +38,10 @@ class Controller extends \lithium\core\Object {
 	 * @return string
 	 * @filter
 	 */
-	public function __invoke($request, $dispatchParams, array $options = array()) {
-		$dispatchParamsDefaults = array('args' => array());
+	public function __invoke($request, $dispatchParams, array $options = []) {
+		$dispatchParamsDefaults = ['args' => []];
 		$dispatchParams += $dispatchParamsDefaults;
-		$defaults = array('format' => 'html', 'timeout' => 0);
+		$defaults = ['format' => 'html', 'timeout' => 0];
 		$options += (array) $request->query + $defaults;
 		$params = compact('request', 'dispatchParams', 'options');
 
@@ -62,12 +62,12 @@ class Controller extends \lithium\core\Object {
 			$this->_restoreCtrlContext();
 
 			$filters = Libraries::locate('test.filter');
-			$menu = Libraries::locate('tests', null, array(
+			$menu = Libraries::locate('tests', null, [
 				'filter' => '/cases|integration|functional/',
 				'exclude' => '/mocks/'
-			));
+			]);
 			sort($menu);
-			$menu = Set::expand(array_combine($menu, $menu), array('separator' => "\\"));
+			$menu = Set::expand(array_combine($menu, $menu), ['separator' => "\\"]);
 			$result = compact('request', 'report', 'filters', 'menu');
 			return $report->render('layout', $result);
 		});

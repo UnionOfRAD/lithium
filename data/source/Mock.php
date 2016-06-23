@@ -17,12 +17,12 @@ namespace lithium\data\source;
  */
 class Mock extends \lithium\data\Source {
 
-	protected $_classes = array(
+	protected $_classes = [
 		'entity' => 'lithium\data\Entity',
 		'set' => 'lithium\data\Collection',
 		'relationship' => 'lithium\data\model\Relationship',
 		'schema' => 'lithium\data\Schema'
-	);
+	];
 
 	public function connect() {
 		return true;
@@ -37,30 +37,30 @@ class Mock extends \lithium\data\Source {
 	}
 
 	public function sources($class = null) {
-		return array();
+		return [];
 	}
 
-	public function describe($entity, $fields = array(), array $meta = array()) {
+	public function describe($entity, $fields = [], array $meta = []) {
 		return $this->_instance('schema', compact('fields'));
 	}
 
-	public function relationship($class, $type, $name, array $options = array()) {
+	public function relationship($class, $type, $name, array $options = []) {
 		return false;
 	}
 
-	public function create($query, array $options = array()) {
+	public function create($query, array $options = []) {
 		return false;
 	}
 
-	public function read($query, array $options = array()) {
+	public function read($query, array $options = []) {
 		return false;
 	}
 
-	public function update($query, array $options = array()) {
+	public function update($query, array $options = []) {
 		return false;
 	}
 
-	public function delete($query, array $options = array()) {
+	public function delete($query, array $options = []) {
 		return false;
 	}
 }

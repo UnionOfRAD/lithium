@@ -16,25 +16,25 @@ class HttpTest extends \lithium\test\Unit {
 
 	public function testCheckBasicIsFalseRequestsAuth() {
 		$request = new Request();
-		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
+		$http = new MockHttp(['method' => 'basic', 'users' => ['gwoo' => 'li3']]);
 		$result = $http->check($request);
 		$this->assertEmpty($result);
 
 		$basic = basename(Libraries::get(true, 'path'));
-		$expected = array('WWW-Authenticate: Basic realm="' . $basic . '"');
+		$expected = ['WWW-Authenticate: Basic realm="' . $basic . '"'];
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCheckBasicIsTrueProcessesAuthAndSucceeds() {
-		$request = new Request(array(
-			'env' => array('PHP_AUTH_USER' => 'gwoo', 'PHP_AUTH_PW' => 'li3')
-		));
-		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
+		$request = new Request([
+			'env' => ['PHP_AUTH_USER' => 'gwoo', 'PHP_AUTH_PW' => 'li3']
+		]);
+		$http = new MockHttp(['method' => 'basic', 'users' => ['gwoo' => 'li3']]);
 		$result = $http->check($request);
 		$this->assertNotEmpty($result);
 
-		$expected = array();
+		$expected = [];
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
 	}
@@ -42,32 +42,32 @@ class HttpTest extends \lithium\test\Unit {
 	public function testCheckBasicIsTrueProcessesAuthAndSucceedsCgi() {
 		$basic = 'Z3dvbzpsaTM=';
 
-		$request = new Request(array(
-			'env' => array('HTTP_AUTHORIZATION' => "Basic {$basic}")
-		));
-		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
+		$request = new Request([
+			'env' => ['HTTP_AUTHORIZATION' => "Basic {$basic}"]
+		]);
+		$http = new MockHttp(['method' => 'basic', 'users' => ['gwoo' => 'li3']]);
 		$result = $http->check($request);
 		$this->assertNotEmpty($result);
 
-		$expected = array();
+		$expected = [];
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
 
-		$request = new Request(array(
-			'env' => array('REDIRECT_HTTP_AUTHORIZATION' => "Basic {$basic}")
-		));
-		$http = new MockHttp(array('method' => 'basic', 'users' => array('gwoo' => 'li3')));
+		$request = new Request([
+			'env' => ['REDIRECT_HTTP_AUTHORIZATION' => "Basic {$basic}"]
+		]);
+		$http = new MockHttp(['method' => 'basic', 'users' => ['gwoo' => 'li3']]);
 		$result = $http->check($request);
 		$this->assertNotEmpty($result);
 
-		$expected = array();
+		$expected = [];
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCheckDigestIsFalseRequestsAuth() {
 		$request = new Request();
-		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
+		$http = new MockHttp(['realm' => 'app', 'users' => ['gwoo' => 'li3']]);
 		$result = $http->check($request);
 		$this->assertFalse($result);
 		$this->assertPattern('/Digest/', $http->headers[0]);
@@ -83,12 +83,12 @@ class HttpTest extends \lithium\test\Unit {
 		$digest .= 'opaque="d3fb67a7aa4d887ec4bf83040a820a46",username="gwoo",';
 		$digest .= 'response="04d7d878c67f289f37e553d2025e3a52"';
 
-		$request = new Request(array('env' => array('PHP_AUTH_DIGEST' => $digest)));
-		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
+		$request = new Request(['env' => ['PHP_AUTH_DIGEST' => $digest]]);
+		$http = new MockHttp(['realm' => 'app', 'users' => ['gwoo' => 'li3']]);
 		$result = $http->check($request);
 		$this->assertNotEmpty($result);
 
-		$expected = array();
+		$expected = [];
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
 	}
@@ -100,25 +100,25 @@ class HttpTest extends \lithium\test\Unit {
 		$digest .= 'opaque="d3fb67a7aa4d887ec4bf83040a820a46",username="gwoo",';
 		$digest .= 'response="04d7d878c67f289f37e553d2025e3a52"';
 
-		$request = new Request(array(
-			'env' => array('HTTP_AUTHORIZATION' => "Digest {$digest}")
-		));
-		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
+		$request = new Request([
+			'env' => ['HTTP_AUTHORIZATION' => "Digest {$digest}"]
+		]);
+		$http = new MockHttp(['realm' => 'app', 'users' => ['gwoo' => 'li3']]);
 		$result = $http->check($request);
 		$this->assertNotEmpty($result);
 
-		$expected = array();
+		$expected = [];
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
 
-		$request = new Request(array(
-			'env' => array('REDIRECT_HTTP_AUTHORIZATION' => "Digest {$digest}")
-		));
-		$http = new MockHttp(array('realm' => 'app', 'users' => array('gwoo' => 'li3')));
+		$request = new Request([
+			'env' => ['REDIRECT_HTTP_AUTHORIZATION' => "Digest {$digest}"]
+		]);
+		$http = new MockHttp(['realm' => 'app', 'users' => ['gwoo' => 'li3']]);
 		$result = $http->check($request);
 		$this->assertNotEmpty($result);
 
-		$expected = array();
+		$expected = [];
 		$result = $http->headers;
 		$this->assertEqual($expected, $result);
 	}

@@ -28,7 +28,7 @@ use Exception;
  * After installing MongoDB, you can connect to it as follows:
  * ```
  * // config/bootstrap/connections.php:
- * Connections::add('default', array('type' => 'MongoDb', 'database' => 'myDb'));
+ * Connections::add('default', ['type' => 'MongoDb', 'database' => 'myDb']);
  * ```
  *
  * By default, it will attempt to connect to a Mongo instance running on `localhost` on port
@@ -73,7 +73,7 @@ class MongoDb extends \lithium\data\Source {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'entity'       => 'lithium\data\entity\Document',
 		'set'          => 'lithium\data\collection\DocumentSet',
 		'result'       => 'lithium\data\source\mongo_db\Result',
@@ -81,20 +81,20 @@ class MongoDb extends \lithium\data\Source {
 		'exporter'     => 'lithium\data\source\mongo_db\Exporter',
 		'relationship' => 'lithium\data\model\Relationship',
 		'server'       => 'MongoClient'
-	);
+	];
 
 	/**
 	 * Map of typical SQL-like operators to their MongoDB equivalents.
 	 *
 	 * @var array Keys are SQL-like operators, value is the MongoDB equivalent.
 	 */
-	protected $_operators = array(
+	protected $_operators = [
 		'<'   => '$lt',
 		'>'   => '$gt',
 		'<='  => '$lte',
 		'>='  => '$gte',
-		'!='  => array('single' => '$ne', 'multiple' => '$nin'),
-		'<>'  => array('single' => '$ne', 'multiple' => '$nin'),
+		'!='  => ['single' => '$ne', 'multiple' => '$nin'],
+		'<>'  => ['single' => '$ne', 'multiple' => '$nin'],
 		'or'  => '$or',
 		'||'  => '$or',
 		'not' => '$not',
@@ -102,14 +102,14 @@ class MongoDb extends \lithium\data\Source {
 		'and' => '$and',
 		'&&'  => '$and',
 		'nor' => '$nor'
-	);
+	];
 
 	/**
 	 * List of comparison operators to use when performing boolean logic in a query.
 	 *
 	 * @var array
 	 */
-	protected $_boolean = array('&&', '||', 'and', '$and', 'or', '$or', 'nor', '$nor');
+	protected $_boolean = ['&&', '||', 'and', '$and', 'or', '$or', 'nor', '$nor'];
 
 	/**
 	 * A closure or anonymous function which receives an instance of this class, a
@@ -126,25 +126,25 @@ class MongoDb extends \lithium\data\Source {
 	 * along with a `'data'` key, which contains the schema for that collection.
 	 *
 	 * ```
-	 * Connections::add('default', array(
+	 * Connections::add('default', [
 	 *  'type' => 'MongoDb',
 	 *  'host' => 'localhost',
 	 *  'database' => 'app',
 	 *  'schema' => function($db, $collection, $meta) {
 	 *      $result = $db->connection->schemas->findOne(compact('collection'));
-	 *      return $result ? $result['data'] : array();
+	 *      return $result ? $result['data'] : [];
 	 *  }
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * A complete schema defintion looks like:
 	 * ```
-	 * array(
-	 *     '_id'  => array('type' => 'id'),
-	 *     'name' => array('type' => 'string', 'default' => 'Moe', 'null' => false),
-	 *     'sign' => array('type' => 'string', 'default' => 'bar', 'null' => false),
-	 *     'age'  => array('type' => 'integer', 'default' => 0, 'null' => false)
-	 * );
+	 * [
+	 *     '_id'  => ['type' => 'id'],
+	 *     'name' => ['type' => 'string', 'default' => 'Moe', 'null' => false],
+	 *     'sign' => ['type' => 'string', 'default' => 'bar', 'null' => false],
+	 *     'age'  => ['type' => 'integer', 'default' => 0, 'null' => false]
+	 * ];
 	 * ```
 	 *
 	 * The tyes in the schema map to database native type like this:
@@ -170,7 +170,7 @@ class MongoDb extends \lithium\data\Source {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('schema', 'classes' => 'merge');
+	protected $_autoConfig = ['schema', 'classes' => 'merge'];
 
 	/**
 	 * With no parameter, checks to see if the `mongo` extension is installed. With a parameter,
@@ -185,14 +185,14 @@ class MongoDb extends \lithium\data\Source {
 		if (!$feature) {
 			return extension_loaded('mongo');
 		}
-		$features = array(
+		$features = [
 			'arrays' => true,
 			'transactions' => false,
 			'booleans' => true,
 			'relationships' => true,
 			'schema' => false,
 			'sources' => true
-		);
+		];
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
 
@@ -220,7 +220,7 @@ class MongoDb extends \lithium\data\Source {
 	 *          to `false`.
 	 *        - `'readPreference'` _mixed_: May either be a single value such as Mongo::RP_NEAREST,
 	 *          or an array containing a read preference and a tag set such as:
-	 *          array(Mongo::RP_SECONDARY_PREFERRED, array('dc' => 'east) See the documentation for
+	 *          (Mongo::RP_SECONDARY_PREFERRED, ['dc' => 'east] See the documentation for
 	 *          `Mongo::setReadPreference()`. Defaults to null.
 	 *          Typically, these parameters are set in `Connections::add()`, when adding the
 	 *          adapter to the list of active connections.
@@ -229,13 +229,13 @@ class MongoDb extends \lithium\data\Source {
 	 *        each query execution the connection is checked and if needed (re-)established.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		if (class_exists($server = $this->_classes['server'], false)) {
 			$defaultHost = $server::DEFAULT_HOST . ':' . $server::DEFAULT_PORT;
 		} else {
 			$defaultHost = static::DEFAULT_HOST . ':' . static::DEFAULT_PORT;
 		}
-		$defaults = array(
+		$defaults = [
 			'host' => $defaultHost,
 			'login'      => null,
 			'password'   => null,
@@ -249,7 +249,7 @@ class MongoDb extends \lithium\data\Source {
 			'readPreference' => null,
 			'autoConnect' => false,
 			'dsn' => null
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -262,12 +262,12 @@ class MongoDb extends \lithium\data\Source {
 	 * @return void
 	 */
 	protected function _init() {
-		$hosts = array();
+		$hosts = [];
 		foreach ((array) $this->_config['host'] as $host) {
-			$host = HostString::parse($host) + array(
+			$host = HostString::parse($host) + [
 				'host' => static::DEFAULT_HOST,
 				'port' => static::DEFAULT_PORT
-			);
+			];
 			$hosts[] = "{$host['host']}:{$host['port']}";
 		}
 		if ($this->_config['login']) {
@@ -286,42 +286,42 @@ class MongoDb extends \lithium\data\Source {
 		}
 		parent::_init();
 
-		$this->_operators += array(
+		$this->_operators += [
 			'like' => function($key, $value) {
 				return new MongoRegex($value);
 			},
 			'$exists' => function($key, $value) {
-				return array('$exists' => (boolean) $value);
+				return ['$exists' => (boolean) $value];
 			},
 			'$type' => function($key, $value) {
-				return array('$type' => (integer) $value);
+				return ['$type' => (integer) $value];
 			},
 			'$mod' => function($key, $value) {
 				$value = (array) $value;
-				return array('$mod' => array(current($value), next($value) ?: 0));
+				return ['$mod' => [current($value), next($value) ?: 0]];
 			},
 			'$size' => function($key, $value) {
-				return array('$size' => (integer) $value);
+				return ['$size' => (integer) $value];
 			},
-			'$elemMatch' => function($operator, $values, $options = array()) {
-				$options += array(
-					'castOpts' => array(),
+			'$elemMatch' => function($operator, $values, $options = []) {
+				$options += [
+					'castOpts' => [],
 					'field' => ''
-				);
-				$options['castOpts'] += array('pathKey' => $options['field']);
+				];
+				$options['castOpts'] += ['pathKey' => $options['field']];
 				$values = (array) $values;
 
 				if (empty($options['castOpts']['schema'])) {
-					return array('$elemMatch' => $values);
+					return ['$elemMatch' => $values];
 				}
 				foreach ($values as $key => &$value) {
 					$value = $options['castOpts']['schema']->cast(
 						null, $key, $value, $options['castOpts']
 					);
 				}
-				return array('$elemMatch' => $values);
+				return ['$elemMatch' => $values];
 			}
-		);
+		];
 	}
 
 	/**
@@ -347,11 +347,11 @@ class MongoDb extends \lithium\data\Source {
 	 *         their respective properties in `Model`.
 	 */
 	public function configureClass($class) {
-		return array(
+		return [
 			'classes' => $this->_classes,
-			'schema' => array(),
-			'meta' => array('key' => '_id', 'locked' => false)
-		);
+			'schema' => [],
+			'meta' => ['key' => '_id', 'locked' => false]
+		];
 	}
 
 	/**
@@ -370,11 +370,11 @@ class MongoDb extends \lithium\data\Source {
 		}
 		$this->_isConnected = false;
 
-		$options = array(
+		$options = [
 			'connect' => true,
 			'connectTimeoutMS' => $this->_config['timeout'],
-			'replicaSet' => $this->_config['replicaSet']
-		);
+			'replicaSet' => $this->_config['replicaSet'],
+		];
 
 		try {
 			$this->server = new $server($this->_config['dsn'], $options);
@@ -384,7 +384,7 @@ class MongoDb extends \lithium\data\Source {
 			}
 
 			if ($prefs = $this->_config['readPreference']) {
-				$prefs = !is_array($prefs) ? array($prefs, array()) : $prefs;
+				$prefs = !is_array($prefs) ? [$prefs, []] : $prefs;
 				$this->server->setReadPreference($prefs[0], $prefs[1]);
 			}
 		} catch (Exception $e) {
@@ -432,7 +432,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @param array $meta Any meta information pre-defined in the model.
 	 * @return array Returns an associative array describing the given collection's schema.
 	 */
-	public function describe($collection, $fields = array(), array $meta = array()) {
+	public function describe($collection, $fields = [], array $meta = []) {
 		if (!$fields && ($func = $this->_schema)) {
 			$fields = $func($this, $collection, $meta);
 		}
@@ -470,7 +470,7 @@ class MongoDb extends \lithium\data\Source {
 		if ((!$this->server) && !$this->connect()) {
 			return null;
 		}
-		return call_user_func_array(array(&$this->server, $method), $params);
+		return call_user_func_array([&$this->server, $method], $params);
 	}
 
 	/**
@@ -483,7 +483,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
-		$childRespondsTo = is_object($this->server) && is_callable(array($this->server, $method));
+		$childRespondsTo = is_object($this->server) && is_callable([$this->server, $method]);
 		return parent::respondsTo($method, $internal) || $childRespondsTo;
 	}
 
@@ -498,7 +498,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array
 	 */
 	public function schema($query, $resource = null, $context = null) {
-		return array();
+		return [];
 	}
 
 	/**
@@ -509,14 +509,14 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean
 	 * @filter
 	 */
-	public function create($query, array $options = array()) {
+	public function create($query, array $options = []) {
 		$this->_checkConnection();
 
-		$defaults = array(
+		$defaults = [
 			'w' => $this->_config['w'],
 			'wTimeoutMS' => $this->_config['wTimeoutMS'],
 			'fsync' => false
-		);
+		];
 		$options += $defaults;
 
 		$params = compact('query', 'options');
@@ -528,12 +528,12 @@ class MongoDb extends \lithium\data\Source {
 			$query   = $params['query'];
 			$options = $params['options'];
 
-			$args    = $query->export($this, array('keys' => array('source', 'data')));
+			$args    = $query->export($this, ['keys' => ['source', 'data']]);
 			$data    = $exporter::get('create', $args['data']);
 			$source  = $args['source'];
 
 			if ($source === "{$prefix}.files" && isset($data['create']['file'])) {
-				$result = array('ok' => true);
+				$result = ['ok' => true];
 				$data['create']['_id'] = $this->_saveFile($data['create']);
 			} else {
 				$result = $this->connection->{$source}->insert($data['create'], $options);
@@ -551,7 +551,7 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	protected function _saveFile($data) {
-		$uploadKeys = array('name', 'type', 'tmp_name', 'error', 'size');
+		$uploadKeys = ['name', 'type', 'tmp_name', 'error', 'size'];
 		$grid = $this->connection->getGridFS($this->_config['gridPrefix']);
 		$file = null;
 		$method = null;
@@ -590,10 +590,10 @@ class MongoDb extends \lithium\data\Source {
 	 * @return object
 	 * @filter
 	 */
-	public function read($query, array $options = array()) {
+	public function read($query, array $options = []) {
 		$this->_checkConnection();
 
-		$defaults = array('return' => 'resource');
+		$defaults = ['return' => 'resource'];
 		$options += $defaults;
 
 		$params = compact('query', 'options');
@@ -609,7 +609,7 @@ class MongoDb extends \lithium\data\Source {
 
 			if ($group = $args['group']) {
 				$result = $this->_group($group, $args, $options);
-				$config = array('class' => 'set', 'defaults' => false) + compact('query') + $result;
+				$config = ['class' => 'set', 'defaults' => false] + compact('query') + $result;
 				return $model::create($config['data'], $config);
 			}
 			$collection = $this->connection->{$source};
@@ -625,15 +625,15 @@ class MongoDb extends \lithium\data\Source {
 
 			$resource = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
 			$result = $this->_instance('result', compact('resource'));
-			$config = compact('result', 'query') + array('class' => 'set', 'defaults' => false);
-			return $model::create(array(), $config);
+			$config = compact('result', 'query') + ['class' => 'set', 'defaults' => false];
+			return $model::create([], $config);
 		});
 	}
 
 	protected function _group($group, $args, $options) {
 		$conditions = $args['conditions'];
-		$group += array('$reduce' => $args['reduce'], 'initial' => $args['initial']);
-		$command = array('group' => $group + array('ns' => $args['source'], 'cond' => $conditions));
+		$group += ['$reduce' => $args['reduce'], 'initial' => $args['initial']];
+		$command = ['group' => $group + ['ns' => $args['source'], 'cond' => $conditions]];
 
 		$stats = $this->connection->command($command);
 		$data = isset($stats['retval']) ? $stats['retval'] : null;
@@ -649,16 +649,16 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean
 	 * @filter
 	 */
-	public function update($query, array $options = array()) {
+	public function update($query, array $options = []) {
 		$this->_checkConnection();
 
-		$defaults = array(
+		$defaults = [
 			'upsert' => false,
 			'multiple' => true,
 			'w' => $this->_config['w'],
 			'wTimeoutMS' => $this->_config['wTimeoutMS'],
 			'fsync' => false
-		);
+		];
 		$options += $defaults;
 
 		$params = compact('query', 'options');
@@ -669,7 +669,7 @@ class MongoDb extends \lithium\data\Source {
 
 			$options = $params['options'];
 			$query  = $params['query'];
-			$args   = $query->export($this, array('keys' => array('conditions', 'source', 'data')));
+			$args   = $query->export($this, ['keys' => ['conditions', 'source', 'data']]);
 			$source = $args['source'];
 			$data   = $args['data'];
 
@@ -686,7 +686,7 @@ class MongoDb extends \lithium\data\Source {
 				return true;
 			}
 			if ($options['multiple'] && !preg_grep('/^\$/', array_keys($update))) {
-				$update = array('$set' => $update);
+				$update = ['$set' => $update];
 			}
 			$result = $this->connection->{$source}->update($args['conditions'], $update, $options);
 
@@ -706,15 +706,15 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean
 	 * @filter
 	 */
-	public function delete($query, array $options = array()) {
+	public function delete($query, array $options = []) {
 		$this->_checkConnection();
 
-		$defaults = array(
+		$defaults = [
 			'justOne' => false,
 			'w' => $this->_config['w'],
 			'wTimeoutMS' => $this->_config['wTimeoutMS'],
 			'fsync' => false
-		);
+		];
 		$options = array_intersect_key($options + $defaults, $defaults);
 		$params = compact('query', 'options');
 
@@ -723,7 +723,7 @@ class MongoDb extends \lithium\data\Source {
 
 			$query = $params['query'];
 			$options = $params['options'];
-			$args = $query->export($this, array('keys' => array('source', 'conditions')));
+			$args = $query->export($this, ['keys' => ['source', 'conditions']]);
 			$source = $args['source'];
 			$conditions = $args['conditions'];
 
@@ -734,15 +734,15 @@ class MongoDb extends \lithium\data\Source {
 				$result = $this->_ok($result);
 			}
 			if ($result && $query->entity()) {
-				$query->entity()->sync(null, array(), array('dematerialize' => true));
+				$query->entity()->sync(null, [], ['dematerialize' => true]);
 			}
 			return $result;
 		});
 	}
 
-	protected function _deleteFile($conditions, $options = array()) {
+	protected function _deleteFile($conditions, $options = []) {
 		$_config = $this->_config;
-		$defaults = array('w' => $_config['w'], 'wTimeoutMS' => $_config['wTimeoutMS']);
+		$defaults = ['w' => $_config['w'], 'wTimeoutMS' => $_config['wTimeoutMS']];
 		$options += $defaults;
 		$prefix = $this->_config['gridPrefix'];
 		return $this->connection->getGridFS($prefix)->remove($conditions, $options);
@@ -769,7 +769,7 @@ class MongoDb extends \lithium\data\Source {
 	 *        to obtain the calculation result.
 	 * @return integer Result of the calculation.
 	 */
-	public function calculation($type, $query, array $options = array()) {
+	public function calculation($type, $query, array $options = []) {
 		$query->calculate($type);
 
 		switch ($type) {
@@ -787,30 +787,30 @@ class MongoDb extends \lithium\data\Source {
 	 * @param array $config
 	 * @return array
 	 */
-	public function relationship($class, $type, $name, array $config = array()) {
+	public function relationship($class, $type, $name, array $config = []) {
 		$fieldName = $this->relationFieldName($type, $name);
 		$config += compact('name', 'type', 'key', 'fieldName');
 		$config['from'] = $class;
 
-		return $this->_instance('relationship', $config + array(
+		return $this->_instance('relationship', $config + [
 			'strategy' => function($rel) use ($config, $class, $name, $type) {
 				if (isset($config['key'])) {
-					return array();
+					return [];
 				}
 				$link = null;
 				$hasLink = isset($config['link']);
 
-				$result = array();
+				$result = [];
 				$to = $rel->to();
 				$local = $class::key();
 				$className = $class::meta('name');
 
-				$keys = array(
-					array($class, $name),
-					array($class, Inflector::singularize($name)),
-					array($to, Inflector::singularize($className)),
-					array($to, $className)
-				);
+				$keys = [
+					[$class, $name],
+					[$class, Inflector::singularize($name)],
+					[$to, Inflector::singularize($className)],
+					[$to, $className]
+				];
 				foreach ($keys as $map) {
 					list($on, $key) = $map;
 					$key = lcfirst(Inflector::camelize($key));
@@ -818,7 +818,7 @@ class MongoDb extends \lithium\data\Source {
 					if (!$on::hasField($key)) {
 						continue;
 					}
-					$join = ($on === $class) ? array($key => $on::key()) : array($local => $key);
+					$join = ($on === $class) ? [$key => $on::key()] : [$local => $key];
 					$result['key'] = $join;
 
 					if (isset($config['link'])) {
@@ -835,9 +835,9 @@ class MongoDb extends \lithium\data\Source {
 				if (!$link && !$hasLink) {
 					$link = ($type === "belongsTo") ? $rel::LINK_CONTAINED : $rel::LINK_EMBEDDED;
 				}
-				return $result + ($hasLink ? array() : compact('link'));
+				return $result + ($hasLink ? [] : compact('link'));
 			}
-		));
+		]);
 	}
 
 	/**
@@ -852,7 +852,7 @@ class MongoDb extends \lithium\data\Source {
 			return;
 		}
 		if (is_string($group) && strpos($group, 'function') === 0) {
-			return array('$keyf' => new MongoCode($group));
+			return ['$keyf' => new MongoCode($group)];
 		}
 		$group = (array) $group;
 
@@ -862,7 +862,7 @@ class MongoDb extends \lithium\data\Source {
 				unset($group[$i]);
 			}
 		}
-		return array('key' => $group);
+		return ['key' => $group];
 	}
 
 	/**
@@ -875,7 +875,7 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function conditions($conditions, $context) {
 		if (!$conditions) {
-			return array();
+			return [];
 		}
 		if ($code = $this->_isMongoCode($conditions)) {
 			return $code;
@@ -902,9 +902,9 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	protected function _conditions(array $conditions, $model, $schema, $context) {
 		$ops = $this->_operators;
-		$castOpts = array(
+		$castOpts = [
 			'first' => true, 'database' => $this, 'wrap' => false, 'asContent' => true
-		);
+		];
 
 		$cast = function($key, $value) use (&$schema, &$castOpts) {
 			return $schema ? $schema->cast(null, $key, $value, $castOpts) : $value;
@@ -931,7 +931,7 @@ class MongoDb extends \lithium\data\Source {
 			$current = key($value);
 
 			if (!isset($ops[$current]) && $current[0] !== '$') {
-				$conditions[$key] = array('$in' => $cast($key, $value));
+				$conditions[$key] = ['$in' => $cast($key, $value)];
 				continue;
 			}
 			$conditions[$key] = $this->_operators($key, $value, $schema);
@@ -944,13 +944,13 @@ class MongoDb extends \lithium\data\Source {
 			$conditions = new MongoCode($conditions);
 		}
 		if ($conditions instanceof MongoCode) {
-			return array('$where' => $conditions);
+			return ['$where' => $conditions];
 		}
 	}
 
 	protected function _operators($field, $operators, $schema) {
 		$castOpts = compact('schema');
-		$castOpts += array('first' => true, 'database' => $this, 'wrap' => false);
+		$castOpts += ['first' => true, 'database' => $this, 'wrap' => false];
 
 		$cast = function($key, $value) use (&$schema, &$castOpts) {
 			return $schema ? $schema->cast(null, $key, $value, $castOpts) : $value;
@@ -986,7 +986,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array Parsed fields array
 	 */
 	public function fields($fields, $context) {
-		return $fields ?: array();
+		return $fields ?: [];
 	}
 
 	/**
@@ -1012,13 +1012,13 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function order($order, $context) {
 		if (!$order) {
-			return array();
+			return [];
 		}
 		if (is_string($order)) {
-			return array($order => 1);
+			return [$order => 1];
 		}
 		if (!is_array($order)) {
-			return array();
+			return [];
 		}
 		foreach ($order as $key => $value) {
 			if (!is_string($key)) {

@@ -34,9 +34,9 @@ class Result extends \lithium\data\source\Result {
 		$result = $this->_resource->getNext();
 
 		if ($result instanceof MongoGridFSFile) {
-			$result = array('file' => $result) + $result->file;
+			$result = ['file' => $result] + $result->file;
 		}
-		return array($this->_iterator, $result);
+		return [$this->_iterator, $result];
 	}
 }
 

@@ -37,7 +37,7 @@ class Session extends \lithium\core\Adaptable {
 	 *
 	 * @var array
 	 */
-	protected static $_configurations = array();
+	protected static $_configurations = [];
 
 	/**
 	 * A dot-separated path for use by `Libraries::locate()`. Used to look up the correct type of
@@ -90,8 +90,8 @@ class Session extends \lithium\core\Adaptable {
 	 * @return mixed Read result on successful session read, `null` otherwise.
 	 * @filter
 	 */
-	public static function read($key = null, array $options = array()) {
-		$defaults = array('name' => null, 'strategies' => true);
+	public static function read($key = null, array $options = []) {
+		$defaults = ['name' => null, 'strategies' => true];
 		$options += $defaults;
 		$method = ($name = $options['name']) ? static::adapter($name)->read($key, $options) : null;
 		$settings = static::_config($name);
@@ -121,7 +121,7 @@ class Session extends \lithium\core\Adaptable {
 		}
 
 		if ($options['strategies']) {
-			$options += array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
+			$options += ['key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__];
 			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
 		}
 		return $result;
@@ -140,17 +140,17 @@ class Session extends \lithium\core\Adaptable {
 	 * @return boolean Returns `true` on successful write, `false` otherwise.
 	 * @filter
 	 */
-	public static function write($key, $value = null, array $options = array()) {
-		$defaults = array('name' => null, 'strategies' => true);
+	public static function write($key, $value = null, array $options = []) {
+		$defaults = ['name' => null, 'strategies' => true];
 		$options += $defaults;
 
 		if (is_resource($value) || !static::$_configurations) {
 			return false;
 		}
-		$methods = array();
+		$methods = [];
 
 		if ($name = $options['name']) {
-			$methods = array($name => static::adapter($name)->write($key, $value, $options));
+			$methods = [$name => static::adapter($name)->write($key, $value, $options)];
 		} else {
 			foreach (array_keys(static::$_configurations) as $name) {
 				if ($method = static::adapter($name)->write($key, $value, $options)) {
@@ -166,7 +166,7 @@ class Session extends \lithium\core\Adaptable {
 			$settings = static::_config($name);
 
 			if ($options['strategies']) {
-				$options += array('key' => $key, 'class' => __CLASS__);
+				$options += ['key' => $key, 'class' => __CLASS__];
 				$value = static::applyStrategies(__FUNCTION__, $name, $original, $options);
 			}
 			$params = compact('key', 'value', 'options');
@@ -199,14 +199,14 @@ class Session extends \lithium\core\Adaptable {
 	 * @return boolean Returns `true` on successful delete, or `false` on failure.
 	 * @filter
 	 */
-	public static function delete($key, array $options = array()) {
-		$defaults = array('name' => null, 'strategies' => true);
+	public static function delete($key, array $options = []) {
+		$defaults = ['name' => null, 'strategies' => true];
 		$options += $defaults;
 
-		$methods = array();
+		$methods = [];
 
 		if ($name = $options['name']) {
-			$methods = array($name => static::adapter($name)->delete($key, $options));
+			$methods = [$name => static::adapter($name)->delete($key, $options)];
 		} else {
 			foreach (static::$_configurations as $name => $config) {
 				if ($method = static::adapter($name)->delete($key, $options)) {
@@ -215,14 +215,14 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		$result = false;
-		$options += array('key' => $key, 'class' => __CLASS__);
+		$options += ['key' => $key, 'class' => __CLASS__];
 		$original = $key;
 
 		foreach ($methods as $name => $method) {
 			$settings = static::_config($name);
 
 			if ($options['strategies']) {
-				$options += array('key' => $key, 'class' => __CLASS__);
+				$options += ['key' => $key, 'class' => __CLASS__];
 				$key = static::applyStrategies(__FUNCTION__, $name, $original, $options);
 			}
 			$params = compact('key', 'options');
@@ -253,13 +253,13 @@ class Session extends \lithium\core\Adaptable {
 	 *                strategy classes should be enabled for this operation. Defaults to `true`.
 	 * @filter
 	 */
-	public static function clear(array $options = array()) {
-		$defaults = array('name' => null, 'strategies' => true);
+	public static function clear(array $options = []) {
+		$defaults = ['name' => null, 'strategies' => true];
 		$options += $defaults;
-		$methods = array();
+		$methods = [];
 
 		if ($name = $options['name']) {
-			$methods = array($name => static::adapter($name)->clear($options));
+			$methods = [$name => static::adapter($name)->clear($options)];
 		} else {
 			foreach (static::$_configurations as $name => $config) {
 				if ($method = static::adapter($name)->clear($options)) {
@@ -286,7 +286,7 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		if ($options['strategies']) {
-			$options += array('mode' => 'LIFO', 'class' => __CLASS__);
+			$options += ['mode' => 'LIFO', 'class' => __CLASS__];
 			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
 		}
 		return $result;
@@ -301,13 +301,13 @@ class Session extends \lithium\core\Adaptable {
 	 * @return boolean
 	 * @filter
 	 */
-	public static function check($key, array $options = array()) {
-		$defaults = array('name' => null, 'strategies' => true);
+	public static function check($key, array $options = []) {
+		$defaults = ['name' => null, 'strategies' => true];
 		$options += $defaults;
-		$methods = array();
+		$methods = [];
 
 		if ($name = $options['name']) {
-			$methods = array($name => static::adapter($name)->check($key, $options));
+			$methods = [$name => static::adapter($name)->check($key, $options)];
 		} else {
 			foreach (static::$_configurations as $name => $config) {
 				if ($method = static::adapter($name)->check($key, $options)) {
@@ -334,7 +334,7 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		if ($options['strategies']) {
-			$options += array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
+			$options += ['key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__];
 			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
 		}
 		return $result;

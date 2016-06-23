@@ -56,8 +56,8 @@ class Random {
 	 *                resulting value will be base64-encoded, per the note above.
 	 * @return string Returns (an encoded) string of random bytes.
 	 */
-	public static function generate($bytes, array $options = array()) {
-		$defaults = array('encode' => null);
+	public static function generate($bytes, array $options = []) {
+		$defaults = ['encode' => null];
 		$options += $defaults;
 
 		$source = static::$_source ?: (static::$_source = static::_source());

@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\template;
 
 class MockRenderer extends \lithium\template\view\Renderer {
 
-	public function render($template, $data = array(), array $options = array()) {
+	public function render($template, $data = [], array $options = []) {
 	}
 }
 

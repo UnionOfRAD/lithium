@@ -15,23 +15,23 @@ use lithium\data\source\database\adapter\PostgreSql;
 
 class ConnectionsTest extends \lithium\test\Unit {
 
-	public $config = array(
+	public $config = [
 		'type'     => 'Mock',
 		'adapter'  => null,
 		'host'     => 'localhost',
 		'login'    => '--user--',
 		'password' => '--pass--',
 		'database' => 'db'
-	);
+	];
 
 	protected $_port = null;
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	public function setUp() {
 		if (!$this->_backup) {
 			foreach (Connections::get() as $conn) {
-				$this->_backup[$conn] = Connections::get($conn, array('config' => true));
+				$this->_backup[$conn] = Connections::get($conn, ['config' => true]);
 			}
 		}
 		Connections::reset();
@@ -43,8 +43,8 @@ class ConnectionsTest extends \lithium\test\Unit {
 	}
 
 	public function testConnectionCreate() {
-		$result = Connections::add('conn-test', array('type' => 'Mock') + $this->config);
-		$expected = $this->config + array('type' => 'Mock');
+		$result = Connections::add('conn-test', ['type' => 'Mock'] + $this->config);
+		$expected = $this->config + ['type' => 'Mock'];
 		$this->assertEqual($expected, $result);
 
 		$result = Connections::get('conn-test');
@@ -60,7 +60,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 	public function testConnectionGetAndReset() {
 		Connections::add('conn-test', $this->config);
 		Connections::add('conn-test-2', $this->config);
-		$this->assertEqual(array('conn-test', 'conn-test-2'), Connections::get());
+		$this->assertEqual(['conn-test', 'conn-test-2'], Connections::get());
 
 		$enabled = (MySql::enabled() || PostgreSql::enabled());
 		$this->skipIf(!$enabled, 'MySql or PostgreSQL is not enabled');
@@ -75,8 +75,8 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$msg = "Cannot connect to localhost:{$this->_port}";
 		$this->skipIf(!$this->_canConnect('localhost', $this->_port), $msg);
 
-		$expected = $this->config + array('type' => 'database', 'filters' => array());
-		$this->assertEqual($expected, Connections::get('conn-test', array('config' => true)));
+		$expected = $this->config + ['type' => 'database', 'filters' => []];
+		$this->assertEqual($expected, Connections::get('conn-test', ['config' => true]));
 
 		$this->assertNull(Connections::reset());
 		$this->assertEmpty(Connections::get());
@@ -94,7 +94,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$result = Connections::get('conn-test');
 		$this->assertInstanceOf('lithium\data\source\Mock', $result);
 
-		$this->assertNull(Connections::get('conn-test-2', array('autoCreate' => false)));
+		$this->assertNull(Connections::get('conn-test-2', ['autoCreate' => false]));
 	}
 
 	public function testInvalidConnection() {
@@ -102,26 +102,26 @@ class ConnectionsTest extends \lithium\test\Unit {
 	}
 
 	public function testStreamConnection() {
-		$config = array(
+		$config = [
 			'type' => 'Http',
 			'socket' => 'Stream',
 			'host' => 'localhost',
 			'login' => 'root',
 			'password' => '',
 			'port' => '80'
-		);
+		];
 
 		Connections::add('stream-test', $config);
 		$result = Connections::get('stream-test');
 		$this->assertInstanceOf('lithium\data\source\Http', $result);
-		Connections::config(array('stream-test' => false));
+		Connections::config(['stream-test' => false]);
 	}
 
 	public function testErrorExceptions() {
-		$config = array(
+		$config = [
 			'adapter' => 'None',
 			'type' => 'Error'
-		);
+		];
 		Connections::add('NoConnection', $config);
 		$result = false;
 
@@ -139,8 +139,8 @@ class ConnectionsTest extends \lithium\test\Unit {
 	}
 
 	public function testConnectionRemove() {
-		$result = Connections::add('conn-to-remove', array('type' => 'Mock') + $this->config);
-		$expected = $this->config + array('type' => 'Mock');
+		$result = Connections::add('conn-to-remove', ['type' => 'Mock'] + $this->config);
+		$expected = $this->config + ['type' => 'Mock'];
 		$this->assertEqual($expected, $result);
 
 		$result = Connections::get('conn-to-remove');

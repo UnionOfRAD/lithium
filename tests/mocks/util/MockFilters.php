@@ -16,7 +16,7 @@ namespace lithium\tests\mocks\util;
 class MockFilters extends \lithium\core\StaticObject {
 
 	public static function filteredMethod() {
-		return static::_filter(__FUNCTION__, array(), function($params) {
+		return static::_filter(__FUNCTION__, [], function($params) {
 			return 'Working?';
 		});
 	}

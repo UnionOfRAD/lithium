@@ -28,7 +28,7 @@ class HostString {
 	 */
 	public static function parse($host) {
 		if ($host[0] === ':') {
-			return array('port' => (integer) substr($host, 1));
+			return ['port' => (integer) substr($host, 1)];
 		}
 		if ($host[0] === '[') {
 			if (($close = strpos($host, ']')) === false) {
@@ -38,20 +38,20 @@ class HostString {
 				if ($host[$close + 1] !== ':') {
 					throw new LogicException("Failed to parse host string `{$host}`.");
 				}
-				return array(
+				return [
 					'host' => substr($host, 1, $close - 1),
 					'port' => (integer) substr($host, $close + 2)
-				);
+				];
 			}
-			return array('host' => substr($host, 1, -1));
+			return ['host' => substr($host, 1, -1)];
 		}
 		if (($colon = strpos($host, ':')) !== false) {
-			return array(
+			return [
 				'host' => substr($host, 0, $colon),
 				'port' => (integer) substr($host, $colon + 1)
-			);
+			];
 		}
-		return array('host' => $host);
+		return ['host' => $host];
 	}
 
 	/**

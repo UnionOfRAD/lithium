@@ -25,16 +25,16 @@ class ComplexityTest extends \lithium\test\Unit {
 	/**
 	 * Helper array to shorten the methods up a bit.
 	 */
-	protected $_paths = array(
+	protected $_paths = [
 		'complexity' => 'lithium\test\filter\Complexity',
 		'testClass' => 'lithium\core\StaticObject',
 		'testClassTest' => 'lithium\tests\cases\core\StaticObjectTest'
-	);
+	];
 
 	/**
 	 * Helper array which stores the expected results to clean up the tests.
 	 */
-	protected $_metrics = array(
+	protected $_metrics = [
 		'invokeMethod' => 7,
 		'respondsTo' => 1,
 		'_instance' => 2,
@@ -42,7 +42,7 @@ class ComplexityTest extends \lithium\test\Unit {
 		'_stop' => 1,
 		'applyFilter' => 4,
 		'_filter' => 3
-	);
+	];
 
 	/**
 	 * Set up a new report which will later be used in the tests.
@@ -67,7 +67,7 @@ class ComplexityTest extends \lithium\test\Unit {
 		Complexity::apply($this->report, $group->tests());
 
 		$results = array_pop($this->report->results['filters'][$this->_paths['complexity']]);
-		$expected = array($this->_paths['testClass'] => $this->_metrics);
+		$expected = [$this->_paths['testClass'] => $this->_metrics];
 		$this->assertEqual($expected, $results);
 
 		Filters::clear($group);
@@ -87,7 +87,7 @@ class ComplexityTest extends \lithium\test\Unit {
 		Complexity::apply($this->report, $group->tests());
 
 		$results = Complexity::analyze($this->report);
-		$expected = array('class' => array($this->_paths['testClass'] => 2.8999999999999999));
+		$expected = ['class' => [$this->_paths['testClass'] => 2.8999999999999999]];
 		foreach ($this->_metrics as $method => $metric) {
 			$expected['max'][$this->_paths['testClass'] . '::' . $method . '()'] = $metric;
 		}
@@ -111,7 +111,7 @@ class ComplexityTest extends \lithium\test\Unit {
 		$results = Complexity::collect(
 			$this->report->results['filters'][$this->_paths['complexity']]
 		);
-		$expected = array($this->_paths['testClass'] => $this->_metrics);
+		$expected = [$this->_paths['testClass'] => $this->_metrics];
 		$this->assertEqual($expected, $results);
 	}
 }

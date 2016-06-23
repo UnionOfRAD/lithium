@@ -28,9 +28,9 @@ use lithium\storage\Cache;
  * A simple configuration can be accomplished as follows:
  *
  * ```
- * Cache::config(array(
- *     'default' => array('adapter' => 'Memory')
- * ));
+ * Cache::config([
+ *     'default' => ['adapter' => 'Memory']
+ * ]);
  * ```
  */
 class Memory extends \lithium\storage\cache\Adapter {
@@ -40,7 +40,7 @@ class Memory extends \lithium\storage\cache\Adapter {
 	 *
 	 * @var array
 	 */
-	protected $_cache = array();
+	protected $_cache = [];
 
 	/**
 	 * Magic method to provide an accessor (getter) to protected class variables.
@@ -64,7 +64,7 @@ class Memory extends \lithium\storage\cache\Adapter {
 	 *               the results array.
 	 */
 	public function read(array $keys) {
-		$results = array();
+		$results = [];
 
 		foreach ($keys as $key) {
 			if (array_key_exists($key, $this->_cache)) {

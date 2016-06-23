@@ -56,7 +56,7 @@ class View extends \lithium\console\command\Create {
 	 * @param array $params
 	 * @return mixed
 	 */
-	protected function _save(array $params = array()) {
+	protected function _save(array $params = []) {
 		$params['path'] = Inflector::underscore($this->request->action);
 		$params['file'] = $this->request->args(0);
 
@@ -76,7 +76,7 @@ class View extends \lithium\console\command\Create {
 			$directory = str_replace($this->_library['path'] . '/', '', $directory);
 			if (file_exists($file)) {
 				$prompt = "{$file} already exists. Overwrite?";
-				$choices = array('y', 'n');
+				$choices = ['y', 'n'];
 				if ($this->in($prompt, compact('choices')) !== 'y') {
 					return "{$params['file']} skipped.";
 				}

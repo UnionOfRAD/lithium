@@ -16,7 +16,7 @@ class Record extends \lithium\data\Entity {
 
 	protected function _init() {
 		parent::_init();
-		$this->_handlers += array('stdClass' => function($item) { return $item; });
+		$this->_handlers += ['stdClass' => function($item) { return $item; }];
 	}
 }
 

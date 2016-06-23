@@ -111,12 +111,12 @@
 - `Cache` together with the `File` adapter can now be used to store BLOBs. 
 
   ```php
-  Cache::config(array(
-    'blob' => array(
+  Cache::config([
+    'blob' => [
       'adapter' => 'File', 
       'streams' => true // Enable this option for BLOB support.
-    )
-  ));
+    ]
+  ]);
   
   $stream = fopen('php://temp', 'wb');
   $pdf->generate()->store($stream); // some expensive action
@@ -165,10 +165,10 @@
 - Text form fields now support generating corresponding `<datalist>` elements for autocompletion.
 
   ```php
-  $this->form->field('region', array(
+  $this->form->field('region', [
       'type' => 'text',
-      'list' => array('foo', 'bar', 'baz')
-  ));
+      'list' => ['foo', 'bar', 'baz']
+  ]);
   ```
 
 - It is now guaranteed that `Random::generate()` will use a cryptographic strong RNG. It 
@@ -204,6 +204,8 @@
       return isset($value['complex'], $value['foo']);
   });
   ```
+
+- Switched to short array syntax.
 
 ### Changed
 
@@ -248,11 +250,11 @@
 
   ```php
   // deprecated usage
-  Session::config(array(
-    'default' => array(
-       'filters' => array(function($self, $params, $chain) { /* ... */ })
-    )
-  ));
+  Session::config([
+    'default' => [
+       'filters' => [function($self, $params, $chain) { /* ... */ }]
+    ]
+  ]);
 
   // always use this
   Filters::apply('lithium\storage\Session', 'write', function($params, $next) { 

@@ -20,10 +20,10 @@ use lithium\security\Hash;
  * Example configuration:
  *
  * ```
- * Session::config(array('default' => array(
+ * Session::config(['default' => [
  *    'adapter' => 'Cookie',
- *    'strategies' => array('Hmac' => array('secret' => 'foobar'))
- * )));
+ *    'strategies' => ['Hmac' => ['secret' => 'foobar']]
+ * ]]);
  * ```
  *
  * This will configure the `HMAC` strategy to be used for all `Session` operations with the
@@ -55,7 +55,7 @@ class Hmac extends \lithium\core\Object {
 	 *        configuration key is not set.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		if (!isset($config['secret'])) {
 			throw new ConfigException("HMAC strategy requires a secret key.");
 		}
@@ -76,15 +76,15 @@ class Hmac extends \lithium\core\Object {
 	 * @param array $options Options for this method.
 	 * @return array Data & signature.
 	 */
-	public function write($data, array $options = array()) {
+	public function write($data, array $options = []) {
 		$class = $options['class'];
 
-		$futureData = $class::read(null, array('strategies' => false));
-		$futureData = array($options['key'] => $data) + $futureData;
+		$futureData = $class::read(null, ['strategies' => false]);
+		$futureData = [$options['key'] => $data] + $futureData;
 		unset($futureData['__signature']);
 
 		$signature = static::_signature($futureData);
-		$class::write('__signature', $signature, array('strategies' => false) + $options);
+		$class::write('__signature', $signature, ['strategies' => false] + $options);
 		return $data;
 	}
 
@@ -106,13 +106,13 @@ class Hmac extends \lithium\core\Object {
 	 * @param array $options Options for this method.
 	 * @return array Validated data.
 	 */
-	public function read($data, array $options = array()) {
+	public function read($data, array $options = []) {
 		if ($data === null) {
 			return $data;
 		}
 		$class = $options['class'];
 
-		$currentData = $class::read(null, array('strategies' => false));
+		$currentData = $class::read(null, ['strategies' => false]);
 
 		if (!isset($currentData['__signature'])) {
 			throw new MissingSignatureException('HMAC signature not found.');
@@ -133,14 +133,14 @@ class Hmac extends \lithium\core\Object {
 	 * @param array $options Options for this method.
 	 * @return array Data & signature.
 	 */
-	public function delete($data, array $options = array()) {
+	public function delete($data, array $options = []) {
 		$class = $options['class'];
 
-		$futureData = $class::read(null, array('strategies' => false));
+		$futureData = $class::read(null, ['strategies' => false]);
 		unset($futureData[$options['key']]);
 
 		$signature = static::_signature($futureData);
-		$class::write('__signature', $signature, array('strategies' => false) + $options);
+		$class::write('__signature', $signature, ['strategies' => false] + $options);
 		return $data;
 	}
 

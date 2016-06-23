@@ -10,33 +10,33 @@ namespace lithium\tests\mocks\security\validation;
 
 class MockFormSignature extends \lithium\security\validation\FormSignature {
 
-	public static $compile = array();
+	public static $compile = [];
 
-	public static $parse = array();
+	public static $parse = [];
 
 	protected static function _compile(array $fields, array $locked, array $excluded) {
 		$result = parent::_compile($fields, $locked, $excluded);
 
-		static::$compile[] = array(
+		static::$compile[] = [
 			'in' => compact('fields', 'locked', 'excluded'),
 			'out' => $result
-		);
+		];
 		return $result;
 	}
 
 	protected static function _parse($signature) {
 		$result = parent::_parse($signature);
 
-		static::$parse[] = array(
+		static::$parse[] = [
 			'in' => compact('signature'),
 			'out' => $result
-		);
+		];
 		return $result;
 	}
 
 	public static function reset() {
-		static::$compile = array();
-		static::$parse = array();
+		static::$compile = [];
+		static::$parse = [];
 	}
 }
 

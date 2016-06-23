@@ -12,20 +12,20 @@ use lithium\data\DocumentSchema;
 
 class MockCouchPost extends \lithium\data\Model {
 
-	protected $_meta = array('source' => 'posts', 'connection' => false, 'key' => 'id');
+	protected $_meta = ['source' => 'posts', 'connection' => false, 'key' => 'id'];
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'author_id' => array('type' => 'integer'),
-		'title' => array('type' => 'string', 'length' => 255),
-		'body' => array('type' => 'text'),
-		'created' => array('type' => 'datetime'),
-		'updated' => array('type' => 'datetime')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer'],
+		'author_id' => ['type' => 'integer'],
+		'title' => ['type' => 'string', 'length' => 255],
+		'body' => ['type' => 'text'],
+		'created' => ['type' => 'datetime'],
+		'updated' => ['type' => 'datetime']
+	];
 
 	public static function resetSchema($array = false) {
 		if ($array) {
-			return static::_object()->_schema = array();
+			return static::_object()->_schema = [];
 		}
 		static::_object()->_schema = new DocumentSchema();
 	}

@@ -25,7 +25,7 @@ class StaticObject {
 	 *
 	 * @var array
 	 */
-	protected static $_parents = array();
+	protected static $_parents = [];
 
 	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
@@ -36,7 +36,7 @@ class StaticObject {
 	 * @param array $params Parameter list to use when calling `$method`.
 	 * @return mixed Returns the result of the method call.
 	 */
-	public static function invokeMethod($method, $params = array()) {
+	public static function invokeMethod($method, $params = []) {
 		switch (count($params)) {
 			case 0:
 				return static::$method();
@@ -51,7 +51,7 @@ class StaticObject {
 			case 5:
 				return static::$method($params[0], $params[1], $params[2], $params[3], $params[4]);
 			default:
-				return forward_static_call_array(array(get_called_class(), $method), $params);
+				return forward_static_call_array([get_called_class(), $method], $params);
 		}
 	}
 
@@ -77,7 +77,7 @@ class StaticObject {
 	 * @param array $options The configuration passed to the constructor.
 	 * @return object
 	 */
-	protected static function _instance($name, array $options = array()) {
+	protected static function _instance($name, array $options = []) {
 		if (is_string($name) && isset(static::$_classes[$name])) {
 			$name = static::$_classes[$name];
 		}
@@ -116,7 +116,7 @@ class StaticObject {
 	 * @deprecated Not used anymore.
 	 * @var array Method filters, indexed by `get_called_class()`.
 	 */
-	protected static $_methodFilters = array();
+	protected static $_methodFilters = [];
 
 	/**
 	 * Apply a closure to a method of the current static object.
@@ -164,7 +164,7 @@ class StaticObject {
 	 * @param array $filters Additional filters to apply to the method for this call only.
 	 * @return mixed
 	 */
-	protected static function _filter($method, $params, $callback, $filters = array()) {
+	protected static function _filter($method, $params, $callback, $filters = []) {
 		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
 		$message .= '`\lithium\aop\Filters::run()` and `::apply()`.';
 		trigger_error($message, E_USER_DEPRECATED);

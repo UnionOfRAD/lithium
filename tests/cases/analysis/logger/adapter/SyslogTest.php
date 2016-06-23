@@ -18,7 +18,7 @@ class SyslogTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->syslog = new Syslog();
-		Logger::config(array('syslog' => array('adapter' => $this->syslog)));
+		Logger::config(['syslog' => ['adapter' => $this->syslog]]);
 	}
 
 	public function testConfiguration() {
@@ -28,32 +28,32 @@ class SyslogTest extends \lithium\test\Unit {
 	}
 
 	public function testConstruct() {
-		$expected = array(
+		$expected = [
 			'identity' => false,
 			'options' => LOG_ODELAY,
 			'facility' => LOG_USER,
 			'init' => true
-		);
+		];
 		$result = $this->syslog->_config;
 		$this->assertEqual($expected, $result);
 
-		$syslog = new Syslog(array(
+		$syslog = new Syslog([
 			'identity' => 'SyslogTest',
 			'priority' => LOG_DEBUG
-		));
-		$expected = array(
+		]);
+		$expected = [
 			'identity' => 'SyslogTest',
 			'options' => LOG_ODELAY,
 			'facility' => LOG_USER,
 			'priority' => LOG_DEBUG,
 			'init' => true
-		);
+		];
 		$result = $syslog->_config;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testWrite() {
-		$result = Logger::write('info', 'SyslogTest message...', array('name' => 'syslog'));
+		$result = Logger::write('info', 'SyslogTest message...', ['name' => 'syslog']);
 		$this->assertNotEmpty($result);
 	}
 }

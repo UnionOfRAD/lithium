@@ -19,16 +19,16 @@ use lithium\g11n\Catalog;
  */
 class ResourcesMessageTest extends \lithium\test\Integration {
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	public function setUp() {
 		$this->_backup['catalogConfig'] = Catalog::config();
-		Catalog::config(array(
-			'lithium' => array(
+		Catalog::config([
+			'lithium' => [
 				'adapter' => 'Php',
 				'path' => Libraries::get('lithium', 'path') . '/g11n/resources/php'
-			)
-		));
+			]
+		]);
 	}
 
 	public function tearDown() {
@@ -45,9 +45,9 @@ class ResourcesMessageTest extends \lithium\test\Integration {
 	 * - German (de)
 	 */
 	public function testPlurals1() {
-		$locales = array(
+		$locales = [
 			'en', 'de'
-		);
+		];
 		foreach ($locales as $locale) {
 			$expected = 2;
 			$result = Catalog::read(true, 'message.pluralForms', $locale);
@@ -76,9 +76,9 @@ class ResourcesMessageTest extends \lithium\test\Integration {
 	 * - French (fr)
 	 */
 	public function testPlurals2() {
-		$locales = array(
+		$locales = [
 			'fr'
-		);
+		];
 		foreach ($locales as $locale) {
 			$expected = 2;
 			$result = Catalog::read(true, 'message.pluralForms', $locale);

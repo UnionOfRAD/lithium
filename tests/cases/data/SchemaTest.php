@@ -13,23 +13,23 @@ use lithium\data\Schema;
 class SchemaTest extends \lithium\test\Unit {
 
 	public function testShortHandTypeDefinitions() {
-		$schema = new Schema(array('fields' => array(
+		$schema = new Schema(['fields' => [
 			'id' => 'int',
 			'name' => 'string',
-			'active' => array('type' => 'boolean', 'default' => true)
-		)));
+			'active' => ['type' => 'boolean', 'default' => true]
+		]]);
 
 		$this->assertEqual('int', $schema->type('id'));
 		$this->assertEqual('string', $schema->type('name'));
 		$this->assertEqual('boolean', $schema->type('active'));
-		$this->assertEqual(array('type' => 'int'), $schema->fields('id'));
-		$this->assertEqual(array('id', 'name', 'active'), $schema->names());
+		$this->assertEqual(['type' => 'int'], $schema->fields('id'));
+		$this->assertEqual(['id', 'name', 'active'], $schema->names());
 
-		$expected = array(
-			'id' => array('type' => 'int'),
-			'name' => array('type' => 'string'),
-			'active' => array('type' => 'boolean', 'default' => true)
-		);
+		$expected = [
+			'id' => ['type' => 'int'],
+			'name' => ['type' => 'string'],
+			'active' => ['type' => 'boolean', 'default' => true]
+		];
 		$this->assertEqual($expected, $schema->fields());
 	}
 }

@@ -10,16 +10,16 @@ namespace lithium\tests\mocks\util;
 
 class MockCollectionObject extends \lithium\core\Object {
 
-	public $data = array(1 => 2);
+	public $data = [1 => 2];
 
 	public function testFoo() {
 		return 'testFoo';
 	}
 
-	public function to($format, array $options = array()) {
+	public function to($format, array $options = []) {
 		switch ($format) {
 			case 'array':
-				return $this->data + array(2 => 3);
+				return $this->data + [2 => 3];
 		}
 	}
 }

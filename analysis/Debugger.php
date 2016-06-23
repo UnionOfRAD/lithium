@@ -24,7 +24,7 @@ class Debugger {
 	 * @see lithium\analysis\Debugger::_closureDef()
 	 * @var array
 	 */
-	protected static $_closureCache = array();
+	protected static $_closureCache = [];
 
 	/**
 	 * Outputs a stack trace based on the supplied options.
@@ -40,29 +40,29 @@ class Debugger {
 	 *        - `'trace'`: A trace to use instead of generating one.
 	 * @return string|array|null Stack trace formatted according to `'format'` option.
 	 */
-	public static function trace(array $options = array()) {
-		$defaults = array(
+	public static function trace(array $options = []) {
+		$defaults = [
 			'depth' => 999,
 			'format' => null,
 			'args' => false,
 			'start' => 0,
-			'scope' => array(),
-			'trace' => array(),
+			'scope' => [],
+			'trace' => [],
 			'includeScope' => true,
 			'closures' => true
-		);
+		];
 		$options += $defaults;
 
 		$backtrace = $options['trace'] ?: debug_backtrace();
 		$scope = $options['scope'];
 		$count = count($backtrace);
-		$back = array();
-		$traceDefault = array(
+		$back = [];
+		$traceDefault = [
 			'line' => '??', 'file' => '[internal]', 'class' => null, 'function' => '[main]'
-		);
+		];
 
 		for ($i = $options['start']; $i < $count && $i < $options['depth']; $i++) {
-			$trace = array_merge(array('file' => '[internal]', 'line' => '??'), $backtrace[$i]);
+			$trace = array_merge(['file' => '[internal]', 'line' => '??'], $backtrace[$i]);
 			$function = '[main]';
 
 			if (isset($backtrace[$i + 1])) {
@@ -72,7 +72,7 @@ class Debugger {
 				if (!empty($next['class'])) {
 					$function = $next['class'] . '::' . $function . '(';
 					if ($options['args'] && isset($next['args'])) {
-						$args = array_map(array('static', 'export'), $next['args']);
+						$args = array_map(['static', 'export'], $next['args']);
 						$function .= join(', ', $args);
 					}
 					$function .= ')';
@@ -82,13 +82,13 @@ class Debugger {
 			if ($options['closures'] && strpos($function, '{closure}') !== false) {
 				$function = static::_closureDef($backtrace[$i], $function);
 			}
-			if (in_array($function, array('call_user_func_array', 'trigger_error'))) {
+			if (in_array($function, ['call_user_func_array', 'trigger_error'])) {
 				continue;
 			}
 			$trace['functionRef'] = $function;
 
 			if ($options['format'] === 'points' && $trace['file'] !== '[internal]') {
-				$back[] = array('file' => $trace['file'], 'line' => $trace['line']);
+				$back[] = ['file' => $trace['file'], 'line' => $trace['line']];
 			} elseif (is_string($options['format']) && $options['format'] !== 'array') {
 				$back[] = Text::insert($options['format'], array_map(
 					function($data) { return is_object($data) ? get_class($data) : $data; },
@@ -124,8 +124,8 @@ class Debugger {
 		$export = var_export($var, true);
 
 		if (is_array($var)) {
-			$replace = array(" (", " )", "  ", " )", "=> \n\t");
-			$with = array("(", ")", "\t", "\t)", "=> ");
+			$replace = [" (", " )", "  ", " )", "=> \n\t"];
+			$with = ["(", ")", "\t", "\t)", "=> "];
 			$export = str_replace($replace, $with, $export);
 		}
 		return $export;
@@ -183,14 +183,14 @@ class Debugger {
 	 */
 	protected static function _closureDef($frame, $function) {
 		$reference = '::';
-		$frame += array('file' => '??', 'line' => '??');
+		$frame += ['file' => '??', 'line' => '??'];
 		$cacheKey = "{$frame['file']}@{$frame['line']}";
 
 		if (isset(static::$_closureCache[$cacheKey])) {
 			return static::$_closureCache[$cacheKey];
 		}
 
-		if ($class = Inspector::classes(array('file' => $frame['file']))) {
+		if ($class = Inspector::classes(['file' => $frame['file']])) {
 			foreach (Inspector::methods(key($class), 'extents') as $method => $extents) {
 				$line = $frame['line'];
 

@@ -43,7 +43,7 @@ class Create extends \lithium\console\Command {
 	 *
 	 * @var array
 	 */
-	protected $_library = array();
+	protected $_library = [];
 
 	/**
 	 * Class initializer. Parses template and sets up params that need to be filled.
@@ -53,7 +53,7 @@ class Create extends \lithium\console\Command {
 	protected function _init() {
 		parent::_init();
 		$this->library = $this->library ?: true;
-		$defaults = array('prefix' => null, 'path' => null);
+		$defaults = ['prefix' => null, 'path' => null];
 		$this->_library = (array) Libraries::get($this->library) + $defaults;
 	}
 
@@ -94,14 +94,14 @@ class Create extends \lithium\console\Command {
 		} catch (ClassNotFoundException $e) {
 			return false;
 		}
-		$data = array();
+		$data = [];
 		$params = $class->invokeMethod('_params');
 
 		foreach ($params as $i => $param) {
-			$data[$param] = $class->invokeMethod("_{$param}", array($this->request));
+			$data[$param] = $class->invokeMethod("_{$param}", [$this->request]);
 		}
 
-		if ($message = $class->invokeMethod('_save', array($data))) {
+		if ($message = $class->invokeMethod('_save', [$data])) {
 			$this->out($message);
 			return true;
 		}
@@ -115,12 +115,12 @@ class Create extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	protected function _default($name) {
-		$commands = array(
-			array('model', $name),
-			array('controller', $name),
-			array('test', 'model', $name),
-			array('test', 'controller', $name)
-		);
+		$commands = [
+			['model', $name],
+			['controller', $name],
+			['test', 'model', $name],
+			['test', 'controller', $name]
+		];
 		foreach ($commands as $args) {
 			$command = $this->template = $this->request->params['command'] = array_shift($args);
 			$this->request->params['action'] = array_shift($args);
@@ -140,17 +140,17 @@ class Create extends \lithium\console\Command {
 	 * @param array $options
 	 * @return string
 	 */
-	protected function _namespace($request, $options  = array()) {
+	protected function _namespace($request, $options  = []) {
 		$name = $request->command;
-		$defaults = array(
+		$defaults = [
 			'prefix' => $this->_library['prefix'],
 			'prepend' => null,
-			'spaces' => array(
+			'spaces' => [
 				'model' => 'models', 'view' => 'views', 'controller' => 'controllers',
 				'command' => 'extensions.command', 'adapter' => 'extensions.adapter',
 				'helper' => 'extensions.helper'
-			)
-		);
+			]
+		];
 		$options += $defaults;
 
 		if (isset($options['spaces'][$name])) {
@@ -170,14 +170,14 @@ class Create extends \lithium\console\Command {
 		$contents = $this->_template();
 
 		if (empty($contents)) {
-			return array();
+			return [];
 		}
 		preg_match_all('/(?:\{:(?P<params>[^}]+)\})/', $contents, $keys);
 
 		if (!empty($keys['params'])) {
 			return array_values(array_unique($keys['params']));
 		}
-		return array();
+		return [];
 	}
 
 	/**
@@ -186,9 +186,9 @@ class Create extends \lithium\console\Command {
 	 * @return string
 	 */
 	protected function _template() {
-		$file = Libraries::locate('command.create.template', $this->template, array(
+		$file = Libraries::locate('command.create.template', $this->template, [
 			'filter' => false, 'type' => 'file', 'suffix' => '.txt.php'
-		));
+		]);
 		if (!$file || is_array($file)) {
 			return false;
 		}
@@ -202,14 +202,14 @@ class Create extends \lithium\console\Command {
 	 * @param array $config
 	 * @return object
 	 */
-	protected function _instance($name, array $config = array()) {
+	protected function _instance($name, array $config = []) {
 		if ($class = Libraries::locate('command.create', Inflector::camelize($name))) {
 			$this->request->params['template'] = $this->template;
 
-			return new $class(array(
+			return new $class([
 				'request' => $this->request,
 				'classes' => $this->_classes
-			));
+			]);
 		}
 		return parent::_instance($name, $config);
 	}
@@ -221,8 +221,8 @@ class Create extends \lithium\console\Command {
 	 * @return string|boolean A result string on success of writing the file. If any errors
 	 *         occur along the way such as missing information boolean false is returned.
 	 */
-	protected function _save(array $params = array()) {
-		$defaults = array('namespace' => null, 'class' => null);
+	protected function _save(array $params = []) {
+		$defaults = ['namespace' => null, 'class' => null];
 		$params += $defaults;
 
 		if (empty($params['class']) || empty($this->_library['path'])) {
@@ -242,7 +242,7 @@ class Create extends \lithium\console\Command {
 		}
 		if (file_exists($file)) {
 			$prompt = "{$relative} already exists. Overwrite?";
-			$choices = array('y', 'n');
+			$choices = ['y', 'n'];
 			if ($this->in($prompt, compact('choices')) !== 'y') {
 				return "{$params['class']} skipped.";
 			}

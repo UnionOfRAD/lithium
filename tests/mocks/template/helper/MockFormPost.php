@@ -10,16 +10,16 @@ namespace lithium\tests\mocks\template\helper;
 
 class MockFormPost extends \lithium\data\Model {
 
-	public $hasMany = array('MockQueryComment');
+	public $hasMany = ['MockQueryComment'];
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'author_id' => array('type' => 'integer'),
-		'title' => array('type' => 'string'),
-		'body' => array('type' => 'text'),
-		'created' => array('type' => 'datetime'),
-		'updated' => array('type' => 'datetime')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer'],
+		'author_id' => ['type' => 'integer'],
+		'title' => ['type' => 'string'],
+		'body' => ['type' => 'text'],
+		'created' => ['type' => 'datetime'],
+		'updated' => ['type' => 'datetime']
+	];
 }
 
 ?>

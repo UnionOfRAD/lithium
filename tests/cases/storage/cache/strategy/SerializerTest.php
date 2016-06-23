@@ -17,7 +17,7 @@ class SerializerTest extends \lithium\test\Unit {
 	}
 
 	public function testWrite() {
-		$data = array('some' => 'data');
+		$data = ['some' => 'data'];
 		$result = $this->Serializer->write($data);
 		$expected = serialize($data);
 		$this->assertEqual($expected, $result);

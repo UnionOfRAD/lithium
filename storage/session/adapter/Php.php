@@ -33,11 +33,11 @@ class Php extends \lithium\core\Object {
 	 * @var array Configuration options matching the pattern `'session.*'` are session
 	 *      ini settings. Please consult the PHP documentation for further information.
 	 */
-	protected $_defaults = array(
+	protected $_defaults = [
 		'session.cookie_lifetime' => '0',
 		'session.cookie_httponly' => true,
 		'session.cache_limiter' => 'nocache'
-	);
+	];
 
 	/**
 	 * Constructor. Takes care of setting appropriate configurations for this object. Also sets
@@ -52,7 +52,7 @@ class Php extends \lithium\core\Object {
 	 *              to `false`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		if (empty($config['session.name'])) {
 			$config['session.name'] = basename(Libraries::get(true, 'path'));
 		}
@@ -129,7 +129,7 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return \Closure Function returning boolean `true` if the key exists, `false` otherwise.
 	 */
-	public function check($key, array $options = array()) {
+	public function check($key, array $options = []) {
 		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException('Could not start session.');
 		}
@@ -146,7 +146,7 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return \Closure Function returning data in the session if successful, `false` otherwise.
 	 */
-	public function read($key = null, array $options = array()) {
+	public function read($key = null, array $options = []) {
 		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException('Could not start session.');
 		}
@@ -177,7 +177,7 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $value, array $options = array()) {
+	public function write($key, $value, array $options = []) {
 		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException('Could not start session.');
 		}
@@ -196,7 +196,7 @@ class Php extends \lithium\core\Object {
 	 * @return \Closure Function returning boolean `true` if the key no longer
 	 *         exists in the session, `false` otherwise
 	 */
-	public function delete($key, array $options = array()) {
+	public function delete($key, array $options = []) {
 		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException('Could not start session.');
 		}
@@ -213,7 +213,7 @@ class Php extends \lithium\core\Object {
 	 * @param array $options Options array. Not used for this adapter method.
 	 * @return \Closure Function returning boolean `true` on successful clear, `false` otherwise.
 	 */
-	public function clear(array $options = array()) {
+	public function clear(array $options = []) {
 		if (!$this->isStarted() && !$this->_start()) {
 			throw new RuntimeException('Could not start session.');
 		}

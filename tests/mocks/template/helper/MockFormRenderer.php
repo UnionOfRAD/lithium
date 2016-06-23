@@ -15,12 +15,12 @@ class MockFormRenderer extends \lithium\template\view\Renderer {
 	public function request() {
 		if (empty($this->_request)) {
 			$this->_request = new Request();
-			$this->_request->params += array('controller' => 'posts', 'action' => 'add');
+			$this->_request->params += ['controller' => 'posts', 'action' => 'add'];
 		}
 		return $this->_request;
 	}
 
-	public function render($template, $data = array(), array $options = array()) {
+	public function render($template, $data = [], array $options = []) {
 	}
 }
 

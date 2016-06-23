@@ -108,7 +108,7 @@ class Filters {
 	 * @see lithium\aop\Filters::_chain()
 	 * @var array
 	 */
-	protected static $_filters = array();
+	protected static $_filters = [];
 
 	/**
 	 * Holds `Chain` objects keyed by their primary class and method id.
@@ -117,7 +117,7 @@ class Filters {
 	 * @see lithium\aop\Filters::_chain()
 	 * @array
 	 */
-	protected static $_chains = array();
+	protected static $_chains = [];
 
 	/**
 	 * Lazily applies a filter to a method.
@@ -149,7 +149,7 @@ class Filters {
 		list($id,) = static::_ids($class, $method);
 
 		if (!isset(static::$_filters[$id])) {
-			static::$_filters[$id] = array();
+			static::$_filters[$id] = [];
 		}
 		static::$_filters[$id][] = $filter;
 
@@ -255,7 +255,7 @@ class Filters {
 	 */
 	public static function clear($class = null, $method = null) {
 		if ($class === null && $method === null) {
-			static::$_filters = static::$_chains = array();
+			static::$_filters = static::$_chains = [];
 			return;
 		}
 
@@ -294,12 +294,12 @@ class Filters {
 	 */
 	protected static function _ids($class, $method) {
 		if (is_string($class)) {
-			return array('<' . ltrim($class, '\\') . ">::{$method}");
+			return ['<' . ltrim($class, '\\') . ">::{$method}"];
 		}
-		return array(
+		return [
 			'<' . get_class($class) . ' #' . spl_object_hash($class) . ">::{$method}",
 			'<' . get_class($class) . ">::{$method}"
-		);
+		];
 	}
 
 	/**
@@ -318,7 +318,7 @@ class Filters {
 		if (isset(static::$_chains[$ids[0]])) {
 			return static::$_chains[$ids[0]];
 		}
-		$filters = array();
+		$filters = [];
 
 		foreach ($ids as $id) {
 			if (isset(static::$_filters[$id])) {

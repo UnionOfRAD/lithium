@@ -13,9 +13,9 @@
  *
  * @link http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms
  */
-return array(
+return [
 	'pluralForms' => 2,
 	'pluralRule' => function ($n) { return $n != 1 ? 1 : 0; }
-);
+];
 
 ?>

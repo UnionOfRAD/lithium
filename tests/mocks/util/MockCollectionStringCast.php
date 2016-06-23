@@ -9,7 +9,7 @@
 namespace lithium\tests\mocks\util;
 
 class MockCollectionStringCast {
-	protected $_data = array(1 => 2, 2 => 3);
+	protected $_data = [1 => 2, 2 => 3];
 
 	public function __toString() {
 		return json_encode($this->_data);

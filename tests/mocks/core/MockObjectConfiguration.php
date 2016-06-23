@@ -12,11 +12,11 @@ class MockObjectConfiguration extends \lithium\core\Object {
 
 	protected $_testScalar = 'default';
 
-	protected $_testArray = array('default');
+	protected $_testArray = ['default'];
 
 	protected $_protected = null;
 
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		if (isset($config['autoConfig'])) {
 			$this->_autoConfig = (array) $config['autoConfig'];
 			unset($config['autoConfig']);
@@ -33,10 +33,10 @@ class MockObjectConfiguration extends \lithium\core\Object {
 	}
 
 	public function getConfig() {
-		return array(
+		return [
 			'testScalar' => $this->_testScalar,
 			'testArray' => $this->_testArray
-		);
+		];
 	}
 }
 

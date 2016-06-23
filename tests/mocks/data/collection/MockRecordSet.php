@@ -24,8 +24,8 @@ class MockRecordSet extends \lithium\data\collection\RecordSet {
 			$this->_init = false;
 			$this->_started = false;
 			$this->_valid = false;
-			$this->_data = array();
-			$this->_index = array();
+			$this->_data = [];
+			$this->_index = [];
 			$this->_result->rewind();
 			$this->_columns = $this->_columnMap();
 			return true;

@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\security\auth\adapter;
 
 class MockHttp extends \lithium\security\auth\adapter\Http {
 
-	public $headers = array();
+	public $headers = [];
 
 	protected function _writeHeader($string) {
 		$this->headers[] = $string;

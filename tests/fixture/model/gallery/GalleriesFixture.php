@@ -12,28 +12,28 @@ class GalleriesFixture extends \li3_fixtures\test\Fixture {
 
 	protected $_model = 'lithium\tests\fixture\model\gallery\Galleries';
 
-	protected $_fields = array(
-		'id' => array('type' => 'id'),
-		'name' => array('type' => 'string', 'length' => 50),
-		'active' => array('type' => 'boolean', 'default' => true),
-		'created' => array('type' => 'datetime'),
-		'modified' => array('type' => 'datetime')
-	);
+	protected $_fields = [
+		'id' => ['type' => 'id'],
+		'name' => ['type' => 'string', 'length' => 50],
+		'active' => ['type' => 'boolean', 'default' => true],
+		'created' => ['type' => 'datetime'],
+		'modified' => ['type' => 'datetime']
+	];
 
-	protected $_records = array(
-		array(
+	protected $_records = [
+		[
 			'name' => 'Foo Gallery',
 			'active' => true,
 			'created' => '2007-06-20 21:02:27',
 			'modified' => '2009-12-14 22:36:09'
-		),
-		array(
+		],
+		[
 			'name' => 'Bar Gallery',
 			'active' => true,
 			'created' => '2008-08-22 16:12:42',
 			'modified' => '2008-08-22 16:12:42'
-		),
-	);
+		],
+	];
 }
 
 ?>

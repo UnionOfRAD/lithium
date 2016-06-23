@@ -15,12 +15,12 @@ class MockInstanceFiltered {
 	protected $_internal = 'secret';
 
 	public function method() {
-		return Filters::run($this, __FUNCTION__, array(), function($params) {
+		return Filters::run($this, __FUNCTION__, [], function($params) {
 			return 'method';
 		});
 	}
 
-	public function methodTracing(array $trace = array()) {
+	public function methodTracing(array $trace = []) {
 		$trace[] = 'Starting outer method call';
 
 		$result = Filters::run($this, __FUNCTION__, compact('trace'), function($params) {
@@ -32,7 +32,7 @@ class MockInstanceFiltered {
 	}
 
 	public function tamper() {
-		return Filters::run($this, __FUNCTION__, array(), function() {
+		return Filters::run($this, __FUNCTION__, [], function() {
 			$this->_internal = 'tampered';
 			return true;
 		});

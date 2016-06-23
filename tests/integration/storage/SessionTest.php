@@ -21,13 +21,13 @@ class SessionTest extends \lithium\test\Integration {
 	public function testPhpReadWriteDelete() {
 		$this->skipIf(PHP_SAPI === 'cli', 'No PHP session support in cli SAPI.');
 
-		$config = array('name' => 'phpInt');
+		$config = ['name' => 'phpInt'];
 
-		Session::config(array(
-			$config['name'] => array(
+		Session::config([
+			$config['name'] => [
 				'adapter' => 'Php'
-			)
-		));
+			]
+		]);
 
 		Session::clear($config);
 
@@ -47,13 +47,13 @@ class SessionTest extends \lithium\test\Integration {
 	public function testCookieReadWriteDelete() {
 		$this->skipIf(PHP_SAPI === 'cli', 'No headers support in cli SAPI.');
 
-		$config = array('name' => 'cookieInt');
+		$config = ['name' => 'cookieInt'];
 
-		Session::config(array(
-			$config['name'] => array(
+		Session::config([
+			$config['name'] => [
 				'adapter' => 'Cookie'
-			)
-		));
+			]
+		]);
 
 		Session::clear($config);
 
@@ -64,22 +64,22 @@ class SessionTest extends \lithium\test\Integration {
 
 		$this->assertNull(Session::read($key1, $config));
 		$this->assertTrue(Session::write($key1, $value1, $config));
-		$this->assertCookie(array('key' => $key1, 'value' => $value1));
+		$this->assertCookie(['key' => $key1, 'value' => $value1]);
 		$this->assertNull(Session::read($key2, $config));
 		$this->assertTrue(Session::delete($key1, $config));
-		$this->assertCookie(array('key' => $key1, 'value' => 'deleted'));
-		$this->assertNoCookie(array('key' => $key2, 'value' => $value2));
+		$this->assertCookie(['key' => $key1, 'value' => 'deleted']);
+		$this->assertNoCookie(['key' => $key2, 'value' => $value2]);
 		$this->assertNull(Session::read($key1, $config));
 	}
 
 	public function testMemoryReadWriteDelete() {
-		$config = array('name' => 'memoryInt');
+		$config = ['name' => 'memoryInt'];
 
-		Session::config(array(
-			$config['name'] => array(
+		Session::config([
+			$config['name'] => [
 				'adapter' => 'Memory'
-			)
-		));
+			]
+		]);
 
 		Session::clear($config);
 
@@ -99,13 +99,13 @@ class SessionTest extends \lithium\test\Integration {
 	public function testNamespacesWithPhpAdapter() {
 		$this->skipIf(PHP_SAPI === 'cli', 'No PHP session support in cli SAPI.');
 
-		$config = array('name' => 'namespaceInt');
+		$config = ['name' => 'namespaceInt'];
 
-		Session::config(array(
-			$config['name'] => array(
+		Session::config([
+			$config['name'] => [
 				'adapter' => 'Php'
-			)
-		));
+			]
+		]);
 
 		Session::clear($config);
 
@@ -118,25 +118,25 @@ class SessionTest extends \lithium\test\Integration {
 		$this->assertTrue(Session::write($key2, $value2, $config));
 		$this->assertEqual($value1, Session::read($key1, $config));
 		$this->assertEqual($value2, Session::read($key2, $config));
-		$expected = array('nested' => array('key' => $value1));
+		$expected = ['nested' => ['key' => $value1]];
 		$this->assertEqual($expected, Session::read('really.deep', $config));
 	}
 
 	public function testHmacStrategyWithPhpAdapter() {
 		$this->skipIf(PHP_SAPI === 'cli', 'No PHP session support in cli SAPI.');
 
-		$config = array('name' => 'hmacInt');
+		$config = ['name' => 'hmacInt'];
 
-		Session::config(array(
-			$config['name'] => array(
+		Session::config([
+			$config['name'] => [
 				'adapter' => 'Php',
-				'strategies' => array(
-					'Hmac' => array(
+				'strategies' => [
+					'Hmac' => [
 						'secret' => 's3cr3t'
-					)
-				)
-			)
-		));
+					]
+				]
+			]
+		]);
 
 		Session::clear($config);
 
@@ -175,18 +175,18 @@ class SessionTest extends \lithium\test\Integration {
 		$this->skipIf(PHP_SAPI === 'cli', 'No PHP session support in cli SAPI.');
 		$this->skipIf(!extension_loaded('mcrypt'), 'The `mcrypt` extension is not loaded.');
 
-		$config = array('name' => 'encryptInt');
+		$config = ['name' => 'encryptInt'];
 
-		Session::config(array(
-			$config['name'] => array(
+		Session::config([
+			$config['name'] => [
 				'adapter' => 'Php',
-				'strategies' => array(
-					'Encrypt' => array(
+				'strategies' => [
+					'Encrypt' => [
 						'secret' => 's3cr3t'
-					)
-				)
-			)
-		));
+					]
+				]
+			]
+		]);
 
 		Session::clear($config);
 

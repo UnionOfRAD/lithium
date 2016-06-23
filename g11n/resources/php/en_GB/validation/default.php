@@ -11,8 +11,8 @@
  *
  * @link http://en.wikipedia.org/wiki/UK_postcodes#Format
  */
-return array(
+return [
 	'postalCode' => '/\\A\\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\\b\\z/i'
-);
+];
 
 ?>

@@ -20,7 +20,7 @@ namespace lithium\util;
  * $coll[] = 'foo';
  * // $coll[0] --> 'foo'
  *
- * $coll = new Collection(array('data' => array('foo')));
+ * $coll = new Collection(['data' => ['foo']]);
  * // $coll[0] --> 'foo'
  *
  * $array = $coll->to('array');
@@ -28,7 +28,7 @@ namespace lithium\util;
  *
  * Apart from array-like data access, Collections allow for filtering and iteration methods:
  * ```
- * $coll = new Collection(array('data' => array(0, 1, 2, 3, 4)));
+ * $coll = new Collection(['data' => [0, 1, 2, 3, 4]]);
  *
  * $coll->first();   // 0
  * $coll->current(); // 0
@@ -55,16 +55,16 @@ namespace lithium\util;
  * 	}
  * }
  *
- * $data = array(
- * 	new Task(array('task' => 'task 1')),
- * 	new Task(array('task' => 'task 2')),
- * 	new Task(array('task' => 'task 3'))
- * );
+ * $data = [
+ * 	new Task(['task' => 'task 1']),
+ * 	new Task(['task' => 'task 2']),
+ * 	new Task(['task' => 'task 3'])
+ * ];
  * $tasks = new Collection(compact('data'));
  *
  * // $result will contain an array, and each element will be the return
  * // value of a run() method call:
- * $result = $tasks->invoke('run', array('now'));
+ * $result = $tasks->invoke('run', ['now']);
  *
  * // Alternatively, the method can be called natively, with the same result:
  * $result = $tasks->run('now');
@@ -83,23 +83,23 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @see lithium\util\Collection::formats()
 	 * @var array
 	 */
-	protected static $_formats = array(
+	protected static $_formats = [
 		'array' => 'lithium\util\Collection::toArray'
-	);
+	];
 
 	/**
 	 * The items contained in the collection.
 	 *
 	 * @var array
 	 */
-	protected $_data = array();
+	protected $_data = [];
 
 	/**
 	 * Allows a collection's items to be automatically assigned from class construction options.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('data');
+	protected $_autoConfig = ['data'];
 
 	/**
 	 * Accessor method for adding format handlers to instances and subclasses of `Collection`.
@@ -149,7 +149,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 */
 	public static function formats($format, $handler = null) {
 		if ($format === false) {
-			return static::$_formats = array('array' => 'lithium\util\Collection::toArray');
+			return static::$_formats = ['array' => 'lithium\util\Collection::toArray'];
 		}
 		if ($handler === null && class_exists($format)) {
 			return static::$_formats[] = $format;
@@ -183,14 +183,14 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed Returns either an array of the return values of the methods, or the return
 	 *         values wrapped in a `Collection` instance.
 	 */
-	public function invoke($method, array $params = array(), array $options = array()) {
+	public function invoke($method, array $params = [], array $options = []) {
 		$class = get_class($this);
-		$defaults = array('merge' => false, 'collect' => false);
+		$defaults = ['merge' => false, 'collect' => false];
 		$options += $defaults;
-		$data = array();
+		$data = [];
 
 		foreach ($this as $object) {
-			$value = call_user_func_array(array(&$object, $method), $params);
+			$value = call_user_func_array([&$object, $method], $params);
 			($options['merge']) ? $data = array_merge($data, $value) : $data[$this->key()] = $value;
 		}
 		return ($options['collect']) ? new $class(compact('data')) : $data;
@@ -203,7 +203,7 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @param array $parameters
 	 * @return mixed
 	 */
-	public function __call($method, $parameters = array()) {
+	public function __call($method, $parameters = []) {
 		return $this->invoke($method, $parameters);
 	}
 
@@ -249,8 +249,8 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The object converted to the value specified in `$format`; usually an array or
 	 *         string.
 	 */
-	public function to($format, array $options = array()) {
-		$defaults = array('internal' => false);
+	public function to($format, array $options = []) {
+		$defaults = ['internal' => false];
 		$options += $defaults;
 		$data = $options['internal'] ? $this->_data : $this;
 		return $this->_to($format, $data, $options);
@@ -292,8 +292,8 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
 	 *         `$options` argument, then an instance of this class will be returned.
 	 */
-	public function find($filter, array $options = array()) {
-		$defaults = array('collect' => true);
+	public function find($filter, array $options = []) {
+		$defaults = ['collect' => true];
 		$options += $defaults;
 		$data = array_filter($this->_data, $filter);
 
@@ -351,8 +351,8 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
 	 *         `$options` argument, then an instance of this class will be returned.
 	 */
-	public function map($filter, array $options = array()) {
-		$defaults = array('collect' => true);
+	public function map($filter, array $options = []) {
+		$defaults = ['collect' => true];
 		$options += $defaults;
 		$data = array_map($filter, $this->_data);
 
@@ -388,9 +388,9 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @param array $options Reserved for future use.
 	 * @return Collection Returns itself.
 	 */
-	public function sort($sorter = 'sort', array $options = array()) {
+	public function sort($sorter = 'sort', array $options = []) {
 		if (is_string($sorter) && strpos($sorter, 'sort') !== false && is_callable($sorter)) {
-			call_user_func_array($sorter, array(&$this->_data));
+			call_user_func_array($sorter, [&$this->_data]);
 		} elseif (is_callable($sorter)) {
 			usort($this->_data, $sorter);
 		}
@@ -554,10 +554,10 @@ class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator
 	 * @return array Returns the value of `$data` as a pure PHP array, recursively converting all
 	 *         sub-objects and other values to their closest array or scalar equivalents.
 	 */
-	public static function toArray($data, array $options = array()) {
-		$defaults = array('handlers' => array());
+	public static function toArray($data, array $options = []) {
+		$defaults = ['handlers' => []];
 		$options += $defaults;
-		$result = array();
+		$result = [];
 
 		foreach ($data as $key => $item) {
 			switch (true) {

@@ -4,7 +4,7 @@ namespace lithium\tests\mocks\test;
 
 class MockStdClass extends \lithium\core\Object {
 
-	protected $_data = array();
+	protected $_data = [];
 
 	public function __set($key, $value) {
 		return $this->_data[$key] = $value;
@@ -58,7 +58,7 @@ class MockStdClass extends \lithium\core\Object {
 
 	public function methodBar() {
 		$this->methodBaz(1);
-		return $this->__call('methodBaz', array(2));
+		return $this->__call('methodBaz', [2]);
 	}
 
 }

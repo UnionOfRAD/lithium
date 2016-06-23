@@ -10,27 +10,27 @@ namespace lithium\tests\mocks\data\model;
 
 class MockImage extends \lithium\data\Model {
 
-	public $belongsTo = array(
-		'Gallery' => array('to' => 'lithium\tests\mocks\data\model\MockGallery')
-	);
+	public $belongsTo = [
+		'Gallery' => ['to' => 'lithium\tests\mocks\data\model\MockGallery']
+	];
 
-	public $hasMany = array(
-		'ImageTag' => array('to' => 'lithium\tests\mocks\data\model\MockImageTag')
-	);
+	public $hasMany = [
+		'ImageTag' => ['to' => 'lithium\tests\mocks\data\model\MockImageTag']
+	];
 
-	protected $_meta = array(
+	protected $_meta = [
 		'key' => 'id',
 		'name' => 'Image',
 		'source' => 'mock_image',
 		'connection' => false
-	);
+	];
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'title' => array('type' => 'string'),
-		'image' => array('type' => 'string'),
-		'gallery_id' => array('type' => 'integer')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer'],
+		'title' => ['type' => 'string'],
+		'image' => ['type' => 'string'],
+		'gallery_id' => ['type' => 'integer']
+	];
 }
 
 ?>

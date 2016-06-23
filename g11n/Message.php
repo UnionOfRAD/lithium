@@ -54,7 +54,7 @@ class Message extends \lithium\core\StaticObject {
 	 * @var array
 	 * @see lithium\g11n\Message::_translated()
 	 */
-	protected static $_cachedPages = array();
+	protected static $_cachedPages = [];
 
 	/**
 	 * Translates a message according to the current or provided locale
@@ -63,7 +63,7 @@ class Message extends \lithium\core\StaticObject {
 	 * Usage:
 	 * ```
 	 * Message::translate('Mind the gap.');
-	 * Message::translate('house', array('count' => 23));
+	 * Message::translate('house', ['count' => 23]);
 	 * ```
 	 *
 	 * `Text::insert()`-style placeholders may be used within the message
@@ -72,9 +72,9 @@ class Message extends \lithium\core\StaticObject {
 	 * Example:
 	 * ```
 	 * Message::translate('I can see {:count} bike.');
-	 * Message::translate('This painting is {:color}.', array(
+	 * Message::translate('This painting is {:color}.', [
 	 * 	'color' => Message::translate('silver'),
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * @see lithium\util\Text::insert()
@@ -96,24 +96,24 @@ class Message extends \lithium\core\StaticObject {
 	 * @return string The translation or the value of the `'default'` option if none
 	 *                     could be found.
 	 */
-	public static function translate($id, array $options = array()) {
-		$defaults = array(
+	public static function translate($id, array $options = []) {
+		$defaults = [
 			'count' => 1,
 			'locale' => Environment::get('locale'),
 			'scope' => null,
 			'context' => null,
 			'default' => null,
 			'noop' => false
-		);
+		];
 		$options += $defaults;
 
 		if ($options['noop']) {
 			$result = null;
 		} else {
-			$result = static::_translated($id, abs($options['count']), $options['locale'], array(
+			$result = static::_translated($id, abs($options['count']), $options['locale'], [
 				'scope' => $options['scope'],
 				'context' => $options['context']
-			));
+			]);
 		}
 
 		if ($result = $result ?: $options['default']) {
@@ -144,13 +144,13 @@ class Message extends \lithium\core\StaticObject {
 	 * @return array Named aliases (`'t'` and `'tn'`) for translation functions.
 	 */
 	public static function aliases() {
-		$t = function($message, array $options = array()) {
-			return Message::translate($message, $options + array('default' => $message));
+		$t = function($message, array $options = []) {
+			return Message::translate($message, $options + ['default' => $message]);
 		};
-		$tn = function($message1, $message2, $count, array $options = array()) {
-			return Message::translate($message1, $options + compact('count') + array(
+		$tn = function($message1, $message2, $count, array $options = []) {
+			return Message::translate($message1, $options + compact('count') + [
 				'default' => $count === 1 ? $message1 : $message2
-			));
+			]);
 		};
 		return compact('t', 'tn');
 	}
@@ -164,7 +164,7 @@ class Message extends \lithium\core\StaticObject {
 	 */
 	public static function cache($cache = null) {
 		if ($cache === false) {
-			static::$_cachedPages = array();
+			static::$_cachedPages = [];
 		}
 		if (is_array($cache)) {
 			static::$_cachedPages += $cache;
@@ -189,7 +189,7 @@ class Message extends \lithium\core\StaticObject {
 	 *         form could not be determined.
 	 * @filter
 	 */
-	protected static function _translated($id, $count, $locale, array $options = array()) {
+	protected static function _translated($id, $count, $locale, array $options = []) {
 		$params = compact('id', 'count', 'locale', 'options');
 
 		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {

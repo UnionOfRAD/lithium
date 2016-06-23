@@ -60,7 +60,7 @@ class CompilerTest extends \lithium\test\Unit {
 		$template = Compiler::template("{$this->_path}/{$this->_file}");
 		$this->assertFileExists($template);
 
-		$expected = array(
+		$expected = [
 			"<?php echo 'this is unescaped content'; ?" . ">",
 			"<?php echo \$h('this is escaped content'); ?" . ">",
 			"<?php echo \$h(\$alsoEscaped); ?" . ">",
@@ -74,7 +74,7 @@ class CompilerTest extends \lithium\test\Unit {
 			'several lines',
 			"'); ?>",
 			"<?php echo \$h('This is pre-escaped content'); ?>"
-		);
+		];
 		$result = array_map('trim', explode("\n", trim(file_get_contents($template))));
 		$this->assertEqual($expected, $result);
 	}
@@ -87,18 +87,18 @@ class CompilerTest extends \lithium\test\Unit {
 		$file = $this->_file;
 
 		$this->assertException('/failed to open stream/', function() use ($path, $file) {
-			Compiler::template("{$path}/{$file}", array(
+			Compiler::template("{$path}/{$file}", [
 				'path' => Libraries::get(true, 'path') . '/foo',
 				'fallback' => true
-			));
+			]);
 		});
 
 		$expected = '/(Could not write compiled template|failed to open stream)/';
 		$this->assertException($expected, function() use ($path, $file) {
-			$result = Compiler::template("{$path}/{$file}", array(
+			$result = Compiler::template("{$path}/{$file}", [
 				'path' => Libraries::get(true, 'path') . '/foo',
 				'fallback' => false
-			));
+			]);
 		});
 
 		error_reporting($backup);

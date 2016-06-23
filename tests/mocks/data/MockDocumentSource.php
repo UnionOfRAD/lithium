@@ -10,12 +10,12 @@ namespace lithium\tests\mocks\data;
 
 class MockDocumentSource extends \lithium\tests\mocks\data\MockSource {
 
-	protected $_classes = array(
+	protected $_classes = [
 		'entity' => 'lithium\data\entity\Document',
 		'set' => 'lithium\data\collection\DocumentSet',
 		'relationship' => 'lithium\data\model\Relationship',
 		'schema' => 'lithium\data\DocumentSchema'
-	);
+	];
 }
 
 ?>

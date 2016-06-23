@@ -16,7 +16,7 @@ class ModelTest extends \lithium\test\Unit {
 
 	public $request;
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	protected $_testPath = null;
 
@@ -26,14 +26,14 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
-		$this->classes = array('response' => 'lithium\tests\mocks\console\MockResponse');
+		$this->classes = ['response' => 'lithium\tests\mocks\console\MockResponse'];
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
-		$_SERVER['argv'] = array();
+		$_SERVER['argv'] = [];
 
-		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
-		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->request->params = array('library' => 'create_test');
+		Libraries::add('create_test', ['path' => $this->_testPath . '/create_test']);
+		$this->request = new Request(['input' => fopen('php://temp', 'w+')]);
+		$this->request->params = ['library' => 'create_test'];
 	}
 
 	public function tearDown() {
@@ -43,15 +43,15 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testClass() {
-		$this->request->params = array(
+		$this->request->params = [
 			'command' => 'model', 'action' => 'Posts'
-		);
-		$model = new Model(array(
+		];
+		$model = new Model([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 
 		$expected = 'Posts';
-		$result = $model->invokeMethod('_class', array($this->request));
+		$result = $model->invokeMethod('_class', [$this->request]);
 		$this->assertEqual($expected, $result);
 	}
 }

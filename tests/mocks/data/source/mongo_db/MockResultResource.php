@@ -10,13 +10,13 @@ namespace lithium\tests\mocks\data\source\mongo_db;
 
 class MockResultResource extends \lithium\core\Object {
 
-	protected $_data = array();
+	protected $_data = [];
 
-	protected $_autoConfig = array('data', 'name');
+	protected $_autoConfig = ['data', 'name'];
 
 	protected $_name = '';
 
-	public $query = array();
+	public $query = [];
 
 	public function hasNext() {
 		return (boolean) $this->_data;
@@ -30,7 +30,7 @@ class MockResultResource extends \lithium\core\Object {
 		return $this->_name;
 	}
 
-	public function fields(array $fields = array()) {
+	public function fields(array $fields = []) {
 		$this->query[__FUNCTION__] = $fields;
 		return $this;
 	}
@@ -45,7 +45,7 @@ class MockResultResource extends \lithium\core\Object {
 		return $this;
 	}
 
-	public function sort(array $fields = array()) {
+	public function sort(array $fields = []) {
 		$this->query[__FUNCTION__] = $fields;
 		return $this;
 	}

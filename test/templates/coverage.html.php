@@ -1,8 +1,8 @@
 <?php
 
-$summary = array(
+$summary = [
 	'classes' => 0, 'executable' => 0, 'covered' => 0, 'uncovered' => 0, 'percentage' => 0
-);
+];
 
 ?>
 

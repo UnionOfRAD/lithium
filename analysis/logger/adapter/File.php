@@ -18,9 +18,9 @@ use lithium\core\Libraries;
  * ```
  * use lithium\analysis\Logger;
  *
- * Logger::config(array(
- * 	'simple' => array('adapter' => 'File')
- * ));
+ * Logger::config([
+ * 	'simple' => ['adapter' => 'File']
+ * ]);
  * Logger::write('debug', 'Something happened!');
  * ```
  *
@@ -51,13 +51,13 @@ class File extends \lithium\core\Object {
 	 *          `"{:timestamp} {:message}\n"`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'path' => Libraries::get(true, 'resources') . '/tmp/logs',
 			'timestamp' => 'Y-m-d H:i:s',
 			'file' => function($data, $config) { return "{$data['priority']}.log"; },
 			'format' => "{:timestamp} {:message}\n"
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 

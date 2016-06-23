@@ -10,13 +10,13 @@ namespace lithium\tests\mocks\g11n\multibyte\adapter;
 
 class MockAdapter extends \lithium\core\Object {
 
-	public $testStrlenArgs = array();
+	public $testStrlenArgs = [];
 
-	public $testStrposArgs = array();
+	public $testStrposArgs = [];
 
-	public $testStrrposArgs = array();
+	public $testStrrposArgs = [];
 
-	public $testSubstrArgs = array();
+	public $testSubstrArgs = [];
 
 	public static function enabled() {
 		return true;

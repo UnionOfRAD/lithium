@@ -24,12 +24,12 @@ class AffectedTest extends \lithium\test\Unit {
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
-		$expected = array(
+		$expected = [
 			'lithium\tests\cases\g11n\CatalogTest',
 			'lithium\tests\cases\g11n\MessageTest',
 			'lithium\tests\cases\console\command\g11n\ExtractTest'
-		);
-		$result = $tests->map('get_class', array('collect' => false));
+		];
+		$result = $tests->map('get_class', ['collect' => false]);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -39,8 +39,8 @@ class AffectedTest extends \lithium\test\Unit {
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
-		$expected = array('lithium\tests\cases\core\StaticObjectTest');
-		$result = $tests->map('get_class', array('collect' => false));
+		$expected = ['lithium\tests\cases\core\StaticObjectTest'];
+		$result = $tests->map('get_class', ['collect' => false]);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -51,13 +51,13 @@ class AffectedTest extends \lithium\test\Unit {
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
-		$expected = array(
+		$expected = [
 			'lithium\tests\cases\g11n\CatalogTest',
 			'lithium\tests\cases\analysis\LoggerTest',
 			'lithium\tests\cases\g11n\MessageTest',
 			'lithium\tests\cases\console\command\g11n\ExtractTest'
-		);
-		$result = $tests->map('get_class', array('collect' => false));
+		];
+		$result = $tests->map('get_class', ['collect' => false]);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -68,22 +68,22 @@ class AffectedTest extends \lithium\test\Unit {
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
-		$expected = array(
+		$expected = [
 			'lithium\tests\cases\g11n\CatalogTest',
 			'lithium\tests\cases\g11n\MessageTest',
 			'lithium\tests\cases\console\command\g11n\ExtractTest'
-		);
-		$result = $tests->map('get_class', array('collect' => false));
+		];
+		$result = $tests->map('get_class', ['collect' => false]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testAnalyze() {
 		$ns = 'lithium\tests\cases';
 
-		$expected = array(
+		$expected = [
 			'lithium\g11n\Message' => "{$ns}\g11n\MessageTest",
 			'lithium\console\command\g11n\Extract' => "{$ns}\console\command\g11n\ExtractTest"
-		);
+		];
 
 		$group = new Group();
 		$group->add('lithium\tests\cases\g11n\CatalogTest');

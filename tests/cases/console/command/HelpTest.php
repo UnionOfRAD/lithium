@@ -9,18 +9,18 @@ class HelpTest extends \lithium\test\Unit {
 
 	public $request;
 
-	public $classes = array();
+	public $classes = [];
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	public function setUp() {
-		$this->classes = array('response' => 'lithium\tests\mocks\console\MockResponse');
+		$this->classes = ['response' => 'lithium\tests\mocks\console\MockResponse'];
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
-		$_SERVER['argv'] = array();
+		$_SERVER['argv'] = [];
 
-		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->request->params = array('library' => 'build_test');
+		$this->request = new Request(['input' => fopen('php://temp', 'w+')]);
+		$this->request->params = ['library' => 'build_test'];
 	}
 
 	public function tearDown() {
@@ -29,7 +29,7 @@ class HelpTest extends \lithium\test\Unit {
 	}
 
 	public function testRun() {
-		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
+		$command = new Help(['request' => $this->request, 'classes' => $this->classes]);
 		$this->assertTrue($command->run());
 
 		$expected = "COMMANDS via lithium\n";
@@ -44,9 +44,9 @@ class HelpTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithName() {
-		$command = new Help(array(
+		$command = new Help([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 
 		$result = $command->run('Test');
 		$this->assertTrue($result);
@@ -88,19 +88,19 @@ class HelpTest extends \lithium\test\Unit {
 	 * Tests that class and method help includes detailed descriptions as well as summary text.
 	 */
 	public function testDocsIncludeDescription() {
-		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
+		$command = new Help(['request' => $this->request, 'classes' => $this->classes]);
 
 		$this->assertNull($command->api('lithium.core.Libraries'));
 		$this->assertPattern('/Auto-loading classes/', $command->response->output);
 
-		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
+		$command = new Help(['request' => $this->request, 'classes' => $this->classes]);
 
 		$this->assertNull($command->api('lithium.core.Libraries::add'));
 		$this->assertPattern('/Adding libraries/', $command->response->output);
 	}
 
 	public function testApiClass() {
-		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
+		$command = new Help(['request' => $this->request, 'classes' => $this->classes]);
 		$result = $command->api('lithium.util.Inflector');
 		$this->assertNull($result);
 
@@ -111,7 +111,7 @@ class HelpTest extends \lithium\test\Unit {
 	}
 
 	public function testApiMethod() {
-		$command = new Help(array('request' => $this->request, 'classes' => $this->classes));
+		$command = new Help(['request' => $this->request, 'classes' => $this->classes]);
 		$result = $command->api('lithium.util.Inflector', 'method');
 		$this->assertNull($result);
 
@@ -122,9 +122,9 @@ class HelpTest extends \lithium\test\Unit {
 	}
 
 	public function testApiMethodWithName() {
-		$command = new Help(array(
+		$command = new Help([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$result = $command->api('lithium.util.Inflector', 'method', 'rules');
 		$this->assertNull($result);
 
@@ -135,9 +135,9 @@ class HelpTest extends \lithium\test\Unit {
 	}
 
 	public function testApiProperty() {
-		$command = new Help(array(
+		$command = new Help([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$result = $command->api('lithium.net.Message', 'property');
 		$this->assertNull($result);
 
@@ -148,9 +148,9 @@ class HelpTest extends \lithium\test\Unit {
 	}
 
 	public function testApiPropertyWithName() {
-		$command = new Help(array(
+		$command = new Help([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$result = $command->api('lithium.net.Message', 'property');
 		$this->assertNull($result);
 
@@ -161,9 +161,9 @@ class HelpTest extends \lithium\test\Unit {
 	}
 
 	public function testApiProperties() {
-		$help = new Help(array(
+		$help = new Help([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$expected = null;
 		$result = $help->api('lithium.tests.mocks.console.command.MockCommandHelp', 'property');
 		$this->assertEqual($expected, $result);

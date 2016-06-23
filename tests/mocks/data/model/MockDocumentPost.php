@@ -13,15 +13,15 @@ use lithium\data\collection\DocumentSet;
 
 class MockDocumentPost extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => false, 'initialized' => true, 'key' => '_id');
+	protected $_meta = ['connection' => false, 'initialized' => true, 'key' => '_id'];
 
 	public static function schema($field = null) {
 		$schema = parent::schema();
-		$schema->append(array(
-			'_id' => array('type' => 'id'),
-			'foo' => array('type' => 'object'),
-			'foo.bar' => array('type' => 'int')
-		));
+		$schema->append([
+			'_id' => ['type' => 'id'],
+			'foo' => ['type' => 'object'],
+			'foo.bar' => ['type' => 'int']
+		]);
 		return $schema;
 	}
 
@@ -39,24 +39,24 @@ class MockDocumentPost extends \lithium\data\Model {
 		return 'lithium';
 	}
 
-	public static function find($type = 'all', array $options = array()) {
+	public static function find($type = 'all', array $options = []) {
 		switch ($type) {
 			case 'first':
-				return new Document(array(
-					'data' => array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+				return new Document([
+					'data' => ['_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'],
 					'model' => __CLASS__
-				));
+				]);
 			break;
 			case 'all':
 			default:
-				return new DocumentSet(array(
-					'data' => array(
-						array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
-						array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
-						array('_id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
-					),
+				return new DocumentSet([
+					'data' => [
+						['_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'],
+						['_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'],
+						['_id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three']
+					],
 					'model' => __CLASS__
-				));
+				]);
 			break;
 		}
 	}

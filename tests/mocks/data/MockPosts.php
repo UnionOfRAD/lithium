@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\data;
 
 class MockPosts extends \lithium\data\Model {
 
-	public $hasMany = array('MockComments');
+	public $hasMany = ['MockComments'];
 
 }
 

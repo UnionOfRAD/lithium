@@ -19,10 +19,10 @@ use lithium\core\ConfigException;
  *
  * ```
  * <?php
- * return array(
+ * return [
  * 	'postalCode' => '\d+',
  * 	'phone' => '\d+\-\d+'
- * );
+ * ];
  * ?>
  * ```
  *
@@ -59,8 +59,8 @@ class Php extends \lithium\g11n\catalog\Adapter {
 	 *        - `'path'`: The path to the directory holding the data.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('path' => null);
+	public function __construct(array $config = []) {
+		$defaults = ['path' => null];
 		parent::__construct($config + $defaults);
 	}
 
@@ -89,7 +89,7 @@ class Php extends \lithium\g11n\catalog\Adapter {
 	public function read($category, $locale, $scope) {
 		$path = $this->_config['path'];
 		$file = $this->_file($category, $locale, $scope);
-		$data = array();
+		$data = [];
 
 		if (file_exists($file)) {
 			foreach (require $file as $id => $translated) {

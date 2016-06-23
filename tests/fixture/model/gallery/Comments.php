@@ -10,7 +10,7 @@ namespace lithium\tests\fixture\model\gallery;
 
 class Comments extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => 'test');
+	protected $_meta = ['connection' => 'test'];
 }
 
 ?>

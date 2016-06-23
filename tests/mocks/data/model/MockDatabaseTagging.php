@@ -10,15 +10,15 @@ namespace lithium\tests\mocks\data\model;
 
 class MockDatabaseTagging extends \lithium\data\Model {
 
-	public $belongsTo = array('MockDatabasePost', 'MockDatabaseTag');
+	public $belongsTo = ['MockDatabasePost', 'MockDatabaseTag'];
 
-	protected $_meta = array('connection' => false);
+	protected $_meta = ['connection' => false];
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'post_id' => array('type' => 'integer'),
-		'tag_id' => array('type' => 'integer')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer'],
+		'post_id' => ['type' => 'integer'],
+		'tag_id' => ['type' => 'integer']
+	];
 }
 
 ?>

@@ -16,7 +16,7 @@ class TestTest extends \lithium\test\Unit {
 
 	public $request;
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	protected $_testPath = null;
 
@@ -27,14 +27,14 @@ class TestTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		Libraries::cache(false);
-		$this->classes = array('response' => 'lithium\tests\mocks\console\MockResponse');
+		$this->classes = ['response' => 'lithium\tests\mocks\console\MockResponse'];
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
-		$_SERVER['argv'] = array();
+		$_SERVER['argv'] = [];
 
-		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
-		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->request->params = array('library' => 'create_test');
+		Libraries::add('create_test', ['path' => $this->_testPath . '/create_test']);
+		$this->request = new Request(['input' => fopen('php://temp', 'w+')]);
+		$this->request->params = ['library' => 'create_test'];
 	}
 
 	public function tearDown() {
@@ -44,13 +44,13 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testTestModel() {
-		$this->request->params += array(
+		$this->request->params += [
 			'command' => 'create', 'action' => 'test',
-			'args' => array('model', 'Posts')
-		);
-		$test = new Test(array(
+			'args' => ['model', 'Posts']
+		];
+		$test = new Test([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$test->path = $this->_testPath;
 		$test->run('test');
 		$expected = "PostsTest created in tests/cases/models/PostsTest.php.\n";
@@ -75,7 +75,7 @@ class PostsTest extends \\lithium\\test\\Unit {
 
 
 EOD;
-		$replace = array("<?php", "?>");
+		$replace = ["<?php", "?>"];
 		$result = str_replace($replace, '',
 			file_get_contents($this->_testPath . '/create_test/tests/cases/models/PostsTest.php')
 		);
@@ -98,10 +98,10 @@ class Post{$id}s {
 EOD;
 		file_put_contents("{$this->_testPath}/{$path}", $body);
 
-		$this->request->params += array('command' => 'create', 'action' => 'test', 'args' => array(
+		$this->request->params += ['command' => 'create', 'action' => 'test', 'args' => [
 			'model', "Post{$id}s"
-		));
-		$test = new Test(array('request' => $this->request, 'classes' => $this->classes));
+		]];
+		$test = new Test(['request' => $this->request, 'classes' => $this->classes]);
 		$test->path = $this->_testPath;
 		$test->run('test');
 		$expected = "Post{$id}sTest created in tests/cases/models/Post{$id}sTest.php.\n";
@@ -126,7 +126,7 @@ class Post{$id}sTest extends \\lithium\\test\\Unit {
 
 
 EOD;
-		$replace = array("<?php", "?>");
+		$replace = ["<?php", "?>"];
 		$path = "create_test/tests/cases/models/Post{$id}sTest.php";
 		$result = str_replace($replace, '', file_get_contents("{$this->_testPath}/{$path}"));
 		$this->assertEqual($expected, $result);

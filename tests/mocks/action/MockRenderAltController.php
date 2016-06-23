@@ -9,10 +9,10 @@
 namespace lithium\tests\mocks\action;
 
 class MockRenderAltController extends \lithium\action\Controller {
-	protected $_render = array(
-		'data' => array('foo' => 'bar'),
+	protected $_render = [
+		'data' => ['foo' => 'bar'],
 		'layout' => 'alternate'
-	);
+	];
 
 	public function access($var) {
 		return $this->{$var};

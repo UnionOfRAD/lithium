@@ -45,20 +45,20 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *
 	 * @var array
 	 */
-	protected $_columns = array(
-		'id' => array('use' => 'integer', 'increment' => true),
-		'string' => array('use' => 'varchar', 'length' => 255),
-		'text' => array('use' => 'text'),
-		'integer' => array('use' => 'integer', 'formatter' => 'intval'),
-		'float' => array('use' => 'real', 'formatter' => 'floatval'),
-		'datetime' => array('use' => 'timestamp', 'format' => 'Y-m-d H:i:s'),
-		'timestamp' => array('use' => 'timestamp', 'format' => 'Y-m-d H:i:s'),
-		'time' => array('use' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
-		'date' => array('use' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
-		'binary' => array('use' => 'bytea'),
-		'boolean' => array('use' => 'boolean'),
-		'inet' => array('use' => 'inet')
-	);
+	protected $_columns = [
+		'id' => ['use' => 'integer', 'increment' => true],
+		'string' => ['use' => 'varchar', 'length' => 255],
+		'text' => ['use' => 'text'],
+		'integer' => ['use' => 'integer', 'formatter' => 'intval'],
+		'float' => ['use' => 'real', 'formatter' => 'floatval'],
+		'datetime' => ['use' => 'timestamp', 'format' => 'Y-m-d H:i:s'],
+		'timestamp' => ['use' => 'timestamp', 'format' => 'Y-m-d H:i:s'],
+		'time' => ['use' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'],
+		'date' => ['use' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'],
+		'binary' => ['use' => 'bytea'],
+		'boolean' => ['use' => 'boolean'],
+		'inet' => ['use' => 'inet']
+	];
 
 	/**
 	 * Column/table metas
@@ -66,34 +66,34 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *
 	 * @var array
 	 */
-	protected $_metas = array(
-		'table' => array(
-			'tablespace' => array('keyword' => 'TABLESPACE')
-		)
-	);
+	protected $_metas = [
+		'table' => [
+			'tablespace' => ['keyword' => 'TABLESPACE']
+		]
+	];
 
 	/**
 	 * Column contraints
 	 *
 	 * @var array
 	 */
-	protected $_constraints = array(
-		'primary' => array('template' => 'PRIMARY KEY ({:column})'),
-		'foreign_key' => array(
+	protected $_constraints = [
+		'primary' => ['template' => 'PRIMARY KEY ({:column})'],
+		'foreign_key' => [
 			'template' => 'FOREIGN KEY ({:column}) REFERENCES {:to} ({:toColumn}) {:on}'
-		),
-		'unique' => array(
+		],
+		'unique' => [
 			'template' => 'UNIQUE {:index} ({:column})'
-		),
-		'check' => array('template' => 'CHECK ({:expr})')
-	);
+		],
+		'check' => ['template' => 'CHECK ({:expr})']
+	];
 
 	/**
 	 * Pair of opening and closing quote characters used for quoting identifiers in queries.
 	 *
 	 * @var array
 	 */
-	protected $_quotes = array('"', '"');
+	protected $_quotes = ['"', '"'];
 
 	/**
 	 * Check for required PHP extension, or supported database feature.
@@ -107,14 +107,14 @@ class PostgreSql extends \lithium\data\source\Database {
 		if (!$feature) {
 			return extension_loaded('pdo_pgsql');
 		}
-		$features = array(
+		$features = [
 			'arrays' => false,
 			'transactions' => true,
 			'booleans' => true,
 			'schema' => true,
 			'relationships' => true,
 			'sources' => true
-		);
+		];
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
 
@@ -136,12 +136,12 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *        - `'timezone'` _string_: The timezone to use. Defaults to `'null'`
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT,
 			'schema' => 'public',
 			'timezone' => null
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -161,10 +161,10 @@ class PostgreSql extends \lithium\data\source\Database {
 				$this->_config['database']
 			);
 		} else {
-			$host = HostString::parse($this->_config['host']) + array(
+			$host = HostString::parse($this->_config['host']) + [
 				'host' => static::DEFAULT_HOST,
 				'port' => static::DEFAULT_PORT
-			);
+			];
 			$this->_config['dsn'] = sprintf(
 				'pgsql:host=%s;port=%s;dbname=%s',
 				$host['host'],
@@ -215,7 +215,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			if (!$result = $this->_execute($sql)) {
 				return null;
 			}
-			$sources = array();
+			$sources = [];
 
 			foreach ($result as $row) {
 				$sources[] = $row[0];
@@ -238,7 +238,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter
 	 */
-	public function describe($entity, $fields = array(), array $meta = array()) {
+	public function describe($entity, $fields = [], array $meta = []) {
 		$schema = $this->_config['schema'];
 		$params = compact('entity', 'meta', 'fields', 'schema');
 
@@ -258,7 +258,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			$sql .= ' AND table_schema = ' . $schema . ' ORDER BY "ordinal_position"';
 
 			$columns = $this->connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-			$fields = array();
+			$fields = [];
 
 			foreach ($columns as $column) {
 				$schema = $this->_column($column['type']);
@@ -273,10 +273,10 @@ class PostgreSql extends \lithium\data\source\Database {
 				} else {
 					$default = null;
 				}
-				$fields[$column['field']] = $schema + array(
+				$fields[$column['field']] = $schema + [
 					'null'     => ($column['null'] === 'YES' ? true : false),
 					'default'  => $default
-				);
+				];
 				if ($fields[$column['field']]['type'] === 'string') {
 					$fields[$column['field']]['length'] = $column['char_length'];
 				}
@@ -354,7 +354,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @param array $schema Formatted array from `lithium\data\source\Database::schema()`
 	 * @return mixed Value with converted type.
 	 */
-	public function value($value, array $schema = array()) {
+	public function value($value, array $schema = []) {
 		if (($result = parent::value($value, $schema)) !== null) {
 			return $result;
 		}
@@ -368,7 +368,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 */
 	public function error() {
 		if ($error = $this->connection->errorInfo()) {
-			return array($error[1], $error[2]);
+			return [$error[1], $error[2]];
 		}
 		return null;
 	}
@@ -388,7 +388,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @param array $options
 	 * @return string
 	 */
-	public function conditions($conditions, $context, array $options = array()) {
+	public function conditions($conditions, $context, array $options = []) {
 		return parent::conditions($conditions, $context, $options);
 	}
 
@@ -401,7 +401,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return \lithium\data\source\Result Returns a result object if the query was successful.
 	 * @filter
 	 */
-	protected function _execute($sql, array $options = array()) {
+	protected function _execute($sql, array $options = []) {
 		$params = compact('sql', 'options');
 
 		return Filters::run($this, __FUNCTION__, $params, function($params) {
@@ -444,23 +444,23 @@ class PostgreSql extends \lithium\data\source\Database {
 		if (!preg_match('/(?P<type>\w+)(?:\((?P<length>[\d,]+)\))?/', $real, $column)) {
 			return $real;
 		}
-		$column = array_intersect_key($column, array('type' => null, 'length' => null));
+		$column = array_intersect_key($column, ['type' => null, 'length' => null]);
 
 		if (isset($column['length']) && $column['length']) {
-			$length = explode(',', $column['length']) + array(null, null);
+			$length = explode(',', $column['length']) + [null, null];
 			$column['length'] = $length[0] ? (integer) $length[0] : null;
 			$length[1] ? $column['precision'] = (integer) $length[1] : null;
 		}
 
 		switch (true) {
-			case in_array($column['type'], array('date', 'time', 'datetime')):
+			case in_array($column['type'], ['date', 'time', 'datetime']):
 				return $column;
 			case ($column['type'] === 'timestamp'):
 				$column['type'] = 'datetime';
 			break;
 			case ($column['type'] === 'tinyint' && $column['length'] == '1'):
 			case ($column['type'] === 'boolean'):
-				return array('type' => 'boolean');
+				return ['type' => 'boolean'];
 			break;
 			case (strpos($column['type'], 'int') !== false):
 				$column['type'] = 'integer';
@@ -501,11 +501,11 @@ class PostgreSql extends \lithium\data\source\Database {
 			return $this->connection->quote($value);
 		};
 
-		return compact('datetime', 'timestamp') + array(
+		return compact('datetime', 'timestamp') + [
 			'boolean' => function($value) {
 				return $this->connection->quote($value ? 't' : 'f');
 			}
-		) + parent::_formatters();
+		] + parent::_formatters();
 	}
 
 	/**
@@ -556,10 +556,10 @@ class PostgreSql extends \lithium\data\source\Database {
 	protected function _distinctExport($query) {
 		$model = $query->model();
 		$orders = $query->order();
-		$result = array(
-			'fields' => array(),
-			'orders' => array(),
-		);
+		$result = [
+			'fields' => [],
+			'orders' => [],
+		];
 
 		if (is_string($orders)) {
 			$direction = 'ASC';
@@ -567,7 +567,7 @@ class PostgreSql extends \lithium\data\source\Database {
 				$orders = $match[1];
 				$direction = $match[2];
 			}
-			$orders = array($orders => $direction);
+			$orders = [$orders => $direction];
 		}
 
 		if (!is_array($orders)) {
@@ -621,26 +621,26 @@ class PostgreSql extends \lithium\data\source\Database {
 				list($fields, $orders) = $this->_distinctExport($query);
 				array_unshift($fields, "DISTINCT ON($pk) $pk AS _ID_");
 
-				$command = $this->renderCommand('read', array(
+				$command = $this->renderCommand('read', [
 					'limit' => null, 'order' => null,
 					'fields' => implode(', ', $fields)
-				) + $data);
+				] + $data);
 				$command = rtrim($command, ';');
 
-				$command = $this->renderCommand('read', array(
+				$command = $this->renderCommand('read', [
 					'source' => "( $command ) AS _TEMP_",
 					'fields' => '_ID_',
 					'order' => "ORDER BY " . implode(', ', $orders),
 					'limit' => $data['limit'],
-				));
+				]);
 			} else {
-				$command = $this->renderCommand('read', array(
+				$command = $this->renderCommand('read', [
 					'fields' => "DISTINCT({$pk}) AS _ID_"
-				) + $data);
+				] + $data);
 			}
 
 			$result = $this->_execute($command);
-			$ids = array();
+			$ids = [];
 
 			foreach ($result as $row) {
 				$ids[] = $row[0];
@@ -650,7 +650,7 @@ class PostgreSql extends \lithium\data\source\Database {
 				break;
 			}
 
-			$conditions = array();
+			$conditions = [];
 			$relations = array_keys($query->relationships());
 			$pattern = '/^(' . implode('|', $relations) . ')\./';
 			foreach ($query->conditions() as $key => $value) {
@@ -659,7 +659,7 @@ class PostgreSql extends \lithium\data\source\Database {
 				}
 			}
 			$data['conditions'] = $this->conditions(
-				array($pk => $ids) + $conditions, $query
+				[$pk => $ids] + $conditions, $query
 			);
 
 			$data['limit'] = '';

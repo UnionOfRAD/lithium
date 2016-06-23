@@ -26,11 +26,11 @@ use lithium\template\TemplateException;
  * Example usage, for built-in HTML format:
  *
  * ```
- * $report = new Report(array(
+ * $report = new Report([
  *     'title' => 'Test Report Title',
- *     'group' => new Group(array('data' => array('lithium\tests\cases\net\http\MediaTest'))),
+ *     'group' => new Group(['data' => ['lithium\tests\cases\net\http\MediaTest']]),
  *     'format' => 'html'
- * ));
+ * ]);
  *
  * $report->run();
  *
@@ -45,11 +45,11 @@ use lithium\template\TemplateException;
  * For example, say you wish to calculate the cyclomatic complexity of the classes you are testing:
  *
  * ```
- * $report = new Report(array(
+ * $report = new Report([
  *     'title' => 'Test Report Title',
- *     'group' => new Group(array('data' => array('lithium\tests\cases\net\http\MediaTest'))),
- *     'filters' => array('Complexity')
- * ));
+ *     'group' => new Group(['data' => ['lithium\tests\cases\net\http\MediaTest']]),
+ *     'filters' => ['Complexity']
+ * ]);
  *
  * $report->run();
  *
@@ -84,14 +84,14 @@ class Report extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	public $results = array('group' => array(), 'filters' => array());
+	public $results = ['group' => [], 'filters' => []];
 
 	/**
 	 * Start and end timers.
 	 *
 	 * @var array
 	 */
-	public $timer = array('start' => null, 'end' => null);
+	public $timer = ['start' => null, 'end' => null];
 
 	/**
 	 * An array key on fully-namespaced class names of the filter with options to be
@@ -99,7 +99,7 @@ class Report extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_filters = array();
+	protected $_filters = [];
 
 	/**
 	 * Constructor.
@@ -111,14 +111,14 @@ class Report extends \lithium\core\Object {
 	 *        - `'reporter'`: The reporter to use.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'title' => null,
 			'group' => null,
-			'filters' => array(),
+			'filters' => [],
 			'format' => 'txt',
 			'reporter' => null
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -141,12 +141,12 @@ class Report extends \lithium\core\Object {
 		$tests = $this->group->tests();
 
 		foreach ($this->filters() as $filter => $options) {
-			$this->results['filters'][$filter] = array();
+			$this->results['filters'][$filter] = [];
 			$tests = $filter::apply($this, $tests, $options['apply']) ?: $tests;
 		}
-		$this->results['group'] = $tests->run(array(
+		$this->results['group'] = $tests->run([
 			'reporter' => $this->_config['reporter']
-		));
+		]);
 
 		foreach ($this->filters() as $filter => $options) {
 			$this->results['filters'][$filter] = $filter::analyze($this, $options['analyze']);
@@ -172,35 +172,35 @@ class Report extends \lithium\core\Object {
 	 */
 	public function stats() {
 		$results = (array) $this->results['group'];
-		$defaults = array(
+		$defaults = [
 			'asserts' => 0,
-			'passes' => array(),
-			'fails' => array(),
-			'exceptions' => array(),
-			'errors' => array(),
-			'skips' => array()
-		);
+			'passes' => [],
+			'fails' => [],
+			'exceptions' => [],
+			'errors' => [],
+			'skips' => []
+		];
 		$stats = array_reduce($results, function($stats, $result) use ($defaults) {
 			$stats = (array) $stats + $defaults;
-			$result = empty($result[0]) ? array($result) : $result;
+			$result = empty($result[0]) ? [$result] : $result;
 			foreach ($result as $response) {
 				if (empty($response['result'])) {
 					continue;
 				}
 				$result = $response['result'];
 
-				if (in_array($result, array('fail', 'exception'))) {
+				if (in_array($result, ['fail', 'exception'])) {
 					$response = array_merge(
-						array('class' => 'unknown', 'method' => 'unknown'), $response
+						['class' => 'unknown', 'method' => 'unknown'], $response
 					);
 					$stats['errors'][] = $response;
 				}
 				unset($response['file'], $response['result']);
 
-				if (in_array($result, array('pass', 'fail'))) {
+				if (in_array($result, ['pass', 'fail'])) {
 					$stats['asserts']++;
 				}
-				if (in_array($result, array('pass', 'fail', 'exception', 'skip'))) {
+				if (in_array($result, ['pass', 'fail', 'exception', 'skip'])) {
 					$stats[Inflector::pluralize($result)][] = $response;
 				}
 			}
@@ -222,15 +222,15 @@ class Report extends \lithium\core\Object {
 	 * @return string
 	 * @filter
 	 */
-	public function render($template, $data = array()) {
+	public function render($template, $data = []) {
 		$config = $this->_config;
 
 		if ($template === 'stats' && !$data) {
 			$data = $this->stats();
 		}
-		$template = Libraries::locate('test.templates', $template, array(
+		$template = Libraries::locate('test.templates', $template, [
 			'filter' => false, 'type' => 'file', 'suffix' => ".{$config['format']}.php"
-		));
+		]);
 
 		if ($template === null) {
 			$message = "Templates for format `{$config['format']}` not found in `test/templates`.";
@@ -246,19 +246,19 @@ class Report extends \lithium\core\Object {
 		});
 	}
 
-	public function filters(array $filters = array()) {
+	public function filters(array $filters = []) {
 		if ($this->_filters && !$filters) {
 			return $this->_filters;
 		}
 		$filters += (array) $this->_config['filters'];
-		$results = array();
+		$results = [];
 
 		foreach ($filters as $filter => $options) {
 			if (!$class = Libraries::locate('test.filter', $filter)) {
 				throw new ClassNotFoundException("`{$class}` is not a valid test filter.");
 			}
 			$options['name'] = strtolower(join('', array_slice(explode("\\", $class), -1)));
-			$results[$class] = $options + array('apply' => array(), 'analyze' => array());
+			$results[$class] = $options + ['apply' => [], 'analyze' => []];
 		}
 		return $this->_filters = $results;
 	}

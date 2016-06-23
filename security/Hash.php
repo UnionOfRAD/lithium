@@ -26,12 +26,12 @@ class Hash {
 	 * Hash::calculate('foo'));
 	 *
 	 * // It is possible to hash non-scalar data, too.
-	 * Hash::calculate(array('foo' => 'bar'));        // serializes before hashing
+	 * Hash::calculate(['foo' => 'bar']);        // serializes before hashing
 	 * Hash::calculate(new Foo());                    // -- " --
 	 * Hash::calculate(function() { return 'bar'; }); // uses `spl_object_hash()`
 	 *
 	 * // Also allows for quick - non secure - hashing of arbitrary data.
-	 * Hash::calculate(array('foo' => 'bar'), array('type' => 'crc32b'));
+	 * Hash::calculate(['foo' => 'bar'], ['type' => 'crc32b']);
 	 * ```
 	 *
 	 * @link http://php.net/hash
@@ -50,16 +50,16 @@ class Hash {
 	 *          Defaults to `false`.
 	 * @return string Returns a hash calculated over given data.
 	 */
-	public static function calculate($data, array $options = array()) {
+	public static function calculate($data, array $options = []) {
 		if (!is_scalar($data)) {
 			$data = ($data instanceof Closure) ? spl_object_hash($data) : serialize($data);
 		}
-		$defaults = array(
+		$defaults = [
 			'type' => 'sha512',
 			'salt' => false,
 			'key' => false,
 			'raw' => false
-		);
+		];
 		$options += $defaults;
 
 		if ($options['salt']) {

@@ -29,10 +29,10 @@ class Cookie extends \lithium\core\Object {
 	 *      `setcookie()` method. The only difference is that the `expire` value is a
 	 *      strtotime-compatible string instead of an epochal timestamp.
 	 */
-	protected $_defaults = array(
+	protected $_defaults = [
 		'expire' => '+2 days', 'path' => '/',
 		'domain' => '', 'secure' => false, 'httponly' => false
-	);
+	];
 
 	/**
 	 * Constructor.
@@ -42,7 +42,7 @@ class Cookie extends \lithium\core\Object {
 	 * @param array $config Optional configuration parameters.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		if (empty($config['name'])) {
 			$config['name'] = basename(Libraries::get(true, 'path')) . 'cookie';
 		}
@@ -97,14 +97,14 @@ class Cookie extends \lithium\core\Object {
 	 * @param array $options Options array. Not used in this adapter.
 	 * @return \Closure Function returning data in the session if successful, `null` otherwise.
 	 */
-	public function read($key = null, array $options = array()) {
+	public function read($key = null, array $options = []) {
 		return function($params) {
 			$key = $params['key'];
 			if (!$key) {
 				if (isset($_COOKIE[$this->_config['name']])) {
 					return $_COOKIE[$this->_config['name']];
 				}
-				return array();
+				return [];
 			}
 			if (strpos($key, '.') !== false) {
 				$key = explode('.', $key);
@@ -112,7 +112,7 @@ class Cookie extends \lithium\core\Object {
 				if (isset($_COOKIE[$this->_config['name']])) {
 					$result = $_COOKIE[$this->_config['name']];
 				} else {
-					$result = array();
+					$result = [];
 				}
 
 				foreach ($key as $k) {
@@ -137,7 +137,7 @@ class Cookie extends \lithium\core\Object {
 	 * @param array $options Options array.
 	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($key, $value = null, array $options = array()) {
+	public function write($key, $value = null, array $options = []) {
 		$expire = (!isset($options['expire']) && empty($this->_config['expire']));
 		$cookieClass = __CLASS__;
 
@@ -149,7 +149,7 @@ class Cookie extends \lithium\core\Object {
 		return function($params) use (&$expires, $cookieClass) {
 			$key = $params['key'];
 			$value = $params['value'];
-			$key = array($key => $value);
+			$key = [$key => $value];
 			if (is_array($value)) {
 				$key = Set::flatten($key);
 			}
@@ -179,7 +179,7 @@ class Cookie extends \lithium\core\Object {
 	 * @param array $options Options array.
 	 * @return \Closure Function returning boolean `true` on successful delete, `false` otherwise.
 	 */
-	public function delete($key, array $options = array()) {
+	public function delete($key, array $options = []) {
 		$cookieClass = get_called_class();
 
 		return function($params) use ($cookieClass) {
@@ -192,7 +192,7 @@ class Cookie extends \lithium\core\Object {
 					$name = $key . '.' . $name;
 				}
 			} else {
-				$cookies = array($key);
+				$cookies = [$key];
 			}
 			foreach ($cookies as &$name) {
 				$result = setcookie(
@@ -218,8 +218,8 @@ class Cookie extends \lithium\core\Object {
 	 * @param array $options Options array. Not used fro this adapter method.
 	 * @return boolean True on successful clear, false otherwise.
 	 */
-	public function clear(array $options = array()) {
-		$options += array('destroySession' => true);
+	public function clear(array $options = []) {
+		$options += ['destroySession' => true];
 		$cookieClass = get_called_class();
 
 		return function($params) use ($options, $cookieClass) {

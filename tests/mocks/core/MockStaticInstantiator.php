@@ -10,9 +10,9 @@ namespace lithium\tests\mocks\core;
 
 class MockStaticInstantiator extends \lithium\core\StaticObject {
 
-	protected static $_classes = array('request' => 'lithium\tests\mocks\core\MockRequest');
+	protected static $_classes = ['request' => 'lithium\tests\mocks\core\MockRequest'];
 
-	public static function instance($name, array $config = array()) {
+	public static function instance($name, array $config = []) {
 		return static::_instance($name, $config);
 	}
 

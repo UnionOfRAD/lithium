@@ -39,28 +39,28 @@ class Request extends \lithium\net\http\Request {
 	 *
 	 * @var array
 	 */
-	public $params = array();
+	public $params = [];
 
 	/**
 	 * Route parameters that should persist when generating URLs in this request context.
 	 *
 	 * @var array
 	 */
-	public $persist = array();
+	public $persist = [];
 
 	/**
 	 * Data found in the HTTP request body, most often populated by `$_POST` and `$_FILES`.
 	 *
 	 * @var array
 	 */
-	public $data = array();
+	public $data = [];
 
 	/**
 	 * Key/value pairs found encoded in the request URL after '?', populated by `$_GET`.
 	 *
 	 * @var array
 	 */
-	public $query = array();
+	public $query = [];
 
 	/**
 	 * Base path.
@@ -75,14 +75,14 @@ class Request extends \lithium\net\http\Request {
 	 * @var array
 	 * @see lithium\action\Request::env()
 	 */
-	protected $_computed = array();
+	protected $_computed = [];
 
 	/**
 	 * Holds the server globals & environment variables.
 	 *
 	 * @var array
 	 */
-	protected $_env = array();
+	protected $_env = [];
 
 	/**
 	 * If POST, PUT or PATCH data is coming from an input stream (rather than `$_POST`),
@@ -104,28 +104,28 @@ class Request extends \lithium\net\http\Request {
 	 * @see lithium\action\Request::detect()
 	 * @var array
 	 */
-	protected $_detectors = array(
-		'mobile'  => array('HTTP_USER_AGENT', null),
-		'ajax'    => array('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest'),
-		'flash'   => array('HTTP_USER_AGENT', 'Shockwave Flash'),
+	protected $_detectors = [
+		'mobile'  => ['HTTP_USER_AGENT', null],
+		'ajax'    => ['HTTP_X_REQUESTED_WITH', 'XMLHttpRequest'],
+		'flash'   => ['HTTP_USER_AGENT', 'Shockwave Flash'],
 		'ssl'     => 'HTTPS',
-		'get'     => array('REQUEST_METHOD', 'GET'),
-		'post'    => array('REQUEST_METHOD', 'POST'),
-		'patch'   => array('REQUEST_METHOD', 'PATCH'),
-		'put'     => array('REQUEST_METHOD', 'PUT'),
-		'delete'  => array('REQUEST_METHOD', 'DELETE'),
-		'head'    => array('REQUEST_METHOD', 'HEAD'),
-		'options' => array('REQUEST_METHOD', 'OPTIONS')
-	);
+		'get'     => ['REQUEST_METHOD', 'GET'],
+		'post'    => ['REQUEST_METHOD', 'POST'],
+		'patch'   => ['REQUEST_METHOD', 'PATCH'],
+		'put'     => ['REQUEST_METHOD', 'PUT'],
+		'delete'  => ['REQUEST_METHOD', 'DELETE'],
+		'head'    => ['REQUEST_METHOD', 'HEAD'],
+		'options' => ['REQUEST_METHOD', 'OPTIONS']
+	];
 
 	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array(
+	protected $_autoConfig = [
 		'classes' => 'merge', 'detectors' => 'merge', 'type', 'stream'
-	);
+	];
 
 	/**
 	 * Contains an array of content-types, sorted by quality (the priority which the browser
@@ -133,7 +133,7 @@ class Request extends \lithium\net\http\Request {
 	 *
 	 * @var array
 	 */
-	protected $_accept = array();
+	protected $_accept = [];
 
 	/**
 	 * Holds the value of the current locale, set through the `locale()` method.
@@ -169,18 +169,18 @@ class Request extends \lithium\net\http\Request {
 	 *          of stream data.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'base' => null,
 			'url' => null,
-			'env' => array(),
-			'data' => array(),
+			'env' => [],
+			'data' => [],
 			'stream' => null,
 			'globals' => true,
 			'drain' => true,
-			'query' => array(),
-			'headers' => array()
-		);
+			'query' => [],
+			'headers' => []
+		];
 		$config += $defaults;
 
 		if ($config['globals']) {
@@ -218,16 +218,16 @@ class Request extends \lithium\net\http\Request {
 		$this->_base = $this->_base($config['base']);
 		$this->url = $this->_url($config['url']);
 
-		$config['headers'] += array(
+		$config['headers'] += [
 			'Content-Type' => $this->env('CONTENT_TYPE'),
 			'Content-Length' => $this->env('CONTENT_LENGTH')
-		);
+		];
 
 		foreach ($this->_env as $name => $value) {
 			if ($name[0] === 'H' && strpos($name, 'HTTP_') === 0) {
 				$name = str_replace('_', ' ', substr($name, 5));
 				$name = str_replace(' ', '-', ucwords(strtolower($name)));
-				$config['headers'] += array($name => $value);
+				$config['headers'] += [$name => $value];
 			}
 		}
 
@@ -246,11 +246,11 @@ class Request extends \lithium\net\http\Request {
 	protected function _init() {
 		parent::_init();
 
-		$mobile = array(
+		$mobile = [
 			'iPhone', 'MIDP', 'AvantGo', 'BlackBerry', 'J2ME', 'Opera Mini', 'DoCoMo', 'NetFront',
 			'Nokia', 'PalmOS', 'PalmSource', 'portalmmm', 'Plucker', 'ReqwirelessWeb', 'iPod',
 			'SonyEricsson', 'Symbian', 'UP\.Browser', 'Windows CE', 'Xiino', 'Android'
-		);
+		];
 		if (!empty($this->_config['detectors']['mobile'][1])) {
 			$mobile = array_merge($mobile, (array) $this->_config['detectors']['mobile'][1]);
 		}
@@ -264,7 +264,7 @@ class Request extends \lithium\net\http\Request {
 		}
 		$type = $this->type($this->_config['type'] ?: $this->env('CONTENT_TYPE'));
 		$this->method = strtoupper($this->env('REQUEST_METHOD'));
-		$hasBody = in_array($this->method, array('POST', 'PUT', 'PATCH'));
+		$hasBody = in_array($this->method, ['POST', 'PUT', 'PATCH']);
 
 		if ($this->_config['drain'] && !$this->body && $hasBody && $type !== 'html') {
 			$this->_stream = $this->_stream ?: fopen('php://input', 'r');
@@ -272,7 +272,7 @@ class Request extends \lithium\net\http\Request {
 			fclose($this->_stream);
 		}
 		if (!$this->data && $this->body) {
-			$this->data = $this->body(null, array('decode' => true, 'encode' => false));
+			$this->data = $this->body(null, ['decode' => true, 'encode' => false]);
 		}
 		$this->body = $this->data;
 
@@ -355,15 +355,15 @@ class Request extends \lithium\net\http\Request {
 				$val = 'text/html';
 			break;
 			case 'PLATFORM':
-				$envs = array('isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI');
+				$envs = ['isapi' => 'IIS', 'cgi' => 'CGI', 'cgi-fcgi' => 'CGI'];
 				$val = isset($envs[PHP_SAPI]) ? $envs[PHP_SAPI] : null;
 			break;
 			case 'REMOTE_ADDR':
-				$https = array(
+				$https = [
 					'HTTP_X_FORWARDED_FOR',
 					'HTTP_PC_REMOTE_ADDR',
 					'HTTP_X_REAL_IP'
-				);
+				];
 				foreach ($https as $altKey) {
 					if ($addr = $this->env($altKey)) {
 						list($val) = explode(', ', $addr);
@@ -488,11 +488,11 @@ class Request extends \lithium\net\http\Request {
 	 */
 	protected function _parseAccept() {
 		$accept = $this->env('HTTP_ACCEPT');
-		$accept = (preg_match('/[a-z,-]/i', $accept)) ? explode(',', $accept) : array('text/html');
+		$accept = (preg_match('/[a-z,-]/i', $accept)) ? explode(',', $accept) : ['text/html'];
 
 		foreach (array_reverse($accept) as $i => $type) {
 			unset($accept[$i]);
-			list($type, $q) = (explode(';q=', $type, 2) + array($type, 1.0 + $i / 100));
+			list($type, $q) = (explode(';q=', $type, 2) + [$type, 1.0 + $i / 100]);
 			$accept[$type] = ($type === '*/*') ? 0.1 : floatval($q);
 		}
 		arsort($accept, SORT_NUMERIC);
@@ -505,7 +505,7 @@ class Request extends \lithium\net\http\Request {
 		if (isset($this->params['type']) && ($handler = $media::type($this->params['type']))) {
 			if (isset($handler['content'])) {
 				$type = (array) $handler['content'];
-				$accept = array(current($type) => 1) + $accept;
+				$accept = [current($type) => 1] + $accept;
 			}
 		}
 		return array_keys($accept);
@@ -543,7 +543,7 @@ class Request extends \lithium\net\http\Request {
 		list($var, $key) = explode(':', $key);
 
 		switch (true) {
-			case in_array($var, array('params', 'data', 'query')):
+			case in_array($var, ['params', 'data', 'query']):
 				return isset($this->{$var}[$key]) ? $this->{$var}[$key] : null;
 			case ($var === 'env'):
 				return $this->env(strtoupper($key));
@@ -607,7 +607,7 @@ class Request extends \lithium\net\http\Request {
 		if (!is_array($detector)) {
 			return (boolean) $this->env($detector);
 		}
-		list($key, $check) = $detector + array('', '');
+		list($key, $check) = $detector + ['', ''];
 
 		if (is_array($check)) {
 			$check = '/' . join('|', $check) . '/i';
@@ -679,7 +679,7 @@ class Request extends \lithium\net\http\Request {
 			if (!$local) {
 				return $ref;
 			}
-			$url = parse_url($ref) + array('path' => '');
+			$url = parse_url($ref) + ['path' => ''];
 			if (empty($url['host']) || $url['host'] === $this->env('HTTP_HOST')) {
 				$ref = $url['path'];
 				if (!empty($url['query'])) {
@@ -703,10 +703,10 @@ class Request extends \lithium\net\http\Request {
 	 * @param array $options Override options.
 	 * @return mixed The return value type depends on `$format`.
 	 */
-	public function to($format, array $options = array()) {
-		$defaults = array(
+	public function to($format, array $options = []) {
+		$defaults = [
 			'path' => $this->env('base') . '/' . $this->url
-		);
+		];
 		return parent::to($format, $options + $defaults);
 	}
 
@@ -740,7 +740,7 @@ class Request extends \lithium\net\http\Request {
 		if ($base === null) {
 			$base = preg_replace('/[^\/]+$/', '', $this->env('PHP_SELF'));
 		}
-		$base = trim(str_replace(array("/app/webroot", '/webroot'), '', $base), '/');
+		$base = trim(str_replace(["/app/webroot", '/webroot'], '', $base), '/');
 		return $base ? '/' . $base : '';
 	}
 
@@ -768,7 +768,7 @@ class Request extends \lithium\net\http\Request {
 	 * @return array Normalized data.
 	 */
 	protected function _parseFiles($data) {
-		$result = array();
+		$result = [];
 
 		$normalize = function($key, $value) use ($result, &$normalize){
 			foreach ($value as $param => $content) {

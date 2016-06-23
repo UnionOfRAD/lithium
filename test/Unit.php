@@ -50,14 +50,14 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * @var string
 	 */
-	protected $_results = array();
+	protected $_results = [];
 
 	/**
 	 * Internal types and how to test for them
 	 *
 	 * @var array
 	 */
-	protected static $_internalTypes = array(
+	protected static $_internalTypes = [
 		'array' => 'is_array',
 		'bool' => 'is_bool',
 		'boolean' => 'is_bool',
@@ -74,7 +74,7 @@ class Unit extends \lithium\core\Object {
 		'resource' => 'is_resource',
 		'scalar' => 'is_scalar',
 		'string' => 'is_string'
-	);
+	];
 
 	/**
 	 * Finds the test case for the corresponding class name.
@@ -113,7 +113,7 @@ class Unit extends \lithium\core\Object {
 	 * For example:
 	 * ```
 	 * public function skip() {
-	 *     $connection = Connections::get('test', array('config' => true));
+	 *     $connection = Connections::get('test', ['config' => true]);
 	 *     $this->skipIf(!$connection, 'Test database is unavailable.');
 	 * }
 	 * ```
@@ -188,8 +188,8 @@ class Unit extends \lithium\core\Object {
 	 *             - `'handler'`: A closure which gets registered as the temporary error handler.
 	 * @return array
 	 */
-	public function run(array $options = array()) {
-		$defaults = array(
+	public function run(array $options = []) {
+		$defaults = [
 			'methods' => $this->methods(),
 			'reporter' => $this->_reporter,
 			'handler' => function($code, $message, $file = null, $line = null) {
@@ -197,9 +197,9 @@ class Unit extends \lithium\core\Object {
 					throw new ErrorException($message, 0, $code, $file, $line);
 				}
 			}
-		);
+		];
 		$options += $defaults;
-		$this->_results = array();
+		$this->_results = [];
 		$this->_reporter = $options['reporter'];
 
 		try {
@@ -229,7 +229,7 @@ class Unit extends \lithium\core\Object {
 	 * @param array $data
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
-	public function assert($expression, $message = false, $data = array()) {
+	public function assert($expression, $message = false, $data = []) {
 		if (!is_string($message)) {
 			$message = '{:message}';
 		}
@@ -238,9 +238,9 @@ class Unit extends \lithium\core\Object {
 			$params['message'] = $this->_message($params);
 			$message = Text::insert($message, $params);
 		}
-		$trace = Debugger::trace(array(
+		$trace = Debugger::trace([
 			'start' => 1, 'depth' => 4, 'format' => 'array', 'closures' => !$expression
-		));
+		]);
 		$methods = $this->methods();
 		$i = 1;
 
@@ -253,11 +253,11 @@ class Unit extends \lithium\core\Object {
 		$class = isset($trace[$i - 1]['object']) ? get_class($trace[$i - 1]['object']) : null;
 		$method = isset($trace[$i]) ? $trace[$i]['function'] : $trace[$i - 1]['function'];
 
-		$result = compact('class', 'method', 'message', 'data') + array(
+		$result = compact('class', 'method', 'message', 'data') + [
 			'file'      => $trace[$i - 1]['file'],
 			'line'      => $trace[$i - 1]['line'],
 			'assertion' => $trace[$i - 1]['function']
-		);
+		];
 		$this->_result($expression ? 'pass' : 'fail', $result);
 		return $expression;
 	}
@@ -395,10 +395,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNotNull($actual, $message = '{:message}') {
-		return $this->assert($actual !== null, $message, array(
+		return $this->assert($actual !== null, $message, [
 			'expected' => null,
 			'actual' => gettype($actual)
-		));
+		]);
 	}
 
 	/**
@@ -411,7 +411,7 @@ class Unit extends \lithium\core\Object {
 	 * $this->assertEmpty('0'); // succeeds
 	 * $this->assertEmpty(null); // succeeds
 	 * $this->assertEmpty(false); // succeeds
-	 * $this->assertEmpty(array()); // succeeds
+	 * $this->assertEmpty([]); // succeeds
 	 * $this->assertEmpty(1); // fails
 	 * ```
 	 *
@@ -422,10 +422,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertEmpty($actual, $message = '{:message}') {
-		return $this->assert(empty($actual), $message, array(
+		return $this->assert(empty($actual), $message, [
 			'expected' => $actual,
 			'result' => empty($actual)
-		));
+		]);
 	}
 
 	/**
@@ -433,7 +433,7 @@ class Unit extends \lithium\core\Object {
 	 *
 	 * ```
 	 * $this->assertNotEmpty(1); // succeeds
-	 * $this->assertNotEmpty(array()); // fails
+	 * $this->assertNotEmpty([]); // fails
 	 * ```
 	 *
 	 * @link http://php.net/empty
@@ -443,10 +443,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNotEmpty($actual, $message = '{:message}') {
-		return $this->assert(!empty($actual), $message, array(
+		return $this->assert(!empty($actual), $message, [
 			'expected' => $actual,
 			'result' => !empty($actual)
-		));
+		]);
 	}
 
 	/**
@@ -615,10 +615,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertStringEndsWith($expected, $actual, $message = '{:message}') {
-		return $this->assert(preg_match("/$expected$/", $actual, $matches) === 1, $message, array(
+		return $this->assert(preg_match("/$expected$/", $actual, $matches) === 1, $message, [
 			'expected' => $expected,
 			'result' => $actual
-		));
+		]);
 	}
 
 	/**
@@ -635,10 +635,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertStringStartsWith($expected, $actual, $message = '{:message}') {
-		return $this->assert(preg_match("/^$expected/", $actual, $matches) === 1, $message, array(
+		return $this->assert(preg_match("/^$expected/", $actual, $matches) === 1, $message, [
 			'expected' => $expected,
 			'result' => $actual
-		));
+		]);
 	}
 
 	/**
@@ -648,28 +648,28 @@ class Unit extends \lithium\core\Object {
 	 * Checks for an input tag with a name attribute (contains any non-empty value) and an id
 	 * attribute that contains 'my-input':
 	 * ```
-	 *     array('input' => array('name', 'id' => 'my-input'))
+	 *     ['input' => ['name', 'id' => 'my-input']]
 	 * ```
 	 *
 	 * Checks for two p elements with some text in them:
 	 * ```
-	 * array(
-	 *     array('p' => true),
+	 * [
+	 *     ['p' => true],
 	 *     'textA',
 	 *     '/p',
-	 *     array('p' => true),
+	 *     ['p' => true],
 	 *     'textB',
 	 *     '/p'
-	 * )
+	 * ]
 	 * ```
 	 *
 	 * You can also specify a pattern expression as part of the attribute values, or the tag
 	 * being defined, if you prepend the value with preg: and enclose it with slashes, like so:
 	 * ```
-	 * array(
-	 *     array('input' => array('name', 'id' => 'preg:/FieldName\d+/')),
+	 * [
+	 *     ['input' => ['name', 'id' => 'preg:/FieldName\d+/']],
 	 *     'preg:/My\s+field/'
-	 * )
+	 * ]
 	 * ```
 	 *
 	 * Important: This function is very forgiving about whitespace and also accepts any
@@ -681,12 +681,12 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertTags($string, $expected) {
-		$regex = array();
-		$normalized = array();
+		$regex = [];
+		$normalized = [];
 
 		foreach ((array) $expected as $key => $val) {
 			if (!is_numeric($key)) {
-				$normalized[] = array($key => $val);
+				$normalized[] = [$key => $val];
 			} else {
 				$normalized[] = $val;
 			}
@@ -696,23 +696,23 @@ class Unit extends \lithium\core\Object {
 		foreach ($normalized as $tags) {
 			$i++;
 			if (is_string($tags) && $tags[0] === '<') {
-				$tags = array(substr($tags, 1) => array());
+				$tags = [substr($tags, 1) => []];
 			} elseif (is_string($tags)) {
 				$tagsTrimmed = preg_replace('/\s+/m', '', $tags);
 
 				if (preg_match('/^\*?\//', $tags, $match) && $tagsTrimmed !== '//') {
-					$prefix = array(null, null);
+					$prefix = [null, null];
 
 					if ($match[0] === '*/') {
-						$prefix = array('Anything, ', '.*?');
+						$prefix = ['Anything, ', '.*?'];
 					}
-					$regex[] = array(
+					$regex[] = [
 						sprintf('%sClose %s tag', $prefix[0], substr($tags, strlen($match[0]))),
 						sprintf('%s<[\s]*\/[\s]*%s[\s]*>[\n\r]*', $prefix[1], substr(
 							$tags, strlen($match[0])
 						)),
 						$i
-					);
+					];
 					continue;
 				}
 
@@ -723,20 +723,20 @@ class Unit extends \lithium\core\Object {
 					$tags = preg_quote($tags, '/');
 					$type = 'Text equals';
 				}
-				$regex[] = array(sprintf('%s "%s"', $type, $tags), $tags, $i);
+				$regex[] = [sprintf('%s "%s"', $type, $tags), $tags, $i];
 				continue;
 			}
 			foreach ($tags as $tag => $attributes) {
-				$regex[] = array(
+				$regex[] = [
 					sprintf('Open %s tag', $tag),
 					sprintf('[\s]*<%s', preg_quote($tag, '/')),
 					$i
-				);
+				];
 				if ($attributes === true) {
-					$attributes = array();
+					$attributes = [];
 				}
-				$attrs = array();
-				$explanations = array();
+				$attrs = [];
+				$explanations = [];
 
 				foreach ($attributes as $attr => $val) {
 					if (is_numeric($attr) && preg_match('/^regex\:\/(.+)\/$/i', $val, $matches)) {
@@ -765,17 +765,17 @@ class Unit extends \lithium\core\Object {
 				}
 				if ($attrs) {
 					$permutations = $this->_arrayPermute($attrs);
-					$permutationTokens = array();
+					$permutationTokens = [];
 					foreach ($permutations as $permutation) {
 						$permutationTokens[] = join('', $permutation);
 					}
-					$regex[] = array(
+					$regex[] = [
 						sprintf('%s', join(', ', $explanations)),
 						$permutationTokens,
 						$i
-					);
+					];
 				}
-				$regex[] = array(sprintf('End %s tag', $tag), '[\s]*\/?[\s]*>[\n\r]*', $i);
+				$regex[] = [sprintf('End %s tag', $tag), '[\s]*\/?[\s]*>[\n\r]*', $i];
 			}
 		}
 
@@ -860,7 +860,7 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	protected function _cookieMatch($expected, $headers) {
-		$defaults = array('path' => '/', 'name' => '[\w.-]+');
+		$defaults = ['path' => '/', 'name' => '[\w.-]+'];
 		$expected += $defaults;
 
 		$headers = ($headers) ?: headers_list();
@@ -894,8 +894,8 @@ class Unit extends \lithium\core\Object {
 	 * Assert that the passed result array has expected number of elements.
 	 *
 	 * ```
-	 * $this->assertCount(1, array('foo')); // succeeds
-	 * $this->assertCount(2, array('foo', 'bar', 'bar')); // fails
+	 * $this->assertCount(1, ['foo']); // succeeds
+	 * $this->assertCount(2, ['foo', 'bar', 'bar']); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
@@ -905,18 +905,18 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertCount($expected, $array, $message = '{:message}') {
-		return $this->assert($expected === ($result = count($array)), $message, array(
+		return $this->assert($expected === ($result = count($array)), $message, [
 			'expected' => $expected,
 			'result' => $result
-		));
+		]);
 	}
 
 	/**
 	 * Assert that the passed result array has *not* the expected number of elements.
 	 *
 	 * ```
-	 * $this->assertNotCount(2, array('foo', 'bar', 'bar')); // succeeds
-	 * $this->assertNotCount(1, array('foo')); // fails
+	 * $this->assertNotCount(2, ['foo', 'bar', 'bar']); // succeeds
+	 * $this->assertNotCount(1, ['foo']); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
@@ -926,18 +926,18 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNotCount($expected, $array, $message = '{:message}') {
-		return $this->assert($expected !== ($result = count($array)), $message, array(
+		return $this->assert($expected !== ($result = count($array)), $message, [
 			'expected' => $expected,
 			'result' => $result
-		));
+		]);
 	}
 
 	/**
 	 * Assert that the result array has given key.
 	 *
 	 * ```
-	 * $this->assertArrayHasKey('bar', array('bar' => 'baz')); // succeeds
-	 * $this->assertArrayHasKey('foo', array('bar' => 'baz')); // fails
+	 * $this->assertArrayHasKey('bar', ['bar' => 'baz']); // succeeds
+	 * $this->assertArrayHasKey('foo', ['bar' => 'baz']); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
@@ -953,18 +953,18 @@ class Unit extends \lithium\core\Object {
 			$result = array_key_exists($key, $array);
 		}
 
-		return $this->assert($result, $message, array(
+		return $this->assert($result, $message, [
 			'expected' => $key,
 			'result' => $array
-		));
+		]);
 	}
 
 	/**
 	 * Assert that the result array does *not* have given key.
 	 *
 	 * ```
-	 * $this->assertArrayNotHasKey('foo', array('bar' => 'baz')); // succeeds
-	 * $this->assertArrayNotHasKey('bar', array('bar' => 'baz')); // fails
+	 * $this->assertArrayNotHasKey('foo', ['bar' => 'baz']); // succeeds
+	 * $this->assertArrayNotHasKey('bar', ['bar' => 'baz']); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
@@ -980,18 +980,18 @@ class Unit extends \lithium\core\Object {
 			$result = array_key_exists($key, $array);
 		}
 
-		return $this->assert(!$result, $message, array(
+		return $this->assert(!$result, $message, [
 			'expected' => $key,
 			'result' => $array
-		));
+		]);
 	}
 
 	/**
 	 * Assert that `$haystack` contains `$needle` as a value.
 	 *
 	 * ```
-	 * $this->assertContains('foo', array('foo', 'bar', 'baz')); // succeeds
-	 * $this->assertContains(4, array(1,2,3)); // fails
+	 * $this->assertContains('foo', ['foo', 'bar', 'baz']); // succeeds
+	 * $this->assertContains(4, [1,2,3]); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
@@ -1002,31 +1002,31 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertContains($needle, $haystack, $message = '{:message}') {
 		if (is_string($haystack)) {
-			return $this->assert(strpos($haystack, $needle) !== false, $message, array(
+			return $this->assert(strpos($haystack, $needle) !== false, $message, [
 				'expected' => $needle,
 				'result' => $haystack
-			));
+			]);
 		}
 		foreach ($haystack as $key => $value) {
 			if ($value === $needle) {
-				return $this->assert(true, $message, array(
+				return $this->assert(true, $message, [
 					'expected' => $needle,
 					'result' => $haystack
-				));
+				]);
 			}
 		}
-		return $this->assert(false, $message, array(
+		return $this->assert(false, $message, [
 			'expected' => $needle,
 			'result' => $haystack
-		));
+		]);
 	}
 
 	/**
 	 * Assert that `$haystack` does *not* contain `$needle` as a value.
 	 *
 	 * ```
-	 * $this->assertNotContains(4, array(1,2,3)); // succeeds
-	 * $this->assertNotContains('foo', array('foo', 'bar', 'baz')); // fails
+	 * $this->assertNotContains(4, [1,2,3]); // succeeds
+	 * $this->assertNotContains('foo', ['foo', 'bar', 'baz']); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
@@ -1037,31 +1037,31 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertNotContains($needle, $haystack, $message = '{:message}') {
 		if (is_string($haystack)) {
-			return $this->assert(strpos($haystack, $needle) === false, $message, array(
+			return $this->assert(strpos($haystack, $needle) === false, $message, [
 				'expected' => $needle,
 				'result' => $haystack
-			));
+			]);
 		}
 		foreach ($haystack as $key => $value) {
 			if ($value === $needle) {
-				return $this->assert(false, $message, array(
+				return $this->assert(false, $message, [
 					'expected' => $needle,
 					'result' => $haystack
-				));
+				]);
 			}
 		}
-		return $this->assert(true, $message, array(
+		return $this->assert(true, $message, [
 			'expected' => $needle,
 			'result' => $haystack
-		));
+		]);
 	}
 
 	/**
 	 * Assert that `$haystack` does only contain item of given type.
 	 *
 	 * ```
-	 * $this->assertContainsOnly('integer', array(1,2,3)); // succeeds
-	 * $this->assertContainsOnly('integer', array('foo', 'bar', 'baz')); // fails
+	 * $this->assertContainsOnly('integer', [1,2,3]); // succeeds
+	 * $this->assertContainsOnly('integer', ['foo', 'bar', 'baz']); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::$_internalTypes
@@ -1075,24 +1075,24 @@ class Unit extends \lithium\core\Object {
 		$method = static::$_internalTypes[$type];
 		foreach ($haystack as $key => $value) {
 			if (!$method($value)) {
-				return $this->assert(false, $message, array(
+				return $this->assert(false, $message, [
 					'expected' => $type,
 					'result' => $haystack
-				));
+				]);
 			}
 		}
-		return $this->assert(true, $message, array(
+		return $this->assert(true, $message, [
 			'expected' => $type,
 			'result' => $haystack
-		));
+		]);
 	}
 
 	/**
 	 * Assert that `$haystack` hasn't any items of given type.
 	 *
 	 * ```
-	 * $this->assertNotContainsOnly('integer', array('foo', 'bar', 'baz')); // succeeds
-	 * $this->assertNotContainsOnly('integer', array(1,2,3)); // fails
+	 * $this->assertNotContainsOnly('integer', ['foo', 'bar', 'baz']); // succeeds
+	 * $this->assertNotContainsOnly('integer', [1,2,3]); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::$_internalTypes
@@ -1106,24 +1106,24 @@ class Unit extends \lithium\core\Object {
 		$method = static::$_internalTypes[$type];
 		foreach ($haystack as $key => $value) {
 			if (!$method($value)) {
-				return $this->assert(true, $message, array(
+				return $this->assert(true, $message, [
 					'expected' => $type,
 					'result' => $haystack
-				));
+				]);
 			}
 		}
-		return $this->assert(false, $message, array(
+		return $this->assert(false, $message, [
 			'expected' => $type,
 			'result' => $haystack
-		));
+		]);
 	}
 
 	/**
 	 * Assert that `$haystack` contains only instances of given class.
 	 *
 	 * ```
-	 * $this->assertContainsOnlyInstancesOf('stdClass', array(new \stdClass)); // succeeds
-	 * $this->assertContainsOnlyInstancesOf('stdClass', array(new \lithium\test\Unit)); // fails
+	 * $this->assertContainsOnlyInstancesOf('stdClass', [new \stdClass]); // succeeds
+	 * $this->assertContainsOnlyInstancesOf('stdClass', [new \lithium\test\Unit]); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
@@ -1133,17 +1133,17 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertContainsOnlyInstancesOf($class, $haystack, $message = '{:message}') {
-		$result = array();
+		$result = [];
 		foreach ($haystack as $key => &$value) {
 			if (!is_a($value, $class)) {
 				$result[$key] =& $value;
 				break;
 			}
 		}
-		return $this->assert(empty($result), $message, array(
+		return $this->assert(empty($result), $message, [
 			'expected' => $class,
 			'result' => $result
-		));
+		]);
 	}
 
 	/**
@@ -1161,10 +1161,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertGreaterThan($expected, $actual, $message = '{:message}') {
-		return $this->assert($expected > $actual, $message, array(
+		return $this->assert($expected > $actual, $message, [
 			'expected' => $expected,
 			'result' => $actual
-		));
+		]);
 	}
 
 	/**
@@ -1182,10 +1182,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertGreaterThanOrEqual($expected, $actual, $message = '{:message}') {
-		return $this->assert($expected >= $actual, $message, array(
+		return $this->assert($expected >= $actual, $message, [
 			'expected' => $expected,
 			'result' => $actual
-		));
+		]);
 	}
 
 	/**
@@ -1203,10 +1203,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertLessThan($expected, $actual, $message = '{:message}') {
-		return $this->assert($expected < $actual, $message, array(
+		return $this->assert($expected < $actual, $message, [
 			'expected' => $expected,
 			'result' => $actual
-		));
+		]);
 	}
 
 	/**
@@ -1224,10 +1224,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertLessThanOrEqual($expected, $actual, $message = '{:message}') {
-		return $this->assert($expected <= $actual, $message, array(
+		return $this->assert($expected <= $actual, $message, [
 			'expected' => $expected,
 			'result' => $actual
-		));
+		]);
 	}
 
 	/**
@@ -1245,10 +1245,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertInstanceOf($expected, $actual, $message = '{:message}') {
-		return $this->assert(is_a($actual, $expected), $message, array(
+		return $this->assert(is_a($actual, $expected), $message, [
 			'expected' => $expected,
 			'result' => get_class($actual)
-		));
+		]);
 	}
 
 	/**
@@ -1266,10 +1266,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNotInstanceOf($expected, $actual, $message = '{:message}') {
-		return $this->assert(!is_a($actual, $expected), $message, array(
+		return $this->assert(!is_a($actual, $expected), $message, [
 			'expected' => $expected,
 			'result' => is_object($actual) ? get_class($actual) : gettype($actual),
-		));
+		]);
 	}
 
 	/**
@@ -1289,10 +1289,10 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertInternalType($expected, $actual, $message = '{:message}') {
 		$method = static::$_internalTypes[$expected];
-		return $this->assert($method($actual), $message, array(
+		return $this->assert($method($actual), $message, [
 			'expected' => $expected,
 			'result' => gettype($actual)
-		));
+		]);
 	}
 
 	/**
@@ -1312,10 +1312,10 @@ class Unit extends \lithium\core\Object {
 	 */
 	public function assertNotInternalType($expected, $actual, $message = '{:message}') {
 		$method = static::$_internalTypes[$expected];
-		return $this->assert(!$method($actual), $message, array(
+		return $this->assert(!$method($actual), $message, [
 			'expected' => $expected,
 			'result' => gettype($actual)
-		));
+		]);
 	}
 
 	/**
@@ -1372,10 +1372,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertFileExists($actual, $message = '{:message}') {
-		return $this->assert(file_exists($actual), $message, array(
+		return $this->assert(file_exists($actual), $message, [
 			'expected' => $actual,
 			'result' => file_exists($actual)
-		));
+		]);
 	}
 
 	/**
@@ -1392,10 +1392,10 @@ class Unit extends \lithium\core\Object {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertFileNotExists($actual, $message = '{:message}') {
-		return $this->assert(!file_exists($actual), $message, array(
+		return $this->assert(!file_exists($actual), $message, [
 			'expected' => $actual,
 			'result' => !file_exists($actual)
-		));
+		]);
 	}
 
 	/**
@@ -1419,10 +1419,10 @@ class Unit extends \lithium\core\Object {
 			throw new InvalidArgumentException('Argument $class must be a string');
 		}
 		$object = new ReflectionClass($class);
-		return $this->assert($object->hasProperty($attributeName), $message, array(
+		return $this->assert($object->hasProperty($attributeName), $message, [
 			'expected' => $attributeName,
 			'result' => $object->getProperties()
-		));
+		]);
 	}
 
 	/**
@@ -1446,10 +1446,10 @@ class Unit extends \lithium\core\Object {
 			throw new InvalidArgumentException('Argument $class must be a string.');
 		}
 		$object = new ReflectionClass($class);
-		return $this->assert(!$object->hasProperty($attributeName), $message, array(
+		return $this->assert(!$object->hasProperty($attributeName), $message, [
 			'expected' => $attributeName,
 			'result' => $object->getProperties()
-		));
+		]);
 	}
 
 	/**
@@ -1472,15 +1472,15 @@ class Unit extends \lithium\core\Object {
 		if ($object->hasProperty($attributeName)) {
 			$attribute = $object->getProperty($attributeName);
 
-			return $this->assert($attribute->isStatic(), $message, array(
+			return $this->assert($attribute->isStatic(), $message, [
 				'expected' => $attributeName,
 				'result' => $object->getProperties()
-			));
+			]);
 		}
-		return $this->assert(false, $message, array(
+		return $this->assert(false, $message, [
 			'expected' => $attributeName,
 			'result' => $object->getProperties()
-		));
+		]);
 	}
 
 	/**
@@ -1503,15 +1503,15 @@ class Unit extends \lithium\core\Object {
 		if ($object->hasProperty($attrName)) {
 			$attribute = $object->getProperty($attrName);
 
-			return $this->assert(!$attribute->isStatic(), $message, array(
+			return $this->assert(!$attribute->isStatic(), $message, [
 				'expected' => $attrName,
 				'result' => $object->getProperties()
-			));
+			]);
 		}
-		return $this->assert(true, $message, array(
+		return $this->assert(true, $message, [
 			'expected' => $attrName,
 			'result' => $object->getProperties()
-		));
+		]);
 	}
 
 	/**
@@ -1534,10 +1534,10 @@ class Unit extends \lithium\core\Object {
 			throw new InvalidArgumentException('Second argument $object must be an object.');
 		}
 		$object = new ReflectionClass($object);
-		return $this->assert($object->hasProperty($attributeName), $message, array(
+		return $this->assert($object->hasProperty($attributeName), $message, [
 			'expected' => $attributeName,
 			'result' => $object->getProperties()
-		));
+		]);
 	}
 
 	/**
@@ -1560,10 +1560,10 @@ class Unit extends \lithium\core\Object {
 			throw new InvalidArgumentException('Second argument $object must be an object');
 		}
 		$object = new ReflectionClass($object);
-		return $this->assert(!$object->hasProperty($attributeName), $message, array(
+		return $this->assert(!$object->hasProperty($attributeName), $message, [
 			'expected' => $attributeName,
 			'result' => $object->getProperties()
-		));
+		]);
 	}
 
 	/**
@@ -1577,9 +1577,9 @@ class Unit extends \lithium\core\Object {
 	 * @param array $options Currently unimplemented.
 	 * @return void
 	 */
-	protected function _result($type, $info, array $options = array()) {
-		$info = (array('result' => $type) + $info);
-		$defaults = array();
+	protected function _result($type, $info, array $options = []) {
+		$info = (['result' => $type] + $info);
+		$defaults = [];
 		$options += $defaults;
 		if ($this->_reporter) {
 			$filtered = $this->_reporter->__invoke($info);
@@ -1616,16 +1616,16 @@ class Unit extends \lithium\core\Object {
 		});
 
 		foreach ($this->_expected as $expected) {
-			$this->_result('fail', compact('method') + array(
+			$this->_result('fail', compact('method') + [
 				'class' => get_class($this),
 				'message' => "Expected exception matching `{$expected}` uncaught.",
-				'data' => array(),
+				'data' => [],
 				'file' => null,
 				'line' => null,
 				'assertion' => 'expectException'
-			));
+			]);
 		}
-		$this->_expected = array();
+		$this->_expected = [];
 
 		try {
 			$this->tearDown();
@@ -1653,9 +1653,9 @@ class Unit extends \lithium\core\Object {
 		$data = $exception;
 
 		if (is_object($exception)) {
-			$data = array('name' => get_class($exception));
+			$data = ['name' => get_class($exception)];
 
-			foreach (array('message', 'file', 'line', 'trace', 'code') as $key) {
+			foreach (['message', 'file', 'line', 'trace', 'code'] as $key) {
 				$method = 'get' . ucfirst($key);
 				$data[$key] = $exception->{$method}();
 			}
@@ -1673,7 +1673,7 @@ class Unit extends \lithium\core\Object {
 			}
 
 			$ref = $exception->getTrace();
-			$ref = $ref[0] + array('class' => null);
+			$ref = $ref[0] + ['class' => null];
 
 			if ($ref['class'] === __CLASS__ && $ref['function'] === 'skipIf') {
 				return $this->_result('skip', $data);
@@ -1700,7 +1700,7 @@ class Unit extends \lithium\core\Object {
 		if ($isExpected) {
 			return array_pop($this->_expected);
 		}
-		$initFrame = current($exception['trace']) + array('class' => '-', 'function' => '-');
+		$initFrame = current($exception['trace']) + ['class' => '-', 'function' => '-'];
 
 		foreach ($exception['trace'] as $frame) {
 			if (isset($scopedFrame)) {
@@ -1714,20 +1714,20 @@ class Unit extends \lithium\core\Object {
 			}
 		}
 		if (class_exists('lithium\analysis\Debugger')) {
-			$exception['trace'] = Debugger::trace(array(
+			$exception['trace'] = Debugger::trace([
 				'trace'        => $exception['trace'],
 				'format'       => '{:functionRef}, line {:line}',
 				'includeScope' => false,
-				'scope'        => array_filter(array(
+				'scope'        => array_filter([
 					'functionRef' => __NAMESPACE__ . '\{closure}',
 					'line'        => $lineFlag
-				))
-			));
+				])
+			]);
 		}
-		$this->_result('exception', $exception + array(
+		$this->_result('exception', $exception + [
 			'class'     => $initFrame['class'],
 			'method'    => $initFrame['function']
-		));
+		]);
 	}
 
 	/**
@@ -1743,7 +1743,7 @@ class Unit extends \lithium\core\Object {
 	 */
 	protected function _compare($type, $expected, $result = null, $trace = null) {
 		$compareTypes = function($expected, $result, $trace) {
-			$types = array('expected' => gettype($expected), 'result' => gettype($result));
+			$types = ['expected' => gettype($expected), 'result' => gettype($result)];
 
 			if ($types['expected'] !== $types['result']) {
 				$expected = trim("({$types['expected']}) " . print_r($expected, true));
@@ -1754,7 +1754,7 @@ class Unit extends \lithium\core\Object {
 		if ($types = $compareTypes($expected, $result, $trace)) {
 			return $types;
 		}
-		$data = array();
+		$data = [];
 
 		if (!is_scalar($expected)) {
 			foreach ($expected as $key => $value) {
@@ -1786,7 +1786,7 @@ class Unit extends \lithium\core\Object {
 						}
 						continue;
 					}
-					if ($check === array()) {
+					if ($check === []) {
 						$trace = $newTrace;
 						return compact('trace', 'expected', 'result');
 					}
@@ -1821,11 +1821,11 @@ class Unit extends \lithium\core\Object {
 			$data = $this->_compare($type, $result, $expected);
 
 			if (!empty($data)) {
-				return array(
+				return [
 					'trace' => $data['trace'],
 					'expected' => $data['result'],
 					'result' => $data['expected']
-				);
+				];
 			}
 		}
 		if ((($type === 'identical') ? $expected === $result : $expected == $result)) {
@@ -1846,7 +1846,7 @@ class Unit extends \lithium\core\Object {
 	 * @param string $message The string prepended to the generate message in the current scope.
 	 * @return string
 	 */
-	protected function _message(&$data = array(), $message =  null) {
+	protected function _message(&$data = [], $message =  null) {
 		if (!empty($data[0])) {
 			foreach ($data as $key => $value) {
 				$message = (!empty($data[$key][0])) ? $message : null;
@@ -1855,7 +1855,7 @@ class Unit extends \lithium\core\Object {
 			}
 			return $message;
 		}
-		$defaults = array('trace' => null, 'expected' => null, 'result' => null);
+		$defaults = ['trace' => null, 'expected' => null, 'result' => null];
 		$data = (array) $data + $defaults;
 
 		$message = null;
@@ -1881,11 +1881,11 @@ class Unit extends \lithium\core\Object {
 	 * @param array $perms
 	 * @return array
 	 */
-	protected function _arrayPermute($items, $perms = array()) {
+	protected function _arrayPermute($items, $perms = []) {
 		static $permuted;
 
 		if (empty($perms)) {
-			$permuted = array();
+			$permuted = [];
 		}
 
 		if (empty($items)) {
@@ -1969,7 +1969,7 @@ class Unit extends \lithium\core\Object {
 			$expected = preg_replace('/\r\n/', "\n", $expected);
 			$result = preg_replace('/\r\n/', "\n", $result);
 		}
-		return array($expected, $result);
+		return [$expected, $result];
 	}
 
 	/* Deprecated */
@@ -1980,7 +1980,7 @@ class Unit extends \lithium\core\Object {
 	 * @deprecated
 	 * @var string
 	 */
-	protected $_expected = array();
+	protected $_expected = [];
 
 	/**
 	 * Used before a call to `assert*()` if you expect the test assertion to generate an exception

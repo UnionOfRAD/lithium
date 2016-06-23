@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\data;
 
 class MockComments extends \lithium\data\Model {
 
-	public $belongsTo = array('MockPosts');
+	public $belongsTo = ['MockPosts'];
 }
 
 ?>

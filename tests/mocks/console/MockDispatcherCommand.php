@@ -12,9 +12,9 @@ use lithium\core\Environment;
 
 class MockDispatcherCommand extends \lithium\console\Command {
 
-	protected $_classes = array(
+	protected $_classes = [
 		'response' => 'lithium\tests\mocks\console\MockResponse'
-	);
+	];
 
 	public function testRun() {
 		$this->response->testAction = __FUNCTION__;

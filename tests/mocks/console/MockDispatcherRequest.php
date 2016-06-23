@@ -10,9 +10,9 @@ namespace lithium\tests\mocks\console;
 
 class MockDispatcherRequest extends \lithium\console\Request {
 
-	public $params = array(
+	public $params = [
 		'command' => '\lithium\tests\mocks\console\MockDispatcherCommand'
-	);
+	];
 }
 
 ?>

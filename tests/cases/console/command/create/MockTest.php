@@ -16,7 +16,7 @@ class MockTest extends \lithium\test\Unit {
 
 	public $request;
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	protected $_testPath = null;
 
@@ -26,14 +26,14 @@ class MockTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
-		$this->classes = array('response' => 'lithium\tests\mocks\console\MockResponse');
+		$this->classes = ['response' => 'lithium\tests\mocks\console\MockResponse'];
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
-		$_SERVER['argv'] = array();
+		$_SERVER['argv'] = [];
 
-		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
-		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->request->params = array('library' => 'create_test');
+		Libraries::add('create_test', ['path' => $this->_testPath . '/create_test']);
+		$this->request = new Request(['input' => fopen('php://temp', 'w+')]);
+		$this->request->params = ['library' => 'create_test'];
 	}
 
 	public function tearDown() {
@@ -43,13 +43,13 @@ class MockTest extends \lithium\test\Unit {
 	}
 
 	public function testMockModel() {
-		$this->request->params += array(
+		$this->request->params += [
 			'command' => 'create', 'action' => 'mock',
-			'args' => array('model', 'Posts')
-		);
-		$mock = new Mock(array(
+			'args' => ['model', 'Posts']
+		];
+		$mock = new Mock([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$mock->path = $this->_testPath;
 		$mock->run('mock');
 		$expected = "MockPosts created in tests/mocks/models/MockPosts.php.\n";
@@ -68,7 +68,7 @@ class MockPosts extends \create_test\models\Posts {
 
 
 test;
-		$replace = array("<?php", "?>");
+		$replace = ["<?php", "?>"];
 		$result = str_replace($replace, '',
 			file_get_contents($this->_testPath . '/create_test/tests/mocks/models/MockPosts.php')
 		);

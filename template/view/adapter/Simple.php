@@ -27,11 +27,11 @@ class Simple extends \lithium\template\view\Renderer {
 	 * @param array $options
 	 * @return string
 	 */
-	public function render($template, $data = array(), array $options = array()) {
-		$defaults = array('context' => array());
+	public function render($template, $data = [], array $options = []) {
+		$defaults = ['context' => []];
 		$options += $defaults;
 
-		$context = array();
+		$context = [];
 		$this->_context = $options['context'] + $this->_context;
 
 		foreach (array_keys($this->_context) as $key) {

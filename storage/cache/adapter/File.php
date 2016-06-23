@@ -28,12 +28,12 @@ use lithium\storage\Cache;
  * A simple configuration can be accomplished as follows:
  *
  * ```
- * Cache::config(array(
- *     'default' => array(
+ * Cache::config([
+ *     'default' => [
  *         'adapter' => 'File',
- *         'strategies => array('Serializer')
- *      )
- * ));
+ *         'strategies => ['Serializer']
+ *      ]
+ * ]);
  * ```
  *
  * The path that the cached files will be written to defaults to
@@ -72,13 +72,13 @@ class File extends \lithium\storage\cache\Adapter {
 	 *          BLOBs.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'path' => Libraries::get(true, 'resources') . '/tmp/cache',
 			'scope' => null,
 			'expiry' => '+1 hour',
 			'streams' => false
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -127,7 +127,7 @@ class File extends \lithium\storage\cache\Adapter {
 		if ($this->_config['scope']) {
 			$keys = $this->_addScopePrefix($this->_config['scope'], $keys, '_');
 		}
-		$results = array();
+		$results = [];
 
 		foreach ($keys as $key) {
 			if (!$item = $this->_read($key, $this->_config['streams'])) {
@@ -305,7 +305,7 @@ class File extends \lithium\storage\cache\Adapter {
 		}
 		fclose($stream);
 
-		return array('expiry' => $matches[1], 'value' => $value);
+		return ['expiry' => $matches[1], 'value' => $value];
 
 	}
 

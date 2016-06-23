@@ -12,22 +12,22 @@ class MockCookieSession extends \lithium\core\Object {
 
 	protected static $_secret = 'foobar';
 
-	protected static $_data = array('one' => 'foo', 'two' => 'bar');
+	protected static $_data = ['one' => 'foo', 'two' => 'bar'];
 
-	public static function read($key = null, array $options = array()) {
+	public static function read($key = null, array $options = []) {
 		if (isset(static::$_data[$key])) {
 			return static::$_data[$key];
 		}
 		return static::$_data;
 	}
 
-	public static function write($key, $value = null, array $options = array()) {
+	public static function write($key, $value = null, array $options = []) {
 		static::$_data[$key] = $value;
 		return $value;
 	}
 
 	public static function reset() {
-		return static::$_data = array('one' => 'foo', 'two' => 'bar');
+		return static::$_data = ['one' => 'foo', 'two' => 'bar'];
 	}
 
 	/**

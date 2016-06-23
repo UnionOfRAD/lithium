@@ -32,7 +32,7 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testWriting() {
-		$this->subject = new File(array('path' => $this->path));
+		$this->subject = new File(['path' => $this->path]);
 		$priority = 'debug';
 		$message = 'This is a debug message';
 		$function = $this->subject->write($priority, $message);
@@ -44,9 +44,9 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testWithoutTimestamp() {
-		$this->subject = new File(array(
+		$this->subject = new File([
 			'path' => $this->path, 'timestamp' => false, 'format' => "{:message}\n"
-		));
+		]);
 		$priority = 'debug';
 		$message = 'This is a debug message';
 		$function = $this->subject->write($priority, $message);

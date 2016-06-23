@@ -11,7 +11,7 @@ include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php';
 use lithium\core\Libraries;
 
 Libraries::add('lithium');
-Libraries::add('app', array('default' => true));
+Libraries::add('app', ['default' => true]);
 Libraries::add('li3_fixtures');
 
 /*
@@ -24,49 +24,49 @@ use lithium\data\Connections;
 
 switch (getenv('DB')) {
 	case 'couchdb':
-		Connections::add('test', array(
-			'test' => array(
+		Connections::add('test', [
+			'test' => [
 				'type' => 'http',
 				'adapter' => 'CouchDb',
 				'host' => 'localhost',
 				'database' => 'lithium_test'
-			)
-		));
+			]
+		]);
 	break;
 	case 'mongodb':
-		Connections::add('test', array(
-			'test' => array(
+		Connections::add('test', [
+			'test' => [
 				'type' => 'MongoDb',
 				'host' => 'localhost',
 				'database' => 'lithium_test'
-			)
-		));
+			]
+		]);
 	break;
 	case 'mysql':
-		Connections::add('test', array(
-			'test' => array(
+		Connections::add('test', [
+			'test' => [
 				'type' => 'database',
 				'adapter' => 'MySql',
 				'host' => 'localhost',
 				'login' => 'root',
 				'password' => '',
 				'database' => 'lithium_test'
-			)
-		));
-		Connections::add('test_alternative', array(
-			'test' => array(
+			]
+		]);
+		Connections::add('test_alternative', [
+			'test' => [
 				'type' => 'database',
 				'adapter' => 'MySql',
 				'host' => 'localhost',
 				'login' => 'root',
 				'password' => '',
 				'database' => 'lithium_test_alternative'
-			)
-		));
+			]
+		]);
 	break;
 	case 'pgsql':
-		Connections::add('test', array(
-			'test' => array(
+		Connections::add('test', [
+			'test' => [
 				'type' => 'database',
 				'adapter' => 'PostgreSql',
 				'host' => 'localhost',
@@ -74,10 +74,10 @@ switch (getenv('DB')) {
 				'password' => '',
 				'encoding' => 'UTF-8',
 				'database' => 'lithium_test'
-			)
-		));
-		Connections::add('test_alternative', array(
-			'test' => array(
+			]
+		]);
+		Connections::add('test_alternative', [
+			'test' => [
 				'type' => 'database',
 				'adapter' => 'PostgreSql',
 				'host' => 'localhost',
@@ -85,18 +85,18 @@ switch (getenv('DB')) {
 				'password' => '',
 				'database' => 'lithium_test_alternative',
 				'encoding' => 'UTF-8'
-			)
-		));
+			]
+		]);
 	break;
 	case 'sqlite':
-		Connections::add('test', array(
-			'test' => array(
+		Connections::add('test', [
+			'test' => [
 				'type' => 'database',
 				'adapter' => 'Sqlite3',
 				'database' => ':memory:',
 				'encoding' => 'UTF-8'
-			)
-		));
+			]
+		]);
 	break;
 }
 

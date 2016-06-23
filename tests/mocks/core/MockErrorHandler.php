@@ -10,7 +10,7 @@ namespace lithium\tests\mocks\core;
 
 class MockErrorHandler extends \lithium\core\ErrorHandler {
 
-	public static function checks($checks = array()) {
+	public static function checks($checks = []) {
 		if ($checks) {
 			static::$_checks = $checks;
 		}

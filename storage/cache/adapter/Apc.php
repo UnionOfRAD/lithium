@@ -39,9 +39,9 @@ use lithium\storage\Cache;
  * A simple configuration can be accomplished as follows:
  *
  * ```
- * Cache::config(array(
- *     'default' => array('adapter' => 'Apc')
- * ));
+ * Cache::config([
+ *     'default' => ['adapter' => 'Apc']
+ * ]);
  * ```
  *
  * @link http://pecl.php.net/package/APCu
@@ -64,11 +64,11 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 *          to `+1 hour`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'scope' => null,
 			'expiry' => '+1 hour'
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -94,7 +94,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 		if ($this->_config['scope']) {
 			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
 		}
-		return apc_store($keys, null, $ttl) === array();
+		return apc_store($keys, null, $ttl) === [];
 	}
 
 	/**
@@ -128,7 +128,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 		if ($this->_config['scope']) {
 			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
 		}
-		return apc_delete($keys) === array();
+		return apc_delete($keys) === [];
 	}
 
 	/**

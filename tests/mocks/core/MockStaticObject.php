@@ -14,7 +14,7 @@ use lithium\aop\Filters;
 class MockStaticObject extends \lithium\core\StaticObject {
 
 	public static function throwException() {
-		return Filters::run(get_called_class(), __FUNCTION__, array(), function($params) {
+		return Filters::run(get_called_class(), __FUNCTION__, [], function($params) {
 			throw new Exception('foo');
 			return 'bar';
 		});
@@ -27,7 +27,7 @@ class MockStaticObject extends \lithium\core\StaticObject {
 
 	public static function parents($get = false) {
 		if ($get === null) {
-			static::$_parents = array();
+			static::$_parents = [];
 		}
 		if ($get) {
 			return static::$_parents;

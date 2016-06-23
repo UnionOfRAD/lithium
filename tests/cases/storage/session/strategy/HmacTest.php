@@ -15,7 +15,7 @@ class HmacTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->secret = 'foobar';
-		$this->Hmac = new Hmac(array('secret' => $this->secret));
+		$this->Hmac = new Hmac(['secret' => $this->secret]);
 		$this->mock = 'lithium\tests\mocks\storage\session\strategy\MockCookieSession';
 		MockCookieSession::reset();
 	}
@@ -41,9 +41,9 @@ class HmacTest extends \lithium\test\Unit {
 		$result = $this->Hmac->write($value, compact('key', 'class'));
 		$this->assertEqual($value, $result);
 
-		$signature = hash_hmac('sha1', serialize(array($key => $value) + $oldData), $this->secret);
+		$signature = hash_hmac('sha1', serialize([$key => $value] + $oldData), $this->secret);
 		$signedData = MockCookieSession::data();
-		$this->assertEqual($signedData, $oldData + array('__signature' => $signature));
+		$this->assertEqual($signedData, $oldData + ['__signature' => $signature]);
 	}
 
 	public function testReadWithValidSignature() {

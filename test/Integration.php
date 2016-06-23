@@ -55,11 +55,11 @@ class Integration extends \lithium\test\Unit {
 	 * @param array $config Override the default URL to check.
 	 * @return boolean True if a network connection is established, false otherwise.
 	 */
-	protected function _hasNetwork($config = array()) {
-		$defaults = array(
+	protected function _hasNetwork($config = []) {
+		$defaults = [
 			'scheme' => 'http',
 			'host' => 'google.com'
-		);
+		];
 		$config += $defaults;
 
 		$url = "{$config['scheme']}://{$config['host']}";

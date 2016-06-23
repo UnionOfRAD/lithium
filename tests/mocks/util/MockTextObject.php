@@ -12,7 +12,7 @@ class MockTextObject extends \lithium\template\view\Renderer {
 
 	public $message = 'custom object';
 
-	public function render($template, $data = array(), array $options = array()) {
+	public function render($template, $data = [], array $options = []) {
 	}
 
 	public function __toString() {

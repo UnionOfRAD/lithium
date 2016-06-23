@@ -10,23 +10,23 @@ namespace lithium\tests\mocks\data\model;
 
 class MockImageTag extends \lithium\data\Model {
 
-	public $belongsTo = array(
-		'Image' => array('to' => 'lithium\tests\mocks\data\model\MockImage'),
-		'Tag' => array('to' => 'lithium\tests\mocks\data\model\MockTag')
-	);
+	public $belongsTo = [
+		'Image' => ['to' => 'lithium\tests\mocks\data\model\MockImage'],
+		'Tag' => ['to' => 'lithium\tests\mocks\data\model\MockTag']
+	];
 
-	protected $_meta = array(
+	protected $_meta = [
 		'key' => 'id',
 		'name' => 'ImageTag',
 		'source' => 'mock_image_tag',
 		'connection' => false
-	);
+	];
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'image_id' => array('type' => 'integer'),
-		'tag_id' => array('type' => 'integer')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer'],
+		'image_id' => ['type' => 'integer'],
+		'tag_id' => ['type' => 'integer']
+	];
 }
 
 ?>

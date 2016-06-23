@@ -29,7 +29,7 @@ class Stream extends \lithium\net\Socket {
 	 *         `'scheme'` or `'host'` settings, or if configuration fails, otherwise returns a
 	 *         resource stream. Throws exception if there is a network error.
 	 */
-	public function open(array $options = array()) {
+	public function open(array $options = []) {
 		parent::open($options);
 		$config = $this->_config;
 

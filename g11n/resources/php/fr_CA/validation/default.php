@@ -9,9 +9,9 @@
 /**
  * Validation data for `fr_CA`.
  */
-return array(
+return [
 	'phone' => '/^(?:\+?1)?[-. ]?\\(?[2-9][0-8][0-9]\\)?[-. ]?[2-9][0-9]{2}[-. ]?[0-9]{4}$/',
 	'postalCode' => '/\\A\\b[ABCEGHJKLMNPRSTVXY][0-9][A-Z] [0-9][A-Z][0-9]\\b\\z/i'
-);
+];
 
 ?>

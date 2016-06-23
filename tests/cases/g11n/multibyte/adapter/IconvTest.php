@@ -14,7 +14,7 @@ class IconvTest extends \lithium\test\Unit {
 
 	public $adapter;
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	public function skip() {
 		$this->skipIf(!Iconv::enabled(), 'The `Iconv` adapter is not enabled.');

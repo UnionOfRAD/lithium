@@ -60,8 +60,8 @@ class Response extends \lithium\core\Object {
 	 *        - `'color'` _boolean_ By default `true`.
 	 * @return void
 	 */
-	public function __construct($config = array()) {
-		$defaults = array('output' => null, 'error' => null, 'plain' => false);
+	public function __construct($config = []) {
+		$defaults = ['output' => null, 'error' => null, 'plain' => false];
 		$config += $defaults;
 
 		$this->output = $config['output'];
@@ -121,8 +121,8 @@ class Response extends \lithium\core\Object {
 	 * @param array|boolean $styles
 	 * @return array
 	 */
-	public function styles($styles = array()) {
-		$defaults = array(
+	public function styles($styles = []) {
+		$defaults = [
 			'end'    => "\033[0m",
 			'black'  => "\033[0;30m",
 			'red'    => "\033[0;31m",
@@ -138,9 +138,9 @@ class Response extends \lithium\core\Object {
 			'error'   => "\033[0;31m",
 			'success' => "\033[0;32m",
 			'bold'    => "\033[1m",
-		);
+		];
 		if ($styles === false || $this->plain || strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			return array_combine(array_keys($defaults), array_pad(array(), count($defaults), null));
+			return array_combine(array_keys($defaults), array_pad([], count($defaults), null));
 		}
 		return $styles + $defaults;
 	}

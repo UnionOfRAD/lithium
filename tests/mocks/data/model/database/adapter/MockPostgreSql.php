@@ -10,10 +10,10 @@ namespace lithium\tests\mocks\data\model\database\adapter;
 
 class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 
-	protected $_quotes = array('{', '}');
+	protected $_quotes = ['{', '}'];
 
-	public function __construct(array $config = array()) {
-		parent::__construct($config + array('database' => 'mock'));
+	public function __construct(array $config = []) {
+		parent::__construct($config + ['database' => 'mock']);
 		$this->connection = $this;
 	}
 

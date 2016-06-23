@@ -72,7 +72,7 @@ class Test extends \lithium\console\Command {
 	 *
 	 * @var array
 	 */
-	protected $_handlers = array();
+	protected $_handlers = [];
 
 	/**
 	 * Initializes the output handlers.
@@ -84,7 +84,7 @@ class Test extends \lithium\console\Command {
 		parent::_init();
 		$command = $this;
 
-		$this->_handlers += array(
+		$this->_handlers += [
 			'txt' => function($runner, $path) use ($command) {
 				if (!$command->justAssertions) {
 					$command->header('Test');
@@ -125,7 +125,7 @@ class Test extends \lithium\console\Command {
 					$columns = 60;
 
 					$reporter = function($result) use ($command, &$i, $columns, $colorize) {
-						$shorten = array('fail', 'skip', 'exception');
+						$shorten = ['fail', 'skip', 'exception'];
 
 						if ($result['result'] === 'pass') {
 							$symbol = '.';
@@ -166,7 +166,7 @@ class Test extends \lithium\console\Command {
 				$report = $runner();
 
 				if ($results = $report->filters()) {
-					$filters = array();
+					$filters = [];
 
 					foreach ($results as $filter => $options) {
 						$filters[$options['name']] = $report->results['filters'][$filter];
@@ -175,7 +175,7 @@ class Test extends \lithium\console\Command {
 				$command->out($report->render('stats', $report->stats() + compact('filters')));
 				return $report;
 			}
-		);
+		];
 	}
 
 	/**
@@ -230,9 +230,9 @@ class Test extends \lithium\console\Command {
 			$this->error(sprintf('No handler for format `%s`... ', $this->format));
 			return false;
 		}
-		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : array();
-		$params = compact('filters') + array('format' => $this->format);
-		$runner = function($options = array()) use ($path, $params) {
+		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : [];
+		$params = compact('filters') + ['format' => $this->format];
+		$runner = function($options = []) use ($path, $params) {
 			return Dispatcher::run($path, $params + $options);
 		};
 		$report = $handlers[$this->format]($runner, $path);

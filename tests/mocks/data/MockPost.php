@@ -10,9 +10,9 @@ namespace lithium\tests\mocks\data;
 
 class MockPost extends \lithium\data\Model {
 
-	public $hasMany = array('MockComment');
+	public $hasMany = ['MockComment'];
 
-	protected $_meta = array('connection' => false, 'key' => 'id');
+	protected $_meta = ['connection' => false, 'key' => 'id'];
 
 	public static function instances() {
 		return array_keys(static::$_instances);

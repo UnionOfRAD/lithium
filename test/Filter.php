@@ -22,7 +22,7 @@ abstract class Filter extends \lithium\core\StaticObject {
 	 * @param array $options Options for how this filter should be applied.
 	 * @return object Returns the instance of `$tests`.
 	 */
-	public static function apply($report, $tests, array $options = array()) {}
+	public static function apply($report, $tests, array $options = []) {}
 
 	/**
 	 * Analyzes the results of a test run and returns the result of the analysis.
@@ -31,7 +31,7 @@ abstract class Filter extends \lithium\core\StaticObject {
 	 * @param array $options
 	 * @return array The results of the analysis.
 	 */
-	public static function analyze($report, array $options = array()) {
+	public static function analyze($report, array $options = []) {
 		return $report->results['filters'][get_called_class()];
 	}
 }

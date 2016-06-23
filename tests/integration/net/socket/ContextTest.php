@@ -13,24 +13,24 @@ use lithium\net\socket\Context;
 
 class ContextTest extends \lithium\test\Integration {
 
-	protected $_testConfig = array(
+	protected $_testConfig = [
 		'persistent' => false,
 		'scheme' => 'http',
 		'host' => 'example.org',
 		'port' => 80,
 		'timeout' => 4,
-		'classes' => array(
+		'classes' => [
 			'request' => 'lithium\net\http\Request',
 			'response' => 'lithium\net\http\Response'
-		)
-	);
+		]
+	];
 
 	public function skip() {
 		$this->skipIf(!$this->_hasNetwork(), 'No network connection.');
 	}
 
 	public function testConstruct() {
-		$subject = new Context(array('timeout' => 300) + $this->_testConfig);
+		$subject = new Context(['timeout' => 300] + $this->_testConfig);
 		$this->assertEqual(300, $subject->timeout());
 		unset($subject);
 	}
@@ -69,7 +69,7 @@ class ContextTest extends \lithium\test\Integration {
 	}
 
 	public function testMessageInConfig() {
-		$socket = new Context(array('message' => new Request($this->_testConfig)));
+		$socket = new Context(['message' => new Request($this->_testConfig)]);
 		$this->assertInternalType('resource', $socket->open());
 	}
 
@@ -86,7 +86,7 @@ class ContextTest extends \lithium\test\Integration {
 		$this->assertInternalType('resource', $stream->open());
 		$result = $stream->send(
 			new Request($this->_testConfig),
-			array('response' => 'lithium\net\http\Response')
+			['response' => 'lithium\net\http\Response']
 		);
 		$this->assertInstanceOf('lithium\net\http\Response', $result);
 		$this->assertPattern("/^HTTP/", (string) $result);
@@ -97,7 +97,7 @@ class ContextTest extends \lithium\test\Integration {
 		$stream = new Context($this->_testConfig);
 		$this->assertInternalType('resource', $stream->open());
 		$result = $stream->send($this->_testConfig,
-			array('response' => 'lithium\net\http\Response')
+			['response' => 'lithium\net\http\Response']
 		);
 		$this->assertInstanceOf('lithium\net\http\Response', $result);
 		$this->assertPattern("/^HTTP/", (string) $result);
@@ -109,7 +109,7 @@ class ContextTest extends \lithium\test\Integration {
 		$this->assertInternalType('resource', $stream->open());
 		$result = $stream->send(
 			new Request($this->_testConfig),
-			array('response' => 'lithium\net\http\Response')
+			['response' => 'lithium\net\http\Response']
 		);
 		$this->assertInstanceOf('lithium\net\http\Response', $result);
 		$this->assertPattern("/^HTTP/", (string) $result);

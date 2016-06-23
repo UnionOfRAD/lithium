@@ -31,7 +31,7 @@ class Router extends \lithium\core\Object {
 	 * @return array $params
 	 */
 	public static function parse($request = null) {
-		$defaults = array('command' => null, 'action' => 'run', 'args' => array());
+		$defaults = ['command' => null, 'action' => 'run', 'args' => []];
 		$params = $request ? (array) $request->params + $defaults : $defaults;
 
 		if (!empty($request->argv)) {
@@ -52,7 +52,7 @@ class Router extends \lithium\core\Object {
 				$params['args'][] = $arg;
 			}
 		}
-		foreach (array('command', 'action') as $param) {
+		foreach (['command', 'action'] as $param) {
 			if (!empty($params['args'])) {
 				$params[$param] = array_shift($params['args']);
 			}

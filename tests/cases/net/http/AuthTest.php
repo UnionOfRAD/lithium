@@ -31,14 +31,14 @@ class AuthTest extends \lithium\test\Unit {
 		$req = md5("GET:/http_auth");
 		$response = md5("{$user}:{$nonce}:{$req}");
 
-		$data = array(
+		$data = [
 			'realm' => 'app',
 			'method' => 'GET',
 			'uri' => '/http_auth',
 			'qop' => 'auth',
 			'nonce' => '4bca0fbca7bd0',
 			'opaque' => 'd3fb67a7aa4d887ec4bf83040a820a46'
-		);
+		];
 		$expected = $data + compact('username', 'response', 'nc', 'cnonce');
 		$result = Auth::encode($username, $password, $data);
 		$this->assertEqual($expected, $result);
@@ -64,14 +64,14 @@ class AuthTest extends \lithium\test\Unit {
 		$req = md5("GET:/http_auth");
 		$hash = md5("{$user}:{$nonce}:{$req}");
 
-		$data = array(
+		$data = [
 			'realm' => 'app',
 			'method' => 'GET',
 			'uri' => '/http_auth',
 			'qop' => 'auth',
 			'nonce' => '4bca0fbca7bd0',
 			'opaque' => 'd3fb67a7aa4d887ec4bf83040a820a46'
-		);
+		];
 		$data = Auth::encode($username, $password, $data);
 		$header = Auth::header($data);
 		$this->assertPattern('/Digest/', $header);
@@ -90,13 +90,13 @@ class AuthTest extends \lithium\test\Unit {
 		$header .= 'opaque="d3fb67a7aa4d887ec4bf83040a820a46",username="gwoo",';
 		$header .= 'response="04d7d878c67f289f37e553d2025e3a52"';
 
-		$expected = array(
+		$expected = [
 			'qop' => 'auth', 'nonce' => '4bca0fbca7bd0',
 			'nc' => '00000001', 'cnonce' => '95b2cd1e179bf5414e52ed62811481cf',
 			'uri' => '/http_auth', 'realm' => 'app',
 			'opaque' => 'd3fb67a7aa4d887ec4bf83040a820a46', 'username' => 'gwoo',
 			'response' => '04d7d878c67f289f37e553d2025e3a52'
-		);
+		];
 		$result = Auth::decode($header);
 		$this->assertEqual($expected, $result);
 	}

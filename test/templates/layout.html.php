@@ -36,7 +36,7 @@ use lithium\util\Inflector;
 		<div class="article">
 			<article>
 				<div class="test-menu">
-					<?php echo $report->render("menu", array("menu" => $menu, "base" => $base)) ?>
+					<?php echo $report->render("menu", ["menu" => $menu, "base" => $base]) ?>
 				</div>
 
 				<div class="test-content">

@@ -23,7 +23,7 @@ class Configuration extends \lithium\core\Object {
 	 *
 	 * @var array of configurations, indexed by name.
 	 */
-	protected $_configurations = array();
+	protected $_configurations = [];
 
 	/**
 	 * A closure called by `_config()` which allows to automatically
@@ -67,7 +67,7 @@ class Configuration extends \lithium\core\Object {
 	 */
 	public function get($name = null) {
 		if ($name === null) {
-			$result = array();
+			$result = [];
 			$this->_configurations = array_filter($this->_configurations);
 
 			foreach ($this->_configurations as $key => $value) {
@@ -98,7 +98,7 @@ class Configuration extends \lithium\core\Object {
 	 * Clears all configurations.
 	 */
 	public function reset() {
-		$this->_configurations = array();
+		$this->_configurations = [];
 	}
 }
 

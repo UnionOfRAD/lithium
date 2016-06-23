@@ -88,7 +88,7 @@ class Filters extends \lithium\util\Collection {
 	 * @deprecated
 	 * @var array
 	 */
-	protected static $_lazyFilters = array();
+	protected static $_lazyFilters = [];
 
 	/**
 	 * This is the list of configuration settings that will be automatically applied to the
@@ -97,7 +97,7 @@ class Filters extends \lithium\util\Collection {
 	 * @deprecated
 	 * @var array
 	 */
-	protected $_autoConfig = array('data', 'class', 'method');
+	protected $_autoConfig = ['data', 'class', 'method'];
 
 	/**
 	 * The fully-namespaced class name of the class containing the method being filtered.
@@ -186,12 +186,12 @@ class Filters extends \lithium\util\Collection {
 	 *          executed first, and will be the last to return.
 	 * @return Returns the value returned by the first closure in `$options['data`]`.
 	 */
-	public static function run($class, $params, array $options = array()) {
+	public static function run($class, $params, array $options = []) {
 		$message  = '`\lithium\util\collection\Filters::run()` has been deprecated ';
 		$message .= 'in favor of `\lithium\aop\Filters::run()`';
 		trigger_error($message, E_USER_DEPRECATED);
 
-		$defaults = array('class' => null, 'method' => null, 'data' => array());
+		$defaults = ['class' => null, 'method' => null, 'data' => []];
 		$options += $defaults;
 
 		$callback = array_pop($options['data']);

@@ -98,15 +98,15 @@ class Controller extends \lithium\core\Object {
 	 * @see lithium\net\http\Media::type()
 	 * @see lithium\net\http\Media::render()
 	 */
-	protected $_render = array(
+	protected $_render = [
 		'type'        => null,
-		'data'        => array(),
+		'data'        => [],
 		'auto'        => true,
 		'layout'      => 'default',
 		'template'    => null,
 		'hasRendered' => false,
 		'negotiate'   => false
-	);
+	];
 
 	/**
 	 * Lists `Controller`'s class dependencies. For details on extending or replacing a class,
@@ -114,18 +114,18 @@ class Controller extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'media' => 'lithium\net\http\Media',
 		'router' => 'lithium\net\http\Router',
 		'response' => 'lithium\action\Response'
-	);
+	];
 
 	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('render' => 'merge', 'classes' => 'merge');
+	protected $_autoConfig = ['render' => 'merge', 'classes' => 'merge'];
 
 	/**
 	 * Constructor.
@@ -141,10 +141,10 @@ class Controller extends \lithium\core\Object {
 	 *        - `'classes'` _array_
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
-			'request' => null, 'response' => array(), 'render' => array(), 'classes' => array()
-		);
+	public function __construct(array $config = []) {
+		$defaults = [
+			'request' => null, 'response' => [], 'render' => [], 'classes' => []
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -192,14 +192,14 @@ class Controller extends \lithium\core\Object {
 	 *         control) or after it has been called and has returned its response (i.e.
 	 *         for caching it).
 	 */
-	public function __invoke($request, $dispatchParams, array $options = array()) {
+	public function __invoke($request, $dispatchParams, array $options = []) {
 		$params = compact('request', 'dispatchParams', 'options');
 
 		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$dispatchParams = $params['dispatchParams'];
 
 			$action = isset($dispatchParams['action']) ? $dispatchParams['action'] : 'index';
-			$args = isset($dispatchParams['args']) ? $dispatchParams['args'] : array();
+			$args = isset($dispatchParams['args']) ? $dispatchParams['args'] : [];
 
 			if (substr($action, 0, 1) === '_' || method_exists(__CLASS__, $action)) {
 				throw new DispatchException('Attempted to invoke a private method.');
@@ -211,7 +211,7 @@ class Controller extends \lithium\core\Object {
 
 			if ($result = $this->invokeMethod($action, $args)) {
 				if (is_string($result)) {
-					$this->render(array('text' => $result));
+					$this->render(['text' => $result]);
 					return $this->response;
 				}
 				if (is_array($result)) {
@@ -232,7 +232,7 @@ class Controller extends \lithium\core\Object {
 	 * @param array $data sets of `<variable name> => <variable value>` to pass to view layer.
 	 * @return void
 	 */
-	public function set($data = array()) {
+	public function set($data = []) {
 		$this->_render['data'] = (array) $data + $this->_render['data'];
 	}
 
@@ -255,7 +255,7 @@ class Controller extends \lithium\core\Object {
 	 *          property. You may refer to it for other options accepted by this method.
 	 * @return object Returns the `Response` object associated with this `Controller` instance.
 	 */
-	public function render(array $options = array()) {
+	public function render(array $options = []) {
 		$media = $this->_classes['media'];
 		$class = get_class($this);
 		$name = preg_replace('/Controller$/', '', substr($class, strrpos($class, '\\') + 1));
@@ -265,14 +265,14 @@ class Controller extends \lithium\core\Object {
 			$this->set($options['data']);
 			unset($options['data']);
 		}
-		$defaults = array(
+		$defaults = [
 			'status'     => null,
 			'location'   => false,
 			'data'       => null,
 			'head'       => false,
 			'controller' => Inflector::underscore($name),
 			'library'    => Libraries::get($class)
-		);
+		];
 
 		$options += $this->_render + $defaults;
 
@@ -290,9 +290,9 @@ class Controller extends \lithium\core\Object {
 		if ($options['head']) {
 			return;
 		}
-		$response = $media::render($this->response, $this->_render['data'], $options + array(
+		$response = $media::render($this->response, $this->_render['data'], $options + [
 			'request' => $this->request
-		));
+		]);
 		return ($this->response = $response ?: $this->response);
 	}
 
@@ -317,8 +317,8 @@ class Controller extends \lithium\core\Object {
 	 * @filter Allows to intercept redirects, either stopping them completely i.e. during debugging
 	 *         or for logging purposes.
 	 */
-	public function redirect($url, array $options = array()) {
-		$defaults = array('location' => null, 'status' => 302, 'head' => true, 'exit' => false);
+	public function redirect($url, array $options = []) {
+		$defaults = ['location' => null, 'status' => 302, 'head' => true, 'exit' => false];
 		$options += $defaults;
 		$params = compact('url', 'options');
 

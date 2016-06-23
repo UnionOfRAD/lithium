@@ -36,12 +36,12 @@ class Auth extends \lithium\core\StaticObject {
 			return null;
 		}
 		if (isset($data['nonce'])) {
-			$defaults =  array(
+			$defaults =  [
 				'realm' => 'app', 'method' => 'GET', 'uri' => '/',
 				'username' => null, 'qop' => 'auth',
 				'nonce' => null, 'opaque' => null,
 				'cnonce' => md5(time()),  'nc' => static::$nc
-			);
+			];
 			$data += $defaults;
 			$auth = "username=\"{$data['username']}\", response=\"{$data['response']}\", ";
 			$auth .= "uri=\"{$data['uri']}\", realm=\"{$data['realm']}\", ";
@@ -61,12 +61,12 @@ class Auth extends \lithium\core\StaticObject {
 	 * @param array $data Params needed to hash the response
 	 * @return array
 	 */
-	public static function encode($username, $password, $data = array()) {
+	public static function encode($username, $password, $data = []) {
 		if (isset($data['nonce'])) {
-			$defaults = array(
+			$defaults = [
 				'realm' => 'app', 'method' => 'GET', 'uri' => '/', 'qop' => null,
 				'cnonce' => md5(time()), 'nc' => static::$nc
-			);
+			];
 			$data = array_filter($data) + $defaults;
 			$part1 = md5("{$username}:{$data['realm']}:{$password}");
 			$part2 = "{$data['nonce']}:{$data['nc']}:{$data['cnonce']}:{$data['qop']}";
@@ -85,12 +85,12 @@ class Auth extends \lithium\core\StaticObject {
 	 * @return array
 	 */
 	public static function decode($header) {
-		$data = array(
+		$data = [
 			'realm' => null, 'username' => null, 'uri' => null,
 			'nonce' => null, 'opaque' => null, 'qop' => null,
 			'cnonce' => null, 'nc' => null,
 			'response' => null
-		);
+		];
 		$keys = implode('|', array_keys($data));
 		$regex = '@(' . $keys . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@';
 		preg_match_all($regex, $header, $matches, PREG_SET_ORDER);

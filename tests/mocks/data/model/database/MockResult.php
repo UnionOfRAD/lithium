@@ -10,13 +10,13 @@ namespace lithium\tests\mocks\data\model\database;
 
 class MockResult extends \lithium\data\source\Result {
 
-	protected $_records = array();
+	protected $_records = [];
 
-	protected $_autoConfig = array('resource', 'records');
+	protected $_autoConfig = ['resource', 'records'];
 
 	protected function _fetch() {
 		if ($this->_records) {
-			return array($this->_iterator++, array_shift($this->_records));
+			return [$this->_iterator++, array_shift($this->_records)];
 		}
 	}
 }

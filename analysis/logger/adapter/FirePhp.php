@@ -27,9 +27,9 @@ trigger_error($message, E_USER_DEPRECATED);
  * use lithium\analysis\Logger;
  * use lithium\aop\Filters;
  *
- * Logger::config(array(
- * 	'default' => array('adapter' => 'FirePhp')
- * ));
+ * Logger::config([
+ * 	'default' => ['adapter' => 'FirePhp']
+ * ]);
  *
  * Filters::apply('lithium\action\Dispatcher', '_call', function($params, $chain) {
  * 	if (isset($params['callable']->response)) {
@@ -66,7 +66,7 @@ trigger_error($message, E_USER_DEPRECATED);
  * method for more information on how your message will be encoded.
  *
  * ```
- * Logger::debug(array('debug' => 'me'));
+ * Logger::debug(['debug' => 'me']);
  * Logger::debug(new \lithium\action\Response());
  * ```
  *
@@ -84,11 +84,11 @@ class FirePhp extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_headers = array(
+	protected $_headers = [
 		'X-Wf-Protocol-1' => 'http://meta.wildfirehq.org/Protocol/JsonStream/0.2',
 		'X-Wf-1-Plugin-1' => 'http://meta.firephp.org/Wildfire/Plugin/FirePHP/Library-FirePHPCore/0.3',
 		'X-Wf-1-Structure-1' => 'http://meta.firephp.org/Wildfire/Structure/FirePHP/FirebugConsole/0.1'
-	);
+	];
 
 	/**
 	 * This is a mapping table that maps Lithium log levels to FirePHP log levels as they
@@ -96,7 +96,7 @@ class FirePhp extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_levels = array(
+	protected $_levels = [
 		'emergency' => 'ERROR',
 		'alert'     => 'ERROR',
 		'critical'  => 'ERROR',
@@ -105,7 +105,7 @@ class FirePhp extends \lithium\core\Object {
 		'notice'    => 'INFO',
 		'info'      => 'INFO',
 		'debug'     => 'LOG'
-	);
+	];
 
 	/**
 	 * This self-incrementing counter allows the user to log more than one message per request.
@@ -122,7 +122,7 @@ class FirePhp extends \lithium\core\Object {
 	/**
 	 * Contains messages that have been written to the log before the bind() call.
 	 */
-	protected $_queue = array();
+	protected $_queue = [];
 
 	/**
 	 * Binds the response object to the logger and sets the required Wildfire
@@ -186,7 +186,7 @@ class FirePhp extends \lithium\core\Object {
 	protected function _format($type, $message) {
 		$key = 'X-Wf-1-1-1-' . $this->_counter++;
 
-		$content = array(array('Type' => $this->_levels[$type]), $message);
+		$content = [['Type' => $this->_levels[$type]], $message];
 		$content = json_encode($content);
 		$content = strlen($content) . '|' . $content . '|';
 

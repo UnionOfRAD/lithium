@@ -41,9 +41,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @see lithium\net\http\Router::parse()
 	 * @var array
 	 */
-	protected static $_classes = array(
+	protected static $_classes = [
 		'router' => 'lithium\net\http\Router'
-	);
+	];
 
 	/**
 	 * Contains pre-process format strings for changing Dispatcher's behavior based on `'rules'`.
@@ -61,11 +61,11 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * present and not empty in the parameters returned from routing, the value of `'action'`
 	 * will be rewritten per the settings in the rule:
 	 * ```
-	 * Dispatcher::config(array(
-	 *	'rules' => array(
+	 * Dispatcher::config([
+	 *	'rules' => [
 	 *		'admin' => 'admin_{:action}'
-	 *	)
-	 * ));
+	 *	]
+	 * ]);
 	 * ```
 	 *
 	 * The following example shows two rules that continuously or independently transform the
@@ -83,19 +83,19 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * action:
 	 * ```
 	 * // ...
-	 *		'action' => array('action' => function($params) {
+	 *		'action' => ['action' => function($params) {
 	 *			return Inflector::camelize(strtolower($params['action']), false);
-	 *		})
+	 *		}]
 	 * // ...
 	 * ```
 	 *
 	 * The entires rules can become a callback as well:
 	 * ```
-	 * Dispatcher::config(array(
+	 * Dispatcher::config([
 	 *	'rules' => function($params) {
 	 *		// ...
 	 *	}
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * @see lithium\action\Dispatcher::config()
@@ -103,7 +103,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @see lithium\util\Inflector
 	 * @var array
 	 */
-	protected static $_rules = array();
+	protected static $_rules = [];
 
 	/**
 	 * Used to set configuration parameters for the `Dispatcher`.
@@ -116,9 +116,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return array If no parameters are passed, returns an associative array with the current
 	 *         configuration, otherwise returns `null`.
 	 */
-	public static function config(array $config = array()) {
+	public static function config(array $config = []) {
 		if (!$config) {
-			return array('rules' => static::$_rules);
+			return ['rules' => static::$_rules];
 		}
 
 		foreach ($config as $key => $val) {
@@ -147,7 +147,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *         `lithium\action\Response`.
 	 * @filter Allows to perform actions very early or late in the request.
 	 */
-	public static function run($request, array $options = array()) {
+	public static function run($request, array $options = []) {
 		$params = compact('request', 'options');
 
 		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
@@ -179,7 +179,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return array Returns the `$params` array with formatting rules applied to array values.
 	 */
 	public static function applyRules(&$params) {
-		$values = array();
+		$values = [];
 		$rules = static::$_rules;
 
 		if (!$params) {
@@ -244,7 +244,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$params = compact('request', 'params', 'options');
 
 		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
-			$options = array('request' => $params['request']) + $params['options'];
+			$options = ['request' => $params['request']] + $params['options'];
 			$controller = $params['params']['controller'];
 
 			try {

@@ -9,8 +9,8 @@
 /**
  * Validation data for `nl_NL`.
  */
-return array(
+return [
 	'ssn' => '/\\A\\b[0-9]{9}\\b\\z/i'
-);
+];
 
 ?>

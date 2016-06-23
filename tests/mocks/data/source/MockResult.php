@@ -10,13 +10,13 @@ namespace lithium\tests\mocks\data\source;
 
 class MockResult extends \lithium\data\source\Result {
 
-	protected $_data = array();
+	protected $_data = [];
 
-	protected $_autoConfig = array('data');
+	protected $_autoConfig = ['data'];
 
 	protected function _fetch() {
 		if ($this->_data) {
-			return array($this->_iterator++, array_shift($this->_data));
+			return [$this->_iterator++, array_shift($this->_data)];
 		}
 	}
 }

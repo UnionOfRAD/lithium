@@ -80,14 +80,14 @@ abstract class Result extends \lithium\core\Object implements \Iterator {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('resource');
+	protected $_autoConfig = ['resource'];
 
 	/**
 	 * Buffer results of query before returning / iterating. Allows consumers to 'peek' at results.
 	 *
 	 * @var array
 	 */
-	protected $_buffer = array();
+	protected $_buffer = [];
 
 	/**
 	 * Returns the used resource.

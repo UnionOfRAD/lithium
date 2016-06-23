@@ -164,13 +164,13 @@ class MockerChainTest extends \lithium\test\Unit {
 	}
 
 	public function testRespondsToParentCall() {
-		$chain = Mocker::chain(array());
+		$chain = Mocker::chain([]);
 		$this->assertTrue($chain->respondsTo('applyFilter'));
 		$this->assertFalse($chain->respondsTo('fooBarBaz'));
 	}
 
 	public function testRespondsToMagic() {
-		$chain = Mocker::chain(array());
+		$chain = Mocker::chain([]);
 		$this->assertTrue($chain->respondsTo('gt'));
 		$this->assertTrue($chain->respondsTo('lt'));
 		$this->assertFalse($chain->respondsTo('et'));

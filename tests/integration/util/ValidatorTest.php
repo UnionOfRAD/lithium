@@ -20,15 +20,15 @@ class ValidatorTest extends \lithium\test\Integration {
 	 * Tests email address validation, with additional hostname lookup
 	 */
 	public function testEmailDomainCheckGoodMxrr() {
-		$this->assertTrue(Validator::isEmail('abc.efg@google.com', null, array(
+		$this->assertTrue(Validator::isEmail('abc.efg@google.com', null, [
 			'deep' => true
-		)));
+		]));
 	}
 
 	public function testEmailDomainCheckBadMxrr() {
-		$this->assertFalse(Validator::isEmail('abc.efg@foo.invalid', null, array(
+		$this->assertFalse(Validator::isEmail('abc.efg@foo.invalid', null, [
 			'deep' => true
-		)));
+		]));
 	}
 }
 

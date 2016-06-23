@@ -57,13 +57,13 @@ class MockerChain extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_data = array(
+	protected $_data = [
 		'results' => null,
 		'method' => false,
 		'args' => false,
 		'success' => true,
 		'callTime' => 0,
-	);
+	];
 
 	/**
 	 * Constructor. Saves the results from the mock.
@@ -83,7 +83,7 @@ class MockerChain extends \lithium\core\Object {
 	 * @return object
 	 */
 	public function __call($comparison, $args) {
-		$methodExists = in_array($comparison, array('gt', 'gte', 'lt', 'lte', 'eq'), true);
+		$methodExists = in_array($comparison, ['gt', 'gte', 'lt', 'lte', 'eq'], true);
 		if (!$this->_data['success'] || !$methodExists) {
 			return $this;
 		}
@@ -133,7 +133,7 @@ class MockerChain extends \lithium\core\Object {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
-		$methodExists = in_array($method, array('gt', 'gte', 'lt', 'lte', 'eq'), true);
+		$methodExists = in_array($method, ['gt', 'gte', 'lt', 'lte', 'eq'], true);
 		return $methodExists || parent::respondsTo($method, $internal);
 	}
 
@@ -202,13 +202,13 @@ class MockerChain extends \lithium\core\Object {
 	 */
 	public function success() {
 		$success = $this->_data['success'];
-		$this->_data = array(
+		$this->_data = [
 			'results' => $this->_data['results'],
 			'method' => false,
 			'args' => false,
 			'success' => true,
 			'callTime' => 0,
-		);
+		];
 		return $success;
 	}
 

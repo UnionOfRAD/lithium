@@ -16,9 +16,9 @@ use MongoBinData;
 
 class Schema extends \lithium\data\DocumentSchema {
 
-	protected $_handlers = array();
+	protected $_handlers = [];
 
-	protected $_types = array(
+	protected $_types = [
 		'MongoId'      => 'id',
 		'MongoDate'    => 'date',
 		'MongoCode'    => 'code',
@@ -26,7 +26,7 @@ class Schema extends \lithium\data\DocumentSchema {
 		'datetime'     => 'date',
 		'timestamp'    => 'date',
 		'int'          => 'integer'
-	);
+	];
 
 	/**
 	 * Constructor.
@@ -35,8 +35,8 @@ class Schema extends \lithium\data\DocumentSchema {
 	 *        - `'fields'` _array_
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('fields' => array('_id' => array('type' => 'id')));
+	public function __construct(array $config = []) {
+		$defaults = ['fields' => ['_id' => ['type' => 'id']]];
 		parent::__construct(array_filter($config) + $defaults);
 	}
 
@@ -44,7 +44,7 @@ class Schema extends \lithium\data\DocumentSchema {
 		$this->_autoConfig[] = 'handlers';
 		parent::_init();
 
-		$this->_handlers += array(
+		$this->_handlers += [
 			'id' => function($v) {
 				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new MongoId($v) : $v;
 			},
@@ -58,7 +58,7 @@ class Schema extends \lithium\data\DocumentSchema {
 			'boolean' => function($v) { return (boolean) $v; },
 			'code'    => function($v) { return new MongoCode($v); },
 			'binary'  => function($v) { return new MongoBinData($v); }
-		);
+		];
 	}
 }
 

@@ -15,7 +15,7 @@ class SocketTest extends \lithium\test\Unit {
 
 	public function testInitialization() {
 		$socket = new MockSocket();
-		$socket->open(array('test' => true));
+		$socket->open(['test' => true]);
 		$config = $socket->config();
 		$this->assertTrue($config['test']);
 	}
@@ -23,7 +23,7 @@ class SocketTest extends \lithium\test\Unit {
 	public function testSend() {
 		$socket = new MockSocket();
 		$message = new Request();
-		$response = $socket->send($message, array('response' => 'lithium\net\http\Response'));
+		$response = $socket->send($message, ['response' => 'lithium\net\http\Response']);
 		$this->assertInstanceOf('lithium\net\http\Response', $response);
 		$this->assertInstanceOf('lithium\net\http\Request', $socket->data);
 	}

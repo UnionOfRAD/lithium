@@ -13,18 +13,18 @@ use lithium\aop\Filters;
 class MockStaticFiltered {
 
 	public static function method() {
-		return Filters::run(get_called_class(), __FUNCTION__, array(), function($params) {
+		return Filters::run(get_called_class(), __FUNCTION__, [], function($params) {
 			return 'method';
 		});
 	}
 
 	public static function method2() {
-		return Filters::run(get_called_class(), __FUNCTION__, array(), function($params) {
+		return Filters::run(get_called_class(), __FUNCTION__, [], function($params) {
 			return 'method2';
 		});
 	}
 
-	public static function methodTracing(array $trace = array()) {
+	public static function methodTracing(array $trace = []) {
 		$trace[] = 'Starting outer method call';
 
 		$result = Filters::run(get_called_class(), __FUNCTION__, compact('trace'), function($params) {
@@ -36,7 +36,7 @@ class MockStaticFiltered {
 	}
 
 	public static function callSubclassMethod() {
-		return Filters::run(get_called_class(), __FUNCTION__, array(), function($params) {
+		return Filters::run(get_called_class(), __FUNCTION__, [], function($params) {
 			return static::childMethod();
 		});
 	}

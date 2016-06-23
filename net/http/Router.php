@@ -21,7 +21,7 @@ use lithium\net\http\RoutingException;
  * to `SessionController::add()`.
  *
  * ```
- * Router::connect('/login', array('controller' => 'Sessions', 'action' => 'add'));
+ * Router::connect('/login', ['controller' => 'Sessions', 'action' => 'add']);
  * ```
  *
  * The `Router` plays an important role in the dispatching process. It allows the `Dispatcher`
@@ -29,7 +29,7 @@ use lithium\net\http\RoutingException;
  * will _parse_ the URL and respond with a set of dispatch parameters.
  *
  * ```
- * Router::parse('/login'); // returns array('controller' => 'Sessions', 'action' => 'add')
+ * Router::parse('/login'); // returns ['controller' => 'Sessions', 'action' => 'add']
  * ```
  *
  * Another important thing the `Router` is quite often used for, is the so called _reverse
@@ -45,7 +45,7 @@ use lithium\net\http\RoutingException;
  * reverse routing and accept route parameters.
  *
  * ```
- * $this->html->link(array(...));
+ * $this->html->link([...]);
  * ```
  *
  * But why use reverse routing and parameters instead of URL string at all? Well, as the whole
@@ -80,7 +80,7 @@ class Router extends \lithium\core\StaticObject {
 	 * @see lithium\net\http\Route
 	 * @var array
 	 */
-	protected static $_configurations = array();
+	protected static $_configurations = [];
 
 	/**
 	 * Array of closures used to format route parameters when parsing URLs.
@@ -88,7 +88,7 @@ class Router extends \lithium\core\StaticObject {
 	 * @see lithium\net\http\Router::modifiers()
 	 * @var array
 	 */
-	protected static $_modifiers = array();
+	protected static $_modifiers = [];
 
 	/**
 	 * An array of named closures matching up to corresponding route parameter values. Used to
@@ -97,17 +97,17 @@ class Router extends \lithium\core\StaticObject {
 	 * @see lithium\net\http\Router::formatters()
 	 * @var array
 	 */
-	protected static $_formatters = array();
+	protected static $_formatters = [];
 
 	/**
 	 * Classes used by `Router`.
 	 *
 	 * @var array
 	 */
-	protected static $_classes = array(
+	protected static $_classes = [
 		'route'         => 'lithium\net\http\Route',
 		'configuration' => 'lithium\core\Configuration'
-	);
+	];
 
 	/**
 	 * Flag for generating Unicode-capable routes. Turn this off if you don't need it, or if you're
@@ -122,9 +122,9 @@ class Router extends \lithium\core\StaticObject {
 	 *        `'classes'` and `'unicode'`.
 	 * @return array Returns the current configuration settings.
 	 */
-	public static function config($config = array()) {
+	public static function config($config = []) {
 		if (!$config) {
-			return array('classes' => static::$_classes, 'unicode' => static::$_unicode);
+			return ['classes' => static::$_classes, 'unicode' => static::$_unicode];
 		}
 		if (isset($config['classes'])) {
 			static::$_classes = $config['classes'] + static::$_classes;
@@ -145,11 +145,11 @@ class Router extends \lithium\core\StaticObject {
 	 * and can be used to short-circuit the framework's lookup and invocation of controller
 	 * actions:
 	 * ```
-	 * Router::connect('/photos/{:id:[0-9]+}.jpg', array(), function($request) {
-	 *     return new Response(array(
-	 *         'headers' => array('Content-type' => 'image/jpeg'),
+	 * Router::connect('/photos/{:id:[0-9]+}.jpg', [], function($request) {
+	 *     return new Response([
+	 *         'headers' => ['Content-type' => 'image/jpeg'],
 	 *         'body' => Photos::first($request->id)->bytes()
-	 *     ));
+	 *     ]);
 	 * });
 	 * ```
 	 *
@@ -168,7 +168,7 @@ class Router extends \lithium\core\StaticObject {
 	 *                      a callable that will be used as a route handler.
 	 * @return \lithium\net\http\Route Instance of the connected route.
 	 */
-	public static function connect($template, $params = array(), $options = array()) {
+	public static function connect($template, $params = [], $options = []) {
 		if (is_array($options) && isset($options['scope'])) {
 			$name = $options['scope'];
 		} else {
@@ -186,13 +186,13 @@ class Router extends \lithium\core\StaticObject {
 		}
 		$params = static::_parseController($params);
 		if (is_callable($options)) {
-			$options = array('handler' => $options);
+			$options = ['handler' => $options];
 		}
-		$config = compact('template', 'params') + $options + array(
+		$config = compact('template', 'params') + $options + [
 			'formatters' => static::formatters(),
 			'modifiers' => static::modifiers(),
 			'unicode' => static::$_unicode
-		);
+		];
 		return (static::$_configurations[$name][] = static::_instance('route', $config));
 	}
 
@@ -218,14 +218,14 @@ class Router extends \lithium\core\StaticObject {
 	 * ```
 	 * use lithium\util\Inflector;
 	 *
-	 * Router::modifiers(array(
+	 * Router::modifiers([
 	 *     'controller' => function($value) {
 	 *         return Inflector::camelize($value);
 	 *     },
 	 *     'action' => function($value) {
 	 *         return Inflector::camelize($value) . 'Action';
 	 *     }
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * _Note_: Because modifiers are copied to `Route` objects on an individual basis, make sure
@@ -235,16 +235,16 @@ class Router extends \lithium\core\StaticObject {
 	 *        existing list.
 	 * @return array Returns the formatters array.
 	 */
-	public static function modifiers(array $modifiers = array()) {
+	public static function modifiers(array $modifiers = []) {
 		if (!static::$_modifiers) {
-			static::$_modifiers = array(
+			static::$_modifiers = [
 				'args' => function($value) {
 					return explode('/', $value);
 				},
 				'controller' => function($value) {
 					return Inflector::camelize($value);
 				}
-			);
+			];
 		}
 		if ($modifiers) {
 			static::$_modifiers = array_filter($modifiers + static::$_modifiers);
@@ -260,10 +260,10 @@ class Router extends \lithium\core\StaticObject {
 	 * ```
 	 * use lithium\util\Inflector;
 	 *
-	 * Router::formatters(array(
+	 * Router::formatters([
 	 *     'controller' => function($value) { return Inflector::slug($value); },
 	 *     'action' => function($value) { return Inflector::slug($value); }
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * _Note_: Because formatters are copied to `Route` objects on an individual basis, make sure
@@ -273,9 +273,9 @@ class Router extends \lithium\core\StaticObject {
 	 *        existing list.
 	 * @return array Returns the formatters array.
 	 */
-	public static function formatters(array $formatters = array()) {
+	public static function formatters(array $formatters = []) {
 		if (!static::$_formatters) {
-			static::$_formatters = array(
+			static::$_formatters = [
 				'args' => function($value) {
 					return is_array($value) ? join('/', $value) : $value;
 				},
@@ -286,7 +286,7 @@ class Router extends \lithium\core\StaticObject {
 					}
 					return Inflector::underscore($value);
 				}
-			);
+			];
 		}
 		if ($formatters) {
 			static::$_formatters = array_filter($formatters + static::$_formatters);
@@ -328,7 +328,7 @@ class Router extends \lithium\core\StaticObject {
 					continue;
 				}
 
-				static::attach($name, null, isset($request->params) ? $request->params : array());
+				static::attach($name, null, isset($request->params) ? $request->params : []);
 				static::scope($name);
 
 				return $request;
@@ -342,12 +342,12 @@ class Router extends \lithium\core\StaticObject {
 	 * against a connected `Route` object. For example, given the following route:
 	 *
 	 * ```
-	 * Router::connect('/login', array('controller' => 'users', 'action' => 'login'));
+	 * Router::connect('/login', ['controller' => 'users', 'action' => 'login']);
 	 * ```
 	 *
 	 * This will match:
 	 * ```
-	 * $url = Router::match(array('controller' => 'users', 'action' => 'login'));
+	 * $url = Router::match(['controller' => 'users', 'action' => 'login']);
 	 * // returns /login
 	 * ```
 	 *
@@ -362,18 +362,18 @@ class Router extends \lithium\core\StaticObject {
 	 *
 	 * You can combine this with more complicated routes; for example:
 	 * ```
-	 * Router::connect('/posts/{:id:\d+}', array('controller' => 'posts', 'action' => 'view'));
+	 * Router::connect('/posts/{:id:\d+}', ['controller' => 'posts', 'action' => 'view']);
 	 * ```
 	 *
 	 * This will match:
 	 * ```
-	 * $url = Router::match(array('controller' => 'posts', 'action' => 'view', 'id' => '1138'));
+	 * $url = Router::match(['controller' => 'posts', 'action' => 'view', 'id' => '1138']);
 	 * // returns /posts/1138
 	 * ```
 	 *
 	 * Again, you can specify the same URL with a more compact syntax, as in the following:
 	 * ```
-	 * $url = Router::match(array('Posts::view', 'id' => '1138'));
+	 * $url = Router::match(['Posts::view', 'id' => '1138']);
 	 * // again, returns /posts/1138
 	 * ```
 	 *
@@ -399,7 +399,7 @@ class Router extends \lithium\core\StaticObject {
 	 * @return string Returns a generated URL, based on the URL template of the matched route, and
 	 *         prefixed with the base URL of the application.
 	 */
-	public static function match($url = array(), $context = null, array $options = array()) {
+	public static function match($url = [], $context = null, array $options = []) {
 		$options = static::_matchOptions($url, $context, $options);
 
 		if (is_string($url = static::_prepareParams($url, $context, $options))) {
@@ -407,8 +407,8 @@ class Router extends \lithium\core\StaticObject {
 		}
 
 		$base = $options['base'];
-		$url += array('action' => 'index');
-		$stack = array();
+		$url += ['action' => 'index'];
+		$stack = [];
 
 		$suffix = isset($url['#']) ? "#{$url['#']}" : null;
 		unset($url['#']);
@@ -416,7 +416,7 @@ class Router extends \lithium\core\StaticObject {
 		$scope = $options['scope'];
 		if (isset(static::$_configurations[$scope])) {
 			foreach (static::$_configurations[$scope] as $route) {
-				if (!$match = $route->match($url + array('scope' => static::attached($scope)), $context)) {
+				if (!$match = $route->match($url + ['scope' => static::attached($scope)], $context)) {
 					continue;
 				}
 				if ($route->canContinue()) {
@@ -452,22 +452,22 @@ class Router extends \lithium\core\StaticObject {
 	 * @return array The initialized options.
 	 */
 	protected static function _matchOptions(&$url, $context, $options) {
-		$defaults = array(
+		$defaults = [
 			'scheme' => null,
 			'host' => null,
 			'absolute' => false,
 			'base' => ''
-		);
+		];
 		if ($context) {
-			$defaults = array(
+			$defaults = [
 				'base' => $context->env('base'),
 				'host' => $context->host,
 				'scheme' => $context->scheme . ($context->scheme ? '://' : '//')
-			) + $defaults;
+			] + $defaults;
 		}
 
-		$options += array('scope' => static::scope());
-		$vars = array();
+		$options += ['scope' => static::scope()];
+		$vars = [];
 		$scope = $options['scope'];
 		if (is_array($scope)) {
 			list($tmp, $vars) = each($scope);
@@ -509,8 +509,8 @@ class Router extends \lithium\core\StaticObject {
 	}
 
 	protected static function _formatError($url) {
-		$match = array("\n", 'array (', ',)', '=> NULL', '(  \'', ',  ');
-		$replace = array('', '(', ')', '=> null', '(\'', ', ');
+		$match = ["\n", 'array (', ',)', '=> NULL', '(  \'', ',  '];
+		$replace = ['', '(', ')', '=> null', '(\'', ', '];
 		return str_replace($match, $replace, var_export($url, true));
 	}
 
@@ -573,8 +573,8 @@ class Router extends \lithium\core\StaticObject {
 	 *              are: `'absolute' => true|false`, `'host' => string` and `'scheme' => string`.
 	 * @return string The prefixed URL, depending on the passed options.
 	 */
-	protected static function _prefix($path, $context = null, array $options = array()) {
-		$defaults = array('scheme' => null, 'host' => null, 'absolute' => false);
+	protected static function _prefix($path, $context = null, array $options = []) {
+		$defaults = ['scheme' => null, 'host' => null, 'absolute' => false];
 		$options += $defaults;
 		return ($options['absolute']) ? "{$options['scheme']}{$options['host']}{$path}" : $path;
 	}
@@ -600,7 +600,7 @@ class Router extends \lithium\core\StaticObject {
 			return $url;
 		}
 		foreach ($context->persist as $key) {
-			$url += array($key => $context->params[$key]);
+			$url += [$key => $context->params[$key]];
 
 			if ($url[$key] === null) {
 				unset($url[$key]);
@@ -636,7 +636,7 @@ class Router extends \lithium\core\StaticObject {
 			if (isset(static::$_configurations[$scope])) {
 				return static::$_configurations[$scope];
 			}
-			return array();
+			return [];
 		}
 
 		if (!isset(static::$_configurations[$scope][$route])) {
@@ -649,7 +649,7 @@ class Router extends \lithium\core\StaticObject {
 	 * Resets the `Router` to its default state, unloading all routes.
 	 */
 	public static function reset() {
-		static::$_configurations = array();
+		static::$_configurations = [];
 		static::$_scope = false;
 		if (isset(static::$_scopes)) {
 			static::$_scopes->reset();
@@ -663,7 +663,7 @@ class Router extends \lithium\core\StaticObject {
 	 * @param boolean $context
 	 * @return array
 	 */
-	protected static function _parseString($path, $context, array $options = array()) {
+	protected static function _parseString($path, $context, array $options = []) {
 		if (!preg_match('/^[A-Za-z0-9._\\\\]+::[A-Za-z0-9_]+$/', $path)) {
 			$base = rtrim($options['base'], '/');
 			if ((!$path || $path[0] != '/') && $context && isset($context->controller)) {
@@ -710,38 +710,38 @@ class Router extends \lithium\core\StaticObject {
 	 *
 	 * Example 1:
 	 * ```
-	 * Router::attach('app', array(
+	 * Router::attach('app', [
 	 *     'absolute' => true,
 	 *     'host' => 'localhost',
 	 *     'scheme' => 'http://',
 	 *     'prefix' => 'web/tests'
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * Example 2:
 	 * ```
-	 * Router::attach('app', array(
+	 * Router::attach('app', [
 	 *     'absolute' => true,
 	 *     'host' => '{:subdomain:[a-z]+}.{:hostname}.{:tld}',
 	 *     'scheme' => '{:scheme:https://}',
 	 *     'prefix' => ''
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * Attach the variables to populate for the app scope.
 	 * ```
-	 * Router::attach('app', null, array(
+	 * Router::attach('app', null, [
 	 *     'subdomain' => 'www',
 	 *     'hostname' => 'li3',
 	 *     'tld' => 'me'
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * @param string Name of the scope.
 	 * @param mixed Settings of the mount point or `null` for setting only variables to populate.
 	 * @param array Variables to populate for the scope.
 	 */
-	public static function attach($name, $config = null, array $vars = array()) {
+	public static function attach($name, $config = null, array $vars = []) {
 		if ($name === false) {
 			return null;
 		}
@@ -768,30 +768,30 @@ class Router extends \lithium\core\StaticObject {
 	 *
 	 * Example:
 	 * ```
-	 * Router::attach('app', array(
+	 * Router::attach('app', [
 	 *     'absolute' => true,
 	 *     'host' => '{:subdomain:[a-z]+}.{:hostname}.{:tld}',
 	 *     'scheme' => '{:scheme:https://}',
 	 *     'prefix' => ''
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * ```
-	 * $result = Router::attached('app', array(
+	 * $result = Router::attached('app', [
 	 *     'subdomain' => 'app',
 	 *     'hostname' => 'blog',
 	 *     'tld' => 'co.uk'
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * Will give the following array in `$result`:
 	 *
-	 * array(
+	 * [
 	 *     'absolute' => true,
 	 *     'host' => 'blog.mysite.co.uk',
 	 *     'scheme' => 'http://',
 	 *     'prefix' => ''
-	 * ));
+	 * ]);
 	 *
 	 * @param string Name of the scope.
 	 * @param array Optionnal variables which override the default setted variables with
@@ -799,7 +799,7 @@ class Router extends \lithium\core\StaticObject {
 	 * @return mixed The settings array of the scope or an array of settings array
 	 *         if `$name === null`.
 	 */
-	public static function attached($name = null, array $vars = array()) {
+	public static function attached($name = null, array $vars = []) {
 		if ($name === false) {
 			return null;
 		}
@@ -811,12 +811,12 @@ class Router extends \lithium\core\StaticObject {
 		if ($name === null) {
 			return static::$_scopes->get();
 		} elseif (!$config = static::$_scopes->get($name)) {
-			static::$_scopes->set($name, array());
+			static::$_scopes->set($name, []);
 			$config = static::$_scopes->get($name);
 		}
 		$vars += $config['values'];
 		$match = '@\{:([^:}]+):?((?:[^{]+(?:\{[0-9,]+\})?)*?)\}@S';
-		$fields = array('scheme', 'host');
+		$fields = ['scheme', 'host'];
 		foreach ($fields as $field) {
 			if (preg_match_all($match, $config[$field], $m)) {
 				$tokens = $m[0];
@@ -842,16 +842,16 @@ class Router extends \lithium\core\StaticObject {
 		static::$_scopes = static::_instance('configuration');
 
 		static::$_scopes->initConfig = function($name, $config) {
-			$defaults = array(
+			$defaults = [
 				'absolute' => false,
 				'host' => null,
 				'scheme' => null,
 				'base' => null,
 				'prefix' => '',
 				'pattern' => '',
-				'values' => array(),
+				'values' => [],
 				'library' => $name
-			);
+			];
 
 			$config += $defaults;
 
@@ -870,15 +870,15 @@ class Router extends \lithium\core\StaticObject {
 	 * @return array Returns the complied settings.
 	 */
 	protected static function _compileScope(array $config) {
-		$defaults = array(
+		$defaults = [
 			'absolute' => false,
 			'host' => null,
 			'scheme' => null,
 			'base' => null,
 			'prefix' => '',
 			'pattern' => '',
-			'params' => array()
-		);
+			'params' => []
+		];
 
 		$config += $defaults;
 
@@ -888,7 +888,7 @@ class Router extends \lithium\core\StaticObject {
 		if (!$config['absolute']) {
 			$config['pattern'] = "@^{$prefix}@";
 		} else {
-			$fields = array('scheme', 'host');
+			$fields = ['scheme', 'host'];
 			foreach ($fields as $field) {
 				$dots = '/(?!\{[^\}]*)\.(?![^\{]*\})/';
 				$pattern[$field] = preg_replace($dots, '\.', $config[$field]);
@@ -941,7 +941,7 @@ class Router extends \lithium\core\StaticObject {
 
 		if ($match) {
 			$result = array_intersect_key($match, array_flip($config['params']));
-			$request->params = array();
+			$request->params = [];
 			if (isset($config['library'])) {
 				$request->params['library'] = $config['library'];
 			}

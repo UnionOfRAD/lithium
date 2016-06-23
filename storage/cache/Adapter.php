@@ -121,7 +121,7 @@ abstract class Adapter extends \lithium\core\Object {
 	 * @return array Prefixed keys array.
 	 */
 	protected function _addScopePrefix($scope, array $keys, $separator = ':') {
-		$results = array();
+		$results = [];
 		$isMapped = !is_int(key($keys));
 
 		foreach ($keys as $key => $value) {
@@ -143,7 +143,7 @@ abstract class Adapter extends \lithium\core\Object {
 	 * @return array Keys array with prefix removed from each key.
 	 */
 	protected function _removeScopePrefix($scope, array $data, $separator = ':') {
-		$results = array();
+		$results = [];
 		$prefix = strlen("{$scope}{$separator}");
 
 		foreach ($data as $key => $value) {

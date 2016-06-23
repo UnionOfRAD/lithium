@@ -10,17 +10,17 @@ namespace lithium\tests\mocks\data\model;
 
 class MockDatabaseComment extends \lithium\data\Model {
 
-	public $belongsTo = array('MockDatabasePost');
+	public $belongsTo = ['MockDatabasePost'];
 
-	protected $_meta = array('connection' => false);
+	protected $_meta = ['connection' => false];
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'post_id' => array('type' => 'integer'),
-		'author_id' => array('type' => 'integer'),
-		'body' => array('type' => 'text'),
-		'created' => array('type' => 'datetime')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer'],
+		'post_id' => ['type' => 'integer'],
+		'author_id' => ['type' => 'integer'],
+		'body' => ['type' => 'text'],
+		'created' => ['type' => 'datetime']
+	];
 }
 
 ?>

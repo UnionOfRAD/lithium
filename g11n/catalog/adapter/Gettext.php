@@ -81,8 +81,8 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 *        - `'path'`: The path to the directory holding the data.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('path' => null);
+	public function __construct(array $config = []) {
+		$defaults = ['path' => null];
 		parent::__construct($config + $defaults);
 	}
 
@@ -125,12 +125,12 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			fclose($stream);
 
 			if ($data) {
-				$data['pluralRule'] = array(
+				$data['pluralRule'] = [
 					'id' => 'pluralRule',
 					'translated' => function($count) {
 						return $count !== 1;
 					}
-				);
+				];
 				return $data;
 			}
 		}
@@ -174,7 +174,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 
 		if (($pos = strpos($category, 'Template')) !== false) {
 			$category = substr($category, 0, $pos);
-			return array("{$path}/{$category}_{$scope}.pot");
+			return ["{$path}/{$category}_{$scope}.pot"];
 		}
 
 		if ($category === 'message') {
@@ -182,10 +182,10 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 		}
 		$category = strtoupper($category);
 
-		return array(
+		return [
 			"{$path}/{$locale}/LC_{$category}/{$scope}.mo",
 			"{$path}/{$locale}/LC_{$category}/{$scope}.po"
-		);
+		];
 	}
 
 	/**
@@ -203,15 +203,15 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	 * @return array
 	 */
 	protected function _parsePo($stream) {
-		$defaults = array(
-			'ids' => array(),
+		$defaults = [
+			'ids' => [],
 			'translated' => null,
-			'flags' => array(),
-			'comments' => array(),
-			'occurrences' => array(),
+			'flags' => [],
+			'comments' => [],
+			'occurrences' => [],
 			'context' => null
-		);
-		$data = array();
+		];
+		$data = [];
 		$item = $defaults;
 
 		while ($line = fgets($stream)) {
@@ -225,10 +225,10 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			} elseif (substr($line, 0, 3) === '#, ') {
 				$item['flags'][substr($line, 3)] = true;
 			} elseif (substr($line, 0, 3) === '#: ') {
-				$item['occurrences'][] = array(
+				$item['occurrences'][] = [
 					'file' => strtok(substr($line, 3), ':'),
 					'line' => strtok(':')
-				);
+				];
 			} elseif (substr($line, 0, 3) === '#. ') {
 				$item['comments'][] = substr($line, 3);
 			} elseif ($line[0] === '#') {
@@ -293,19 +293,19 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			throw new RangeException("MO stream content has an invalid format.");
 		}
 
-		$header = array(
+		$header = [
 			'formatRevision' => null,
 			'count' => null,
 			'offsetId' => null,
 			'offsetTranslated' => null,
 			'sizeHashes' => null,
 			'offsetHashes' => null
-		);
+		];
 		foreach ($header as &$value) {
 			$value = $this->_readLong($stream, $isBigEndian);
 		}
 		extract($header);
-		$data = array();
+		$data = [];
 
 		for ($i = 0; $i < $count; $i++) {
 			$singularId = $pluralId = null;
@@ -343,7 +343,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 				$translated = explode("\000", $translated);
 			}
 
-			$ids = array('singular' => $singularId, 'plural' => $pluralId);
+			$ids = ['singular' => $singularId, 'plural' => $pluralId];
 			$data = $this->_merge($data, compact('ids', 'translated', 'context'));
 		}
 		return $data;
@@ -397,7 +397,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 		fwrite($stream, $output);
 
 		foreach ($data as $key => $item) {
-			$output = array();
+			$output = [];
 			$item = $this->_prepareForWrite($item);
 
 			foreach ($item['occurrences'] as $occurrence) {
@@ -418,7 +418,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			if (isset($item['ids']['plural'])) {
 				$output[] = "msgid_plural \"{$item['ids']['plural']}\"";
 
-				foreach ((array) $item['translated'] ?: array(null, null) as $key => $value) {
+				foreach ((array) $item['translated'] ?: [null, null] as $key => $value) {
 					$output[] = "msgstr[{$key}] \"{$value}\"";
 				}
 			} else {
@@ -475,11 +475,11 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			if (is_array($value)) {
 				return array_map($filter, $value);
 			}
-			$value = strtr($value, array("\\'" => "'", "\\\\" => "\\", "\r\n" => "\n"));
+			$value = strtr($value, ["\\'" => "'", "\\\\" => "\\", "\r\n" => "\n"]);
 			$value = addcslashes($value, "\0..\37\\\"");
 			return $value;
 		};
-		$fields = array('id', 'ids', 'translated', 'context');
+		$fields = ['id', 'ids', 'translated', 'context'];
 
 		foreach ($fields as $field) {
 			if (isset($item[$field])) {
@@ -517,7 +517,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			}
 			return stripcslashes($value);
 		};
-		$fields = array('id', 'ids', 'translated', 'context');
+		$fields = ['id', 'ids', 'translated', 'context'];
 
 		foreach ($fields as $field) {
 			if (isset($item[$field])) {

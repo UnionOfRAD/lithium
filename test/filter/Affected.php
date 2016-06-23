@@ -23,7 +23,7 @@ use lithium\analysis\Inspector;
  */
 class Affected extends \lithium\test\Filter {
 
-	protected static $_cachedDepends = array();
+	protected static $_cachedDepends = [];
 
 	/**
 	 * Takes an instance of an object (usually a Collection object) containing test
@@ -34,9 +34,9 @@ class Affected extends \lithium\test\Filter {
 	 * @param array $options Not used.
 	 * @return object Returns the instance of `$tests`.
 	 */
-	public static function apply($report, $tests, array $options = array()) {
-		$affected = array();
-		$testsClasses = $tests->map('get_class', array('collect' => false));
+	public static function apply($report, $tests, array $options = []) {
+		$affected = [];
+		$testsClasses = $tests->map('get_class', ['collect' => false]);
 
 		foreach ($tests as $test) {
 			$affected = array_merge($affected, static::_affected($test->subject()));
@@ -49,7 +49,7 @@ class Affected extends \lithium\test\Filter {
 			if ($test && !in_array($test, $testsClasses)) {
 				$tests[] = new $test();
 			}
-			$report->collect(__CLASS__, array($class => $test));
+			$report->collect(__CLASS__, [$class => $test]);
 		}
 		return $tests;
 	}
@@ -61,8 +61,8 @@ class Affected extends \lithium\test\Filter {
 	 * @param array $options
 	 * @return array The results of the analysis.
 	 */
-	public static function analyze($report, array $options = array()) {
-		$analyze = array();
+	public static function analyze($report, array $options = []) {
+		$analyze = [];
 		foreach ($report->results['filters'][__CLASS__] as $result) {
 			foreach ($result as $class => $test) {
 				$analyze[$class] = $test;
@@ -81,9 +81,9 @@ class Affected extends \lithium\test\Filter {
 	 */
 	protected static function _affected($dependency, $exclude = null) {
 		$exclude = $exclude ?: '/(tests|webroot|resources|libraries|plugins)/';
-		$classes = Libraries::find(true, compact('exclude') + array('recursive' => true));
+		$classes = Libraries::find(true, compact('exclude') + ['recursive' => true]);
 		$dependency = ltrim($dependency, '\\');
-		$affected = array();
+		$affected = [];
 
 		foreach ($classes as $class) {
 			if (isset(static::$_cachedDepends[$class])) {

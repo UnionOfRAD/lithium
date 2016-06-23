@@ -13,18 +13,18 @@ use lithium\tests\mocks\data\model\database\adapter\MockSqlite3;
 class Sqlite3Test extends \lithium\test\Unit {
 
 	public function testDsn() {
-		$db = new MockSqlite3(array(
+		$db = new MockSqlite3([
 			'autoConnect' => false,
 			'database' => '/tmp/test.sqlite'
-		));
+		]);
 		$expected = 'sqlite:/tmp/test.sqlite';
 		$result = $db->dsn();
 		$this->assertEqual($expected, $result);
 
-		$db = new MockSqlite3(array(
+		$db = new MockSqlite3([
 			'autoConnect' => false,
 			'database' => ':memory:'
-		));
+		]);
 		$expected = 'sqlite::memory:';
 		$result = $db->dsn();
 		$this->assertEqual($expected, $result);

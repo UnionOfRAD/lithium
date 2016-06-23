@@ -18,7 +18,7 @@ class MockExposed extends \lithium\core\Object {
 	public function tamper() {
 		$internal =& $this->_internal;
 
-		return $this->_filter(__METHOD__, array(), function() use (&$internal) {
+		return $this->_filter(__METHOD__, [], function() use (&$internal) {
 			$internal = 'tampered';
 			return true;
 		});
