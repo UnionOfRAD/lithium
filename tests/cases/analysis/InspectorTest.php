@@ -12,6 +12,7 @@ use lithium\analysis\Inspector;
 use lithium\core\Libraries;
 use lithium\tests\mocks\analysis\MockEmptyClass;
 use lithium\tests\mocks\core\MockMethodFiltering;
+use lithium\action\Controller;
 
 class InspectorTest extends \lithium\test\Unit {
 
@@ -104,8 +105,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = [__LINE__ - 5 => "\tpublic function testLineIntrospection() {"];
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::lines(__CLASS__, [16]);
-		$expected = [16 => 'class InspectorTest extends \lithium\test\Unit {'];
+		$result = Inspector::lines(__CLASS__, [17]);
+		$expected = [17 => 'class InspectorTest extends \lithium\test\Unit {'];
 		$this->assertEqual($expected, $result);
 
 		$lines = 'This is the first line.' . PHP_EOL . 'And this the second.';
@@ -220,6 +221,7 @@ class InspectorTest extends \lithium\test\Unit {
 	public function testClassDependencies() {
 		$expected = [
 			'Exception', 'ReflectionClass', 'ReflectionProperty', 'ReflectionException',
+			'InvalidArgumentException',
 			'SplFileObject', 'lithium\\core\\Libraries', 'lithium\\analysis\\Docblock'
 		];
 
@@ -251,38 +253,40 @@ class InspectorTest extends \lithium\test\Unit {
 	public function testGetClassProperties() {
 		$result = array_map(
 			function($property) { return $property['name']; },
-			Inspector::properties(__CLASS__)
+			Inspector::properties($this)
 		);
 		$expected = ['test', 'test2'];
 		$this->assertEqual($expected, $result);
 
 		$result = array_map(
 			function($property) { return $property['name']; },
-			Inspector::properties(__CLASS__, ['public' => false])
+			Inspector::properties($this, ['public' => false])
 		);
 		$expected = ['test', 'test2', '_test'];
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::properties(__CLASS__);
+		$result = Inspector::properties($this);
 		$expected = [
 			[
 				'modifiers' => ['public'],
+				'value' => 'foo',
 				'docComment' => false,
-				'name' => 'test',
-				'value' => null
+				'name' => 'test'
 			],
 			[
 				'modifiers' => ['public', 'static'],
+				'value' => 'bar',
 				'docComment' => false,
-				'name' => 'test2',
-				'value' => 'bar'
+				'name' => 'test2'
 			]
 		];
 		$this->assertEqual($expected, $result);
 
+		$controller = new Controller(['init' => false]);
+
 		$result = array_map(
 			function($property) { return $property['name']; },
-			Inspector::properties('lithium\action\Controller')
+			Inspector::properties($controller)
 		);
 		$this->assertTrue(in_array('request', $result));
 		$this->assertTrue(in_array('response', $result));
@@ -291,7 +295,7 @@ class InspectorTest extends \lithium\test\Unit {
 
 		$result = array_map(
 			function($property) { return $property['name']; },
-			Inspector::properties('lithium\action\Controller', ['public' => false])
+			Inspector::properties($controller, ['public' => false])
 		);
 		$this->assertTrue(in_array('request', $result));
 		$this->assertTrue(in_array('response', $result));

@@ -229,6 +229,9 @@
 - Instance filters are now not cleaned up automatically anymore, that
   is when the instance was destroyed, its filters went away with it.
 
+- `Inspector::properties()` and `Inspector::methdos()` now requires an instance when 
+  inspecting concrete classes.
+
 ### Deprecated
 
 - Multi-word console command arguments i.e. `--no-color` were made available as
@@ -350,6 +353,8 @@
   a falsey value (i.e. `null`, `false`, `''`).
 
 - Fixed parsing certain exception details in `Database` i.e. `pgsql unknown role exception`.
+
+- Fixed retrieval of property default values in concrete classes through `Inspector`.
 
 ## v1.0.1
 

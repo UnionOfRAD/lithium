@@ -12,6 +12,7 @@ use Exception;
 use ReflectionClass;
 use ReflectionProperty;
 use ReflectionException;
+use InvalidArgumentException;
 use SplFileObject;
 use lithium\core\Libraries;
 use lithium\analysis\Docblock;
@@ -256,7 +257,8 @@ class Inspector {
 	/**
 	 * Returns various information on the methods of an object, in different formats.
 	 *
-	 * @param mixed $class A string class name or an object instance, from which to get methods.
+	 * @param string|object $class A string class name for purely static classes or an object
+	 *        instance, from which to get methods.
 	 * @param string $format The type and format of data to return. Available options are:
 	 *        - `null`: Returns a `Collection` object containing a `ReflectionMethod` instance
 	 *         for each method.
@@ -328,7 +330,8 @@ class Inspector {
 	/**
 	 * Returns various information on the properties of an object.
 	 *
-	 * @param mixed $class A string class name or an object instance, from which to get methods.
+	 * @param string|object $class A string class name for purely static classes or an object
+	 *        instance, from which to get properties.
 	 * @param array $options Set of options applied directly (check `_items()` for more options):
 	 *        - `'properties'`: array of properties to gather information from.
 	 *        - `'self'`: If true (default), only returns properties defined in `$class`,
@@ -340,28 +343,33 @@ class Inspector {
 		$defaults = ['properties' => [], 'self' => true];
 		$options += $defaults;
 
-		if (!(is_object($class) && $class instanceof ReflectionClass)) {
-			try {
-				$class = new ReflectionClass($class);
-			} catch (ReflectionException $e) {
-				return null;
-			}
+		try {
+			$reflClass = new ReflectionClass($class);
+		} catch (ReflectionException $e) {
+			return null;
 		}
 		$options += ['names' => $options['properties']];
 
-		return static::_items($class, 'getProperties', $options)->map(function($item) {
-			$class = __CLASS__;
-			$modifiers = array_values($class::invokeMethod('_modifiers', [$item]));
+		return static::_items($reflClass, 'getProperties', $options)->map(function($item) use ($class) {
+			$modifiers = array_values(Inspector::invokeMethod('_modifiers', [$item]));
 			$setAccess = (
 				array_intersect($modifiers, ['private', 'protected']) !== []
 			);
 			if ($setAccess) {
 				$item->setAccessible(true);
 			}
-			$result = compact('modifiers') + [
+			if (is_string($class)) {
+				if (!$item->isStatic()) {
+					$message = 'Must provide an object instance for non-static properties.';
+					throw new InvalidArgumentException($message);
+				}
+				$value = $item->getValue($item->getDeclaringClass());
+			} else {
+				$value = $item->getValue($class);
+			}
+			$result = compact('modifiers', 'value') + [
 				'docComment' => $item->getDocComment(),
-				'name' => $item->getName(),
-				'value' => $item->getValue($item->getDeclaringClass())
+				'name' => $item->getName()
 			];
 			if ($setAccess) {
 				$item->setAccessible(false);
