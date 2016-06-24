@@ -7,7 +7,7 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
-use \RuntimeException;
+// use \RuntimeException;
 
 foreach (explode(' ', getenv('PHP_EXT')) ?: [] as $extension) {
 	PhpExtensions::install($extension);
@@ -57,8 +57,12 @@ class PhpExtensions {
 
 	protected static function _apcu() {
 		if (!static::_isHhvm()) {
-			static::_pecl('apcu', '5.1.2', true);
-			static::_ini(['extension=apcu.so']);
+			if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
+				static::_pecl('apcu', '5.1.5', true);
+			} else {
+				static::_pecl('apcu', '5.1.2', true);
+			}
+			// static::_ini(['extension=apcu.so']);
 		}
 		static::_ini([
 			'apc.enabled=1',
