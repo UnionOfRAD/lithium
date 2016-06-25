@@ -328,18 +328,18 @@ class MemcacheTest extends \lithium\test\Integration {
 		$test = new Memcache(['host' => '127.0.0.1']);
 		$hosts = [['host' => '127.0.0.1', 'port' => 11211]];
 
-		if (defined('HHVM_VERSION')) {
-			$hosts['weight'] = 0;
+		$result = $test->connection->getServerList();
+		foreach ($result as &$r) {
+			if (isset($r['type'])) {
+				unset($r['type']);
+			}
+			if (isset($r['weight'])) {
+				unset($r['weight']);
+			}
 		}
-		$this->assertEqual($hosts, $test->connection->getServerList());
+		unset($r);
 
-		$test = new Memcache(['host' => '127.0.0.1:11222']);
-		$hosts = [['host' => '127.0.0.1', 'port' => 11222]];
-
-		if (defined('HHVM_VERSION')) {
-			$hosts['weight'] = 0;
-		}
-		$this->assertEqual($hosts, $test->connection->getServerList());
+		$this->assertEqual($hosts, $result);
 	}
 
 	public function testMultiServerConnectionSettings() {
@@ -353,7 +353,19 @@ class MemcacheTest extends \lithium\test\Integration {
 			['host' => '127.0.0.2', 'port' => 11223],
 			['host' => '127.0.0.3', 'port' => 11224]
 		];
-		$this->assertEqual($hosts, $test->connection->getServerList());
+
+		$result = $test->connection->getServerList();
+		foreach ($result as &$r) {
+			if (isset($r['type'])) {
+				unset($r['type']);
+			}
+			if (isset($r['weight'])) {
+				unset($r['weight']);
+			}
+		}
+		unset($r);
+
+		$this->assertEqual($hosts, $result);
 	}
 
 	public function testWriteReadAndDeleteRoundtrip() {
