@@ -235,6 +235,9 @@
 - When calculating test coverage dead code is not ignored anymore. `XDEBUG_CC_DEAD_CODE`
   causes problems with PHP 7.0 + opcache and cannot be relieably used. 
 
+- The undocumented and deprecated `'servers'` option in the `Memcache` cache adapter has been
+  removed. `'host'` should be used in all cases.
+
 ### Deprecated
 
 - Multi-word console command arguments i.e. `--no-color` were made available as

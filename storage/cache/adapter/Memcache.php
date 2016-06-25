@@ -106,12 +106,6 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 */
 	protected function _init() {
 		$this->connection = $this->connection ?: new Memcached();
-		$servers = [];
-
-		if (isset($this->_config['servers'])) {
-			$this->connection->addServers($this->_config['servers']);
-			return;
-		}
 		$this->connection->addServers($this->_formatHostList($this->_config['host']));
 
 		if ($this->_config['scope']) {
