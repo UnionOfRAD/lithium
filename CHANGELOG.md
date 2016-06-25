@@ -232,6 +232,9 @@
 - `Inspector::properties()` and `Inspector::methdos()` now requires an instance when 
   inspecting concrete classes.
 
+- When calculating test coverage dead code is not ignored anymore. `XDEBUG_CC_DEAD_CODE`
+  causes problems with PHP 7.0 + opcache and cannot be relieably used. 
+
 ### Deprecated
 
 - Multi-word console command arguments i.e. `--no-color` were made available as

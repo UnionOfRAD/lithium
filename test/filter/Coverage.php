@@ -44,7 +44,7 @@ class Coverage extends \lithium\test\Filter {
 
 		foreach ($tests as $test) {
 			$filter = function($params, $next) use ($test, $report) {
-				xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
+				xdebug_start_code_coverage(XDEBUG_CC_UNUSED);
 				$next($params);
 				$results = xdebug_get_code_coverage();
 				xdebug_stop_code_coverage();
