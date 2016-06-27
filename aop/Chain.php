@@ -17,7 +17,7 @@ namespace lithium\aop;
  * While the first added filter is called with the input first, and last in
  * receiving the result.
  *
- * ```
+ * ```asciiart
  *        │                ▲
  *        │                │
  * ┌──────┼────────────────┼──────┐
