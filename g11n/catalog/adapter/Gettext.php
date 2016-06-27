@@ -22,7 +22,7 @@ use lithium\core\Libraries;
  * the standard gettext directory structure with a few slight adjustments to the way
  * templates are being named.
  *
- * ```
+ * ```asciiart
  * resources/g11n/po
  * ├── <locale>
  * |   ├── LC_MESSAGES
