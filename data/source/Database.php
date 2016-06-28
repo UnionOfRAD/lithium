@@ -155,7 +155,7 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * @see lithium\data\source\Database::renderCommand()
 	 * @param string $sql The sql string to execute
-	 * @return resource
+	 * @return \lithium\data\source\Result Returns a result object if the query was successful.
 	 */
 	abstract protected function _execute($sql);
 
