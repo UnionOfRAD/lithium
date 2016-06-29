@@ -748,6 +748,9 @@ abstract class Database extends \lithium\data\Source {
 	 * Executes calculation-related queries, such as those required for `count` and other
 	 * aggregates.
 	 *
+	 * When building `count` queries and a single field is given, will use that to build
+	 * the `COUNT()` fragment. When multiple fields are given forces a `COUNT(*)`.
+	 *
 	 * @param string $type Only accepts `count`.
 	 * @param mixed $query The query to be executed.
 	 * @param array $options Optional arguments for the `read()` query that will be executed

@@ -602,9 +602,11 @@ class Model extends \lithium\core\StaticObject {
 	 *        - `'all'`: Returns all records matching the conditions.
 	 *        - `'first'`: Returns the first record matching the conditions.
 	 *        - `'count'`: Returns an integer count of all records matching the conditions.
-	 *        - `'list'`: Returns a one dimensional array, where the key is the (primary)
+	 *          When using `Database` adapter, you can specify the field to count on
+	 *          via `fields`, when multiple fields are given does a count on all fields (`'*'`).
+	 *        - `'list'`: Returns a one dimensional array, where the key is the (primary)p
 	 *          key and the value the title of the record (the record must have a `'title'`
-	 *          field). A result may look like: `array(1 => 'Foo', 2 => 'Bar')`.
+	 *          field). A result may look like: `[1 => 'Foo', 2 => 'Bar']`.
 	 *
 	 *        Instead of the name of a finder, also supports shorthand usage with an object or
 	 *        integer as the first parameter. When passed such a value it is equal to
