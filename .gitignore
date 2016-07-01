@@ -10,3 +10,6 @@
 
 # Vim
 .*.sw[a-z]
+
+# PHPStorm
+.idea
