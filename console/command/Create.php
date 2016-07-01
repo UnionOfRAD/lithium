@@ -18,26 +18,54 @@ use lithium\core\ClassNotFoundException;
  * The `create` command allows you to rapidly develop your models, views, controllers, and tests
  * by generating the minimum code necessary to test and run your application.
  *
- * `li3 create --template=controller Posts`
- * `li3 create --template=model Posts`
+ * These commands create the `Posts`-controller and model.
+ * ```sh
+ * li3 create controller Posts
+ * li3 create model Posts
+ * ```
+ *
+ * To create the tests for each run:
+ * ```sh
+ * li3 create test controller Posts
+ * li3 create test model Posts
+ * ```
+ *
+ * To create everything in one go run:
+ * ```sh
+ * li3 create Posts
+ * ```
+ *
+ * Have your own model template? Use the `--template` option:
+ * ```sh
+ * li3 create --template=MyModel model Posts
+ * ```
  */
 class Create extends \lithium\console\Command {
-
-	/**
-	 * Name of library to use
-	 *
-	 * @var string
-	 */
-	public $library = null;
 
 	/**
 	 * The name of the template to use to generate the file. This allows you to add a custom
 	 * template to be used in place of the core template for each command. Place templates in
 	 * `<library>\extensions\command\create\template`.
 	 *
+	 * ```sh
+	 * li3 create --template=MyModel model Posts
+	 * ```
+	 *
 	 * @var string
 	 */
 	public $template = null;
+
+	/**
+	 * Name of the library to use, defaults to the current application.
+	 *
+	 * The following command creates a `Posts` model inside the `blog` library.
+	 * ```sh
+	 * li3 create --library=blog model Posts
+	 * ```
+	 *
+	 * @var string
+	 */
+	public $library = null;
 
 	/**
 	 * Holds library data from `lithium\core\Libraries::get()`.
@@ -61,23 +89,24 @@ class Create extends \lithium\console\Command {
 	/**
 	 * Run the create command. Takes `$command` and delegates to `$command::$method`
 	 *
-	 * @param string $command
+	 * When just `$type` is given and `$name` is not given,
+	 * will use `$type` as a name and create all types of things for it.
+	 *
+	 * @param string $type The type of thing to create (i.e. `'test'`, `'model'` or `'controller'`).
+	 * @param string $name The name of the thing to create (i.e. `'Posts'`).
 	 * @return boolean
 	 */
-	public function run($command = null) {
-		if ($command && !$this->request->args()) {
-			return $this->_default($command);
+	public function run($type, $name = null) {
+		if ($type && !$name) {
+			return $this->_default($type);
 		}
 		$this->request->shift();
-		$this->template = $this->template ?: $command;
+		$this->template = $this->template ?: $type;
 
-		if (!$command) {
-			return false;
-		}
-		if ($this->_execute($command)) {
+		if ($this->_execute($type)) {
 			return true;
 		}
-		$this->error("{$command} could not be created.");
+		$this->error("Thing of type `{$type}` could not be created.");
 		return false;
 	}
 
@@ -98,7 +127,7 @@ class Create extends \lithium\console\Command {
 		$data = [];
 		$params = $class->invokeMethod('_params');
 
-		foreach ($params as $i => $param) {
+		foreach ($params as $param) {
 			$data[$param] = $class->invokeMethod("_{$param}", [$this->request]);
 		}
 
