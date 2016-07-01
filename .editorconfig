@@ -1,8 +1,9 @@
 #
-# Lithium: the most rad php framework
+# li₃: the most RAD framework for PHP (http://li3.me)
 #
-# @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
-# @license       https://opensource.org/licenses/BSD-3-Clause The BSD 3-Clause License
+# Copyright 2016, Union of RAD. All rights reserved. This source
+# code is distributed under the terms of the BSD 3-Clause License.
+# The full license text can be found in the LICENSE.txt file.
 #
 
 # See http://editorconfig.org on how to put this file to good use.
