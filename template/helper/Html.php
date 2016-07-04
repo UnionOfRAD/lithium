@@ -163,7 +163,7 @@ class Html extends \lithium\template\Helper {
 	 * `'/'`, the path will be relative to the base path of your application.  Otherwise, the path
 	 * will be relative to your JavaScript path, usually `webroot/js`.
 	 *
-	 * @link http://li3.me/docs/manual/handling-http-requests/views.wiki
+	 * @link http://li3.me/docs/book/manual/1.x/views/
 	 * @param mixed $path String The name of a JavaScript file, or an array of names.
 	 * @param array $options Available options are:
 	 *              - `'inline'` _boolean_: Whether or not the `<script />` element should be output
