@@ -15,13 +15,10 @@ use PDOException;
  * MySQL database driver. Extends the `Database` class to implement the necessary
  * SQL-formatting and resultset-fetching features for working with MySQL databases.
  *
- * - Implements optional strict mode.
- *
  * For more information on configuring the database connection, see
  * the `__construct()` method.
  *
  * @see lithium\data\source\database\adapter\MySql::__construct()
- * @see lithium\data\source\database\adapter\MySql::strict()
  */
 class MySql extends \lithium\data\source\Database {
 
