@@ -15,8 +15,8 @@ use ReflectionProperty;
 /**
  * Base message class for any URI based request/response.
  *
- * @see http://tools.ietf.org/html/rfc3986#section-1.1.1
- * @see http://en.wikipedia.org/wiki/URI_scheme#Generic_syntax
+ * @link http://tools.ietf.org/html/rfc3986#section-1.1.1
+ * @link http://en.wikipedia.org/wiki/URI_scheme#Generic_syntax
  */
 class Message extends \lithium\core\Object {
 

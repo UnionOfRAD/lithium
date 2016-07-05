@@ -22,7 +22,7 @@ use lithium\core\ConfigException;
  * For more information on configuring the database connection, see
  * the `__construct()` method.
  *
- * @see lithium\data\source\database\adapter\Sqlite::__construct()
+ * @see lithium\data\source\database\adapter\Sqlite3::__construct()
  */
 class Sqlite3 extends \lithium\data\source\Database {
 

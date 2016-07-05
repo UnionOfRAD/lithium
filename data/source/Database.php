@@ -1259,7 +1259,7 @@ abstract class Database extends \lithium\data\Source {
 	 * Will only include fields if they have been updated in the entity of the context. Also
 	 * handles correct incremented/decremented fields.
 	 *
-	 * @see lithium\data\source\Entity::increment()
+	 * @see lithium\data\Entity::increment()
 	 * @see lithium\data\source\Database::_fieldsReturn()
 	 * @param array $data
 	 * @param array $schema An array defining the schema of the fields used in the criteria.

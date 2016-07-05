@@ -180,7 +180,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * Connects to the database by creating a PDO intance using the constructed DSN string.
 	 * Will set specific options on the connection as provided (timezone, schema).
 	 *
-	 * @see lithium\data\source\dataase\adapter\PostgreSql::timezone()
+	 * @see lithium\data\source\database\adapter\PostgreSql::timezone()
 	 * @return boolean Returns `true` if a database connection could be established,
 	 *         otherwise `false`.
 	 */
@@ -512,7 +512,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	/**
 	 * Helper for `Database::column()`.
 	 *
-	 * @see lithium\data\Database::column()
+	 * @see lithium\data\source\Database::column()
 	 * @param array $field A field array.
 	 * @return string SQL column string.
 	 */
@@ -549,7 +549,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * Helper method for `PostgreSql::_queryExport()` to export data
 	 * for use in distinct query.
 	 *
-	 * @see lithium\data\source\PostgreSql::_quryExport()
+	 * @see lithium\data\source\PostgreSql::_queryExport()
 	 * @param object $query The query object.
 	 * @return array Returns an array with the fields as the first
 	 *         value and the orders as the second value.

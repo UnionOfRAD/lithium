@@ -121,7 +121,7 @@ class PhpExtensions {
 	 *
 	 * Note that in HHVM we currently cannot access the loaded ini file.
 	 *
-	 * @see http://php.net/php_ini_loaded_file
+	 * @link http://php.net/php_ini_loaded_file
 	 * @param array $data INI settings to add.
 	 * @return void
 	 */

@@ -180,7 +180,7 @@ class Unit extends \lithium\core\Object {
 	 * methods to run assertions against i.e. deprecated functions. Usually
 	 * the error_level is set by the test runner so that all errors are converted.
 	 *
-	 * @see http://php.net/manual/function.error-reporting.php
+	 * @link http://php.net/manual/function.error-reporting.php
 	 * @param array $options The options to use when running the test. Available options are:
 	 *             - `'methods'`: An arbitrary array of method names to execute. If
 	 *                unspecified, all methods starting with 'test' are run.

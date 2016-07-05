@@ -64,7 +64,7 @@ abstract class Source extends \lithium\core\Object {
 	/**
 	 * Holds cached methods.
 	 *
-	 * @see lithium\data\Source::methods();
+	 * @see lithium\data\Source::methods()
 	 * @var array
 	 */
 	protected $_cachedMethods = [];
