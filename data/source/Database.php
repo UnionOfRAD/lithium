@@ -1231,7 +1231,7 @@ abstract class Database extends \lithium\data\Source {
 	 *
 	 * Also handles correct incremented/decremented fields.
 	 *
-	 * @see lithium\data\source\Entity::increment()
+	 * @see lithium\data\Entity::increment()
 	 * @see lithium\data\source\Database::_fieldsReturn()
 	 * @param array $data
 	 * @param array $schema An array defining the schema of the fields used in the criteria.

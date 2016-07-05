@@ -687,7 +687,7 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 * offset and wraps all data array in its appropriate object type.
 	 *
 	 * @see lithium\data\Collection::_populate()
-	 * @see lithium\data\Collection::_offsetSet()
+	 * @see lithium\data\Collection::offsetSet()
 	 * @param mixed $data An array or an `Entity` object to set.
 	 * @param mixed $offset The offset. If offset is `null` data is simply appended to the set.
 	 * @param array $options Any additional options to pass to the `Entity`'s constructor.

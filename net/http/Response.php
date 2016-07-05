@@ -36,7 +36,7 @@ class Response extends \lithium\net\http\Message {
 	 * of PHP `setcookie()`.
 	 *
 	 * @see lithium\net\http\Response::cookies()
-	 * @see http://php.net/function.setcookie.php
+	 * @link http://php.net/function.setcookie.php
 	 * @var array
 	 */
 	public $cookies = array();
@@ -223,7 +223,7 @@ class Response extends \lithium\net\http\Message {
 	 * Cookies which have been set multiple times do not overwrite each other.  Rather they are stored
 	 * as an array of associative arrays.
 	 *
-	 * @see http://php.net/function.setcookie.php
+	 * @link http://php.net/function.setcookie.php
 	 * @param string $key
 	 * @param string $value
 	 * @return mixed

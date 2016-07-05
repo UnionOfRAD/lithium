@@ -750,7 +750,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Returns an array with the default finders.
 	 *
-	 * @see lithium\Model::_initialize()
+	 * @see lithium\data\Model::_initialize()
 	 * @return array
 	 */
 	protected static function _finders() {
@@ -970,7 +970,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * This method automagically bind in the fly unloaded relations.
 	 *
-	 * @see lithium\data\model::relations()
+	 * @see lithium\data\Model::relations()
 	 * @param $type A type of model relation.
 	 * @param $name A relation name.
 	 * @return An array of relation instances or an instance of relation.

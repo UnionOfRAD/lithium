@@ -377,7 +377,7 @@ class LocaleTest extends \lithium\test\Unit {
 	 * When the Accept-Language contains `*;q=0.01` it's been seen as `q` and
 	 * raises an exception.
 	 *
-	 * @see https://github.com/UnionOfRAD/lithium/issues/386
+	 * @link https://github.com/UnionOfRAD/lithium/issues/386
 	 */
 	public function testPreferredStarWithQ() {
 		$available = array('fr', 'de');
@@ -400,7 +400,7 @@ class LocaleTest extends \lithium\test\Unit {
 	/**
 	 * When the Accept-Language is empty, it should return `null`.
 	 *
-	 * @see https://github.com/UnionOfRAD/lithium/issues/386
+	 * @link https://github.com/UnionOfRAD/lithium/issues/386
 	 */
 	public function testPreferredEmpty() {
 		$available = array('fr', 'de');
@@ -416,7 +416,7 @@ class LocaleTest extends \lithium\test\Unit {
 	 * A random Firefox 4 sent us this Accept-Language header which is
 	 * malformed.
 	 *
-	 * @see https://github.com/UnionOfRAD/lithium/issues/386
+	 * @link https://github.com/UnionOfRAD/lithium/issues/386
 	 */
 	public function testPreferredMalformedContainingChrome() {
 		$available = array('fr', 'de');
@@ -433,7 +433,7 @@ class LocaleTest extends \lithium\test\Unit {
 	 * A very strange Accept-Language which might be coming from a proxy, this
 	 * rule `x-ns…` must be ignored.
 	 *
-	 * @see https://github.com/UnionOfRAD/lithium/issues/386
+	 * @link https://github.com/UnionOfRAD/lithium/issues/386
 	 */
 	public function testPreferredMalformedSquid() {
 		$available = array('fr', 'de');
@@ -451,7 +451,7 @@ class LocaleTest extends \lithium\test\Unit {
 	 * item `es-419` causing `preferred` to fail with an exception while it
 	 * should ignored.
 	 *
-	 * @see https://github.com/UnionOfRAD/lithium/issues/386
+	 * @link https://github.com/UnionOfRAD/lithium/issues/386
 	 */
 	public function testPreferredMalformedSpanish() {
 		$available = array('fr', 'de');
