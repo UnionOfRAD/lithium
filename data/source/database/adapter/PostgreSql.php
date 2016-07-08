@@ -520,7 +520,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Helper method for `PostgreSql::_quryExport()` to export data
+	 * Helper method for `PostgreSql::_queryExport()` to export data
 	 * for use in distinct query.
 	 *
 	 * @see lithium\data\source\PostgreSql::_queryExport()

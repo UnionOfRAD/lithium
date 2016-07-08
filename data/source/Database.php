@@ -1802,8 +1802,8 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Helper for building columns metas
 	 *
-	 * @see DatabaseSchema::createSchema()
-	 * @see DatabaseSchema::_column()
+	 * @see lithium\data\soure\Database::createSchema()
+	 * @see lithium\data\soure\Database::column()
 	 * @param array $metas The array of column metas.
 	 * @param array $names If `$names` is not `null` only build meta present in `$names`
 	 * @param type $joiner The join character
@@ -1824,7 +1824,7 @@ abstract class Database extends \lithium\data\Source {
 	/**
 	 * Helper for building columns constraints
 	 *
-	 * @see DatabaseSchema::createSchema()
+	 * @see lithium\data\soure\Database::createSchema()
 	 * @param array $constraints The array of constraints
 	 * @param type $schema The schema of the table
 	 * @param type $joiner The join character
