@@ -993,6 +993,9 @@ class Libraries {
 		$suffix = ($options['suffix'] === null) ? $suffix : $options['suffix'];
 
 		$dFlags = GLOB_ONLYDIR & GLOB_BRACE;
+                if(!defined('GLOB_BRACE')) {
+                    define('GLOB_BRACE', 0x10);
+                }
 		$libs = (array) glob($path . $suffix, $options['namespaces'] ? $dFlags : GLOB_BRACE);
 
 		if ($options['recursive']) {
