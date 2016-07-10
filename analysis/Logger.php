@@ -118,7 +118,10 @@ class Logger extends \lithium\core\Adaptable {
 		foreach ($methods as $name => $method) {
 			$params = compact('priority', 'message', 'options');
 			$config = static::_config($name);
-			$result &= static::_filter(__FUNCTION__, $params, $method, $config['filters']);
+
+			if (!static::_filter(__FUNCTION__, $params, $method, $config['filters'])) {
+				$result = false;
+			}
 		}
 		return $methods ? $result : false;
 	}
