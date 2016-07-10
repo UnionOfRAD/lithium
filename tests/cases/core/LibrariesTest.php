@@ -284,6 +284,14 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEmpty($result);
 	}
 
+	public function testSearchOptimizedNamespacesWithOnlyDir() {
+		$result = Libraries::find('lithium', array(
+			'namespaces' => true,
+			'filter' => false
+		));
+		$this->assertFalse(in_array('lithium\LICENSE.txt', $result));
+	}
+
 	/**
 	 * Tests the loading of libraries
 	 */

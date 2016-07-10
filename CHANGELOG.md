@@ -1,5 +1,11 @@
 # Change Log
 
+## v1.0.2
+
+### Fixed
+
+- Optimized searching for a library's namespaces has been reenabled. 
+
 ## v1.0.1
 
 ### Fixed
