@@ -67,23 +67,6 @@ class LibrariesTest extends \lithium\test\Unit {
 		$this->assertEqual($paths, Libraries::paths());
 	}
 
-	public function testPathTemplateWithGlobBrace() {
-		Libraries::paths(array(
-			'analysis' => array(
-				'{:library}\analysis\*{Docblock,Debugger}',
-			),
-		));
-
-		$analysis = list($docblock, $debugger) = Libraries::locate('analysis', null, array(
-			'recursive' => false,
-			'format' => false,
-		));
-
-		$this->assertCount(2, $analysis);
-		$this->assertPattern('/Docblock\.php/', $docblock);
-		$this->assertPattern('/Debugger\.php/', $debugger);
-	}
-
 	public function testPathTransform() {
 		$expected = 'Library/Class/Separated/By/Underscore';
 		$result = Libraries::path('Library_Class_Separated_By_Underscore', array(
@@ -794,10 +777,39 @@ EOD;
 		$this->assertEqual('patched class', $result);
 	}
 
+	/* Deprecated / BC */
+
+	/**
+	 * @deprecated
+	 */
 	public function testDeprectatedInit() {
 		$this->assertException("/has been removed/i", function() {
 			MockInitMethod::li3();
 		});
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public function testPathTemplateWithGlobBrace() {
+		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
+
+		Libraries::paths(array(
+			'analysis' => array(
+				'{:library}\analysis\*{Docblock,Debugger}',
+			),
+		));
+
+		$analysis = list($docblock, $debugger) = Libraries::locate('analysis', null, array(
+			'recursive' => false,
+			'format' => false,
+		));
+
+		$this->assertCount(2, $analysis);
+		$this->assertPattern('/Docblock\.php/', $docblock);
+		$this->assertPattern('/Debugger\.php/', $debugger);
+
+		error_reporting($original);
 	}
 }
 

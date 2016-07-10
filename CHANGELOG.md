@@ -2,6 +2,12 @@
 
 ## v1.0.2
 
+### Deprecated
+
+- Brace globbing support has been deprecated in `Libraries`. This feature
+  cannot be reliably be provided crossplatform and will already not work
+  if `GLOB_BRACE` is not available.
+
 ### Fixed
 
 - Optimized searching for a library's namespaces has been reenabled. 
