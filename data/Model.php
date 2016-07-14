@@ -1203,6 +1203,9 @@ class Model extends \lithium\core\StaticObject {
 	 * $post->save(null, array('validate' => false));
 	 * ```
 	 *
+	 * By default only validates and saves fields from the schema (if available). This behavior
+	 * can be controlled via the `'whitelist'` and `'locked'` options.
+	 *
 	 * @see lithium\data\Model::$validates
 	 * @see lithium\data\Model::validates()
 	 * @see lithium\data\Entity::errors()
@@ -1224,7 +1227,10 @@ class Model extends \lithium\core\StaticObject {
 	 *          correspond to the optional `'on'` key in validation rules. They will be passed
 	 *          to the validates() method if `'validate'` is not `false`.
 	 *        - `'whitelist'` _array_: An array of fields that are allowed to be saved to this
-	 *          record.
+	 *          record. When unprovided will - if available - default to fields of the current
+	 *          schema and the `'locked'` option is not `false`.
+	 *        - `'locked'` _boolean_: Whether to use schema for saving just fields from the
+	 *          schema or not. Defaults to `true`.
 	 * @return boolean Returns `true` on a successful save operation, `false` on failure.
 	 * @filter
 	 */
