@@ -48,12 +48,16 @@
   special methods or properties defined. This is possible by entirely relying on a central
   filters manager and using `spl_object_hash()` internally.
 
+  **Simplified filters context.** By integrating PHP 5.5's new `::class` keyword with `use`,
+  references to the static context are now made with `Context::class`, removing the need
+  for a static `$self` and repeating the full class name across filters in the same file.
+
   **Simplified filters signature.** By using PHP 5.4's new context binding feature for
   closures, we were able to simplify the signature of filters - i.e. by dropping the
   `$self`.
 
   This - as a sideeffect - reduces the requirement of using `invokeMethod()` to access
-  protected members of the context. `$this` and `static` can be used to access
+  protected members of the context. `$this` and `Context::class` can be used to access
   the filtered object. Also makes better stacktraces.
 
   **Simplified chain advancing.**
@@ -266,7 +270,9 @@
   ]);
 
   // always use this
-  Filters::apply('lithium\storage\Session', 'write', function($params, $next) { 
+  use lithium\storage\Session;
+
+  Filters::apply(Session::class, 'write', function($params, $next) { 
     /* ... */ 
   });
   ```
