@@ -226,13 +226,20 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 			throw new TemplateException("Invalid template type '{$type}'.");
 		}
 
+		$app_path = Libraries::get(true, "path");
+
 		foreach ((array) $this->_paths[$type] as $path) {
-			if (!file_exists($path = Text::insert($path, $params))) {
-				continue;
+			if (file_exists($filename = Text::insert($path, $params))):
+				return $filename;
+			endif;
+
+			$filename = Text::insert($path, ['library' => $app_path] + $params);
+
+			if ($params['library'] != $app_path && file_exists($filename)) {
+				return $filename;
 			}
-			return $path;
 		}
-		throw new TemplateException("Template not found at path `{$path}`.");
+		throw new TemplateException("Template not found at path `{$filename}`.");
 	}
 }
 
