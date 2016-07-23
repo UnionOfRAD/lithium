@@ -9,22 +9,57 @@
 
 namespace lithium\tests\integration\data;
 
-use lithium\tests\fixture\model\gallery\Galleries;
+use MongoId;
+use lithium\core\Libraries;
+use lithium\data\Connections;
+use lithium\data\model\Query;
+use lithium\tests\fixture\model\mongodb\Images;
+use lithium\tests\fixture\model\mongodb\Galleries;
+use li3_fixtures\test\Fixtures;
 
 class MongoDbTest extends \lithium\tests\integration\data\Base {
 
+	protected $_export = null;
+
+	protected $_fixtures = array(
+		'images' => 'lithium\tests\fixture\model\mongodb\ImagesFixture',
+		'galleries' => 'lithium\tests\fixture\model\mongodb\GalleriesFixture',
+	);
+
 	public function skip() {
 		parent::connect($this->_connection);
+		if (!class_exists('li3_fixtures\test\Fixtures')) {
+			$this->skipIf(true, 'Need `li3_fixtures` to run tests.');
+		}
 		$this->skipIf(!$this->with(['MongoDb']));
+		$this->_export = Libraries::path('lithium\tests\fixture\model\mongodb\export', array(
+			'dirs' => true
+		));
 	}
 
+	/**
+	 * Creating the test database
+	 */
 	public function setUp() {
-		Galleries::config(['meta' => ['connection' => 'test']]);
+		$options = array(
+			'db' => array(
+				'adapter' => 'Connection',
+				'connection' => $this->_connection,
+				'fixtures' => $this->_fixtures
+			)
+		);
+
+		Fixtures::config($options);
+		Fixtures::save('db');
 	}
 
+	/**
+	 * Dropping the test database
+	 */
 	public function tearDown() {
-		Galleries::remove();
+		Fixtures::clear('db');
 		Galleries::reset();
+		Images::reset();
 	}
 
 	public function testCountOnEmptyResultSet() {
@@ -43,6 +78,7 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testDateCastingUsingExists() {
+		Galleries::remove();
 		Galleries::config(['schema' => ['_id' => 'id', 'created_at' => 'date']]);
 		$gallery = Galleries::create(['created_at' => time()]);
 		$gallery->save();
@@ -50,6 +86,44 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 		$result = Galleries::first(['conditions' => ['created_at' => ['$exists' => false]]]);
 		$this->assertNull($result);
 	}
+
+	public function testManyToOne() {
+		$opts = array('conditions' => array('gallery' => 1));
+
+		$query = new Query($opts + array(
+			'type' => 'read',
+			'model' => 'lithium\tests\fixture\model\mongodb\Images',
+			'source' => 'images',
+			'alias' => 'Images',
+			'with' => array('Galleries')
+		));
+		$images = $this->_db->read($query)->data();
+		$expected = include $this->_export . '/testManyToOne.php';
+		$this->assertEqual($expected, $images);
+
+		$images = Images::find('all', $opts + array('with' => 'Galleries'))->data();
+		$this->assertEqual($expected, $images);
+	}
+
+	public function testOneToMany() {
+		$opts = array('conditions' => array('_id' => 1));
+
+		$query = new Query($opts + array(
+			'type' => 'read',
+			'model' => 'lithium\tests\fixture\model\mongodb\Galleries',
+			'source' => 'galleries',
+			'alias' => 'Galleries',
+			'with' => array('Images')
+		));
+		$galleries = $this->_db->read($query)->data();
+		$expected = include $this->_export . '/testOneToMany.php';
+		$this->assertEqual($expected, $galleries);
+
+		$gallery = Galleries::find('first', $opts + array('with' => 'Images'))->data();
+		$this->assertEqual(3, count($gallery['images']));
+		$this->assertEqual(reset($expected), $gallery);
+	}
+
 }
 
 ?>

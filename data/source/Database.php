@@ -292,10 +292,9 @@ abstract class Database extends \lithium\data\Source {
 						}
 					}
 				}
+				$context->with(array());
 			},
-			'nested' => function($model, $context) {
-				throw new QueryException("This strategy is not yet implemented.");
-			}
+			'nested' => function($model, $context) {}
 		];
 	}
 
@@ -603,32 +602,37 @@ abstract class Database extends \lithium\data\Source {
 				return $result;
 			}
 			if ($return === 'item') {
-				return $model::create([], compact('query', 'result') + [
+				$collection = $model::create([], compact('query', 'result') + [
 					'class' => 'set', 'defaults' => false
 				]);
-			}
-			$columns = $args['schema'] ?: $this->schema($query, $result);
+			} else {
+				$columns = $args['schema'] ?: $this->schema($query, $result);
 
-			if (!is_array(reset($columns))) {
-				$columns = ['' => $columns];
-			}
-
-			$i = 0;
-			$records = [];
-
-			foreach ($result as $data) {
-				$offset = 0;
-				$records[$i] = [];
-
-				foreach ($columns as $path => $cols) {
-					$len = count($cols);
-					$values = array_combine($cols, array_slice($data, $offset, $len));
-					($path) ? $records[$i][$path] = $values : $records[$i] += $values;
-					$offset += $len;
+				if (!is_array(reset($columns))) {
+					$columns = ['' => $columns];
 				}
-				$i++;
+
+				$i = 0;
+				$records = [];
+
+				foreach ($result as $data) {
+					$offset = 0;
+					$records[$i] = [];
+
+					foreach ($columns as $path => $cols) {
+						$len = count($cols);
+						$values = array_combine($cols, array_slice($data, $offset, $len));
+						($path) ? $records[$i][$path] = $values : $records[$i] += $values;
+						$offset += $len;
+					}
+					$i++;
+				}
+				$collection = Set::expand($records);
 			}
-			return Set::expand($records);
+			if (is_object($query) && $query->with()) {
+				$model::embed($collection, $query->with(), array('return' => $return));
+			}
+			return $collection;
 		});
 	}
 

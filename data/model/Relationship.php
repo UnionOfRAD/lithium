@@ -9,7 +9,9 @@
 
 namespace lithium\data\model;
 
+use Exception;
 use Countable;
+use Traversable;
 use lithium\util\Set;
 use lithium\core\Libraries;
 use lithium\core\ConfigException;
@@ -312,6 +314,163 @@ class Relationship extends \lithium\core\Object {
 				return $model::all(Set::merge($query, $options));
 			}
 		];
+	}
+
+	/**
+	 * Fetch data related to a whole collection and embed the result in it.
+	 *
+	 * @param mixed $collection A collection of data.
+	 * @param array $options The embed query options.
+	 * @return mixed The fetched data.
+	 */
+	public function embed(&$collection, $options = array()) {
+		$keys = $this->key();
+		if (count($keys) !== 1) {
+			throw new Exception("The embedding doesn't support composite primary key.");
+		}
+		list($formKey, $toKey) = each($keys);
+
+		$related = array();
+
+		if ($this->type() === 'belongsTo') {
+
+			$indexes = $this->_index($collection, $formKey);
+			$related = $this->_find(array_keys($indexes), $options);
+
+			$fieldName = $this->fieldName();
+			$indexes = $this->_index($related, $toKey);
+			$this->_cleanup($collection);
+
+			foreach ($collection as $index => $source) {
+				if (is_object($source)) {
+					$value = (string) $source->{$formKey};
+					if (isset($indexes[$value])) {
+						$source->{$fieldName} = $related[$indexes[$value]];
+					}
+				} else {
+					$value = (string) $source[$formKey];
+					if (isset($indexes[$value])) {
+						$collection[$index][$fieldName] = $related[$indexes[$value]];
+					}
+				}
+			}
+
+		} elseif ($this->type() === 'hasMany') {
+
+			$indexes = $this->_index($collection, $formKey);
+			$related = $this->_find(array_keys($indexes), $options);
+
+			$fieldName = $this->fieldName();
+
+			$this->_cleanup($collection);
+
+			foreach ($collection as $index => $entity) {
+				if (is_object($entity)) {
+					$entity->{$fieldName} = array();
+				} else {
+					$collection[$index][$fieldName] = array();
+				}
+			}
+
+			foreach ($related as $index => $entity) {
+				$isObject = is_object($entity);
+				$values = $isObject ? $entity->{$toKey} : $entity[$toKey];
+				$values = is_array($values) || $values instanceof Traversable ? $values : array($values);
+				foreach ($values as $value) {
+					$value = (string) $value;
+					if (isset($indexes[$value])) {
+						if ($isObject) {
+							$source = $collection[$indexes[$value]];
+							$source->{$fieldName}[] = $entity;
+						} else {
+							$collection[$indexes[$value]][$fieldName][] = $entity;
+						}
+					}
+				}
+			}
+
+		} elseif ($this->type() === 'hasOne') {
+
+			$indexes = $this->_index($collection, $formKey);
+			$related = $this->_find(array_keys($indexes), $options);
+			$fieldName = $this->fieldName();
+			$this->_cleanup($collection);
+			foreach ($related as $index => $entity) {
+				if (is_object($entity)) {
+					$value = (string) $entity->{$toKey};
+					if (isset($indexes[$value])) {
+						$source = $collection[$indexes[$value]];
+						$source->{$fieldName} = $entity;
+					}
+				} else {
+					$value = (string) $entity[$toKey];
+					if (isset($indexes[$value])) {
+						$collection[$indexes[$value]][$fieldName] = $entity;
+					}
+				}
+			}
+
+		} else {
+			throw new Exception("Error {$this->type()} is unsupported ");
+		}
+		return $related;
+	}
+
+	/**
+	 * Gets all entities attached to a collection en entities.
+	 *
+	 * @param  mixed  $id An id or an array of ids.
+	 * @return object     A collection of items matching the id/ids.
+	 */
+	protected function _find($id, $options = array()) {
+		if ($this->link() !== static::LINK_KEY) {
+			throw new Exception("This relation is not based on a foreign key.");
+		}
+		if ($id === array()) {
+			return array();
+		}
+		$to = $this->to();
+		$options += array('conditions' => array());
+		$options['conditions'] = array_merge($options['conditions'], array(
+			current($this->key()) => $id
+		));
+		return $to::find('all', $options);
+	}
+
+	/**
+	 * Indexes a collection.
+	 *
+	 * @param  mixed  $collection An collection to extract index from.
+	 * @param  string $name       The field name to build index for.
+	 * @return array              An array of indexes where keys are `$name` values and
+	 *                            values the correcponding index in the collection.
+	 */
+	protected function _index($collection, $name) {
+		$indexes = array();
+		foreach ($collection as $key => $entity) {
+			if (is_object($entity)) {
+				$indexes[(string) $entity->{$name}] = $key;
+			} else {
+				$indexes[(string) $entity[$name]] = $key;
+			}
+		}
+		return $indexes;
+	}
+
+	/**
+	 * Unsets the relationship attached to a collection en entities.
+	 *
+	 * @param  mixed  $collection An collection to "clean up".
+	 */
+	public function _cleanup($collection) {
+		$name = $this->name();
+		foreach ($collection as $index => $entity) {
+			if (is_object($entity)) {
+				unset($entity->{$name});
+			} else {
+				unset($entity[$name]);
+			}
+		}
 	}
 }
 

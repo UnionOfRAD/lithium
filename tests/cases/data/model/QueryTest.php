@@ -714,11 +714,7 @@ class QueryTest extends \lithium\test\Unit {
 			'mode' => null,
 			'model' => 'lithium\tests\mocks\data\model\MockGallery',
 			'calculate' => 'MyCalculate',
-			'with' => [
-				'Image.ImageTag.Tag' => null,
-				'Image' => null,
-				'Image.ImageTag' => null
-			],
+			'with' => [],
 			'source' => '{mock_gallery}',
 			'offset' => null,
 			'page' => null,
