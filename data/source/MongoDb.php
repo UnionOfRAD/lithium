@@ -550,7 +550,12 @@ class MongoDb extends \lithium\data\Source {
 			$resource = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
 			$result = $self->invokeMethod('_instance', array('result', compact('resource')));
 			$config = compact('result', 'query') + array('class' => 'set', 'defaults' => false);
-			return $model::create(array(), $config);
+			$collection = $model::create(array(), $config);
+
+			if (is_object($query) && $query->with()) {
+				$model::embed($collection, $query->with());
+			}
+			return $collection;
 		});
 	}
 

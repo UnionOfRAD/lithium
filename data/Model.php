@@ -1558,6 +1558,34 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Eager loads relations.
+	 *
+	 * @param mixed $collection The collection to extend.
+	 * @param array $relations The relations to eager load.
+	 * @return mixed The collection.
+	 */
+	public static function embed(&$collection, $relations) {
+		$tree = Set::expand(array_fill_keys(array_keys(Set::normalize($relations)), array()));
+
+		foreach ($tree as $name => $subtree) {
+			$rel = static::relations($name);
+			$to = $rel->to();
+			$related = $rel->embed($collection, isset($relations[$name]) ? $relations[$name] : array());
+
+			$subrelations = array();
+			foreach ($relations as $path => $value) {
+				if (preg_match('~^'.$name.'\.(.*)$~', $path, $matches)) {
+					$subrelations[] = $matches[1];
+				}
+			}
+			if ($subrelations) {
+				$to::embed($related, $subrelations);
+			}
+		}
+		return $collection;
+	}
+
+	/**
 	 * Resetting the model.
 	 */
 	public static function reset() {

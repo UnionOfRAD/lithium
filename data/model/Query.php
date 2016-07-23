@@ -211,12 +211,9 @@ class Query extends \lithium\core\Object {
 		if ($this->_entity && !$this->_config['model']) {
 			$this->model($this->_entity->model());
 		}
-		if ($this->_config['with']) {
-			if (!$model = $this->model()) {
-				throw new ConfigException("The `'with'` option needs a valid binded model.");
-			}
-			$this->_config['with'] = Set::normalize($this->_config['with']);
-		}
+
+		$this->with($this->_config['with']);
+
 		if ($model = $this->model()) {
 			$this->alias($this->_config['alias'] ?: $model::meta('name'));
 		}
@@ -540,6 +537,24 @@ class Query extends \lithium\core\Object {
 		if (isset($this->_config['joins'][$name])) {
 			return $this->_config['joins'][$name];
 		}
+	}
+
+
+	/**
+	 * Set and get method for the query's embed specification.
+	 *
+	 * @param array $with The dotted relation paths to embed
+	 * @return mixed
+	 */
+	public function with($with = array()) {
+		if (!func_num_args()) {
+			return $this->_config['with'];
+		}
+		if ((!$model = $this->model()) && $with) {
+			throw new ConfigException("The `'with'` option needs a valid binded model.");
+		}
+		$this->_config['with'] = Set::normalize($with);
+		return $this;
 	}
 
 	/**
