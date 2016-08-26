@@ -380,13 +380,13 @@ class MongoDb extends \lithium\data\Source {
 		try {
 			$this->server = new $server($this->_config['dsn'], $options);
 
-			if ($this->connection = $this->server->{$this->_config['database']}) {
-				$this->_isConnected = true;
-			}
-
 			if ($prefs = $this->_config['readPreference']) {
 				$prefs = !is_array($prefs) ? [$prefs, []] : $prefs;
 				$this->server->setReadPreference($prefs[0], $prefs[1]);
+			}
+
+			if ($this->connection = $this->server->{$this->_config['database']}) {
+				$this->_isConnected = true;
 			}
 		} catch (Exception $e) {
 			throw new NetworkException("Could not connect to the database.", 503, $e);

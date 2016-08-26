@@ -126,11 +126,14 @@ class Logger extends \lithium\core\Adaptable {
 				$message .= "filter the manager class' static methods instead.";
 				trigger_error($message, E_USER_DEPRECATED);
 
-				$result &= Filters::bcRun(
+				$r = Filters::bcRun(
 					get_called_class(), __FUNCTION__, $params, $method, $config['filters']
 				);
 			} else {
-				$result &= Filters::run(get_called_class(), __FUNCTION__, $params, $method);
+				$r = Filters::run(get_called_class(), __FUNCTION__, $params, $method);
+			}
+			if (!$r) {
+				$result = false;
 			}
 		}
 		return $methods ? $result : false;

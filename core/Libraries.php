@@ -959,8 +959,18 @@ class Libraries {
 		$suffix = $options['namespaces'] ? '' : $config['suffix'];
 		$suffix = ($options['suffix'] === null) ? $suffix : $options['suffix'];
 
-		$dFlags = GLOB_ONLYDIR & GLOB_BRACE;
-		$libs = (array) glob($path . $suffix, $options['namespaces'] ? $dFlags : GLOB_BRACE);
+
+		$dFlags = GLOB_ONLYDIR;
+		$zFlags = 0;
+		if (strpos($path, '{') !== false) {
+			$message  = "Search path `{$path}` relies on brace globbing. ";
+			$message .= 'Support for brace globbing in search paths has been deprecated.';
+			trigger_error($message, E_USER_DEPRECATED);
+
+			$dFlags |= GLOB_BRACE;
+			$zFlags |= GLOB_BRACE;
+		}
+		$libs = (array) glob($path . $suffix, $options['namespaces'] ? $dFlags : $zFlags);
 
 		if ($options['recursive']) {
 			list($current, $match) = explode('/*', $path, 2);

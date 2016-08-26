@@ -362,6 +362,20 @@
 
 - Fixed retrieval of property default values in concrete classes through `Inspector`.
 
+## v1.0.2
+
+### Deprecated
+
+- Brace globbing support has been deprecated in `Libraries`. This feature
+  cannot be reliably be provided crossplatform and will already not work
+  if `GLOB_BRACE` is not available. (reported by Aaron Santiago)
+
+### Fixed
+
+- Optimized searching for a library's namespaces has been reenabled. 
+
+- Per connection read preference settings for MongoDB were ignored. (Fitz Agard)
+
 ## v1.0.1
 
 ### Fixed

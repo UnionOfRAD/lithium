@@ -19,11 +19,15 @@ class MockCallable extends \lithium\core\Object {
 
 	public static $callStatic = [];
 
+	public $trace = array();
+
 	public function __construct() {
+		$this->trace[] = array(__FUNCTION__, func_get_args());
 		$this->construct = func_get_args();
 	}
 
 	public function __call($method, $params = []) {
+		$this->trace[] = array(__FUNCTION__, func_get_args());
 		return $this->call = compact('method', 'params');
 	}
 
@@ -32,6 +36,7 @@ class MockCallable extends \lithium\core\Object {
 	}
 
 	public function __get($value) {
+		$this->trace[] = array(__FUNCTION__, func_get_args());
 		return $this->get = $value;
 	}
 }
