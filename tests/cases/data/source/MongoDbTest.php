@@ -936,18 +936,18 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testSetReadPreferenceBeforeAccessCollection() {
-		$prefs = array(
+		$prefs = [
 			"SECONDARY",
-			array('dc' => 'east', 'use' => 'reporting')
-		);
-		$db = new MongoDb(array(
+			['dc' => 'east', 'use' => 'reporting']
+		];
+		$db = new MongoDb([
 			'database' => 'test',
 			'autoConnect' => true,
 			'readPreference' => $prefs,
-			'classes' => array(
+			'classes' => [
 				'server' => 'lithium\tests\mocks\core\MockCallable'
-			)
-		));
+			]
+		]);
 
 		$trace = $db->server->trace;
 		$this->assertEqual('__call', $trace[1][0]);

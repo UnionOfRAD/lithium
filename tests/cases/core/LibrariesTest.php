@@ -269,10 +269,10 @@ class LibrariesTest extends \lithium\test\Unit {
 	}
 
 	public function testSearchOptimizedNamespacesWithOnlyDir() {
-		$result = Libraries::find('lithium', array(
+		$result = Libraries::find('lithium', [
 			'namespaces' => true,
 			'filter' => false
-		));
+		]);
 		$this->assertFalse(in_array('lithium\LICENSE.txt', $result));
 	}
 
