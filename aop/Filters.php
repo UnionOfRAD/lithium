@@ -84,8 +84,9 @@ use lithium\aop\Chain;
  * modified by any custom logic present before being returned from `run()`.
  * ```
  * use lithium\aop\Filters;
+ * use lithium\action\Dispatcher;
  *
- * Filters::apply('lithium\action\Dispatcher', 'run', function($params, $next) {
+ * Filters::apply(Dispatcher::class, 'run', function($params, $next) {
  * 	// Custom pre-dispatch logic goes here.
  * 	$response = $next($params);
  *
