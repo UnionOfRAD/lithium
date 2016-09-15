@@ -162,6 +162,23 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$this->assertEqual($expected, $images);
 	}
 
+	public function testManyToOneUsingNestedStrategy() {
+		$opts = array('conditions' => array('gallery_id' => 1), 'strategy' => 'nested');
+		$query = new Query($opts + array(
+			'type' => 'read',
+			'model' => 'lithium\tests\fixture\model\gallery\Images',
+			'source' => 'images',
+			'alias' => 'Images',
+			'with' => array('Galleries')
+		));
+		$images = $this->_db->read($query)->data();
+		$expected = include $this->_export . '/testManyToOne.php';
+		$this->assertEqual($expected, $images);
+
+		$images = Images::find('all', $opts + array('with' => 'Galleries'))->data();
+		$this->assertEqual($expected, $images);
+	}
+
 	public function testOneToMany() {
 		$opts = array('conditions' => array('Galleries.id' => 1));
 
@@ -174,9 +191,27 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		));
 		$galleries = $this->_db->read($query)->data();
 		$expected = include $this->_export . '/testOneToMany.php';
-		$gallery = Galleries::find('first', $opts + array('with' => 'Images'))->data();
+		$this->assertEqual($expected, $galleries);
 
+		$gallery = Galleries::find('first', $opts + array('with' => 'Images'))->data();
 		$this->assertEqual(3, count($gallery['images']));
+		$this->assertEqual(reset($expected), $gallery);
+	}
+
+	public function testOneToManyUsingNestedStrategy() {
+		$opts = array('conditions' => array('Galleries.id' => 1), 'strategy' => 'nested');
+		$query = new Query($opts + array(
+			'type' => 'read',
+			'model' => 'lithium\tests\fixture\model\gallery\Galleries',
+			'source' => 'galleries',
+			'alias' => 'Galleries',
+			'with' => array('Images')
+		));
+		$galleries = $this->_db->read($query)->data();
+		$expected = include $this->_export . '/testOneToMany.php';
+		$this->assertEqual($expected, $galleries);
+
+		$gallery = Galleries::find('first', $opts + array('with' => 'Images'))->data();
 		$this->assertEqual(reset($expected), $gallery);
 	}
 
