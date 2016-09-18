@@ -4,6 +4,21 @@
 
 ### Added
 
+- Database now support the `nested` strategy which will embed related records/documents by
+  fetching them using additional queries. (jails) 
+	
+  This strategy is auto-enabled on NoSQL-style databases where documents now
+  do not have to be fetched manually anymore. For classic relational databases
+  the new strategy can be enabled on a per query basis, if preferred over the
+  default `joined` strategy:
+
+  ```
+  Galleries::find('all', ['with' => 'Images', 'strategy' => 'nested'])
+  ```
+
+  Please note that records/documents - fetched using this strategy - cannot be
+  further constrained by conditions.
+
 ### Changed
 
 ### Deprecated
