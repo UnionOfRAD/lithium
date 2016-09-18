@@ -1,5 +1,15 @@
 # Change Log
 
+## v1.2.0
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Fixed
+
 ## v1.1.0
 
 ### Added
