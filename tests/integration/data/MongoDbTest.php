@@ -21,10 +21,10 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 
 	protected $_export = null;
 
-	protected $_fixtures = array(
+	protected $_fixtures = [
 		'images' => 'lithium\tests\fixture\model\mongodb\ImagesFixture',
 		'galleries' => 'lithium\tests\fixture\model\mongodb\GalleriesFixture',
-	);
+	];
 
 	public function skip() {
 		parent::connect($this->_connection);
@@ -32,22 +32,22 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 			$this->skipIf(true, 'Need `li3_fixtures` to run tests.');
 		}
 		$this->skipIf(!$this->with(['MongoDb']));
-		$this->_export = Libraries::path('lithium\tests\fixture\model\mongodb\export', array(
+		$this->_export = Libraries::path('lithium\tests\fixture\model\mongodb\export', [
 			'dirs' => true
-		));
+		]);
 	}
 
 	/**
 	 * Creating the test database
 	 */
 	public function setUp() {
-		$options = array(
-			'db' => array(
+		$options = [
+			'db' => [
 				'adapter' => 'Connection',
 				'connection' => $this->_connection,
 				'fixtures' => $this->_fixtures
-			)
-		);
+			]
+		];
 
 		Fixtures::config($options);
 		Fixtures::save('db');
@@ -88,38 +88,38 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testManyToOne() {
-		$opts = array('conditions' => array('gallery' => 1));
+		$opts = ['conditions' => ['gallery' => 1]];
 
-		$query = new Query($opts + array(
+		$query = new Query($opts + [
 			'type' => 'read',
 			'model' => 'lithium\tests\fixture\model\mongodb\Images',
 			'source' => 'images',
 			'alias' => 'Images',
-			'with' => array('Galleries')
-		));
+			'with' => ['Galleries']
+		]);
 		$images = $this->_db->read($query)->data();
 		$expected = include $this->_export . '/testManyToOne.php';
 		$this->assertEqual($expected, $images);
 
-		$images = Images::find('all', $opts + array('with' => 'Galleries'))->data();
+		$images = Images::find('all', $opts + ['with' => 'Galleries'])->data();
 		$this->assertEqual($expected, $images);
 	}
 
 	public function testOneToMany() {
-		$opts = array('conditions' => array('_id' => 1));
+		$opts = ['conditions' => ['_id' => 1]];
 
-		$query = new Query($opts + array(
+		$query = new Query($opts + [
 			'type' => 'read',
 			'model' => 'lithium\tests\fixture\model\mongodb\Galleries',
 			'source' => 'galleries',
 			'alias' => 'Galleries',
-			'with' => array('Images')
-		));
+			'with' => ['Images']
+		]);
 		$galleries = $this->_db->read($query)->data();
 		$expected = include $this->_export . '/testOneToMany.php';
 		$this->assertEqual($expected, $galleries);
 
-		$gallery = Galleries::find('first', $opts + array('with' => 'Images'))->data();
+		$gallery = Galleries::find('first', $opts + ['with' => 'Images'])->data();
 		$this->assertEqual(3, count($gallery['images']));
 		$this->assertEqual(reset($expected), $gallery);
 	}

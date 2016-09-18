@@ -323,17 +323,17 @@ class Relationship extends \lithium\core\Object {
 	 * @param array $options The embed query options.
 	 * @return mixed The fetched data.
 	 */
-	public function embed(&$collection, $options = array()) {
+	public function embed(&$collection, $options = []) {
 		$keys = $this->key();
+
 		if (count($keys) !== 1) {
 			throw new Exception("The embedding doesn't support composite primary key.");
 		}
 		list($formKey, $toKey) = each($keys);
 
-		$related = array();
+		$related = [];
 
 		if ($this->type() === 'belongsTo') {
-
 			$indexes = $this->_index($collection, $formKey);
 			$related = $this->_find(array_keys($indexes), $options);
 
@@ -354,9 +354,7 @@ class Relationship extends \lithium\core\Object {
 					}
 				}
 			}
-
 		} elseif ($this->type() === 'hasMany') {
-
 			$indexes = $this->_index($collection, $formKey);
 			$related = $this->_find(array_keys($indexes), $options);
 
@@ -366,16 +364,17 @@ class Relationship extends \lithium\core\Object {
 
 			foreach ($collection as $index => $entity) {
 				if (is_object($entity)) {
-					$entity->{$fieldName} = array();
+					$entity->{$fieldName} = [];
 				} else {
-					$collection[$index][$fieldName] = array();
+					$collection[$index][$fieldName] = [];
 				}
 			}
 
 			foreach ($related as $index => $entity) {
 				$isObject = is_object($entity);
 				$values = $isObject ? $entity->{$toKey} : $entity[$toKey];
-				$values = is_array($values) || $values instanceof Traversable ? $values : array($values);
+				$values = is_array($values) || $values instanceof Traversable ? $values : [$values];
+
 				foreach ($values as $value) {
 					$value = (string) $value;
 					if (isset($indexes[$value])) {
@@ -388,13 +387,12 @@ class Relationship extends \lithium\core\Object {
 					}
 				}
 			}
-
 		} elseif ($this->type() === 'hasOne') {
-
 			$indexes = $this->_index($collection, $formKey);
 			$related = $this->_find(array_keys($indexes), $options);
 			$fieldName = $this->fieldName();
 			$this->_cleanup($collection);
+
 			foreach ($related as $index => $entity) {
 				if (is_object($entity)) {
 					$value = (string) $entity->{$toKey};
@@ -409,7 +407,6 @@ class Relationship extends \lithium\core\Object {
 					}
 				}
 			}
-
 		} else {
 			throw new Exception("Error {$this->type()} is unsupported ");
 		}
@@ -422,18 +419,18 @@ class Relationship extends \lithium\core\Object {
 	 * @param  mixed  $id An id or an array of ids.
 	 * @return object     A collection of items matching the id/ids.
 	 */
-	protected function _find($id, $options = array()) {
+	protected function _find($id, $options = []) {
 		if ($this->link() !== static::LINK_KEY) {
 			throw new Exception("This relation is not based on a foreign key.");
 		}
-		if ($id === array()) {
-			return array();
+		if ($id === []) {
+			return [];
 		}
 		$to = $this->to();
-		$options += array('conditions' => array());
-		$options['conditions'] = array_merge($options['conditions'], array(
+		$options += ['conditions' => []];
+		$options['conditions'] = array_merge($options['conditions'], [
 			current($this->key()) => $id
-		));
+		]);
 		return $to::find('all', $options);
 	}
 
@@ -446,7 +443,7 @@ class Relationship extends \lithium\core\Object {
 	 *                            values the correcponding index in the collection.
 	 */
 	protected function _index($collection, $name) {
-		$indexes = array();
+		$indexes = [];
 		foreach ($collection as $key => $entity) {
 			if (is_object($entity)) {
 				$indexes[(string) $entity->{$name}] = $key;

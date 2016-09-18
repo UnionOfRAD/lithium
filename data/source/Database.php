@@ -292,7 +292,7 @@ abstract class Database extends \lithium\data\Source {
 						}
 					}
 				}
-				$context->with(array());
+				$context->with([]);
 			},
 			'nested' => function($model, $context) {}
 		];
@@ -630,7 +630,7 @@ abstract class Database extends \lithium\data\Source {
 				$collection = Set::expand($records);
 			}
 			if (is_object($query) && $query->with()) {
-				$model::embed($collection, $query->with(), array('return' => $return));
+				$model::embed($collection, $query->with(), ['return' => $return]);
 			}
 			return $collection;
 		});

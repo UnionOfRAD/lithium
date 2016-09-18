@@ -1528,14 +1528,14 @@ class Model extends \lithium\core\StaticObject {
 	 * @return mixed The collection.
 	 */
 	public static function embed(&$collection, $relations) {
-		$tree = Set::expand(array_fill_keys(array_keys(Set::normalize($relations)), array()));
+		$tree = Set::expand(array_fill_keys(array_keys(Set::normalize($relations)), []));
 
 		foreach ($tree as $name => $subtree) {
 			$rel = static::relations($name);
 			$to = $rel->to();
-			$related = $rel->embed($collection, isset($relations[$name]) ? $relations[$name] : array());
+			$related = $rel->embed($collection, isset($relations[$name]) ? $relations[$name] : []);
 
-			$subrelations = array();
+			$subrelations = [];
 			foreach ($relations as $path => $value) {
 				if (preg_match('~^'.$name.'\.(.*)$~', $path, $matches)) {
 					$subrelations[] = $matches[1];

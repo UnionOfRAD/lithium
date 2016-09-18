@@ -766,6 +766,7 @@ class MongoDb extends \lithium\data\Source {
 		}
 		return !isset($result['err']) || $result['err'] === null;
 	}
+
 	/**
 	 * Executes calculation-related queries, such as those required for `count`.
 	 *

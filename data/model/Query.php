@@ -547,12 +547,12 @@ class Query extends \lithium\core\Object {
 	 * @param array $with The dotted relation paths to embed
 	 * @return mixed
 	 */
-	public function with($with = array()) {
+	public function with($with = []) {
 		if (!func_num_args()) {
 			return $this->_config['with'];
 		}
 		if ((!$model = $this->model()) && $with) {
-			throw new ConfigException("The `'with'` option needs a valid binded model.");
+			throw new ConfigException("The `'with'` option needs a valid bound model.");
 		}
 		$this->_config['with'] = Set::normalize($with);
 		return $this;
@@ -803,7 +803,7 @@ class Query extends \lithium\core\Object {
 	 */
 	public function childs($relpath = null, $query = null) {
 		if (!$model = $this->model()) {
-			throw new ConfigException("No binded model.");
+			throw new ConfigException('No bound model.');
 		}
 		if ($query) {
 			$this->_childs[$relpath] = $query;
