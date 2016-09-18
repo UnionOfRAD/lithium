@@ -63,43 +63,43 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testSanitzeKeys() {
-		$result = $this->File->key(array('posts for bjœrn'));
-		$expected = array('posts_for_bj_rn_fdf03955');
+		$result = $this->File->key(['posts for bjœrn']);
+		$expected = ['posts_for_bj_rn_fdf03955'];
 		$this->assertEqual($expected, $result);
 
-		$result = $this->File->key(array('posts-for-bjoern'));
-		$expected = array('posts-for-bjoern');
+		$result = $this->File->key(['posts-for-bjoern']);
+		$expected = ['posts-for-bjoern'];
 		$this->assertEqual($expected, $result);
 
-		$result = $this->File->key(array('posts for Helgi Þorbjörnsson'));
-		$expected = array('posts_for_Helgi__orbj_rnsson_c7f8433a');
+		$result = $this->File->key(['posts for Helgi Þorbjörnsson']);
+		$expected = ['posts_for_Helgi__orbj_rnsson_c7f8433a'];
 		$this->assertEqual($expected, $result);
 
-		$result = $this->File->key(array('libraries.cache'));
-		$expected = array('libraries_cache_38235880');
+		$result = $this->File->key(['libraries.cache']);
+		$expected = ['libraries_cache_38235880'];
 		$this->assertEqual($expected, $result);
 
 		$key = 'post_';
 		for ($i = 0; $i <= 127; $i++) {
 			$key .= chr($i);
 		}
-		$result = $this->File->key(array($key));
+		$result = $this->File->key([$key]);
 		$expected  = 'post______________________________________________-__0123456789_______ABCDEF';
 		$expected .= 'GHIJKLMNOPQRSTUVWXYZ______abcdefghijklmnopqrstuvwxyz______38676d3e';
-		$expected = array($expected);
+		$expected = [$expected];
 		$this->assertEqual($expected, $result);
 
 		$key = str_repeat('0', 300);
-		$result = $this->File->key(array($key));
-		$expected = array(str_repeat('0', 246) . '_9e1830ed');
+		$result = $this->File->key([$key]);
+		$expected = [str_repeat('0', 246) . '_9e1830ed'];
 		$this->assertEqual($expected, $result);
 		$this->assertTrue(strlen($result[0]) <= 255);
 
-		$adapter = new File(array('scope' => 'foo'));
+		$adapter = new File(['scope' => 'foo']);
 
 		$key = str_repeat('0', 300);
-		$result = $adapter->key(array($key));
-		$expected = array(str_repeat('0', 246 - strlen('_foo')) . '_9e1830ed');
+		$result = $adapter->key([$key]);
+		$expected = [str_repeat('0', 246 - strlen('_foo')) . '_9e1830ed'];
 		$this->assertEqual($expected, $result);
 		$this->assertTrue(strlen($result[0]) <= 255);
 	}

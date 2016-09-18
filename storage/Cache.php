@@ -108,11 +108,11 @@ class Cache extends \lithium\core\Adaptable {
 	 * Cache::key('default', 'post');
 	 * // returns `'post'`
 	 *
-	 * Cache::key('default', array('posts', 'banners'));
-	 * // returns `array('posts', 'banners')`
+	 * Cache::key('default', ['posts', 'banners']);
+	 * // returns `['posts', 'banners']`
 	 *
-	 * Cache::key('default', array('posts' => 'foo', 'banners' => 'bar));
-	 * // returns `array('posts' => 'foo', 'banners' => 'bar')`
+	 * Cache::key('default', ['posts' => 'foo', 'banners' => 'bar]);
+	 * // returns `['posts' => 'foo', 'banners' => 'bar']`
 	 * ```
 	 *
 	 * Make a key safe to use with adapter (exact result depends
@@ -130,17 +130,17 @@ class Cache extends \lithium\core\Adaptable {
 	 * Cache::key('default', 'post', array(2, 'json'));
 	 * // returns `'post:723f0e19'`
 	 *
-	 * Cache::key('default', array('posts', 'banners'), 'json');
-	 * // returns `array('posts:6b072545', 'banners:6b072545')`
+	 * Cache::key('default', ['posts', 'banners'], 'json');
+	 * // returns `['posts:6b072545', 'banners:6b072545']`
 	 *
-	 * Cache::key('default', array('posts' => 'foo', 'banners' => 'bar'), 'json');
-	 * // returns `array('posts:38ec40e5' => 'foo', 'banners:38ec40e5' => 'bar')`
+	 * Cache::key('default', ['posts' => 'foo', 'banners' => 'bar'], 'json');
+	 * // returns `['posts:38ec40e5' => 'foo', 'banners:38ec40e5' => 'bar']`
 	 * ```
 	 *
 	 * Or with a resuable key generator function:
 	 * ```
-	 * $posts[0] = array('id' => 1);
-	 * $posts[1] = array('id' => 2);
+	 * $posts[0] = ['id' => 1];
+	 * $posts[1] = ['id' => 2];
 	 *
 	 * $key = function($data) { return 'post:' . $data['id']};
 	 *
@@ -171,9 +171,9 @@ class Cache extends \lithium\core\Adaptable {
 		$adapter = static::adapter($name);
 
 		if (is_callable($key)) {
-			return current($adapter->key(array($key($data))));
+			return current($adapter->key([$key($data)]));
 		}
-		$keys = ($isMulti = is_array($key)) ? $key : array($key);
+		$keys = ($isMulti = is_array($key)) ? $key : [$key];
 		$keys = ($hasData = !is_integer(key($keys))) ? array_keys($keys) : $keys;
 
 		if ($data !== null) {

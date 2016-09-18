@@ -57,7 +57,7 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testKeyNoop() {
-		Cache::config(array('default' => array('adapter' => 'Memory')));
+		Cache::config(['default' => ['adapter' => 'Memory']]);
 
 		$key = 'this is a cache key';
 
@@ -75,43 +75,43 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = 'foo';
 		$this->assertIdentical($expected, $result);
 
-		$result = Cache::key('default', array('foo', 'bar'));
-		$expected = array('foo', 'bar');
+		$result = Cache::key('default', ['foo', 'bar']);
+		$expected = ['foo', 'bar'];
 		$this->assertIdentical($expected, $result);
 
-		$result = Cache::key('default', array('foo' => 'bar', 'baz' => 'boo'));
-		$expected = array('foo' => 'bar', 'baz' => 'boo');
+		$result = Cache::key('default', ['foo' => 'bar', 'baz' => 'boo']);
+		$expected = ['foo' => 'bar', 'baz' => 'boo'];
 		$this->assertIdentical($expected, $result);
 	}
 
 	public function testKeyWithDataHash() {
-		Cache::config(array('default' => array('adapter' => 'Memory')));
+		Cache::config(['default' => ['adapter' => 'Memory']]);
 
 		$result = Cache::key('default', 'post', 2);
 		$expected = 'post:1ad5be0d';
 		$this->assertIdentical($expected, $result);
 
-		$result = Cache::key('default', 'post', array(2, 'json'));
+		$result = Cache::key('default', 'post', [2, 'json']);
 		$expected = 'post:723f0e19';
 		$this->assertIdentical($expected, $result);
 
-		$result = Cache::key('default', array('posts', 'banners'), 'json');
-		$expected = array(
+		$result = Cache::key('default', ['posts', 'banners'], 'json');
+		$expected = [
 			'posts:6b072545',
 			'banners:6b072545'
-		);
+		];
 		$this->assertIdentical($expected, $result);
 
-		$result = Cache::key('default', array('posts' => 'foo', 'banners' => 'bar'), 'json');
-		$expected = array(
+		$result = Cache::key('default', ['posts' => 'foo', 'banners' => 'bar'], 'json');
+		$expected = [
 			'posts:6b072545' => 'foo',
 			'banners:6b072545' => 'bar'
-		);
+		];
 		$this->assertIdentical($expected, $result);
 	}
 
 	public function testKeyWithGeneratorLambda() {
-		Cache::config(array('default' => array('adapter' => 'Memory')));
+		Cache::config(['default' => ['adapter' => 'Memory']]);
 
 		$key = function() {
 			return 'lambda_key';
@@ -141,7 +141,7 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testKeyWithGeneratorClosure() {
-		Cache::config(array('default' => array('adapter' => 'Memory')));
+		Cache::config(['default' => ['adapter' => 'Memory']]);
 
 		$value = 5;
 
@@ -167,7 +167,7 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testKeyWithGeneratorClosureAndArguments() {
-		Cache::config(array('default' => array('adapter' => 'Memory')));
+		Cache::config(['default' => ['adapter' => 'Memory']]);
 
 		$value = 'closure argument';
 

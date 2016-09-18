@@ -51,44 +51,44 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testSanitzeKeys() {
-		$result = $this->memcache->key(array('posts for bjœrn'));
-		$expected = array('posts_for_bjœrn_fdf03955');
+		$result = $this->memcache->key(['posts for bjœrn']);
+		$expected = ['posts_for_bjœrn_fdf03955'];
 		$this->assertEqual($expected, $result);
 
-		$result = $this->memcache->key(array('posts-for-bjoern'));
-		$expected = array('posts-for-bjoern');
+		$result = $this->memcache->key(['posts-for-bjoern']);
+		$expected = ['posts-for-bjoern'];
 		$this->assertEqual($expected, $result);
 
-		$result = $this->memcache->key(array('posts for Helgi Þorbjörnsson'));
-		$expected = array('posts_for_Helgi_Þorbjörnsson_c7f8433a');
+		$result = $this->memcache->key(['posts for Helgi Þorbjörnsson']);
+		$expected = ['posts_for_Helgi_Þorbjörnsson_c7f8433a'];
 		$this->assertEqual($expected, $result);
 
-		$result = $this->memcache->key(array('libraries.cache'));
-		$expected = array('libraries.cache');
+		$result = $this->memcache->key(['libraries.cache']);
+		$expected = ['libraries.cache'];
 		$this->assertEqual($expected, $result);
 
 		$key = 'post_';
 		for ($i = 0; $i <= 127; $i++) {
 			$key .= chr($i);
 		}
-		$result = $this->memcache->key(array($key));
+		$result = $this->memcache->key([$key]);
 		$expected  = 'post__________________________________!"#$%&\'()*+,-./0123456789:;';
 		$expected .= '<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|';
 		$expected .= '}~__38676d3e';
-		$expected = array($expected);
+		$expected = [$expected];
 		$this->assertEqual($expected, $result);
 
 		$key = str_repeat('0', 300);
-		$result = $this->memcache->key(array($key));
-		$expected = array(str_repeat('0', 241) . '_9e1830ed');
+		$result = $this->memcache->key([$key]);
+		$expected = [str_repeat('0', 241) . '_9e1830ed'];
 		$this->assertEqual($expected, $result);
 		$this->assertTrue(strlen($result[0]) <= 250);
 
-		$adapter = new Memcache(array('scope' => 'foo'));
+		$adapter = new Memcache(['scope' => 'foo']);
 
 		$key = str_repeat('0', 300);
-		$result = $adapter->key(array($key));
-		$expected = array(str_repeat('0', 241 - strlen('_foo')) . '_9e1830ed');
+		$result = $adapter->key([$key]);
+		$expected = [str_repeat('0', 241 - strlen('_foo')) . '_9e1830ed'];
 		$this->assertEqual($expected, $result);
 		$this->assertTrue(strlen($result[0]) <= 250);
 	}

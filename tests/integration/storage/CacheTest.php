@@ -35,7 +35,7 @@ class CacheTest extends \lithium\test\Integration {
 	}
 
 	public function testFileAdapterSanitzeKey() {
-		Cache::config(array('default' => array('adapter' => 'File')));
+		Cache::config(['default' => ['adapter' => 'File']]);
 
 		$result = Cache::key('default', 'posts for bjœrn');
 		$expected = 'posts_for_bj_rn_fdf03955';
@@ -49,8 +49,8 @@ class CacheTest extends \lithium\test\Integration {
 		$expected = 'posts_for_Helgi__orbj_rnsson_c7f8433a';
 		$this->assertEqual($expected, $result);
 
-		$result = Cache::key('default', array('posts for bjœrn'));
-		$expected = array('posts_for_bj_rn_fdf03955');
+		$result = Cache::key('default', ['posts for bjœrn']);
+		$expected = ['posts_for_bj_rn_fdf03955'];
 		$this->assertEqual($expected, $result);
 	}
 
