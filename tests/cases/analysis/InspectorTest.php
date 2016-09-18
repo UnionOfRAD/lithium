@@ -106,8 +106,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = [__LINE__ - 5 => "\tpublic function testLineIntrospection() {"];
 		$this->assertEqual($expected, $result);
 
-		$result = Inspector::lines(__CLASS__, [17]);
-		$expected = [17 => 'class InspectorTest extends \lithium\test\Unit {'];
+		$result = Inspector::lines(__CLASS__, [18]);
+		$expected = [18 => 'class InspectorTest extends \lithium\test\Unit {'];
 		$this->assertEqual($expected, $result);
 
 		$lines = 'This is the first line.' . PHP_EOL . 'And this the second.';

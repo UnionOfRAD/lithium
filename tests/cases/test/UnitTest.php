@@ -100,7 +100,7 @@ class UnitTest extends \lithium\test\Unit {
 		$expected = 'testSomething';
 		$this->assertEqual($expected, $results[0]['method']);
 
-		$expected = 25;
+		$expected = 26;
 		$this->assertEqual($expected, $results[0]['line']);
 	}
 
@@ -183,7 +183,7 @@ class UnitTest extends \lithium\test\Unit {
 			'message' => "expected: 1\nresult: 1\n",
 			'data' => ['expected' => true, 'result' => true],
 			'file' => realpath($file),
-			'line' => 14,
+			'line' => 15,
 			'assertion' => 'assertTrue'
 		];
 		$result = $this->test->run();
