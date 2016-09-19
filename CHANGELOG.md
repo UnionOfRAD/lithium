@@ -4,7 +4,7 @@
 
 ### Added
 
-- Database now support the `nested` strategy which will embed related records/documents by
+- Data sources now support the `nested` strategy which will embed related records/documents by
   fetching them using additional queries. (jails) 
 	
   This strategy is auto-enabled on NoSQL-style databases where documents now
@@ -19,10 +19,10 @@
   Please note that records/documents - fetched using this strategy - cannot be
   further constrained by conditions.
 
-- `Cache::key()` learned to generate safe per adapter cache keys. The method was
-   all in all made more flexible and feature rich as it added support for reusable
-   and key mutating generator functions as well as support for key generation
-   by passing any form of data.
+- `Cache::key()` learned to generate safe cache keys. Where each adapter defines
+  what "safe" means. The method was all in all made more flexible and feature rich
+  as it added support for reusable and key mutating generator functions as well as
+  support for key generation by passing any form of data.
 
 ### Changed
 
