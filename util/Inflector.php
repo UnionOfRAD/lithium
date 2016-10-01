@@ -218,6 +218,43 @@ class Inflector {
 	protected static $_humanized = [];
 
 	/**
+	 * Clears local in-memory caches.  Can be used to force a full-cache clear when updating
+	 * inflection rules mid-way through request execution.
+	 */
+	public static function reset() {
+		static::$_singularized = static::$_pluralized = [];
+		static::$_camelized = static::$_underscored = [];
+		static::$_humanized = [];
+
+		static::$_plural['regexUninflected'] = static::$_singular['regexUninflected'] = null;
+		static::$_plural['regexIrregular'] = static::$_singular['regexIrregular'] = null;
+		static::$_transliteration = [
+			'/à|á|å|â/' => 'a',
+			'/è|é|ê|ẽ|ë/' => 'e',
+			'/ì|í|î/' => 'i',
+			'/ò|ó|ô|ø/' => 'o',
+			'/ù|ú|ů|û/' => 'u',
+			'/ç|ć|č/' => 'c',
+			'/đ/' => 'dj',
+			'/š/' => 's',
+			'/ž/' => 'z',
+			'/ñ/' => 'n',
+			'/ä|æ/' => 'ae',
+			'/ö/' => 'oe',
+			'/ü/' => 'ue',
+			'/Ä/' => 'Ae',
+			'/Ü/' => 'Ue',
+			'/Ö/' => 'Oe',
+			'/ß/' => 'ss',
+			'/Č|Ć/' => 'C',
+			'/DŽ/' => 'Dz',
+			'/Đ/' => 'Dj',
+			'/Š/' => 'S',
+			'/Ž/' => 'Z'
+		];
+	}
+
+	/**
 	 * Gets or adds inflection and transliteration rules.
 	 *
 	 * @param string $type Either `'transliteration'`, `'uninflected'`, `'singular'` or `'plural'`.
@@ -342,43 +379,6 @@ class Inflector {
 			}
 		}
 		return static::$_singularized[$word] = $word;
-	}
-
-	/**
-	 * Clears local in-memory caches.  Can be used to force a full-cache clear when updating
-	 * inflection rules mid-way through request execution.
-	 */
-	public static function reset() {
-		static::$_singularized = static::$_pluralized = [];
-		static::$_camelized = static::$_underscored = [];
-		static::$_humanized = [];
-
-		static::$_plural['regexUninflected'] = static::$_singular['regexUninflected'] = null;
-		static::$_plural['regexIrregular'] = static::$_singular['regexIrregular'] = null;
-		static::$_transliteration = [
-			'/à|á|å|â/' => 'a',
-			'/è|é|ê|ẽ|ë/' => 'e',
-			'/ì|í|î/' => 'i',
-			'/ò|ó|ô|ø/' => 'o',
-			'/ù|ú|ů|û/' => 'u',
-			'/ç|ć|č/' => 'c',
-			'/đ/' => 'dj',
-			'/š/' => 's',
-			'/ž/' => 'z',
-			'/ñ/' => 'n',
-			'/ä|æ/' => 'ae',
-			'/ö/' => 'oe',
-			'/ü/' => 'ue',
-			'/Ä/' => 'Ae',
-			'/Ü/' => 'Ue',
-			'/Ö/' => 'Oe',
-			'/ß/' => 'ss',
-			'/Č|Ć/' => 'C',
-			'/DŽ/' => 'Dz',
-			'/Đ/' => 'Dj',
-			'/Š/' => 'S',
-			'/Ž/' => 'Z'
-		];
 	}
 
 	/**
