@@ -210,13 +210,21 @@ class Relationship extends \lithium\core\Object {
 		$conditions = (array) $this->constraints();
 
 		foreach ($this->key() as $from => $to) {
-			if (!isset($object->{$from})) {
-				return null;
+			if (empty($object->{$from})) {
+				return;
 			}
 			$conditions[$to] = $object->{$from};
 
-			if (is_object($conditions[$to]) && $conditions[$to] instanceof Countable) {
-				$conditions[$to] = iterator_to_array($conditions[$to]);
+			if (is_object($conditions[$to])) {
+				if ($conditions[$to] instanceof Countable) {
+					$conditions[$to] = iterator_to_array($conditions[$to], false);
+				} elseif (method_exists($conditions[$to], 'data')) {
+					$conditions[$to] = $conditions[$to]->data();
+				}
+			}
+
+			if (empty($conditions[$to])) {
+				return null;
 			}
 		}
 		$fields = $this->fields();
@@ -301,16 +309,18 @@ class Relationship extends \lithium\core\Object {
 			},
 			static::LINK_KEY => function($object, $relationship, $options) {
 				$model = $relationship->to();
-				if (!$query = $relationship->query($object)) {
-					return;
-				}
 				$method = ($relationship->type() === "hasMany") ? 'all' : 'first';
+				if (!$query = $relationship->query($object)) {
+					return $method === 'first' ? null : $model::create(array(), array('class' => 'set'));
+				}
 				return $model::$method(Set::merge((array) $query, (array) $options));
 			},
 			static::LINK_KEY_LIST  => function($object, $relationship, $options) {
 				$model = $relationship->to();
-				$query = $relationship->query($object);
-				return $model::all(Set::merge($query, $options));
+				if (!$query = $relationship->query($object)) {
+					return $model::create(array(), array('class' => 'set'));
+				}
+				return $model::all(Set::merge((array) $query, (array) $options));
 			}
 		);
 	}
@@ -327,90 +337,177 @@ class Relationship extends \lithium\core\Object {
 		if (count($keys) !== 1) {
 			throw new Exception("The embedding doesn't support composite primary key.");
 		}
+
+		switch($this->type()) {
+			case 'belongsTo';
+				return $this->_embedBelongsTo($collection, $options);
+			case 'hasMany';
+				if ($this->link() === static::LINK_KEY_LIST) {
+					return $this->_embedHasManyAsList($collection, $options);
+				}
+				return $this->_embedHasMany($collection, $options);
+			case 'hasOne';
+				return $this->_embedHasOne($collection, $options);
+			default:
+				throw new Exception("Error {$this->type()} is unsupported ");
+		}
+	}
+
+	/**
+	 * Fetch belongsTo related data to a whole collection and embed the result in it.
+	 *
+	 * @param mixed $collection A collection of data.
+	 * @param array $options The embed query options.
+	 * @return mixed The fetched data.
+	 */
+	protected function _embedBelongsTo(&$collection, $options) {
+		$keys = $this->key();
 		list($formKey, $toKey) = each($keys);
 
 		$related = array();
 
-		if ($this->type() === 'belongsTo') {
+		$indexes = $this->_index($collection, $formKey);
+		$related = $this->_find(array_keys($indexes), $options);
+		$indexes = $this->_index($related, $toKey);
 
-			$indexes = $this->_index($collection, $formKey);
-			$related = $this->_find(array_keys($indexes), $options);
+		$fieldName = $this->fieldName();
 
-			$fieldName = $this->fieldName();
-			$indexes = $this->_index($related, $toKey);
-			$this->_cleanup($collection);
-
-			foreach ($collection as $index => $source) {
-				if (is_object($source)) {
-					$value = (string) $source->{$formKey};
-					if (isset($indexes[$value])) {
-						$source->{$fieldName} = $related[$indexes[$value]];
-					}
-				} else {
-					$value = (string) $source[$formKey];
-					if (isset($indexes[$value])) {
-						$collection[$index][$fieldName] = $related[$indexes[$value]];
-					}
+		foreach ($collection as $index => $source) {
+			if (is_object($source)) {
+				$value = (string) $source->{$formKey};
+				if (isset($indexes[$value])) {
+					$source->{$fieldName} = $related[$indexes[$value]];
+				}
+			} else {
+				$value = (string) $source[$formKey];
+				if (isset($indexes[$value])) {
+					$collection[$index][$fieldName] = $related[$indexes[$value]];
 				}
 			}
+		}
 
-		} elseif ($this->type() === 'hasMany') {
+		return $related;
+	}
 
-			$indexes = $this->_index($collection, $formKey);
-			$related = $this->_find(array_keys($indexes), $options);
+	/**
+	 * Fetch hasMany related data to a whole collection and embed the result in it.
+	 *
+	 * @param mixed $collection A collection of data.
+	 * @param array $options The embed query options.
+	 * @return mixed The fetched data.
+	 */
+	protected function _embedHasMany(&$collection, $options) {
+		$keys = $this->key();
+		list($formKey, $toKey) = each($keys);
 
-			$fieldName = $this->fieldName();
+		$related = array();
 
-			$this->_cleanup($collection);
+		$indexes = $this->_index($collection, $formKey);
+		$related = $this->_find(array_keys($indexes), $options);
+		$fieldName = $this->fieldName();
 
-			foreach ($collection as $index => $entity) {
-				if (is_object($entity)) {
-					$entity->{$fieldName} = array();
-				} else {
-					$collection[$index][$fieldName] = array();
-				}
+		foreach ($collection as $index => $entity) {
+			if (is_object($entity)) {
+				$entity->{$fieldName} = array();
+			} else {
+				$collection[$index][$fieldName] = array();
 			}
+		}
 
-			foreach ($related as $index => $entity) {
-				$isObject = is_object($entity);
-				$values = $isObject ? $entity->{$toKey} : $entity[$toKey];
-				$values = is_array($values) || $values instanceof Traversable ? $values : array($values);
-				foreach ($values as $value) {
-					$value = (string) $value;
-					if (isset($indexes[$value])) {
-						if ($isObject) {
-							$source = $collection[$indexes[$value]];
-							$source->{$fieldName}[] = $entity;
-						} else {
-							$collection[$indexes[$value]][$fieldName][] = $entity;
-						}
-					}
-				}
-			}
-
-		} elseif ($this->type() === 'hasOne') {
-
-			$indexes = $this->_index($collection, $formKey);
-			$related = $this->_find(array_keys($indexes), $options);
-			$fieldName = $this->fieldName();
-			$this->_cleanup($collection);
-			foreach ($related as $index => $entity) {
-				if (is_object($entity)) {
-					$value = (string) $entity->{$toKey};
-					if (isset($indexes[$value])) {
+		foreach ($related as $index => $entity) {
+			$isObject = is_object($entity);
+			$values = $isObject ? $entity->{$toKey} : $entity[$toKey];
+			$values = is_array($values) || $values instanceof Traversable ? $values : array($values);
+			foreach ($values as $value) {
+				$value = (string) $value;
+				if (isset($indexes[$value])) {
+					if ($isObject) {
 						$source = $collection[$indexes[$value]];
-						$source->{$fieldName} = $entity;
-					}
-				} else {
-					$value = (string) $entity[$toKey];
-					if (isset($indexes[$value])) {
-						$collection[$indexes[$value]][$fieldName] = $entity;
+						$source->{$fieldName}[] = $entity;
+					} else {
+						$collection[$indexes[$value]][$fieldName][] = $entity;
 					}
 				}
 			}
+		}
 
-		} else {
-			throw new Exception("Error {$this->type()} is unsupported ");
+		return $related;
+	}
+
+	/**
+	 * Fetch hasMany related data (through an embedded list) to a whole collection and embed the result in it.
+	 *
+	 * @param mixed $collection A collection of data.
+	 * @param array $options The embed query options.
+	 * @return mixed The fetched data.
+	 */
+	protected function _embedHasManyAsList(&$collection, $options) {
+		$keys = $this->key();
+		list($formKey, $toKey) = each($keys);
+
+		$related = array();
+
+		$list = $this->_list($collection, $formKey);
+		$related = $this->_find($list, $options);
+		$indexes = $this->_index($related, $toKey);
+		$fieldName = $this->fieldName();
+
+		foreach ($collection as $index => $source) {
+			if (is_object($source)) {
+				$list = $source->{$formKey};
+				$source->{$fieldName} = array();
+				foreach ($list as $id) {
+					$id = (string) $id;
+					if (isset($indexes[$id])) {
+						$source->{$fieldName}[] = $related[$indexes[$id]];
+					}
+				}
+			} else {
+				$list = $source[$formKey];
+				$collection[$index][$fieldName] = array();
+				foreach ($list as $id) {
+					$id = (string) $id;
+					if (isset($indexes[$id])) {
+						$collection[$index][$fieldName][] = $related[$indexes[$id]];
+					}
+				}
+			}
+		}
+
+		return $related;
+	}
+
+	/**
+	 * Fetch hasOne related data to a whole collection and embed the result in it.
+	 *
+	 * @param mixed $collection A collection of data.
+	 * @param array $options The embed query options.
+	 * @return mixed The fetched data.
+	 */
+	protected function _embedOne(&$collection, $options) {
+
+		$keys = $this->key();
+		list($formKey, $toKey) = each($keys);
+
+		$related = array();
+
+		$indexes = $this->_index($collection, $formKey);
+		$related = $this->_find(array_keys($indexes), $options);
+		$fieldName = $this->fieldName();
+
+		foreach ($related as $index => $entity) {
+			if (is_object($entity)) {
+				$value = (string) $entity->{$toKey};
+				if (isset($indexes[$value])) {
+					$source = $collection[$indexes[$value]];
+					$source->{$fieldName} = $entity;
+				}
+			} else {
+				$value = (string) $entity[$toKey];
+				if (isset($indexes[$value])) {
+					$collection[$indexes[$value]][$fieldName] = $entity;
+				}
+			}
 		}
 		return $related;
 	}
@@ -422,7 +519,7 @@ class Relationship extends \lithium\core\Object {
 	 * @return object     A collection of items matching the id/ids.
 	 */
 	protected function _find($id, $options = array()) {
-		if ($this->link() !== static::LINK_KEY) {
+		if ($this->link() !== static::LINK_KEY && $this->link() !== static::LINK_KEY_LIST) {
 			throw new Exception("This relation is not based on a foreign key.");
 		}
 		if ($id === array()) {
@@ -447,29 +544,28 @@ class Relationship extends \lithium\core\Object {
 	protected function _index($collection, $name) {
 		$indexes = array();
 		foreach ($collection as $key => $entity) {
-			if (is_object($entity)) {
-				$indexes[(string) $entity->{$name}] = $key;
-			} else {
-				$indexes[(string) $entity[$name]] = $key;
-			}
+			$id = is_object($entity) ? $entity->{$name} : $entity[$name];
+			$indexes[(string) $id] = $key;
 		}
 		return $indexes;
 	}
 
 	/**
-	 * Unsets the relationship attached to a collection en entities.
+	 * Extract embedded hasMany foreign keys from collection.
 	 *
-	 * @param  mixed  $collection An collection to "clean up".
+	 * @param  mixed  $collection An collection to extract keys from.
+	 * @param  string $name       The field name of the key.
+	 * @return array              An array of keys.
 	 */
-	public function _cleanup($collection) {
-		$name = $this->name();
-		foreach ($collection as $index => $entity) {
-			if (is_object($entity)) {
-				unset($entity->{$name});
-			} else {
-				unset($entity[$name]);
+	protected function _list($collection, $name) {
+		$list = array();
+		foreach ($collection as $key => $entity) {
+			$array = is_object($entity) ? $entity->{$name} : $entity[$name];
+			foreach ($array as $id) {
+				$list[] = $id;
 			}
 		}
+		return $list;
 	}
 }
 
