@@ -89,24 +89,23 @@ class Create extends \lithium\console\Command {
 	/**
 	 * Run the create command. Takes `$command` and delegates to `$command::$method`
 	 *
-	 * When just `$type` is given and `$name` is not given,
-	 * will use `$type` as a name and create all types of things for it.
-	 *
-	 * @param string $type The type of thing to create (i.e. `'test'`, `'model'` or `'controller'`).
-	 * @param string $name The name of the thing to create (i.e. `'Posts'`).
+	 * @param string $command
 	 * @return boolean
 	 */
-	public function run($type, $name = null) {
-		if ($type && !$name) {
-			return $this->_default($type);
+	public function run($command = null) {
+		if ($command && !$this->request->args()) {
+			return $this->_default($command);
 		}
 		$this->request->shift();
-		$this->template = $this->template ?: $type;
+		$this->template = $this->template ?: $command;
 
-		if ($this->_execute($type)) {
+		if (!$command) {
+			return false;
+		}
+		if ($this->_execute($command)) {
 			return true;
 		}
-		$this->error("Thing of type `{$type}` could not be created.");
+		$this->error("{$command} could not be created.");
 		return false;
 	}
 
