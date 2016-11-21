@@ -103,6 +103,10 @@ class PhpExtensions {
 		static::_ini(['extension=mongo.so']);
 	}
 
+	protected static function _mongodb() {
+		static::_ini(['extension=mongodb.so']);
+	}
+
 	/**
 	 * Executes given command, reports and exits in case it fails.
 	 *
