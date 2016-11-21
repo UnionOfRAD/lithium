@@ -1,0 +1,7 @@
+{
+    "name": "unionofrad/lithium-tests-ci-app",
+    "require": {},
+    "config": {
+        "vendor-dir": "libraries"
+    }
+}
