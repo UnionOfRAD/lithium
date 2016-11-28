@@ -89,6 +89,7 @@ abstract class Database extends \lithium\data\Source {
 		'!=' => array('multiple' => 'NOT IN'),
 		'<>' => array('multiple' => 'NOT IN'),
 		'BETWEEN' => array('format' => 'BETWEEN ? AND ?'),
+		'NOT BETWEEN' => array('format' => 'NOT BETWEEN ? AND ?'),
 		'LIKE' => array(),
 		'NOT LIKE' => array(),
 		'IS' => array(),
