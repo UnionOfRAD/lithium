@@ -8,7 +8,7 @@
 
 namespace lithium\data\source;
 
-use lithium\util\String;
+use lithium\util\LIString;
 use lithium\data\model\Query;
 
 /**

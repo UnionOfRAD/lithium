@@ -11,7 +11,7 @@ namespace lithium\data\source;
 use PDO;
 use PDOException;
 use lithium\util\Set;
-use lithium\util\String;
+use lithium\util\LIString;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
 use lithium\core\NetworkException;

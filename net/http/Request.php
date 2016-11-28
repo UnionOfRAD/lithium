@@ -8,7 +8,7 @@
 
 namespace lithium\net\http;
 
-use lithium\util\String;
+use lithium\util\LIString;
 use UnexpectedValueException;
 
 /**

@@ -8,7 +8,7 @@
 
 namespace lithium\action;
 
-use lithium\util\String;
+use lithium\util\LIString;
 use lithium\util\Inflector;
 use lithium\core\Libraries;
 use lithium\action\DispatchException;

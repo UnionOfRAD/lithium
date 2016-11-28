@@ -9,7 +9,7 @@
 namespace lithium\core;
 
 use RuntimeException;
-use lithium\util\String;
+use lithium\util\LIString;
 use lithium\util\collection\Filters;
 use lithium\core\ConfigException;
 use lithium\core\ClassNotFoundException;
@@ -880,7 +880,7 @@ class Libraries {
 
 			foreach (static::_searchPaths($paths, $library) as $tpl) {
 				$params['library'] = rtrim($config['prefix'], '\\');
-				$class = str_replace('\\*', '', String::insert($tpl, $params));
+				$class = str_replace('\\*', '', LIString::insert($tpl, $params));
 
 				if (file_exists($file = Libraries::path($class, $options))) {
 					return ($options['type'] === 'file') ? $file : $class;
@@ -935,7 +935,7 @@ class Libraries {
 			$params['library'] = $config['path'];
 
 			foreach (static::_searchPaths($paths, $library) as $tpl) {
-				$options['path'] = str_replace('\\', '/', String::insert($tpl, $params, $flags));
+				$options['path'] = str_replace('\\', '/', LIString::insert($tpl, $params, $flags));
 				$options['path'] = str_replace('*/', '', $options['path']);
 				$classes = array_merge($classes, static::_search($config, $options));
 			}

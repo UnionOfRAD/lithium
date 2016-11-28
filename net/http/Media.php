@@ -10,7 +10,7 @@ namespace lithium\net\http;
 
 use Closure;
 use lithium\util\Set;
-use lithium\util\String;
+use lithium\util\LIString;
 use lithium\core\Libraries;
 use lithium\core\Environment;
 use lithium\net\http\MediaException;
@@ -549,7 +549,7 @@ class Media extends \lithium\core\StaticObject {
 		if ($isAbsolute && $options['base'] && strpos($asset, $options['base']) !== 0) {
 			$asset = "{$options['base']}{$asset}";
 		} elseif (!$isAbsolute) {
-			$asset = String::insert(key($path), array('path' => $asset) + $options);
+			$asset = LIString::insert(key($path), array('path' => $asset) + $options);
 		}
 
 		if (is_array($options['filter']) && !empty($options['filter'])) {

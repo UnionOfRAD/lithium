@@ -16,7 +16,7 @@ use Exception;
  * {:tag} and regex replacement, and tokenization. Also includes a cryptographically-strong random
  * number generator, and a base64 encoder for use with DES and XDES.
  */
-class String {
+class LIString {
 
 	/**
 	 * UUID-related constant. Clears all bits of version byte (`00001111`).
