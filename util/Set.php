@@ -542,6 +542,33 @@ class Set {
 	}
 
 	/**
+	 * Traverse a multidimensional array index until the data is found
+	 *
+	 * @param array $array, the multidimensional array
+	 * @param mixed $path, the string path (dot separated) or an array
+	 * @param integer $i, cursor in the path
+	 * @return mixed
+	 */
+	public static function get($array, $path, $i = 0) {
+		if (empty($path)) {
+			return $array;
+		}
+
+		if (!is_array($path)) {
+			$path = explode('.', $path);
+		}
+
+		if ($path && isset($path[$i])) {
+			if (isset($array[$path[$i]])) {
+				return Set::get($array[$path[$i]], $path, ($i + 1));
+			} else {
+				return null;
+			}
+		}
+		return $array;
+	}
+
+	/**
 	 * Checks to see if all the values in the array are numeric.
 	 *
 	 * @param array $array The array to check.  If null, the value of the current Set object.
