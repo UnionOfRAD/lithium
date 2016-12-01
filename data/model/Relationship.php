@@ -306,16 +306,18 @@ class Relationship extends \lithium\core\Object {
 			},
 			static::LINK_KEY => function($object, $relationship, $options) {
 				$model = $relationship->to();
-				if (!$query = $relationship->query($object)) {
-					return;
-				}
 				$method = ($relationship->type() === "hasMany") ? 'all' : 'first';
+				if (!$query = $relationship->query($object)) {
+					return $method === 'first' ? null : $model::create([], ['class' => 'set']);
+				}
 				return $model::$method(Set::merge((array) $query, (array) $options));
 			},
 			static::LINK_KEY_LIST  => function($object, $relationship, $options) {
 				$model = $relationship->to();
-				$query = $relationship->query($object);
-				return $model::all(Set::merge($query, $options));
+				if (!$query = $relationship->query($object)) {
+					return $model::create([], ['class' => 'set']);
+				}
+				return $model::all(Set::merge((array) $query, (array) $options));
 			}
 		];
 	}
