@@ -357,9 +357,10 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$connectionConfig1 = Connections::get($connection1, ['config' => true]);
 		$connectionConfig2 = Connections::get($connection2, ['config' => true]);
 
-		parent::connect($connection2);
 		$this->skipIf(!$connectionConfig2, "The `'{$connection2}' connection is not available`.");
 		$this->skipIf(!$this->with(['MySql', 'PostgreSql', 'Sqlite3']));
+
+		parent::connect($connection2);
 
 		$bothInMemory = $connectionConfig1['database'] == ':memory:';
 		$bothInMemory = $bothInMemory && $connectionConfig2['database'] == ':memory:';
@@ -400,9 +401,10 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		$connectionConfig1 = Connections::get($connection1, ['config' => true]);
 		$connectionConfig2 = Connections::get($connection2, ['config' => true]);
 
-		parent::connect($connection2);
 		$this->skipIf(!$connectionConfig2, "The `'{$connection2}' connection is not available`.");
 		$this->skipIf(!$this->with(['MySql', 'PostgreSql', 'Sqlite3']));
+
+		parent::connect($connection2);
 
 		$bothInMemory = $connectionConfig1['database'] == ':memory:';
 		$bothInMemory = $bothInMemory && $connectionConfig2['database'] == ':memory:';
