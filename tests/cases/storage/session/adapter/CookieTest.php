@@ -265,7 +265,7 @@ class CookieTest extends \lithium\test\Unit {
 		$cookie = new Cookie(['name' => 'my.name']);
 		$key = 'key';
 		$value = 'value';
-		$result = $cookie->write($key, $value)->__invoke($cookie, compact('key', 'value'), null);
+		$result = $cookie->write($key, $value)->__invoke(compact('key', 'value'));
 		$this->assertCookie(compact('key', 'value'));
 	}
 }
