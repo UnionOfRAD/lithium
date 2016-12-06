@@ -10,6 +10,7 @@
 namespace lithium\data\source\mongo_db;
 
 use MongoGridFSFile;
+use IteratorIterator;
 
 /**
  * This is the result class for all MongoDB. It needs a `MongoCursor` as
@@ -18,6 +19,8 @@ use MongoGridFSFile;
  * @link http://php.net/manual/en/class.mongocursor.php
  */
 class Result extends \lithium\data\source\Result {
+
+	protected $_it = null;
 
 	/**
 	 * Fetches the next result from the resource.
@@ -29,14 +32,17 @@ class Result extends \lithium\data\source\Result {
 		if (!$this->_resource) {
 			return false;
 		}
-		if (!$this->_resource->hasNext()) {
-			return null;
+		if (!$this->_it) {
+			$this->_resource->setTypeMap(['root' => 'array', 'document' => 'array']);
+			$this->_it = new IteratorIterator($this->_resource);
+			$this->_it->rewind();
 		}
-		$result = $this->_resource->getNext();
+		if (!$this->_it->valid()) {
+			return;
+		}
+		$result = $this->_it->current();
+		$this->_it->next();
 
-		if ($result instanceof MongoGridFSFile) {
-			$result = ['file' => $result] + $result->file;
-		}
 		return [$this->_iterator, $result];
 	}
 }

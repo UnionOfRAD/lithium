@@ -25,8 +25,8 @@ class DocumentSet extends \lithium\data\Collection {
 		parent::_init();
 		$this->_original = $this->_data;
 		$this->_handlers += [
-			'MongoId' => function($value) { return (string) $value; },
-			'MongoDate' => function($value) { return $value->sec; }
+			'MongoDB\BSON\ObjectID' => function($value) { return (string) $value; },
+			'MongoDB\BSON\UTCDateTime' => function($value) { return $value->toDateTime()->getTimestamp(); }
 		];
 	}
 

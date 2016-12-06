@@ -562,7 +562,7 @@ class Model extends \lithium\core\StaticObject {
 	 * Posts::find(23);
 	 *
 	 * // Also works with objects.
-	 * Posts::find(new MongoId(23));
+	 * Posts::find(new ObjectID(23));
 	 * ```
 	 *
 	 * @see lithium\data\Model::finder()

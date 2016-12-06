@@ -5,7 +5,7 @@
 # code is distributed under the terms of the BSD 3-Clause License.
 # The full license text can be found in the LICENSE.txt file.
 #
-
+sudo: false
 language: php
 
 services:
@@ -13,6 +13,12 @@ services:
   - memcache
   - couchdb
   - redis
+addons:
+  apt:
+    sources:
+    - mongodb-3.2-precise
+    packages:
+    - mongodb-org-server
 
 env:
   # Run one build with as many enabled and compatible extensions as possible.
@@ -22,10 +28,7 @@ env:
   - DB=mysql TESTS=data
   - DB=pgsql TESTS=data
   - DB=couchdb TESTS=data
-  # TODO: Once the new mongo adapter is supported, uncomment the first and
-  #       remove the second line as well as the builds under "allow_failures".
-  # - DB=mongodb PHP_EXT=mongo TESTS=data
-  - DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
+  - DB=mongodb PHP_EXT=mongodb TESTS=data
 
 php:
   - 7.0

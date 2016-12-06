@@ -9,7 +9,7 @@
 
 namespace lithium\tests\cases\data\source\mongo_db;
 
-use MongoId;
+use MongoDB\BSON\ObjectID;
 use lithium\data\source\MongoDb;
 use lithium\data\source\mongo_db\Schema;
 
@@ -31,13 +31,13 @@ class SchemaTest extends \lithium\test\Unit {
 			'users' => ['type' => 'id', 'array' => true]
 		]]);
 
-		$result = $schema->cast(null, null, ['users' => new MongoId()], [
+		$result = $schema->cast(null, null, ['users' => new ObjectID()], [
 			'database' => $this->_db
 		]);
 
 		$this->assertEqual(['users'], array_keys($result->data()));
 		$this->assertCount(1, $result->users);
-		$this->assertInstanceOf('MongoId', $result->users[0]);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result->users[0]);
 	}
 
 	public function testCastingEmptyValues() {

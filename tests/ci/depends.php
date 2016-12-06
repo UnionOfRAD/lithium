@@ -72,6 +72,7 @@ class PhpExtensions {
 	}
 
 	protected static function _mongodb() {
+		static::_pecl('mongodb');
 		static::_ini(['extension=mongodb.so']);
 	}
 

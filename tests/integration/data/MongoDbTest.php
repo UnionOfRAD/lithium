@@ -62,6 +62,63 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 		Images::reset();
 	}
 
+	public function testInsert() {
+		$image = Images::create(['title' => 'Post Title']);
+		$this->assertIdentical(true, $image->save());
+		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $image->_id);
+
+		$persisted = Images::first($image->_id);
+		$this->assertEqual([
+			'_id' => (string) $image->_id,
+			'title' => 'Post Title'
+		], $persisted->data());
+	}
+
+	public function testUpdate() {
+		$image = Images::create(['title' => 'Post Title']);
+		$this->assertIdentical(true, $image->save());
+
+		$image->title = 'Updated Post Title';
+		$this->assertIdentical(true, $image->save());
+
+		$persisted = Images::first($image->_id);
+		$this->assertEqual([
+			'_id' => (string) $image->_id,
+			'title' => 'Updated Post Title'
+		], $persisted->data());
+	}
+
+	public function testDelete() {
+		$image = Images::create(['title' => 'Post Title']);
+		$this->assertIdentical(true, $image->save());
+		$id = $image->_id;
+
+		$count = Images::find('count', ['conditions' => ['_id' => $id]]);
+		$this->assertIdentical(1, $count);
+
+		$image->delete();
+
+		$count = Images::find('count', ['conditions' => ['_id' => $id]]);
+		$this->assertIdentical(0, $count);
+	}
+
+	public function testCount() {
+		$count = Galleries::find('count');
+		$this->assertIdentical(2, $count);
+	}
+
+	public function testSorting() {
+		$asc = Galleries::find('all', ['order' => ['name']]);
+
+		$this->assertEqual('Bar Gallery', $asc->first()->name);
+		$this->assertEqual('Foo Gallery', $asc->next()->name);
+
+		$desc = Galleries::find('all', ['order' => ['name' => 'desc']]);
+
+		$this->assertEqual('Foo Gallery', $desc->first()->name);
+		$this->assertEqual('Bar Gallery', $desc->next()->name);
+	}
+
 	public function testCountOnEmptyResultSet() {
 		$data = Galleries::find('all', ['conditions' => ['name' => 'no match']]);
 
