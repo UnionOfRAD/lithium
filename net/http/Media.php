@@ -915,6 +915,7 @@ class Media extends \lithium\core\StaticObject {
 				)
 			),
 			'html' => array(),
+			'js'   => array(),
 			'json' => array(
 				'cast' => true,
 				'encode' => 'json_encode',
