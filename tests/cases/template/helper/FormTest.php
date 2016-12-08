@@ -912,6 +912,30 @@ class FormTest extends \lithium\test\Unit {
 		)));
 	}
 
+	public function testFormCreateInSubmodule() {
+		Router::reset();
+		Router::connect('/users', array('controller' => 'submodule.Users'));
+		Router::connect('/users/{:action}', array('controller' => 'submodule.Users'));
+
+		$request = new Request();
+		$request->params = array(
+			'library' => 'submodule',
+			'controller' => 'submodule.Users',
+			'action' => 'index'
+		);
+		$request->persist = array('controller');
+
+		$context = new MockFormRenderer(compact('request'));
+		$form = new Form(compact('context'));
+
+		$result = $form->create();
+		
+		$this->assertTags($result, array('form' => array(
+			'action' => "/users",
+			'method' => 'post'
+		)));
+	}
+
 	public function testFormCreateWithMoreParamsButSpecifiedAction() {
 		$request = new Request();
 		$request->params = array('controller' => 'mock', 'action' => 'test', 'args' => array('1'));

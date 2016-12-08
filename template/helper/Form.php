@@ -317,6 +317,11 @@ class Form extends \lithium\template\Helper {
 
 			$url = $scope['action'] ? array('action' => $scope['action']) : $scope['url'];
 			$options['method'] = strtolower($scope['method']);
+
+			if (is_array($url) && isset($url['library'])) {
+				unset($url['library']);
+			}
+
 			$args = array($extra['method'], $extra['tpl'], compact('url', 'options', 'append'));
 			$_options = $scope + $options;
 
