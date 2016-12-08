@@ -247,6 +247,10 @@ class RouterTest extends \lithium\test\Unit {
 		$result = Router::match(array('Posts::index', 'page' => '10'));
 		$expected = '/posts/10';
 		$this->assertIdentical($expected, $result);
+		
+		$result = Router::match(array("admin.Posts::index", 'page' => '9'));
+		$expected = '/admin/posts/9';
+		$this->assertEqual($expected, $result);
 
 		$result = Router::match(array("admin.Posts::index", 'page' => '9'));
 		$expected = '/admin/posts/9';
