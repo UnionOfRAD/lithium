@@ -361,6 +361,8 @@
 - Fixed slug generation by `Inflector` for strings containing multibyte characters or
   (unprintable) whitespaces.
 
+- Added missing uppercase transliteration pairs used by `Inflector::slug()`.
+
 - Fixed edge case when using `Collection::prev()` and the collection contained
   a falsey value (i.e. `null`, `false`, `''`).
 
