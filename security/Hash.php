@@ -79,9 +79,6 @@ class Hash {
 	 * hash, it is important that _both provided hash strings  have the same length_ and that
 	 * the _user-supplied hash string is passed as a second parameter_ rather than first.
 	 *
-	 * This function has the same signature and behavior as the native `hash_equals()` function
-	 * and will use that function if available (PHP >= 5.6).
-	 *
 	 * An E_USER_WARNING will be emitted when either of the supplied parameters is not a string.
 	 *
 	 * @link http://php.net/hash_equals
@@ -91,21 +88,7 @@ class Hash {
 	 * @return boolean Returns a boolean indicating whether the two hash strings are equal.
 	 */
 	public static function compare($known, $user) {
-		if (function_exists('hash_equals')) {
-			return hash_equals($known, $user);
-		}
-		if (!is_string($known) || !is_string($user)) {
-			trigger_error('Expected `$known` & `$user` parameters to be strings.', E_USER_WARNING);
-			return false;
-		}
-
-		if (($length = strlen($known)) !== strlen($user)) {
-			return false;
-		}
-		for ($i = 0, $result = 0; $i < $length; $i++) {
-			$result |= ord($known[$i]) ^ ord($user[$i]);
-		}
-		return $result === 0;
+		return hash_equals($known, $user);
 	}
 }
 
