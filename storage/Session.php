@@ -107,7 +107,7 @@ class Session extends \lithium\core\Adaptable {
 		$filters = $settings['filters'] ?: array();
 		$result = static::_filter(__FUNCTION__, compact('key', 'options'), $method, $filters);
 
-		if ($options['strategies']) {
+		if ($result && $options['strategies']) {
 			$options += array('key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__);
 			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
 		}
