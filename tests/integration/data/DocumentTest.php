@@ -69,6 +69,15 @@ class DocumentTest extends \lithium\tests\integration\data\Base {
 		$result = $updated->foo[1];
 		$this->assertEqual($expected, $result);
 	}
+
+	public function testDateCastingIssueOnExists() {
+		Galleries::config(array('schema' => array('_id' => 'id', 'created_at' => 'date')));
+		$gallery = Galleries::create(array('created_at' => time()));
+		$gallery->save();
+
+		$result = Galleries::first(array('conditions' => array('created_at' => array('$exists' => false))));
+		$this->assertNull($result);
+	}
 }
 
 ?>
