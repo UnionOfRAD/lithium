@@ -204,7 +204,7 @@ class Html extends \lithium\template\Helper {
 	 * prefixed with `'/'`, the path will be relative to the base path of your application.
 	 * Otherwise, the path will be relative to your stylesheets path, usually `webroot/css`.
 	 *
-	 * @param mixed $path The name of a CSS stylesheet in `/app/webroot/css`, or an array
+	 * @param mixed $path The name of a CSS stylesheet in `webroot/css`, or an array
 	 *              containing names of CSS stylesheets in that directory.
 	 * @param array $options Available options are:
 	 *              - `'inline'` _boolean_: Whether or not the `<style />` element should be output
@@ -280,7 +280,7 @@ class Html extends \lithium\template\Helper {
 	 * @param string $path Path to the image file. If the filename is prefixed with
 	 *               `'/'`, the path will be relative to the base path of your application.
 	 *               Otherwise the path will be relative to the images directory, usually
-	 *               `app/webroot/img/`. If the name starts with `'http://'`, this is treated
+	 *               `webroot/img/`. If the name starts with `'http://'`, this is treated
 	 *               as an external url used as the `src` attribute.
 	 * @param array $options Array of HTML attributes.
 	 * @return string Returns a formatted `<img />` tag.

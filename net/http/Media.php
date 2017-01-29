@@ -1006,7 +1006,7 @@ class Media extends \lithium\core\StaticObject {
 	 * Example:
 	 * ```
 	 * Media::attach('app', [
-	 *     'path' => '/var/www/website/app/webroot/extradir',
+	 *     'path' => '/var/www/website/webroot/extradir',
 	 *     'prefix' => 'extradir'
 	 * ]);
 	 * ```
