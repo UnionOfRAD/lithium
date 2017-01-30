@@ -471,7 +471,9 @@ class Router extends \lithium\core\StaticObject {
 		$vars = [];
 		$scope = $options['scope'];
 		if (is_array($scope)) {
-			list($tmp, $vars) = each($scope);
+			$tmp = key($scope);
+			$vars = current($scope);
+
 			if (!is_array($vars)) {
 				$vars = $scope;
 				$scope = static::scope();

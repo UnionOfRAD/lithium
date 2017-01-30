@@ -255,7 +255,8 @@ class Cache extends \lithium\core\Adaptable {
 				}
 				if (!$isEvaluated) {
 					$write = is_callable($write) ? $write() : $write;
-					list($expiry, $value) = each($write);
+					$expiry = key($write);
+					$value = current($write);
 					$value = is_callable($value) ? $value() : $value;
 
 					$isEvaluated = true;

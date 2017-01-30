@@ -798,7 +798,8 @@ class Form extends \lithium\template\Helper {
 		$defaults = ['escape' => true];
 
 		if (is_array($title)) {
-			list($title, $options) = each($title);
+			$options = current($title);
+			$title = key($title);
 		}
 		$title = $title ?: Inflector::humanize(str_replace('.', '_', $id));
 
