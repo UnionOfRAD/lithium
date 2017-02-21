@@ -274,7 +274,7 @@ class Validator extends \lithium\core\StaticObject {
 				return in_array($value, $options['list'], $strict);
 			},
 			'lengthBetween' => function($value, $format, $options) {
-				$length = strlen($value);
+				$length = mb_strlen($value);
 				$options += array('min' => 1, 'max' => 255);
 				return ($length >= $options['min'] && $length <= $options['max']);
 			},
