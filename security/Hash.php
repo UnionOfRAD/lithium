@@ -24,10 +24,10 @@ class Hash {
 	 * Examples:
 	 * ```
 	 * // Calculates a secure hash over string `'foo'`.
-	 * Hash::calculate('foo'));
+	 * Hash::calculate('foo');
 	 *
 	 * // It is possible to hash non-scalar data, too.
-	 * Hash::calculate(['foo' => 'bar']);        // serializes before hashing
+	 * Hash::calculate(['foo' => 'bar']);             // serializes before hashing
 	 * Hash::calculate(new Foo());                    // -- " --
 	 * Hash::calculate(function() { return 'bar'; }); // uses `spl_object_hash()`
 	 *
