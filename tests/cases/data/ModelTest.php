@@ -534,7 +534,7 @@ class ModelTest extends \lithium\test\Unit {
 		$result = $post->errors();
 		$this->assertNotEmpty($result);
 
-		$expected = array('email' => array('email is not valid'));
+		$expected = array('email' => array(1 => 'email is not valid'));
 		$result = $post->errors();
 		$this->assertEqual($expected, $result);
 	}
@@ -576,9 +576,9 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array(
 			'title' => array('please enter a title'),
 			'email' => array(
-				'email is empty',
-				'email is not valid',
-				'email is not in 1st list'
+				0 => 'email is empty',
+				1 => 'email is not valid',
+				3 => 'email is not in 1st list'
 			)
 		);
 		$result = $post->errors();
@@ -610,10 +610,10 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array(
 			'title' => array('please enter a title'),
 			'email' => array(
-				'email is empty',
-				'email is not valid',
-				'email is not in 1st list',
-				'email is not in 2nd list'
+				0 => 'email is empty',
+				1 => 'email is not valid',
+				3 => 'email is not in 1st list',
+				4 => 'email is not in 2nd list'
 			)
 		);
 		$result = $post->errors();
@@ -633,7 +633,7 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertNotEmpty($result);
 
 		$expected = array(
-			'email' => array('email is not in 2nd list')
+			'email' => array(4 => 'email is not in 2nd list')
 		);
 		$result = $post->errors();
 		$this->assertEqual($expected, $result);
@@ -844,10 +844,10 @@ class ModelTest extends \lithium\test\Unit {
 		$expected = array(
 			'title' => array('please enter a title'),
 			'email' => array(
-				'email is empty',
-				'email is not valid',
-				'email is not in 1st list',
-				'email is not in 2nd list'
+				0 => 'email is empty',
+				1 => 'email is not valid',
+				3 => 'email is not in 1st list',
+				4 => 'email is not in 2nd list'
 			)
 		);
 		$result = $post->errors();
