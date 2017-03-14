@@ -87,6 +87,7 @@ class Response extends \lithium\net\http\Message {
 		422 => 'Unprocessable Entity',
 		423 => 'Locked',
 		424 => 'Method Failure',
+		426 => 'Upgrade Required',
 		428 => 'Precondition Required',
 		429 => 'Too Many Requests',
 		431 => 'Request Header Fields Too Large',
