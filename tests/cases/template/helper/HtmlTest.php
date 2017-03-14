@@ -376,7 +376,7 @@ class HtmlTest extends \lithium\test\Unit {
 	 * passing multiple scripts or styles to a single method call.
 	 */
 	public function testMultiNonInlineScriptsAndStyles() {
-		$result = $this->html->script(array('foo', 'bar'));
+		$result = $this->html->script(array('foo', 'bar', 'foo'));
 		$expected = array(
 			array('script' => array('type' => 'text/javascript', 'src' => 'regex:/.*\/foo\.js/')),
 			'/script',
@@ -386,6 +386,10 @@ class HtmlTest extends \lithium\test\Unit {
 		$this->assertTags($result, $expected);
 
 		$this->assertNull($this->html->script(array('foo', 'bar'), array('inline' => false)));
+		$result = $this->context->scripts();
+		$this->assertTags($result, $expected);
+
+		$this->html->script('foo', array('inline' => false));
 		$result = $this->context->scripts();
 		$this->assertTags($result, $expected);
 	}
