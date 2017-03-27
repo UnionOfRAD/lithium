@@ -103,10 +103,26 @@ class MySqlTest extends \lithium\tests\integration\data\Base {
 
 	public function testDatabaseEncoding() {
 		$this->assertTrue($this->_db->isConnected());
+
+		$this->assertTrue($this->_db->encoding('ascii'));
+		$this->assertEqual('ascii', $this->_db->encoding());
+
+		$this->assertTrue($this->_db->encoding('ASCII'));
+		$this->assertEqual('ascii', $this->_db->encoding());
+
+		$this->assertTrue($this->_db->encoding('LATIN2'));
+		$this->assertEqual('latin2',  $this->_db->encoding());
+
+		$this->assertTrue($this->_db->encoding('UTF8'));
+		$this->assertEqual('UTF-8', $this->_db->encoding());
+
 		$this->assertTrue($this->_db->encoding('utf8'));
 		$this->assertEqual('UTF-8', $this->_db->encoding());
 
 		$this->assertTrue($this->_db->encoding('UTF-8'));
+		$this->assertEqual('UTF-8', $this->_db->encoding());
+
+		$this->assertTrue($this->_db->encoding('utf-8'));
 		$this->assertEqual('UTF-8', $this->_db->encoding());
 	}
 
