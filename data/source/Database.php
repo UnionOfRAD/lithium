@@ -324,7 +324,7 @@ abstract class Database extends \lithium\data\Source {
 					throw new ConfigException($msg, null, $e);
 				break;
 			}
-			throw new ConfigException("An unknown configuration error has occured.", null, $e);
+			throw new ConfigException("PHP PDO extension not found in php.ini", null, $e);
 		}
 		$this->_isConnected = true;
 
