@@ -67,7 +67,7 @@ class MySqlTest extends \lithium\tests\integration\data\Base {
 		$result = $db->get('_config');
 		$expected = array(
 			'autoConnect' => false, 'encoding' => null,'persistent' => true,
-			'host' => 'localhost:3306', 'login' => 'root', 'password' => '',
+			'host' => 'localhost:3306', 'strict' => null, 'login' => 'root', 'password' => '',
 			'database' => null, 'dsn' => null, 'options' => array(), 'init' => true
 		);
 		$this->assertEqual($expected, $result);
@@ -108,6 +108,18 @@ class MySqlTest extends \lithium\tests\integration\data\Base {
 
 		$this->assertTrue($this->_db->encoding('UTF-8'));
 		$this->assertEqual('UTF-8', $this->_db->encoding());
+	}
+
+	public function testDatabaseStrictMode() {
+		$backup = $this->_db->strict();
+
+		$this->assertTrue($this->_db->strict(false));
+		$this->assertFalse($this->_db->strict());
+
+		$this->assertTrue($this->_db->strict(true));
+		$this->assertTrue($this->_db->strict());
+
+		$this->_db->strict($backup);
 	}
 
 	public function testValueByIntrospect() {
