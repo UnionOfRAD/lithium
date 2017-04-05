@@ -577,6 +577,26 @@ class Form extends \lithium\template\Helper {
 	}
 
 	/**
+	 * Generates an HTML `<input type="radio" />` object.
+	 * @param string $name The name of the field
+	 * @param array $options All options to be passed to the render
+	 * @return string Returns a `<input />` tag with the given name and attributes 
+	 */
+	public function radio($name, array $options = array()) {
+		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
+
+		$default = $options['value'];
+
+		if (!isset($options['checked'])) {
+			if ($this->_binding && $bound = $this->_binding->data($name)) {
+				$options['checked'] = ($bound == $default);
+			}
+		}
+
+		return $this->_render(__METHOD__, $template, compact('name', 'options'));
+	}
+
+	/**
 	 * Generates a `<select />` list using the `$list` parameter for the `<option />` tags. The
 	 * default selection will be set to the value of `$options['value']`, if specified.
 	 *
