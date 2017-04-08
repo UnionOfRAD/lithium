@@ -9,6 +9,7 @@
 
 namespace lithium\test;
 
+use Error;
 use Exception;
 use ErrorException;
 use ReflectionClass;
@@ -469,28 +470,31 @@ class Unit extends \lithium\core\Object {
 			$message = sprintf('An exception "%s" was expected but not thrown.', $expected);
 			return $this->assert(false, $message, compact('expected', 'result'));
 		} catch (Exception $e) {
-			$class = get_class($e);
-			$eMessage = $e->getMessage();
-
-			if (get_class($e) === $expected) {
-				$result = $class;
-				return $this->assert(true, $message, compact('expected', 'result'));
-			}
-			if ($eMessage === $expected) {
-				$result = $eMessage;
-				return $this->assert(true, $message, compact('expected', 'result'));
-			}
-			if (Validator::isRegex($expected) && preg_match($expected, $eMessage)) {
-				$result = $eMessage;
-				return $this->assert(true, $message, compact('expected', 'result'));
-			}
-
-			$message = sprintf(
-				'Exception "%s" was expected. Exception "%s" with message "%s" was thrown instead.',
-				$expected, get_class($e), $eMessage
-			);
-			return $this->assert(false, $message);
+			// fallthrough
+		} catch (Error $e) {
+			// fallthrough
 		}
+		$class = get_class($e);
+		$eMessage = $e->getMessage();
+
+		if (get_class($e) === $expected) {
+			$result = $class;
+			return $this->assert(true, $message, compact('expected', 'result'));
+		}
+		if ($eMessage === $expected) {
+			$result = $eMessage;
+			return $this->assert(true, $message, compact('expected', 'result'));
+		}
+		if (Validator::isRegex($expected) && preg_match($expected, $eMessage)) {
+			$result = $eMessage;
+			return $this->assert(true, $message, compact('expected', 'result'));
+		}
+
+		$message = sprintf(
+			'Exception "%s" was expected. Exception "%s" with message "%s" was thrown instead.',
+			$expected, get_class($e), $eMessage
+		);
+		return $this->assert(false, $message);
 	}
 
 	/**
