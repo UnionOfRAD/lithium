@@ -756,15 +756,17 @@ class Router extends \lithium\core\StaticObject {
 	 * ]);
 	 * ```
 	 *
-	 * By default all routes attached to an `'app'` scope are attached to a library of the
-	 * same name (i.e. the `'app'` library in this case). So you don't need to deal with an
-	 * extra library in your routes definition when you are using scopes.
+	 * When using scoped routes, just the scope must be given to match a route. The library
+	 * is already derived from the scope for you. This way you can keep route definitions short
+	 * and sweet while still using scopes.
 	 *
-	 * Moreover you can override the attached library name with:
+	 * By default the library is directly derived from the scope name. So that all routes
+	 * attached to an `'app'` scope are attached to a library of the same name (i.e. the `'app'`
+	 * library in this case).
+	 *
+	 * This behavior can be overridden like so:
 	 * ```
-	 * Router::attach('app', [
-	 *     'library' => 'custom_library_name'
-	 * ]);
+	 * Router::attach('app', ['library' => 'foo']);
 	 * ```
 	 *
 	 * @see lithium\net\http\Router::scope()
