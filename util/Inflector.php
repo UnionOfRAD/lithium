@@ -27,27 +27,33 @@ class Inflector {
 	 */
 	protected static $_transliteration = [
 		'/à|á|å|â/' => 'a',
-		'/è|é|ê|ẽ|ë/' => 'e',
+		'/Á|À|Å|Â/' => 'A',
+		'/è|é|ė|ê|ẽ|ë/' => 'e',
+		'/É|È|Ė|Ê|Ē|Ë/' => 'E',
 		'/ì|í|î/' => 'i',
-		'/ò|ó|ô|ø/' => 'o',
+		'/Í|Ì|Î/' => 'I',
+		'/ò|ó|ơ|ô|ø/' => 'o',
+		'/Ò|Ó|Ơ|Ô|Ø/' => 'O',
 		'/ù|ú|ů|û/' => 'u',
+		'/Ú|Ù|Ů|Û/' => 'U',
 		'/ç|ć|č/' => 'c',
+		'/Č|Ć|Č/' => 'C',
 		'/đ/' => 'dj',
-		'/š/' => 's',
-		'/ž/' => 'z',
-		'/ñ/' => 'n',
-		'/ä|æ/' => 'ae',
-		'/ö/' => 'oe',
-		'/ü/' => 'ue',
-		'/Ä/' => 'Ae',
-		'/Ü/' => 'Ue',
-		'/Ö/' => 'Oe',
-		'/ß/' => 'ss',
-		'/Č|Ć/' => 'C',
-		'/DŽ/' => 'Dz',
 		'/Đ/' => 'Dj',
+		'/DŽ/' => 'Dz',
+		'/š/' => 's',
 		'/Š/' => 'S',
-		'/Ž/' => 'Z'
+		'/ž/' => 'z',
+		'/Ž/' => 'Z',
+		'/ñ/' => 'n',
+		'/Ñ/' => 'N',
+		'/ä|æ/' => 'ae',
+		'/Ä/' => 'Ae',
+		'/ö/' => 'oe',
+		'/Ö/' => 'Oe',
+		'/ü/' => 'ue',
+		'/Ü/' => 'Ue',
+		'/ß/' => 'ss'
 	];
 
 	/**
@@ -218,6 +224,43 @@ class Inflector {
 	protected static $_humanized = [];
 
 	/**
+	 * Clears local in-memory caches.  Can be used to force a full-cache clear when updating
+	 * inflection rules mid-way through request execution.
+	 */
+	public static function reset() {
+		static::$_singularized = static::$_pluralized = [];
+		static::$_camelized = static::$_underscored = [];
+		static::$_humanized = [];
+
+		static::$_plural['regexUninflected'] = static::$_singular['regexUninflected'] = null;
+		static::$_plural['regexIrregular'] = static::$_singular['regexIrregular'] = null;
+		static::$_transliteration = [
+			'/à|á|å|â/' => 'a',
+			'/è|é|ê|ẽ|ë/' => 'e',
+			'/ì|í|î/' => 'i',
+			'/ò|ó|ô|ø/' => 'o',
+			'/ù|ú|ů|û/' => 'u',
+			'/ç|ć|č/' => 'c',
+			'/đ/' => 'dj',
+			'/š/' => 's',
+			'/ž/' => 'z',
+			'/ñ/' => 'n',
+			'/ä|æ/' => 'ae',
+			'/ö/' => 'oe',
+			'/ü/' => 'ue',
+			'/Ä/' => 'Ae',
+			'/Ü/' => 'Ue',
+			'/Ö/' => 'Oe',
+			'/ß/' => 'ss',
+			'/Č|Ć/' => 'C',
+			'/DŽ/' => 'Dz',
+			'/Đ/' => 'Dj',
+			'/Š/' => 'S',
+			'/Ž/' => 'Z'
+		];
+	}
+
+	/**
 	 * Gets or adds inflection and transliteration rules.
 	 *
 	 * @param string $type Either `'transliteration'`, `'uninflected'`, `'singular'` or `'plural'`.
@@ -342,43 +385,6 @@ class Inflector {
 			}
 		}
 		return static::$_singularized[$word] = $word;
-	}
-
-	/**
-	 * Clears local in-memory caches.  Can be used to force a full-cache clear when updating
-	 * inflection rules mid-way through request execution.
-	 */
-	public static function reset() {
-		static::$_singularized = static::$_pluralized = [];
-		static::$_camelized = static::$_underscored = [];
-		static::$_humanized = [];
-
-		static::$_plural['regexUninflected'] = static::$_singular['regexUninflected'] = null;
-		static::$_plural['regexIrregular'] = static::$_singular['regexIrregular'] = null;
-		static::$_transliteration = [
-			'/à|á|å|â/' => 'a',
-			'/è|é|ê|ẽ|ë/' => 'e',
-			'/ì|í|î/' => 'i',
-			'/ò|ó|ô|ø/' => 'o',
-			'/ù|ú|ů|û/' => 'u',
-			'/ç|ć|č/' => 'c',
-			'/đ/' => 'dj',
-			'/š/' => 's',
-			'/ž/' => 'z',
-			'/ñ/' => 'n',
-			'/ä|æ/' => 'ae',
-			'/ö/' => 'oe',
-			'/ü/' => 'ue',
-			'/Ä/' => 'Ae',
-			'/Ü/' => 'Ue',
-			'/Ö/' => 'Oe',
-			'/ß/' => 'ss',
-			'/Č|Ć/' => 'C',
-			'/DŽ/' => 'Dz',
-			'/Đ/' => 'Dj',
-			'/Š/' => 'S',
-			'/Ž/' => 'Z'
-		];
 	}
 
 	/**

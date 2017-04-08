@@ -21,6 +21,10 @@ Libraries::add('lithium');
 Libraries::add('app', ['default' => true]);
 Libraries::add('li3_fixtures');
 
+if (file_exists($file = LITHIUM_LIBRARY_PATH . '/autoload.php')) {
+	require_once $file;
+}
+
 /*
  * Setup test databases.
  *

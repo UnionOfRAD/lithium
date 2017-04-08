@@ -368,6 +368,27 @@ class CacheTest extends \lithium\test\Unit {
 		$this->assertIdentical('read-through write 2', $result);
 	}
 
+	public function testCacheReadThroughWriteNoCallWhenHasKey() {
+		Cache::config(['default' => ['adapter' => 'Memory']]);
+
+		$callCount = 0;
+		Cache::write('default', 'foo', 'bar');
+
+		$result = Cache::read('default', 'foo');
+		$this->assertEqual('bar', $result);
+
+		Cache::read('default', 'foo', ['write' => [
+			'+1 minute' => function() use (&$callCount) {
+				$callCount++;
+				return 'baz';
+			}
+		]]);
+		$this->assertIdentical(0, $callCount);
+
+		$result = Cache::read('default', 'foo');
+		$this->assertEqual('bar', $result);
+	}
+
 	public function testCacheReadAndWrite() {
 		$config = ['default' => [
 			'adapter' => 'Memory', 'filters' => []

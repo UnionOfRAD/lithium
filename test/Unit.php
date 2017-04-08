@@ -872,14 +872,20 @@ class Unit extends \lithium\core\Object {
 		$key = preg_quote($key, '/');
 
 		if (isset($expected['expires'])) {
-			$date = gmdate('D, d-M-Y H:i:s \G\M\T', strtotime($expected['expires']));
-			$expires = preg_quote($date, '/');
+			$expectedExpires = strtotime($expected['expires']);
+
+			$expires = gmdate('D, d-M-Y H:i:s \G\M\T', $expectedExpires);
+			$expires = preg_quote($expires, '/');
+			$maxAge = $expectedExpires - time();
 		} else {
 			$expires = '(?:.+?)';
+			$maxAge = '([0-9]+)';
 		}
 		$path = preg_quote($expected['path'], '/');
 		$pattern  = "/^Set\-Cookie:\s{$expected['name']}$key=$value;";
-		$pattern .= "\sexpires=$expires;\spath=$path/";
+		$pattern .= "\sexpires=$expires;";
+		$pattern .= "\sMax-Age=$maxAge;";
+		$pattern .= "\spath=$path/";
 		$match = false;
 
 		foreach ($headers as $header) {

@@ -471,7 +471,9 @@ class Router extends \lithium\core\StaticObject {
 		$vars = [];
 		$scope = $options['scope'];
 		if (is_array($scope)) {
-			list($tmp, $vars) = each($scope);
+			$tmp = key($scope);
+			$vars = current($scope);
+
 			if (!is_array($vars)) {
 				$vars = $scope;
 				$scope = static::scope();
@@ -586,8 +588,18 @@ class Router extends \lithium\core\StaticObject {
 	 * persisting by setting the value in the URL to `null`, or by assigning some other value.
 	 *
 	 * For example:
+	 * ```
+	 * Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', array(), array(
+	 * 	'persist' => array('controller', 'id')
+	 * ));
 	 *
-	 * ``` embed:lithium\tests\cases\net\http\RouterTest::testParameterPersistence(1-10) ```
+	 * // URLs generated with $request will now have the 'controller' and 'id'
+	 * // parameters copied to new URLs.
+	 * $request = Router::process(new Request(array('url' => 'posts/view/1138')));
+	 *
+	 * $params = array('action' => 'edit');
+	 * $url = Router::match($params, $request); // Returns: '/posts/edit/1138'
+	 * ```
 	 *
 	 * @see lithium\action\Request::$persist
 	 * @param array $url The parameters that define the URL to be matched.
@@ -679,15 +691,21 @@ class Router extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Scope getter/setter.
+	 * Sets or gets default/previous named scope.
 	 *
-	 * Special use case: If `$closure` is not null executing the closure inside
-	 * the specified scope.
+	 * Please note: scopes are not compatible with the "library" based route syntax. This
+	 * mean you can't mix them, you need to choose either the old way (i.e the "library"
+	 * based route syntax), or the the scope syntax to build your routes.
 	 *
-	 * @param string $name Name of the scope to use.
+	 * If you move completely to scopes, you don't need to deal with `{:library}` anymore,
+	 * the scoping feature will do the job for you.
+	 *
+	 * @see lithium\net\http\Router::attach()
+	 * @param string|null $name Name of the scope to use or `null` when you want to get
+	 *        the default scope.
 	 * @param \Closure $closure A closure to execute inside the scope.
-	 * @return mixed Returns the previous scope if if `$name` is not null and `$closure` is null,
-	 *         returns the default used scope if `$name` is null, otherwise returns `null`.
+	 * @return mixed If `$name` is `null` returns the default used scope, otherwise
+	 *         returns the previous named scope. Once `$closure` is used, returns `null`.
 	 */
 	public static function scope($name = null, \Closure $closure = null) {
 		if ($name === null) {
@@ -707,7 +725,7 @@ class Router extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Attach a scope to a mount point.
+	 * Defines a scope and attaches it to a mount point.
 	 *
 	 * Example 1:
 	 * ```
@@ -738,6 +756,19 @@ class Router extends \lithium\core\StaticObject {
 	 * ]);
 	 * ```
 	 *
+	 * By default all routes attached to an `'app'` scope are attached to a library of the
+	 * same name (i.e. the `'app'` library in this case). So you don't need to deal with an
+	 * extra library in your routes definition when you are using scopes.
+	 *
+	 * Moreover you can override the attached library name with:
+	 * ```
+	 * Router::attach('app', [
+	 *     'library' => 'custom_library_name'
+	 * ]);
+	 * ```
+	 *
+	 * @see lithium\net\http\Router::scope()
+	 * @see lithium\net\http\Router::attached()
 	 * @param string Name of the scope.
 	 * @param mixed Settings of the mount point or `null` for setting only variables to populate.
 	 * @param array Variables to populate for the scope.
@@ -767,7 +798,6 @@ class Router extends \lithium\core\StaticObject {
 	/**
 	 * Returns an attached mount point configuration.
 	 *
-	 * Example:
 	 * ```
 	 * Router::attach('app', [
 	 *     'absolute' => true,
@@ -775,24 +805,21 @@ class Router extends \lithium\core\StaticObject {
 	 *     'scheme' => '{:scheme:https://}',
 	 *     'prefix' => ''
 	 * ]);
-	 * ```
 	 *
-	 * ```
 	 * $result = Router::attached('app', [
 	 *     'subdomain' => 'app',
 	 *     'hostname' => 'blog',
 	 *     'tld' => 'co.uk'
 	 * ]);
+	 *
+	 * // $result is:
+	 * // [
+	 * //     'absolute' => true,
+	 * //     'host' => 'blog.mysite.co.uk',
+	 * //     'scheme' => 'http://',
+	 * //     'prefix' => ''
+	 * // ];
 	 * ```
-	 *
-	 * Will give the following array in `$result`:
-	 *
-	 * [
-	 *     'absolute' => true,
-	 *     'host' => 'blog.mysite.co.uk',
-	 *     'scheme' => 'http://',
-	 *     'prefix' => ''
-	 * ]);
 	 *
 	 * @param string Name of the scope.
 	 * @param array Optionnal variables which override the default setted variables with

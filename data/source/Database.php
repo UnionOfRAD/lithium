@@ -1489,8 +1489,9 @@ abstract class Database extends \lithium\data\Source {
 		$defaults = ['boolean' => 'AND'];
 		$options += $defaults;
 
-		list($op, $value) = each($value);
-		$op = strtoupper($op);
+		$op = strtoupper(key($value));
+		$value = current($value);
+
 		$config = $this->_operators[$op];
 		$key = $this->name($key);
 		$values = [];

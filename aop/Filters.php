@@ -124,7 +124,7 @@ class Filters {
 	/**
 	 * Lazily applies a filter to a method.
 	 *
-	 * Classes aliased via `class_alias()` are treated as entirely seperate from
+	 * Classes aliased via `class_alias()` are treated as entirely separate from
 	 * their original class.
 	 *
 	 * When calling apply after previous runs (rarely happens), this method will

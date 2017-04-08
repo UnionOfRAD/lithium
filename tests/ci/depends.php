@@ -13,6 +13,9 @@
 foreach (explode(' ', getenv('PHP_EXT')) ?: [] as $extension) {
 	PhpExtensions::install($extension);
 }
+foreach (explode(' ', getenv('COMPOSER_PKG')) ?: [] as $package) {
+	ComposerPackages::install($package);
+}
 
 /**
  * Class to install native PHP extensions mainly for preparing test runs
@@ -98,6 +101,10 @@ class PhpExtensions {
 			throw new RuntimeException("`mongo` cannot be used with HHVM.");
 		}
 		static::_ini(['extension=mongo.so']);
+	}
+
+	protected static function _mongodb() {
+		static::_ini(['extension=mongodb.so']);
 	}
 
 	/**
@@ -188,6 +195,22 @@ class PhpExtensions {
 
 	protected static function _isHhvm() {
 		return defined('HHVM_VERSION');
+	}
+}
+
+/**
+ * Allows to install composer packages into the test environment.
+ */
+class ComposerPackages {
+
+	public static function install($package) {
+		$return = 0;
+		system($command = "composer require {$package}", $return);
+
+		if (0 !== $return) {
+			printf("=> Command '%s' failed !", $command);
+			exit($return);
+		}
 	}
 }
 

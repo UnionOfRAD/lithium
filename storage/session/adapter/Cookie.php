@@ -26,13 +26,18 @@ class Cookie extends \lithium\core\Object {
 	/**
 	 * Default settings for this session adapter.
 	 *
+	 * @link http://php.net/setcookie
 	 * @var array Keys are in direct correspondence with the parameters in the PHP-native
 	 *      `setcookie()` method. The only difference is that the `expire` value is a
 	 *      strtotime-compatible string instead of an epochal timestamp.
 	 */
 	protected $_defaults = [
-		'expire' => '+2 days', 'path' => '/',
-		'domain' => '', 'secure' => false, 'httponly' => false
+		'expire' => '+2 days',
+		'path' => '/',
+		'domain' => '',
+		'secure' => false,
+		'httponly' => false,
+		'name' => null
 	];
 
 	/**
@@ -40,7 +45,14 @@ class Cookie extends \lithium\core\Object {
 	 *
 	 * Takes care of setting appropriate configurations for this object.
 	 *
-	 * @param array $config Optional configuration parameters.
+	 * @param array $config Configuration for this adapter. These settings are queryable
+	 *        through `Session::config('name')`. The available options are as follows:
+	 *        - `'expire'` _string_: Defaults to `'+2 days'`.
+	 *        - `'path'` _string_: Defaults to `'/'` and does not further restrict path access.
+	 *        - `'domain'` _string_: Defaults to `''` and does not further restrict domain access.
+	 *        - `'secure'` _boolean_: Defaults to `false`.
+	 *        - `'httponly'` _boolean_: Defaults to `false`.
+	 *        - `'name'` _string_: Defaults to the basename of the applications path.
 	 * @return void
 	 */
 	public function __construct(array $config = []) {

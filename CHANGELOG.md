@@ -289,8 +289,8 @@
 - The XCache caching adapter has been deprecated as it is not compatible with the wildly
   deployed OPcache and does not perform better.
 
- - The FirePhp logging adapter has been deprecated as Firebug's usage share is shrinking
-   in favor of builtin developer tools.
+- The FirePhp logging adapter has been deprecated as Firebug's usage share is shrinking
+  in favor of builtin developer tools.
 
 - The builtin mocking framework (`lithium\test\Mocker`) has been deprecated as alternatives
   exist and it is not needed as a core test dependency. This takes the task of maintaining full
@@ -400,12 +400,24 @@
 - Fixed slug generation by `Inflector` for strings containing multibyte characters or
   (unprintable) whitespaces.
 
+- Added missing uppercase transliteration pairs used by `Inflector::slug()`.
+
 - Fixed edge case when using `Collection::prev()` and the collection contained
   a falsey value (i.e. `null`, `false`, `''`).
 
 - Fixed parsing certain exception details in `Database` i.e. `pgsql unknown role exception`.
 
 - Fixed retrieval of property default values in concrete classes through `Inspector`.
+
+- Fixed write through caching via `Cache::read()`. When passing in a closure for the `'write'`
+  option, the closure was called even when the key was already present in cache.
+
+## v1.0.3
+
+### Fixed
+
+- Fixed write through caching via `Cache::read()`. When passing in a closure for the `'write'`
+  option, the closure was called even when the key was already present in cache.
 
 ## v1.0.2
 

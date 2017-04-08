@@ -321,13 +321,19 @@ class Cache extends \lithium\core\Adaptable {
 		});
 
 		if ($write = $options['write']) {
-			$write = is_callable($write) ? $write() : $write;
-			list($expiry, $value) = each($write);
-			$value = is_callable($value) ? $value() : $value;
+			$isEvaluated = false;
 
 			foreach ($keys as $key) {
 				if (isset($results[$key])) {
 					continue;
+				}
+				if (!$isEvaluated) {
+					$write = is_callable($write) ? $write() : $write;
+					$expiry = key($write);
+					$value = current($write);
+					$value = is_callable($value) ? $value() : $value;
+
+					$isEvaluated = true;
 				}
 				if (!static::write($name, $key, $value, $expiry)) {
 					return false;

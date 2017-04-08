@@ -525,18 +525,22 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testAssertCookieWithHeaders() {
-		$headers = [
-			'Set-Cookie: name[key]=value; expires=Tue, 04-May-2010 19:02:36 GMT; path=/',
-			'Set-Cookie: name[key1]=value1; expires=Tue, 04-May-2010 19:02:36 GMT; path=/',
-			'Set-Cookie: name[key2][nested]=value1; expires=Tue, 04-May-2010 19:02:36 GMT; path=/'
-		];
+		$maxAge = 60;
+		$time = time() + $maxAge;
+		$gmt = gmdate('D, d-M-Y H:i:s \G\M\T', $time);
+		$est = date('D, d-M-Y H:i:s \E\S\T', $time - (5 * 60 * 60));
 
+		$headers = [
+			'Set-Cookie: name[key]=value; expires=Tue, 04-May-2010 19:02:36 GMT; Max-Age=12; path=/',
+			'Set-Cookie: name[key1]=value1; expires=Tue, 04-May-2010 19:02:36 GMT; Max-Age=23; path=/',
+			'Set-Cookie: name[key2][nested]=value1; expires=' . $gmt . '; Max-Age=' . $maxAge . '; path=/'
+		];
 		$this->test->assertCookie(['key' => 'key', 'value' => 'value'], $headers);
 		$this->test->assertCookie(['key' => 'key1', 'value' => 'value1'], $headers);
 		$this->test->assertCookie(['key' => 'key2.nested', 'value' => 'value1'], $headers);
 
 		$expected = [
-			'key' => 'key2.nested', 'value' => 'value1', 'expires' => 'May 04 2010 14:02:36 EST'
+			'key' => 'key2.nested', 'value' => 'value1', 'expires' => $est
 		];
 		$this->test->assertCookie($expected, $headers);
 

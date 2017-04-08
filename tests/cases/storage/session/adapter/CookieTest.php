@@ -15,6 +15,10 @@ use lithium\core\Libraries;
 
 class CookieTest extends \lithium\test\Unit {
 
+	public $cookie;
+
+	public $name = 'testcookie';
+
 	/**
 	 * Skip the test if running under CLI.
 	 */
@@ -25,8 +29,7 @@ class CookieTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
-		$this->cookie = new Cookie();
-		$this->name = basename(Libraries::get(true, 'path')) . 'cookie';
+		$this->cookie = new Cookie(['name' => $this->name]);
 	}
 
 	public function tearDown() {
@@ -75,7 +78,7 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'value');
-		$result = $closure($params, null);
+		$result = $closure($params);
 
 		$this->assertCookie(compact('key', 'value', 'expires', 'path'));
 	}
@@ -98,7 +101,7 @@ class CookieTest extends \lithium\test\Unit {
 		$closure = $this->cookie->write($key, $value);
 		$this->assertInternalType('callable', $closure);
 		$params = compact('key', 'value');
-		$result = $closure($params, null);
+		$result = $closure($params);
 
 		$expected = compact('expires');
 		$expected += ['key' => 'user.email', 'value' => 'test@localhost'];
@@ -145,7 +148,7 @@ class CookieTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'value', 'options');
-		$result = $closure($params, null);
+		$result = $closure($params);
 
 		$this->assertCookie(compact('key', 'value', 'expires', 'path'));
 	}
@@ -265,7 +268,7 @@ class CookieTest extends \lithium\test\Unit {
 		$cookie = new Cookie(['name' => 'my.name']);
 		$key = 'key';
 		$value = 'value';
-		$result = $cookie->write($key, $value)->__invoke($cookie, compact('key', 'value'), null);
+		$result = $cookie->write($key, $value)->__invoke(compact('key', 'value'));
 		$this->assertCookie(compact('key', 'value'));
 	}
 }
