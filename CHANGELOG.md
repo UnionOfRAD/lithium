@@ -4,6 +4,8 @@
 
 ### Added
 
+- PHP 7.0 support
+
 - `Database` now supports the `NOT BETWEEN` operator. #1208 (Eric Cholis)
 
 - Restrictions on library search paths for i.e. adapters inside non-core libraries have been
