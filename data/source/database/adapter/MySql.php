@@ -290,6 +290,11 @@ class MySql extends \lithium\data\source\Database {
 	 * @return mixed Value with converted type.
 	 */
 	public function value($value, array $schema = array()) {
+		if(isset($schema['type']) && $schema['type'] == 'point') {
+			if(is_array($value)) {
+				return "PointFromText('POINT({$value['latitude']} {$value['longitude']})')";
+			}
+		}
 		if (($result = parent::value($value, $schema)) !== null) {
 			return $result;
 		}
@@ -383,7 +388,7 @@ class MySql extends \lithium\data\source\Database {
 		}
 
 		switch (true) {
-			case in_array($column['type'], array('date', 'time', 'datetime', 'timestamp')):
+			case in_array($column['type'], array('date', 'time', 'datetime', 'timestamp', 'point')):
 				return $column;
 			case ($column['type'] === 'tinyint' && $column['length'] == '1'):
 			case ($column['type'] === 'boolean'):

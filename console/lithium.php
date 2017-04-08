@@ -15,7 +15,8 @@
  * looking for a `config` directory with a `bootstrap.php` file in it.  If no
  * application context is found, just boot up the core framework.
  */
-$params = getopt("", array("app::"));
+$params = getopt("", array("app::", "appname::"));
+$appname = $params ? array_pop($params) : basename($working);
 $working = $params ? array_pop($params) : getcwd();
 $app = null;
 
@@ -23,7 +24,7 @@ $app = null;
  * If we're not running inside an application (i.e. a self-bootstrapping library), bootstrap the
  * core automatically with the default settings.
  */
-$bootstrap = function() use ($working) {
+$bootstrap = function() use ($working, $appname) {
 	define('LITHIUM_LIBRARY_PATH', dirname(dirname(__DIR__)));
 	define('LITHIUM_APP_PATH', $working);
 
@@ -41,7 +42,7 @@ $bootstrap = function() use ($working) {
 	}
 
 	lithium\core\Libraries::add('lithium');
-	lithium\core\Libraries::add(basename($working), array(
+	lithium\core\Libraries::add($appname, array(
 		'default' => true,
 		'path' => $working,
 		'resources' => $resources
