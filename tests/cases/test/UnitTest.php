@@ -592,11 +592,11 @@ class UnitTest extends \lithium\test\Unit {
 
 		$test->run();
 
-		$expected = '/Missing argument 1/';
+		$expected = '/expects exactly 1 parameter/';
 		$results = $test->results();
 		$this->assertPattern($expected, $results[0]['message']);
 
-		$expected = '/Unit::_arrayPermute()/';
+		$expected = '/array_shift\(\)/';
 		$this->assertPattern($expected, $results[0]['message']);
 
 		error_reporting($backup);
