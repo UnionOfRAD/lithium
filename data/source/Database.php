@@ -324,7 +324,6 @@ abstract class Database extends \lithium\data\Source {
 			$this->connection = new PDO($dsn, $config['login'], $config['password'], $options);
 		} catch (PDOException $e) {
 			preg_match('/SQLSTATE\[(.+?)\]/', $e->getMessage(), $code);
-			var_dump($e->getMessage());
 			$code = empty($code[1]) ? 0 : $code[0];
 			switch (true) {
 				case $code === 'HY000' || substr($code, 0, 2) === '08':
@@ -336,7 +335,7 @@ abstract class Database extends \lithium\data\Source {
 					throw new ConfigException($msg, null, $e);
 				break;
 			}
-			throw new ConfigException('An unknown configuration error has occured.', null, $e);
+			throw new ConfigException($e->getMessage(), null, $e);
 		}
 		$this->_isConnected = true;
 

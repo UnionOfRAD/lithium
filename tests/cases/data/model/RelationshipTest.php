@@ -9,6 +9,7 @@
 
 namespace lithium\tests\cases\data\model;
 
+use lithium\util\Collection;
 use lithium\data\Connections;
 use lithium\data\model\Relationship;
 use lithium\tests\mocks\data\model\MockDatabase;
@@ -152,9 +153,37 @@ class RelationshipTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests that queries are correctly generated for each relationship/key type.
+	 * Tests that queries are correctly generated for LINK_KEY,
 	 */
-	public function testQueryGeneration() {
+	public function testQueryGenerationWithLinkKey() {
+		$relationship = new Relationship([
+			'name' => 'Users',
+			'type' => 'belongsTo',
+			'link' => Relationship::LINK_KEY,
+			'from' => 'my\models\Images',
+			'to'   => 'my\models\Galleries',
+			'key'  => ['gallery_id' => '_id'],
+			'fieldName' => 'users'
+		]);
+
+		$this->assertNull($relationship->query((object) []));
+
+		$expected = ['conditions' => ['_id' => 1], 'fields' => null];
+		$this->assertEqual($expected, $relationship->query((object) [
+			'gallery_id' => 1
+		]));
+
+		$id = (object) 1;
+		$expected = ['conditions' => ['_id' => $id], 'fields' => null];
+		$this->assertEqual($expected, $relationship->query((object) [
+			'gallery_id' => $id
+		]));
+	}
+
+	/**
+	 * Tests that queries are correctly generated for LINK_KEY_LIST,
+	 */
+	public function testQueryGenerationWithLinkKeyList() {
 		$relationship = new Relationship([
 			'name' => 'Users',
 			'type' => 'hasMany',
@@ -169,7 +198,10 @@ class RelationshipTest extends \lithium\test\Unit {
 
 		$keys = [1, 2, 3];
 		$expected = ['conditions' => ['_id' => $keys], 'fields' => null];
-		$this->assertEqual($expected, $relationship->query((object) ['users' => $keys]));
+
+		$this->assertEqual($expected, $relationship->query((object) [
+			'users' => new Collection(['data' => $keys])
+		]));
 	}
 }
 
