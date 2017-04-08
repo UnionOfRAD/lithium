@@ -62,7 +62,7 @@ class PhpExtensions {
 	protected static function _apcu() {
 		if (!static::_isHhvm()) {
 			if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
-				static::_pecl('apcu', '5.1.5', true);
+				static::_pecl('apcu', '5.1.8', true);
 			} else {
 				static::_pecl('apcu', '5.1.2', true);
 			}
