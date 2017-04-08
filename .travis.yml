@@ -33,8 +33,6 @@ matrix:
   exclude:
   include:
     # `mongo` extension is not supported on PHP 7
-    - php: 5.5
-      env: DB=mongodb PHP_EXT=mongo TESTS=data
     - php: 5.6
       env: DB=mongodb PHP_EXT=mongo TESTS=data
     - php: 7.0
@@ -43,8 +41,6 @@ matrix:
       env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
     # XCache is not supported on PHP 7
     # Must be tested in isolation as it interferes with other opcaches.
-    - php: 5.5
-      env: PHP_EXT=xcache TESTS=storage
     - php: 5.6
       env: PHP_EXT=xcache TESTS=storage
     # Just one exemplaric job.
