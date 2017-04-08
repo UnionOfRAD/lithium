@@ -12,7 +12,7 @@ namespace lithium\tests\mocks\test\cases;
 class MockErrorHandlingTest extends \lithium\test\Unit {
 
 	public function testNotEnoughParams() {
-		$this->_arrayPermute();
+		array_shift();
 	}
 }
 

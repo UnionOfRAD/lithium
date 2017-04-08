@@ -43,9 +43,17 @@
 
 ### Fixed
 
+## v1.1.1
+
+### Added
+
+- PHP 7.1 support
+
 ## v1.1.0
 
 ### Added
+
+- PHP 7.0 support
 
 - `Database` now supports the `NOT BETWEEN` operator. #1208 (Eric Cholis)
 

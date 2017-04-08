@@ -40,7 +40,7 @@ class ReportTest extends \lithium\test\Unit {
 			'group' => new Group(
 				['data' => ['lithium\tests\mocks\test\MockFilterClassTest']]
 			),
-			'filters' => ["Complexity" => ""],
+			'filters' => ["Complexity" => []],
 			'format' => 'html'
 		]);
 
@@ -83,7 +83,7 @@ class ReportTest extends \lithium\test\Unit {
 			'group' => new Group([
 				'data' => ['lithium\tests\mocks\test\MockFilterClassTest']
 			]),
-			'filters' => ["Complexity" => ""]
+			'filters' => ["Complexity" => []]
 		]);
 		$report->run();
 
