@@ -1,5 +1,11 @@
 # Change Log
 
+## v1.1.1
+
+### Added
+
+- PHP 7.1 support
+
 ## v1.1.0
 
 ### Added
