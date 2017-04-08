@@ -110,6 +110,7 @@ class Request extends \lithium\net\http\Request {
 		'ajax'    => ['HTTP_X_REQUESTED_WITH', 'XMLHttpRequest'],
 		'flash'   => ['HTTP_USER_AGENT', 'Shockwave Flash'],
 		'ssl'     => 'HTTPS',
+		'dnt'     => ['HTTP_DNT', '1'],
 		'get'     => ['REQUEST_METHOD', 'GET'],
 		'post'    => ['REQUEST_METHOD', 'POST'],
 		'patch'   => ['REQUEST_METHOD', 'PATCH'],

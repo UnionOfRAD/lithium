@@ -24,6 +24,9 @@
   as it added support for reusable and key mutating generator functions as well as
   support for key generation by passing any form of data.
 
+- `action\Request` is now (via `$this->request->is('dnt')`) able to detect if the 
+  _Do Not Track_ feature is enabled.
+
 ### Changed
 
 - The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 

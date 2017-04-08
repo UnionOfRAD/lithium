@@ -502,6 +502,23 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertTrue($request->is('mobile'));
 	}
 
+	public function testIsDNT() {
+		$request = new Request(['env' => ['HTTP_DNT' => '1']]);
+		$this->assertTrue($request->is('dnt'));
+
+		$request = new Request(['env' => ['HTTP_DNT' => '0']]);
+		$this->assertFalse($request->is('dnt'));
+
+		$request = new Request(['env' => ['HTTP_DNT' => 'invalid']]);
+		$this->assertFalse($request->is('dnt'));
+
+		$request = new Request(['env' => ['HTTP_DNT' => 'true']]);
+		$this->assertFalse($request->is('dnt'));
+
+		$request = new Request(['env' => []]);
+		$this->assertFalse($request->is('dnt'));
+	}
+
 	public function testType() {
 		$request = new Request();
 		$this->assertEqual('html', $request->type());
