@@ -62,6 +62,7 @@ class Help extends \lithium\console\Command {
 		foreach ($methods as $method) {
 			$this->_renderUsage($command, $method);
 		}
+		$this->out();
 
 		if (!empty($info['description'])) {
 			$this->nl();
@@ -81,6 +82,7 @@ class Help extends \lithium\console\Command {
 		if ($properties) {
 			$this->_render($properties);
 		}
+		$this->out();
 		return true;
 	}
 
@@ -303,7 +305,7 @@ class Help extends \lithium\console\Command {
 		$this->out('DESCRIPTION', 'heading');
 		$break = PHP_EOL . PHP_EOL;
 		$description = trim("{$info['description']}{$break}{$info['text']}");
-		$this->out($this->_pad($description, PHP_EOL));
+		$this->out($this->_pad($description), 2);
 	}
 
 	/**
