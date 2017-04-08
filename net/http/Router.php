@@ -482,7 +482,7 @@ class Router extends \lithium\core\StaticObject {
 			}
 		}
 		if ($config = static::attached($scope, $vars)) {
-			if (is_array($url)) {
+			if (is_array($url) && $config['library'] !== false) {
 				unset($url['library']);
 			}
 			$config['host'] = $config['host'] ? : $defaults['host'];
@@ -767,6 +767,11 @@ class Router extends \lithium\core\StaticObject {
 	 * This behavior can be overridden like so:
 	 * ```
 	 * Router::attach('app', ['library' => 'foo']);
+	 * ```
+	 *
+	 * Or disable it and continue to use scope and library name in route definitions:
+	 * ```
+	 * Router::attach('app', ['library' => false]);
 	 * ```
 	 *
 	 * @see lithium\net\http\Router::scope()

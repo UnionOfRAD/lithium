@@ -1964,6 +1964,29 @@ class RouterTest extends \lithium\test\Unit {
 
 		$this->assertEqual('/2', $result);
 	}
+
+	public function testDisableScopeAutoLibraryFeature() {
+		$request = new Request(['url' => '/', 'base' => '']);
+
+		Router::attach('admin', [
+			'prefix' => 'admin',
+			'absolute' => false,
+			'library' => false
+		]);
+		Router::scope('admin', function() {
+			Router::connect('/foo/posts/{:id}', [
+				'controller' => 'Posts', 'action' => 'index',
+				'library' => 'admin_foo'
+			]);
+		});
+		$result = Router::match([
+			'controller' => 'Posts', 'action' => 'index',
+			'id' => 23,
+			'library' => 'admin_foo'
+		], $request, ['scope' => 'admin']);
+
+		$this->assertEqual('/admin/foo/posts/23', $result);
+	}
 }
 
 ?>

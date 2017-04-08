@@ -27,6 +27,10 @@
 - `action\Request` is now (via `$this->request->is('dnt')`) able to detect if the 
   _Do Not Track_ feature is enabled.
 
+- The auto-library feature for scoped routes can now be disabled, so it's possible to
+  i.e. have an app and an admin scope, where the admin scope itself contains several 
+  admin libraries.
+
 ### Changed
 
 - The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 
