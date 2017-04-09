@@ -41,6 +41,14 @@
 
 ### Deprecated
 
+- Short rendering instructions have now been officially deprecated and trigger a
+  deprecation message. Usage of short syntax was already discouraged.
+  
+  ```
+  ['template' => '/path/to/template'] // short deprecated syntax
+  ['template' => ['path' => '/path/to/template']] // full valid syntax
+  ```
+
 ### Fixed
 
 ## v1.1.1
