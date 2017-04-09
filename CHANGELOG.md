@@ -39,6 +39,8 @@
 
 - `Cache::key()` now requires a cache configuration name as it's first argument.
 
+- Dropped support for PHP 5.5
+
 ### Deprecated
 
 - Short rendering instructions have now been officially deprecated and trigger a
