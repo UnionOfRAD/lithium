@@ -47,7 +47,20 @@ class Exporter extends \lithium\core\StaticObject {
 			}
 			$result[$to] = $changes[$from];
 		}
-		unset($result['$set']['_id']);
+		
+		$unsetKeyRecursive = function(&$array, $key = "_id") use (&$unsetKeyRecursive)
+		{
+			unset($array[$key]);
+			
+			foreach($array as &$value) {
+				if(is_array($value)) {
+					$unsetKeyRecursive($value, $key);
+				}
+			}
+		};
+		
+		$unsetKeyRecursive($result['$set']);
+		
 		return $result;
 	}
 
