@@ -1092,6 +1092,36 @@ class FormTest extends \lithium\test\Unit {
 		));
 	}
 
+	public function testMultipleFieldsWithOptions() {
+		$result = $this->form->field(array(
+			'username', 'password' => array('type' => 'password'), 'email' => 'E-mail',
+			'gender' => array('type' => 'select', 'list' => array('male', 'female'))
+		));
+		$this->assertTags($result, array(
+			array('div' => array()),
+				array('label' => array('for' => 'Username')), 'Username', '/label',
+				array('input' => array(
+					'type' => 'text', 'name' => 'username', 'id' => 'Username'
+				)), '/div',
+		array('div' => array()),
+			array('label' => array('for' => 'Password')), 'Password', '/label',
+			array('input' => array(
+				'type' => 'password', 'name' => 'password', 'id' => 'Password'
+			)), '/div',
+		array('div' => array()),
+			array('label' => array('for' => 'Email')), 'E-mail', '/label',
+			array('input' => array(
+				'type' => 'text', 'name' => 'email', 'id' => 'Email'
+			)), '/div',
+		array('div' => array()),
+			array('label' => array('for' => 'Gender')), 'Gender', '/label',
+			array('select' => array('name' => 'gender', 'id' => 'Gender')),
+			array('option' => array('value' => 0, 'selected' => 'selected')), 'male', '/option',
+			array('option' => array('value' => 1)), 'female', '/option',
+			'/select', '/div'
+		));
+	}
+
 	public function testCustomInputTypes() {
 		// Creates an HTML5 'range' input slider:
 		$range = $this->form->range('completion', array('min' => 0, 'max' => 100));

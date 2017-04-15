@@ -508,11 +508,19 @@ class Form extends \lithium\template\Helper {
 		$result = array();
 
 		foreach ($fields as $field => $label) {
-			if (is_numeric($field)) {
-				$field = $label;
-				unset($label);
+			$opts = $options;
+			switch (true) {
+				case is_numeric($field):
+					$field = $label;
+				break;
+				case is_array($label):
+					$opts = $label + $opts;
+				break;
+				default:
+					$opts['label'] = $label;
+				break;
 			}
-			$result[] = $this->field($field, compact('label') + $options);
+			$result[] = $this->field($field, $opts);
 		}
 		return join("\n", $result);
 	}

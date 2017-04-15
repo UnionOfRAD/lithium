@@ -1203,6 +1203,47 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testValidationWithArrays() {
+		$rules = array(
+			'foo' => array('arrayTest', 'message' => 'fail')
+		);
+		Validator::add('arrayTest', function($value, $format, $options) {
+			return ($value == array('bar' => 1));
+		});
+
+		$data = array('foo' => array('bar' => 1));
+		$result = Validator::check($data, $rules);
+		$this->assertTrue(empty($result));
+
+		$data = array('foo' => null);
+		$result = Validator::check($data, $rules);
+		$this->assertFalse(empty($result));
+
+		$data = array('foo' => array('bar' => 'baz'));
+		$result = Validator::check($data, $rules);
+		$this->assertFalse(empty($result));
+	}
+
+	public function testValidationDotSyntax() {
+		$rules = array(
+			'foo.bar' => array('numeric', 'message' => 'fail'),
+			'foo.baz.dib' => array('email', 'message' => 'fail')
+		);
+		$data = array('foo' => array('bar' => 2, 'baz' => array('dib' => 'blah@blah.com')));
+		$result = Validator::add($data, $rules);
+		$this->assertTrue(empty($result));
+
+		$data['foo']['bar'] = 'a';
+		$expected = array('foo.bar' => array('fail'));
+		$result = Validator::check($data, $rules);
+		$this->assertEqual($expected, $result);
+
+		$data['foo']['baz']['dib'] = 'lithium!';
+		$expected['foo.baz.dib'] = array('fail');
+		$result = Validator::check($data, $rules);
+		$this->assertEqual($expected, $result);
+	}
+
 	/**
 	 * Tests validating nested fields using dot-separated paths.
 	 */
