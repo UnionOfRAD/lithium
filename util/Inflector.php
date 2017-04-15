@@ -66,9 +66,9 @@ class Inflector {
 		'mews', 'moose', 'mumps', 'Nankingese', 'news', 'nexus', 'Niasese', 'People',
 		'Pekingese', 'Piedmontese', 'pincers', 'Pistoiese', 'pliers', 'Portuguese',
 		'proceedings', 'rabies', 'rice', 'rhinoceros', 'salmon', 'Sarawakese', 'scissors',
-		'sea[- ]bass', 'series', 'Shavese', 'shears', 'siemens', 'species', 'swine', 'testes',
-		'trousers', 'trout','tuna', 'Vermontese', 'Wenchowese', 'whiting', 'wildebeest',
-		'Yengeese'
+		'sea[- ]bass', 'series', 'Shavese', 'shears', 'siemens', 'species', 'status', 'swine',
+		'testes', 'trousers', 'trout','tuna', 'Vermontese', 'Wenchowese', 'whiting',
+		'wildebeest', 'Yengeese'
 	);
 
 	/**
