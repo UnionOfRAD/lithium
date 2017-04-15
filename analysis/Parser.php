@@ -57,6 +57,9 @@ class Parser extends \lithium\core\StaticObject {
 		if ($options['wrap']) {
 			$code = "<?php {$code}?>";
 		}
+		$curlyContent = '';
+		$curlyBrace = false;
+		$i = 0;
 		foreach (token_get_all($code) as $token) {
 			$token = (isset($token[1])) ? $token : array(null, $token, $line);
 			list($id, $content, $line) = $token;
@@ -73,7 +76,30 @@ class Parser extends \lithium\core\StaticObject {
 					continue;
 				}
 			}
-			$tokens[] = array('id' => $id, 'name' => $name, 'content' => $content, 'line' => $line);
+
+			if ($content === '$') {
+				$curlyBrace = null;
+			}
+			if ($content === '{' && $curlyBrace === null) {
+				$curlyBrace = true;
+			}
+			if ($curlyBrace !== false) {
+				$curlyContent .= $content;
+				if($content === '}') {
+					$curlyBrace = false;
+					$tokens[$i++] = array(
+						'id' => T_VARIABLE,
+						'name' => 'T_VARIABLE',
+						'content' => $curlyContent,
+						'line' => $line
+					);
+					$curlyContent = '';
+				}
+			} else {
+				$tokens[$i++] = array(
+					'id' => $id, 'name' => $name, 'content' => $content, 'line' => $line
+				);
+			}
 
 			$line += count(preg_split('/\r\n|\r|\n/', $content)) - 1;
 		}
