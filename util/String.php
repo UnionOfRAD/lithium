@@ -123,7 +123,7 @@ class String {
 		switch (true) {
 			case isset(static::$_source):
 				return static::$_source;
-			case is_readable('/dev/urandom') && $fp = fopen('/dev/urandom', 'rb'):
+			case @is_readable('/dev/urandom') && $fp = fopen('/dev/urandom', 'rb'):
 				return static::$_source = function($bytes) use (&$fp) {
 					return fread($fp, $bytes);
 				};
