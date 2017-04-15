@@ -160,6 +160,13 @@ class Curl extends \lithium\net\Socket {
 					CURLOPT_POSTFIELDS => $data->body()
 				));
 			}
+			if (isset($data->method) && $data->method === 'PATCH') {
+				$this->set(array(
+					CURLOPT_CUSTOMREQUEST => 'PATCH',
+					CURLOPT_POSTFIELDS => $data->body()
+				));
+			}
+
 		}
 		return (boolean) curl_setopt_array($this->_resource, $this->options);
 	}
