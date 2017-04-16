@@ -599,6 +599,9 @@ class Validator extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function rule($rule, $value, $format = 'any', array $options = array()) {
+		if (!$options['required'] && empty($value)) {
+			return true;
+		}
 		if (!isset(static::$_rules[$rule])) {
 			throw new InvalidArgumentException("Rule `{$rule}` is not a validation rule.");
 		}
