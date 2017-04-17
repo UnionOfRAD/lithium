@@ -55,6 +55,9 @@
 
 ### Fixed
 
+- The `'key'` and `'class'` options were supposed to be provided only for
+  Session strategies. They however leaked into Session adapters options.
+
 ## v1.1.1
 
 ### Added
