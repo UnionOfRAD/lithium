@@ -122,8 +122,11 @@ class Session extends \lithium\core\Adaptable {
 		}
 
 		if ($options['strategies']) {
-			$options += ['key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__];
-			return static::applyStrategies(__FUNCTION__, $name, $result, $options);
+			return static::applyStrategies(__FUNCTION__, $name, $result, $options + [
+				'mode' => 'LIFO',
+				'key' => $key,
+				'class' => __CLASS__
+			]);
 		}
 		return $result;
 	}
@@ -160,15 +163,16 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		$result = false;
-
 		$original = $value;
 
 		foreach ($methods as $name => $method) {
 			$settings = static::_config($name);
 
 			if ($options['strategies']) {
-				$options += ['key' => $key, 'class' => __CLASS__];
-				$value = static::applyStrategies(__FUNCTION__, $name, $original, $options);
+				$value = static::applyStrategies(__FUNCTION__, $name, $original, $options + [
+					'key' => $key,
+					'class' => __CLASS__
+				]);
 			}
 			$params = compact('key', 'value', 'options');
 
@@ -216,15 +220,16 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		$result = false;
-		$options += ['key' => $key, 'class' => __CLASS__];
 		$original = $key;
 
 		foreach ($methods as $name => $method) {
 			$settings = static::_config($name);
 
 			if ($options['strategies']) {
-				$options += ['key' => $key, 'class' => __CLASS__];
-				$key = static::applyStrategies(__FUNCTION__, $name, $original, $options);
+				$key = static::applyStrategies(__FUNCTION__, $name, $original, $options + [
+					'key' => $key,
+					'class' => __CLASS__
+				]);
 			}
 			$params = compact('key', 'options');
 
