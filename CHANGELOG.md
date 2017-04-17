@@ -31,6 +31,8 @@
   i.e. have an app and an admin scope, where the admin scope itself contains several 
   admin libraries.
 
+- `openssl_random_pseudo_bytes()` has been added as a new RNG source.
+
 ### Changed
 
 - The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 

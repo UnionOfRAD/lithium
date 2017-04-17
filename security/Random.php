@@ -100,6 +100,11 @@ class Random {
 				return random_bytes($bytes);
 			};
 		}
+		if (function_exists('openssl_random_pseudo_bytes')) {
+			return function($bytes) {
+				return openssl_random_pseudo_bytes($bytes);
+			};
+		}
 		if (function_exists('mcrypt_create_iv')) {
 			return function($bytes) {
 				return mcrypt_create_iv($bytes, MCRYPT_DEV_URANDOM);
