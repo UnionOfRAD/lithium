@@ -21,7 +21,7 @@ class Memory extends \lithium\core\Object {
 	 *
 	 * @var array "Session" data.
 	 */
-	public $_session = [];
+	protected $_session = [];
 
 	/**
 	 * Obtain the session key.
