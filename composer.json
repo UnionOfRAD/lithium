@@ -20,5 +20,8 @@
     "require-dev": {
         "unionofrad/li3_fixtures": "^1.1"
     },
+    "suggest": {
+        "ext-openssl": "For the Encrypt strategy."
+    },
     "bin" : ["console/li3"]
 }

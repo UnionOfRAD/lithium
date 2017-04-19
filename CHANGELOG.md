@@ -42,6 +42,13 @@
 
 - The `Response` now knows about HTTP status code 426 (Upgrade Required).
 
+- The `Encrypt` session strategy now uses the `openssl` extension for symmetric 
+  encryption for better support and performance, whenever possible. Previously the,
+  now deprecated, `mcrypt` extension was always used. When `openssl` cannot be 
+  used as a drop in, the strategy will fall back to `mcrypt` usage (aka _legacy_ 
+  mode). This is the case when a non-default cipher mode (anything else than AES 256 
+  CBC) has been chosen or the `openssl` extension is not available.
+
 ### Changed
 
 - The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 
@@ -51,6 +58,10 @@
 - `Cache::key()` now requires a cache configuration name as it's first argument.
 
 - Dropped support for PHP 5.5
+
+- The `Encrypt` strategy now depends on the `openssl` extension, when it does not
+  operate in _legacy_ mode (see above). In this case it also doesn't depend on the 
+  `mcrypt` extension anymore.
 
 ### Deprecated
 
@@ -72,10 +83,18 @@
   | `*Object::_stop()` | _no replacement_, must reimplement |
   | `Object::__set_state()` | _no replacement_ |
 
+- Changing the default cipher and/or mode for the `Encrypt` strategy has been 
+  deprecated and will cause the strategy to switch into _legacy_ mode. In legacy
+  mode the deprecated `mcrypt` extension will still be used.
+
 ### Fixed
 
 - The `'key'` and `'class'` options were supposed to be provided only for
   Session strategies. They however leaked into Session adapters options.
+
+- A potential invalid reuse of a previously initialized `mcrypt` resource
+  has been fixed when using multiple `Encrypt` strategies with different
+  ciphers and/or modes. 
 
 ## v1.1.1
 
