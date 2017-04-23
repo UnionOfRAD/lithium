@@ -356,7 +356,7 @@ class ModelTest extends \lithium\test\Unit {
 	 * @link https://github.com/UnionOfRAD/lithium/issues/1314
 	 */
 	public function testDefaultQueryModification() {
-		MockPost::query(array('limit' => 23));
+		MockPost::query(['limit' => 23]);
 
 		$result = MockPost::query();
 		$this->assertEqual(23, $result['limit']);
