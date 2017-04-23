@@ -811,7 +811,7 @@ class Model extends \lithium\core\StaticObject {
 		if (!$query) {
 			return $self->_query;
 		}
-		$self->_query += $query;
+		$self->_query = $query + $self->_query;
 	}
 
 	/**

@@ -350,6 +350,18 @@ class ModelTest extends \lithium\test\Unit {
 		MockTag::config(['meta' => ['connection' => false]]);
 	}
 
+	/**
+	 * Verifies that modifying the default query through the `query()` method works.
+	 *
+	 * @link https://github.com/UnionOfRAD/lithium/issues/1314
+	 */
+	public function testDefaultQueryModification() {
+		MockPost::query(array('limit' => 23));
+
+		$result = MockPost::query();
+		$this->assertEqual(23, $result['limit']);
+	}
+
 	public function testSimpleRecordCreation() {
 		$comment = MockComment::create([
 			'author_id' => 451,
