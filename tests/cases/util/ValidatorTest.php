@@ -2,7 +2,7 @@
 /**
  * Lithium: the most rad php framework
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
+ * @copyright     Copyright 2017, Union of RAD (http://union-of-rad.org)
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
@@ -729,7 +729,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('493637431790930965', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('633321438601941513', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('675913800898840986', 'switch'));
-		$this->assertTrue(Validator::isCreditCard('564182592016841547', 'switch'));
+		$this->assertTrue(Validator::isCreditCard('564182592017841547', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('564182428380440899', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('493696376827623463', 'switch'));
 		$this->assertTrue(Validator::isCreditCard('675977939286485757', 'switch'));
