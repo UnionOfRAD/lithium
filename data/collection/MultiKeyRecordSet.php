@@ -80,7 +80,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 *                      `$offset` is `null`, all records are loaded into the record set, and
 	 *                      `offsetGet` returns `null`.
 	 * @return object Returns a `Record` object if a record is found with a key that matches the
-	 *                value of `$offset`, otheriwse returns `null`.
+	 *                value of `$offset`, otherwise returns `null`.
 	 */
 	public function offsetGet($offset) {
 		$offset = (!$offset || $offset === true) ? 0 : $offset;
