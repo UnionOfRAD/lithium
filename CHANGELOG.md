@@ -4,6 +4,8 @@
 
 ### Added
 
+- PHP 7.1 support
+
 - Data sources now support the `nested` strategy which will embed related records/documents by
   fetching them using additional queries. (jails) 
 	
@@ -58,13 +60,13 @@
   ['template' => ['path' => '/path/to/template']] // full valid syntax
   ```
 
-- `Object` and `StaticObject` are beeing step by step deprecated, as
+- `Object` and `StaticObject` are being step by step deprecated, as
   `Object` is soft-reserved in PHP >=7. Chance is taken for a cleanup of the
   class-hirarchy and unused/obsolete methods.
 
   | old | new |
   | --- | --- |
-  | `*Object::_parents()` | _no replacement_, for inheritance use `lithium\core\MergeInheritable::_inherit()` |
+  | `*Object::_parents()` | replaced, use `lithium\core\MergeInheritable::_inherit()` |
   | `*Object::_stop()` | _no replacement_, must reimplement |
   | `Object::__set_state()` | _no replacement_ |
 
