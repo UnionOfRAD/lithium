@@ -21,11 +21,13 @@ class EncryptTest extends \lithium\test\Unit {
 	 */
 	public function skip() {
 		$this->skipIf(!Encrypt::enabled(), 'The Mcrypt extension is not installed or enabled.');
+		 error_reporting(($this->_backup = error_reporting()) & ~E_USER_DEPRECATED);
 	}
 
 	public function setUp() {
 		$this->mock = 'lithium\tests\mocks\storage\session\strategy\MockCookieSession';
 		MockCookieSession::reset();
+		error_reporting($this->_backup);
 	}
 
 	public function testConstructException() {
