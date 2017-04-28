@@ -439,6 +439,8 @@
 - Fixed write through caching via `Cache::read()`. When passing in a closure for the `'write'`
   option, the closure was called even when the key was already present in cache.
 
+  - Fixed and enabled modification of the default query options through `Model::query()`.
+
 ## v1.0.3
 
 ### Fixed
