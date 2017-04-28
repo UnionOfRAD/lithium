@@ -60,12 +60,12 @@ class MemoryTest extends \lithium\test\Unit {
 	 * Test if reading from the memory adapter works as expected.
 	 */
 	public function testRead() {
-		$this->Memory->read();
+		$writer = $this->Memory->write(null, null);
 
 		$key = 'read_test';
 		$value = 'value to be read';
 
-		$this->Memory->_session[$key] = $value;
+		$writer(compact('key', 'value'));
 
 		$closure = $this->Memory->read($key);
 		$this->assertInternalType('callable', $closure);
@@ -95,26 +95,30 @@ class MemoryTest extends \lithium\test\Unit {
 	 * Writes test data into the $_session array.
 	 */
 	public function testWrite() {
+		$reader = $this->Memory->read(null);
+		$writer = $this->Memory->write(null, null);
+
 		$key = 'write-test';
 		$value = 'value to be written';
 
-		$closure = $this->Memory->write($key, $value);
-		$this->assertInternalType('callable', $closure);
+		$this->assertInternalType('callable', $writer);
 
 		$params = compact('key', 'value');
-		$result = $closure($params, null);
-		$this->assertEqual($this->Memory->_session[$key], $value);
+
+		$writer($params);
+		$this->assertEqual($reader($params), $value);
 	}
 
 	/**
 	 * Checks if the session data is empty on creation.
 	 */
 	public function testCheck() {
-		$this->Memory->read();
+		$writer = $this->Memory->write(null, null);
 
 		$key = 'read';
 		$value = 'value to be read';
-		$this->Memory->_session[$key] = $value;
+
+		$writer(compact('key', 'value'));
 
 		$closure = $this->Memory->check($key);
 		$this->assertInternalType('callable', $closure);
@@ -136,12 +140,12 @@ class MemoryTest extends \lithium\test\Unit {
 	 * Test key deletion.
 	 */
 	public function testDelete() {
-		$this->Memory->read();
+		$writer = $this->Memory->write(null, null);
 
 		$key = 'delete_test';
 		$value = 'value to be deleted';
 
-		$this->Memory->_session[$key] = $value;
+		$writer(compact('key', 'value'));
 
 		$closure = $this->Memory->delete($key);
 		$this->assertInternalType('callable', $closure);
@@ -163,11 +167,15 @@ class MemoryTest extends \lithium\test\Unit {
 	 * Checks if erasing the whole session array works as expected.
 	 */
 	public function testClear() {
-		$this->Memory->_session['foobar'] = 'foo';
+		$reader = $this->Memory->read(null);
+		$writer = $this->Memory->write(null, null);
+
+		$writer(['key' => 'foo', 'value' => 'bar']);
+
 		$closure = $this->Memory->clear();
 		$this->assertInternalType('callable', $closure);
 		$result = $closure([], null);
-		$this->assertEmpty($this->Memory->_session);
+		$this->assertEmpty($reader(['key' => 'foo']));
 	}
 }
 
