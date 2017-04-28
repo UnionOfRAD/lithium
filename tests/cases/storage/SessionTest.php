@@ -266,6 +266,7 @@ class SessionTest extends \lithium\test\Unit {
 
 	public function testEncryptedStrategy() {
 		$this->skipIf(!MockEncrypt::enabled(), 'The Mcrypt extension is not installed or enabled.');
+		error_reporting(($this->_backup = error_reporting()) & ~E_DEPRECATED);
 
 		$key = 'foobar';
 		$adapter = new Memory();

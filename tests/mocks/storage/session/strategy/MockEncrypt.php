@@ -10,6 +10,19 @@
 namespace lithium\tests\mocks\storage\session\strategy;
 
 class MockEncrypt extends \lithium\storage\session\strategy\Encrypt {
+
+	protected $_backup;
+
+	public function __construct(array $config) {
+		error_reporting(($this->_backup = error_reporting()) & ~E_DEPRECATED);
+		parent::__construct($config);
+	}
+
+	public function __destruct() {
+		parent::__destruct();
+		error_reporting($this->_backup);
+	}
+
 	public function encrypt($decrypted = []) {
 		return parent::_encrypt($decrypted);
 	}

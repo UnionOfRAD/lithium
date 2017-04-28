@@ -133,23 +133,6 @@ class MbstringTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testStrposInvalidOffset() {
-		$backup = error_reporting();
-		error_reporting(E_ALL);
-
-		$haystack = 'abäab';
-		$needle = 'a';
-		$offset = -1;
-		$adapter = $this->adapter;
-
-		$expected = '/Offset not contained in string/';
-		$this->assertException($expected, function() use ($adapter, $haystack, $needle, $offset) {
-			$adapter->strpos($haystack, $needle, $offset);
-		});
-
-		error_reporting($backup);
-	}
-
 	public function testStrrpos() {
 		$haystack = 'abäab';
 		$needle = 'ä';
