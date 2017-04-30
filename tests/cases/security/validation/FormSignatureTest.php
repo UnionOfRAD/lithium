@@ -85,6 +85,25 @@ class FormSignatureTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Tests that `FormSignature::check()` and `FormSignature::key()` generate matching signatures
+	 */
+	public function testSignatureBasic() {
+		$data = [
+			'fields' => [
+				'email' => 'foo@baz',
+				'pass' => 'whatever',
+				'active' => 'true'
+			],
+			'locked' => [],
+			'excluded' => []
+		];
+		$signature = FormSignature::key($data);
+		$data['fields']['security'] = compact('signature');
+		$request = new Request(['data' => $data['fields']]);
+		$this->assertTrue(FormSignature::check($request));
+	}
+
+	/**
 	 * Tests that `FormSignature` fails to generate a matching signature for data where locked
 	 * values have been tampered with.
 	 */
