@@ -40,6 +40,8 @@
   merging `action\Controller::$_render` and `data\Model` properties. Also 
   slightly optimizes memory usage in said classes.
 
+- The `Response` now knows about HTTP status code 426 (Upgrade Required).
+
 ### Changed
 
 - The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 
