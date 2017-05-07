@@ -32,7 +32,7 @@ class FilterTest extends \lithium\test\Integration {
 	}
 
 	public function testSingleTest() {
-		$this->report->filters(['Coverage' => null]);
+		$this->report->filters(['Coverage' => []]);
 
 		$this->report->run();
 
@@ -55,7 +55,7 @@ class FilterTest extends \lithium\test\Integration {
 		foreach ($permutations as $filters) {
 			$filters = array_flip($filters);
 			$filters = array_map(function($v) {
-				return "";
+				return [];
 			}, $filters);
 
 			$report = new Report([

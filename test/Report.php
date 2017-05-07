@@ -131,6 +131,7 @@ class Report extends \lithium\core\Object {
 	protected function _init() {
 		$this->group = $this->_config['group'];
 		$this->title = $this->_config['title'] ?: $this->_config['title'];
+		$this->_filters = $this->filters($this->_config['filters']);
 	}
 
 	/**
@@ -247,21 +248,26 @@ class Report extends \lithium\core\Object {
 		});
 	}
 
+	/**
+	 * Getter/setter for report test filters.
+	 *
+	 * @param array $filters A set of filters, mapping the filter class names, to their
+	 *        corresponding array of options. When not provided, simply returns current
+	 *        set of filters.
+	 * @return array The current set of filters.
+	 */
 	public function filters(array $filters = []) {
-		if ($this->_filters && !$filters) {
-			return $this->_filters;
-		}
-		$filters += (array) $this->_config['filters'];
-		$results = [];
-
 		foreach ($filters as $filter => $options) {
 			if (!$class = Libraries::locate('test.filter', $filter)) {
 				throw new ClassNotFoundException("`{$class}` is not a valid test filter.");
 			}
-			$options['name'] = strtolower(join('', array_slice(explode("\\", $class), -1)));
-			$results[$class] = $options + ['apply' => [], 'analyze' => []];
+			$this->_filters[$class] = $options + [
+				'name' => strtolower(join('', array_slice(explode("\\", $class), -1))),
+				'apply' => [],
+				'analyze' => []
+			];
 		}
-		return $this->_filters = $results;
+		return $this->_filters;
 	}
 }
 
