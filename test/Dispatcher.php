@@ -60,7 +60,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 		$isCase = is_string($group) && preg_match('/Test$/', $group);
 		$items = ($isCase) ? [new $group()] : (array) $group;
 
-		$options['filters'] = Set::normalize($options['filters']);
+		$options['filters'] = array_map(function($v) {
+			return (array) $v;
+		}, Set::normalize($options['filters']));
+
 		$group = static::_group($items);
 		$report = static::_report($group, $options);
 

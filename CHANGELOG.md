@@ -83,6 +83,10 @@
 
 - PHP 7.1 support
 
+### Fixed
+
+- Test report filters are now fully normalized before passing them into `Report`.
+
 ## v1.1.0
 
 ### Added

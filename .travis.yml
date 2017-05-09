@@ -77,7 +77,7 @@ before_script:
 script:
   # Run all tests.
   - sh -c "if [ '$TESTS' = 'all' ]; then libraries/lithium/console/li3 test libraries/lithium/tests/cases; fi"
-  - sh -c "if [ '$TESTS' = 'all' ]; then libraries/lithium/console/li3 test --verbose libraries/lithium/tests/integration; fi"
+  - sh -c "if [ '$TESTS' = 'all' ]; then libraries/lithium/console/li3 test libraries/lithium/tests/integration; fi"
   # Run just the database related tests.
   - sh -c "if [ '$TESTS' = 'data' ]; then libraries/lithium/console/li3 test libraries/lithium/tests/cases/data; fi"
   - sh -c "if [ '$TESTS' = 'data' ]; then libraries/lithium/console/li3 test libraries/lithium/tests/integration/data; fi"
