@@ -233,11 +233,7 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-		try {
-			$adapter = static::adapter($name);
-		} catch (ConfigException $e) {
-			return false;
-		}
+		$adapter = static::adapter($name);
 
 		if (is_array($key)) {
 			$keys = $key;
@@ -303,11 +299,7 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-		try {
-			$adapter = static::adapter($name);
-		} catch (ConfigException $e) {
-			return false;
-		}
+		$adapter = static::adapter($name);
 
 		if ($isMulti = is_array($key)) {
 			$keys = $key;
@@ -375,11 +367,7 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-		try {
-			$adapter = static::adapter($name);
-		} catch (ConfigException $e) {
-			return false;
-		}
+		$adapter = static::adapter($name);
 
 		if (is_array($key)) {
 			$keys = $key;
@@ -412,11 +400,7 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-		try {
-			$adapter = static::adapter($name);
-		} catch (ConfigException $e) {
-			return false;
-		}
+		$adapter = static::adapter($name);
 		$params = compact('key', 'offset');
 
 		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
@@ -443,11 +427,7 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
 		}
-		try {
-			$adapter = static::adapter($name);
-		} catch (ConfigException $e) {
-			return false;
-		}
+		$adapter = static::adapter($name);
 		$params = compact('key', 'offset');
 
 		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
@@ -464,11 +444,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return boolean `true` on successful cleaning, `false` if failed partially or entirely.
 	 */
 	public static function clean($name) {
-		try {
-			return static::adapter($name)->clean();
-		} catch (ConfigException $e) {
-			return false;
-		}
+		return static::adapter($name)->clean();
 	}
 
 	/**
@@ -479,11 +455,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return boolean `true` on successful clearing, `false` if failed partially or entirely.
 	 */
 	public static function clear($name) {
-		try {
-			return static::adapter($name)->clear();
-		} catch (ConfigException $e) {
-			return false;
-		}
+		return static::adapter($name)->clear();
 	}
 }
 

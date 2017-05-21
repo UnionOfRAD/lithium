@@ -7,6 +7,9 @@
 - Removed deprecated functionality: magic download header in action response, unit testing's
   expectException method. (David Persson) 
 
+- ConfigExceptions (thrown when accessing non exsitent configurations) are now allowed to 
+  bubble up in `Cache`.
+
 ## v1.2.0
 
 ### Added
