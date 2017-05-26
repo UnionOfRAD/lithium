@@ -76,16 +76,14 @@ class Random {
 	 * The source of randomness used are as follows:
 	 *
 	 * 1. `random_bytes()`, available in PHP >=7.0
-	 * 2. `mcrypt_create_iv()`, available if the mcrypt extensions is installed
-	 * 3. `/dev/urandom`, available on *nix
-	 * 4. `GetRandom()` through COM, available on Windows
+	 * 2. `random_bytes()`, available if the openssl extension is installed
+	 * 3. `mcrypt_create_iv()`, available if the mcrypt extensions is installed
+	 * 4. `/dev/urandom`, available on *nix
+	 * 5. `GetRandom()` through COM, available on Windows
 	 *
 	 * Note: Users restricting path access through the `open_basedir` INI setting,
 	 * will need to include `/dev/urandom` into the list of allowed paths, as this
 	 * method might read from it.
-	 *
-	 * The `openssl_random_pseudo_bytes()` function is not used, as it is not clear
-	 * under which circumstances it will not have a strong source available to it.
 	 *
 	 * @link http://php.net/random_bytes
 	 * @link http://php.net/mcrypt_create_iv
