@@ -21,7 +21,12 @@
         "unionofrad/li3_fixtures": "^1.1"
     },
     "suggest": {
-        "ext-openssl": "For the Encrypt strategy."
+        "ext-openssl": "For the Encrypt Session strategy.",
+        "ext-memcached": "For the Memcache Cache adapter.",
+        "ext-redis": "For the Redis Cache adapter.",
+        "ext-mongo": "For the MongoDb Datasource. ",
+        "ext-pdo": "For the MySql, Postgres and Sqlite Datasources.",
+        "ext-curl": "For the Curl Socket adapter."
     },
     "bin" : ["console/li3"]
 }
