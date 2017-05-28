@@ -463,6 +463,12 @@ class Libraries {
 			foreach (static::$_configurations as $library => $config) {
 				$libs = array_merge($libs, static::find($library, $options));
 			}
+			if(PHP_VERSION_ID >= 70000) {
+				if(($key = array_search('lithium\util\String', $libs)) !== false) {
+					unset($libs[$key]);
+					$libs = array_values($libs);
+				}
+			}
 			return $libs;
 		}
 		if (!isset(static::$_configurations[$library])) {
