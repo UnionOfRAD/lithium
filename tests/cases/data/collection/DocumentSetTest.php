@@ -22,6 +22,10 @@ class DocumentSetTest extends \lithium\test\Unit {
 
 	protected $_model = 'lithium\tests\mocks\data\model\MockDocumentPost';
 
+    public function skip() {
+        $this->skipIf(!MongoDb::enabled(), 'MongoDb is not enabled');
+    }
+
 	public function setUp() {
 		$connection = new MockDocumentSource();
 		Connections::add('mockconn', ['object' => $connection]);
