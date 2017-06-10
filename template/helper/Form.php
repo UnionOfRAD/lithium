@@ -19,17 +19,20 @@ use lithium\util\Inflector;
  * the helper can pre-fill form input values, render error messages, and introspect column types.
  *
  * For example, assuming you have created a `Posts` model in your application:
+ *
+ * In controller code:
  * ```
- * // In controller code:
  * use app\models\Posts;
  * $post = Posts::find(1);
  * return compact('post');
+ * ```
  *
- * // In view code:
- * <?=$this->form->create($post); // Echoes a <form> tag and binds the helper to $post ?>
- * <?=$this->form->text('title'); // Echoes an <input /> element, pre-filled with $post's title ?>
- * <?=$this->form->submit('Update'); // Echoes a submit button with the title 'Update' ?>
- * <?=$this->form->end(); // Echoes a </form> tag & unbinds the form ?>
+ * In view code:
+ * ```
+ * <?= $this->form->create($post) ?> // Echoes a <form> tag and binds the helper to $post
+ * <?= $this->form->text('title') ?> // Echoes an <input /> element, pre-filled with $post's title
+ * <?= $this->form->submit('Update') ?> // Echoes a submit button with the title 'Update'
+ * <?= $this->form->end() ?> // Echoes a </form> tag & unbinds the form
  * ```
  */
 class Form extends \lithium\template\Helper {
