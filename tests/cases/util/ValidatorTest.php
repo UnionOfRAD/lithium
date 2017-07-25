@@ -612,6 +612,12 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('5162739131368058', 'mc'));
 		$this->assertFalse(Validator::isCreditCard('6767432107064987', 'mc'));
 
+		/* MasterCard 2-Series */
+		$this->assertTrue(Validator::isCreditCard('2221000000000000', 'mc'));
+		$this->assertTrue(Validator::isCreditCard('2720990000000000', 'mc'));
+		$this->assertFalse(Validator::isCreditCard('2121000000000000', 'mc'));
+		$this->assertFalse(Validator::isCreditCard('2821000000000000', 'mc'));
+
 		/* Solo 16 */
 		$this->assertTrue(Validator::isCreditCard('6767432107064987', 'solo'));
 		$this->assertTrue(Validator::isCreditCard('6334667758225411', 'solo'));
