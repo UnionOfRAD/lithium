@@ -654,7 +654,8 @@ abstract class Database extends \lithium\data\Source {
 			$pk = $this->name($model::meta('name') . '.' . $model::key());
 
 			$result = $this->_execute($this->renderCommand('read', [
-				'fields' => "DISTINCT({$pk}) AS _ID_"] + $data
+				'fields' => "DISTINCT({$pk}) AS _ID_",
+				'order' => null] + $data
 			));
 			$ids = [];
 
