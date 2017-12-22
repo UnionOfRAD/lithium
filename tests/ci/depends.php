@@ -64,7 +64,7 @@ class PhpExtensions {
 			if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
 				static::_pecl('apcu', '5.1.8', true);
 			} else {
-				static::_pecl('apcu', '5.1.2', true);
+				static::_pecl('apcu', '4.0.11', true);
 			}
 			// static::_ini(['extension=apcu.so']);
 		}
