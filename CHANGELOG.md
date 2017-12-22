@@ -9,6 +9,7 @@
 ### Fixed
 
 - Test report filters are now fully normalized before passing them into `Report`.
+- Removed debug code in exception handling of `Database` (Alex Bowers).
 
 ## v1.1.0
 
