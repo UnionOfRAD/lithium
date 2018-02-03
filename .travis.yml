@@ -22,37 +22,28 @@ env:
   - DB=mysql TESTS=data
   - DB=pgsql TESTS=data
   - DB=couchdb TESTS=data
-  # for mongodb tests see matrix definitions
+  # TODO: Once the new mongo adapter is supported, uncomment the first and
+  #       remove the second line as well as the builds under "allow_failures".
+  # - DB=mongodb PHP_EXT=mongo TESTS=data
+  - DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
 
 php:
-  - 5.6
   - 7.0
   - 7.1
 
 matrix:
   exclude:
   include:
-    # `mongo` extension is not supported on PHP 7
-    - php: 5.6
-      env: DB=mongodb PHP_EXT=mongo TESTS=data
-    - php: 7.0
-      env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
-    - php: 7.1
-      env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
-    # XCache is not supported on PHP 7
-    # Must be tested in isolation as it interferes with other opcaches.
-    - php: 5.6
-      env: PHP_EXT=xcache TESTS=storage
     # Just one exemplaric job.
     - php: nightly
       env: PHP_EXT=memcached TESTS=all
   allow_failures:
-    - php: nightly
-      env: PHP_EXT=memcached TESTS=all
     - php: 7.0
       env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
     - php: 7.1
       env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
+    - php: nightly
+      env: PHP_EXT=memcached TESTS=all
   # Mark build as failed as soon as one job failed.
   fast_finish: true
 
