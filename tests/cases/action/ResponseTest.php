@@ -209,24 +209,6 @@ class ResponseTest extends \lithium\test\Unit {
 			return '/foo_bar';
 		}
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * Tests custom header add-ons, like 'download'.
-	 */
-	public function testDownloadMagicHeader() {
-		$backup = error_reporting();
-		error_reporting(E_ALL);
-
-		$response = $this->response;
-
-		$this->assertException('/deprecated/', function() use ($response) {
-			$response->headers('download', 'report.csv');
-		});
-
-		error_reporting($backup);
-	}
 }
 
 ?>
