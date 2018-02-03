@@ -48,31 +48,6 @@ class EncryptTest extends \lithium\test\Unit {
 
 		$this->assertEqual('foo', $decrypted);
 	}
-
-	/* Deprecated / BC */
-
-	public function testMigrateExistingFromMcryptToOpenssl() {
-		$this->skipIf(!extension_loaded('mcrypt'), '`mcrypt` extension not loaded.');
-
-		error_reporting(($this->_backup = error_reporting()) & ~E_DEPRECATED & ~E_USER_DEPRECATED);
-
-		$new = new Encrypt(['secret' => str_repeat('a', 32)]);
-		$old = new Encrypt([
-			'secret' => str_repeat('a', 32),
-			'cipher' => MCRYPT_RIJNDAEL_128,
-			'mode' => MCRYPT_MODE_CBC
-		]);
-
-		$key = 'fookey';
-		$value = 'barvalue';
-
-		$encrypted = $old->write($value, ['class' => $this->mock, 'key' => $key]);
-		$decrypted = $new->read($encrypted, ['class' => $this->mock, 'key' => $key]);
-		$this->assertEqual($value, $decrypted);
-
-		unset($old);
-		error_reporting($this->_backup);
-	}
 }
 
 ?>

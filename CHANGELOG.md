@@ -18,6 +18,7 @@
 	- Long options like `--foo-bar` are now only made available as `fooBar` and
 	  not `foo-bar` after parsing in the console router.
 	- The test `Mocker` class
+	- Support for `mcrypt` in the sesion `Encrypt` strategy
 
 ## v1.2.0
 

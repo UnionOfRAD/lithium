@@ -42,36 +42,7 @@ use lithium\security\Random;
  * want to use your own hashing algorithm, make sure it has the maximum key length of the algorithm
  * used. See the `Encrypt::_hashSecret()` method for more information on this.
  *
- * ## Legacy Mode
- *
- * This class previously used the now deprecated `mcrypt` extension and has been migrated
- * to use of the `openssl` extension for better support and performance. For backwards
- * compatibility reasons this class supports a _legacy_ mode in which `mcrypt` will be
- * used. The class will switch to legacy mode whenever it is not possible to use openssl
- * as a drop in.
- *
- * First, legacy mode will be triggered when the `openssl` extension is not available.
- *
- * Second, previously overriding the default cipher and mode were possible (see example
- * below). As we only support AES-256 in CBC mode (equals `mcrypt`'s RIJNDAEL_128 with
- * MODE_CBC) with the `openssl` extension, overrding the defaults will trigger legacy
- * mode.
- *
- * ```
- * Session::config(['default' => [
- *     'adapter' => 'Cookie',
- *     'strategies' => ['Encrypt' => [
- *         'cipher' => MCRYPT_RIJNDAEL_256,
- *         'mode' => MCRYPT_MODE_ECB, // Don't use ECB when you don't have to!
- *         'secret' => 'f00bar$l1thium'
- *     ]]
- * ]]);
- * ```
- *
  * @link http://php.net/book.openssl.php
- * @link http://php.net/book.mcrypt.php The mcrypt extension.
- * @link http://php.net/mcrypt.ciphers.php List of supported ciphers.
- * @link http://php.net/mcrypt.constants.php List of supported modes.
  */
 class Encrypt extends \lithium\core\Object {
 
@@ -92,24 +63,10 @@ class Encrypt extends \lithium\core\Object {
 		if (!isset($config['secret'])) {
 			throw new ConfigException('Encrypt strategy requires a secret key.');
 		}
-
-		if ($this->_mcrypt = $this->_mcrypt($config)) {
-			if (!extension_loaded('mcrypt')) {
-				throw new ConfigException('The mcrypt extension is not installed or enabled.');
-			}
-			parent::__construct($config + $this->_defaults + [
-				'cipher' => MCRYPT_RIJNDAEL_128,
-				'mode' => MCRYPT_MODE_CBC
-			]);
-			$this->_mcryptResource = mcrypt_module_open(
-				$this->_config['cipher'], '', $this->_config['mode'], ''
-			);
-		} else {
-			if (!extension_loaded('openssl')) {
-				throw new ConfigException('The `openssl` extension is not installed or enabled.');
-			}
-			parent::__construct($config + $this->_defaults);
+		if (!extension_loaded('openssl')) {
+			throw new ConfigException('The `openssl` extension is not installed or enabled.');
 		}
+		parent::__construct($config + $this->_defaults);
 	}
 
 	/**
@@ -128,12 +85,7 @@ class Encrypt extends \lithium\core\Object {
 		if (!isset($encrypted['__encrypted']) || !$encrypted['__encrypted']) {
 			return isset($encrypted[$key]) ? $encrypted[$key] : null;
 		}
-
-		if ($this->_mcrypt) {
-			$current = $this->_bcDecrypt($encrypted['__encrypted']);
-		} else {
-			$current = $this->_decrypt($encrypted['__encrypted']);
-		}
+		$current = $this->_decrypt($encrypted['__encrypted']);
 
 		if ($key) {
 			return isset($current[$key]) ? $current[$key] : null;
@@ -157,11 +109,7 @@ class Encrypt extends \lithium\core\Object {
 		$payload = null;
 
 		if (!empty($futureData)) {
-			if ($this->_mcrypt) {
-				$payload = $this->_bcEncrypt($futureData);
-			} else {
-				$payload = $this->_encrypt($futureData);
-			}
+			$payload = $this->_encrypt($futureData);
 		}
 
 		$class::write('__encrypted', $payload, ['strategies' => false] + $options);
@@ -184,11 +132,7 @@ class Encrypt extends \lithium\core\Object {
 		$payload = null;
 
 		if (!empty($futureData)) {
-			if ($this->_mcrypt) {
-				$payload = $this->_bcEncrypt($futureData);
-			} else {
-				$payload = $this->_encrypt($futureData);
-			}
+			$payload = $this->_encrypt($futureData);
 		}
 
 		$class::write('__encrypted', $payload, ['strategies' => false] + $options);
@@ -282,150 +226,6 @@ class Encrypt extends \lithium\core\Object {
 	 */
 	protected function _vectorSize() {
 		return openssl_cipher_iv_length('aes-256-cbc');
-	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * Indicates if we are in legacy / BC mode and the class is using the mcrypt extension
-	 * or we are able to use the openssl extension.
-	 *
-	 * @deprecated
-	 */
-	protected $_mcrypt = false;
-
-	/**
-	 * Holds the mcrypt crypto resource after initialization, when in legacy mode.
-	 *
-	 * @deprecated
-	 */
-	protected $_mcryptResource = null;
-
-	/**
-	 * Checks for legacy mode.
-	 *
-	 * @deprecated
-	 * @param array $config
-	 * @return boolean
-	 */
-	protected function _mcrypt(array $config) {
-		if (isset($config['cipher']) || isset($config['mode'])) {
-			$message  = "You've selected a non-default cipher and/or mode configuration. ";
-			$message .= "The Encrypt strategy is now in legacy mode and will use the ";
-			$message .= "deprecated mcrypt extension. To disable legacy mode, use the strategy ";
-			$message .= "with default configuration.";
-			trigger_error($message, E_USER_DEPRECATED);
-
-			return true;
-		}
-		if (!extension_loaded('openssl')) {
-			$message .= "The Encrypt strategy is now in legacy mode and will use the ";
-			$message .= "deprecated mcrypt extension. To disable legacy mode, install the ";
-			$message .= "openssl extension.";
-			trigger_error($message, E_USER_DEPRECATED);
-
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Destructor. Closes the crypto resource when it is no longer needed.
-	 *
-	 * @deprecated
-	 * @return void
-	 */
-	public function __destruct() {
-		if (is_resource($this->_mcryptResource)) {
-			mcrypt_module_close($this->_mcryptResource);
-		}
-	}
-
-	/**
-	 * Serialize and encrypt a given data array.
-	 *
-	 * @deprecated
-	 * @param array $decrypted The cleartext data to be encrypted.
-	 * @return string A Base64 encoded and encrypted string.
-	 */
-	protected function _bcEncrypt($decrypted = []) {
-		$vector = $this->_bcVector();
-		$secret = $this->_bcHashSecret($this->_config['secret']);
-
-		mcrypt_generic_init($this->_mcryptResource, $secret, $vector);
-		$encrypted = mcrypt_generic($this->_mcryptResource, serialize($decrypted));
-		mcrypt_generic_deinit($this->_mcryptResource);
-
-		return base64_encode($encrypted) . base64_encode($vector);
-	}
-
-	/**
-	 * Decrypt and unserialize a previously encrypted string.
-	 *
-	 * @deprecated
-	 * @param string $encrypted The base64 encoded and encrypted string.
-	 * @return array The cleartext data.
-	 */
-	protected function _bcDecrypt($encrypted) {
-		$secret = $this->_hashSecret($this->_config['secret']);
-
-		$vectorSize = strlen(base64_encode(str_repeat(" ", $this->_bcVectorSize())));
-		$vector = base64_decode(substr($encrypted, -$vectorSize));
-		$data = base64_decode(substr($encrypted, 0, -$vectorSize));
-
-		mcrypt_generic_init($this->_mcryptResource, $secret, $vector);
-		$decrypted = mdecrypt_generic($this->_mcryptResource, $data);
-		mcrypt_generic_deinit($this->_mcryptResource);
-
-		return unserialize(trim($decrypted));
-	}
-
-	/**
-	 * Hashes the given secret to make harder to detect.
-	 *
-	 * This method figures out the appropriate key size for the chosen encryption algorithm and
-	 * then hashes the given key accordingly. Note that if the key has already the needed length,
-	 * it is considered to be hashed (secure) already and is therefore not hashed again. This lets
-	 * you change the hashing method in your own code if you like.
-	 *
-	 * The default `MCRYPT_RIJNDAEL_128` key should be 32 byte long `sha256` is used
-	 * as the hashing algorithm. If the key size is shorter than the one generated by
-	 * `sha256`, the first n bytes will be used.
-	 *
-	 * @deprecated
-	 * @link http://php.net/function.mcrypt-enc-get-key-size.php
-	 * @param string $key The possibly too weak key.
-	 * @return string The hashed (raw) key.
-	 */
-	protected function _bcHashSecret($key) {
-		$size = mcrypt_enc_get_key_size($this->_mcryptResource);
-
-		if (strlen($key) >= $size) {
-			return $key;
-		}
-		return substr(hash('sha256', $key, true), 0, $size);
-	}
-
-	/**
-	 * Generates an initialization vector.
-	 *
-	 * @deprecated
-	 * @link http://php.net/function.mcrypt-create-iv.php
-	 * @return string Returns an initialization vector.
-	 */
-	protected function _bcVector() {
-		return mcrypt_create_iv($this->_bcVectorSize(), MCRYPT_DEV_URANDOM);
-	}
-
-	/**
-	 * Returns the vector size vor a given cipher and mode.
-	 *
-	 * @deprecated
-	 * @link http://php.net/function.mcrypt-enc-get-iv-size.php
-	 * @return number The vector size.
-	 */
-	protected function _bcVectorSize() {
-		return mcrypt_enc_get_iv_size($this->_mcryptResource);
 	}
 }
 
