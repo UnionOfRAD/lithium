@@ -80,22 +80,6 @@ class PhpExtensions {
 		}
 	}
 
-	protected static function _xcache() {
-		if (static::_isHhvm()) {
-			throw new RuntimeException("`xcache` cannot be used with HHVM.");
-		}
-		static::_build([
-			'url' => 'http://xcache.lighttpd.net/pub/Releases/3.2.0/xcache-3.2.0.tar.gz',
-			'configure' => ['--enable-xcache'],
-		]);
-		static::_ini([
-			'extension=xcache.so',
-			'xcache.cacher=false',
-			'xcache.admin.enable_auth=0',
-			'xcache.var_size=1M'
-		]);
-	}
-
 	protected static function _mongo() {
 		if (static::_isHhvm()) {
 			throw new RuntimeException("`mongo` cannot be used with HHVM.");

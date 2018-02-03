@@ -10,6 +10,8 @@
 - ConfigExceptions (thrown when accessing non exsitent configurations) are now allowed to 
   bubble up in `Cache`.
 
+- Removed previously deprecated `XCache` cache adapter.
+
 ## v1.2.0
 
 ### Added
