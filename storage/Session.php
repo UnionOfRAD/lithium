@@ -95,7 +95,6 @@ class Session extends \lithium\core\Adaptable {
 		$defaults = ['name' => null, 'strategies' => true];
 		$options += $defaults;
 		$method = ($name = $options['name']) ? static::adapter($name)->read($key, $options) : null;
-		$settings = static::_config($name);
 
 		if (!$method) {
 			foreach (array_keys(static::$_configurations) as $name) {
@@ -155,8 +154,6 @@ class Session extends \lithium\core\Adaptable {
 		$original = $value;
 
 		foreach ($methods as $name => $method) {
-			$settings = static::_config($name);
-
 			if ($options['strategies']) {
 				$value = static::applyStrategies(__FUNCTION__, $name, $original, $options + [
 					'key' => $key,
@@ -201,8 +198,6 @@ class Session extends \lithium\core\Adaptable {
 		$original = $key;
 
 		foreach ($methods as $name => $method) {
-			$settings = static::_config($name);
-
 			if ($options['strategies']) {
 				$key = static::applyStrategies(__FUNCTION__, $name, $original, $options + [
 					'key' => $key,
@@ -244,7 +239,6 @@ class Session extends \lithium\core\Adaptable {
 		$result = false;
 
 		foreach ($methods as $name => $method) {
-			$settings = static::_config($name);
 			$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method) || $result;
 		}
 		if ($options['strategies']) {
@@ -281,7 +275,6 @@ class Session extends \lithium\core\Adaptable {
 		$result = false;
 
 		foreach ($methods as $name => $method) {
-			$settings = static::_config($name);
 			$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method) || $result;
 		}
 		if ($options['strategies']) {
