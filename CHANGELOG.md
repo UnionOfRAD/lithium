@@ -20,6 +20,7 @@
 	- The test `Mocker` class
 	- Support for `mcrypt` in the sesion `Encrypt` strategy
 	- Support for old-style rendering instructions i.e. `['template' => '/path/to/template']`
+	- The `FirePhp` logging adapter
 
 ## v1.2.0
 
