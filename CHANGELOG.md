@@ -10,12 +10,11 @@
 - ConfigExceptions (thrown when accessing non exsitent configurations) are now allowed to 
   bubble up in `Cache`.
 
-- Removed previously deprecated `XCache` cache adapter.
-
-- Removed previously deprecated glob brace support in `Libraries`.
-
-- Removed previously deprecated per adapter filters.
-
+- The following previously deprecated things have been removed:
+	- The `XCache` `Cache` adapter
+	- Glob brace support in `Libraries`
+	- Per adapter filters
+	- The `String` class
 
 ## v1.2.0
 
