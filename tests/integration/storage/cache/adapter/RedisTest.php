@@ -575,7 +575,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testRespondsToParentCall() {
-		$this->assertTrue($this->redis->respondsTo('applyFilter'));
+		$this->assertTrue($this->redis->respondsTo('invokeMethod'));
 		$this->assertFalse($this->redis->respondsTo('fooBarBaz'));
 	}
 }

@@ -1063,45 +1063,6 @@ class Libraries {
 		}
 		return compact('library', 'namespace', 'type', 'class', 'name');
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * Stores the closures that represent the method filters. They are indexed by method name.
-	 *
-	 * @deprecated Not used anymore.
-	 * @var array
-	 */
-	protected static $_methodFilters = [];
-
-	/**
-	 * Apply a closure to a method in `Libraries`.
-	 *
-	 * @deprecated Replaced by `\lithium\aop\Filters::apply()` and `::clear()`.
-	 * @see lithium\util\collection\Filters
-	 * @param string $method The name of the method to apply the closure to.
-	 * @param Closure $filter The closure that is used to filter the method.
-	 * @return void
-	 */
-	public static function applyFilter($method, $filter = null) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
-		$message .= '`\lithium\aop\Filters::apply()` and `::clear()`.';
-		trigger_error($message, E_USER_DEPRECATED);
-
-		$class = get_called_class();
-
-		if ($method === false) {
-			Filters::clear($class);
-			return;
-		}
-		foreach ((array) $method as $m) {
-			if ($filter === false) {
-				Filters::clear($class, $m);
-			} else {
-				Filters::apply($class, $m, $filter);
-			}
-		}
-	}
 }
 
 ?>

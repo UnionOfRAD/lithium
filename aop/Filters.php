@@ -225,8 +225,6 @@ class Filters {
 	 * @return mixed The result of running the chain.
 	 */
 	public static function run($class, $method, array $params, $implementation) {
-		$implementation = static::_bcImplementation($class, $method, $params, $implementation);
-
 		if (!static::hasApplied($class, $method)) {
 			return $implementation($params);
 		}
@@ -328,38 +326,6 @@ class Filters {
 			}
 		}
 		return static::$_chains[$ids[0]] = new Chain(compact('class', 'method', 'filters'));
-	}
-
-	/* Deprecated / BC */
-
-	public static function bcRun($class, $method, array $params, $implementation, array $filters) {
-		$implementation = static::_bcImplementation($class, $method, $params, $implementation);
-		$ids = static::_ids($class, $method);
-
-		foreach ($ids as $id) {
-			if (isset(static::$_filters[$id])) {
-				$filters = array_merge(static::$_filters[$id], $filters);
-			}
-		}
-		return new Chain(compact('class', 'method', 'filters'));
-	}
-
-	protected static function _bcImplementation($class, $method, $params, $implementation) {
-		$reflect = new \ReflectionFunction($implementation);
-
-		if ($reflect->getNumberOfParameters() > 1) {
-			$message  = 'Old style implementation function in file ' . $reflect->getFileName() . ' ';
-			$message .= 'on line ' . $reflect->getStartLine() . '. ';
-			$message .= 'The signature for implementation functions has changed. It is now ';
-			$message .= '`($params)` instead of the old `($self, $params)`. ';
-			$message .= 'Instead of `$self` use `$this` or `static`.';
-			trigger_error($message, E_USER_DEPRECATED);
-
-			$implementation = function($params) use ($class, $implementation) {
-				return $implementation($class, $params, null);
-			};
-		}
-		return $implementation;
 	}
 }
 

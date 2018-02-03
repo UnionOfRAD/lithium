@@ -591,7 +591,7 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testRespondsToParentCall() {
-		$this->assertTrue($this->memcache->respondsTo('applyFilter'));
+		$this->assertTrue($this->memcache->respondsTo('invokeMethod'));
 		$this->assertFalse($this->memcache->respondsTo('fooBarBaz'));
 	}
 }

@@ -629,20 +629,6 @@ class Model extends \lithium\core\StaticObject {
 		if (isset($self->_finders[$type])) {
 			$finder = $self->_finders[$type];
 
-			$reflect = new \ReflectionFunction($finder);
-			if ($reflect->getNumberOfParameters() > 2) {
-				$message  = 'Old style finder function in file ' . $reflect->getFileName() . ' ';
-				$message .= 'on line ' . $reflect->getStartLine() . '. ';
-				$message .= 'The signature for finder functions has changed. It is now ';
-				$message .= '`($params, $next)` instead of the old `($self, $params, $chain)`. ';
-				$message .= 'Instead of `$self` use `$this` or `static`.';
-				trigger_error($message, E_USER_DEPRECATED);
-
-				return Filters::bcRun(
-					get_called_class(), __FUNCTION__, $params, $implementation, [$finder]
-				);
-			}
-
 			$implementation = function($params) use ($finder, $implementation) {
 				return $finder($params, $implementation);
 			};

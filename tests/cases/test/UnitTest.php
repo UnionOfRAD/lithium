@@ -856,7 +856,7 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testClassHasStaticAttributeTrue() {
 		$class = '\lithium\core\StaticObject';
-		$this->assertTrue($this->test->assertClassHasStaticAttribute('_methodFilters', $class));
+		$this->assertTrue($this->test->assertClassHasStaticAttribute('_parents', $class));
 
 		$results = $this->test->results();
 		$result = array_pop($results);
@@ -875,8 +875,7 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual([
 			'expected' => 'foobar',
 			'result' => [
-				new \ReflectionProperty('lithium\core\StaticObject', '_parents'),
-				new \ReflectionProperty('lithium\core\StaticObject', '_methodFilters')
+				new \ReflectionProperty('lithium\core\StaticObject', '_parents')
 			]
 		], $result['data']);
 	}
@@ -900,17 +899,16 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testClassNotHasStaticAttributeFalse() {
 		$class = '\lithium\core\StaticObject';
-		$this->assertFalse($this->test->assertClassNotHasStaticAttribute('_methodFilters', $class));
+		$this->assertFalse($this->test->assertClassNotHasStaticAttribute('_parents', $class));
 
 		$results = $this->test->results();
 		$result = array_pop($results);
 
 		$this->assertEqual('fail', $result['result']);
 		$this->assertEqual([
-			'expected' => '_methodFilters',
+			'expected' => '_parents',
 			'result' => [
-				new \ReflectionProperty('lithium\core\StaticObject', '_parents'),
-				new \ReflectionProperty('lithium\core\StaticObject', '_methodFilters')
+				new \ReflectionProperty('lithium\core\StaticObject', '_parents')
 			]
 		], $result['data']);
 	}

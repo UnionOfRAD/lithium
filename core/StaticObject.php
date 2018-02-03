@@ -90,14 +90,6 @@ class StaticObject {
 	protected static $_parents = [];
 
 	/**
-	 * Stores the closures that represent the method filters. They are indexed by called class.
-	 *
-	 * @deprecated Not used anymore.
-	 * @var array Method filters, indexed by `get_called_class()`.
-	 */
-	protected static $_methodFilters = [];
-
-	/**
 	 * Exit immediately. Primarily used for overrides during testing.
 	 *
 	 * @deprecated
@@ -127,69 +119,6 @@ class StaticObject {
 			static::$_parents[$class] = class_parents($class);
 		}
 		return static::$_parents[$class];
-	}
-
-	/**
-	 * Apply a closure to a method of the current static object.
-	 *
-	 * @deprecated Replaced by `\lithium\aop\Filters::apply()` and `::clear()`.
-	 * @see lithium\core\StaticObject::_filter()
-	 * @see lithium\util\collection\Filters
-	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
-	 *        method name as a string, or an array of method names. Can also be false to remove
-	 *        all filters on the current object.
-	 * @param \Closure $filter The closure that is used to filter the method(s), can also be false
-	 *        to remove all the current filters for the given method.
-	 * @return void
-	 */
-	public static function applyFilter($method, $filter = null) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
-		$message .= '`\lithium\aop\Filters::apply()` and `::clear()`.';
-		trigger_error($message, E_USER_DEPRECATED);
-
-		$class = get_called_class();
-
-		if ($method === false) {
-			Filters::clear($class);
-			return;
-		}
-		foreach ((array) $method as $m) {
-			if ($filter === false) {
-				Filters::clear($class, $m);
-			} else {
-				Filters::apply($class, $m, $filter);
-			}
-		}
-	}
-
-	/**
-	 * Executes a set of filters against a method by taking a method's main implementation as a
-	 * callback, and iteratively wrapping the filters around it.
-	 *
-	 * @deprecated Replaced by `\lithium\aop\Filters::run()`.
-	 * @see lithium\util\collection\Filters
-	 * @param string $method The name of the method being executed.
-	 * @param array $params An associative array containing all the parameters passed into
-	 *        the method.
-	 * @param \Closure $callback The method's implementation, wrapped in a closure.
-	 * @param array $filters Additional filters to apply to the method for this call only.
-	 * @return mixed
-	 */
-	protected static function _filter($method, $params, $callback, $filters = []) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
-		$message .= '`\lithium\aop\Filters::run()` and `::apply()`.';
-		trigger_error($message, E_USER_DEPRECATED);
-
-		if (strpos($method, '::') !== false) {
-			list($class, $method) = explode('::' , $method);
-		} else {
-			$class = get_called_class();
-		}
-
-		foreach ($filters as $filter) {
-			Filters::apply($class, $method, $filter);
-		}
-		return Filters::run($class, $method, $params, $callback);
 	}
 }
 

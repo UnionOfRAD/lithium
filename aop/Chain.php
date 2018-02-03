@@ -78,21 +78,11 @@ class Chain {
 	 *
 	 * @param array $config Class configuration parameters The available options are:
 	 *         - `'filters'` _array_
-	 *         - `'class'` _array_: Deprecated. Here for BC.
-	 *         - `'method'` _array_: Depreacted. Here for BC.
 	 * @return void
 	 */
 	public function __construct(array $config = []) {
-		$config += [
-			'filters' => [],
-			'class' => null,
-			'method' => null
-		];
+		$config += ['filters' => []];
 		$this->_filters = $config['filters'];
-		$this->_class = $config['class'];
-		$this->_method = $config['method'];
-
-		$this->_bcFilters();
 	}
 
 	/**
@@ -154,96 +144,6 @@ class Chain {
 
 		$implementation = $this->_implementation;
 		return $implementation($params);
-	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * The fully-namespaced class name of the class or an instance of a
-	 * class containing the method being filtered.
-	 *
-	 * @deprecated
-	 * @see lithium\aop\Chain::method()
-	 * @var string|object
-	 */
-	protected $_class = null;
-
-	/**
-	 * The name of the method being filtered.
-	 *
-	 * @deprecated
-	 * @see lithium\aop\Chain::method()
-	 * @var string
-	 */
-	protected $_method = null;
-
-	/**
-	 * Advances the chain by one and executes the next filter in line.
-	 * This method is usually accessed from within a filter function.
-	 *
-	 * ```
-	 * function($params, $chain) {
-	 *     return $chain->next($params);
-	 * }
-	 * ```
-	 *
-	 * @deprecated
-	 * @param array $params An array of named parameters.
-	 * @return mixed The return value of the next filter. If there is no
-	 *         next filter, the return value of the implementation.
-	 */
-	public function next(/* array */ $params) {
-		$message = '`$chain->next()` has been deprecated in favor of `$chain($params)`.';
-		trigger_error($message, E_USER_DEPRECATED);
-
-		return $this($this->_bcNext(func_get_args()));
-	}
-
-	/**
-	 * Gets the method name associated with this filter chain. This is
-	 * the method being filtered.
-	 *
-	 * @deprecated
-	 * @param boolean $full Whether to include the class name, defaults to `false`.
-	 * @return string When $full is `true` returns a string with pattern
-	 *        `<CLASS>::<METHOD>`, else returns just the method name.
-	 */
-	public function method($full = false) {
-		$message = '`$chain->method()` has been deprecated.';
-		trigger_error($message, E_USER_DEPRECATED);
-
-		$class = is_string($this->_class) ? $this->_class : get_class($this->_class);
-		return $full ? $class . '::' . $this->_method : $this->_method;
-	}
-
-	protected function _bcFilters() {
-		foreach ($this->_filters as &$filter) {
-			$reflect = new \ReflectionFunction($filter);
-
-			if ($reflect->getNumberOfParameters() > 2) {
-				$message  = 'Old style filter function in file ' . $reflect->getFileName() . ' ';
-				$message .= 'on line ' . $reflect->getStartLine() . '. ';
-				$message .= 'The signature for filter functions has changed. It is now ';
-				$message .= '`($params, $next)` instead of the old `($self, $params, $chain)`. ';
-				$message .= 'Instead of `$self` use `$this` or `static`.';
-				trigger_error($message, E_USER_DEPRECATED);
-
-				$filter = function($params, $chain) use ($filter) {
-					return $filter($this->_class, $params, $chain);
-				};
-			}
-		}
-	}
-
-	protected function _bcNext($args) {
-		if (isset($args[1])) {
-			$message  = '`$chain->next($s, $p, $c)` signature changed. ';
-			$message .= 'Please use `$next($params)` instead.';
-			trigger_error($message, E_USER_DEPRECATED);
-
-			return $args[1];
-		}
-		return $args[0];
 	}
 }
 

@@ -184,17 +184,6 @@ class Object {
 	protected static $_parents = [];
 
 	/**
-	 * Contains a 2-dimensional array of filters applied to this object's methods, indexed by method
-	 * name. See the associated methods for more details.
-	 *
-	 * @deprecated Not used anymore.
-	 * @see lithium\core\Object::_filter()
-	 * @see lithium\core\Object::applyFilter()
-	 * @var array
-	 */
-	protected $_methodFilters = [];
-
-	/**
 	 * PHP magic method used in conjunction with `var_export()` to allow objects to be
 	 * re-instantiated with their pre-existing properties and values intact. This method can be
 	 * called statically on any class that extends `Object` to return an instance of it.
@@ -244,69 +233,6 @@ class Object {
 			static::$_parents[$class] = class_parents($class);
 		}
 		return static::$_parents[$class];
-	}
-
-	/**
-	 * Apply a closure to a method of the current object instance.
-	 *
-	 * @deprecated Replaced by `\lithium\aop\Filters::apply()` and `::clear()`.
-	 * @see lithium\core\Object::_filter()
-	 * @see lithium\util\collection\Filters
-	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
-	 *        method name as a string, or an array of method names. Can also be false to remove
-	 *        all filters on the current object.
-	 * @param \Closure $filter The closure that is used to filter the method(s), can also be false
-	 *        to remove all the current filters for the given method.
-	 * @return void
-	 */
-	public function applyFilter($method, $filter = null) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
-		$message .= '`\lithium\aop\Filters::apply()` and `::clear()`.';
-		trigger_error($message, E_USER_DEPRECATED);
-
-		if ($method === false) {
-			Filters::clear($this);
-			return;
-		}
-		foreach ((array) $method as $m) {
-			if ($filter === false) {
-				Filters::clear($this, $m);
-			} else {
-				Filters::apply($this, $m, $filter);
-			}
-		}
-	}
-
-	/**
-	 * Executes a set of filters against a method by taking a method's main implementation as a
-	 * callback, and iteratively wrapping the filters around it. This, along with the `Filters`
-	 * class, is the core of Lithium's filters system. This system allows you to "reach into" an
-	 * object's methods which are marked as _filterable_, and intercept calls to those methods,
-	 * optionally modifying parameters or return values.
-	 *
-	 * @deprecated Replaced by `\lithium\aop\Filters::run()`.
-	 * @see lithium\core\Object::applyFilter()
-	 * @see lithium\util\collection\Filters
-	 * @param string $method The name of the method being executed, usually the value of
-	 *               `__METHOD__`.
-	 * @param array $params An associative array containing all the parameters passed into
-	 *              the method.
-	 * @param \Closure $callback The method's implementation, wrapped in a closure.
-	 * @param array $filters Additional filters to apply to the method for this call only.
-	 * @return mixed Returns the return value of `$callback`, modified by any filters passed in
-	 *         `$filters` or applied with `applyFilter()`.
-	 */
-	protected function _filter($method, $params, $callback, $filters = []) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
-		$message .= '`\lithium\aop\Filters::run()` and `::apply()`.';
-		trigger_error($message, E_USER_DEPRECATED);
-
-		list(, $method) = explode('::', $method);
-
-		foreach ($filters as $filter) {
-			Filters::apply($this, $method, $filter);
-		}
-		return Filters::run($this, $method, $params, $callback);
 	}
 }
 

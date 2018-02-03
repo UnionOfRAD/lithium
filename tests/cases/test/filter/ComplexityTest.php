@@ -40,9 +40,7 @@ class ComplexityTest extends \lithium\test\Unit {
 		'respondsTo' => 1,
 		'_instance' => 2,
 		'_parents' => 2,
-		'_stop' => 1,
-		'applyFilter' => 4,
-		'_filter' => 3
+		'_stop' => 1
 	];
 
 	/**
@@ -88,7 +86,7 @@ class ComplexityTest extends \lithium\test\Unit {
 		Complexity::apply($this->report, $group->tests());
 
 		$results = Complexity::analyze($this->report);
-		$expected = ['class' => [$this->_paths['testClass'] => 2.8999999999999999]];
+		$expected = ['class' => [$this->_paths['testClass'] => 2.6]];
 		foreach ($this->_metrics as $method => $metric) {
 			$expected['max'][$this->_paths['testClass'] . '::' . $method . '()'] = $metric;
 		}
