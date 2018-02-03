@@ -19,6 +19,7 @@
 	  not `foo-bar` after parsing in the console router.
 	- The test `Mocker` class
 	- Support for `mcrypt` in the sesion `Encrypt` strategy
+	- Support for old-style rendering instructions i.e. `['template' => '/path/to/template']`
 
 ## v1.2.0
 

@@ -270,25 +270,6 @@ class ViewTest extends \lithium\test\Unit {
 		Libraries::remove('test_app2');
 		$this->_cleanUp();
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testDeprecatedBasicRenderModes() {
-		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$view = new View(['loader' => 'Simple', 'renderer' => 'Simple']);
-
-		$result = $view->render(['element' => 'Logged in as: {:name}.'], [
-			'name' => "Cap'n Crunch"
-		]);
-		$expected = "Logged in as: Cap'n Crunch.";
-		$this->assertEqual($expected, $result);
-
-		error_reporting($original);
-	}
 }
 
 ?>
