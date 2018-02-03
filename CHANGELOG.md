@@ -89,6 +89,8 @@
   deprecated and will cause the strategy to switch into _legacy_ mode. In legacy
   mode the deprecated `mcrypt` extension will still be used.
 
+- Deprecated the non-flatten mode in `Set::extract()` as it is rarely used.
+
 ### Fixed
 
 - The `'key'` and `'class'` options were supposed to be provided only for
