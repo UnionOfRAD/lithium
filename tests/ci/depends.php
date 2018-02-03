@@ -20,11 +20,6 @@ foreach (explode(' ', getenv('COMPOSER_PKG')) ?: [] as $package) {
 /**
  * Class to install native PHP extensions mainly for preparing test runs
  * in continuous integration environments like Travis CI.
- *
- * Both plain PHP.net and HHVM interpreters are supported. Some extensions
- * cannot be installed with HHVM as they are not yet bundled.
- *
- * @link https://github.com/facebook/hhvm/wiki/Extensions
  */
 class PhpExtensions {
 
@@ -50,9 +45,6 @@ class PhpExtensions {
 	}
 
 	protected static function _opcache() {
-		if (static::_isHhvm()) {
-			throw new RuntimeException("`opcache` cannot be used with HHVM.");
-		}
 		static::_ini([
 			'opcache.enable=1',
 			'opcache.enable_cli=1'
@@ -60,13 +52,10 @@ class PhpExtensions {
 	}
 
 	protected static function _apcu() {
-		if (!static::_isHhvm()) {
-			if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
-				static::_pecl('apcu', '5.1.8', true);
-			} else {
-				static::_pecl('apcu', '4.0.11', true);
-			}
-			// static::_ini(['extension=apcu.so']);
+		if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
+			static::_pecl('apcu', '5.1.8', true);
+		} else {
+			static::_pecl('apcu', '4.0.11', true);
 		}
 		static::_ini([
 			'apc.enabled=1',
@@ -75,15 +64,10 @@ class PhpExtensions {
 	}
 
 	protected static function _memcached() {
-		if (!static::_isHhvm()) {
-			static::_ini(['extension=memcached.so']);
-		}
+		static::_ini(['extension=memcached.so']);
 	}
 
 	protected static function _mongo() {
-		if (static::_isHhvm()) {
-			throw new RuntimeException("`mongo` cannot be used with HHVM.");
-		}
 		static::_ini(['extension=mongo.so']);
 	}
 
@@ -110,16 +94,11 @@ class PhpExtensions {
 	/**
 	 * Add INI settings. Uses configration retrieved as per `php_ini_loaded_file()`.
 	 *
-	 * Note that in HHVM we currently cannot access the loaded ini file.
-	 *
 	 * @link http://php.net/php_ini_loaded_file
 	 * @param array $data INI settings to add.
 	 * @return void
 	 */
 	protected static function _ini(array $data) {
-		if (static::_isHhvm()) {
-			return;
-		}
 		foreach ($data as $ini) {
 			static::_system(sprintf("echo %s >> %s", $ini, php_ini_loaded_file()));
 		}
@@ -175,10 +154,6 @@ class PhpExtensions {
 		));
 
 		echo "=> built\n";
-	}
-
-	protected static function _isHhvm() {
-		return defined('HHVM_VERSION');
 	}
 }
 
