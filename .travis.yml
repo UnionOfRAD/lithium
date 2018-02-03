@@ -49,14 +49,9 @@ matrix:
     - php: 5.6
       env: PHP_EXT=xcache TESTS=storage
     # Just one exemplaric job.
-    - php: hhvm
-      env: PHP_EXT=memcached TESTS=all
     - php: nightly
       env: PHP_EXT=memcached TESTS=all
   allow_failures:
-    # We do not aim for full HHVM compatibilty now.
-    - php: hhvm
-      env: PHP_EXT=memcached TESTS=all
     - php: nightly
       env: PHP_EXT=memcached TESTS=all
     - php: 7.0
