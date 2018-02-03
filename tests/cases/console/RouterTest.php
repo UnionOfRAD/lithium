@@ -86,8 +86,7 @@ class RouterTest extends \lithium\test\Unit {
 	public function testParseGnuStyleLongOptionsContainingDash() {
 		$expected = [
 			'command' => 'test', 'action' => 'run', 'args' => [],
-			'fooBar' => 'something',
-			'foo-bar' => 'something'
+			'fooBar' => 'something'
 		];
 		$result = Router::parse(new Request([
 			'args' => [

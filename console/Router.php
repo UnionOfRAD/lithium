@@ -24,9 +24,8 @@ class Router extends \lithium\core\Object {
 	 * XF68-style long options (i.e. `-foo`) are not supported but support
 	 * can be added by extending this class.
 	 *
-	 * If passing through `--foo-bar` this previously (pre 1.1) resulted in
-	 * the option `foo-bar` being available. This has been deprecated in favor
-	 * of `fooBar` being created.
+	 * Long options like `--foo-bar` are camelized and made available
+	 * after parsing as `fooBar`.
 	 *
 	 * @param \lithium\console\Request $request
 	 * @return array $params
@@ -42,12 +41,12 @@ class Router extends \lithium\core\Object {
 				$arg = array_shift($args);
 				if (preg_match('/^-(?P<key>[a-zA-Z0-9])$/i', $arg, $match)) {
 					$key = Inflector::camelize($match['key'], false);
-					$params[$key] = $params[$match['key']] = true;
+					$params[$key] = true;
 					continue;
 				}
 				if (preg_match('/^--(?P<key>[a-z0-9-]+)(?:=(?P<val>.+))?$/i', $arg, $match)) {
 					$key = Inflector::camelize($match['key'], false);
-					$params[$key] = $params[$match['key']] = !isset($match['val']) ? true : $match['val'];
+					$params[$key] = !isset($match['val']) ? true : $match['val'];
 					continue;
 				}
 				$params['args'][] = $arg;

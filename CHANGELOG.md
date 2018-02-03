@@ -15,6 +15,8 @@
 	- Glob brace support in `Libraries`
 	- Per adapter filters
 	- The `String` class
+	- Long options like `--foo-bar` are now only made available as `fooBar` and
+	  not `foo-bar` after parsing in the console router.
 
 ## v1.2.0
 
