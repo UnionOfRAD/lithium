@@ -59,6 +59,8 @@
   mode). This is the case when a non-default cipher mode (anything else than AES 256 
   CBC) has been chosen or the `openssl` extension is not available.
 
+- The credit card validator now supports MasterCard 2-series. (Grayson Scherer)
+
 ### Changed
 
 - The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 
