@@ -12,6 +12,8 @@
 
 - Removed previously deprecated `XCache` cache adapter.
 
+- Removed previously deprecated glob brace support in `Libraries`.
+
 ## v1.2.0
 
 ### Added

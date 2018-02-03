@@ -788,30 +788,6 @@ EOD;
 			MockInitMethod::li3();
 		});
 	}
-
-	/**
-	 * @deprecated
-	 */
-	public function testPathTemplateWithGlobBrace() {
-		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
-
-		Libraries::paths([
-			'analysis' => [
-				'{:library}\analysis\*{Docblock,Debugger}',
-			],
-		]);
-
-		$analysis = list($docblock, $debugger) = Libraries::locate('analysis', null, [
-			'recursive' => false,
-			'format' => false,
-		]);
-
-		$this->assertCount(2, $analysis);
-		$this->assertPattern('/Docblock\.php/', $docblock);
-		$this->assertPattern('/Debugger\.php/', $debugger);
-
-		error_reporting($original);
-	}
 }
 
 ?>

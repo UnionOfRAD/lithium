@@ -960,21 +960,14 @@ class Libraries {
 		$suffix = ($options['suffix'] === null) ? $suffix : $options['suffix'];
 
 
-		$dFlags = GLOB_ONLYDIR;
-		$zFlags = 0;
-		if (strpos($path, '{') !== false) {
-			$message  = "Search path `{$path}` relies on brace globbing. ";
-			$message .= 'Support for brace globbing in search paths has been deprecated.';
-			trigger_error($message, E_USER_DEPRECATED);
-
-			$dFlags |= GLOB_BRACE;
-			$zFlags |= GLOB_BRACE;
-		}
-		$libs = (array) glob($path . $suffix, $options['namespaces'] ? $dFlags : $zFlags);
+		$libs = (array) glob($path . $suffix, $options['namespaces'] ? GLOB_ONLYDIR : 0);
 
 		if ($options['recursive']) {
 			list($current, $match) = explode('/*', $path, 2);
-			$queue = array_diff((array) glob($current . '/*', $dFlags), $libs);
+			$queue = array_diff(
+				(array) glob($current . '/*', GLOB_ONLYDIR),
+				$libs
+			);
 			$match = str_replace('##', '.+', preg_quote(str_replace('*', '##', $match), '/'));
 			$match = '/' . $match . preg_quote($suffix, '/') . '$/';
 
@@ -982,8 +975,14 @@ class Libraries {
 				if (!is_dir($dir = array_pop($queue))) {
 					continue;
 				}
-				$libs = array_merge($libs, (array) glob("{$dir}/*{$suffix}"));
-				$queue = array_merge($queue, array_diff((array) glob("{$dir}/*", $dFlags), $libs));
+				$libs = array_merge(
+					$libs,
+					(array) glob("{$dir}/*{$suffix}")
+				);
+				$queue = array_merge(
+					$queue,
+					array_diff((array) glob("{$dir}/*", GLOB_ONLYDIR), $libs)
+				);
 			}
 			$libs = preg_grep($match, $libs);
 		}
