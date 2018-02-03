@@ -1625,19 +1625,6 @@ class Unit extends \lithium\core\Object {
 				$this->_handleException($e);
 			}
 		});
-
-		foreach ($this->_expected as $expected) {
-			$this->_result('fail', compact('method') + [
-				'class' => get_class($this),
-				'message' => "Expected exception matching `{$expected}` uncaught.",
-				'data' => [],
-				'file' => null,
-				'line' => null,
-				'assertion' => 'expectException'
-			]);
-		}
-		$this->_expected = [];
-
 		try {
 			$this->tearDown();
 		} catch (Exception $e) {
@@ -1704,13 +1691,6 @@ class Unit extends \lithium\core\Object {
 	 */
 	protected function _reportException($exception, $lineFlag = null) {
 		$message = $exception['message'];
-
-		$isExpected = (($exp = end($this->_expected)) && ($exp === true || $exp === $message || (
-			Validator::isRegex($exp) && preg_match($exp, $message)
-		)));
-		if ($isExpected) {
-			return array_pop($this->_expected);
-		}
 		$initFrame = current($exception['trace']) + ['class' => '-', 'function' => '-'];
 
 		foreach ($exception['trace'] as $frame) {
