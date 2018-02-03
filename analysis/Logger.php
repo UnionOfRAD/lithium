@@ -121,18 +121,7 @@ class Logger extends \lithium\core\Adaptable {
 			$params = compact('priority', 'message', 'options');
 			$config = static::_config($name);
 
-			if (!empty($config['filters'])) {
-				$message  = 'Per adapter filters have been deprecated. Please ';
-				$message .= "filter the manager class' static methods instead.";
-				trigger_error($message, E_USER_DEPRECATED);
-
-				$r = Filters::bcRun(
-					get_called_class(), __FUNCTION__, $params, $method, $config['filters']
-				);
-			} else {
-				$r = Filters::run(get_called_class(), __FUNCTION__, $params, $method);
-			}
-			if (!$r) {
+			if (!Filters::run(get_called_class(), __FUNCTION__, $params, $method)) {
 				$result = false;
 			}
 		}

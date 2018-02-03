@@ -108,18 +108,7 @@ class Session extends \lithium\core\Adaptable {
 			}
 		}
 		$params = compact('key', 'options');
-
-		if (!empty($settings['filters'])) {
-			$message  = 'Per adapter filters have been deprecated. Please ';
-			$message .= "filter the manager class' static methods instead.";
-			trigger_error($message, E_USER_DEPRECATED);
-
-			$result = Filters::bcRun(
-				get_called_class(), __FUNCTION__, $params, $method, $settings['filters']
-			);
-		} else {
-			$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method);
-		}
+		$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method);
 
 		if ($options['strategies']) {
 			return static::applyStrategies(__FUNCTION__, $name, $result, $options + [
@@ -175,18 +164,7 @@ class Session extends \lithium\core\Adaptable {
 				]);
 			}
 			$params = compact('key', 'value', 'options');
-
-			if (!empty($settings['filters'])) {
-				$message  = 'Per adapter filters have been deprecated. Please ';
-				$message .= "filter the manager class' static methods instead.";
-				trigger_error($message, E_USER_DEPRECATED);
-
-				$result = Filters::bcRun(
-					get_called_class(), __FUNCTION__, $params, $method, $settings['filters']
-				) || $result;
-			} else {
-				$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method) || $result;
-			}
+			$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method) || $result;
 		}
 		return $result;
 	}
@@ -232,18 +210,7 @@ class Session extends \lithium\core\Adaptable {
 				]);
 			}
 			$params = compact('key', 'options');
-
-			if (!empty($settings['filters'])) {
-				$message  = 'Per adapter filters have been deprecated. Please ';
-				$message .= "filter the manager class' static methods instead.";
-				trigger_error($message, E_USER_DEPRECATED);
-
-				$result = Filters::bcRun(
-					get_called_class(), __FUNCTION__, $params, $method, $settings['filters']
-				) || $result;
-			} else {
-				$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method) || $result;
-			}
+			$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method) || $result;
 		}
 		return $result;
 	}
@@ -278,18 +245,7 @@ class Session extends \lithium\core\Adaptable {
 
 		foreach ($methods as $name => $method) {
 			$settings = static::_config($name);
-
-			if (!empty($settings['filters'])) {
-				$message  = 'Per adapter filters have been deprecated. Please ';
-				$message .= "filter the manager class' static methods instead.";
-				trigger_error($message, E_USER_DEPRECATED);
-
-				$result = Filters::bcRun(
-					get_called_class(), __FUNCTION__, $params, $method, $settings['filters']
-				) || $result;
-			} else {
-				$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method) || $result;
-			}
+			$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method) || $result;
 		}
 		if ($options['strategies']) {
 			$options += ['mode' => 'LIFO', 'class' => __CLASS__];
@@ -326,18 +282,7 @@ class Session extends \lithium\core\Adaptable {
 
 		foreach ($methods as $name => $method) {
 			$settings = static::_config($name);
-
-			if (!empty($settings['filters'])) {
-				$message  = 'Per adapter filters have been deprecated. Please ';
-				$message .= "filter the manager class' static methods instead.";
-				trigger_error($message, E_USER_DEPRECATED);
-
-				$result = Filters::bcRun(
-					get_called_class(), __FUNCTION__, $params, $method, $settings['filters']
-				) || $result;
-			} else {
-				$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method) || $result;
-			}
+			$result = Filters::run(get_called_class(), __FUNCTION__, $params, $method) || $result;
 		}
 		if ($options['strategies']) {
 			return static::applyStrategies(__FUNCTION__, $name, $result, $options + [

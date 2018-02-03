@@ -76,7 +76,7 @@ class AdaptableTest extends \lithium\test\Unit {
 	}
 
 	public function testConfigAndAdapter() {
-		$items = ['default' => ['adapter' => 'Memory', 'filters' => []]];
+		$items = ['default' => ['adapter' => 'Memory']];
 		MockAdaptable::config($items);
 		$config = MockAdaptable::config();
 

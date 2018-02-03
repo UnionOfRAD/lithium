@@ -14,6 +14,9 @@
 
 - Removed previously deprecated glob brace support in `Libraries`.
 
+- Removed previously deprecated per adapter filters.
+
+
 ## v1.2.0
 
 ### Added
