@@ -17,6 +17,7 @@
 	- The `String` class
 	- Long options like `--foo-bar` are now only made available as `fooBar` and
 	  not `foo-bar` after parsing in the console router.
+	- The test `Mocker` class
 
 ## v1.2.0
 
