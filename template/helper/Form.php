@@ -19,17 +19,20 @@ use lithium\util\Inflector;
  * the helper can pre-fill form input values, render error messages, and introspect column types.
  *
  * For example, assuming you have created a `Posts` model in your application:
+ *
+ * In controller code:
  * ```
- * // In controller code:
  * use app\models\Posts;
  * $post = Posts::find(1);
  * return compact('post');
+ * ```
  *
- * // In view code:
- * <?=$this->form->create($post); // Echoes a <form> tag and binds the helper to $post ?>
- * <?=$this->form->text('title'); // Echoes an <input /> element, pre-filled with $post's title ?>
- * <?=$this->form->submit('Update'); // Echoes a submit button with the title 'Update' ?>
- * <?=$this->form->end(); // Echoes a </form> tag & unbinds the form ?>
+ * In view code:
+ * ```
+ * <?= $this->form->create($post) ?> // Echoes a <form> tag and binds the helper to $post
+ * <?= $this->form->text('title') ?> // Echoes an <input /> element, pre-filled with $post's title
+ * <?= $this->form->submit('Update') ?> // Echoes a submit button with the title 'Update'
+ * <?= $this->form->end() ?> // Echoes a </form> tag & unbinds the form
  * ```
  */
 class Form extends \lithium\template\Helper {
@@ -436,7 +439,7 @@ class Form extends \lithium\template\Helper {
 	 *          parameters. By default, the label text is a human-friendly version of `$name`.
 	 *          However, you can specify the label manually as a string, or both the label
 	 *          text and options as an array, i.e.:
-	 *          `array('Your Label Title' => ['class' => 'foo', 'other' => 'options'])`.
+	 *          `['Your Label Title' => ['class' => 'foo', 'other' => 'options']]`.
 	 *        - `'type'` _string_: The type of form field to render. Available default options
 	 *          are: `'text'`, `'textarea'`, `'select'`, `'checkbox'`, `'password'` or
 	 *          `'hidden'`, as well as any arbitrary type (i.e. HTML5 form fields).

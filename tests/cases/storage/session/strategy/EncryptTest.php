@@ -14,23 +14,15 @@ use lithium\tests\mocks\storage\session\strategy\MockCookieSession;
 
 class EncryptTest extends \lithium\test\Unit {
 
-	public $secret = 'foobar';
+	public $mock = 'lithium\tests\mocks\storage\session\strategy\MockCookieSession';
 
-	/**
-	 * Skip the test if the mcrypt extension is unavailable.
-	 */
 	public function skip() {
-		$this->skipIf(!Encrypt::enabled(), 'The Mcrypt extension is not installed or enabled.');
+		$this->skipIf(!Encrypt::enabled(), 'The `Encrypt` strategy is not enabled.');
+		$this->skipIf(!extension_loaded('openssl'), '`openssl` extension not loaded.');
 	}
 
 	public function setUp() {
-		error_reporting(($this->_backup = error_reporting()) & ~E_DEPRECATED);
-		$this->mock = 'lithium\tests\mocks\storage\session\strategy\MockCookieSession';
 		MockCookieSession::reset();
-	}
-
-	public function tearDown() {
-		error_reporting($this->_backup);
 	}
 
 	public function testConstructException() {
@@ -44,62 +36,42 @@ class EncryptTest extends \lithium\test\Unit {
 	}
 
 	public function testConstruct() {
-		$encrypt = new Encrypt(['secret' => $this->secret]);
+		$encrypt = new Encrypt(['secret' => str_repeat('a', 32)]);
 		$this->assertInstanceOf('lithium\storage\session\strategy\Encrypt', $encrypt);
 	}
 
-	public function testWrite() {
-		$encrypt = new Encrypt(['secret' => $this->secret]);
+	public function testReadWriteSymmetry() {
+		$encrypt = new Encrypt(['secret' => str_repeat('a', 32)]);
 
-		$key = 'fookey';
-		$value = 'barvalue';
+		$encrypted = $encrypt->write('foo', ['class' => $this->mock, 'key' => 'fookey']);
+		$decrypted = $encrypt->read($encrypted, ['class' => $this->mock, 'key' => 'fookey']);
 
-		$result = $encrypt->write($value, ['class' => $this->mock, 'key' => $key]);
-		$cookie = MockCookieSession::data();
-
-		$this->assertNotEmpty($result);
-		$this->assertNotEmpty($cookie['__encrypted']);
-		$this->assertInternalType('string', $cookie['__encrypted']);
-		$this->assertNotEqual($cookie['__encrypted'], $value);
+		$this->assertEqual('foo', $decrypted);
 	}
 
-	public function testRead() {
-		$encrypt = new Encrypt(['secret' => $this->secret]);
+	/* Deprecated / BC */
+
+	public function testMigrateExistingFromMcryptToOpenssl() {
+		$this->skipIf(!extension_loaded('mcrypt'), '`mcrypt` extension not loaded.');
+
+		error_reporting(($this->_backup = error_reporting()) & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
+		$new = new Encrypt(['secret' => str_repeat('a', 32)]);
+		$old = new Encrypt([
+			'secret' => str_repeat('a', 32),
+			'cipher' => MCRYPT_RIJNDAEL_128,
+			'mode' => MCRYPT_MODE_CBC
+		]);
 
 		$key = 'fookey';
 		$value = 'barvalue';
 
-		$result = $encrypt->write($value, ['class' => $this->mock, 'key' => $key]);
-		$this->assertNotEmpty($result);
+		$encrypted = $old->write($value, ['class' => $this->mock, 'key' => $key]);
+		$decrypted = $new->read($encrypted, ['class' => $this->mock, 'key' => $key]);
+		$this->assertEqual($value, $decrypted);
 
-		$cookie = MockCookieSession::data();
-		$result = $encrypt->read($key, ['class' => $this->mock, 'key' => $key]);
-
-		$this->assertEqual($value, $result);
-		$this->assertNotEqual($cookie['__encrypted'], $result);
-	}
-
-	public function testDelete() {
-		$encrypt = new Encrypt(['secret' => $this->secret]);
-
-		$key = 'fookey';
-		$value = 'barvalue';
-
-		$result = $encrypt->write($value, ['class' => $this->mock, 'key' => $key]);
-		$this->assertNotEmpty($result);
-
-		$cookie = MockCookieSession::data();
-		$result = $encrypt->read($key, ['class' => $this->mock, 'key' => $key]);
-
-		$this->assertEqual($value, $result);
-
-		$result = $encrypt->delete($key, ['class' => $this->mock, 'key' => $key]);
-
-		$cookie = MockCookieSession::data();
-		$this->assertEmpty($cookie['__encrypted']);
-
-		$result = $encrypt->read($key, ['class' => $this->mock]);
-		$this->assertEmpty($result);
+		unset($old);
+		error_reporting($this->_backup);
 	}
 }
 
