@@ -4,6 +4,12 @@
 
 ### Changed
 
+- The `Mongo` data source adapter has been updated to work with the `mongodb` extension
+  instead of the old `mongo` extension. This brings back full li₃ support for MongoDB 
+  on PHP 7.x. Due to how the new extension works, we do not support GridFS through the 
+  adapter anymore. You can still access GridFS using the underlying connection object. 
+  (Simon Jaillet) 
+
 - Removed deprecated functionality: magic download header in action response, unit testing's
   expectException method. (David Persson) 
 
