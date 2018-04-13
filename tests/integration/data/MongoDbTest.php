@@ -9,7 +9,6 @@
 
 namespace lithium\tests\integration\data;
 
-use MongoId;
 use lithium\core\Libraries;
 use lithium\data\Connections;
 use lithium\data\model\Query;
@@ -65,7 +64,7 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 	public function testInsert() {
 		$image = Images::create(['title' => 'Post Title']);
 		$this->assertIdentical(true, $image->save());
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $image->_id);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $image->_id);
 
 		$persisted = Images::first($image->_id);
 		$this->assertEqual([

@@ -9,7 +9,6 @@
 
 namespace lithium\data\source\mongo_db;
 
-use MongoGridFSFile;
 use IteratorIterator;
 
 /**
@@ -20,7 +19,12 @@ use IteratorIterator;
  */
 class Result extends \lithium\data\source\Result {
 
-	protected $_it = null;
+	/**
+	 * internal (sub)iterator
+	 *
+	 * @var IteratorIterator
+	 */
+	protected $_subIterator = null;
 
 	/**
 	 * Fetches the next result from the resource.
@@ -32,16 +36,16 @@ class Result extends \lithium\data\source\Result {
 		if (!$this->_resource) {
 			return false;
 		}
-		if (!$this->_it) {
+		if (!$this->_subIterator) {
 			$this->_resource->setTypeMap(['root' => 'array', 'document' => 'array']);
-			$this->_it = new IteratorIterator($this->_resource);
-			$this->_it->rewind();
+			$this->_subIterator = new IteratorIterator($this->_resource);
+			$this->_subIterator->rewind();
 		}
-		if (!$this->_it->valid()) {
+		if (!$this->_subIterator->valid()) {
 			return;
 		}
-		$result = $this->_it->current();
-		$this->_it->next();
+		$result = $this->_subIterator->current();
+		$this->_subIterator->next();
 
 		return [$this->_iterator, $result];
 	}

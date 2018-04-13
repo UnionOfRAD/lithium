@@ -8,12 +8,12 @@
   instead of the old `mongo` extension. This brings back full li₃ support for MongoDB 
   on PHP 7.x. Due to how the new extension works, we do not support GridFS through the 
   adapter anymore. You can still access GridFS using the underlying connection object. 
-  (Simon Jaillet) 
+  (Simon Jaillet, Dirk Brünsicke)
 
 - Removed deprecated functionality: magic download header in action response, unit testing's
   expectException method. (David Persson) 
 
-- ConfigExceptions (thrown when accessing non exsitent configurations) are now allowed to 
+- ConfigExceptions (thrown when accessing non existent configurations) are now allowed to 
   bubble up in `Cache`.
 
 - The following previously deprecated things have been removed:

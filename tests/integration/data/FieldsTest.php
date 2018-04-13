@@ -103,7 +103,6 @@ class FieldsTest extends \lithium\tests\integration\data\Base {
 			'conditions' => [$key => $id],
 			'fields' => [$key, 'name']
 		]);
-
 		$this->assertEqual($entity->name, 'Celebrities');
 		$new->delete();
 	}

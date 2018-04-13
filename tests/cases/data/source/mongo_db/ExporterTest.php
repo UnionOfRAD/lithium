@@ -9,7 +9,7 @@
 
 namespace lithium\tests\cases\data\source\mongo_db;
 
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\BSON\Javascript;
 use MongoDB\BSON\Regex;
@@ -32,12 +32,12 @@ class ExporterTest extends \lithium\test\Unit {
 		'guid' => ['type' => 'id'],
 		'title' => ['type' => 'string'],
 		'tags' => ['type' => 'string', 'array' => true],
-		'comments' => ['type' => 'MongoDB\BSON\ObjectID'],
+		'comments' => ['type' => 'MongoDB\BSON\ObjectId'],
 		'accounts' => ['type' => 'object', 'array' => true],
 		'accounts._id' => ['type' => 'id'],
 		'accounts.name' => ['type' => 'string'],
 		'accounts.created' => ['type' => 'date'],
-		'authors' => ['type' => 'MongoDB\BSON\ObjectID', 'array' => true],
+		'authors' => ['type' => 'MongoDB\BSON\ObjectId', 'array' => true],
 		'created' => ['type' => 'MongoDB\BSON\UTCDateTime'],
 		'modified' => ['type' => 'datetime'],
 		'voters' => ['type' => 'id', 'array' => true],
@@ -57,7 +57,7 @@ class ExporterTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_handlers = [
 			'id' => function($v) {
-				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new ObjectID($v) : $v;
+				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new ObjectId($v) : $v;
 			},
 			'date' => function($v) {
 				$v = is_numeric($v) ? (integer) $v : strtotime($v);
@@ -89,7 +89,7 @@ class ExporterTest extends \lithium\test\Unit {
 	public function testCreateWithFixedData() {
 		$time = time();
 		$doc = new Document(['exists' => false, 'data' => [
-			'_id' => new ObjectID(),
+			'_id' => new ObjectId(),
 			'created' => new UTCDateTime($time * 1000),
 			'numbers' => new DocumentSet(['data' => [7, 8, 9]]),
 			'objects' => new DocumentSet(['data' => [
@@ -99,10 +99,10 @@ class ExporterTest extends \lithium\test\Unit {
 			'deeply' => new Document(['data' => ['nested' => 'object']])
 		]]);
 		$this->assertEqual('object', $doc->deeply->nested);
-		$this->assertTrue($doc->_id instanceof ObjectID);
+		$this->assertTrue($doc->_id instanceof ObjectId);
 
 		$result = Exporter::get('create', $doc->export());
-		$this->assertTrue($result['create']['_id'] instanceof ObjectID);
+		$this->assertTrue($result['create']['_id'] instanceof ObjectId);
 		$this->assertTrue($result['create']['created'] instanceof UTCDateTime);
 		$this->assertIdentical($time, $result['create']['created']->toDateTime()->getTimestamp());
 
@@ -349,15 +349,15 @@ class ExporterTest extends \lithium\test\Unit {
 		$schema = new Schema(['fields' => $this->_schema]);
 		$result = $schema->cast(null, null, $data, $options);
 		$this->assertEqual(array_keys($data), array_keys($result->data()));
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result->_id);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result->_id);
 		$this->assertEqual('4c8f86167675abfabd970300', (string) $result->_id);
 
 		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $result->comments);
 		$this->assertCount(3, $result['comments']);
 
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result->comments[0]);
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result->comments[1]);
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result->comments[2]);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result->comments[0]);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result->comments[1]);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result->comments[2]);
 		$this->assertEqual('4c8f86167675abfabdbe0300', (string) $result->comments[0]);
 		$this->assertEqual('4c8f86167675abfabdbf0300', (string) $result->comments[1]);
 		$this->assertEqual('4c8f86167675abfabdc00300', (string) $result->comments[2]);
@@ -365,7 +365,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertEqual($data['comments'], $result->comments->data());
 		$this->assertEqual(['test'], $result->tags->data());
 		$this->assertEqual(['4c8f86167675abfabdb00300'], $result->authors->data());
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result->authors[0]);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result->authors[0]);
 
 		$this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $result->modified);
 		$this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $result->created);
@@ -407,7 +407,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$result = $schema->cast(null, null, $data, $options);
 
 		$this->assertEqual(array_keys($data), array_keys($result->data()));
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result->_id);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result->_id);
 		$this->assertEqual('4c8f86167675abfabd970300', (string) $result->_id);
 
 		$this->assertInstanceOf('lithium\data\collection\DocumentSet', $result->accounts);
@@ -415,9 +415,9 @@ class ExporterTest extends \lithium\test\Unit {
 
 		$id1 = '4fb6e2dd3e91581fe6e75736';
 		$id2 = '4fb6e2df3e91581fe6e75737';
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result->accounts[$id1]['_id']);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result->accounts[$id1]['_id']);
 		$this->assertEqual($id1, (string) $result->accounts[$id1]['_id']);
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result->accounts[$id2]['_id']);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result->accounts[$id2]['_id']);
 		$this->assertEqual($id2, (string) $result->accounts[$id2]['_id']);
 
 		$this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $result->accounts[$id1]['created']);
@@ -463,7 +463,7 @@ class ExporterTest extends \lithium\test\Unit {
 	public function testArrayConversion() {
 		$time = time();
 		$doc = new Document(['data' => [
-			'_id' => new ObjectID(),
+			'_id' => new ObjectId(),
 			'date' => new UTCDateTime($time * 1000)
 		]]);
 		$result = $doc->data();
@@ -596,13 +596,13 @@ class ExporterTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests the casting of ObjectIDs in nested arrays.
+	 * Tests the casting of ObjectIds in nested arrays.
 	 */
-	public function testNestedArrayObjectIDCasting() {
+	public function testNestedArrayObjectIdCasting() {
 
-		$articleOneId = new ObjectID();
-		$bookOneId = new ObjectID();
-		$bookTwoId = new ObjectID();
+		$articleOneId = new ObjectId();
+		$bookOneId = new ObjectId();
+		$bookTwoId = new ObjectId();
 		$data = [
 			'_id' => '4c8f86167675abfabd970300',
 			'title' => 'Foo',
@@ -626,36 +626,36 @@ class ExporterTest extends \lithium\test\Unit {
 		$options = compact('model', 'handlers');
 
 		$schema = new Schema(['fields' => [
-			'_id' => ['type' => 'MongoDB\BSON\ObjectID'],
+			'_id' => ['type' => 'MongoDB\BSON\ObjectId'],
 			'title' => ['type' => 'text'],
 			'similar_text' => ['type' => 'array'],
-			'similar_text.articles' => ['type' => 'MongoDB\BSON\ObjectID', 'array' => true],
-			'similar_text.books' => ['type' => 'MongoDB\BSON\ObjectID', 'array' => true],
-			'similar_text.magazines' => ['type' => 'MongoDB\BSON\ObjectID', 'array' => true]
+			'similar_text.articles' => ['type' => 'MongoDB\BSON\ObjectId', 'array' => true],
+			'similar_text.books' => ['type' => 'MongoDB\BSON\ObjectId', 'array' => true],
+			'similar_text.magazines' => ['type' => 'MongoDB\BSON\ObjectId', 'array' => true]
 		]]);
 		$result = $schema->cast(null, null, $data, $options);
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result['similar_text']['articles'][0]);
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result['similar_text']['books'][0]);
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result['similar_text']['books'][1]);
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result['similar_text']['magazines'][0]);
-		$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result['similar_text']['magazines'][1]);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result['similar_text']['articles'][0]);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result['similar_text']['books'][0]);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result['similar_text']['books'][1]);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result['similar_text']['magazines'][0]);
+		$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result['similar_text']['magazines'][1]);
 	}
 
 	/**
-	 * Tests that updating arrays of `ObjectID`s correctly preserves their type.
+	 * Tests that updating arrays of `ObjectId`s correctly preserves their type.
 	 */
-	public function testUpdatingObjectIDArray() {
+	public function testUpdatingObjectIdArray() {
 		$schema = new Schema(['fields' => [
 			'list' => ['type' => 'id', 'array' => true]
 		]]);
 
 		$doc = new Document(['exists' => true, 'data' => [
-			'list' => [new ObjectID(), new ObjectID(), new ObjectID()]
+			'list' => [new ObjectId(), new ObjectId(), new ObjectId()]
 		]]);
 		$this->assertEqual([], Exporter::get('update', $doc->export()));
 
-		$doc->list[] = new ObjectID();
-		$doc->list[] = new ObjectID();
+		$doc->list[] = new ObjectId();
+		$doc->list[] = new ObjectId();
 		$result = Exporter::get('update', $doc->export());
 
 		$this->assertCount(1, $result);
@@ -663,13 +663,13 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertCount(5, $result['update']['list']);
 
 		for ($i = 0; $i < 5; $i++) {
-			$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result['update']['list'][$i]);
+			$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result['update']['list'][$i]);
 		}
 
 		$doc = new Document(['exists' => true, 'data' => [
-			'list' => [new ObjectID(), new ObjectID(), new ObjectID()]
+			'list' => [new ObjectId(), new ObjectId(), new ObjectId()]
 		]]);
-		$doc->list = [new ObjectID(), new ObjectID(), new ObjectID()];
+		$doc->list = [new ObjectId(), new ObjectId(), new ObjectId()];
 		$result = Exporter::get('update', $doc->export());
 
 		$this->assertCount(1, $result);
@@ -677,7 +677,7 @@ class ExporterTest extends \lithium\test\Unit {
 		$this->assertCount(3, $result['update']['list']);
 
 		for ($i = 0; $i < 3; $i++) {
-			$this->assertInstanceOf('MongoDB\BSON\ObjectID', $result['update']['list'][$i]);
+			$this->assertInstanceOf('MongoDB\BSON\ObjectId', $result['update']['list'][$i]);
 		}
 	}
 

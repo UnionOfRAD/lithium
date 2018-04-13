@@ -9,8 +9,6 @@
 
 namespace lithium\tests\mocks\data\source;
 
-use MongoId;
-
 class MockMongoManager {
 
 	public $queries = [];

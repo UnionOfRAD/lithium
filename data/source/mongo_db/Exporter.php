@@ -19,11 +19,11 @@ class Exporter extends \lithium\core\StaticObject {
 	];
 
 	protected static $_commands = [
-		'create'    => null,
-		'update'    => '$set',
+		'create' => null,
+		'update' => '$set',
 		'increment' => '$inc',
-		'remove'    => '$unset',
-		'rename'    => '$rename'
+		'remove' => '$unset',
+		'rename' => '$rename'
 	];
 
 	public static function get($type, $export, array $options = []) {
@@ -116,7 +116,7 @@ class Exporter extends \lithium\core\StaticObject {
 				'indexed' => null,
 				'handlers' => [
 					'MongoDB\BSON\UTCDateTime' => function($value) { return $value; },
-					'MongoDB\BSON\ObjectID' => function($value) { return $value; }
+					'MongoDB\BSON\ObjectId' => function($value) { return $value; }
 				]
 			];
 

@@ -5,6 +5,7 @@
 # code is distributed under the terms of the BSD 3-Clause License.
 # The full license text can be found in the LICENSE.txt file.
 #
+
 sudo: false
 language: php
 
@@ -16,7 +17,7 @@ services:
 addons:
   apt:
     sources:
-      - mongodb-3.4-precise
+      - mongodb-3.4-trusty
     packages:
       - mongodb-org-server
 
@@ -41,10 +42,6 @@ matrix:
     - php: nightly
       env: PHP_EXT=memcached TESTS=all
   allow_failures:
-    - php: 7.0
-      env: DB=mongodb PHP_EXT=mongodb TESTS=data
-    - php: 7.1
-      env: DB=mongodb PHP_EXT=mongodb TESTS=data
     - php: nightly
       env: PHP_EXT=memcached TESTS=all
   # Mark build as failed as soon as one job failed.
@@ -62,7 +59,7 @@ before_script:
   - php libraries/lithium/tests/ci/depends.php
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database lithium_test; create database lithium_test_alternative;'; fi"
   - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'create database lithium_test;' -U postgres; psql -c 'create database lithium_test_alternative;' -U postgres; fi"
-  - sh -c "if [ '$DB' = 'mongodb' ]; mongod --version; fi"
+  - sh -c "if [ '$DB' = 'mongodb' ]; then mongod --version; fi"
 
 script:
   # Run all tests.

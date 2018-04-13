@@ -9,9 +9,10 @@
 
 namespace lithium\data\source;
 
+use stdClass;
 use Exception;
 use MongoDB\Driver\Exception\BulkWriteException;
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Javascript;
 use MongoDB\BSON\Regex;
 use MongoDB\Driver\Query;
@@ -23,6 +24,7 @@ use MongoDB\Driver\Command;
 use lithium\aop\Filters;
 use lithium\util\Set;
 use lithium\util\Inflector;
+use lithium\core\ConfigException;
 use lithium\core\NetworkException;
 use lithium\net\HostString;
 
@@ -37,22 +39,47 @@ use lithium\net\HostString;
  *
  * After installing MongoDB, you can connect to it as follows:
  * ```
- * // config/bootstrap/connections.php:
- * Connections::add('default', ['type' => 'MongoDb', 'database' => 'myDb']);
+ * Connections::add('default', [
+ *     'type' => 'MongoDb',
+ *     'database' => 'my_app',
+ *     'host' => 'example.org:27017',
+ *     'uriOptions' => ['replicaSet' => 'Cluster0'],
+ * ]);
+ * ```
+ *
+ * Or with multiple hosts:
+ * ```
+ *     'host' => [host1:27017, host2:27018]
+ * ]);
+ * ```
+ *
+ * Or using a DSN:
+ * ```
+ * Connections::add('default', [
+ *     'type' => 'MongoDb',
+ *     'dsn' => 'mongodb://c0-s1.mongodb.net:27017,c0-s2.mongodb.net:27017/my_app?replicaSet=rs1',
+ * ]);
+ * ```
+ *
+ * Specifiyng a cluster works with MongoDB 3.6 and above, too:
+ * ```
+ *     'dsn' => 'mongodb+srv://cluster0-my_app.mongodb.net/my_app',
+ * ]);
  * ```
  *
  * By default, it will attempt to connect to a Mongo instance running on `localhost` on port
- * 27017. See `__construct()` for details on the accepted configuration settings.
+ * 27017. See the MongoDB documentation for details on the accepted configuration settings.
  *
  * This adapter is officially supported on PHP 7, where it simply needs the `mongodb`
- * extension.
+ * extension. MongoDB 3.4 and up is required, versions lower than this might work,
+ * but are not supported or tested.
  *
  * @see lithium\data\entity\Document
  * @see lithium\data\Connections::add()
- * @see lithium\data\source\MongoDb::__construct()
+ * @link https://secure.php.net/manual/en/mongodb-driver-manager.construct.php
+ * @link https://docs.mongodb.com/manual/reference/connection-string/#connections-connection-options
  * @link https://pecl.php.net/package/mongodb
  * @link http://www.mongodb.org/
- * @link https://github.com/alcaeus/mongo-php-adapter
  */
 class MongoDb extends \lithium\data\Source {
 
@@ -71,7 +98,7 @@ class MongoDb extends \lithium\data\Source {
 	 *
 	 * @var object
 	 */
-	public $server = null;
+	public $manager = null;
 
 	/**
 	 * Classes used by this class.
@@ -79,13 +106,13 @@ class MongoDb extends \lithium\data\Source {
 	 * @var array
 	 */
 	protected $_classes = [
-		'entity'       => 'lithium\data\entity\Document',
-		'set'          => 'lithium\data\collection\DocumentSet',
-		'result'       => 'lithium\data\source\mongo_db\Result',
-		'schema'       => 'lithium\data\source\mongo_db\Schema',
-		'exporter'     => 'lithium\data\source\mongo_db\Exporter',
+		'entity' => 'lithium\data\entity\Document',
+		'set' => 'lithium\data\collection\DocumentSet',
+		'result' => 'lithium\data\source\mongo_db\Result',
+		'schema' => 'lithium\data\source\mongo_db\Schema',
+		'exporter' => 'lithium\data\source\mongo_db\Exporter',
 		'relationship' => 'lithium\data\model\Relationship',
-		'server'       => 'MongoDB\Driver\Manager'
+		'manager' => 'MongoDB\Driver\Manager'
 	];
 
 	/**
@@ -94,18 +121,18 @@ class MongoDb extends \lithium\data\Source {
 	 * @var array Keys are SQL-like operators, value is the MongoDB equivalent.
 	 */
 	protected $_operators = [
-		'<'   => '$lt',
-		'>'   => '$gt',
-		'<='  => '$lte',
-		'>='  => '$gte',
-		'!='  => ['single' => '$ne', 'multiple' => '$nin'],
-		'<>'  => ['single' => '$ne', 'multiple' => '$nin'],
-		'or'  => '$or',
-		'||'  => '$or',
+		'<' => '$lt',
+		'>' => '$gt',
+		'<=' => '$lte',
+		'>=' => '$gte',
+		'!=' => ['single' => '$ne', 'multiple' => '$nin'],
+		'<>' => ['single' => '$ne', 'multiple' => '$nin'],
+		'or' => '$or',
+		'||' => '$or',
 		'not' => '$not',
-		'!'   => '$not',
+		'!' => '$not',
 		'and' => '$and',
-		'&&'  => '$and',
+		'&&' => '$and',
 		'nor' => '$nor'
 	];
 
@@ -152,9 +179,9 @@ class MongoDb extends \lithium\data\Source {
 	 * ];
 	 * ```
 	 *
-	 * The tyes in the schema map to database native type like this:
+	 * The types in the schema map to database native type like this:
 	 * ```
-	 *  id      => MongoDB\BSON\ObjectID
+	 *  id      => MongoDB\BSON\ObjectId
 	 *  date    => MongoDB\BSON\UTCDateTime
 	 *  regex   => MongoDB\BSON\Regex
 	 *  integer => integer
@@ -229,46 +256,23 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function __construct(array $config = []) {
 		$defaults = [
-			'host'               => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT,
-			'login'              => null,
-			'password'           => null,
-			'database'           => null,
-			'timeout'            => 100,
-			'schema'             => null,
-			'uriOptions'            => [
-				'replicaSet'               => null,
-				'ssl'                      => null,
-				'connectTimeoutMS'         => null,
-				'socketTimeoutMS'          => null,
-				'maxPoolSize'              => null,
-				'minPoolSize'              => null,
-				'maxIdleTimeMS'            => null,
-				'waitQueueMultiple'        => null,
-				'waitQueueTimeoutMS'       => null,
-				'w'                        => WriteConcern::MAJORITY,
-				'wTimeoutMS'               => 10000,
-				'journal'                  => true,
-				'readConcernLevel'         => ReadConcern::LOCAL,
-				'readPreference'           => ReadPreference::RP_PRIMARY,
-				'readPreferenceTags'       => [],
-				'authSource'               => null,
-				'authMechanism'            => null,
-				'gssapiServiceName'        => null,
-				'localThresholdMS'         => null,
-				'serverSelectionTimeoutMS' => null,
-				'serverSelectionTryOnce'   => null,
-				'heartbeatFrequencyMS'     => null,
-				'uuidRepresentation'       => null
+			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT,
+			'login' => null,
+			'password' => null,
+			'database' => null,
+			'dsn' => null,
+			'timeout' => 1000,
+			'uriOptions' => [
+				'w' => 'majority',
+				'wTimeoutMS' => 10000,
+				'journal' => true,
+				'readConcernLevel' => 'local',
+				'readPreference' => 'primary',
+				'readPreferenceTags' => [],
 			],
 			'driverOptions' => [
 				'allow_invalid_hostname' => false,
-				'ca_dir'                 => null,
-				'ca_file'                => null,
-				'crl_file'               => null,
-				'pem_file'               => null,
-				'pem_pwd'                => null,
-				'context'                => null,
-				'weak_cert_validation'   => false
+				'weak_cert_validation' => false
 			]
 		];
 		$config = Set::merge($defaults, $config);
@@ -280,7 +284,7 @@ class MongoDb extends \lithium\data\Source {
 
 	/**
 	 * Initializer. Adds operator handlers which will later allow to correctly cast any
-	 * values. Constructs a DSN from configuration.
+	 * values. Constructs a DSN from configuration, if not given.
 	 *
 	 * @see lithium\data\source\MongoDb::$_operators
 	 * @see lithium\data\source\MongoDb::_operators()
@@ -289,37 +293,45 @@ class MongoDb extends \lithium\data\Source {
 	protected function _init() {
 		parent::_init();
 
-		$hosts = [];
-		foreach ((array) $this->_config['host'] as $host) {
-			$host = HostString::parse($host) + [
-				'host' => static::DEFAULT_HOST,
-				'port' => static::DEFAULT_PORT
-			];
-			$hosts[] = "{$host['host']}:{$host['port']}";
-		}
-		if ($this->_config['login']) {
-			$this->_config['dsn'] = sprintf(
-				'mongodb://%s:%s@%s/%s',
-				$this->_config['login'],
-				$this->_config['password'],
-				implode(',', $hosts),
-				$this->_config['database']
-			);
-		} else {
-			$this->_config['dsn'] = sprintf(
-				'mongodb://%s',
-				implode(',', $hosts)
-			);
+		if (is_string($this->_config['host']) && stristr($this->_config['host'], '://')) {
+			$this->_config['dsn'] = $this->_config['host'];
 		}
 
-		$server = $this->_classes['server'];
+		switch (true) {
+			case (!empty($this->_config['dsn'])):
+				$connectionConfig = $this->_parseConnectionString($this->_config['dsn']);
+				$this->_config = Set::merge($this->_config, $connectionConfig);
+				break;
+			case (!$this->_config['host']):
+				throw new ConfigException('No host configured.');
+			default:
+				$hosts = [];
+				foreach ((array) $this->_config['host'] as $host) {
+					$host = HostString::parse($host) + [
+						'host' => static::DEFAULT_HOST,
+						'port' => static::DEFAULT_PORT
+					];
+					$hosts[] = "{$host['host']}:{$host['port']}";
+				}
+				if ((!$this->_config['login'])) {
+					$this->_config['dsn'] = sprintf('mongodb://%s', implode(',', $hosts));
+				} else {
+					$this->_config['dsn'] = sprintf(
+						'mongodb://%s:%s@%s/%s',
+						$this->_config['login'],
+						$this->_config['password'],
+						implode(',', $hosts),
+						$this->_config['database']
+					);
+				}
+		}
 
-		$notNull = function($value){
-			return $value !== null;
-		};
-		$uriOptions = array_filter($this->_config['uriOptions'], $notNull);
-		$driverOptions = array_filter($this->_config['driverOptions'], $notNull);
-		$this->server = new $server($this->_config['dsn'], $uriOptions, $driverOptions);
+		$manager = $this->_classes['manager'];
+		$this->manager = new $manager(
+			$this->_config['dsn'],
+			$this->_config['uriOptions'],
+			$this->_config['driverOptions']
+		);
 
 		$this->_operators += [
 			'like' => function($key, $value) {
@@ -360,15 +372,6 @@ class MongoDb extends \lithium\data\Source {
 	}
 
 	/**
-	 * Destructor. Ensures that the server connection is closed and resources are freed when
-	 * the adapter instance is destroyed.
-	 *
-	 * @return void
-	 */
-	public function __destruct() {
-	}
-
-	/**
 	 * Configures a model class by overriding the default dependencies for `'set'` and
 	 * `'entity'` , and sets the primary key to `'_id'`, in keeping with Mongo's conventions.
 	 *
@@ -392,8 +395,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean Returns `true`.
 	 */
 	public function connect() {
-		$this->_isConnected = true;
-		return true;
+		return $this->_isConnected = true;
 	}
 
 	/**
@@ -402,7 +404,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean Returns `true`.
 	 */
 	public function disconnect() {
-		unset($this->server);
+		unset($this->manager);
 		return true;
 	}
 
@@ -413,7 +415,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return array Returns an array of objects to which models can connect.
 	 */
 	public function sources($class = null) {
-		$collections = $this->server->executeCommand($this->_config['database'], new Command(['listCollections' => 1]));
+		$collections = $this->manager->executeCommand($this->_config['database'], new Command(['listCollections' => 1]));
 		$names = [];
 		foreach ($collections as $collection) {
 			$names[] = $collection->name;
@@ -466,7 +468,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return mixed The return value of the native method specified in `$method`.
 	 */
 	public function __call($method, $params) {
-		return call_user_func_array([$this->server, $method], $params);
+		return call_user_func_array([$this->manager, $method], $params);
 	}
 
 	/**
@@ -479,7 +481,7 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
-		$childRespondsTo = is_object($this->server) && is_callable([$this->server, $method]);
+		$childRespondsTo = is_object($this->manager) && is_callable([$this->manager, $method]);
 		return parent::respondsTo($method, $internal) || $childRespondsTo;
 	}
 
@@ -507,10 +509,10 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function create($query, array $options = []) {
 		$defaults = [
-			'ordered'    => true,
-			'w'          => $this->_config['uriOptions']['w'],
+			'ordered' => true,
+			'w' => $this->_config['uriOptions']['w'],
 			'wTimeoutMS' => $this->_config['uriOptions']['wTimeoutMS'],
-			'journal'    => $this->_config['uriOptions']['journal']
+			'journal' => $this->_config['uriOptions']['journal']
 		];
 		$options += $defaults;
 
@@ -519,20 +521,20 @@ class MongoDb extends \lithium\data\Source {
 		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$exporter = $this->_classes['exporter'];
 
-			$query   = $params['query'];
+			$query = $params['query'];
 			$options = $params['options'];
 
-			$args    = $query->export($this, ['keys' => ['source', 'data']]);
-			$data    = $exporter::get('create', $args['data']);
-			$source  = $args['source'];
+			$args = $query->export($this, ['keys' => ['source', 'data']]);
+			$data = $exporter::get('create', $args['data']);
+			$source = $args['source'];
 
 			$insertQuery = new BulkWrite(['ordered' => $options['ordered']]);
-			$data['create']['_id'] = empty($data['create']['_id']) ? new ObjectID() : $data['create']['_id'];
+			$data['create']['_id'] = empty($data['create']['_id']) ? new ObjectId() : $data['create']['_id'];
 			$insertQuery->insert($data['create']);
 
 			try {
 				$writeConcern = new WriteConcern($options['w'], $options['wTimeoutMS'], $options['journal']);
-				$this->server->executeBulkWrite("{$this->_config['database']}.{$source}", $insertQuery, $writeConcern);
+				$this->manager->executeBulkWrite("{$this->_config['database']}.{$source}", $insertQuery, $writeConcern);
 
 				if ($query->entity()) {
 					$query->entity()->sync($data['create']['_id']);
@@ -554,9 +556,9 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function read($query, array $options = []) {
 		$defaults = [
-			'readPreference'     => $this->_config['uriOptions']['readPreference'],
+			'readPreference' => $this->_config['uriOptions']['readPreference'],
 			'readPreferenceTags' => $this->_config['uriOptions']['readPreferenceTags'],
-			'return'             => 'resource'
+			'return' => 'resource'
 		];
 		$options += $defaults;
 
@@ -577,13 +579,13 @@ class MongoDb extends \lithium\data\Source {
 
 			$readQuery = new Query($args['conditions'], [
 				'projection' => $args['fields'],
-				'sort'  => $args['order'],
+				'sort' => $args['order'],
 				'limit' => $args['limit'],
-				'skip'  => $args['offset']
+				'skip' => $args['offset']
 			]);
 
 			$readPreference = new ReadPreference($options['readPreference'], $options['readPreferenceTags']);
-			$resource = $this->server->executeQuery("{$this->_config['database']}.{$source}", $readQuery, $readPreference);
+			$resource = $this->manager->executeQuery("{$this->_config['database']}.{$source}", $readQuery, $readPreference);
 
 			$result = $this->_instance('result', compact('resource'));
 			$config = compact('result', 'query') + ['class' => 'set', 'defaults' => false];
@@ -617,12 +619,12 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function update($query, array $options = []) {
 		$defaults = [
-			'ordered'    => true,
-			'multiple'   => true,
-			'upsert'     => false,
-			'w'          => $this->_config['uriOptions']['w'],
+			'ordered' => true,
+			'multiple' => true,
+			'upsert' => false,
+			'w' => $this->_config['uriOptions']['w'],
 			'wTimeoutMS' => $this->_config['uriOptions']['wTimeoutMS'],
-			'journal'    => $this->_config['uriOptions']['journal']
+			'journal' => $this->_config['uriOptions']['journal']
 		];
 		$options += $defaults;
 
@@ -632,10 +634,10 @@ class MongoDb extends \lithium\data\Source {
 			$exporter = $this->_classes['exporter'];
 
 			$options = $params['options'];
-			$query  = $params['query'];
-			$args   = $query->export($this, ['keys' => ['conditions', 'source', 'data']]);
+			$query = $params['query'];
+			$args = $query->export($this, ['keys' => ['conditions', 'source', 'data']]);
 			$source = $args['source'];
-			$data   = $args['data'];
+			$data = $args['data'];
 
 			if ($query->entity()) {
 				$data = $exporter::get('update', $data);
@@ -658,7 +660,7 @@ class MongoDb extends \lithium\data\Source {
 
 			try {
 				$writeConcern = new WriteConcern($options['w'], $options['wTimeoutMS'], $options['journal']);
-				$this->server->executeBulkWrite("{$this->_config['database']}.{$source}", $updateQuery, $writeConcern);
+				$this->manager->executeBulkWrite("{$this->_config['database']}.{$source}", $updateQuery, $writeConcern);
 				$query->entity() ? $query->entity()->sync() : null;
 				return true;
 			} catch (BulkWriteException $e) {
@@ -677,11 +679,11 @@ class MongoDb extends \lithium\data\Source {
 	 */
 	public function delete($query, array $options = []) {
 		$defaults = [
-			'ordered'    => true,
-			'justOne'    => false,
-			'w'          => $this->_config['uriOptions']['w'],
+			'ordered' => true,
+			'justOne' => false,
+			'w' => $this->_config['uriOptions']['w'],
 			'wTimeoutMS' => $this->_config['uriOptions']['wTimeoutMS'],
-			'journal'    => $this->_config['uriOptions']['journal']
+			'journal' => $this->_config['uriOptions']['journal']
 		];
 		$options += $defaults;
 		$params = compact('query', 'options');
@@ -698,7 +700,7 @@ class MongoDb extends \lithium\data\Source {
 
 			try {
 				$writeConcern = new WriteConcern($options['w'], $options['wTimeoutMS'], $options['journal']);
-				$this->server->executeBulkWrite("{$this->_config['database']}.{$source}", $deleteQuery, $writeConcern);
+				$this->manager->executeBulkWrite("{$this->_config['database']}.{$source}", $deleteQuery, $writeConcern);
 				if ($query->entity()) {
 					$query->entity()->sync(null, [], ['dematerialize' => true]);
 				}
@@ -724,17 +726,20 @@ class MongoDb extends \lithium\data\Source {
 		switch ($type) {
 			case 'count':
 				$args = $query->export($this);
+
 				$pipeline = [];
 				if ($args['conditions']) {
 					$pipeline[] = ['$match' => $args['conditions']];
 				}
-				$pipeline[] = ['$group' => ['_id' => null, 'count' => ['$sum' => 1 ]]];
-				$cursor = $this->server->executeCommand($this->_config['database'], new Command([
+				$pipeline[] = ['$group' => ['_id' => null, 'count' => ['$sum' => 1]]];
+
+				$result = $this->manager->executeCommand($this->_config['database'], new Command([
 					'aggregate' => $args['source'],
-					'pipeline'  => $pipeline
-				]));
-				$result = current($cursor->toArray())->result;
-				return $result ? current($result)->count : 0;
+					'pipeline' => $pipeline,
+					'cursor' => new stdClass,
+				]))->toArray();
+
+				return (!empty($result)) ? current($result)->count : 0;
 		}
 	}
 
@@ -786,7 +791,7 @@ class MongoDb extends \lithium\data\Source {
 					}
 					$fieldType = $on::schema()->type($key);
 
-					if ($fieldType === 'id' || $fieldType === 'MongoDB\BSON\ObjectID') {
+					if ($fieldType === 'id' || $fieldType === 'MongoDB\BSON\ObjectId') {
 						$isArray = $on::schema()->is('array', $key);
 						$link = $isArray ? $rel::LINK_KEY_LIST : $rel::LINK_KEY;
 						break;
@@ -823,6 +828,87 @@ class MongoDb extends \lithium\data\Source {
 			}
 		}
 		return ['key' => $group];
+	}
+
+
+	/**
+	 * Return formatted identifiers for fields.
+	 *
+	 * @param array $fields Fields to be parsed
+	 * @param object $context
+	 * @return array Parsed fields array
+	 */
+	public function fields($fields, $context) {
+		$result = [];
+		foreach ($fields as $key => $value) {
+			if (is_numeric($key)) {
+				$result[$value] = true;
+			} else {
+				$result[$key] = $value;
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Return formatted clause for limit.
+	 *
+	 * MongoDB doesn't require limit identifer formatting; as a result, this method is not
+	 * implemented.
+	 *
+	 * @param mixed $limit The `limit` clause to be formatted.
+	 * @param object $context The `Query` object instance.
+	 * @return mixed Formatted `limit` clause.
+	 */
+	public function limit($limit, $context) {
+		return $limit ?: 0;
+	}
+
+	/**
+	 * Return formatted clause for order.
+	 *
+	 * @param mixed $order The `order` clause to be formatted
+	 * @param object $context
+	 * @return mixed Formatted `order` clause.
+	 */
+	public function order($order, $context) {
+		if (!$order) {
+			return [];
+		}
+		if (is_string($order)) {
+			return [$order => 1];
+		}
+		if (!is_array($order)) {
+			return [];
+		}
+		foreach ($order as $key => $value) {
+			if (!is_string($key)) {
+				unset($order[$key]);
+				$order[$value] = 1;
+				continue;
+			}
+			if (is_string($value)) {
+				$order[$key] = strtolower($value) === 'asc' ? 1 : -1;
+			}
+		}
+		return $order;
+	}
+
+	/**
+	 * Returns the field name of a relation name (camelBack).
+	 *
+	 * @param string The type of the relation.
+	 * @param string The name of the relation.
+	 * @return string
+	 */
+	public function relationFieldName($type, $name) {
+		$fieldName = Inflector::camelize($name, false);
+		if (preg_match('/Many$/', $type)) {
+			$fieldName = Inflector::pluralize($fieldName);
+		} else {
+			$fieldName = Inflector::singularize($fieldName);
+		}
+		return $fieldName;
 	}
 
 	/**
@@ -935,85 +1021,44 @@ class MongoDb extends \lithium\data\Source {
 		return $operators;
 	}
 
-	/**
-	 * Return formatted identifiers for fields.
-	 *
-	 * @param array $fields Fields to be parsed
-	 * @param object $context
-	 * @return array Parsed fields array
-	 */
-	public function fields($fields, $context) {
-		$result = [];
-		foreach ($fields as $key => $value) {
-			if (is_numeric($key)) {
-				$result[$value] = true;
-			} else {
-				$result[$key] = $value;
-			}
+	protected function _parseConnectionString($connection) {
+
+		$result = array_fill_keys(['login', 'password', 'host', 'database'], null);
+		$parts = array_fill_keys(['scheme', 'user', 'pass', 'host', 'port', 'path', 'query'], '');
+		$parts = parse_url($connection) + $parts;
+
+		if (!empty($parts['query'])) {
+			parse_str($parts['query'], $result['uriOptions']);
+			$result['uriOptions'] = array_map(function($value) {
+				return (is_numeric($value)) ? (int) $value : $value;
+			}, $result['uriOptions']);
 		}
+
+		$hostList = (stristr($parts['host'], ','))
+			? explode(',', $parts['host'])
+			: $parts['host'];
+
+		$hosts = [];
+		foreach ((array) $hostList as $host) {
+			$host = HostString::parse($host) + [
+				'host' => static::DEFAULT_HOST,
+				'port' => static::DEFAULT_PORT
+			];
+			$hosts[] = "{$host['host']}:{$host['port']}";
+		}
+		$result['host'] = (count($hosts) > 1) ? $hosts : $hosts[0];
+		$result['login'] = !empty($parts['user']) ? $parts['user'] : null;
+		$result['password'] = $parts['pass'];
+		$result['database'] = trim($parts['path'], '/');
+
+		$error = "Failed to parse MongoDB URI `$connection`";
+		if (!$result['database']) {
+			throw new ConfigException("$error. No database configured.");
+		}
+
 		return $result;
 	}
 
-	/**
-	 * Return formatted clause for limit.
-	 *
-	 * MongoDB doesn't require limit identifer formatting; as a result, this method is not
-	 * implemented.
-	 *
-	 * @param mixed $limit The `limit` clause to be formatted.
-	 * @param object $context The `Query` object instance.
-	 * @return mixed Formatted `limit` clause.
-	 */
-	public function limit($limit, $context) {
-		return $limit ?: 0;
-	}
-
-	/**
-	 * Return formatted clause for order.
-	 *
-	 * @param mixed $order The `order` clause to be formatted
-	 * @param object $context
-	 * @return mixed Formatted `order` clause.
-	 */
-	public function order($order, $context) {
-		if (!$order) {
-			return [];
-		}
-		if (is_string($order)) {
-			return [$order => 1];
-		}
-		if (!is_array($order)) {
-			return [];
-		}
-		foreach ($order as $key => $value) {
-			if (!is_string($key)) {
-				unset($order[$key]);
-				$order[$value] = 1;
-				continue;
-			}
-			if (is_string($value)) {
-				$order[$key] = strtolower($value) === 'asc' ? 1 : -1;
-			}
-		}
-		return $order;
-	}
-
-	/**
-	 * Returns the field name of a relation name (camelBack).
-	 *
-	 * @param string The type of the relation.
-	 * @param string The name of the relation.
-	 * @return string
-	 */
-	public function relationFieldName($type, $name) {
-		$fieldName = Inflector::camelize($name, false);
-		if (preg_match('/Many$/', $type)) {
-			$fieldName = Inflector::pluralize($fieldName);
-		} else {
-			$fieldName = Inflector::singularize($fieldName);
-		}
-		return $fieldName;
-	}
 }
 
 ?>

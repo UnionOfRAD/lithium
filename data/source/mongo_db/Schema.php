@@ -9,7 +9,7 @@
 
 namespace lithium\data\source\mongo_db;
 
-use MongoDB\BSON\ObjectID;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Javascript;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\BSON\Regex;
@@ -20,14 +20,14 @@ class Schema extends \lithium\data\DocumentSchema {
 	protected $_handlers = [];
 
 	protected $_types = [
-		'MongoDB\BSON\ObjectID'    => 'id',
+		'MongoDB\BSON\ObjectId' => 'id',
 		'MongoDB\BSON\UTCDateTime' => 'date',
-		'MongoDB\BSON\Javascript'  => 'code',
-		'MongoDB\BSON\Binary'      => 'binary',
-		'MongoDB\BSON\Regex'       => 'regex',
-		'datetime'                 => 'date',
-		'timestamp'                => 'date',
-		'int'                      => 'integer'
+		'MongoDB\BSON\Javascript' => 'code',
+		'MongoDB\BSON\Binary' => 'binary',
+		'MongoDB\BSON\Regex' => 'regex',
+		'datetime' => 'date',
+		'timestamp' => 'date',
+		'int' => 'integer'
 	];
 
 	/**
@@ -48,18 +48,18 @@ class Schema extends \lithium\data\DocumentSchema {
 
 		$this->_handlers += [
 			'id' => function($v) {
-				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new ObjectID($v) : $v;
+				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new ObjectId($v) : $v;
 			},
 			'date' => function($v) {
 				$v = is_numeric($v) ? (integer) $v : strtotime($v);
 				return !$v ? new UTCDateTime() : new UTCDateTime($v * 1000);
 			},
-			'regex'   => function($v) { return new Regex($v); },
+			'regex' => function($v) { return new Regex($v); },
 			'integer' => function($v) { return (integer) $v; },
-			'float'   => function($v) { return (float) $v; },
+			'float' => function($v) { return (float) $v; },
 			'boolean' => function($v) { return (boolean) $v; },
-			'code'    => function($v) { return new Javascript($v); },
-			'binary'  => function($v) { return new Binary($v); }
+			'code' => function($v) { return new Javascript($v); },
+			'binary' => function($v) { return new Binary($v); }
 		];
 	}
 }

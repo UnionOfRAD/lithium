@@ -21,7 +21,7 @@ class MockMongoPost extends \lithium\data\Model {
 		$result = parent::schema($field);
 
 		if (is_object($result) && get_class($result) === 'lithium\data\Schema') {
-			return new Schema(['fields' => $result->fields(), 'meta'   => $result->meta()]);
+			return new Schema(['fields' => $result->fields(), 'meta' => $result->meta()]);
 		}
 		return $result;
 	}
