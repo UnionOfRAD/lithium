@@ -14,6 +14,9 @@ use lithium\tests\mocks\core\MockRequest;
 use lithium\tests\mocks\core\MockStaticInstantiator;
 use lithium\tests\mocks\core\MockStaticObject;
 
+/**
+ * @deprecated
+ */
 class StaticObjectTest extends \lithium\test\Unit {
 
 	protected $_backup = null;
@@ -35,8 +38,6 @@ class StaticObjectTest extends \lithium\test\Unit {
 		$this->assertFalse(MockStaticInstantiator::respondsTo('_foo'));
 		$this->assertTrue(MockStaticInstantiator::respondsTo('_foo', 1));
 	}
-
-	/* Deprecated / BC */
 
 	public function testClassParents() {
 		$class = 'lithium\tests\mocks\core\MockStaticObject';

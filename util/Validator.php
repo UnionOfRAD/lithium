@@ -391,8 +391,24 @@ class Validator extends \lithium\core\StaticObject {
 	}
 
 	/**
+	 * Checks whether a rule under given name exists and can be called using `is<Name>`
+	 * syntax.
+	 *
+	 * @param string $rule Name of the rule.
+	 * @return boolean `true` if the rule exists, `false` if not.
+	 */
+	public static function has($rule) {
+		if (!preg_match('/^(is)?([A-Za-z0-9]+)$/', $rule, $matches)) {
+			return false;
+		}
+		$matches[2][0] = strtolower($matches[2][0]);
+		return isset(static::$_rules[$matches[2]]);
+	}
+
+	/**
 	 * Determines if a given method can be called.
 	 *
+	 * @deprecated
 	 * @param string $method Name of the method.
 	 * @param boolean $internal Provide `true` to perform check from inside the
 	 *                class/object. When `false` checks also for public visibility;
@@ -400,6 +416,10 @@ class Validator extends \lithium\core\StaticObject {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public static function respondsTo($method, $internal = false) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= "Use `Validator::has()` or `is_callable([<class>, '<method>'])` instead.";
+		trigger_error($message, E_USER_DEPRECATED);
+
 		$rule = preg_replace("/^is([A-Z][A-Za-z0-9]+)$/", '$1', $method);
 		$rule[0] = strtolower($rule[0]);
 		return isset(static::$_rules[$rule]) || parent::respondsTo($method, $internal);

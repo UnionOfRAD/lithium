@@ -492,17 +492,32 @@ class LocaleTest extends \lithium\test\Unit {
 		$this->assertNull($result);
 	}
 
+	/* Deprecated / BC */
+
+	/**
+	 * @deprecated
+	 */
 	public function testRespondsToParentCall() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
 		$this->assertTrue(Locale::respondsTo('invokeMethod'));
 		$this->assertFalse(Locale::respondsTo('fooBarBaz'));
+
+		error_reporting($backup);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function testRespondsToMagic() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
 		$this->assertTrue(Locale::respondsTo('language'));
 		$this->assertTrue(Locale::respondsTo('territory'));
 		$this->assertFalse(Locale::respondsTo('foobar'));
-	}
 
+		error_reporting($backup);
+	}
 }
 
 ?>

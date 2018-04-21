@@ -503,6 +503,7 @@ class Model extends \lithium\core\StaticObject {
 	/**
 	 * Determines if a given method can be called.
 	 *
+	 * @deprecated
 	 * @param string $method Name of the method.
 	 * @param boolean $internal Provide `true` to perform check from inside the
 	 *                class/object. When `false` checks also for public visibility;
@@ -510,6 +511,11 @@ class Model extends \lithium\core\StaticObject {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public static function respondsTo($method, $internal = false) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= "Use `Model::hasFinder()` instead.";
+		trigger_error($message, E_USER_DEPRECATED);
+
+
 		$self = static::object();
 		$methods = static::instanceMethods();
 		$isFinder = isset($self->_finders[$method]);
@@ -688,6 +694,27 @@ class Model extends \lithium\core\StaticObject {
 			};
 		}
 		$self->_finders[$name] = $finder;
+	}
+
+	/**
+	 * Checks whether given name can be used as a finder in `Model::find()`.
+	 *
+	 * @param string $name Name of the method, i.e. `'first'` or `'byId'`.
+	 * @return boolean
+	 */
+	public static function hasFinder($name) {
+		if ($name === 'all') {
+			return true;
+		}
+		if (isset(static::object()->_finders[$name])) {
+			return true;
+		}
+		preg_match(
+			'/^(find)?[Bb]y(?P<field>\w+)$|^(find)?(?P<type>\w+)[Bb]y(?P<fields>\w+)$/',
+			$name,
+			$args
+		);
+		return (boolean) $args;
 	}
 
 	/**

@@ -485,6 +485,7 @@ class MongoDb extends \lithium\data\Source {
 	/**
 	 * Determines if a given method can be called.
 	 *
+	 * @deprecated
 	 * @param string $method Name of the method.
 	 * @param boolean $internal Provide `true` to perform check from inside the
 	 *                class/object. When `false` checks also for public visibility;
@@ -492,6 +493,10 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= 'Use `is_callable([$adapter->server, \'<method>\'])` instead.';
+		trigger_error($message, E_USER_DEPRECATED);
+
 		$childRespondsTo = is_object($this->server) && is_callable([$this->server, $method]);
 		return parent::respondsTo($method, $internal) || $childRespondsTo;
 	}

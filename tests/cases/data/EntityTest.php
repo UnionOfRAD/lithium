@@ -261,27 +261,6 @@ class EntityTest extends \lithium\test\Unit {
 		$model::meta('title', $old);
 	}
 
-	public function testRespondsTo() {
-		$model = $this->_model;
-		$data = ['foo' => true];
-		$entity = new Entity(compact('model', 'data'));
-
-		$this->assertTrue($entity->respondsTo('foobar'));
-		$this->assertTrue($entity->respondsTo('findByFoo'));
-		$this->assertFalse($entity->respondsTo('barbaz'));
-		$this->assertTrue($entity->respondsTo('model'));
-		$this->assertTrue($entity->respondsTo('instances'));
-	}
-
-	public function testRespondsToParentCall() {
-		$model = $this->_model;
-		$data = ['foo' => true];
-		$entity = new Entity(compact('model', 'data'));
-
-		$this->assertTrue($entity->respondsTo('invokeMethod'));
-		$this->assertFalse($entity->respondsTo('fooBarBaz'));
-	}
-
 	public function testHandlers() {
 		$handlers = [
 			'stdClass' => function($value) { return substr($value->scalar, -1); }
@@ -294,6 +273,43 @@ class EntityTest extends \lithium\test\Unit {
 
 		$expected = ['value' => 'o'];
 		$this->assertIdentical($expected, $array->to('array', ['indexed' => false]));
+	}
+
+	/* Deprecated / BC */
+
+	/**
+	 * @deprecated
+	 */
+	public function testRespondsTo() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$model = $this->_model;
+		$data = ['foo' => true];
+		$entity = new Entity(compact('model', 'data'));
+
+		$this->assertTrue($entity->respondsTo('foobar'));
+		$this->assertTrue($entity->respondsTo('findByFoo'));
+		$this->assertFalse($entity->respondsTo('barbaz'));
+		$this->assertTrue($entity->respondsTo('model'));
+		$this->assertTrue($entity->respondsTo('instances'));
+
+		error_reporting($backup);
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public function testRespondsToParentCall() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$model = $this->_model;
+		$data = ['foo' => true];
+		$entity = new Entity(compact('model', 'data'));
+
+		$this->assertTrue($entity->respondsTo('invokeMethod'));
+		$this->assertFalse($entity->respondsTo('fooBarBaz'));
+
+		error_reporting($backup);
 	}
 }
 

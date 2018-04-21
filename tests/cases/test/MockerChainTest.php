@@ -176,7 +176,6 @@ class MockerChainTest extends \lithium\test\Unit {
 		$this->assertTrue($chain->respondsTo('lt'));
 		$this->assertFalse($chain->respondsTo('et'));
 	}
-
 }
 
 ?>

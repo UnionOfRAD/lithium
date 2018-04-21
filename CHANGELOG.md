@@ -55,6 +55,10 @@
 
 - `Helper::attributes()` is now part of the public API.
 
+- `Model::hasFinder()` checks if a given finder is available, works for magic finders, too.
+
+- `Validator::has()` checks if a rule is available under given name.
+
 ### Changed
 
 - The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 
@@ -79,9 +83,10 @@
   ['template' => ['path' => '/path/to/template']] // full valid syntax
   ```
 
-- `Object` and `StaticObject` are being step by step deprecated, as
+- `Object` and `StaticObject` are being deprecated, as
   `Object` is soft-reserved in PHP >=7. Chance is taken for a cleanup of the
-  class-hirarchy and unused/obsolete methods.
+  class-hirarchy and unused/obsolete methods. Newly created classes should
+  not inherit from `Object`/`StaticObject` anymore.
 
   | old | new |
   | --- | --- |
@@ -93,6 +98,9 @@
   | `Object::__set_state()` | _no replacement_ |
   | `*Object::invokeMethod()` | _no replacement_, use `call_user_func_array()` |
   | `analysis\Inspector::invokeMethod()` | _no replacement_ |
+  | `Model::respondsTo()` | use `Model::hasFinder()` instead |
+  | `Validator::respondsTo()` | use `Validator::has()` instead |
+  | `*::respondsTo()` | use `is_callable()` instead |
 
 - Changing the default cipher and/or mode for the `Encrypt` strategy has been 
   deprecated and will cause the strategy to switch into _legacy_ mode. In legacy

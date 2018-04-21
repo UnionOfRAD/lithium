@@ -48,6 +48,8 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $config->getConfig());
 	}
 
+	/* Deprecated / BC */
+
 	public function testRespondsTo() {
 		$obj = new MockRequest();
 		$this->assertTrue($this->respondsTo('get'));
@@ -59,8 +61,6 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->assertFalse($obj->respondsTo('_parents'));
 		$this->assertTrue($obj->respondsTo('_parents', 1));
 	}
-
-	/* Deprecated / BC */
 
 	public function testParents() {
 		$expected = ['lithium\core\Object' => 'lithium\core\Object'];
