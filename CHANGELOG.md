@@ -51,6 +51,8 @@
 
 - The credit card validator now supports MasterCard 2-series. (Grayson Scherer)
 
+- `Libraries::instance()` now accepts a class map as a 4th parameter.
+
 ### Changed
 
 - The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 

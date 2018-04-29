@@ -666,20 +666,31 @@ class Libraries {
 	 * If the given class can't be found, an exception is thrown.
 	 *
 	 * @param string $type The type of class as defined by `Libraries::$_paths`.
-	 * @param string $name The un-namespaced name of the class to instantiate.
-	 * @param array $options An array of constructor parameters to pass to the class.
-	 * @return object If the class is found, returns an instance of it, otherwise throws an
-	 *         exception.
+	 * @param string|object $name The un- or fully namespaced name of the class to instantiate or
+	 *        a name in the $classes array. Alternatively an already instantiated object, which will
+	 *        be returned unmodified.
+	 * @param array $config An array of constructor parameters to pass to the class.
+	 * @param array $classes Map of short names to fully namespaced classes or instantiated objects,
+	 *        to use for resolving short names.
+	 * @return object If the class is found, returns an instance of it.
 	 * @throws lithium\core\ClassNotFoundException Throws an exception if the class can't be found.
 	 * @filter
 	 */
-	public static function instance($type, $name, array $options = []) {
-		$params = compact('type', 'name', 'options');
+	public static function instance($type, $name, array $options = [], array $classes = []) {
+		$params = compact('type', 'name', 'options', 'classes');
 
 		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$name = $params['name'];
 			$type = $params['type'];
+			$classes = $params['classes'];
 
+			if (is_string($name) && isset($classes[$name])) {
+				$name = $classes[$name];
+			}
+
+			if (is_object($name)) {
+				return $name;
+			}
 			if (!$name && !$type) {
 				$message = "Invalid class lookup: `\$name` and `\$type` are empty.";
 				throw new ClassNotFoundException($message);
@@ -689,9 +700,6 @@ class Libraries {
 			}
 			if (!$class = static::locate($type, $name)) {
 				throw new ClassNotFoundException("Class `{$name}` of type `{$type}` not found.");
-			}
-			if (is_object($class)) {
-				return $class;
 			}
 			if (!(is_string($class) && class_exists($class))) {
 				throw new ClassNotFoundException("Class `{$name}` of type `{$type}` not defined.");
