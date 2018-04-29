@@ -10,8 +10,7 @@
         {"name": "The Community"}
     ],
     "support": {
-        "stack overflow": "https://stackoverflow.com/tags/lithium",
-        "irc": "irc://irc.freenode.org/li3"
+        "stack overflow": "https://stackoverflow.com/tags/li3"
     },
     "require": {
         "php": "^5.6 || ~7.0.3 || ~7.1.0",
