@@ -9,13 +9,14 @@
 
 namespace lithium\data\source;
 
+use Exception;
 use MongoCode;
 use MongoRegex;
 use lithium\aop\Filters;
-use lithium\util\Inflector;
+use lithium\core\Libraries;
 use lithium\core\NetworkException;
 use lithium\net\HostString;
-use Exception;
+use lithium\util\Inflector;
 
 /**
  * A data source adapter which allows you to connect to the MongoDB database engine. MongoDB is an
@@ -444,7 +445,7 @@ class MongoDb extends \lithium\data\Source {
 		if (!$fields && ($func = $this->_schema)) {
 			$fields = $func($this, $collection, $meta);
 		}
-		return $this->_instance('schema', compact('fields'));
+		return Libraries::instance(null, 'schema', compact('fields'), $this->_classes);
 	}
 
 	/**
@@ -632,7 +633,7 @@ class MongoDb extends \lithium\data\Source {
 			}
 
 			$resource = $result->sort($args['order'])->limit($args['limit'])->skip($args['offset']);
-			$result = $this->_instance('result', compact('resource'));
+			$result = Libraries::instance(null, 'result', compact('resource'), $this->_classes);
 			$config = compact('result', 'query') + ['class' => 'set', 'defaults' => false];
 			$collection = $model::create([], $config);
 
@@ -806,7 +807,7 @@ class MongoDb extends \lithium\data\Source {
 		$config += compact('name', 'type', 'key', 'fieldName');
 		$config['from'] = $class;
 
-		return $this->_instance('relationship', $config + [
+		return Libraries::instance(null, 'relationship', $config + [
 			'strategy' => function($rel) use ($config, $class, $name, $type) {
 				if (isset($config['key'])) {
 					return [];
@@ -851,7 +852,7 @@ class MongoDb extends \lithium\data\Source {
 				}
 				return $result + ($hasLink ? [] : compact('link'));
 			}
-		]);
+		], $this->_classes);
 	}
 
 	/**

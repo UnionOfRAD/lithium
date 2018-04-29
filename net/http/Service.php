@@ -274,7 +274,7 @@ class Service extends \lithium\core\Object {
 		$defaults = ['type' => 'form'];
 		$options += $defaults + $this->_config;
 
-		$request = $this->_instance('request', $options);
+		$request = Libraries::instance(null, 'request', $options, $this->_classes);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
 		$hasBody = in_array($method, ['POST', 'PUT', 'PATCH']);

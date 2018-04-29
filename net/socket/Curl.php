@@ -9,6 +9,7 @@
 
 namespace lithium\net\socket;
 
+use lithium\core\Libraries;
 use lithium\net\http\Message;
 
 /**
@@ -137,7 +138,9 @@ class Curl extends \lithium\net\Socket {
 			return false;
 		}
 		if (!is_object($data)) {
-			$data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
+			$data = Libraries::instance(
+				null, 'request', (array) $data + $this->_config, $this->_classes
+			);
 		}
 		$this->set(CURLOPT_URL, $data->to('url'));
 

@@ -9,12 +9,12 @@
 
 namespace lithium\tests\cases\core;
 
-use stdClass;
-use SplFileInfo;
 use Phar;
-use lithium\util\Inflector;
+use SplFileInfo;
 use lithium\core\Libraries;
 use lithium\tests\mocks\core\MockInitMethod;
+use lithium\util\Inflector;
+use stdClass;
 
 class LibrariesTest extends \lithium\test\Unit {
 
@@ -671,7 +671,19 @@ EOD;
 		unlink($file);
 	}
 
-	public function testClassInstanceWithSubnamespace() {
+	public function testInstanceWithClasses() {
+		$result = Libraries::instance(null, 'view', [], [
+			'view' => 'lithium\template\view\adapter\Simple'
+		]);
+		$this->assertInstanceOf('lithium\template\view\adapter\Simple', $result);
+	}
+
+	public function testInstanceWithObject() {
+		$result = Libraries::instance(null, new stdClass());
+		$this->assertInstanceOf('stdClass', $result);
+	}
+
+	public function testInstanceWithSubnamespace() {
 		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/test_app';
 		mkdir($testApp);
 		$paths = ["/controllers", "/controllers/admin"];

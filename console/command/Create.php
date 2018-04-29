@@ -240,7 +240,7 @@ class Create extends \lithium\console\Command {
 				'classes' => $this->_classes
 			]);
 		}
-		return parent::_instance($name, $config);
+		return Libraries::instance(null, $name, $config, $this->_classes);
 	}
 
 	/**

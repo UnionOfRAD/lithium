@@ -36,11 +36,11 @@ class ComplexityTest extends \lithium\test\Unit {
 	 * Helper array which stores the expected results to clean up the tests.
 	 */
 	protected $_metrics = [
-		'invokeMethod' => 7,
 		'respondsTo' => 1,
-		'_instance' => 2,
-		'_parents' => 2,
+		'invokeMethod' => 7,
+		'_instance' => 1,
 		'_stop' => 1,
+		'_parents' => 2,
 		'applyFilter' => 4,
 		'_filter' => 3
 	];
@@ -88,7 +88,7 @@ class ComplexityTest extends \lithium\test\Unit {
 		Complexity::apply($this->report, $group->tests());
 
 		$results = Complexity::analyze($this->report);
-		$expected = ['class' => [$this->_paths['testClass'] => 2.8999999999999999]];
+		$expected = ['class' => [$this->_paths['testClass'] => 2.7]];
 		foreach ($this->_metrics as $method => $metric) {
 			$expected['max'][$this->_paths['testClass'] . '::' . $method . '()'] = $metric;
 		}

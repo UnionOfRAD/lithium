@@ -26,33 +26,6 @@ class StaticObjectTest extends \lithium\test\Unit {
 		error_reporting($this->_backup);
 	}
 
-	public function testInstanceWithClassesKey() {
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class(MockStaticInstantiator::instance('request'));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceWithNamespacedClass() {
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class(MockStaticInstantiator::instance(
-			'lithium\tests\mocks\core\MockRequest'
-		));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceWithObject() {
-		$request = new MockRequest();
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class(MockStaticInstantiator::instance($request));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceFalse() {
-		$this->assertException('/^Invalid class lookup/', function() {
-			MockStaticInstantiator::instance(false);
-		});
-	}
-
 	public function testRespondsTo() {
 		$this->assertTrue(MockStaticInstantiator::respondsTo('applyFilter'));
 		$this->assertFalse(MockStaticInstantiator::respondsTo('fooBarBaz'));
@@ -255,6 +228,33 @@ class StaticObjectTest extends \lithium\test\Unit {
 			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
 		];
 		$this->assertEqual(MockStaticObject::invokeMethod('foo', $params), $params);
+	}
+
+	public function testInstanceWithClassesKey() {
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class(MockStaticInstantiator::instance('request'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstanceWithNamespacedClass() {
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class(MockStaticInstantiator::instance(
+			'lithium\tests\mocks\core\MockRequest'
+		));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstanceWithObject() {
+		$request = new MockRequest();
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class(MockStaticInstantiator::instance($request));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstanceFalse() {
+		$this->assertException('/^Invalid class lookup/', function() {
+			MockStaticInstantiator::instance(false);
+		});
 	}
 }
 

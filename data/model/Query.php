@@ -9,10 +9,11 @@
 
 namespace lithium\data\model;
 
-use lithium\util\Set;
-use lithium\data\Source;
-use lithium\core\ConfigException;
 use InvalidArgumentException;
+use lithium\core\ConfigException;
+use lithium\core\Libraries;
+use lithium\data\Source;
+use lithium\util\Set;
 
 /**
  * The `Query` class acts as a container for all information necessary to perform a particular
@@ -662,9 +663,8 @@ class Query extends \lithium\core\Object {
 		}
 		if ($model = $this->model()) {
 			return $model::schema($field);
-		} else {
-			return $this->_instance('schema');
 		}
+		return Libraries::instance(null, 'schema', [], $this->_classes);
 	}
 
 	/**

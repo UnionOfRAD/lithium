@@ -9,6 +9,8 @@
 
 namespace lithium\data\source;
 
+use lithium\core\Libraries;
+
 /**
  * The `Mock` data source is used behind-the-scenes when a model does not use a backend data source.
  * It implements the necessary methods, but does not support querying and has no storage backend.
@@ -42,7 +44,7 @@ class Mock extends \lithium\data\Source {
 	}
 
 	public function describe($entity, $fields = [], array $meta = []) {
-		return $this->_instance('schema', compact('fields'));
+		return Libraries::instance(null, 'schema', compact('fields'), $this->_classes);
 	}
 
 	public function relationship($class, $type, $name, array $options = []) {

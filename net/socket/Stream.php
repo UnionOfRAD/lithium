@@ -9,6 +9,7 @@
 
 namespace lithium\net\socket;
 
+use lithium\core\Libraries;
 use lithium\core\NetworkException;
 
 /**
@@ -107,7 +108,9 @@ class Stream extends \lithium\net\Socket {
 			return false;
 		}
 		if (!is_object($data)) {
-			$data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
+			$data = Libraries::instance(
+				null, 'request', (array) $data + $this->_config, $this->_classes
+			);
 		}
 		return fwrite($this->_resource, (string) $data, strlen((string) $data));
 	}

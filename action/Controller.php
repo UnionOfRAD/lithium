@@ -9,10 +9,10 @@
 
 namespace lithium\action;
 
-use lithium\util\Inflector;
 use lithium\action\DispatchException;
-use lithium\core\Libraries;
 use lithium\aop\Filters;
+use lithium\core\Libraries;
+use lithium\util\Inflector;
 
 /**
  * The `Controller` class is the fundamental building block of your application's request/response
@@ -163,7 +163,9 @@ class Controller extends \lithium\core\Object {
 		$this->_inherit(['_render']);
 
 		$this->request = $this->request ?: $this->_config['request'];
-		$this->response = $this->_instance('response', $this->_config['response']);
+		$this->response = Libraries::instance(
+			null, 'response', $this->_config['response'], $this->_classes
+		);
 
 		if (!$this->request || $this->_render['type']) {
 			return;

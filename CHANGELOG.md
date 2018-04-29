@@ -85,6 +85,9 @@
 
   | old | new |
   | --- | --- |
+  | `*Object::_instance()` | replaced, use `lithium\core\Libraries::instance()` |
+  | `analysis\Inspector::_instance()` |  replaced, use `lithium\core\Libraries::instance()` |
+  | `data\Model::_instance()` |  replaced, use `lithium\core\Libraries::instance()` |
   | `*Object::_parents()` | replaced, use `lithium\core\MergeInheritable::_inherit()` |
   | `*Object::_stop()` | _no replacement_, must reimplement |
   | `Object::__set_state()` | _no replacement_ |

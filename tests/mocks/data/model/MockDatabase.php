@@ -9,6 +9,7 @@
 
 namespace lithium\tests\mocks\data\model;
 
+use lithium\core\Libraries;
 use lithium\tests\mocks\data\model\database\MockResult;
 
 class MockDatabase extends \lithium\data\source\Database {
@@ -66,7 +67,7 @@ class MockDatabase extends \lithium\data\source\Database {
 	public function sources($class = null) {}
 
 	public function describe($entity, $fields = [], array $meta = []) {
-		return $this->_instance('schema', compact('fields'));
+		return Libraries::instance(null, 'schema', compact('fields'), $this->_classes);
 	}
 
 	public function encoding($encoding = null) {}

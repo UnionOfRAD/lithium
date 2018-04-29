@@ -9,6 +9,9 @@
 
 namespace lithium\tests\mocks\core;
 
+/**
+ * @deprecated
+ */
 class MockStaticInstantiator extends \lithium\core\StaticObject {
 
 	protected static $_classes = ['request' => 'lithium\tests\mocks\core\MockRequest'];

@@ -128,22 +128,6 @@ class Object {
 		return Inspector::isCallable($this, $method, $internal);
 	}
 
-	/**
-	 * Returns an instance of a class with given `config`. The `name` could be a key from the
-	 * `classes` array, a fully-namespaced class name, or an object. Typically this method is used
-	 * in `_init` to create the dependencies used in the current class.
-	 *
-	 * @param string|object $name A `classes` key or fully-namespaced class name.
-	 * @param array $options The configuration passed to the constructor.
-	 * @return object
-	 */
-	protected function _instance($name, array $options = []) {
-		if (is_string($name) && isset($this->_classes[$name])) {
-			$name = $this->_classes[$name];
-		}
-		return Libraries::instance(null, $name, $options);
-	}
-
 	/* Deprecated / BC */
 
 	/**
@@ -216,6 +200,23 @@ class Object {
 			default:
 				return call_user_func_array([&$this, $method], $params);
 		}
+	}
+
+	/**
+	 * Returns an instance of a class with given `config`. The `name` could be a key from the
+	 * `classes` array, a fully-namespaced class name, or an object. Typically this method is used
+	 * in `_init` to create the dependencies used in the current class.
+	 *
+	 * @deprecated
+	 * @param string|object $name A `classes` key or fully-namespaced class name.
+	 * @param array $options The configuration passed to the constructor.
+	 * @return object
+	 */
+	protected function _instance($name, array $options = []) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= 'Please use Libraries::instance(), with the 4th parameter instead.';
+		trigger_error($message, E_USER_DEPRECATED);
+		return Libraries::instance(null, $name, $options, $this->_classes);
 	}
 
 	/**

@@ -11,6 +11,7 @@ namespace lithium\data\source\http\adapter;
 
 use lithium\aop\Filters;
 use lithium\core\ConfigException;
+use lithium\core\Libraries;
 
 /**
  * A data source adapter which allows you to connect to Apache CouchDB.
@@ -176,7 +177,7 @@ class CouchDb extends \lithium\data\source\Http {
 		if (!$this->_db) {
 			throw new ConfigException("Database `{$entity}` is not available.");
 		}
-		return $this->_instance('schema', [['fields' => $schema]]);
+		return Libraries::instance(null, 'schema', [['fields' => $schema]], $this->_classes);
 	}
 
 	/**

@@ -48,35 +48,6 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $config->getConfig());
 	}
 
-	public function testInstanceWithClassesKey() {
-		$object = new MockInstantiator();
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class($object->instance('request'));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceWithNamespacedClass() {
-		$object = new MockInstantiator();
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class($object->instance('lithium\tests\mocks\core\MockRequest'));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceWithObject() {
-		$object = new MockInstantiator();
-		$request = new MockRequest();
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class($object->instance($request));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceFalse() {
-		$object = new MockInstantiator();
-		$this->assertException('/^Invalid class lookup/', function() use ($object) {
-			$object->instance(false);
-		});
-	}
-
 	public function testRespondsTo() {
 		$obj = new MockRequest();
 		$this->assertTrue($this->respondsTo('get'));
@@ -322,6 +293,35 @@ class ObjectTest extends \lithium\test\Unit {
 		$result = $callable->invokeMethod('foo', $expected);
 		$this->assertEqual($result['method'], 'foo');
 		$this->assertEqual($result['params'], $expected);
+	}
+
+	public function testInstanceWithClassesKey() {
+		$object = new MockInstantiator();
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class($object->instance('request'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstanceWithNamespacedClass() {
+		$object = new MockInstantiator();
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class($object->instance('lithium\tests\mocks\core\MockRequest'));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstanceWithObject() {
+		$object = new MockInstantiator();
+		$request = new MockRequest();
+		$expected = 'lithium\tests\mocks\core\MockRequest';
+		$result = get_class($object->instance($request));
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testInstanceFalse() {
+		$object = new MockInstantiator();
+		$this->assertException('/^Invalid class lookup/', function() use ($object) {
+			$object->instance(false);
+		});
 	}
 }
 

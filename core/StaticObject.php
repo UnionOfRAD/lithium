@@ -34,22 +34,6 @@ class StaticObject {
 		return Inspector::isCallable(get_called_class(), $method, $internal);
 	}
 
-	/**
-	 * Returns an instance of a class with given `config`. The `name` could be a key from the
-	 * `classes` array, a fully namespaced class name, or an object. Typically this method is used
-	 * in `_init` to create the dependencies used in the current class.
-	 *
-	 * @param string|object $name A `classes` key or fully-namespaced class name.
-	 * @param array $options The configuration passed to the constructor.
-	 * @return object
-	 */
-	protected static function _instance($name, array $options = []) {
-		if (is_string($name) && isset(static::$_classes[$name])) {
-			$name = static::$_classes[$name];
-		}
-		return Libraries::instance(null, $name, $options);
-	}
-
 	/* Deprecated / BC */
 
 	/**
@@ -98,6 +82,23 @@ class StaticObject {
 			default:
 				return forward_static_call_array([get_called_class(), $method], $params);
 		}
+	}
+
+	/**
+	 * Returns an instance of a class with given `config`. The `name` could be a key from the
+	 * `classes` array, a fully namespaced class name, or an object. Typically this method is used
+	 * in `_init` to create the dependencies used in the current class.
+	 *
+	 * @deprecated
+	 * @param string|object $name A `classes` key or fully-namespaced class name.
+	 * @param array $options The configuration passed to the constructor.
+	 * @return object
+	 */
+	protected static function _instance($name, array $options = []) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= 'Please use Libraries::instance(), with the 4th parameter instead.';
+		trigger_error($message, E_USER_DEPRECATED);
+		return Libraries::instance(null, $name, $options, static::$_classes);
 	}
 
 	/**

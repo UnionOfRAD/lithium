@@ -9,6 +9,7 @@
 
 namespace lithium\console\command\create;
 
+use lithium\core\Libraries;
 use lithium\util\Inflector;
 
 /**

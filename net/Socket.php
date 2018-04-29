@@ -9,6 +9,8 @@
 
 namespace lithium\net;
 
+use lithium\core\Libraries;
+
 /**
  * Abstract class for connecting to sockets with various adapters.
  *
@@ -146,7 +148,7 @@ abstract class Socket extends \lithium\core\Object {
 
 		if ($this->write($message)) {
 			$config = ['message' => $this->read()] + $this->_config;
-			return $this->_instance($options['response'], $config);
+			return Libraries::instance(null, $options['response'], $config, $this->_classes);
 		}
 	}
 
