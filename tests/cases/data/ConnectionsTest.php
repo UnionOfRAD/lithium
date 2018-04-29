@@ -76,7 +76,7 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$msg = "Cannot connect to localhost:{$this->_port}";
 		$this->skipIf(!$this->_canConnect('localhost', $this->_port), $msg);
 
-		$expected = $this->config + ['type' => 'database'];
+		$expected = $this->config + ['type' => 'database', 'filters' => []];
 		$this->assertEqual($expected, Connections::get('conn-test', ['config' => true]));
 
 		$this->assertNull(Connections::reset());
