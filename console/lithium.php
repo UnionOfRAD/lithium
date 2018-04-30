@@ -6,7 +6,7 @@
  * code is distributed under the terms of the BSD 3-Clause License.
  * The full license text can be found in the LICENSE.txt file.
  */
-
+//require_once('/home/vagrant/bin/psysh');
 /**
  * This console front-controller file is the gateway to your application
  * through the command line.  It is responsible for intercepting requests, and

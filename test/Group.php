@@ -36,12 +36,15 @@ use lithium\util\Collection;
 class Group extends \lithium\util\Collection {
 
 	/**
-	 * auto init for setting up items passed into constructor
+	 * Constructor. Sets up items passed as `'data'`.
 	 *
+	 * @param array $config Valid options are:
+	 *        - `'data'`
 	 * @return void
 	 */
-	protected function _init() {
-		parent::_init();
+	 public function __construct(array $config = []) {
+		parent::__construct($config);
+
 		$data = $this->_data;
 		$this->_data = [];
 

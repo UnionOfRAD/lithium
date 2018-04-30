@@ -29,7 +29,7 @@ class ServiceTest extends \lithium\test\Unit {
 	}
 
 	public function testAllMethodsNoConnection() {
-		$http = new Service(['init' => false]);
+		$http = new Service(['socket' => false]);
 		$this->assertEmpty($http->get());
 		$this->assertEmpty($http->post());
 		$this->assertEmpty($http->put());

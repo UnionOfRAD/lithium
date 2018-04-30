@@ -26,6 +26,8 @@ use lithium\util\Inflector;
  */
 abstract class Source extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * The list of object properties to be automatically assigned from configuration passed to
 	 * `__construct()`.
@@ -92,7 +94,13 @@ abstract class Source extends \lithium\core\ObjectDeprecated {
 	public function __construct(array $config = []) {
 		$defaults = ['autoConnect' => true];
 		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
+
+		if ($this->_config['autoConnect']) {
+			$this->connect();
+		}
 	}
+
 
 	/**
 	 * Destructor. Ensures the connection is closed, before the object is destroyed.
@@ -102,13 +110,6 @@ abstract class Source extends \lithium\core\ObjectDeprecated {
 	public function __destruct() {
 		if ($this->isConnected()) {
 			$this->disconnect();
-		}
-	}
-
-	protected function _init() {
-		parent::_init();
-		if ($this->_config['autoConnect']) {
-			$this->connect();
 		}
 	}
 

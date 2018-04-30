@@ -76,13 +76,15 @@ class Test extends \lithium\console\Command {
 	protected $_handlers = [];
 
 	/**
-	 * Initializes the output handlers.
+	 * Constructor. Initializes the output handlers.
 	 *
+	 * @see lithium\console\Command
 	 * @see lithium\console\command\Test::$_handlers
+	 * @param array $config For available options, see parent class.
 	 * @return void
 	 */
-	protected function _init() {
-		parent::_init();
+	public function __construct(array $config = []) {
+		parent::__construct($config);
 		$command = $this;
 
 		$this->_handlers += [

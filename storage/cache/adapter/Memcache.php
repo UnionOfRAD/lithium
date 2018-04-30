@@ -70,8 +70,11 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	public $connection = null;
 
 	/**
-	 * Constructor. Instantiates the `Memcached` object, adds appropriate servers to the pool,
-	 * and configures any optional settings passed (see the `_init()` method).
+	 * Constructor. Instantiates the `Memcached` object, adds appropriate servers to the
+	 * pool, and configures any optional settings passed.
+	 *
+	 * Handles the actual `Memcached` connection and server connection adding for the
+	 * adapter constructor and sets prefix using the scope if provided.
 	 *
 	 * @see lithium\storage\Cache::config()
 	 * @param array $config Configuration for this cache adapter. These settings are queryable
@@ -96,6 +99,13 @@ class Memcache extends \lithium\storage\cache\Adapter {
 			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT
 		];
 		parent::__construct(Set::merge($defaults, $config));
+
+		$this->connection = new Memcached();
+		$this->connection->addServers($this->_formatHostList($this->_config['host']));
+
+		if ($this->_config['scope']) {
+			$this->connection->setOption(Memcached::OPT_PREFIX_KEY, "{$this->_config['scope']}:");
+		}
 	}
 
 	/**
@@ -120,22 +130,6 @@ class Memcache extends \lithium\storage\cache\Adapter {
 			},
 			$keys
 		);
-	}
-
-	/**
-	 * Handles the actual `Memcached` connection and server connection
-	 * adding for the adapter constructor and sets prefix using the scope
-	 * if provided.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		$this->connection = $this->connection ?: new Memcached();
-		$this->connection->addServers($this->_formatHostList($this->_config['host']));
-
-		if ($this->_config['scope']) {
-			$this->connection->setOption(Memcached::OPT_PREFIX_KEY, "{$this->_config['scope']}:");
-		}
 	}
 
 	/**

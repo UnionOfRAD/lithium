@@ -40,8 +40,9 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 * @see lithium\data\collection\RecordSet::$_columns
 	 * @return void
 	 */
-	protected function _init() {
-		parent::_init();
+
+	public function __construct(array $config = []) {
+		parent::__construct($config);
 		if ($this->_result) {
 			$this->_columns = $this->_columnMap();
 		}

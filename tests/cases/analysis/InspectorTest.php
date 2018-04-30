@@ -48,8 +48,8 @@ class InspectorTest extends \lithium\test\Unit {
 		$result = Inspector::methods($this, null);
 		$this->assertInstanceOf('ReflectionMethod', $result[0]);
 
-		$result = Inspector::info('lithium\core\ObjectDeprecated::_init()');
-		$expected = '_init';
+		$result = Inspector::info('lithium\core\Libraries::_configure()');
+		$expected = '_configure';
 		$this->assertEqual($expected, $result['name']);
 
 		$expected = 'void';

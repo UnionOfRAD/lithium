@@ -20,6 +20,8 @@ use ReflectionProperty;
  */
 class Message extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * The URI scheme.
 	 *
@@ -98,6 +100,7 @@ class Message extends \lithium\core\ObjectDeprecated {
 			$this->{$key} = $value;
 		}
 		parent::__construct($config);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 	}
 
 	/**

@@ -76,8 +76,9 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	const MO_HEADER_SIZE = 28;
 
 	/**
-	 * Constructor.
+	 * Constructor. Checks if the configured path exists.
 	 *
+	 * @throws ConfigException
 	 * @param array $config Available configuration options are:
 	 *        - `'path'`: The path to the directory holding the data.
 	 * @return void
@@ -85,16 +86,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 	public function __construct(array $config = []) {
 		$defaults = ['path' => null];
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Initializer.  Checks if the configured path exists.
-	 *
-	 * @return void
-	 * @throws ConfigException
-	 */
-	protected function _init() {
-		parent::_init();
 		if (!is_dir($this->_config['path'])) {
 			$message = "Gettext directory does not exist at path `{$this->_config['path']}`.";
 			throw new ConfigException($message);

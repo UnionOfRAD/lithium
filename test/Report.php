@@ -121,14 +121,7 @@ class Report extends \lithium\core\ObjectDeprecated {
 			'reporter' => null
 		];
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Initializer.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
 		$this->group = $this->_config['group'];
 		$this->title = $this->_config['title'] ?: $this->_config['title'];
 		$this->_filters = $this->filters($this->_config['filters']);

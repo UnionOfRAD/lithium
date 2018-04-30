@@ -20,9 +20,12 @@ class DocumentSchema extends \lithium\data\Schema {
 
 	protected $_handlers = [];
 
-	protected function _init() {
+	public function __construct(array $config = []) {
 		$this->_autoConfig[] = 'handlers';
-		parent::_init();
+
+		$defaults = ['handlers' => []];
+
+		parent::__construct($config + $defaults);
 	}
 
 	public function cast($object, $key, $data, array $options = []) {

@@ -21,6 +21,8 @@ use lithium\core\Libraries;
  */
 class Growl extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * Array that maps `Logger` message priority names to Growl-compatible priority levels.
 	 *
@@ -115,6 +117,8 @@ class Growl extends \lithium\core\ObjectDeprecated {
 			'registered' => false
 		];
 		parent::__construct($config + $defaults);
+
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 	}
 
 	/**

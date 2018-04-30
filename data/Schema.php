@@ -17,6 +17,8 @@ use RuntimeException;
  */
 class Schema extends \lithium\core\ObjectDeprecated implements \ArrayAccess {
 
+	use \lithium\core\AutoConfigurable;
+
 	protected $_fields = [];
 
 	protected $_meta = [];
@@ -36,11 +38,10 @@ class Schema extends \lithium\core\ObjectDeprecated implements \ArrayAccess {
 	 */
 	public function __construct(array $config = []) {
 		$defaults = ['fields' => []];
-		parent::__construct($config + $defaults);
-	}
 
-	protected function _init() {
-		parent::_init();
+		parent::__construct($config + $defaults);
+
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 
 		foreach ($this->_fields as $key => $type) {
 			if (is_string($type)) {

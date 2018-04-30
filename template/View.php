@@ -194,7 +194,8 @@ class View extends \lithium\core\ObjectDeprecated {
 	];
 
 	/**
-	 * Constructor.
+	 * Constructor. Looks up and initializes loader and renderer classes, and initializes
+	 * the output escape handler, matching the encoding from the `Response` object.
 	 *
 	 * @see lithium\template\View::$_steps
 	 * @see lithium\template\View::$_processes
@@ -233,18 +234,6 @@ class View extends \lithium\core\ObjectDeprecated {
 			'outputFilters' => []
 		];
 		parent::__construct($config + $defaults);
-	}
-
-	/**
-	 * Perform initialization of the View.
-	 *
-	 * Looks up and initializes loader and renderer classes, and initializes the output escape
-	 * handler, matching the encoding from the `Response` object.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		parent::_init();
 
 		$encoding = 'UTF-8';
 

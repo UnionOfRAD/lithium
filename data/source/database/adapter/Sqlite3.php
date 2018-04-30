@@ -131,16 +131,8 @@ class Sqlite3 extends \lithium\data\source\Database {
 	public function __construct(array $config = []) {
 		$defaults = ['database' => ':memory:'];
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Initializer. Constructs a DSN from configuration.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
 		$this->_config['dsn'] = sprintf("sqlite:%s", $this->_config['database']);
-		parent::_init();
 	}
 
 	/**

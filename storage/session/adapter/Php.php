@@ -58,28 +58,30 @@ class Php extends \lithium\core\ObjectDeprecated {
 			$config['session.name'] = basename(Libraries::get(true, 'path'));
 		}
 		parent::__construct($config + $this->_defaults);
+
+		if (!$this->isStarted() && !$this->_initialize()) {
+			throw new ConfigException('Could not initialize the session.');
+		}
 	}
 
 	/**
 	 * Initialization of the session.
 	 *
-	 * @todo Split up into an _initialize() and a _start().
+	 * @return boolean
 	 */
-	protected function _init() {
-		if ($this->isStarted()) {
-			return true;
-		}
+	protected function _initialize() {
 		$config = $this->_config;
-		unset($config['adapter'], $config['strategies'], $config['filters'], $config['init']);
+		unset($config['adapter'], $config['strategies'], $config['filters']);
 
 		foreach ($config as $key => $value) {
 			if (strpos($key, 'session.') === false) {
 				continue;
 			}
 			if (ini_set($key, $value) === false) {
-				throw new ConfigException('Could not initialize the session.');
+				return false;
 			}
 		}
+		return true;
 	}
 
 	/**

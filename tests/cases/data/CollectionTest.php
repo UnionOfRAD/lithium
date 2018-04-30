@@ -165,6 +165,7 @@ class CollectionTest extends \lithium\test\Unit {
 		]]);
 
 		$collection->sort('name');
+		//require_once('/home/vagrant/bin/psysh'); eval(\Psy\sh());
 		$idsSorted = $collection->map(function ($v) { return $v['id']; })->to('array');
 		$this->assertEqual($idsSorted, [1, 4, 5, 3, 2]);
 	}

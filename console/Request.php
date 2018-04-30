@@ -17,6 +17,8 @@ namespace lithium\console;
  */
 class Request extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * The raw data passed from the command line
 	 *
@@ -63,8 +65,13 @@ class Request extends \lithium\core\ObjectDeprecated {
 	protected $_autoConfig = ['env' => 'merge'];
 
 	/**
-	 * Constructor.
+	 * Constructor. Initializes request object, pulling request data from superglobals.
 	 *
+	 * Defines an artificial `'PLATFORM'` environment variable as `'CLI'` to
+	 * allow checking for the SAPI in a normalized way. This is also for
+	 * establishing consistency with this class' sister classes.
+	 *
+	 * @see lithium\action\Request::_init()
 	 * @param array $config Available configuration options are:
 	 *        - `'args'` _array_
 	 *        - `'input'` _resource|null_
@@ -78,25 +85,15 @@ class Request extends \lithium\core\ObjectDeprecated {
 			'input' => null,
 			'globals' => true
 		];
-		$config += $defaults;
-		parent::__construct($config);
-	}
+		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 
-	/**
-	 * Initialize request object, pulling request data from superglobals.
-	 *
-	 * Defines an artificial `'PLATFORM'` environment variable as `'CLI'` to
-	 * allow checking for the SAPI in a normalized way. This is also for
-	 * establishing consistency with this class' sister classes.
-	 *
-	 * @see lithium\action\Request::_init()
-	 * @return void
-	 */
-	protected function _init() {
 		if ($this->_config['globals']) {
 			$this->_env += (array) $_SERVER + (array) $_ENV;
 		}
-		$this->_env['working'] = str_replace('\\', '/', getcwd()) ?: null;
+		if (!$this->_env['working']) {
+			$this->_env['working'] = str_replace('\\', '/', getcwd()) ?: null;
+		}
 		$argv = (array) $this->env('argv');
 		$this->_env['script'] = array_shift($argv);
 		$this->_env['PLATFORM'] = 'CLI';
@@ -106,7 +103,6 @@ class Request extends \lithium\core\ObjectDeprecated {
 		if (!is_resource($this->_config['input'])) {
 			$this->input = fopen('php://stdin', 'r');
 		}
-		parent::_init();
 	}
 
 	/**

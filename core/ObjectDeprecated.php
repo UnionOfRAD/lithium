@@ -66,52 +66,8 @@ class ObjectDeprecated {
 	 * @return void
 	 */
 	public function __construct(array $config = []) {
-		$defaults = ['init' => true];
-		$this->_config = $config + $defaults;
-
-		if ($this->_config['init']) {
-			$this->_init();
-		}
+		$this->_config = $config;
 	}
-
-	/**
-	 * Initializer function called by the constructor unless the constructor `'init'` flag is set
-	 * to `false`. May be used for testing purposes, where objects need to be manipulated in an
-	 * un-initialized state, or for high-overhead operations that require more control than the
-	 * constructor provides. Additionally, this method iterates over the `$_autoConfig` property
-	 * to automatically assign configuration settings to their corresponding properties.
-	 *
-	 * For example, given the following:
-	 * ```
-	 * class Bar extends \lithium\core\Object {
-	 * 	protected $_autoConfig = ['foo'];
-	 * 	protected $_foo;
-	 * }
-	 *
-	 * $instance = new Bar(['foo' => 'value']);
-	 * ```
-	 *
-	 * The `$_foo` property of `$instance` would automatically be set to `'value'`. If `$_foo` was
-	 * an array, `$_autoConfig` could be set to `array('foo' => 'merge')`, and the constructor value
-	 * of `'foo'` would be merged with the default value of `$_foo` and assigned to it.
-	 *
-	 * @see lithium\core\Object::$_autoConfig
-	 * @return void
-	 */
-	protected function _init() {
-		foreach ($this->_autoConfig as $key => $flag) {
-			if (!isset($this->_config[$key]) && !isset($this->_config[$flag])) {
-				continue;
-			}
-
-			if ($flag === 'merge') {
-				$this->{"_{$key}"} = $this->_config[$key] + $this->{"_{$key}"};
-			} else {
-				$this->{"_$flag"} = $this->_config[$flag];
-			}
-		}
-	}
-
 }
 
 ?>

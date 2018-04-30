@@ -37,11 +37,13 @@ class PhpTest extends \lithium\test\Unit {
 		if (!$name) {
 			$name = session_name();
 		}
-		$settings = session_get_cookie_params();
-		setcookie(
-			$name, '', time() - 1000, $settings['path'], $settings['domain'],
-			$settings['secure'], $settings['httponly']
-		);
+		if (PHP_SAPI !== 'cli') {
+			$settings = session_get_cookie_params();
+			setcookie(
+				$name, '', time() - 1000, $settings['path'], $settings['domain'],
+				$settings['secure'], $settings['httponly']
+			);
+		}
 		if (session_id()) {
 			session_destroy();
 		}
@@ -122,7 +124,7 @@ class PhpTest extends \lithium\test\Unit {
 	public function testIsStartedNoInit() {
 		$this->_destroySession(session_name());
 
-		$php = new Php(['init' => false]);
+		$php = new Php();
 		$result = $php->isStarted();
 		$this->assertFalse($result);
 
@@ -246,28 +248,28 @@ class PhpTest extends \lithium\test\Unit {
 	}
 
 	public function testCheckThrowException() {
-		$php = new MockPhp(['init' => false]);
+		$php = new MockPhp();
 		$this->assertException('/Could not start session./', function() use ($php) {
 			$php->check('whatever');
 		});
 	}
 
 	public function testReadThrowException() {
-		$php = new MockPhp(['init' => false]);
+		$php = new MockPhp();
 		$this->assertException('/Could not start session./', function() use ($php) {
 			$php->read('whatever');
 		});
 	}
 
 	public function testWriteThrowException() {
-		$php = new MockPhp(['init' => false]);
+		$php = new MockPhp();
 		$this->assertException('/Could not start session./', function() use ($php) {
 			$php->write('whatever', 'value');
 		});
 	}
 
 	public function testDeleteThrowException() {
-		$php = new MockPhp(['init' => false]);
+		$php = new MockPhp();
 		$this->assertException('/Could not start session./', function() use ($php) {
 			$php->delete('whatever');
 		});

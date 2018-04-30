@@ -14,6 +14,8 @@ namespace lithium\tests\mocks\core;
  */
 class MockObjectDeprecatedConfiguration extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	protected $_testScalar = 'default';
 
 	protected $_testArray = ['default'];
@@ -25,6 +27,7 @@ class MockObjectDeprecatedConfiguration extends \lithium\core\ObjectDeprecated {
 			$this->_autoConfig = (array) $config['autoConfig'];
 			unset($config['autoConfig']);
 		}
+		$this->_autoConfig($config, $this->_autoConfig);
 		parent::__construct($config);
 	}
 

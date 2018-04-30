@@ -31,6 +31,8 @@ use lithium\util\Set;
  */
 class Query extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * Array containing mappings of relationship and field names, which allow database results to
 	 * be mapped to the correct objects.
@@ -193,13 +195,10 @@ class Query extends \lithium\core\ObjectDeprecated {
 			'schema' => null,
 			'comment' => null,
 			'map' => [],
-			'relationships' => []
+			'relationships' => [],
 		];
 		parent::__construct($config + $defaults);
-	}
-
-	protected function _init() {
-		parent::_init();
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 
 		foreach ($this->_initializers as $key) {
 			if (($value = $this->_config[$key]) !== null) {
@@ -221,7 +220,7 @@ class Query extends \lithium\core\ObjectDeprecated {
 		}
 		$this->fields($this->_config['fields']);
 
-		unset($this->_config['entity'], $this->_config['init']);
+		unset($this->_config['entity']);
 	}
 
 	/**

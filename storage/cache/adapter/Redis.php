@@ -70,7 +70,8 @@ class Redis extends \lithium\storage\cache\Adapter {
 	public $connection;
 
 	/**
-	 * Constructor.
+	 * Constructor. Initialize the Redis connection object, connect to the Redis server
+	 * and sets prefix using the scope if provided.
 	 *
 	 * @todo Implement configurable & optional authentication
 	 * @see lithium\storage\Cache::config()
@@ -100,18 +101,8 @@ class Redis extends \lithium\storage\cache\Adapter {
 			'persistent' => false
 		];
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Initialize the Redis connection object, connect to the Redis server and sets
-	 * prefix using the scope if provided.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		if (!$this->connection) {
-			$this->connection = new RedisCore();
-		}
+		$this->connection = new RedisCore();
 		$method = $this->_config['persistent'] ? 'pconnect' : 'connect';
 
 		if (HostString::isSocket($this->_config['host'])) {

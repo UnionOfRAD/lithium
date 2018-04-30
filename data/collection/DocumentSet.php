@@ -21,8 +21,8 @@ class DocumentSet extends \lithium\data\Collection {
 	 */
 	protected $_original = [];
 
-	protected function _init() {
-		parent::_init();
+	public function __construct(array $config = []) {
+		parent::__construct($config);
 		$this->_original = $this->_data;
 		$this->_handlers += [
 			'MongoDB\BSON\ObjectId' => function($value) { return (string) $value; },

@@ -118,7 +118,7 @@ class Relationship extends \lithium\core\ObjectDeprecated {
 			'fields'      => true,
 			'fieldName'   => null,
 			'constraints' => [],
-			'strategy'    => null
+			'strategy'    => null,
 		];
 		$config += $defaults;
 
@@ -128,15 +128,9 @@ class Relationship extends \lithium\core\ObjectDeprecated {
 		if (!$config['to'] && !$config['name']) {
 			throw new ConfigException("`'to'` and `'name'` options can't both be empty.");
 		}
-		parent::__construct($config);
-	}
 
-	/**
-	 * Initializes the `Relationship` object by attempting to automatically generate any values
-	 * that were not provided in the constructor configuration.
-	 */
-	protected function _init() {
-		parent::_init();
+		parent::__construct($config);
+
 		$config =& $this->_config;
 
 		if (!$config['to']) {

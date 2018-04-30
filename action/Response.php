@@ -41,9 +41,12 @@ class Response extends \lithium\net\http\Response {
 	protected $_autoConfig = ['classes' => 'merge'];
 
 	/**
-	 * Constructor. Adds config values to the public properties when a new object is created.
-	 * Config options also include default values for `Response::body()` when called from
-	 * `Response::render()`.
+	 * Constructor. Adds config values to the public properties when a new object is
+	 * created. Config options also include default values for `Response::body()` when
+	 * called from `Response::render()`.
+	 *
+	 * Sets the Location header using `$config['location']` and `$config['request']`
+	 * passed in through the constructor if provided.
 	 *
 	 * @see lithium\net\http\Message::body()
 	 * @see lithium\net\http\Response::__construct()
@@ -65,19 +68,10 @@ class Response extends \lithium\net\http\Response {
 			'decode' => false
 		];
 		parent::__construct($config + $defaults);
-	}
-
-	/**
-	 * Sets the Location header using `$config['location']` and `$config['request']` passed in
-	 * through the constructor if provided.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		parent::_init();
-		$router = $this->_classes['router'];
 
 		if ($this->_config['location']) {
+			$router = $this->_classes['router'];
+
 			$location = $router::match($this->_config['location'], $this->_config['request']);
 			$this->headers('Location', $location);
 		}

@@ -197,18 +197,6 @@ abstract class Database extends \lithium\data\Source {
 			'options'    => []
 		];
 		parent::__construct($config + $defaults);
-	}
-
-	/**
-	 * Initializer. Initializes properties like `Database::$_strategies` because
-	 * closures cannot be created within the class definition.
-	 *
-	 * @see lithium\data\source\Database::$_columns
-	 * @see lithium\data\source\Database::$_strings
-	 * @see lithium\data\source\Database::$_strategies
-	 */
-	protected function _init() {
-		parent::_init();
 
 		if (!$this->_config['database']) {
 			throw new ConfigException('No database configured.');

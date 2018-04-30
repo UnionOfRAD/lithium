@@ -98,10 +98,11 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 */
 	protected $_removed = [];
 
-	protected function _init() {
-		parent::_init();
+	public function __construct(array $config = []) {
+		parent::__construct($config);
 
 		$data = (array) $this->_data;
+
 		$this->_data = [];
 		$this->_updated = [];
 		$this->_removed = [];
@@ -111,7 +112,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 			'MongoDB\BSON\UTCDateTime' => function($value) { return $value->toDateTime()->getTimestamp(); }
 		];
 
-		$this->set($data, ['init' => true]);
+		$this->set($data);
 		$this->sync(null, [], ['materialize' => $this->_exists]);
 		unset($this->_autoConfig);
 	}

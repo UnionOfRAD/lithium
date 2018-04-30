@@ -192,7 +192,7 @@ class Help extends \lithium\console\Command {
 		$defaults = ['name' => null];
 		$options += $defaults;
 
-		$properties = Inspector::properties(new $class(['init' => false]), ['self' => false]);
+		$properties = Inspector::properties(new $class(), ['self' => false]);
 		$results = [];
 
 		foreach ($properties as &$property) {

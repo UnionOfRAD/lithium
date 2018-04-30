@@ -75,7 +75,6 @@ class DatabaseTest extends \lithium\test\Unit {
 			'dsn'         => null,
 			'options'     => [],
 			'autoConnect' => true,
-			'init'        => true
 		];
 		$result = $this->_db->testConfig();
 		$this->assertEqual($expected, $result);
@@ -93,7 +92,6 @@ class DatabaseTest extends \lithium\test\Unit {
 			'dsn'           => null,
 			'options'       => [],
 			'autoConnect'   => true,
-			'init'          => true
 		];
 		$result = $db->testConfig();
 		$this->assertEqual($expected, $result);

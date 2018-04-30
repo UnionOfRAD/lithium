@@ -31,6 +31,8 @@ use lithium\analysis\Inspector;
  */
 class Entity extends \lithium\core\ObjectDeprecated implements \Serializable {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * Fully-namespaced class name of model that this record is bound to. Instance methods declared
 	 * in the model may be called on the entity. See the `Model` class documentation for more
@@ -137,9 +139,11 @@ class Entity extends \lithium\core\ObjectDeprecated implements \Serializable {
 		'handlers'
 	];
 
-	protected function _init() {
-		parent::_init();
+	public function __construct(array $config = []) {
+		parent::__construct($config);
+		$this->_autoConfig($config, $this->_autoConfig);
 		$this->_updated = $this->_data;
+
 	}
 
 	/**

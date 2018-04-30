@@ -18,6 +18,8 @@ use lithium\core\ClassNotFoundException;
  */
 class Service extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * The `Socket` instance used to send `Service` calls.
 	 *
@@ -79,7 +81,7 @@ class Service extends \lithium\core\ObjectDeprecated {
 	 *        - `'username'` _string_
 	 *        - `'password'` _string_
 	 *        - `'encoding'` _string_
-	 *        - `'socket'` _string_
+	 *        - `'socket'` _string_|_boolean_ if `false` will not establish a connection.
 	 * @return void
 	 */
 	public function __construct(array $config = []) {
@@ -93,24 +95,18 @@ class Service extends \lithium\core\ObjectDeprecated {
 			'username'   => null,
 			'password'   => null,
 			'encoding'   => 'UTF-8',
-			'socket'     => 'Context'
+			'socket'     => 'Context',
 		];
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Initialize connection.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		$config = ['classes' => $this->_classes] + $this->_config;
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 
-		try {
-			$this->connection = Libraries::instance('socket', $config['socket'], $config);
-		} catch(ClassNotFoundException $e) {
-			$this->connection = null;
+		if ($this->_config['socket']) {
+			$this->connection = Libraries::instance(
+				'socket', $this->_config['socket'], ['classes' => $this->_classes] + $this->_config
+			);
 		}
+
 		$this->_responseTypes += [
 			'headers' => function($response) { return $response->headers; },
 			'body' => function($response) { return $response->body(); },

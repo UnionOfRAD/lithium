@@ -134,7 +134,8 @@ class Form extends \lithium\template\Helper {
 	protected $_bindingOptions = [];
 
 	/**
-	 * Constructor.
+	 * Constructor. Adds a content handler for the `wrap` key in the `field()` method,
+	 * which converts an array of properties to an attribute string.
 	 *
 	 * @param array $config Configuration options.
 	 * @return void
@@ -183,16 +184,6 @@ class Form extends \lithium\template\Helper {
 			}
 		];
 		parent::__construct(Set::merge($defaults, $config));
-	}
-
-	/**
-	 * Object initializer. Adds a content handler for the `wrap` key in the `field()` method, which
-	 * converts an array of properties to an attribute string.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		parent::_init();
 
 		if ($this->_context) {
 			$this->_context->handlers(['wrap' => 'attributes']);

@@ -157,17 +157,7 @@ class MySql extends \lithium\data\source\Database {
 			'strict' => null
 		];
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Initializer. Adds MySQL-specific operators to `$_operators`. Constructs
-	 * a DSN from configuration.
-	 *
-	 * @see lithium\data\source\database\adapter\MySql::$_operators
-	 * @see lithium\data\source\Database::$_operators
-	 * @return void
-	 */
-	protected function _init() {
 		if (!$this->_config['host']) {
 			throw new ConfigException('No host configured.');
 		}
@@ -190,7 +180,6 @@ class MySql extends \lithium\data\source\Database {
 				$this->_config['database']
 			);
 		}
-		parent::_init();
 
 		$this->_operators += [
 			'REGEXP' => [],

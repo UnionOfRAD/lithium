@@ -88,13 +88,10 @@ class Http extends \lithium\data\Source {
 		$config = $config + $defaults;
 		$config['username'] = $config['login'];
 		parent::__construct($config);
-	}
 
-	protected function _init() {
 		$config = $this->_config;
 		unset($config['type']);
 		$this->connection = Libraries::instance(null, 'service', $config, $this->_classes);
-		parent::_init();
 	}
 
 	/**

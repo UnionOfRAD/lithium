@@ -15,8 +15,8 @@ namespace lithium\data\entity;
  */
 class Record extends \lithium\data\Entity {
 
-	protected function _init() {
-		parent::_init();
+	public function __construct(array $config = []) {
+		parent::__construct($config);
 		$this->_handlers += ['stdClass' => function($item) { return $item; }];
 	}
 }

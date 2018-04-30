@@ -53,6 +53,8 @@ namespace lithium\net\http;
  */
 class Route extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * The URL template string that the route matches, i.e.
 	 * `'/admin/{:controller}/{:id:\d+}/{:args}'`.
@@ -225,10 +227,8 @@ class Route extends \lithium\core\ObjectDeprecated {
 			'unicode'  => true
 		];
 		parent::__construct($config + $defaults);
-	}
 
-	protected function _init() {
-		parent::_init();
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 
 		if (!$this->_config['continue'] && strpos($this->_template, '{:action:') === false) {
 			$this->_params += ['action' => 'index'];

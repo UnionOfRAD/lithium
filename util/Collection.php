@@ -77,6 +77,8 @@ namespace lithium\util;
  */
 class Collection extends \lithium\core\ObjectDeprecated implements \ArrayAccess, \Iterator, \Countable {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * A central registry of global format handlers for `Collection` objects and subclasses.
 	 * Accessed via the `formats()` method.
@@ -159,14 +161,25 @@ class Collection extends \lithium\core\ObjectDeprecated implements \ArrayAccess,
 	}
 
 	/**
-	 * Initializes the collection object by merging in collection items and removing redundant
-	 * object properties.
+	 * Constructor. Initializes the collection object by merging in collection items and
+	 * removing redundant object properties.
 	 *
+	 * @param array $config Valid options are:
+	 *        - `'data'`
 	 * @return void
 	 */
-	protected function _init() {
-		parent::_init();
-		unset($this->_config['data']);
+	public function __construct(array $config = []) {
+		$defaults = ['data' => []];
+		$this->_config = $config + $defaults;
+
+		parent::__construct($config + $defaults);
+
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
+
+		// probably ugly/smelly fix?
+		if (!in_array("lithium\data\Collection", class_parents($this))) {
+			unset($this->_config['data']);
+		}
 	}
 
 	/**

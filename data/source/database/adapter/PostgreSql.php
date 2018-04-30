@@ -145,14 +145,7 @@ class PostgreSql extends \lithium\data\source\Database {
 			'timezone' => null
 		];
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Initializer. Constructs a DSN from configuration.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
 		if (!$this->_config['host'] && $this->_config['host'] !== false) {
 			throw new ConfigException('No host configured.');
 		}
@@ -174,7 +167,6 @@ class PostgreSql extends \lithium\data\source\Database {
 				$this->_config['database']
 			);
 		}
-		parent::_init();
 	}
 
 	/**

@@ -598,7 +598,7 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testMagicParamsAccess() {
-		$request = new Request(['init' => false]);
+		$request = new Request(['globals' => false]);
 		$this->assertNull($request->action);
 		$this->assertArrayNotHasKey('action', $request->params);
 		$this->assertFalse(isset($request->action));

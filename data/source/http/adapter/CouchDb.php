@@ -64,10 +64,7 @@ class CouchDb extends \lithium\data\source\Http {
 	public function __construct(array $config = []) {
 		$defaults = ['port' => 5984, 'version' => 1, 'database' => null];
 		parent::__construct($config + $defaults);
-	}
 
-	protected function _init() {
-		parent::_init();
 		$this->_handlers += [
 			'integer' => function($v) { return (integer) $v; },
 			'float'   => function($v) { return (float) $v; },

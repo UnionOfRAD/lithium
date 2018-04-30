@@ -28,8 +28,9 @@ use lithium\template\view\Compiler;
 class Code extends \lithium\g11n\catalog\Adapter {
 
 	/**
-	 * Constructor.
+	 * Constructor. Checks if the configured path exists.
 	 *
+	 * @throws lithium\core\ConfigException
 	 * @param array $config Available configuration options are:
 	 *        - `'path'`: The path to the directory holding the data.
 	 *        - `'scope'`: Scope to use.
@@ -38,15 +39,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	public function __construct(array $config = []) {
 		$defaults = ['path' => null, 'scope' => null];
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Initializer.  Checks if the configured path exists.
-	 *
-	 * @throws lithium\core\ConfigException
-	 */
-	protected function _init() {
-		parent::_init();
 		if (!is_dir($this->_config['path'])) {
 			$message = "Code directory does not exist at path `{$this->_config['path']}`.";
 			throw new ConfigException($message);

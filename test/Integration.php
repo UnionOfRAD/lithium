@@ -24,12 +24,13 @@ use lithium\aop\Filters;
 class Integration extends \lithium\test\Unit {
 
 	/**
-	 * Auto init for applying Integration filter to this test class.
+	 * Constructor. Applies Integration filter to this test class.
 	 *
+	 * @param array $config Currently unused.
 	 * @return void
 	 */
-	protected function _init() {
-		parent::_init();
+	public function __construct(array $config = []) {
+		parent::__construct($config);
 
 		Filters::apply($this, 'run', function($params, $next) {
 			$before = $this->results();

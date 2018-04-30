@@ -42,7 +42,6 @@ class GroupTest extends \lithium\test\Unit {
 			new MockTest()
 		]]);
 		$result = $group->tests();
-
 		$this->assertEqual($expected, $result);
 	}
 

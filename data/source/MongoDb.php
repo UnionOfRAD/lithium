@@ -236,6 +236,11 @@ class MongoDb extends \lithium\data\Source {
 	/**
 	 * Constructor.
 	 *
+	 * Adds operator handlers which will later allow to correctly cast any
+	 * values. Constructs a DSN from configuration, if not given.
+	 *
+	 * @see lithium\data\source\MongoDb::$_operators
+	 * @see lithium\data\source\MongoDb::_operators()
 	 * @see lithium\data\Connections::add()
 	 * @see lithium\data\source\MongoDb::$_schema
 	 * @link http://php.net/mongo.construct.php PHP Manual: Mongo::__construct()
@@ -281,18 +286,6 @@ class MongoDb extends \lithium\data\Source {
 			$config['uriOptions']['connectTimeoutMS'] = $config['timeout'];
 		}
 		parent::__construct($config);
-	}
-
-	/**
-	 * Initializer. Adds operator handlers which will later allow to correctly cast any
-	 * values. Constructs a DSN from configuration, if not given.
-	 *
-	 * @see lithium\data\source\MongoDb::$_operators
-	 * @see lithium\data\source\MongoDb::_operators()
-	 * @return void
-	 */
-	protected function _init() {
-		parent::_init();
 
 		if (is_string($this->_config['host']) && stristr($this->_config['host'], '://')) {
 			$this->_config['dsn'] = $this->_config['host'];

@@ -105,8 +105,13 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $request->argv);
 
 		$request = new Request([
-			'env' => ['script' => '/path/to/lithium.php'],
-			'args' => ['one', 'two', 'three', 'four']
+			'env' => [
+				'argv' => [
+					'/path/to/lithium.php',
+					'one', 'two', 'three', 'four'
+				]
+			],
+			'globals' => false
 		]);
 
 		$expected = '/path/to/lithium.php';

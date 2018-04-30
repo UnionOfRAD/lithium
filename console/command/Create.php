@@ -75,12 +75,15 @@ class Create extends \lithium\console\Command {
 	protected $_library = [];
 
 	/**
-	 * Class initializer. Parses template and sets up params that need to be filled.
+	 * Constructor. Parses template and sets up params that need to be filled.
 	 *
+	 * @see lithium\console\Command
+	 * @param array $config For available options, see parent class.
 	 * @return void
 	 */
-	protected function _init() {
-		parent::_init();
+	public function __construct(array $config = []) {
+		parent::__construct($config);
+
 		$this->library = $this->library ?: true;
 		$defaults = ['prefix' => null, 'path' => null];
 		$this->_library = (array) Libraries::get($this->library) + $defaults;

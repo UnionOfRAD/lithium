@@ -19,6 +19,8 @@ use lithium\util\Text;
  */
 abstract class Helper extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * Maps helper method names to content types as defined by the `Media` class, where key are
 	 * method names, and values are the content type that the method name outputs a link to.
@@ -67,7 +69,7 @@ abstract class Helper extends \lithium\core\ObjectDeprecated {
 	];
 
 	/**
-	 * Constructor.
+	 * Constructor. Imports local string definitions into rendering context.
 	 *
 	 * @param array $config Configuration options.
 	 * @return void
@@ -75,15 +77,8 @@ abstract class Helper extends \lithium\core\ObjectDeprecated {
 	public function __construct(array $config = []) {
 		$defaults = ['handlers' => [], 'context' => null];
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Imports local string definitions into rendering context.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		parent::_init();
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 
 		if (!$this->_context) {
 			return;

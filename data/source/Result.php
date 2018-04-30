@@ -40,6 +40,8 @@ namespace lithium\data\source;
  */
 abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterator {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * The current position of the iterator.
 	 *
@@ -104,8 +106,10 @@ abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterato
 	 *
 	 * @return void
 	 */
-	protected function _init() {
-		parent::_init();
+
+	public function __construct(array $config = []) {
+		parent::__construct($config);
+		$this->_autoConfig($config, $this->_autoConfig);
 		$this->next();
 	}
 

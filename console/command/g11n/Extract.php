@@ -24,8 +24,16 @@ class Extract extends \lithium\console\Command {
 
 	public $scope;
 
-	protected function _init() {
-		parent::_init();
+	/**
+	 * Constructor.
+	 *
+	 * @see lithium\console\Command
+	 * @param array $config For available options, see parent class.
+	 * @return void
+	 */
+	public function __construct(array $config = []) {
+		parent::__construct($config);
+
 		$this->source = $this->source ?: Libraries::get(true, 'path');
 		$this->destination = $this->destination ?: Libraries::get(true, 'resources') . '/g11n';
 	}

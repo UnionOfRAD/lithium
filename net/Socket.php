@@ -18,6 +18,8 @@ use lithium\core\Libraries;
  */
 abstract class Socket extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * The resource for the current connection.
 	 *
@@ -64,6 +66,7 @@ abstract class Socket extends \lithium\core\ObjectDeprecated {
 			'timeout'    => 30
 		];
 		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 	}
 
 	/**

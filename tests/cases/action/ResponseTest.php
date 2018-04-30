@@ -17,7 +17,7 @@ class ResponseTest extends \lithium\test\Unit {
 	public $response = null;
 
 	public function setUp() {
-		$this->response = new MockResponse(['init' => false]);
+		$this->response = new MockResponse();
 	}
 
 	public function testTypeManipulation() {

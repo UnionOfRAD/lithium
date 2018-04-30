@@ -54,8 +54,9 @@ use lithium\core\ConfigException;
 class Php extends \lithium\g11n\catalog\Adapter {
 
 	/**
-	 * Constructor.
+	 * Constructor. Checks if the configured path exists.
 	 *
+	 * @throws lithium\core\ConfigException
 	 * @param array $config Available configuration options are:
 	 *        - `'path'`: The path to the directory holding the data.
 	 * @return void
@@ -63,16 +64,7 @@ class Php extends \lithium\g11n\catalog\Adapter {
 	public function __construct(array $config = []) {
 		$defaults = ['path' => null];
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Initializer.  Checks if the configured path exists.
-	 *
-	 * @return void
-	 * @throws \Exception
-	 */
-	protected function _init() {
-		parent::_init();
 		if (!is_dir($this->_config['path'])) {
 			$message = "Php directory does not exist at path `{$this->_config['path']}`.";
 			throw new ConfigException($message);

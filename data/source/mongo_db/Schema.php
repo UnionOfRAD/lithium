@@ -40,11 +40,8 @@ class Schema extends \lithium\data\DocumentSchema {
 	public function __construct(array $config = []) {
 		$defaults = ['fields' => ['_id' => ['type' => 'id']]];
 		parent::__construct(array_filter($config) + $defaults);
-	}
 
-	protected function _init() {
 		$this->_autoConfig[] = 'handlers';
-		parent::_init();
 
 		$this->_handlers += [
 			'id' => function($v) {

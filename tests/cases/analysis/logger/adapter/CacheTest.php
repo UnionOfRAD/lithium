@@ -47,8 +47,7 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = [
 			'config' => "cachelog",
 			'expiry' => CacheStorage::PERSIST,
-			'key' => "cachelog_testkey",
-			'init' => true
+			'key' => "cachelog_testkey"
 		];
 		$result = $this->cachelog->_config;
 		$this->assertEqual($expected, $result);

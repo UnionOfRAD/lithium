@@ -23,6 +23,8 @@ namespace lithium\data;
  */
 abstract class Collection extends \lithium\util\Collection implements \Serializable {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * A reference to this object's parent `Document` object.
 	 *
@@ -136,13 +138,12 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 * @return void
 	 */
 	public function __construct(array $config = []) {
-		$defaults = ['data' => [], 'model' => null];
+		$defaults = ['model' => null];
 		parent::__construct($config + $defaults);
-	}
 
-	protected function _init() {
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 		$data = $this->_config['data'];
-		parent::_init();
+
 		$this->set($data);
 		foreach (['classes', 'model', 'result', 'query'] as $key) {
 			unset($this->_config[$key]);
@@ -664,7 +665,6 @@ abstract class Collection extends \lithium\util\Collection implements \Serializa
 	 */
 	public function unserialize($data) {
 		$vars = unserialize($data);
-		parent::_init();
 
 		foreach ($vars as $key => $value) {
 			$this->{$key} = $value;

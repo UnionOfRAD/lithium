@@ -142,6 +142,8 @@ use lithium\util\Inflector;
  */
 class Form extends \lithium\core\ObjectDeprecated {
 
+	use \lithium\core\AutoConfigurable;
+
 	/**
 	 * The name of the model class to query against. This can either be a model name (i.e.
 	 * `'Users'`), or a fully-namespaced class reference (i.e. `'app\models\Users'`). When
@@ -297,15 +299,8 @@ class Form extends \lithium\core\ObjectDeprecated {
 		$config['validators'] = array_filter($config['validators'] + compact('password'));
 
 		parent::__construct($config + $defaults);
-	}
 
-	/**
-	 * Initializes values configured in the constructor.
-	 *
-	 * @return void
-	 */
-	protected function _init() {
-		parent::_init();
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
 
 		foreach ($this->_fields as $key => $val) {
 			if (is_int($key)) {

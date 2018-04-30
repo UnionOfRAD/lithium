@@ -61,8 +61,8 @@ class RecordSet extends \lithium\data\Collection {
 	 * @see lithium\data\collection\RecordSet::$_columns
 	 * @return void
 	 */
-	protected function _init() {
-		parent::_init();
+	public function __construct(array $config = []) {
+		parent::__construct($config);
 
 		if (!$this->_result) {
 			return;

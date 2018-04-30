@@ -34,16 +34,16 @@ class Route extends \lithium\console\Command {
 	/**
 	 * Constructor. Load the routes file and set the environment.
 	 *
-	 * @param array $config The default configuration, wherein the absolute path to the
-	 *        routes file to load may be specified, using the `'routes'` key.
+	 * @see lithium\console\Command
+	 * @param array $config For available options, see parent class.
+	 *        Additionally the absolute path to the routes file to load
+	 *        may be specified, using the `'routes'` key.
+	 * @return void
 	 */
-	public function __construct($config = []) {
+	public function __construct(array $config = []) {
 		$defaults = ['routes' => Libraries::get(true, 'path') . '/config/routes.php'];
 		parent::__construct($config + $defaults);
-	}
 
-	protected function _init() {
-		parent::_init();
 		Environment::set($this->env);
 
 		if (file_exists($this->_config['routes'])) {

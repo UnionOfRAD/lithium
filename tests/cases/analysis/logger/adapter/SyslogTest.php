@@ -32,8 +32,7 @@ class SyslogTest extends \lithium\test\Unit {
 		$expected = [
 			'identity' => false,
 			'options' => LOG_ODELAY,
-			'facility' => LOG_USER,
-			'init' => true
+			'facility' => LOG_USER
 		];
 		$result = $this->syslog->_config;
 		$this->assertEqual($expected, $result);
@@ -46,8 +45,7 @@ class SyslogTest extends \lithium\test\Unit {
 			'identity' => 'SyslogTest',
 			'options' => LOG_ODELAY,
 			'facility' => LOG_USER,
-			'priority' => LOG_DEBUG,
-			'init' => true
+			'priority' => LOG_DEBUG
 		];
 		$result = $syslog->_config;
 		$this->assertEqual($expected, $result);
