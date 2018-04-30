@@ -35,10 +35,10 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 * Initializes the record set and uses the database connection to get the column list contained
 	 * in the query that created this object.
 	 *
-	 * @see lithium\data\collection\RecordSet::$_columns
-	 * @return void
 	 * @todo The part that uses _handle->schema() should be rewritten so that the column list
 	 *       is coming from the query object.
+	 * @see lithium\data\collection\RecordSet::$_columns
+	 * @return void
 	 */
 	protected function _init() {
 		parent::_init();

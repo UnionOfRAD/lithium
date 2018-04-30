@@ -249,7 +249,7 @@ class Service extends \lithium\core\Object {
 		$response = $this->connection->send($request, $options);
 		$this->connection->close();
 
-		if ($response->status['code'] == 401 && $auth = $response->digest()) {
+		if ($response->status['code'] == 401 && ($auth = $response->digest())) {
 			$request->auth = $auth;
 			$this->connection->open(['message' => $request] + $options);
 			$response = $this->connection->send($request, $options);

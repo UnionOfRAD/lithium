@@ -56,10 +56,10 @@ class RecordSet extends \lithium\data\Collection {
 	 * Initializes the record set and uses the database connection to get the column list contained
 	 * in the query that created this object.
 	 *
-	 * @see lithium\data\collection\RecordSet::$_columns
-	 * @return void
 	 * @todo The part that uses _handle->schema() should be rewritten so that the column list
 	 *       is coming from the query object.
+	 * @see lithium\data\collection\RecordSet::$_columns
+	 * @return void
 	 */
 	protected function _init() {
 		parent::_init();
@@ -129,7 +129,7 @@ class RecordSet extends \lithium\data\Collection {
 	 *
 	 * @throws RuntimeException
 	 * @param array $row 2 dimensional PDO `Result` array
-	 * @return object Returns a `Record` object
+	 * @return \lithium\data\entity\Record Returns a `Record` object.
 	 */
 	protected function _mapRecord($row) {
 		$main = array_intersect_key($row, $this->_keyIndex);

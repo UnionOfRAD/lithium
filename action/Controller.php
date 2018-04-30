@@ -146,7 +146,10 @@ class Controller extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = []) {
 		$defaults = [
-			'request' => null, 'response' => [], 'render' => [], 'classes' => []
+			'request' => null,
+			'response' => [],
+			'render' => [],
+			'classes' => []
 		];
 		parent::__construct($config + $defaults);
 	}

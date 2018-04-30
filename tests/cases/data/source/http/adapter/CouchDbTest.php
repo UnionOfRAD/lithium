@@ -51,6 +51,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		Connections::remove('mockconn');
 		MockCouchPost::reset();
 	}
+
 	public function testAllMethodsNoConnection() {
 		$this->assertNotEmpty($this->_db->connect());
 		$this->assertNotEmpty($this->_db->disconnect());
