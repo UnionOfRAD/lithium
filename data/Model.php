@@ -1115,7 +1115,7 @@ class Model extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Getter and setter for custom instance methods. This is used in `Entity::__call()`.
+	 * Getter and setter for custom instance methods. This is used in `__call()`.
 	 *
 	 * ```
 	 * Model::instanceMethods([
@@ -1125,7 +1125,7 @@ class Model extends \lithium\core\StaticObject {
 	 * ]);
 	 * ```
 	 *
-	 * @see lithium\data\Entity::__call()
+	 * @see lithium\data\Model::__call()
 	 * @param array $methods
 	 * @return array
 	 */
