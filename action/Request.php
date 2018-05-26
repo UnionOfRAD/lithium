@@ -241,8 +241,6 @@ class Request extends \lithium\net\http\Request {
 	 * populating the data property either by using i.e. form data or reading from STDIN in
 	 * case binary data is streamed. Will merge any files posted in forms with parsed data.
 	 *
-	 * Note that only beginning with PHP 5.6 STDIN can be opened/read and closed more than once.
-	 *
 	 * @see lithium\action\Request::_parseFiles()
 	 */
 	protected function _init() {
