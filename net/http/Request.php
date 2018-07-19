@@ -152,13 +152,14 @@ class Request extends \lithium\net\http\Message {
 	 */
 	public function type($type = null) {
 		$type = parent::type($type);
-		$media = $this->_classes['media'];
 		if (strpos($type, '/') !== false) {
+			$media = $this->_classes['media'];
 			$data = $media::type($type);
 			if (is_array($data) && !isset($data['content'])) {
 				foreach ($data as $short_type) {
 					$conf = $media::type($short_type);
-					if ($media::match($this, ['name' => $short_type] + $conf)) {
+					$conf['name'] = $short_type;
+					if ($media::match($this, $conf)) {
 						$type = $short_type;
 						break;
 					}
