@@ -158,7 +158,7 @@ class Request extends \lithium\net\http\Message {
 			if (is_array($data) && !isset($data['content'])) {
 				foreach ($data as $short_type) {
 					$conf = $media::type($short_type);
-					if ($media::match($this, $conf)) {
+					if ($media::match($this, ['name' => $short_type] + $conf)) {
 						$type = $short_type;
 						break;
 					}
