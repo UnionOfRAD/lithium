@@ -165,7 +165,7 @@ class Request extends \lithium\net\http\Message {
 				}
 			}
 		}
-		return $this->_type = $type;
+		return ($this->_type = $type);
 	}
 
 	/**
