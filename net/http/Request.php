@@ -140,36 +140,6 @@ class Request extends \lithium\net\http\Message {
 	}
 
 	/**
-	 * Handle the case where multiple types are registered with the Media class
-	 * with the same Content-Type where conditions distinguish them. In these
-	 * cases, to correctly determine the "short type" from the full type
-	 * (e.g. 'json' from 'application/json') we must loop over each short type
-	 * returned from Media::type and attempt to match the request to it.
-	 *
-	 * @param string $type A full content type i.e. `'application/json'` or simple name `'json'`
-	 * @return string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending
-	 *         on the content type of the request.
-	 */
-	public function type($type = null) {
-		$type = parent::type($type);
-		if (strpos($type, '/') !== false) {
-			$media = $this->_classes['media'];
-			$data = $media::type($type);
-			if (is_array($data) && !isset($data['content'])) {
-				foreach ($data as $short_type) {
-					$conf = $media::type($short_type);
-					$conf['name'] = $short_type;
-					if ($media::match($this, $conf)) {
-						$type = $short_type;
-						break;
-					}
-				}
-			}
-		}
-		return ($this->_type = $type);
-	}
-
-	/**
 	 * Compile the HTTP message body, optionally encoding its parts according to content type.
 	 *
 	 * @see lithium\net\http\Message::body()
