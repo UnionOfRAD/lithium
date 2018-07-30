@@ -73,6 +73,10 @@
   operate in _legacy_ mode (see above). In this case it also doesn't depend on the 
   `mcrypt` extension anymore.
 
+- With HTML5 stating the type when linking or embedding scripts and styles using
+  `text/css` and `text/javascript` has become unnecessary. The `Html` helper will 
+  now generate `<link>`, `<style>` and `<script>` tags without such types.
+
 ### Deprecated
 
 - Short rendering instructions have now been officially deprecated and trigger a
