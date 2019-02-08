@@ -121,9 +121,17 @@ class CouchDb extends \lithium\data\source\Http {
                 if (is_array($result)) {
                         return (object) $result;
                 }
-                else{
+                else if (is_string($result)){
                         return json_decode($result);
                 }
+                else {
+                        $message  = "CouchDB connection returns datatype : ".gettype($result)." . ";
+                        $message .= 'We are unable to handle that.';
+                        trigger_error($message, E_USER_ERROR);
+
+
+                }
+
 	}
 
 	/**
