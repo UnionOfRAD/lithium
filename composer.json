@@ -14,11 +14,11 @@
         "irc": "irc://irc.freenode.org/li3"
     },
     "require": {
-        "php": ">=5.3.6 <7.0.0",
+        "php": "^5.5.14 || ^7.0.3",
         "composer/installers": "1.*"
     },
     "require-dev": {
-        "unionofrad/li3_fixtures": "1.0.*"
+        "unionofrad/li3_fixtures": "^1.1"
     },
     "bin" : ["console/li3"]
 }

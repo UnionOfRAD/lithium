@@ -1,16 +1,17 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\template\view\adapter;
 
 use Exception;
 use lithium\util\Set;
-use lithium\util\String;
+use lithium\util\Text;
 
 /**
  * This view adapter renders content using simple string substitution, and is only useful for very
@@ -27,18 +28,18 @@ class Simple extends \lithium\template\view\Renderer {
 	 * @param array $options
 	 * @return string
 	 */
-	public function render($template, $data = array(), array $options = array()) {
-		$defaults = array('context' => array());
+	public function render($template, $data = [], array $options = []) {
+		$defaults = ['context' => []];
 		$options += $defaults;
 
-		$context = array();
+		$context = [];
 		$this->_context = $options['context'] + $this->_context;
 
 		foreach (array_keys($this->_context) as $key) {
 			$context[$key] = $this->__get($key);
 		}
 		$data = array_merge($this->_toString($context), $this->_toString($data));
-		return String::insert($template, $data, $options);
+		return Text::insert($template, $data, $options);
 	}
 
 	/**

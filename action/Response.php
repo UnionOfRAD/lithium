@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\action;
@@ -26,18 +27,18 @@ class Response extends \lithium\net\http\Response {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'router' => 'lithium\net\http\Router',
 		'media' => 'lithium\net\http\Media',
 		'auth' => 'lithium\net\http\Auth'
-	);
+	];
 
 	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('classes' => 'merge');
+	protected $_autoConfig = ['classes' => 'merge'];
 
 	/**
 	 * Constructor. Adds config values to the public properties when a new object is created.
@@ -56,13 +57,13 @@ class Response extends \lithium\net\http\Response {
 	 *        - `'request'` _object_: Defaults to `null`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'buffer' => 8192,
 			'location' => null,
 			'request' => null,
 			'decode' => false
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -93,23 +94,23 @@ class Response extends \lithium\net\http\Response {
 	 */
 	public function cache($expires) {
 		if ($expires === false) {
-			$headers = array(
+			$headers = [
 				'Expires' => 'Mon, 26 Jul 1997 05:00:00 GMT',
-				'Cache-Control' => array(
+				'Cache-Control' => [
 					'no-store, no-cache, must-revalidate',
 					'post-check=0, pre-check=0',
 					'max-age=0'
-				),
+				],
 				'Pragma' => 'no-cache'
-			);
+			];
 		} else {
 			$expires = is_int($expires) ? $expires : strtotime($expires);
 
-			$headers = array(
+			$headers = [
 				'Expires' => gmdate('D, d M Y H:i:s', $expires) . ' GMT',
 				'Cache-Control' => 'max-age=' . ($expires - time()),
 				'Pragma' => 'cache'
-			);
+			];
 		}
 		$this->headers($headers);
 	}
@@ -196,6 +197,8 @@ class Response extends \lithium\net\http\Response {
 			$code ? header($header, false, $code) : header($header, false);
 		}
 	}
+
+	/* Deprecated / BC */
 
 	/**
 	 * Expands on `\net\http\Message::headers()` with some magic conversions for shorthand headers.

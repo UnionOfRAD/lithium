@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\g11n;
@@ -15,19 +16,19 @@ use lithium\g11n\catalog\adapter\Memory;
 
 class MessageTest extends \lithium\test\Unit {
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	public function setUp() {
 		$this->_backup['catalogConfig'] = Catalog::config();
 		Catalog::reset();
-		Catalog::config(array(
-			'runtime' => array('adapter' => new Memory())
-		));
+		Catalog::config([
+			'runtime' => ['adapter' => new Memory()]
+		]);
 		$data = function($n) { return $n === 1 ? 0 : 1; };
 		Catalog::write('runtime', 'message.pluralRule', 'root', $data);
 
 		$this->_backup['environment'] = Environment::get('test');
-		Environment::set('test', array('locale' => 'en'));
+		Environment::set('test', ['locale' => 'en']);
 		Environment::set('test');
 		Message::cache(false);
 	}
@@ -40,221 +41,221 @@ class MessageTest extends \lithium\test\Unit {
 	}
 
 	public function testTranslateBasic() {
-		$data = array('catalog' => 'Katalog');
+		$data = ['catalog' => 'Katalog'];
 		Catalog::write('runtime', 'message', 'de', $data);
 
 		$expected = 'Katalog';
-		$result = Message::translate('catalog', array('locale' => 'de'));
+		$result = Message::translate('catalog', ['locale' => 'de']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testTranslatePlural() {
-		$data = array(
-			'house' => array('Haus', 'Häuser')
-		);
+		$data = [
+			'house' => ['Haus', 'Häuser']
+		];
 		Catalog::write('runtime', 'message', 'de', $data);
 
 		$expected = 'Haus';
-		$result = Message::translate('house', array('locale' => 'de'));
+		$result = Message::translate('house', ['locale' => 'de']);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => 5));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => 5]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testTranslateNonIntegerCounts() {
-		$data = array(
-			'house' => array('Haus', 'Häuser')
-		);
+		$data = [
+			'house' => ['Haus', 'Häuser']
+		];
 		Catalog::write('runtime', 'message', 'de', $data);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => 2.31));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => 2.31]);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => 1.1));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => 1.1]);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => 0.1));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => 0.1]);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Haus';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => true));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => true]);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => false));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => false]);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => '2'));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => '2']);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => '0'));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => '0']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testTranslateNegativeIntegerCounts() {
-		$data = array(
-			'house' => array('Haus', 'Häuser')
-		);
+		$data = [
+			'house' => ['Haus', 'Häuser']
+		];
 		Catalog::write('runtime', 'message', 'de', $data);
 
 		$expected = 'Haus';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => -1));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => -1]);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => -2));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => -2]);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = Message::translate('house', array('locale' => 'de', 'count' => -5));
+		$result = Message::translate('house', ['locale' => 'de', 'count' => -5]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testTranslateFail() {
-		$result = Message::translate('catalog', array('locale' => 'de'));
+		$result = Message::translate('catalog', ['locale' => 'de']);
 		$this->assertNull($result);
 
 		Catalog::reset();
-		Catalog::config(array(
-			'runtime' => array('adapter' => new Memory())
-		));
+		Catalog::config([
+			'runtime' => ['adapter' => new Memory()]
+		]);
 
-		$data = array(
-			'catalog' => array('Katalog', 'Kataloge')
-		);
+		$data = [
+			'catalog' => ['Katalog', 'Kataloge']
+		];
 		Catalog::write('runtime', 'message', 'de', $data);
 
-		$result = Message::translate('catalog', array('locale' => 'de'));
+		$result = Message::translate('catalog', ['locale' => 'de']);
 		$this->assertNull($result);
 
 		$data = 'not a valid pluralization function';
 		Catalog::write('runtime', 'message.pluralRule', 'root', $data);
 
-		$result = Message::translate('catalog', array('locale' => 'de'));
+		$result = Message::translate('catalog', ['locale' => 'de']);
 		$this->assertNull($result);
 	}
 
 	public function testTranslateScope() {
-		$data = array(
+		$data = [
 			'catalog' => 'Katalog'
-		);
-		Catalog::write('runtime', 'message', 'de', $data, array('scope' => 'test'));
+		];
+		Catalog::write('runtime', 'message', 'de', $data, ['scope' => 'test']);
 
 		$data = function($n) { return $n === 1 ? 0 : 1; };
-		Catalog::write('runtime', 'message.pluralRule', 'root', $data, array(
+		Catalog::write('runtime', 'message.pluralRule', 'root', $data, [
 			'scope' => 'test'
-		));
+		]);
 
-		$result = Message::translate('catalog', array('locale' => 'de'));
+		$result = Message::translate('catalog', ['locale' => 'de']);
 		$this->assertNull($result);
 
 		$expected = 'Katalog';
-		$result = Message::translate('catalog', array('locale' => 'de', 'scope' => 'test'));
+		$result = Message::translate('catalog', ['locale' => 'de', 'scope' => 'test']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testTranslateDefault() {
-		$result = Message::translate('Here I am', array('locale' => 'de'));
+		$result = Message::translate('Here I am', ['locale' => 'de']);
 		$this->assertNull($result);
 
-		$result = Message::translate('Here I am', array(
+		$result = Message::translate('Here I am', [
 			'locale' => 'de', 'default' => 'Here I am'
-		));
+		]);
 		$expected = 'Here I am';
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testTranslatePlaceholders() {
-		$data = array(
+		$data = [
 			'green' => 'grün',
 			'No. {:id}' => 'Nr. {:id}',
 			'The fish is {:color}.' => 'Der Fisch ist {:color}.',
-			'{:count} bike' => array('{:count} Fahrrad', '{:count} Fahrräder')
-		);
+			'{:count} bike' => ['{:count} Fahrrad', '{:count} Fahrräder']
+		];
 		Catalog::write('runtime', 'message', 'de', $data);
 
 		$expected = 'Der Fisch ist grün.';
-		$result = Message::translate('The fish is {:color}.', array(
+		$result = Message::translate('The fish is {:color}.', [
 			'locale' => 'de',
-			'color' => Message::translate('green', array('locale' => 'de'))
-		));
+			'color' => Message::translate('green', ['locale' => 'de'])
+		]);
 		$this->assertEqual($expected, $result);
 
 		$expected = '1 Fahrrad';
-		$result = Message::translate('{:count} bike', array('locale' => 'de', 'count' => 1));
+		$result = Message::translate('{:count} bike', ['locale' => 'de', 'count' => 1]);
 		$this->assertEqual($expected, $result);
 
 		$expected = '7 Fahrräder';
-		$result = Message::translate('{:count} bike', array('locale' => 'de', 'count' => 7));
+		$result = Message::translate('{:count} bike', ['locale' => 'de', 'count' => 7]);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Nr. 8';
-		$result = Message::translate('No. {:id}', array('locale' => 'de', 'id' => 8));
+		$result = Message::translate('No. {:id}', ['locale' => 'de', 'id' => 8]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testTranslateContext() {
-		$data = array(
+		$data = [
 			'fast|speed' => 'rapide',
 			'fast|go without food' => 'jeûner'
-		);
+		];
 		Catalog::write('runtime', 'message', 'fr', $data);
 
 		$expected = 'rapide';
-		$result = Message::translate('fast', array(
+		$result = Message::translate('fast', [
 			'locale' => 'fr',
 			'context' => 'speed'
-		));
+		]);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'jeûner';
-		$result = Message::translate('fast', array(
+		$result = Message::translate('fast', [
 			'locale' => 'fr',
 			'context' => 'go without food'
-		));
+		]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testTranslateLocales() {
-		$data = array(
+		$data = [
 			'catalog' => 'Katalog'
-		);
+		];
 		Catalog::write('runtime', 'message', 'de', $data);
-		$data = array(
+		$data = [
 			'catalog' => 'catalogue'
-		);
+		];
 		Catalog::write('runtime', 'message', 'fr', $data);
 
 		$expected = 'Katalog';
-		$result = Message::translate('catalog', array('locale' => 'de'));
+		$result = Message::translate('catalog', ['locale' => 'de']);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'catalogue';
-		$result = Message::translate('catalog', array('locale' => 'fr'));
+		$result = Message::translate('catalog', ['locale' => 'fr']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testTranslateNoop() {
-		$data = array(
+		$data = [
 			'catalog' => 'Katalog'
-		);
+		];
 		Catalog::write('runtime', 'message', 'de', $data);
 
-		$result = Message::translate('catalog', array('locale' => 'de', 'noop' => true));
+		$result = Message::translate('catalog', ['locale' => 'de', 'noop' => true]);
 		$this->assertNull($result);
 	}
 
 	public function testAliasesBasic() {
-		$data = array(
-			'house' => array('Haus', 'Häuser')
-		);
+		$data = [
+			'house' => ['Haus', 'Häuser']
+		];
 		Catalog::write('runtime', 'message', 'de', $data);
 
 		$filters = Message::aliases();
@@ -262,36 +263,36 @@ class MessageTest extends \lithium\test\Unit {
 		$tn = $filters['tn'];
 
 		$expected = 'Haus';
-		$result = $t('house', array('locale' => 'de'));
+		$result = $t('house', ['locale' => 'de']);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Haus';
-		$result = $tn('house', 'houses', 1, array('locale' => 'de'));
+		$result = $tn('house', 'houses', 1, ['locale' => 'de']);
 		$this->assertEqual($expected, $result);
 
 		$expected = 'Häuser';
-		$result = $tn('house', 'houses', 3, array('locale' => 'de'));
+		$result = $tn('house', 'houses', 3, ['locale' => 'de']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testAliasesSymmetry() {
-		$data = array('house' => array('Haus', 'Häuser'));
+		$data = ['house' => ['Haus', 'Häuser']];
 		Catalog::write('runtime', 'message', 'de', $data);
 
 		$filters = Message::aliases();
 		$t = $filters['t'];
 		$tn = $filters['tn'];
 
-		$expected = Message::translate('house', array('locale' => 'de'));
-		$result = $t('house', array('locale' => 'de'));
+		$expected = Message::translate('house', ['locale' => 'de']);
+		$result = $t('house', ['locale' => 'de']);
 		$this->assertEqual($expected, $result);
 
-		$expected = Message::translate('house', array('locale' => 'de', 'count' => 1));
-		$result = $tn('house', 'houses', 1, array('locale' => 'de'));
+		$expected = Message::translate('house', ['locale' => 'de', 'count' => 1]);
+		$result = $tn('house', 'houses', 1, ['locale' => 'de']);
 		$this->assertEqual($expected, $result);
 
-		$expected = Message::translate('house', array('locale' => 'de', 'count' => 3));
-		$result = $tn('house', 'houses', 3, array('locale' => 'de'));
+		$expected = Message::translate('house', ['locale' => 'de', 'count' => 3]);
+		$result = $tn('house', 'houses', 3, ['locale' => 'de']);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -300,22 +301,22 @@ class MessageTest extends \lithium\test\Unit {
 		$t = $filters['t'];
 		$tn = $filters['tn'];
 
-		$expected = Message::translate('house', array('locale' => 'de'));
-		$result = $t('house', array('locale' => 'de'));
+		$expected = Message::translate('house', ['locale' => 'de']);
+		$result = $t('house', ['locale' => 'de']);
 		$this->assertNotEqual($expected, $result);
 
-		$expected = Message::translate('house', array('locale' => 'de', 'count' => 3));
-		$result = $tn('house', 'houses', array('locale' => 'de'));
+		$expected = Message::translate('house', ['locale' => 'de', 'count' => 3]);
+		$result = $tn('house', 'houses', ['locale' => 'de']);
 		$this->assertNotEqual($expected, $result);
 	}
 
 	public function testCaching() {
-		$data = array('catalog' => 'Katalog');
-		Catalog::write('runtime', 'message', 'de', $data, array('scope' => 'foo'));
+		$data = ['catalog' => 'Katalog'];
+		Catalog::write('runtime', 'message', 'de', $data, ['scope' => 'foo']);
 
 		$this->assertEmpty(Message::cache());
 
-		$result = Message::translate('catalog', array('locale' => 'de', 'scope' => 'foo'));
+		$result = Message::translate('catalog', ['locale' => 'de', 'scope' => 'foo']);
 		$this->assertEqual('Katalog', $result);
 
 		$cache = Message::cache();
@@ -324,15 +325,15 @@ class MessageTest extends \lithium\test\Unit {
 		Message::cache(false);
 		$this->assertEmpty(Message::cache());
 
-		Message::cache(array('foo' => array('de' => array('catalog' => '<Katalog>'))));
-		$result = Message::translate('catalog', array('locale' => 'de', 'scope' => 'foo'));
+		Message::cache(['foo' => ['de' => ['catalog' => '<Katalog>']]]);
+		$result = Message::translate('catalog', ['locale' => 'de', 'scope' => 'foo']);
 		$this->assertEqual('<Katalog>', $result);
 
-		$options = array('locale' => 'de', 'scope' => 'foo', 'count' => 2);
+		$options = ['locale' => 'de', 'scope' => 'foo', 'count' => 2];
 		$this->assertEqual('<Katalog>', Message::translate('catalog', $options));
 
 		Message::cache(false);
-		Message::cache(array('foo' => array('de' => array('catalog' => array('<Katalog>')))));
+		Message::cache(['foo' => ['de' => ['catalog' => ['<Katalog>']]]]);
 		$this->assertNull(Message::translate('catalog', $options));
 	}
 }

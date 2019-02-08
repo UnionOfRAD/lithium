@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\net\http;
@@ -12,13 +13,13 @@ class MockSocket extends \lithium\net\Socket {
 
 	public $data = null;
 
-	public $configs = array();
+	public $configs = [];
 
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		parent::__construct((array) $config);
 	}
 
-	public function open(array $options = array()) {
+	public function open(array $options = []) {
 		parent::open($options);
 		return true;
 	}
@@ -55,7 +56,7 @@ class MockSocket extends \lithium\net\Socket {
 			$header .= 'opaque="d3fb67a7aa4d887ec4bf83040a820a46";';
 			$this->data->headers('WWW-Authenticate', $header);
 			$status = "GET HTTP/1.1 401 Authorization Required";
-			$response = array($status, join("\r\n", $this->data->headers()), "", "not authorized");
+			$response = [$status, join("\r\n", $this->data->headers()), "", "not authorized"];
 			return join("\r\n", $response);
 		}
 		return (string) $this->data;

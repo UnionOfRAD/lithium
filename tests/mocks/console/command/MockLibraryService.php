@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\console\command;
@@ -13,25 +14,25 @@ use lithium\net\http\Response;
 
 class MockLibraryService extends \lithium\net\http\Service {
 
-	public function send($method, $path = null, $data = array(), array $options = array()) {
+	public function send($method, $path = null, $data = [], array $options = []) {
 		if ($this->_config['host'] === 'localhost') {
 			return null;
 		}
 		if ($method === 'post') {
 			$this->request = $this->_request($method, $path, $data, $options);
 			if (!empty($this->request->username)) {
-				$user =  array(
+				$user =  [
 					'method' => 'Basic', 'username' => 'gwoo', 'password' => 'password'
-				);
+				];
 				if ($this->request->username !== $user['username']) {
-					$this->last = (object) array('response' => new Response());
+					$this->last = (object) ['response' => new Response()];
 					$this->last->response->status(401);
-					return json_encode(array(
+					return json_encode([
 						'error' => 'Invalid username/password.'
-					));
+					]);
 				}
 			}
-			$this->last = (object) array('response' => new Response());
+			$this->last = (object) ['response' => new Response()];
 			$this->last->response->status(201);
 			return json_encode($this->_data('plugins', 1));
 		}
@@ -61,88 +62,88 @@ class MockLibraryService extends \lithium\net\http\Service {
 	protected function _data($type, $key = null) {
 		$resources = Libraries::get(true, 'resources');
 
-		$plugins = array(
-			array(
+		$plugins = [
+			[
 				'name' => 'li3_lab', 'version' => '1.0',
 				'summary' => 'the li3 plugin client/server',
-				'maintainers' => array(
-					array(
+				'maintainers' => [
+					[
 						'name' => 'gwoo', 'email' => 'gwoo@nowhere.com',
 						'website' => 'li3.rad-dev.org'
-					)
-				),
+					]
+				],
 				'created' => '2009-11-30', 'updated' => '2009-11-30',
 				'rating' => '9.9', 'downloads' => '1000',
-				'sources' => array(
+				'sources' => [
 					'git' => 'git://rad-dev.org/li3_lab.git',
 					'phar' => 'http://downloads.rad-dev.org/li3_lab.phar.gz'
-				),
-				'requires' => array()
-			),
-			array(
+				],
+				'requires' => []
+			],
+			[
 				'id' => 'b22a2f0dfc873fd0e1a7655f4895872ae4b94ef4',
 				'name' => 'library_test_plugin', 'version' => '1.0',
 				'summary' => 'an li3 plugin example',
-				'maintainers' => array(
-					array(
+				'maintainers' => [
+					[
 						'name' => 'gwoo', 'email' => 'gwoo@nowhere.com',
 						'website' => 'li3.rad-dev.org'
-					)
-				),
+					]
+				],
 				'created' => '2009-11-30', 'updated' => '2009-11-30',
 				'rating' => '9.9', 'downloads' => '1000',
-				'sources' => array(
+				'sources' => [
 					'phar' => "{$resources}/tmp/tests/library_test_plugin.phar.gz"
-				),
-				'requires' => array(
-					'li3_lab' => array('version' => '<=1.0')
-				)
-			),
-			array(
+				],
+				'requires' => [
+					'li3_lab' => ['version' => '<=1.0']
+				]
+			],
+			[
 				'name' => 'li3_docs', 'version' => '1.0',
 				'summary' => 'the li3 plugin client/server',
-				'maintainers' => array(
-					array(
+				'maintainers' => [
+					[
 						'name' => 'gwoo', 'email' => 'gwoo@nowhere.com',
 						'website' => 'li3.rad-dev.org'
-					)
-				),
+					]
+				],
 				'created' => '2009-11-30', 'updated' => '2009-11-30',
 				'rating' => '9.9', 'downloads' => '1000',
-				'sources' => array(
+				'sources' => [
 					'git' => 'git://rad-dev.org/li3_docs.git',
 					'phar' => 'http://downloads.rad-dev.org/li3_docs.phar.gz'
-				),
-				'requires' => array()
-			)
-		);
+				],
+				'requires' => []
+			]
+		];
 
-		$extensions = array(
-			array(
+		$extensions = [
+			[
 				'class' => 'Example', 'namespace' => 'app\extensions\adapter\cache',
 				'summary' => 'the example adapter',
-				'maintainers' => array(
-					array(
+				'maintainers' => [
+					[
 						'name' => 'gwoo', 'email' => 'gwoo@nowhere.com',
 						'website' => 'li3.rad-dev.org'
-					)
-				),
+					]
+				],
 				'created' => '2009-11-30', 'updated' => '2009-11-30',
 				'rating' => '9.9', 'downloads' => '1000'
-			),
-			array(
+			],
+			[
 				'class' => 'Paginator', 'namespace' => 'app\extensions\helpes',
 				'summary' => 'a paginator helper',
-				'maintainers' => array(
-					array(
+				'maintainers' => [
+					[
 						'name' => 'gwoo', 'email' => 'gwoo@nowhere.com',
 						'website' => 'li3.rad-dev.org'
-					)
-				),
+					]
+				],
 				'created' => '2009-11-30', 'updated' => '2009-11-30',
 				'rating' => '9.9', 'downloads' => '1000'
-			)
-		);
+			]
+		];
 		$data = compact('plugins', 'extensions');
 
 		if (isset($data[$type][$key])) {

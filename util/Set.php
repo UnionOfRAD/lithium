@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\util;
@@ -100,7 +101,7 @@ class Set {
 	 */
 	public static function combine($data, $path1 = null, $path2 = null, $groupPath = null) {
 		if (!$data) {
-			return array();
+			return [];
 		}
 		if (is_object($data)) {
 			$data = get_object_vars($data);
@@ -111,7 +112,7 @@ class Set {
 		} else {
 			$keys = static::extract($data, $path1);
 		}
-		$vals = array();
+		$vals = [];
 		if (!empty($path2) && is_array($path2)) {
 			$format = array_shift($path2);
 			$vals = static::format($data, $format, $path2);
@@ -133,7 +134,7 @@ class Set {
 						$group[$i] = 0;
 					}
 					if (!isset($out[$group[$i]])) {
-						$out[$group[$i]] = array();
+						$out[$group[$i]] = [];
 					}
 					$out[$group[$i]][$keys[$i]] = $vals[$i];
 				}
@@ -175,8 +176,8 @@ class Set {
 	 * @param array $options
 	 * @return integer The number of dimensions in `$array`.
 	 */
-	public static function depth($data, array $options = array()) {
-		$defaults = array('all' => false, 'count' => 0);
+	public static function depth($data, array $options = []) {
+		$defaults = ['all' => false, 'count' => 0];
 		$options += $defaults;
 
 		if (!$data) {
@@ -186,14 +187,14 @@ class Set {
 		if (!$options['all']) {
 			return (is_array(reset($data))) ? static::depth(reset($data)) + 1 : 1;
 		}
-		$depth = array($options['count']);
+		$depth = [$options['count']];
 
 		if (is_array($data) && reset($data) !== false) {
 			foreach ($data as $value) {
-				$depth[] = static::depth($value, array(
+				$depth[] = static::depth($value, [
 					'all' => $options['all'],
 					'count' => $options['count'] + 1
-				));
+				]);
 			}
 		}
 		return max($depth);
@@ -210,7 +211,7 @@ class Set {
 		if (!$val1 || !$val2) {
 			return $val2 ?: $val1;
 		}
-		$out = array();
+		$out = [];
 
 		foreach ($val1 as $key => $val) {
 			$exists = isset($val2[$key]);
@@ -252,12 +253,12 @@ class Set {
 	 *              disabled for higher XPath-ness.
 	 * @return array An array of matched items.
 	 */
-	public static function extract(array $data, $path = null, array $options = array()) {
-		$defaults = array('flatten' => true);
+	public static function extract(array $data, $path = null, array $options = []) {
+		$defaults = ['flatten' => true];
 		$options += $defaults;
 
 		if (!$data) {
-			return array();
+			return [];
 		}
 		if ($path === '/') {
 			return array_filter($data, function($data) {
@@ -267,7 +268,7 @@ class Set {
 		$contexts = $data;
 
 		if (!isset($contexts[0])) {
-			$contexts = array($data);
+			$contexts = [$data];
 		}
 
 		$tokens = array_slice(preg_split('/(?<!=)\/(?![a-z-]*\])/', $path), 1);
@@ -280,11 +281,11 @@ class Set {
 				$conditions = $m[1];
 				$token = substr($token, 0, strpos($token, '['));
 			}
-			$matches = array();
+			$matches = [];
 
 			foreach ($contexts as $key => $context) {
 				if (!isset($context['trace'])) {
-					$context = array('trace' => array(null), 'item' => $context, 'key' => $key);
+					$context = ['trace' => [null], 'item' => $context, 'key' => $key];
 				}
 				if ($token === '..') {
 					if (count($context['trace']) === 1) {
@@ -302,35 +303,35 @@ class Set {
 				$match = false;
 
 				if ($token === '@*' && is_array($context['item'])) {
-					$matches[] = array(
+					$matches[] = [
 						'trace' => array_merge($context['trace'], (array) $key),
 						'key' => $key,
 						'item' => array_keys($context['item'])
-					);
+					];
 				} elseif (is_array($context['item']) && isset($context['item'][$token])) {
 					$items = $context['item'][$token];
 					if (!is_array($items)) {
-						$items = array($items);
+						$items = [$items];
 					} elseif (!isset($items[0])) {
 						$current = current($items);
 						if ((is_array($current) && count($items) <= 1) || !is_array($current)) {
-							$items = array($items);
+							$items = [$items];
 						}
 					}
 
 					foreach ($items as $key => $item) {
-						$ctext = array($context['key']);
+						$ctext = [$context['key']];
 						if (!is_numeric($key)) {
 							$ctext[] = $token;
 							$token = array_shift($tokens);
 							if (isset($items[$token])) {
 								$ctext[] = $token;
 								$item = $items[$token];
-								$matches[] = array(
+								$matches[] = [
 									'trace' => array_merge($context['trace'], $ctext),
 									'key' => $key,
 									'item' => $item
-								);
+								];
 								break;
 							} else {
 								array_unshift($tokens, $token);
@@ -339,30 +340,30 @@ class Set {
 							$ctext[] = $token;
 						}
 
-						$matches[] = array(
+						$matches[] = [
 							'trace' => array_merge($context['trace'], $ctext),
 							'key' => $key,
 							'item' => $item
-						);
+						];
 					}
 				} elseif (
 					$key === $token || (is_numeric($token) && $key == $token) || $token === '.'
 				) {
 					$context['trace'][] = $key;
-					$matches[] = array(
+					$matches[] = [
 						'trace' => $context['trace'],
 						'key' => $key,
 						'item' => $context['item']
-					);
+					];
 				}
 			}
 			if ($conditions) {
 				foreach ($conditions as $condition) {
-					$filtered = array();
+					$filtered = [];
 					$length = count($matches);
 
 					foreach ($matches as $i => $match) {
-						if (static::matches($match['item'], array($condition), $i + 1, $length)) {
+						if (static::matches($match['item'], [$condition], $i + 1, $length)) {
 							$filtered[] = $match;
 						}
 					}
@@ -376,13 +377,13 @@ class Set {
 			}
 		} while (true);
 
-		$r = array();
+		$r = [];
 
 		foreach ($matches as $match) {
 			$key = array_pop($match['trace']);
 			$condition = (!is_int($key) && $key !== null);
 			if ((!$options['flatten'] || is_array($match['item'])) && $condition) {
-				$r[] = array($key => $match['item']);
+				$r[] = [$key => $match['item']];
 			} else {
 				$r[] = $match['item'];
 			}
@@ -392,8 +393,8 @@ class Set {
 
 	/**
 	 * Collapses a multi-dimensional array into a single dimension, using a delimited array path
-	 * for each array element's key, i.e. array(array('Foo' => array('Bar' => 'Far'))) becomes
-	 * array('0.Foo.Bar' => 'Far').
+	 * for each array element's key, i.e. [array('Foo' => ['Bar' => 'Far'])] becomes
+	 * ['0.Foo.Bar' => 'Far'].
 	 *
 	 * @param array $data array to flatten
 	 * @param array $options Available options are:
@@ -401,10 +402,10 @@ class Set {
 	 *        - `'path'`: Starting point (defaults to null).
 	 * @return array
 	 */
-	public static function flatten($data, array $options = array()) {
-		$defaults = array('separator' => '.', 'path' => null);
+	public static function flatten($data, array $options = []) {
+		$defaults = ['separator' => '.', 'path' => null];
 		$options += $defaults;
-		$result = array();
+		$result = [];
 
 		if ($options['path'] !== null) {
 			$options['path'] .= $options['separator'];
@@ -414,7 +415,7 @@ class Set {
 				$result[$options['path'] . $key] = $val;
 				continue;
 			}
-			$opts = array('separator' => $options['separator'], 'path' => $options['path'] . $key);
+			$opts = ['separator' => $options['separator'], 'path' => $options['path'] . $key];
 			$result += (array) static::flatten($val, $opts);
 		}
 		return $result;
@@ -430,10 +431,10 @@ class Set {
 	 * @return array Returns a multi-dimensional array expanded from a one dimensional
 	 *         dot-separated array.
 	 */
-	public static function expand(array $data, array $options = array()) {
-		$defaults = array('separator' => '.');
+	public static function expand(array $data, array $options = []) {
+		$defaults = ['separator' => '.'];
 		$options += $defaults;
-		$result = array();
+		$result = [];
 
 		foreach ($data as $key => $val) {
 			if (strpos($key, $options['separator']) === false) {
@@ -464,7 +465,7 @@ class Set {
 	 * @link http://php.net/sprintf
 	 */
 	public static function format($data, $format, $keys) {
-		$extracted = array();
+		$extracted = [];
 		$count = count($keys);
 
 		if (!$count) {
@@ -473,7 +474,7 @@ class Set {
 		for ($i = 0; $i < $count; $i++) {
 			$extracted[] = static::extract($data, $keys[$i]);
 		}
-		$out = array();
+		$out = [];
 		$data = $extracted;
 		$count = count($data[0]);
 
@@ -499,7 +500,7 @@ class Set {
 		$count2 = count($data);
 
 		for ($j = 0; $j < $count; $j++) {
-			$args = array();
+			$args = [];
 
 			for ($i = 0; $i < $count2; $i++) {
 				if (isset($data[$i][$j])) {
@@ -519,7 +520,7 @@ class Set {
 	 * @param array $data Data to insert.
 	 * @return array
 	 */
-	public static function insert($list, $path, $data = array()) {
+	public static function insert($list, $path, $data = []) {
 		if (!is_array($path)) {
 			$path = explode('.', $path);
 		}
@@ -533,7 +534,7 @@ class Set {
 				$_list[$key] = $data;
 			} else {
 				if (!isset($_list[$key])) {
-					$_list[$key] = array();
+					$_list[$key] = [];
 				}
 				$_list =& $_list[$key];
 			}
@@ -649,7 +650,7 @@ class Set {
 	 * @return array Merged array of all passed params.
 	 */
 	public static function merge(array $array1, array $array2) {
-		$args = array($array1, $array2);
+		$args = [$array1, $array2];
 
 		if (!$array1 || !$array2) {
 			return $array1 ?: $array2;
@@ -674,8 +675,8 @@ class Set {
 	 * Normalizes a string or array list.
 	 *
 	 * ```
-	 * Set::normalize('foo,bar'); // returns array('foo' => null, 'bar' => null);
-	 * Set::normalize(array('foo', 'bar' => 'baz'); // returns array('foo' => null, 'bar' => 'baz');
+	 * Set::normalize('foo,bar'); // returns ['foo' => null, 'bar' => null];
+	 * Set::normalize(['foo', 'bar' => 'baz']; // returns ['foo' => null, 'bar' => 'baz'];
 	 * ```
 	 *
 	 * @param string|array $list List to normalize.
@@ -709,7 +710,7 @@ class Set {
 		}
 
 		if (!$numeric || $assoc) {
-			$newList = array();
+			$newList = [];
 			for ($i = 0; $i < $count; $i++) {
 				if (is_int($keys[$i]) && is_scalar($list[$keys[$i]])) {
 					$newList[$list[$keys[$i]]] = null;
@@ -764,7 +765,7 @@ class Set {
 	 */
 	public static function sort($data, $path, $dir = 'asc') {
 		$flatten = function($flatten, $results, $key = null) {
-			$stack = array();
+			$stack = [];
 			foreach ((array) $results as $k => $r) {
 				$id = $k;
 				if ($key !== null) {
@@ -773,7 +774,7 @@ class Set {
 				if (is_array($r)) {
 					$stack = array_merge($stack, $flatten($flatten, $r, $id));
 				} else {
-					$stack[] = array('id' => $id, 'value' => $r);
+					$stack[] = ['id' => $id, 'value' => $r];
 				}
 			}
 			return $stack;
@@ -786,7 +787,7 @@ class Set {
 
 		$dir = ($dir === 'desc') ? SORT_DESC : SORT_ASC;
 		array_multisort($values, $dir, $keys, $dir);
-		$sorted = array();
+		$sorted = [];
 		$keys = array_unique($keys);
 
 		foreach ($keys as $k) {
@@ -810,7 +811,7 @@ class Set {
 	public static function slice(array $data, $keys) {
 		$removed = array_intersect_key($data, array_fill_keys((array) $keys, true));
 		$data = array_diff_key($data, $removed);
-		return array($data, $removed);
+		return [$data, $removed];
 	}
 
 }

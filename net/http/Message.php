@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\net\http;
@@ -33,7 +34,7 @@ class Message extends \lithium\net\Message {
 	 *
 	 * @var array
 	 */
-	public $headers = array();
+	public $headers = [];
 
 	/**
 	 * Content-Type
@@ -47,10 +48,10 @@ class Message extends \lithium\net\Message {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'media' => 'lithium\net\http\Media',
 		'auth' => 'lithium\net\http\Auth'
-	);
+	];
 
 	/**
 	 * Constructor. Adds config values to the public properties when a new object is created.
@@ -64,13 +65,13 @@ class Message extends \lithium\net\Message {
 	 *        - `'headers'` _array_: Defaults to `array()`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'protocol' => null,
 			'version' => '1.1',
 			'scheme' => 'http',
-			'headers' => array()
-		);
+			'headers' => []
+		];
 		$config += $defaults;
 
 		foreach (array_intersect_key(array_filter($config), $defaults) as $key => $value) {
@@ -96,19 +97,19 @@ class Message extends \lithium\net\Message {
 	 * ```
 	 * // Get single or multiple headers.
 	 * $request->headers('Content-Type'); // returns 'text/plain'
-	 * $request->headers(); // returns array('Content-Type: text/plain', ... )
+	 * $request->headers(); // returns ['Content-Type: text/plain', ... ]
 	 *
 	 * // Set single or multiple headers.
 	 * $request->headers('Content-Type', 'text/plain');
-	 * $request->headers(array('Content-Type' => 'text/plain', ...));
+	 * $request->headers(['Content-Type' => 'text/plain', ...]);
 	 *
 	 * // Alternatively use full header line.
 	 * $request->headers('Content-Type: text/plain');
-	 * $request->headers(array('Content-Type: text/plain', ...));
+	 * $request->headers(['Content-Type: text/plain', ...]);
 	 *
 	 * // Removing single or multiple headers.
 	 * $request->headers('Content-Type', false);
-	 * $request->headers(array('Content-Type' => false, ...));
+	 * $request->headers(['Content-Type' => false, ...]);
 	 * ```
 	 *
 	 * Certain header fields support multiple values. These can be separated by
@@ -124,7 +125,7 @@ class Message extends \lithium\net\Message {
 	 * ```
 	 * // Replace single or multiple headers
 	 * $request->headers('Cache-Control', 'no-store');
-	 * $request->headers(array('Cache-Control' => 'public'));
+	 * $request->headers(['Cache-Control' => 'public']);
 	 * $request->headers('Cache-Control'); // returns 'public'
 	 *
 	 * // Merging with existing array headers.
@@ -132,17 +133,17 @@ class Message extends \lithium\net\Message {
 	 * $request->headers('Cache-Control', 'no-store');
 	 * $request->headers('Cache-Control', 'no-cache', false);
 	 * $request->headers();
-	 * // returns array('Cache-Control: no-store', 'Cache-Control: no-cache')
+	 * // returns ['Cache-Control: no-store', 'Cache-Control: no-cache']
 	 *
 	 * $request->headers('Cache-Control', 'no-store');
-	 * $request->headers('Cache-Control', array('no-cache'), false);
+	 * $request->headers('Cache-Control', ['no-cache'], false);
 	 * $request->headers();
-	 * // returns array('Cache-Control: no-store', 'Cache-Control: no-cache')
+	 * // returns ['Cache-Control: no-store', 'Cache-Control: no-cache']
 	 *
 	 * $request->headers('Cache-Control', 'max-age=0');
 	 * $request->headers('Cache-Control', 'no-store, no-cache');
 	 * $request->headers();
-	 * // returns array('Cache-Control: no-store, no-cache')
+	 * // returns ['Cache-Control: no-store, no-cache']
 	 * ```
 	 *
 	 * @link http://www.ietf.org/rfc/rfc2616.txt Section 4.2 Message Headers
@@ -162,7 +163,7 @@ class Message extends \lithium\net\Message {
 	 */
 	public function headers($key = null, $value = null, $replace = true) {
 		if ($key === null && $value === null) {
-			$headers = array();
+			$headers = [];
 
 			foreach ($this->headers as $key => $value) {
 				if (is_scalar($value)) {
@@ -229,7 +230,7 @@ class Message extends \lithium\net\Message {
 		if (!$type && $this->_type) {
 			return $this->_type;
 		}
-		$headers = $this->headers + array('Content-Type' => null);
+		$headers = $this->headers + ['Content-Type' => null];
 		$type = $type ?: $headers['Content-Type'];
 
 		if (!$type) {
@@ -261,8 +262,8 @@ class Message extends \lithium\net\Message {
 	 *        - `'decode'` _boolean_: decode the body based on the content type
 	 * @return array
 	 */
-	public function body($data = null, $options = array()) {
-		$default = array('buffer' => null, 'encode' => false, 'decode' => false);
+	public function body($data = null, $options = []) {
+		$default = ['buffer' => null, 'encode' => false, 'decode' => false];
 		$options += $default;
 
 		if ($data !== null) {

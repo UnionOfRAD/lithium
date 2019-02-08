@@ -1,14 +1,15 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\console;
 
-use lithium\util\String;
+use lithium\util\Text;
 
 /**
  * The `Response` class is used by other console classes to generate output. It contains stream
@@ -43,15 +44,25 @@ class Response extends \lithium\core\Object {
 	public $status = 0;
 
 	/**
+	 * Disables color output. Useful when piping command output
+	 * into other commands. Colors are by default enabled.
+	 *
+	 * @var boolean
+	 * @see lithium\console\Response::styles()
+	 */
+	public $plain = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array $config Available configuration options are:
 	 *        - `'output'` _resource|null_
 	 *        - `'error'` _resource|null_
+	 *        - `'color'` _boolean_ By default `true`.
 	 * @return void
 	 */
-	public function __construct($config = array()) {
-		$defaults = array('output' => null, 'error' => null);
+	public function __construct($config = []) {
+		$defaults = ['output' => null, 'error' => null, 'plain' => false];
 		$config += $defaults;
 
 		$this->output = $config['output'];
@@ -65,6 +76,8 @@ class Response extends \lithium\core\Object {
 		if (!is_resource($this->error)) {
 			$this->error = fopen('php://stderr', 'r');
 		}
+		$this->plain = $config['plain'];
+
 		parent::__construct($config);
 	}
 
@@ -75,7 +88,7 @@ class Response extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function output($output) {
-		return fwrite($this->output, String::insert($output, $this->styles()));
+		return fwrite($this->output, Text::insert($output, $this->styles()));
 	}
 
 	/**
@@ -85,7 +98,7 @@ class Response extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function error($error) {
-		return fwrite($this->error, String::insert($error, $this->styles()));
+		return fwrite($this->error, Text::insert($error, $this->styles()));
 	}
 
 	/**
@@ -103,13 +116,14 @@ class Response extends \lithium\core\Object {
 	}
 
 	/**
-	 * Handles styling output.
+	 * Handles styling output. Uses ANSI escape sequences for colorization. These
+	 * may not always be supported (i.e. on Windows).
 	 *
 	 * @param array|boolean $styles
 	 * @return array
 	 */
-	public function styles($styles = array()) {
-		$defaults = array(
+	public function styles($styles = []) {
+		$defaults = [
 			'end'    => "\033[0m",
 			'black'  => "\033[0;30m",
 			'red'    => "\033[0;31m",
@@ -125,16 +139,11 @@ class Response extends \lithium\core\Object {
 			'error'   => "\033[0;31m",
 			'success' => "\033[0;32m",
 			'bold'    => "\033[1m",
-		);
-		if ($styles === false) {
-			return array_combine(array_keys($defaults), array_pad(array(), count($defaults), null));
+		];
+		if ($styles === false || $this->plain || strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			return array_combine(array_keys($defaults), array_pad([], count($defaults), null));
 		}
-		$styles += $defaults;
-
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			return $this->styles(false);
-		}
-		return $styles;
+		return $styles + $defaults;
 	}
 }
 

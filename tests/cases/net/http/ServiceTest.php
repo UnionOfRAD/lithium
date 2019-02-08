@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\net\http;
@@ -15,20 +16,20 @@ class ServiceTest extends \lithium\test\Unit {
 
 	public $request = null;
 
-	protected $_testConfig = array(
-		'classes' => array('response' => 'lithium\net\http\Response'),
+	protected $_testConfig = [
+		'classes' => ['response' => 'lithium\net\http\Response'],
 		'socket' => 'lithium\tests\mocks\net\http\MockSocket',
 		'host' => 'localhost',
 		'port' => 80,
 		'timeout' => 2
-	);
+	];
 
 	public function setUp() {
 		Media::reset();
 	}
 
 	public function testAllMethodsNoConnection() {
-		$http = new Service(array('init' => false));
+		$http = new Service(['init' => false]);
 		$this->assertEmpty($http->get());
 		$this->assertEmpty($http->post());
 		$this->assertEmpty($http->put());
@@ -36,28 +37,28 @@ class ServiceTest extends \lithium\test\Unit {
 	}
 
 	public function testRequestPath() {
-		$http = new Service(array('host' => 'localhost') + $this->_testConfig);
+		$http = new Service(['host' => 'localhost'] + $this->_testConfig);
 		$result = $http->get();
 
 		$expected = '/';
 		$result = $http->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$http = new Service(array('host' => 'localhost/base/path/') + $this->_testConfig);
+		$http = new Service(['host' => 'localhost/base/path/'] + $this->_testConfig);
 		$result = $http->get();
 
 		$expected = '/base/path/';
 		$result = $http->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$http = new Service(array('host' => 'localhost/base/path') + $this->_testConfig);
+		$http = new Service(['host' => 'localhost/base/path'] + $this->_testConfig);
 		$result = $http->get('/somewhere');
 
 		$expected = '/base/path/somewhere';
 		$result = $http->last->request->path;
 		$this->assertEqual($expected, $result);
 
-		$http = new Service(array('host' => 'localhost/base/path/') + $this->_testConfig);
+		$http = new Service(['host' => 'localhost/base/path/'] + $this->_testConfig);
 		$result = $http->get('/somewhere');
 
 		$expected = '/base/path/somewhere';
@@ -67,13 +68,13 @@ class ServiceTest extends \lithium\test\Unit {
 
 	public function testReturnHandlers() {
 		$http = new Service($this->_testConfig);
-		$result = $http->get(null, null, array('return' => 'headers'));
+		$result = $http->get(null, null, ['return' => 'headers']);
 		$this->assertEqual('localhost:80', $result['Host']);
 
-		$result = $http->get(null, null, array('return' => 'response'));
+		$result = $http->get(null, null, ['return' => 'response']);
 		$this->assertEqual($result, $http->last->response);
 
-		$result = $http->get(null, null, array('return' => 'body'));
+		$result = $http->get(null, null, ['return' => 'body']);
 		$this->assertEqual($result, $http->last->response->body());
 	}
 
@@ -98,7 +99,7 @@ class ServiceTest extends \lithium\test\Unit {
 
 	public function testHeadQueryString() {
 		$http = new Service($this->_testConfig);
-		$expected = array('foo' => 'bar');
+		$expected = ['foo' => 'bar'];
 		$result = $http->head('/', $expected);
 		$this->assertEqual($expected, $http->last->request->query);
 	}
@@ -125,8 +126,8 @@ class ServiceTest extends \lithium\test\Unit {
 
 	public function testPost() {
 		$http = new Service($this->_testConfig);
-		$http->post('update.xml', array('status' => 'cool'));
-		$expected = join("\r\n", array(
+		$http->post('update.xml', ['status' => 'cool']);
+		$expected = join("\r\n", [
 			'POST /update.xml HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
@@ -134,11 +135,11 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Type: application/x-www-form-urlencoded',
 			'Content-Length: 11',
 			'', 'status=cool'
-		));
+		]);
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 
-		$expected = join("\r\n", array(
+		$expected = join("\r\n", [
 			'HTTP/1.1 200 OK',
 			'Host: localhost:80',
 			'Connection: Close',
@@ -146,15 +147,15 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
 			'Content-Length: 11',
 			'', 'status=cool'
-		));
+		]);
 		$result = (string) $http->last->response;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testPut() {
 		$http = new Service($this->_testConfig);
-		$http->put('update.xml', array('status' => 'cool'));
-		$expected = join("\r\n", array(
+		$http->put('update.xml', ['status' => 'cool']);
+		$expected = join("\r\n", [
 			'PUT /update.xml HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
@@ -162,11 +163,11 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Type: application/x-www-form-urlencoded',
 			'Content-Length: 11',
 			'', 'status=cool'
-		));
+		]);
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 
-		$expected = join("\r\n", array(
+		$expected = join("\r\n", [
 			'HTTP/1.1 200 OK',
 			'Host: localhost:80',
 			'Connection: Close',
@@ -174,7 +175,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
 			'Content-Length: 11',
 			'', 'status=cool'
-		));
+		]);
 		$result = (string) $http->last->response;
 		$this->assertEqual($expected, $result);
 	}
@@ -182,32 +183,32 @@ class ServiceTest extends \lithium\test\Unit {
 	public function testDelete() {
 		$http = new Service($this->_testConfig);
 		$http->delete('posts/1');
-		$expected = join("\r\n", array(
+		$expected = join("\r\n", [
 			'DELETE /posts/1 HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'', ''
-		));
+		]);
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 
-		$expected = join("\r\n", array(
+		$expected = join("\r\n", [
 			'HTTP/1.1 200 OK',
 			'Host: localhost:80',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'', ''
-		));
+		]);
 		$result = (string) $http->last->response;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testJsonPost() {
 		$http = new Service($this->_testConfig);
-		$data = array('status' => array('cool', 'awesome'));
-		$http->post('update.xml', $data, array('type' => 'json'));
-		$expected = join("\r\n", array(
+		$data = ['status' => ['cool', 'awesome']];
+		$http->post('update.xml', $data, ['type' => 'json']);
+		$expected = join("\r\n", [
 			'POST /update.xml HTTP/1.1',
 			'Host: localhost:80',
 			'Connection: Close',
@@ -215,11 +216,11 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Type: application/json',
 			'Content-Length: 29',
 			'', '{"status":["cool","awesome"]}'
-		));
+		]);
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 
-		$expected = join("\r\n", array(
+		$expected = join("\r\n", [
 			'HTTP/1.1 200 OK',
 			'Host: localhost:80',
 			'Connection: Close',
@@ -227,7 +228,7 @@ class ServiceTest extends \lithium\test\Unit {
 			'Content-Type: application/json;charset=UTF-8',
 			'Content-Length: 29',
 			'', '{"status":["cool","awesome"]}'
-		));
+		]);
 		$result = (string) $http->last->response;
 		$this->assertEqual($expected, $result);
 	}
@@ -237,14 +238,14 @@ class ServiceTest extends \lithium\test\Unit {
 		$connection = $http->connection;
 		$this->assertEqual('lithium\tests\mocks\net\http\MockSocket', get_class($connection));
 
-		$http->connection->open(array('scheme' => 'https'));
+		$http->connection->open(['scheme' => 'https']);
 		$config = $http->connection->config();
 		$this->assertEqual('https', $config['scheme']);
 	}
 
 	public function testSendConfiguringConnection() {
 		$http = new Service($this->_testConfig);
-		$result = $http->send('get', 'some-path/stuff', array(), array('someKey' => 'someValue'));
+		$result = $http->send('get', 'some-path/stuff', [], ['someKey' => 'someValue']);
 		$config = $http->connection->config();
 		$this->assertEqual('someValue', $config['someKey']);
 	}
@@ -253,8 +254,8 @@ class ServiceTest extends \lithium\test\Unit {
 		$http = new Service($this->_testConfig);
 		$response = $http->patch(
 			'some-path/stuff',
-			array('someData' => 'someValue'),
-			array('return' => 'response')
+			['someData' => 'someValue'],
+			['return' => 'response']
 		);
 		$result = $http->last->request;
 		$this->assertEqual('PATCH', $result->method);
@@ -266,8 +267,8 @@ class ServiceTest extends \lithium\test\Unit {
 		$http = new Service($this->_testConfig);
 		$response = $http->patch(
 			'some-path/stuff',
-			array('someData' => 'someValue'),
-			array('return' => 'response', 'type' => 'json')
+			['someData' => 'someValue'],
+			['return' => 'response', 'type' => 'json']
 		);
 		$result = $http->last->request;
 		$this->assertEqual('{"someData":"someValue"}', $result->body());
@@ -284,9 +285,9 @@ class ServiceTest extends \lithium\test\Unit {
 	}
 
 	public function testDigestAuth() {
-		$this->_testConfig += array('auth' => 'digest', 'username' => 'gwoo', 'password' => 'li3');
+		$this->_testConfig += ['auth' => 'digest', 'username' => 'gwoo', 'password' => 'li3'];
 		$http = new Service($this->_testConfig);
-		$response = $http->get('/http_auth/', array(), array('return' => 'response'));
+		$response = $http->get('/http_auth/', [], ['return' => 'response']);
 		$this->assertEqual('success', $response->body());
 	}
 

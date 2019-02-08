@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/mit-license.php The MIT License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\util;
@@ -24,30 +25,36 @@ class Inflector {
 	 * @see lithium\util\Inflector::rules()
 	 * @var array
 	 */
-	protected static $_transliteration = array(
+	protected static $_transliteration = [
 		'/à|á|å|â/' => 'a',
-		'/è|é|ê|ẽ|ë/' => 'e',
+		'/Á|À|Å|Â/' => 'A',
+		'/è|é|ė|ê|ẽ|ë/' => 'e',
+		'/É|È|Ė|Ê|Ē|Ë/' => 'E',
 		'/ì|í|î/' => 'i',
-		'/ò|ó|ô|ø/' => 'o',
+		'/Í|Ì|Î/' => 'I',
+		'/ò|ó|ơ|ô|ø/' => 'o',
+		'/Ò|Ó|Ơ|Ô|Ø/' => 'O',
 		'/ù|ú|ů|û/' => 'u',
+		'/Ú|Ù|Ů|Û/' => 'U',
 		'/ç|ć|č/' => 'c',
+		'/Č|Ć|Č/' => 'C',
 		'/đ/' => 'dj',
-		'/š/' => 's',
-		'/ž/' => 'z',
-		'/ñ/' => 'n',
-		'/ä|æ/' => 'ae',
-		'/ö/' => 'oe',
-		'/ü/' => 'ue',
-		'/Ä/' => 'Ae',
-		'/Ü/' => 'Ue',
-		'/Ö/' => 'Oe',
-		'/ß/' => 'ss',
-		'/Č|Ć/' => 'C',
-		'/DŽ/' => 'Dz',
 		'/Đ/' => 'Dj',
+		'/DŽ/' => 'Dz',
+		'/š/' => 's',
 		'/Š/' => 'S',
-		'/Ž/' => 'Z'
-	);
+		'/ž/' => 'z',
+		'/Ž/' => 'Z',
+		'/ñ/' => 'n',
+		'/Ñ/' => 'N',
+		'/ä|æ/' => 'ae',
+		'/Ä/' => 'Ae',
+		'/ö/' => 'oe',
+		'/Ö/' => 'Oe',
+		'/ü/' => 'ue',
+		'/Ü/' => 'Ue',
+		'/ß/' => 'ss'
+	];
 
 	/**
 	 * Indexed array of words which are the same in both singular and plural form.  You can add
@@ -56,7 +63,7 @@ class Inflector {
 	 * @see lithium\util\Inflector::rules()
 	 * @var array
 	 */
-	protected static $_uninflected = array(
+	protected static $_uninflected = [
 		'Amoyese', 'bison', 'Borghese', 'bream', 'breeches', 'britches', 'buffalo', 'cantus',
 		'carp', 'chassis', 'clippers', 'cod', 'coitus', 'Congoese', 'contretemps', 'corps',
 		'debris', 'diabetes', 'djinn', 'eland', 'elk', 'equipment', 'Faroese', 'flounder',
@@ -69,7 +76,7 @@ class Inflector {
 		'sea[- ]bass', 'series', 'Shavese', 'shears', 'siemens', 'species', 'swine', 'testes',
 		'trousers', 'trout','tuna', 'Vermontese', 'Wenchowese', 'whiting', 'wildebeest',
 		'Yengeese'
-	);
+	];
 
 	/**
 	 * Contains the list of pluralization rules.
@@ -85,8 +92,8 @@ class Inflector {
 	 *        not inflected according to the rules. This is populated from `Inflector::$_plural`
 	 *        when the class is loaded.
 	 */
-	protected static $_singular = array(
-		'rules' => array(
+	protected static $_singular = [
+		'rules' => [
 			'/(s)tatuses$/i' => '\1\2tatus',
 			'/^(.*)(menu)s$/i' => '\1\2',
 			'/(quiz)zes$/i' => '\\1',
@@ -119,19 +126,19 @@ class Inflector {
 			'/(n)ews$/i' => '\1\2ews',
 			'/^(.*us)$/' => '\\1',
 			'/s$/i' => ''
-		),
-		'irregular' => array(),
-		'uninflected' => array(
+		],
+		'irregular' => [],
+		'uninflected' => [
 			'.*[nrlm]ese', '.*deer', '.*fish', '.*measles', '.*ois', '.*pox', '.*sheep', '.*ss'
-		)
-	);
+		]
+	];
 
 	/**
 	 * Contains a cache map of previously singularized words.
 	 *
 	 * @var array
 	 */
-	protected static $_singularized = array();
+	protected static $_singularized = [];
 
 	/**
 	 * Contains the list of pluralization rules.
@@ -146,8 +153,8 @@ class Inflector {
 	 *      - `'irregular'`: Contains key-value pairs of specific words which are
 	 *        not inflected according to the rules.
 	 */
-	protected static $_plural = array(
-		'rules' => array(
+	protected static $_plural = [
+		'rules' => [
 			'/(s)tatus$/i' => '\1\2tatuses',
 			'/(quiz)$/i' => '\1zes',
 			'/^(ox)$/i' => '\1\2en',
@@ -170,8 +177,8 @@ class Inflector {
 			'/s$/' => 's',
 			'/^$/' => '',
 			'/$/' => 's'
-		),
-		'irregular' => array(
+		],
+		'irregular' => [
 			'atlas' => 'atlases', 'beef' => 'beefs', 'brother' => 'brothers',
 			'child' => 'children', 'corpus' => 'corpuses', 'cow' => 'cows',
 			'ganglion' => 'ganglions', 'genie' => 'genies', 'genus' => 'genera',
@@ -182,39 +189,76 @@ class Inflector {
 			'person' => 'people', 'sex' => 'sexes', 'sleeve' => 'sleeves',
 			'soliloquy' => 'soliloquies', 'tax' => 'taxes', 'testis' => 'testes',
 			'trilby' => 'trilbys', 'turf' => 'turfs'
-		),
-		'uninflected' => array(
+		],
+		'uninflected' => [
 			'.*[nrlm]ese', '.*deer', '.*fish', '.*measles', '.*ois', '.*pox', '.*sheep'
-		)
-	);
+		]
+	];
 
 	/**
 	 * Contains a cache map of previously pluralized words.
 	 *
 	 * @var array
 	 */
-	protected static $_pluralized = array();
+	protected static $_pluralized = [];
 
 	/**
 	 * Contains a cache map of previously camelized words.
 	 *
 	 * @var array
 	 */
-	protected static $_camelized = array();
+	protected static $_camelized = [];
 
 	/**
 	 * Contains a cache map of previously underscored words.
 	 *
 	 * @var array
 	 */
-	protected static $_underscored = array();
+	protected static $_underscored = [];
 
 	/**
 	 * Contains a cache map of previously humanized words.
 	 *
 	 * @var array
 	 */
-	protected static $_humanized = array();
+	protected static $_humanized = [];
+
+	/**
+	 * Clears local in-memory caches.  Can be used to force a full-cache clear when updating
+	 * inflection rules mid-way through request execution.
+	 */
+	public static function reset() {
+		static::$_singularized = static::$_pluralized = [];
+		static::$_camelized = static::$_underscored = [];
+		static::$_humanized = [];
+
+		static::$_plural['regexUninflected'] = static::$_singular['regexUninflected'] = null;
+		static::$_plural['regexIrregular'] = static::$_singular['regexIrregular'] = null;
+		static::$_transliteration = [
+			'/à|á|å|â/' => 'a',
+			'/è|é|ê|ẽ|ë/' => 'e',
+			'/ì|í|î/' => 'i',
+			'/ò|ó|ô|ø/' => 'o',
+			'/ù|ú|ů|û/' => 'u',
+			'/ç|ć|č/' => 'c',
+			'/đ/' => 'dj',
+			'/š/' => 's',
+			'/ž/' => 'z',
+			'/ñ/' => 'n',
+			'/ä|æ/' => 'ae',
+			'/ö/' => 'oe',
+			'/ü/' => 'ue',
+			'/Ä/' => 'Ae',
+			'/Ü/' => 'Ue',
+			'/Ö/' => 'Oe',
+			'/ß/' => 'ss',
+			'/Č|Ć/' => 'C',
+			'/DŽ/' => 'Dz',
+			'/Đ/' => 'Dj',
+			'/Š/' => 'S',
+			'/Ž/' => 'Z'
+		];
+	}
 
 	/**
 	 * Gets or adds inflection and transliteration rules.
@@ -224,7 +268,7 @@ class Inflector {
 	 * @return mixed If `$config` is empty, returns the rules list specified
 	 *         by `$type`, otherwise returns `null`.
 	 */
-	public static function rules($type, $config = array()) {
+	public static function rules($type, $config = []) {
 		$var = '_' . $type;
 
 		if (!isset(static::${$var})) {
@@ -235,7 +279,7 @@ class Inflector {
 		}
 		switch ($type) {
 			case 'transliteration':
-				$_config = array();
+				$_config = [];
 
 				foreach ($config as $key => $val) {
 					if ($key[0] !== '/') {
@@ -344,43 +388,6 @@ class Inflector {
 	}
 
 	/**
-	 * Clears local in-memory caches.  Can be used to force a full-cache clear when updating
-	 * inflection rules mid-way through request execution.
-	 */
-	public static function reset() {
-		static::$_singularized = static::$_pluralized = array();
-		static::$_camelized = static::$_underscored = array();
-		static::$_humanized = array();
-
-		static::$_plural['regexUninflected'] = static::$_singular['regexUninflected'] = null;
-		static::$_plural['regexIrregular'] = static::$_singular['regexIrregular'] = null;
-		static::$_transliteration = array(
-			'/à|á|å|â/' => 'a',
-			'/è|é|ê|ẽ|ë/' => 'e',
-			'/ì|í|î/' => 'i',
-			'/ò|ó|ô|ø/' => 'o',
-			'/ù|ú|ů|û/' => 'u',
-			'/ç|ć|č/' => 'c',
-			'/đ/' => 'dj',
-			'/š/' => 's',
-			'/ž/' => 'z',
-			'/ñ/' => 'n',
-			'/ä|æ/' => 'ae',
-			'/ö/' => 'oe',
-			'/ü/' => 'ue',
-			'/Ä/' => 'Ae',
-			'/Ü/' => 'Ue',
-			'/Ö/' => 'Oe',
-			'/ß/' => 'ss',
-			'/Č|Ć/' => 'C',
-			'/DŽ/' => 'Dz',
-			'/Đ/' => 'Dj',
-			'/Š/' => 'S',
-			'/Ž/' => 'Z'
-		);
-	}
-
-	/**
 	 * Takes a under_scored word and turns it into a CamelCased or camelBack word
 	 *
 	 * @param string $word An under_scored or slugged word (i.e. `'red_bike'` or `'red-bike'`).
@@ -393,7 +400,7 @@ class Inflector {
 		if (isset(static::$_camelized[$_word]) && $cased) {
 			return static::$_camelized[$_word];
 		}
-		$word = str_replace(" ", "", ucwords(str_replace(array("_", '-'), " ", $word)));
+		$word = str_replace(" ", "", ucwords(str_replace(["_", '-'], " ", $word)));
 
 		if (!$cased) {
 			return lcfirst($word);
@@ -425,11 +432,12 @@ class Inflector {
 	 * @return string The converted string.
 	 */
 	public static function slug($string, $replacement = '-') {
-		$map = static::$_transliteration + array(
-			'/[^\w\s]/' => ' ', '/\\s+/' => $replacement,
+		$map = static::$_transliteration + [
+			'/[^\s\p{L}\p{Nd}]/u' => ' ',
+			'/\s+/u' => $replacement,
 			'/(?<=[a-z])([A-Z])/' => $replacement . '\\1',
 			str_replace(':rep', preg_quote($replacement, '/'), '/^[:rep]+|[:rep]+$/') => ''
-		);
+		];
 		return preg_replace(array_keys($map), array_values($map), $string);
 	}
 

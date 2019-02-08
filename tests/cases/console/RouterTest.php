@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\console;
@@ -17,7 +18,7 @@ class RouterTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->_backup = $_SERVER;
-		$_SERVER['argv'] = array();
+		$_SERVER['argv'] = [];
 	}
 
 	public function tearDown() {
@@ -25,125 +26,126 @@ class RouterTest extends \lithium\test\Unit {
 	}
 
 	public function testParseNoArgumentsNoOptions() {
-		$expected = array(
-			'command' => null, 'action' => 'run', 'args' => array()
-		);
+		$expected = [
+			'command' => null, 'action' => 'run', 'args' => []
+		];
 		$result = Router::parse();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testParseArguments() {
-		$expected = array(
+		$expected = [
 			'command' => 'test', 'action' => 'action',
-			'args' => array('param')
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array('test', 'action', 'param')
-		)));
+			'args' => ['param']
+		];
+		$result = Router::parse(new Request([
+			'args' => ['test', 'action', 'param']
+		]));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testParseZeroArgument() {
-		$expected = array(
+		$expected = [
 			'command' => 'test', 'action' => 'action',
-			'args' => array('0', '1')
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array('test', 'action', '0', '1')
-		)));
+			'args' => ['0', '1']
+		];
+		$result = Router::parse(new Request([
+			'args' => ['test', 'action', '0', '1']
+		]));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testParseGnuStyleLongOptions() {
-		$expected = array(
-			'command' => 'test', 'action' => 'run', 'args' => array(),
+		$expected = [
+			'command' => 'test', 'action' => 'run', 'args' => [],
 			'case' => 'lithium.tests.cases.console.RouterTest'
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array(
+		];
+		$result = Router::parse(new Request([
+			'args' => [
 				'test', 'run',
 				'--case=lithium.tests.cases.console.RouterTest'
-			)
-		)));
+			]
+		]));
 		$this->assertEqual($expected, $result);
 
-		$expected = array(
-			'command' => 'test', 'action' => 'run', 'args' => array(),
+		$expected = [
+			'command' => 'test', 'action' => 'run', 'args' => [],
 			'case' => 'lithium.tests.cases.console.RouterTest',
 			'phase' => 'drowning'
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array(
+		];
+		$result = Router::parse(new Request([
+			'args' => [
 				'test',
 				'--case=lithium.tests.cases.console.RouterTest',
 				'--phase=drowning'
-			)
-		)));
+			]
+		]));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testParseGnuStyleLongOptionsContainingDash() {
-		$expected = array(
-			'command' => 'test', 'action' => 'run', 'args' => array(),
+		$expected = [
+			'command' => 'test', 'action' => 'run', 'args' => [],
+			'fooBar' => 'something',
 			'foo-bar' => 'something'
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array(
+		];
+		$result = Router::parse(new Request([
+			'args' => [
 				'test', 'run',
 				'--foo-bar=something'
-			)
-		)));
+			]
+		]));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testParseShortOption() {
-		$expected = array(
-			'command' => 'test', 'action' => 'action', 'args' => array(),
+		$expected = [
+			'command' => 'test', 'action' => 'action', 'args' => [],
 			'i' => true
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array('test', 'action', '-i')
-		)));
+		];
+		$result = Router::parse(new Request([
+			'args' => ['test', 'action', '-i']
+		]));
 		$this->assertEqual($expected, $result);
 
-		$expected = array(
-			'command' => 'test', 'action' => 'action', 'args' => array('something'),
+		$expected = [
+			'command' => 'test', 'action' => 'action', 'args' => ['something'],
 			'i' => true
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array('test', 'action', '-i', 'something')
-		)));
+		];
+		$result = Router::parse(new Request([
+			'args' => ['test', 'action', '-i', 'something']
+		]));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testParseShortOptionAsFirst() {
-		$expected = array(
-			'command' => 'test', 'action' => 'action', 'args' => array(),
+		$expected = [
+			'command' => 'test', 'action' => 'action', 'args' => [],
 			'i' => true
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array('-i', 'test', 'action')
-		)));
+		];
+		$result = Router::parse(new Request([
+			'args' => ['-i', 'test', 'action']
+		]));
 		$this->assertEqual($expected, $result);
 
-		$expected = array(
-			'command' => 'test', 'action' => 'action', 'args' => array('something'),
+		$expected = [
+			'command' => 'test', 'action' => 'action', 'args' => ['something'],
 			'i' => true
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array('-i', 'test', 'action', 'something')
-		)));
+		];
+		$result = Router::parse(new Request([
+			'args' => ['-i', 'test', 'action', 'something']
+		]));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testParseGnuStyleLongOptionAsFirst() {
-		$expected = array(
+		$expected = [
 			'command' => 'test', 'action' => 'action', 'long' => 'something', 'i' => true,
-			'args' => array()
-		);
-		$result = Router::parse(new Request(array(
-			'args' => array('--long=something', 'test', 'action', '-i')
-		)));
+			'args' => []
+		];
+		$result = Router::parse(new Request([
+			'args' => ['--long=something', 'test', 'action', '-i']
+		]));
 		$this->assertEqual($expected, $result);
 	}
 }

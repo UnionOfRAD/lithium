@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\action;
@@ -12,11 +13,11 @@ use stdClass;
 
 class MockDispatcher extends \lithium\action\Dispatcher {
 
-	public static $dispatched = array();
+	public static $dispatched = [];
 
 	public static function reset() {
-		static::$dispatched = array();
-		static::$_rules = array();
+		static::$dispatched = [];
+		static::$_rules = [];
 	}
 
 	protected static function _callable($request, $params, $options) {

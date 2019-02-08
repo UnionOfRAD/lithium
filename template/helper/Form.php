@@ -1,13 +1,15 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\template\helper;
 
+use lithium\aop\Filters;
 use lithium\util\Set;
 use lithium\util\Inflector;
 
@@ -37,7 +39,7 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * @var array
 	 */
-	protected $_strings = array(
+	protected $_strings = [
 		'button'         => '<button{:options}>{:title}</button>',
 		'checkbox'       => '<input type="checkbox" name="{:name}"{:options} />',
 		'checkbox-multi' => '<input type="checkbox" name="{:name}[]"{:options} />',
@@ -49,7 +51,7 @@ class Form extends \lithium\template\Helper {
 		'form'           => '<form action="{:url}"{:options}>{:append}',
 		'form-end'       => '</form>',
 		'hidden'         => '<input type="hidden" name="{:name}"{:options} />',
-		'field'          => '<div{:wrap}>{:label}{:input}{:error}</div>',
+		'field'          => '<div{:wrap}>{:label}{:input}{:datalist}{:error}</div>',
 		'field-checkbox' => '<div{:wrap}>{:input}{:label}{:error}</div>',
 		'field-radio'    => '<div{:wrap}>{:input}{:label}{:error}</div>',
 		'label'          => '<label for="{:id}"{:options}>{:title}</label>',
@@ -65,8 +67,10 @@ class Form extends \lithium\template\Helper {
 		'submit-image'   => '<input type="image" src="{:url}"{:options} />',
 		'text'           => '<input type="text" name="{:name}"{:options} />',
 		'textarea'       => '<textarea name="{:name}"{:options}>{:value}</textarea>',
-		'fieldset'       => '<fieldset{:options}><legend>{:content}</legend>{:raw}</fieldset>'
-	);
+		'fieldset'       => '<fieldset{:options}><legend>{:content}</legend>{:raw}</fieldset>',
+		'datalist'       => '<datalist{:options}>{:raw}</datalist>',
+		'datalist-option' => '<option value="{:value}"></option>'
+	];
 
 	/**
 	 * Maps method names to template string names, allowing the default template strings to be set
@@ -76,9 +80,9 @@ class Form extends \lithium\template\Helper {
 	 * the template string mappings per the following:
 	 *
 	 * ```
-	 * $this->form->config(array('templates' => array(
+	 * $this->form->config(['templates' => [
 	 * 	'text' => '<span><input type="text" name="{:name}"{:options} /></span>'
-	 * )));
+	 * ]]);
 	 * ```
 	 *
 	 * Alternatively, you can re-map one type as another. This is useful if, for example, you
@@ -87,16 +91,16 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * ```
 	 * // Renders all password fields as text fields
-	 * $this->form->config(array('templates' => array('password' => 'text')));
+	 * $this->form->config(['templates' => ['password' => 'text']]);
 	 * ```
 	 *
 	 * @var array
 	 * @see lithium\template\helper\Form::config()
 	 */
-	protected $_templateMap = array(
+	protected $_templateMap = [
 		'create' => 'form',
 		'end' => 'form-end'
-	);
+	];
 
 	/**
 	 * The data object or list of data objects to which the current form is bound. In order to
@@ -124,7 +128,7 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * @var array
 	 */
-	protected $_bindingOptions = array();
+	protected $_bindingOptions = [];
 
 	/**
 	 * Constructor.
@@ -132,23 +136,21 @@ class Form extends \lithium\template\Helper {
 	 * @param array $config Configuration options.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$self =& $this;
-
-		$defaults = array(
-			'base' => array(),
-			'text' => array(),
-			'textarea' => array(),
-			'select' => array('multiple' => false),
-			'attributes' => array(
-				'id' => function($method, $name, $options) use (&$self) {
-					if (in_array($method, array('create', 'end', 'label', 'error'))) {
+	public function __construct(array $config = []) {
+		$defaults = [
+			'base' => [],
+			'text' => [],
+			'textarea' => [],
+			'select' => ['multiple' => false],
+			'attributes' => [
+				'id' => function($method, $name, $options) {
+					if (in_array($method, ['create', 'end', 'label', 'error'])) {
 						return;
 					}
 					if (!$name || ($method === 'hidden' && $name === '_method')) {
 						return;
 					}
-					$info = $self->binding($name);
+					$info = $this->binding($name);
 					$model = $info->class;
 					$id = Inflector::camelize(Inflector::slug($info->name));
 					return $model ? basename(str_replace('\\', '/', $model)) . $id : $id;
@@ -161,22 +163,22 @@ class Form extends \lithium\template\Helper {
 					$first = array_shift($name);
 					return $first . '[' . join('][', $name) . ']';
 				}
-			),
+			],
 			'binding' => function($object, $name = null) {
-				$result = compact('name') + array(
+				$result = compact('name') + [
 					'data' => null, 'errors' => null, 'class' => null
-				);
+				];
 
 				if (is_object($object)) {
-					$result = compact('name') + array(
+					$result = compact('name') + [
 						'data'   => $object->data($name),
 						'errors' => $object->errors($name),
 						'class'  => $object->model()
-					);
+					];
 				}
 				return (object) $result;
 			}
-		);
+		];
 		parent::__construct(Set::merge($defaults, $config));
 	}
 
@@ -190,7 +192,7 @@ class Form extends \lithium\template\Helper {
 		parent::_init();
 
 		if ($this->_context) {
-			$this->_context->handlers(array('wrap' => '_attributes'));
+			$this->_context->handlers(['wrap' => '_attributes']);
 		}
 	}
 
@@ -202,7 +204,7 @@ class Form extends \lithium\template\Helper {
 	 * simply do the following:
 	 *
 	 * ```
-	 * $this->form->config(array('label' => array('class' => 'foo')));
+	 * $this->form->config(['label' => ['class' => 'foo']]);
 	 * ```
 	 *
 	 * Note that this can be overridden on a case-by-case basis, and when overriding, values are
@@ -215,9 +217,9 @@ class Form extends \lithium\template\Helper {
 	 * own custom UI elements, and you wanted to change the markup used, you could do the following:
 	 *
 	 * ```
-	 * $this->form->config(array('templates' => array(
+	 * $this->form->config(['templates' => [
 	 * 	'checkbox' => '<div id="{:name}" class="ui-checkbox-element"{:options}></div>'
-	 * )));
+	 * ]]);
 	 * ```
 	 *
 	 * Now, for any calls to `$this->form->checkbox()`, your custom markup template will be applied.
@@ -231,10 +233,10 @@ class Form extends \lithium\template\Helper {
 	 * @return array Returns an array containing the currently set per-method configurations, and
 	 *         an array of the currently set template overrides (in the `'templates'` array key).
 	 */
-	public function config(array $config = array()) {
+	public function config(array $config = []) {
 		if (!$config) {
-			$keys = array('base' => '', 'text' => '', 'textarea' => '', 'attributes' => '');
-			return array('templates' => $this->_templateMap) + array_intersect_key(
+			$keys = ['base' => '', 'text' => '', 'textarea' => '', 'attributes' => ''];
+			return ['templates' => $this->_templateMap] + array_intersect_key(
 				$this->_config, $keys
 			);
 		}
@@ -242,9 +244,9 @@ class Form extends \lithium\template\Helper {
 			$this->_templateMap = $config['templates'] + $this->_templateMap;
 			unset($config['templates']);
 		}
-		return ($this->_config = Set::merge($this->_config, $config)) + array(
+		return ($this->_config = Set::merge($this->_config, $config)) + [
 			'templates' => $this->_templateMap
-		);
+		];
 	}
 
 	/**
@@ -277,29 +279,27 @@ class Form extends \lithium\template\Helper {
 	 *         attributes passed in `$options`.
 	 * @filter
 	 */
-	public function create($bindings = null, array $options = array()) {
+	public function create($bindings = null, array $options = []) {
 		$request = $this->_context ? $this->_context->request() : null;
 		$binding = is_array($bindings) ? reset($bindings) : $bindings;
 
-		$defaults = array(
-			'url' => $request ? $request->params : array(),
+		$defaults = [
+			'url' => $request ? $request->params : [],
 			'type' => null,
 			'action' => null,
 			'method' => $binding ? ($binding->exists() ? 'put' : 'post') : 'post'
-		);
+		];
 
 		list(, $options, $tpl) = $this->_defaults(__FUNCTION__, null, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
-		$_binding =& $this->_binding;
-		$_options =& $this->_bindingOptions;
 		$params = compact('scope', 'options', 'bindings');
-		$extra = array('method' => __METHOD__) + compact('tpl', 'defaults');
+		$extra = ['method' => __METHOD__] + compact('tpl', 'defaults');
 
-		$filter = function($self, $params) use ($extra, &$_binding, &$_options) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) use ($extra) {
 			$scope = $params['scope'];
 			$options = $params['options'];
-			$_binding = $params['bindings'];
+			$this->_binding = $params['bindings'];
 			$append = null;
 			$scope['method'] = strtolower($scope['method']);
 
@@ -311,18 +311,18 @@ class Form extends \lithium\template\Helper {
 			}
 
 			if (!($scope['method'] === 'get' || $scope['method'] === 'post')) {
-				$append = $self->hidden('_method', array('value' => strtoupper($scope['method'])));
+				$append = $this->hidden('_method', ['value' => strtoupper($scope['method'])]);
 				$scope['method'] = 'post';
 			}
 
-			$url = $scope['action'] ? array('action' => $scope['action']) : $scope['url'];
+			$url = $scope['action'] ? ['action' => $scope['action']] : $scope['url'];
 			$options['method'] = strtolower($scope['method']);
-			$args = array($extra['method'], $extra['tpl'], compact('url', 'options', 'append'));
-			$_options = $scope + $options;
+			$this->_bindingOptions = $scope + $options;
 
-			return $self->invokeMethod('_render', $args);
-		};
-		return $this->_filter(__METHOD__, $params, $filter);
+			return $this->_render($extra['method'], $extra['tpl'],
+				compact('url', 'options', 'append')
+			);
+		});
 	}
 
 	/**
@@ -333,16 +333,13 @@ class Form extends \lithium\template\Helper {
 	 * @filter
 	 */
 	public function end() {
-		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, array());
+		list(, $options, $template) = $this->_defaults(__FUNCTION__, null, []);
 		$params = compact('options', 'template');
-		$_context =& $this->_context;
-		$_options =& $this->_bindingOptions;
 
-		$filter = function($self, $params) use (&$_context, &$_options, $template) {
-			$_options = array();
-			return $self->invokeMethod('_render', array('end', $params['template'], array()));
-		};
-		$result = $this->_filter(__METHOD__, $params, $filter);
+		$result = Filters::run($this, __FUNCTION__, $params, function($params) {
+			$this->_bindingOptions = [];
+			return $this->_render('end', $params['template'], []);
+		});
 		unset($this->_binding);
 		$this->_binding = null;
 		return $result;
@@ -396,8 +393,8 @@ class Form extends \lithium\template\Helper {
 	 *        of element attributes.
 	 * @return string Returns an `<input />` tag of the type specified in `$type`.
 	 */
-	public function __call($type, array $params = array()) {
-		$params += array(null, array());
+	public function __call($type, array $params = []) {
+		$params += [null, []];
 		list($name, $options) = $params;
 		list($name, $options, $template) = $this->_defaults($type, $name, $options);
 		$template = $this->_context->strings($template) ? $template : 'input';
@@ -414,7 +411,7 @@ class Form extends \lithium\template\Helper {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
-		return is_callable(array($this, $method), true);
+		return is_callable([$this, $method], true);
 	}
 
 	/**
@@ -423,23 +420,23 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * ```
 	 *  echo $this->form->field('name');
-	 *  echo $this->form->field('present', array('type' => 'checkbox'));
-	 *  echo $this->form->field(array('email' => 'Enter a valid email'));
-	 *  echo $this->form->field(array('name','email','phone'), array('div' => false));
+	 *  echo $this->form->field('present', ['type' => 'checkbox']);
+	 *  echo $this->form->field(['email' => 'Enter a valid email']);
+	 *  echo $this->form->field(['name','email','phone'], ['div' => false]);
 	 * ```
 	 *
 	 * @param mixed $name The name of the field to render. If the form was bound to an object
 	 *        passed in `create()`, `$name` should be the name of a field in that object.
 	 *        Otherwise, can be any arbitrary field name, as it will appear in POST data.
 	 *        Alternatively supply an array of fields that will use the same options
-	 *        array($field1 => $label1, $field2, $field3 => $label3)
+	 *        [$field1 => $label1, $field2, $field3 => $label3]
 	 * @param array $options Rendering options for the form field. The available options are as
 	 *        follows:
 	 *        - `'label'` _mixed_: A string or array defining the label text and / or
 	 *          parameters. By default, the label text is a human-friendly version of `$name`.
 	 *          However, you can specify the label manually as a string, or both the label
 	 *          text and options as an array, i.e.:
-	 *          `array('Your Label Title' => array('class' => 'foo', 'other' => 'options'))`.
+	 *          `array('Your Label Title' => ['class' => 'foo', 'other' => 'options'])`.
 	 *        - `'type'` _string_: The type of form field to render. Available default options
 	 *          are: `'text'`, `'textarea'`, `'select'`, `'checkbox'`, `'password'` or
 	 *          `'hidden'`, as well as any arbitrary type (i.e. HTML5 form fields).
@@ -449,12 +446,23 @@ class Form extends \lithium\template\Helper {
 	 *          `'<li{:wrap}>{:label}{:input}{:error}</li>'`.
 	 *        - `'wrap'` _array_: An array of HTML attributes which will be embedded in the
 	 *          wrapper tag.
-	 *        - `list` _array_: If `'type'` is set to `'select'`, `'list'` is an array of
+	 *        - `list` _array|string_: If `'type'` is set to `'select'`, `'list'` is an array of
 	 *          key/value pairs representing the `$list` parameter of the `select()` method.
+	 *          If `'type'` is set to `'text'`, `'list'` is used to render/reference a corresponding
+	 *          `<datalist>` element. It then can either be an array of option values or
+	 *          a string to reference an existing `<datalist>`.
+	 *        - `error` _array|string|boolean_: Allows to control rendering of error messages.
+	 *          By setting this option to `false` any messages are disabled. When an array
+	 *          mapping failed rule names to messages, will use these alternative message
+	 *          instead of the ones provided when the validation was originally defined (i.e
+	 *          inside the model). The array may contain a `'default'` key which value will
+	 *          be used as a fallback message. In absence of a default message, the original
+	 *          messages get rendered instead. When providing a string it will be used for
+	 *          any error messages.
 	 * @return string Returns a form input (the input type is based on the `'type'` option), with
 	 *         label and error message, wrapped in a `<div />` element.
 	 */
-	public function field($name, array $options = array()) {
+	public function field($name, array $options = []) {
 		if (is_array($name)) {
 			return $this->_fields($name, $options);
 		}
@@ -463,19 +471,21 @@ class Form extends \lithium\template\Helper {
 			$method = 'field-' . $options['type'];
 		}
 		list(, $options, $template) = $this->_defaults($method, $name, $options);
-		$defaults = array(
+		$defaults = [
 			'label' => null,
 			'type' => isset($options['list']) ? 'select' : 'text',
 			'template' => $template,
-			'wrap' => array(),
-			'list' => null
-		);
+			'wrap' => [],
+			'list' => null,
+			'error' => []
+		];
 		list($options, $field) = $this->_options($defaults, $options);
 
 		$label = $input = null;
 		$wrap = $options['wrap'];
 		$type = $options['type'];
 		$list = $options['list'];
+		$error = $options['error'];
 		$template = $options['template'];
 		$notText = $template === 'field' && $type !== 'text';
 
@@ -489,10 +499,26 @@ class Form extends \lithium\template\Helper {
 			$label = $this->label(isset($options['id']) ? $options['id'] : '', $options['label']);
 		}
 
-		$call = ($type === 'select') ? array($name, $list, $field) : array($name, $field);
-		$input = call_user_func_array(array($this, $type), $call);
-		$error = ($this->_binding) ? $this->error($name) : null;
-		return $this->_render(__METHOD__, $template, compact('wrap', 'label', 'input', 'error'));
+		if ($type === 'text' && $list) {
+			if (is_array($list)) {
+				list($list, $datalist) = $this->_datalist($list, $options);
+			}
+			$field['list'] = $list;
+		} else {
+			$datalist = null;
+		}
+
+		$call = ($type === 'select') ? [$name, $list, $field] : [$name, $field];
+		$input = call_user_func_array([$this, $type], $call);
+
+		if ($error !== false && $this->_binding) {
+			$error = $this->error($name, null, ['messages' => $error]);
+		} else {
+			$error = null;
+		}
+		return $this->_render(__METHOD__, $template, compact(
+			'wrap', 'label', 'input', 'datalist', 'error'
+		));
 	}
 
 	/**
@@ -504,8 +530,8 @@ class Form extends \lithium\template\Helper {
 	 *        the `$options` parameter of the `field` method for more information.
 	 * @return string Returns the fields rendered by `field()`, each separated by a newline.
 	 */
-	protected function _fields(array $fields, array $options = array()) {
-		$result = array();
+	protected function _fields(array $fields, array $options = []) {
+		$result = [];
 
 		foreach ($fields as $field => $label) {
 			if (is_numeric($field)) {
@@ -525,8 +551,8 @@ class Form extends \lithium\template\Helper {
 	 *        `<button></button>` tag.
 	 * @return string Returns a `<button></button>` tag with the given title and HTML attributes.
 	 */
-	public function button($title = null, array $options = array()) {
-		$defaults = array('escape' => true);
+	public function button($title = null, array $options = []) {
+		$defaults = ['escape' => true];
 		list($scope, $options) = $this->_options($defaults, $options);
 		list($title, $options, $template) = $this->_defaults(__METHOD__, $title, $options);
 
@@ -542,7 +568,7 @@ class Form extends \lithium\template\Helper {
 	 *        `<input />` tag.
 	 * @return string Returns a submit `<input />` tag with the given title and HTML attributes.
 	 */
-	public function submit($title = null, array $options = array()) {
+	public function submit($title = null, array $options = []) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, null, $options);
 		return $this->_render(__METHOD__, $template, compact('title', 'options'));
 	}
@@ -557,9 +583,9 @@ class Form extends \lithium\template\Helper {
 	 *        - Any other options specified are rendered as HTML attributes of the element.
 	 * @return string Returns a `<textarea>` tag with the given name and HTML attributes.
 	 */
-	public function textarea($name, array $options = array()) {
+	public function textarea($name, array $options = []) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
-		list($scope, $options) = $this->_options(array('value' => null), $options);
+		list($scope, $options) = $this->_options(['value' => null], $options);
 		$value = isset($scope['value']) ? $scope['value'] : '';
 		return $this->_render(__METHOD__, $template, compact('name', 'options', 'value'));
 	}
@@ -571,9 +597,33 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options All options passed are rendered as HTML attributes.
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
-	public function text($name, array $options = array()) {
+	public function text($name, array $options = []) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
+	}
+
+	/**
+	 * Generates an HTML `<datalist></datalist>` object with `<option>` elements.
+	 *
+	 * @link https://www.w3.org/wiki/HTML/Elements/datalist
+	 * @param array $list Valuues, which will be used to render the options of the datalist.
+	 * @param array $scope An array of options passed to the parent scope.
+	 * @return string Returns a `<datalist>` tag with `<option>` elements.
+	 */
+	protected function _datalist(array $list, array $scope) {
+		$options = [];
+
+		if (isset($scope['id'])) {
+			$id = $options['id'] = $scope['id'] . 'List';
+		}
+		$raw = array_reduce($list, function($carry, $value) {
+			return $carry .= $this->_render(__METHOD__, 'datalist-option', compact('value'));
+		}, '');
+
+		return [
+			isset($options['id']) ? $options['id'] : null,
+			$this->_render(__METHOD__, 'datalist', compact('options', 'raw'))
+		];
 	}
 
 	/**
@@ -582,9 +632,9 @@ class Form extends \lithium\template\Helper {
 	 *
 	 * For example:
 	 * ```
-	 * $this->form->select('colors', array(1 => 'red', 2 => 'green', 3 => 'blue'), array(
+	 * $this->form->select('colors', [1 => 'red', 2 => 'green', 3 => 'blue'], [
 	 * 	'id' => 'Colors', 'value' => 2
-	 * ));
+	 * ]);
 	 * // Renders a '<select />' list with options 'red', 'green' and 'blue', with the 'green'
 	 * // option as the selection
 	 * ```
@@ -597,13 +647,13 @@ class Form extends \lithium\template\Helper {
 	 *        that is selected by default.
 	 * @return string Returns an HTML `<select />` element.
 	 */
-	public function select($name, $list = array(), array $options = array()) {
-		$defaults = array('empty' => false, 'value' => null);
+	public function select($name, $list = [], array $options = []) {
+		$defaults = ['empty' => false, 'value' => null];
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		list($scope, $options) = $this->_options($defaults, $options);
 
 		if ($scope['empty']) {
-			$list = array('' => ($scope['empty'] === true) ? '' : $scope['empty']) + $list;
+			$list = ['' => ($scope['empty'] === true) ? '' : $scope['empty']] + $list;
 		}
 		if ($template === __FUNCTION__ && $scope['multiple']) {
 			$template = 'select-multi';
@@ -631,7 +681,7 @@ class Form extends \lithium\template\Helper {
 		foreach ($list as $value => $title) {
 			if (is_array($title)) {
 				$label = $value;
-				$options = array();
+				$options = [];
 
 				$raw = $this->_selectOptions($title, $scope);
 				$params = compact('label', 'options', 'raw');
@@ -643,7 +693,7 @@ class Form extends \lithium\template\Helper {
 				($scope['empty'] && empty($scope['value']) && $value === '') ||
 				(is_scalar($scope['value']) && ((string) $scope['value'] === (string) $value))
 			);
-			$options = $selected ? array('selected' => true) : array();
+			$options = $selected ? ['selected' => true] : [];
 			$params = compact('value', 'title', 'options');
 			$result .= $this->_render('select', 'select-option',  $params);
 		}
@@ -661,8 +711,8 @@ class Form extends \lithium\template\Helper {
 	 *        - Any other options specified are rendered as HTML attributes of the element.
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
-	public function checkbox($name, array $options = array()) {
-		$defaults = array('value' => '1', 'hidden' => true);
+	public function checkbox($name, array $options = []) {
+		$defaults = ['value' => '1', 'hidden' => true];
 		$options += $defaults;
 		$default = $options['value'];
 		$key = $name;
@@ -675,7 +725,7 @@ class Form extends \lithium\template\Helper {
 			$options['checked'] = ($this->binding($key)->data == $default);
 		}
 		if ($scope['hidden']) {
-			$out = $this->hidden($name, array('value' => '', 'id' => false));
+			$out = $this->hidden($name, ['value' => '', 'id' => false]);
 		}
 		$options['value'] = $scope['value'];
 		return $out . $this->_render(__METHOD__, $template, compact('name', 'options'));
@@ -692,8 +742,8 @@ class Form extends \lithium\template\Helper {
 	 *        - Any other options specified are rendered as HTML attributes of the element.
 	 * @return string Returns a `<input />` tag with the given name and attributes
 	 */
-	public function radio($name, array $options = array()) {
-		$defaults = array('value' => '1');
+	public function radio($name, array $options = []) {
+		$defaults = ['value' => '1'];
 		$options += $defaults;
 		$default = $options['value'];
 		$key = $name;
@@ -716,7 +766,7 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options An array of HTML attributes with which the field should be rendered.
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
-	public function password($name, array $options = array()) {
+	public function password($name, array $options = []) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		unset($options['value']);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
@@ -729,7 +779,7 @@ class Form extends \lithium\template\Helper {
 	 * @param array $options An array of HTML attributes with which the field should be rendered.
 	 * @return string Returns a `<input />` tag with the given name and HTML attributes.
 	 */
-	public function hidden($name, array $options = array()) {
+	public function hidden($name, array $options = []) {
 		list($name, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		return $this->_render(__METHOD__, $template, compact('name', 'options'));
 	}
@@ -744,11 +794,12 @@ class Form extends \lithium\template\Helper {
 	 *          label should be escaped. If `false`, it will be treated as raw HTML.
 	 * @return string Returns a `<label>` tag for the name and with HTML attributes.
 	 */
-	public function label($id, $title = null, array $options = array()) {
-		$defaults = array('escape' => true);
+	public function label($id, $title = null, array $options = []) {
+		$defaults = ['escape' => true];
 
 		if (is_array($title)) {
-			list($title, $options) = each($title);
+			$options = current($title);
+			$title = key($title);
 		}
 		$title = $title ?: Inflector::humanize(str_replace('.', '_', $id));
 
@@ -774,42 +825,53 @@ class Form extends \lithium\template\Helper {
 	 *        the error.
 	 * @return string Returns a rendered error message based on the `'error'` string template.
 	 */
-	public function error($name, $key = null, array $options = array()) {
-		$defaults = array('class' => 'error');
+	public function error($name, $key = null, array $options = []) {
+		$defaults = ['class' => 'error', 'messages' => []];
 		list(, $options, $template) = $this->_defaults(__FUNCTION__, $name, $options);
 		$options += $defaults;
-		$params = compact('name', 'key', 'options', 'template');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) {
+		if (is_array($options['messages'])) {
+			$messages = $options['messages'] + ['default' => null];
+		} else {
+			$messages = ['default' => $options['messages']];
+		}
+		unset($options['messages']);
+
+		$params = compact('name', 'key', 'messages', 'options', 'template');
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$options = $params['options'];
 			$template = $params['template'];
+			$messages = $params['messages'];
 
 			if (isset($options['value'])) {
 				unset($options['value']);
 			}
-			if (!$content = $self->binding($params['name'])->errors) {
+			if (!$content = $this->binding($params['name'])->errors) {
 				return null;
 			}
 			$result = '';
 
 			if (!is_array($content)) {
-				$args = array(__METHOD__, $template, compact('content', 'options'));
-				return $self->invokeMethod('_render', $args);
+				return $this->_render(__METHOD__, $template, compact('content', 'options'));
 			}
 			$errors = $content;
 
 			if ($params['key'] === null) {
-				foreach ($errors as $content) {
-					$args = array(__METHOD__, $template, compact('content', 'options'));
-					$result .= $self->invokeMethod('_render', $args);
+				foreach ($errors as $rule => $content) {
+					if (isset($messages[$rule])) {
+						$content = $messages[$rule];
+					} elseif ($messages['default']) {
+						$content = $messages['default'];
+					}
+					$result .= $this->_render(__METHOD__, $template, compact('content', 'options'));
 				}
 				return $result;
 			}
 
 			$key = $params['key'];
 			$content = !isset($errors[$key]) || $key === true ? reset($errors) : $errors[$key];
-			$args = array(__METHOD__, $template, compact('content', 'options'));
-			return $self->invokeMethod('_render', $args);
+			return $this->_render(__METHOD__, $template, compact('content', 'options'));
 		});
 	}
 
@@ -822,22 +884,20 @@ class Form extends \lithium\template\Helper {
 	 * @return array Defaults array contents.
 	 */
 	protected function _defaults($method, $name, $options) {
-		$config = $this->_config;
 		$params = compact('method', 'name', 'options');
-		$tpls = $this->_templateMap;
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($config, $tpls) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$method = $params['method'];
 			$name = $params['name'];
 			$options = $params['options'];
 
-			$methodConfig = isset($config[$method]) ? $config[$method] : array();
-			$options += $methodConfig + $config['base'];
-			$options = $self->invokeMethod('_generators', array($method, $name, $options));
+			$methodConfig = isset($this->_config[$method]) ? $this->_config[$method] : [];
+			$options += $methodConfig + $this->_config['base'];
+			$options = $this->_generators($method, $name, $options);
 
 			$hasValue = (
 				(!isset($options['value']) || $options['value'] === null) &&
-				$name && $value = $self->binding($name)->data
+				$name && $value = $this->binding($name)->data
 			);
 			$isZero = (isset($value) && ($value === 0 || $value === "0"));
 
@@ -852,12 +912,12 @@ class Form extends \lithium\template\Helper {
 			}
 			unset($options['default']);
 
-			$generator = $config['attributes']['name'];
+			$generator = $this->_config['attributes']['name'];
 			$name = $generator($method, $name, $options);
 
 			$tplKey = isset($options['template']) ? $options['template'] : $method;
-			$template = isset($tpls[$tplKey]) ? $tpls[$tplKey] : $tplKey;
-			return array($name, $options, $template);
+			$template = isset($this->_templateMap[$tplKey]) ? $this->_templateMap[$tplKey] : $tplKey;
+			return [$name, $options, $template];
 		});
 	}
 

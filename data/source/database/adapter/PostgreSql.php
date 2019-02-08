@@ -1,15 +1,19 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright	  Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license		  http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\data\source\database\adapter;
 
 use PDO;
 use PDOException;
+use lithium\aop\Filters;
+use lithium\core\ConfigException;
+use lithium\net\HostString;
 
 /**
  * PostgreSQL database driver. Extends the `Database` class to implement the necessary
@@ -28,24 +32,34 @@ use PDOException;
 class PostgreSql extends \lithium\data\source\Database {
 
 	/**
+	 * The default host used to connect to the server.
+	 */
+	const DEFAULT_HOST = 'localhost';
+
+	/**
+	 * The default port used to connect to the server.
+	 */
+	const DEFAULT_PORT = 5432;
+
+	/**
 	 * PostgreSQL column type definitions.
 	 *
 	 * @var array
 	 */
-	protected $_columns = array(
-		'id' => array('use' => 'integer', 'increment' => true),
-		'string' => array('use' => 'varchar', 'length' => 255),
-		'text' => array('use' => 'text'),
-		'integer' => array('use' => 'integer', 'formatter' => 'intval'),
-		'float' => array('use' => 'real', 'formatter' => 'floatval'),
-		'datetime' => array('use' => 'timestamp', 'format' => 'Y-m-d H:i:s'),
-		'timestamp' => array('use' => 'timestamp', 'format' => 'Y-m-d H:i:s'),
-		'time' => array('use' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
-		'date' => array('use' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
-		'binary' => array('use' => 'bytea'),
-		'boolean' => array('use' => 'boolean'),
-		'inet' => array('use' => 'inet')
-	);
+	protected $_columns = [
+		'id' => ['use' => 'integer', 'increment' => true],
+		'string' => ['use' => 'varchar', 'length' => 255],
+		'text' => ['use' => 'text'],
+		'integer' => ['use' => 'integer', 'formatter' => 'intval'],
+		'float' => ['use' => 'real', 'formatter' => 'floatval'],
+		'datetime' => ['use' => 'timestamp', 'format' => 'Y-m-d H:i:s'],
+		'timestamp' => ['use' => 'timestamp', 'format' => 'Y-m-d H:i:s'],
+		'time' => ['use' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'],
+		'date' => ['use' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'],
+		'binary' => ['use' => 'bytea'],
+		'boolean' => ['use' => 'boolean'],
+		'inet' => ['use' => 'inet']
+	];
 
 	/**
 	 * Column/table metas
@@ -53,58 +67,34 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *
 	 * @var array
 	 */
-	protected $_metas = array(
-		'table' => array(
-			'tablespace' => array('keyword' => 'TABLESPACE')
-		)
-	);
+	protected $_metas = [
+		'table' => [
+			'tablespace' => ['keyword' => 'TABLESPACE']
+		]
+	];
 
 	/**
 	 * Column contraints
 	 *
 	 * @var array
 	 */
-	protected $_constraints = array(
-		'primary' => array('template' => 'PRIMARY KEY ({:column})'),
-		'foreign_key' => array(
+	protected $_constraints = [
+		'primary' => ['template' => 'PRIMARY KEY ({:column})'],
+		'foreign_key' => [
 			'template' => 'FOREIGN KEY ({:column}) REFERENCES {:to} ({:toColumn}) {:on}'
-		),
-		'unique' => array(
+		],
+		'unique' => [
 			'template' => 'UNIQUE {:index} ({:column})'
-		),
-		'check' => array('template' => 'CHECK ({:expr})')
-	);
+		],
+		'check' => ['template' => 'CHECK ({:expr})']
+	];
 
 	/**
 	 * Pair of opening and closing quote characters used for quoting identifiers in queries.
 	 *
 	 * @var array
 	 */
-	protected $_quotes = array('"', '"');
-
-	/**
-	 * Constructor. Constructs the PostgreSQL adapter and sets the default port to 5432.
-	 *
-	 * @see lithium\data\source\Database::__construct()
-	 * @see lithium\data\Source::__construct()
-	 * @see lithium\data\Connections::add()
-	 * @param array $config The available configuration options are the following. Further
-	 *        options are inherited from the parent classes. Typically, these parameters are
-	 *        set in `Connections::add()`, when adding the adapter to the list of active
-	 *        connections.
-	 *        - `'host'` _string_: Defaults to `'localhost:5432'`.
-	 *        - `'schema'` _string_: The name of the database schema to use. Defaults to `'public'`.
-	 *        - `'timezone'` _string_: The timezone to use. Defaults to `'null'`
-	 * @return void
-	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
-			'host' => 'localhost:5432',
-			'schema' => 'public',
-			'timezone' => null
-		);
-		parent::__construct($config + $defaults);
-	}
+	protected $_quotes = ['"', '"'];
 
 	/**
 	 * Check for required PHP extension, or supported database feature.
@@ -118,42 +108,89 @@ class PostgreSql extends \lithium\data\source\Database {
 		if (!$feature) {
 			return extension_loaded('pdo_pgsql');
 		}
-		$features = array(
+		$features = [
 			'arrays' => false,
 			'transactions' => true,
 			'booleans' => true,
 			'schema' => true,
 			'relationships' => true,
 			'sources' => true
-		);
+		];
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
 
 	/**
-	 * Connects to the database by constructing DSN string and creating a PDO intance using
-	 * the parent class. Will set specific options on the connection as provided (timezone,
-	 * schema).
+	 * Constructor.
 	 *
-	 * @see lithium\data\source\dataase\adapter\PostgreSql::timezone()
+	 * @see lithium\data\source\Database::__construct()
+	 * @see lithium\data\Source::__construct()
+	 * @see lithium\data\Connections::add()
+	 * @param array $config The available configuration options are the following. Further
+	 *        options are inherited from the parent classes. Typically, these parameters are
+	 *        set in `Connections::add()`, when adding the adapter to the list of active
+	 *        connections.
+	 *        - `'host'` _string|boolean_: A string in the form of `'<host>'`, `'<host>:<port>'` or
+	 *          `':<port>'` indicating the host and/or port to connect to. When one or both are
+	 *          not provided uses general server defaults.
+	 *          To use Unix sockets set this to `false`.
+	 *        - `'schema'` _string_: The name of the database schema to use. Defaults to `'public'`.
+	 *        - `'timezone'` _string_: The timezone to use. Defaults to `'null'`
+	 * @return void
+	 */
+	public function __construct(array $config = []) {
+		$defaults = [
+			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT,
+			'schema' => 'public',
+			'timezone' => null
+		];
+		parent::__construct($config + $defaults);
+	}
+
+	/**
+	 * Initializer. Constructs a DSN from configuration.
+	 *
+	 * @return void
+	 */
+	protected function _init() {
+		if (!$this->_config['host'] && $this->_config['host'] !== false) {
+			throw new ConfigException('No host configured.');
+		}
+
+		if ($this->_config['host'] === false) {
+			$this->_config['dsn'] = sprintf(
+				'pgsql:dbname=%s',
+				$this->_config['database']
+			);
+		} else {
+			$host = HostString::parse($this->_config['host']) + [
+				'host' => static::DEFAULT_HOST,
+				'port' => static::DEFAULT_PORT
+			];
+			$this->_config['dsn'] = sprintf(
+				'pgsql:host=%s;port=%s;dbname=%s',
+				$host['host'],
+				$host['port'],
+				$this->_config['database']
+			);
+		}
+		parent::_init();
+	}
+
+	/**
+	 * Connects to the database by creating a PDO intance using the constructed DSN string.
+	 * Will set specific options on the connection as provided (timezone, schema).
+	 *
+	 * @see lithium\data\source\database\adapter\PostgreSql::timezone()
 	 * @return boolean Returns `true` if a database connection could be established,
 	 *         otherwise `false`.
 	 */
 	public function connect() {
-		if (!$this->_config['dsn']) {
-			$host = $this->_config['host'];
-			list($host, $port) = explode(':', $host) + array(1 => "5432");
-			$dsn = "pgsql:host=%s;port=%s;dbname=%s";
-			$this->_config['dsn'] = sprintf($dsn, $host, $port, $this->_config['database']);
-		}
-
 		if (!parent::connect()) {
 			return false;
 		}
-
 		if ($this->_config['schema']) {
 			$this->searchPath($this->_config['schema']);
 		}
-
 		if ($this->_config['timezone']) {
 			$this->timezone($this->_config['timezone']);
 		}
@@ -168,19 +205,18 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @filter
 	 */
 	public function sources($model = null) {
-		$_config = $this->_config;
 		$params = compact('model');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($_config) {
-			$schema = $self->connection->quote($_config['schema']);
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
+			$schema = $this->connection->quote($this->_config['schema']);
 
-			$sql = "SELECT table_name as name FROM INFORMATION_SCHEMA.tables";
+			$sql  = "SELECT table_name as name FROM INFORMATION_SCHEMA.tables";
 			$sql .= " WHERE table_schema = {$schema}";
 
-			if (!$result = $self->invokeMethod('_execute', array($sql))) {
+			if (!$result = $this->_execute($sql)) {
 				return null;
 			}
-			$sources = array();
+			$sources = [];
 
 			foreach ($result as $row) {
 				$sources[] = $row[0];
@@ -203,29 +239,30 @@ class PostgreSql extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter
 	 */
-	public function describe($entity, $fields = array(), array $meta = array()) {
+	public function describe($entity, $fields = [], array $meta = []) {
 		$schema = $this->_config['schema'];
 		$params = compact('entity', 'meta', 'fields', 'schema');
-		return $this->_filter(__METHOD__, $params, function($self, $params) {
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			extract($params);
 
 			if ($fields) {
-				return $self->invokeMethod('_instance', array('schema', compact('fields')));
+				return $this->_instance('schema', compact('fields'));
 			}
-			$name = $self->connection->quote($self->invokeMethod('_entityName', array($entity)));
-			$schema = $self->connection->quote($schema);
+			$name = $this->connection->quote($this->_entityName($entity));
+			$schema = $this->connection->quote($schema);
 
-			$sql = 'SELECT "column_name" AS "field", "data_type" AS "type",	';
+			$sql  = 'SELECT "column_name" AS "field", "data_type" AS "type",	';
 			$sql .= '"is_nullable" AS "null", "column_default" AS "default", ';
 			$sql .= '"character_maximum_length" AS "char_length" ';
 			$sql .= 'FROM "information_schema"."columns" WHERE "table_name" = ' . $name;
 			$sql .= ' AND table_schema = ' . $schema . ' ORDER BY "ordinal_position"';
 
-			$columns = $self->connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-			$fields = array();
+			$columns = $this->connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+			$fields = [];
 
 			foreach ($columns as $column) {
-				$schema = $self->invokeMethod('_column', array($column['type']));
+				$schema = $this->_column($column['type']);
 				$default = $column['default'];
 
 				if (preg_match("/^'(.*)'::/", $default, $match)) {
@@ -237,81 +274,77 @@ class PostgreSql extends \lithium\data\source\Database {
 				} else {
 					$default = null;
 				}
-				$fields[$column['field']] = $schema + array(
+				$fields[$column['field']] = $schema + [
 					'null'     => ($column['null'] === 'YES' ? true : false),
 					'default'  => $default
-				);
+				];
 				if ($fields[$column['field']]['type'] === 'string') {
 					$fields[$column['field']]['length'] = $column['char_length'];
 				}
 			}
-			return $self->invokeMethod('_instance', array('schema', compact('fields')));
+			return $this->_instance('schema', compact('fields'));
 		});
 	}
 
 	/**
-	 * Gets or sets the search path for the connection.
+	 * Getter/Setter for the connection's search path.
 	 *
-	 * @param $searchPath
-	 * @return mixed If setting the searchPath; returns ture on success, else false
-	 *         When getting, returns the searchPath
+	 * @param null|string $searchPath Either `null` to retrieve the current one, or
+	 *        a string to set the current one to.
+	 * @return string|boolean When $searchPath is `null` returns the current search path
+	 *         in effect, otherwise a boolean indicating if setting the search path
+	 *         succeeded or failed.
 	 */
-	public function searchPath($searchPath) {
-		if (empty($searchPath)) {
-			$query = $this->connection->query('SHOW search_path');
-			$searchPath = $query->fetchColumn(1);
-			return explode(",", $searchPath);
+	public function searchPath($searchPath = null) {
+		if ($searchPath === null) {
+			return explode(',', $this->connection->query('SHOW search_path')->fetchColumn(1));
 		}
-		try{
-			$this->connection->exec("SET search_path TO ${searchPath}");
-			return true;
-		} catch (PDOException $e) {
-			return false;
-		}
+		return $this->connection->exec("SET search_path TO {$searchPath}") !== false;
 	}
 
 	/**
-	 * Gets or sets the time zone for the connection
+	 * Getter/Setter for the connection's timezone.
 	 *
-	 * @param $timezone
-	 * @return mixed If setting the time zone; returns true on success, else false
-	 *         When getting, returns the time zone
+	 * @param null|string $timezone Either `null` to retrieve the current TZ, or
+	 *        a string to set the current TZ to.
+	 * @return string|boolean When $timezone is `null` returns the current TZ
+	 *         in effect, otherwise a boolean indicating if setting the TZ
+	 *         succeeded or failed.
 	 */
 	public function timezone($timezone = null) {
-		if (empty($timezone)) {
-			$query = $this->connection->query('SHOW TIME ZONE');
-			return $query->fetchColumn();
+		if ($timezone === null) {
+			return $this->connection->query('SHOW TIME ZONE')->fetchColumn();
 		}
-		try {
-			$this->connection->exec("SET TIME ZONE '{$timezone}'");
-			return true;
-		} catch (PDOException $e) {
-			return false;
-		}
+		return $this->connection->exec("SET TIME ZONE '{$timezone}'") !== false;
 	}
 
 	/**
-	 * Gets or sets the encoding for the connection.
+	 * Getter/Setter for the connection's encoding.
 	 *
-	 * @param $encoding
-	 * @return mixed If setting the encoding; returns true on success, else false.
-	 *         When getting, returns the encoding.
+	 * PostgreSQL uses the string `UTF8` to identify the UTF-8 encoding. In general `UTF-8` is used
+	 * to identify that encoding. This methods allows both strings to be used for _setting_ the
+	 * encoding (in lower and uppercase, with or without dash) and will transparently convert
+	 * to PostgreSQL native format. When _getting_ the encoding, it is converted back into `UTF-8`.
+	 * So that this method should ever only return `UTF-8` when the encoding is used.
+	 *
+	 * @param null|string $encoding Either `null` to retrieve the current encoding, or
+	 *        a string to set the current encoding to. For UTF-8 accepts any permutation.
+	 * @return string|boolean When $encoding is `null` returns the current encoding
+	 *         in effect, otherwise a boolean indicating if setting the encoding
+	 *         succeeded or failed. Returns `'UTF-8'` when this encoding is used.
 	 */
 	public function encoding($encoding = null) {
-		$encodingMap = array('UTF-8' => 'UTF8');
+		if ($encoding === null) {
+			$encoding = $this->connection
+				->query('SHOW client_encoding')
+				->fetchColumn();
 
-		if (empty($encoding)) {
-			$query = $this->connection->query("SHOW client_encoding");
-			$encoding = $query->fetchColumn();
-			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
+			return $encoding === 'UTF8' ? 'UTF-8' : $encoding;
 		}
-		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
-		try {
-			$this->connection->exec("SET NAMES '{$encoding}'");
-			return true;
-		} catch (PDOException $e) {
-			return false;
+		if (strcasecmp($encoding, 'utf-8') === 0 || strcasecmp($encoding, 'utf8') === 0) {
+			$encoding = 'UTF8';
 		}
+		return $this->connection->exec("SET NAMES '{$encoding}'") !== false;
 	}
 
 	/**
@@ -322,7 +355,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @param array $schema Formatted array from `lithium\data\source\Database::schema()`
 	 * @return mixed Value with converted type.
 	 */
-	public function value($value, array $schema = array()) {
+	public function value($value, array $schema = []) {
 		if (($result = parent::value($value, $schema)) !== null) {
 			return $result;
 		}
@@ -336,7 +369,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 */
 	public function error() {
 		if ($error = $this->connection->errorInfo()) {
-			return array($error[1], $error[2]);
+			return [$error[1], $error[2]];
 		}
 		return null;
 	}
@@ -356,7 +389,7 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @param array $options
 	 * @return string
 	 */
-	public function conditions($conditions, $context, array $options = array()) {
+	public function conditions($conditions, $context, array $options = []) {
 		return parent::conditions($conditions, $context, $options);
 	}
 
@@ -369,21 +402,16 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @return \lithium\data\source\Result Returns a result object if the query was successful.
 	 * @filter
 	 */
-	protected function _execute($sql, array $options = array()) {
-		$conn = $this->connection;
-
+	protected function _execute($sql, array $options = []) {
 		$params = compact('sql', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($conn) {
-			$sql = $params['sql'];
-
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			try {
-				$resource = $conn->query($sql);
-			} catch(PDOException $e) {
-				$self->invokeMethod('_error', array($sql));
+				$resource = $this->connection->query($params['sql']);
+			} catch (PDOException $e) {
+				$this->_error($params['sql']);
 			};
-
-			return $self->invokeMethod('_instance', array('result', compact('resource')));
+			return $this->_instance('result', compact('resource'));
 		});
 	}
 
@@ -417,23 +445,23 @@ class PostgreSql extends \lithium\data\source\Database {
 		if (!preg_match('/(?P<type>\w+)(?:\((?P<length>[\d,]+)\))?/', $real, $column)) {
 			return $real;
 		}
-		$column = array_intersect_key($column, array('type' => null, 'length' => null));
+		$column = array_intersect_key($column, ['type' => null, 'length' => null]);
 
 		if (isset($column['length']) && $column['length']) {
-			$length = explode(',', $column['length']) + array(null, null);
+			$length = explode(',', $column['length']) + [null, null];
 			$column['length'] = $length[0] ? (integer) $length[0] : null;
 			$length[1] ? $column['precision'] = (integer) $length[1] : null;
 		}
 
 		switch (true) {
-			case in_array($column['type'], array('date', 'time', 'datetime')):
+			case in_array($column['type'], ['date', 'time', 'datetime']):
 				return $column;
 			case ($column['type'] === 'timestamp'):
 				$column['type'] = 'datetime';
 			break;
 			case ($column['type'] === 'tinyint' && $column['length'] == '1'):
 			case ($column['type'] === 'boolean'):
-				return array('type' => 'boolean');
+				return ['type' => 'boolean'];
 			break;
 			case (strpos($column['type'], 'int') !== false):
 				$column['type'] = 'integer';
@@ -464,29 +492,27 @@ class PostgreSql extends \lithium\data\source\Database {
 	 * @see lithium\data\source\Database::_formatters()
 	 */
 	protected function _formatters() {
-		$self = $this;
-
-		$datetime = $timestamp = function($format, $value) use ($self) {
+		$datetime = $timestamp = function($format, $value) {
 			if ($format && (($time = strtotime($value)) !== false)) {
 				$val = date($format, $time);
 				if (!preg_match('/^' . preg_quote($val) . '\.\d+$/', $value)) {
 					$value = $val;
 				}
 			}
-			return $self->connection->quote($value);
+			return $this->connection->quote($value);
 		};
 
-		return compact('datetime', 'timestamp') + array(
-			'boolean' => function($value) use ($self){
-				return $self->connection->quote($value ? 't' : 'f');
+		return compact('datetime', 'timestamp') + [
+			'boolean' => function($value) {
+				return $this->connection->quote($value ? 't' : 'f');
 			}
-		) + parent::_formatters();
+		] + parent::_formatters();
 	}
 
 	/**
 	 * Helper for `Database::column()`.
 	 *
-	 * @see lithium\data\Database::column()
+	 * @see lithium\data\source\Database::column()
 	 * @param array $field A field array.
 	 * @return string SQL column string.
 	 */
@@ -520,10 +546,10 @@ class PostgreSql extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Helper method for `PostgreSql::_quryExport()` to export data
+	 * Helper method for `PostgreSql::_queryExport()` to export data
 	 * for use in distinct query.
 	 *
-	 * @see lithium\data\source\PostgreSql::_quryExport()
+	 * @see lithium\data\source\PostgreSql::_queryExport()
 	 * @param object $query The query object.
 	 * @return array Returns an array with the fields as the first
 	 *         value and the orders as the second value.
@@ -531,10 +557,10 @@ class PostgreSql extends \lithium\data\source\Database {
 	protected function _distinctExport($query) {
 		$model = $query->model();
 		$orders = $query->order();
-		$result = array(
-			'fields' => array(),
-			'orders' => array(),
-		);
+		$result = [
+			'fields' => [],
+			'orders' => [],
+		];
 
 		if (is_string($orders)) {
 			$direction = 'ASC';
@@ -542,7 +568,7 @@ class PostgreSql extends \lithium\data\source\Database {
 				$orders = $match[1];
 				$direction = $match[2];
 			}
-			$orders = array($orders => $direction);
+			$orders = [$orders => $direction];
 		}
 
 		if (!is_array($orders)) {
@@ -596,26 +622,26 @@ class PostgreSql extends \lithium\data\source\Database {
 				list($fields, $orders) = $this->_distinctExport($query);
 				array_unshift($fields, "DISTINCT ON($pk) $pk AS _ID_");
 
-				$command = $this->renderCommand('read', array(
+				$command = $this->renderCommand('read', [
 					'limit' => null, 'order' => null,
 					'fields' => implode(', ', $fields)
-				) + $data);
+				] + $data);
 				$command = rtrim($command, ';');
 
-				$command = $this->renderCommand('read', array(
+				$command = $this->renderCommand('read', [
 					'source' => "( $command ) AS _TEMP_",
 					'fields' => '_ID_',
 					'order' => "ORDER BY " . implode(', ', $orders),
 					'limit' => $data['limit'],
-				));
+				]);
 			} else {
-				$command = $this->renderCommand('read', array(
+				$command = $this->renderCommand('read', [
 					'fields' => "DISTINCT({$pk}) AS _ID_"
-				) + $data);
+				] + $data);
 			}
 
 			$result = $this->_execute($command);
-			$ids = array();
+			$ids = [];
 
 			foreach ($result as $row) {
 				$ids[] = $row[0];
@@ -625,7 +651,7 @@ class PostgreSql extends \lithium\data\source\Database {
 				break;
 			}
 
-			$conditions = array();
+			$conditions = [];
 			$relations = array_keys($query->relationships());
 			$pattern = '/^(' . implode('|', $relations) . ')\./';
 			foreach ($query->conditions() as $key => $value) {
@@ -634,7 +660,7 @@ class PostgreSql extends \lithium\data\source\Database {
 				}
 			}
 			$data['conditions'] = $this->conditions(
-				array($pk => $ids) + $conditions, $query
+				[$pk => $ids] + $conditions, $query
 			);
 
 			$data['limit'] = '';

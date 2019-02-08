@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\integration\data;
@@ -14,10 +15,10 @@ use li3_fixtures\test\Fixtures;
 
 class FieldsTest extends \lithium\tests\integration\data\Base {
 
-	protected $_fixtures = array(
+	protected $_fixtures = [
 		'images' => 'lithium\tests\fixture\model\gallery\ImagesFixture',
 		'galleries' => 'lithium\tests\fixture\model\gallery\GalleriesFixture',
-	);
+	];
 
 	/**
 	 * Skip the test if no test database connection available.
@@ -27,20 +28,20 @@ class FieldsTest extends \lithium\tests\integration\data\Base {
 		if (!class_exists('li3_fixtures\test\Fixtures')) {
 			$this->skipIf(true, 'Need `li3_fixtures` to run tests.');
 		}
-		$this->skipIf($this->with(array('CouchDb')));
+		$this->skipIf($this->with(['CouchDb']));
 	}
 
 	/**
 	 * Creating the test database
 	 */
 	public function setUp() {
-		Fixtures::config(array(
-			'db' => array(
+		Fixtures::config([
+			'db' => [
 				'adapter' => 'Connection',
 				'connection' => $this->_connection,
 				'fixtures' => $this->_fixtures
-			)
-		));
+			]
+		]);
 		Fixtures::create('db');
 
 		$db = $this->_db;
@@ -60,7 +61,7 @@ class FieldsTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testSingleField() {
-		$new = Galleries::create(array('name' => 'People'));
+		$new = Galleries::create(['name' => 'People']);
 		$key = Galleries::meta('key');
 		$new->save();
 		$id = is_object($new->{$key}) ? (string) $new->{$key} : $new->{$key};
@@ -69,39 +70,39 @@ class FieldsTest extends \lithium\tests\integration\data\Base {
 
 		$this->assertInstanceOf('lithium\data\Entity', $entity);
 
-		$expected = array(
+		$expected = [
 			$key => $id,
 			'name' => 'People',
 			'active' => true
-		);
+		];
 		$result = $entity->data();
 		$this->assertEqual($expected, array_filter($result));
 
-		$entity = Galleries::first(array(
-			'conditions' => array($key => $id),
-			'fields' => array($key)
-		));
+		$entity = Galleries::first([
+			'conditions' => [$key => $id],
+			'fields' => [$key]
+		]);
 
 		$this->assertInstanceOf('lithium\data\Entity', $entity);
 
-		$expected = array($key => $id);
+		$expected = [$key => $id];
 		$result = $entity->data();
 		$this->assertEqual($expected, $result);
 
-		$entity = Galleries::find('first',array(
-			'conditions' => array($key => $id),
-			'fields' => array($key, 'name')
-		));
+		$entity = Galleries::find('first',[
+			'conditions' => [$key => $id],
+			'fields' => [$key, 'name']
+		]);
 		$this->assertInstanceOf('lithium\data\Entity', $entity);
 
 		$entity->name = 'Celebrities';
 		$result = $entity->save();
 		$this->assertTrue($result);
 
-		$entity = Galleries::find('first',array(
-			'conditions' => array($key => $id),
-			'fields' => array($key, 'name')
-		));
+		$entity = Galleries::find('first',[
+			'conditions' => [$key => $id],
+			'fields' => [$key, 'name']
+		]);
 		$this->assertEqual($entity->name, 'Celebrities');
 		$new->delete();
 	}
@@ -109,43 +110,43 @@ class FieldsTest extends \lithium\tests\integration\data\Base {
 	public function testFieldsWithJoins() {
 		$db = $this->_db;
 		$this->skipIf(!$db::enabled('relationships'));
-		$this->skipIf($this->with(array('MongoDb')));
+		$this->skipIf($this->with(['MongoDb']));
 
-		$new = Galleries::create(array('name' => 'Celebrities'));
+		$new = Galleries::create(['name' => 'Celebrities']);
 		$cKey = Galleries::meta('key');
 		$result = $new->save();
 		$this->assertTrue($result);
 		$cId = (string) $new->{$cKey};
 
-		$new = Images::create(array(
+		$new = Images::create([
 			'gallery_id' => $cId,
 			'title' => 'John Doe'
-		));
+		]);
 		$eKey = Images::meta('key');
 		$result = $new->save();
 		$this->assertTrue($result);
 
 		$eId = (string) $new->{$eKey};
-		$entity = Galleries::first(array(
+		$entity = Galleries::first([
 			'with' => 'Images',
-			'conditions' => array(
+			'conditions' => [
 				'Galleries.id' => $cId
-			),
-			'fields' => array(
-				'Galleries' => array('name'),
-				'Images' => array('id', 'title')
-			)
-		));
-		$expected = array(
+			],
+			'fields' => [
+				'Galleries' => ['name'],
+				'Images' => ['id', 'title']
+			]
+		]);
+		$expected = [
 			'id' => $cId,
 			'name' => 'Celebrities',
-			'images' => array(
-				array(
+			'images' => [
+				[
 					'id' => $eId,
 					'title' => 'John Doe'
-				)
-			)
-		);
+				]
+			]
+		];
 		$this->assertEqual($expected, $entity->data());
 	}
 }

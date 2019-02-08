@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of Rad, Inc. (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\storage\session\adapter;
@@ -15,7 +16,7 @@ use lithium\tests\mocks\storage\session\adapter\MockPhp;
 class PhpTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		$this->_session = isset($_SESSION) ? $_SESSION : array();
+		$this->_session = isset($_SESSION) ? $_SESSION : [];
 		$this->_destroySession();
 
 		$this->php = new Php();
@@ -44,7 +45,7 @@ class PhpTest extends \lithium\test\Unit {
 		if (session_id()) {
 			session_destroy();
 		}
-		$_SESSION = array();
+		$_SESSION = [];
 	}
 
 	public function testEnabled() {
@@ -68,17 +69,17 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertNotEmpty((integer) $result);
 
 		$name = 'this-is-a-custom-name';
-		$php = new Php(array('session.name' => $name));
+		$php = new Php(['session.name' => $name]);
 		$this->assertNotInternalType('numeric', $php->_config['session.name']);
 	}
 
 	public function testCustomConfiguration() {
-		$config = array(
+		$config = [
 			'session.name' => 'awesome_name', 'session.cookie_lifetime' => 1200,
 			'session.cookie_domain' => 'awesome.domain',
 			'session.save_path' => Libraries::get(true, 'resources') . '/tmp/',
 			'somebad.configuration' => 'whoops'
-		);
+		];
 
 		$adapter = new Php($config);
 
@@ -121,7 +122,7 @@ class PhpTest extends \lithium\test\Unit {
 	public function testIsStartedNoInit() {
 		$this->_destroySession(session_name());
 
-		$php = new Php(array('init' => false));
+		$php = new Php(['init' => false]);
 		$result = $php->isStarted();
 		$this->assertFalse($result);
 
@@ -148,7 +149,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'value');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 
 		$this->assertEqual($_SESSION[$key], $value);
 	}
@@ -165,7 +166,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 
 		$this->assertIdentical($value, $result);
 
@@ -174,14 +175,14 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 		$this->assertNull($result);
 
 		$closure = $this->php->read();
 		$this->assertInternalType('callable', $closure);
 
-		$result = $closure($this->php, array('key' => null), null);
-		$expected = array('read_test' => 'value to be read');
+		$result = $closure(['key' => null], null);
+		$expected = ['read_test' => 'value to be read'];
 		$this->assertEqual($expected, $result);
 	}
 
@@ -196,7 +197,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 		$this->assertTrue($result);
 
 		$key = 'does_not_exist';
@@ -204,7 +205,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 		$this->assertFalse($result);
 	}
 
@@ -220,7 +221,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 		$this->assertTrue($result);
 
 		$key = 'non-existent';
@@ -228,7 +229,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 		$this->assertTrue($result);
 	}
 
@@ -240,33 +241,33 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertNotEmpty($_SESSION);
 		$closure = $this->php->clear();
 		$this->assertInternalType('callable', $closure);
-		$result = $closure($this->php, array(), null);
+		$result = $closure([], null);
 		$this->assertEmpty($_SESSION);
 	}
 
 	public function testCheckThrowException() {
-		$php = new MockPhp(array('init' => false));
+		$php = new MockPhp(['init' => false]);
 		$this->assertException('/Could not start session./', function() use ($php) {
 			$php->check('whatever');
 		});
 	}
 
 	public function testReadThrowException() {
-		$php = new MockPhp(array('init' => false));
+		$php = new MockPhp(['init' => false]);
 		$this->assertException('/Could not start session./', function() use ($php) {
 			$php->read('whatever');
 		});
 	}
 
 	public function testWriteThrowException() {
-		$php = new MockPhp(array('init' => false));
+		$php = new MockPhp(['init' => false]);
 		$this->assertException('/Could not start session./', function() use ($php) {
 			$php->write('whatever', 'value');
 		});
 	}
 
 	public function testDeleteThrowException() {
-		$php = new MockPhp(array('init' => false));
+		$php = new MockPhp(['init' => false]);
 		$this->assertException('/Could not start session./', function() use ($php) {
 			$php->delete('whatever');
 		});
@@ -276,7 +277,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->php->read();
 
 		$key = 'dot';
-		$value = array('syntax' => array('key' => 'value'));
+		$value = ['syntax' => ['key' => 'value']];
 
 		$_SESSION[$key] = $value;
 
@@ -284,12 +285,12 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 
 		$this->assertIdentical($value, $result);
 
-		$params = array('key' => 'dot.syntax');
-		$result = $closure($this->php, $params, null);
+		$params = ['key' => 'dot.syntax'];
+		$result = $closure($params, null);
 
 		$this->assertIdentical($value['syntax'], $result);
 	}
@@ -302,7 +303,7 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertInternalType('callable', $closure);
 
 		$params = compact('key', 'value');
-		$result = $closure($this->php, $params, null);
+		$result = $closure($params, null);
 
 		$this->assertEqual($_SESSION['dot']['syntax'], $value);
 	}

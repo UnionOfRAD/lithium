@@ -1,15 +1,29 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\storage\session\strategy;
 
 class MockEncrypt extends \lithium\storage\session\strategy\Encrypt {
-	public function encrypt($decrypted = array()) {
+
+	protected $_backup;
+
+	public function __construct(array $config) {
+		error_reporting(($this->_backup = error_reporting()) & ~E_DEPRECATED);
+		parent::__construct($config);
+	}
+
+	public function __destruct() {
+		parent::__destruct();
+		error_reporting($this->_backup);
+	}
+
+	public function encrypt($decrypted = []) {
 		return parent::_encrypt($decrypted);
 	}
 

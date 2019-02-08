@@ -1,15 +1,16 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\core;
 
 use lithium\core\Libraries;
-use lithium\util\collection\Filters;
+use lithium\aop\Filters;
 use lithium\analysis\Inspector;
 
 /**
@@ -25,9 +26,6 @@ use lithium\analysis\Inspector;
  *   automatically by `Object::__construct()`, but may be disabled by passing `'init' => false` to
  *   the constructor. The initializer is also used for automatically assigning object properties.
  *   See the documentation on the `_init()` method for more details.
- * - **Filters**: The `Object` class implements two methods which allow an object to easily
- *   implement filterable methods. The `_filter()` method allows methods to be implemented as
- *   filterable, and the `applyFilter()` method allows filters to be wrapped around them.
  * - **Testing / misc.**: The `__set_state()` method provides a default implementation of the PHP
  *   magic method (works with `var_export()`) which can instantiate an object with a static method
  *   call. Finally, the `_stop()` method may be used instead of `exit()`, as it can be overridden
@@ -44,7 +42,7 @@ class Object {
 	 *
 	 * @var array
 	 */
-	protected $_config = array();
+	protected $_config = [];
 
 	/**
 	 * Holds an array of values that should be processed on initialization. Each value should have
@@ -55,17 +53,7 @@ class Object {
 	 * @see lithium\core\Object::_init()
 	 * @var array
 	 */
-	protected $_autoConfig = array();
-
-	/**
-	 * Contains a 2-dimensional array of filters applied to this object's methods, indexed by method
-	 * name. See the associated methods for more details.
-	 *
-	 * @see lithium\core\Object::_filter()
-	 * @see lithium\core\Object::applyFilter()
-	 * @var array
-	 */
-	protected $_methodFilters = array();
+	protected $_autoConfig = [];
 
 	/**
 	 * Parents of the current class.
@@ -73,7 +61,7 @@ class Object {
 	 * @see lithium\core\Object::_parents()
 	 * @var array
 	 */
-	protected static $_parents = array();
+	protected static $_parents = [];
 
 	/**
 	 * Constructor. Initializes class configuration (`$_config`), and assigns object properties
@@ -88,8 +76,8 @@ class Object {
 	 *          method. If `false`, the method is not called, otherwise it is. Defaults to `true`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('init' => true);
+	public function __construct(array $config = []) {
+		$defaults = ['init' => true];
 		$this->_config = $config + $defaults;
 
 		if ($this->_config['init']) {
@@ -107,11 +95,11 @@ class Object {
 	 * For example, given the following:
 	 * ```
 	 * class Bar extends \lithium\core\Object {
-	 * 	protected $_autoConfig = array('foo');
+	 * 	protected $_autoConfig = ['foo'];
 	 * 	protected $_foo;
 	 * }
 	 *
-	 * $instance = new Bar(array('foo' => 'value'));
+	 * $instance = new Bar(['foo' => 'value']);
 	 * ```
 	 *
 	 * The `$_foo` property of `$instance` would automatically be set to `'value'`. If `$_foo` was
@@ -136,33 +124,6 @@ class Object {
 	}
 
 	/**
-	 * Apply a closure to a method of the current object instance.
-	 *
-	 * @see lithium\core\Object::_filter()
-	 * @see lithium\util\collection\Filters
-	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
-	 *        method name as a string, or an array of method names. Can also be false to remove
-	 *        all filters on the current object.
-	 * @param \Closure $filter The closure that is used to filter the method(s), can also be false
-	 *        to remove all the current filters for the given method.
-	 * @return void
-	 */
-	public function applyFilter($method, $filter = null) {
-		if ($method === false) {
-			$this->_methodFilters = array();
-			return;
-		}
-		foreach ((array) $method as $m) {
-			if (!isset($this->_methodFilters[$m]) || $filter === false) {
-				$this->_methodFilters[$m] = array();
-			}
-			if ($filter !== false) {
-				$this->_methodFilters[$m][] = $filter;
-			}
-		}
-	}
-
-	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper
 	 * for call_user_func_array, and improves performance by using straight method calls
 	 * in most cases.
@@ -171,7 +132,7 @@ class Object {
 	 * @param array $params  Parameter list to use when calling $method
 	 * @return mixed  Returns the result of the method call
 	 */
-	public function invokeMethod($method, $params = array()) {
+	public function invokeMethod($method, $params = []) {
 		switch (count($params)) {
 			case 0:
 				return $this->{$method}();
@@ -186,7 +147,7 @@ class Object {
 			case 5:
 				return $this->{$method}($params[0], $params[1], $params[2], $params[3], $params[4]);
 			default:
-				return call_user_func_array(array(&$this, $method), $params);
+				return call_user_func_array([&$this, $method], $params);
 		}
 	}
 
@@ -231,41 +192,11 @@ class Object {
 	 * @param array $options The configuration passed to the constructor.
 	 * @return object
 	 */
-	protected function _instance($name, array $options = array()) {
+	protected function _instance($name, array $options = []) {
 		if (is_string($name) && isset($this->_classes[$name])) {
 			$name = $this->_classes[$name];
 		}
 		return Libraries::instance(null, $name, $options);
-	}
-
-	/**
-	 * Executes a set of filters against a method by taking a method's main implementation as a
-	 * callback, and iteratively wrapping the filters around it. This, along with the `Filters`
-	 * class, is the core of Lithium's filters system. This system allows you to "reach into" an
-	 * object's methods which are marked as _filterable_, and intercept calls to those methods,
-	 * optionally modifying parameters or return values.
-	 *
-	 * @see lithium\core\Object::applyFilter()
-	 * @see lithium\util\collection\Filters
-	 * @param string $method The name of the method being executed, usually the value of
-	 *               `__METHOD__`.
-	 * @param array $params An associative array containing all the parameters passed into
-	 *              the method.
-	 * @param \Closure $callback The method's implementation, wrapped in a closure.
-	 * @param array $filters Additional filters to apply to the method for this call only.
-	 * @return mixed Returns the return value of `$callback`, modified by any filters passed in
-	 *         `$filters` or applied with `applyFilter()`.
-	 */
-	protected function _filter($method, $params, $callback, $filters = array()) {
-		list($class, $method) = explode('::', $method);
-
-		if (empty($this->_methodFilters[$method]) && empty($filters)) {
-			return $callback($this, $params, null);
-		}
-
-		$f = isset($this->_methodFilters[$method]) ? $this->_methodFilters[$method] : array();
-		$data = array_merge($f, $filters, array($callback));
-		return Filters::run($this, $params, compact('data', 'class', 'method'));
 	}
 
 	/**
@@ -276,10 +207,10 @@ class Object {
 	protected static function _parents() {
 		$class = get_called_class();
 
-		if (!isset(self::$_parents[$class])) {
-			self::$_parents[$class] = class_parents($class);
+		if (!isset(static::$_parents[$class])) {
+			static::$_parents[$class] = class_parents($class);
 		}
-		return self::$_parents[$class];
+		return static::$_parents[$class];
 	}
 
 	/**
@@ -292,6 +223,81 @@ class Object {
 		exit($status);
 	}
 
+	/* Deprecated / BC */
+
+	/**
+	 * Contains a 2-dimensional array of filters applied to this object's methods, indexed by method
+	 * name. See the associated methods for more details.
+	 *
+	 * @deprecated Not used anymore.
+	 * @see lithium\core\Object::_filter()
+	 * @see lithium\core\Object::applyFilter()
+	 * @var array
+	 */
+	protected $_methodFilters = [];
+
+	/**
+	 * Apply a closure to a method of the current object instance.
+	 *
+	 * @deprecated Replaced by `\lithium\aop\Filters::apply()` and `::clear()`.
+	 * @see lithium\core\Object::_filter()
+	 * @see lithium\util\collection\Filters
+	 * @param mixed $method The name of the method to apply the closure to. Can either be a single
+	 *        method name as a string, or an array of method names. Can also be false to remove
+	 *        all filters on the current object.
+	 * @param \Closure $filter The closure that is used to filter the method(s), can also be false
+	 *        to remove all the current filters for the given method.
+	 * @return void
+	 */
+	public function applyFilter($method, $filter = null) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
+		$message .= '`\lithium\aop\Filters::apply()` and `::clear()`.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		if ($method === false) {
+			Filters::clear($this);
+			return;
+		}
+		foreach ((array) $method as $m) {
+			if ($filter === false) {
+				Filters::clear($this, $m);
+			} else {
+				Filters::apply($this, $m, $filter);
+			}
+		}
+	}
+
+	/**
+	 * Executes a set of filters against a method by taking a method's main implementation as a
+	 * callback, and iteratively wrapping the filters around it. This, along with the `Filters`
+	 * class, is the core of Lithium's filters system. This system allows you to "reach into" an
+	 * object's methods which are marked as _filterable_, and intercept calls to those methods,
+	 * optionally modifying parameters or return values.
+	 *
+	 * @deprecated Replaced by `\lithium\aop\Filters::run()`.
+	 * @see lithium\core\Object::applyFilter()
+	 * @see lithium\util\collection\Filters
+	 * @param string $method The name of the method being executed, usually the value of
+	 *               `__METHOD__`.
+	 * @param array $params An associative array containing all the parameters passed into
+	 *              the method.
+	 * @param \Closure $callback The method's implementation, wrapped in a closure.
+	 * @param array $filters Additional filters to apply to the method for this call only.
+	 * @return mixed Returns the return value of `$callback`, modified by any filters passed in
+	 *         `$filters` or applied with `applyFilter()`.
+	 */
+	protected function _filter($method, $params, $callback, $filters = []) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated in favor of ';
+		$message .= '`\lithium\aop\Filters::run()` and `::apply()`.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		list(, $method) = explode('::', $method);
+
+		foreach ($filters as $filter) {
+			Filters::apply($this, $method, $filter);
+		}
+		return Filters::run($this, $method, $params, $callback);
+	}
 }
 
 ?>

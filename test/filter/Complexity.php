@@ -1,12 +1,16 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\test\filter;
+
+use lithium\analysis\Parser;
+use lithium\analysis\Inspector;
 
 /**
  * Calculates the cyclomatic complexity of class methods, and shows worst-offenders and statistics.
@@ -16,46 +20,34 @@ class Complexity extends \lithium\test\Filter {
 	/**
 	 * The list of tokens which represent the starting point of a code branch.
 	 */
-	protected static $_include = array(
+	protected static $_include = [
 		'T_CASE', 'T_CATCH', 'T_IF', 'T_FOR',
 		'T_FOREACH', 'T_WHILE', 'T_DO', 'T_ELSEIF'
-	);
-
-	protected static $_classes = array(
-		'parser' => 'lithium\analysis\Parser',
-		'inspector' => 'lithium\analysis\Inspector',
-	);
+	];
 
 	/**
 	 * Takes an instance of an object (usually a Collection object) containing test
 	 * instances. Introspects the test subject classes to extract cyclomatic complexity data.
 	 *
 	 * @param object $report Instance of Report which is calling apply.
-	 * @param array $tests The test to apply this filter on
+	 * @param \lithium\util\Collection $tests The tests to apply this filter on.
 	 * @param array $options Additional options to overwrite dependencies.
 	 *                       - `'classes'` _array_: Overwrite default classes array.
 	 * @return object Returns the instance of `$tests`.
 	 */
-	public static function apply($report, $tests, array $options = array()) {
-		$results = array();
-		$options += array(
-			'classes' => array(),
-		);
-		$classes = $options['classes'] + static::$_classes;
-		$inspector = $classes['inspector'];
-		$parser = $classes['parser'];
-
+	public static function apply($report, $tests, array $options = []) {
+		$results = [];
 		foreach ($tests->invoke('subject') as $class) {
-			$results[$class] = array();
+			$results[$class] = [];
 
-			if (!$methods = $inspector::methods($class, 'ranges', array('public' => false))) {
+			if (!$methods = Inspector::methods($class, 'ranges', ['public' => false])) {
 				continue;
 			}
 			foreach ($methods as $method => $lines) {
-				$lines = $inspector::lines($class, $lines);
-				$branches = $parser::tokenize(join("\n", (array) $lines), array(
+				$lines = Inspector::lines($class, $lines);
+				$branches = Parser::tokenize(join("\n", (array) $lines), [
 					'include' => static::$_include
-				));
+				]);
 				$results[$class][$method] = count($branches) + 1;
 				$report->collect(__CLASS__, $results);
 			}
@@ -70,9 +62,9 @@ class Complexity extends \lithium\test\Filter {
 	 * @param array $options Not used.
 	 * @return array The results of the analysis.
 	 */
-	public static function analyze($report, array $options = array()) {
+	public static function analyze($report, array $options = []) {
 		$filterResults = static::collect($report->results['filters'][__CLASS__]);
-		$metrics = array('max' => array(), 'class' => array());
+		$metrics = ['max' => [], 'class' => []];
 
 		foreach ($filterResults as $class => $methods) {
 			if (!$methods) {
@@ -97,12 +89,12 @@ class Complexity extends \lithium\test\Filter {
 	 * @return array The packaged results.
 	 */
 	public static function collect($filterResults) {
-		$packagedResults = array();
+		$packagedResults = [];
 
 		foreach ($filterResults as $result) {
 			foreach ($result as $class => $method) {
 				if (!isset($packagedResults[$class])) {
-					$packagedResults[$class] = array();
+					$packagedResults[$class] = [];
 				}
 				$classResult = (array) $result[$class];
 				$packagedResults[$class] = array_merge($classResult, $packagedResults[$class]);

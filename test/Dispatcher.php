@@ -1,13 +1,15 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\test;
 
+use lithium\aop\Filters;
 use lithium\util\Set;
 use lithium\core\Libraries;
 use lithium\core\Environment;
@@ -25,10 +27,10 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *
 	 * @var array Key/value array of short identifier for the fully-namespaced class.
 	 */
-	protected static $_classes = array(
+	protected static $_classes = [
 		'group' => 'lithium\test\Group',
 		'report' => 'lithium\test\Report'
-	);
+	];
 
 	/**
 	 * Runs a test group or a specific test file based on the passed
@@ -47,22 +49,25 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *         have been applied.
 	 * @filter
 	 */
-	public static function run($group = null, array $options = array()) {
-		$defaults = array(
+	public static function run($group = null, array $options = []) {
+		$defaults = [
 			'title' => $group,
-			'filters' => array(),
+			'filters' => [],
 			'format' => 'txt',
 			'reporter' => null
-		);
+		];
 		$options += $defaults;
 		$isCase = is_string($group) && preg_match('/Test$/', $group);
-		$items = ($isCase) ? array(new $group()) : (array) $group;
+		$items = ($isCase) ? [new $group()] : (array) $group;
 
-		$options['filters'] = Set::normalize($options['filters']);
+		$options['filters'] = array_map(function($v) {
+			return (array) $v;
+		}, Set::normalize($options['filters']));
+
 		$group = static::_group($items);
 		$report = static::_report($group, $options);
 
-		return static::_filter(__FUNCTION__, compact('report'), function($self, $params, $chain) {
+		return Filters::run(get_called_class(), __FUNCTION__, compact('report'), function($params) {
 			$environment = Environment::get();
 			Environment::set('test');
 

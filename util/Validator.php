@@ -1,13 +1,15 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\util;
 
+use lithium\aop\Filters;
 use lithium\util\Set;
 use InvalidArgumentException;
 
@@ -154,7 +156,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * @see lithium\util\Validator::add()
 	 * @see lithium\util\Validator::rule()
 	 */
-	protected static $_rules = array();
+	protected static $_rules = [];
 
 	/**
 	 * Default options used when defining a new validator rule. Each key contains method-specific
@@ -165,9 +167,9 @@ class Validator extends \lithium\core\StaticObject {
 	 * @see lithium\util\Validator::rule()
 	 * @var array
 	 */
-	protected static $_options = array(
-		'defaults' => array('contains' => true)
-	);
+	protected static $_options = [
+		'defaults' => ['contains' => true]
+	];
 
 	/**
 	 * Initializes the list of default validation rules.
@@ -175,12 +177,12 @@ class Validator extends \lithium\core\StaticObject {
 	public static function reset() {
 		$alnum = '[A-Fa-f0-9]';
 		$class = get_called_class();
-		static::$_methodFilters[$class] = array();
+		Filters::clear($class);
 
-		static::$_rules = array(
+		static::$_rules = [
 			'alphaNumeric' => '/^[\p{Ll}\p{Lm}\p{Lo}\p{Lt}\p{Lu}\p{Nd}]+$/mu',
 			'blank'        => '/[^\\s]/',
-			'creditCard'   => array(
+			'creditCard'   => [
 				'amex'     => '/^3[4|7]\\d{13}$/',
 				'bankcard' => '/^56(10\\d\\d|022[1-5])\\d{10}$/',
 				'diners'   => '/^(?:3(0[0-5]|[68]\\d)\\d{11})|(?:5[1-5]\\d{14})$/',
@@ -198,8 +200,8 @@ class Validator extends \lithium\core\StaticObject {
 				'voyager'  => '/^8699[0-9]{11}$/',
 				'fast'     => '/^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6011[0-9]{12}|3' .
 				              '(?:0[0-5]|[68][0-9])[0-9]{11}|3[47][0-9]{13})$/'
-			),
-			'date'         => array(
+			],
+			'date'         => [
 				'dmy'      => '%^(?:(?:31(\\/|-|\\.|\\x20)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)' .
 				              '(\\/|-|\\.|\\x20)(?:0?[1,3-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?' .
 				              '\\d{2})$|^(?:29(\\/|-|\\.|\\x20)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?' .
@@ -235,17 +237,17 @@ class Validator extends \lithium\core\StaticObject {
 				              'Aug(ust)?|Oct(ober)?|(Sep(?=\\b|t)t?|Nov|Dec)(ember)?)\\ ((1[6-9]' .
 				              '|[2-9]\\d)\\d{2})$%',
 				'my'       => '%^(0?[1-9]|1[012])([- /.])((1[6-9])|([2-9]\\d)\\d{2})$%'
-			),
-			'ip' => function($value, $format = null, array $options = array()) {
-				$options += array('flags' => array());
+			],
+			'ip' => function($value, $format = null, array $options = []) {
+				$options += ['flags' => []];
 				return (boolean) filter_var($value, FILTER_VALIDATE_IP, $options);
 			},
-			'money'        => array(
+			'money'        => [
 				'right'    => '/^(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?(?:\1\d{3})*|(?:\d+))' .
 				              '((?!\1)[,.]\d{2})?(?<!\x{00a2})\p{Sc}?$/u',
 				'left'     => '/^(?!\x{00a2})\p{Sc}?(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?' .
 				              '(?:\1\d{3})*|(?:\d+))((?!\1)[,.]\d{2})?$/u'
-			),
+			],
 			'notEmpty'     => '/[^\s]+/m',
 			'phone'        => '/^\+?[0-9\(\)\-]{10,20}$/',
 			'postalCode'   => '/(^|\A\b)[A-Z0-9\s\-]{5,}($|\b\z)/i',
@@ -258,7 +260,7 @@ class Validator extends \lithium\core\StaticObject {
 				$filter = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 				return ($bool || $filter !== null || empty($value));
 			},
-			'decimal' => function($value, $format = null, array $options = array()) {
+			'decimal' => function($value, $format = null, array $options = []) {
 				if (isset($options['precision'])) {
 					$precision = strlen($value) - strrpos($value, '.') - 1;
 
@@ -269,13 +271,13 @@ class Validator extends \lithium\core\StaticObject {
 				return (filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) !== null);
 			},
 			'inList' => function($value, $format, $options) {
-				$options += array('list' => array());
+				$options += ['list' => []];
 				$strict = is_bool($value) || $value === '';
 				return in_array($value, $options['list'], $strict);
 			},
 			'lengthBetween' => function($value, $format, $options) {
 				$length = strlen($value);
-				$options += array('min' => 1, 'max' => 255);
+				$options += ['min' => 1, 'max' => 255];
 				return ($length >= $options['min'] && $length <= $options['max']);
 			},
 			'luhn' => function($value) {
@@ -298,7 +300,7 @@ class Validator extends \lithium\core\StaticObject {
 				return is_numeric($value);
 			},
 			'inRange' => function($value, $format, $options) {
-				$defaults = array('upper' => null, 'lower' => null);
+				$defaults = ['upper' => null, 'lower' => null];
 				$options += $defaults;
 
 				if (!is_numeric($value)) {
@@ -318,39 +320,42 @@ class Validator extends \lithium\core\StaticObject {
 			'email' => function($value) {
 				return filter_var($value, FILTER_VALIDATE_EMAIL);
 			},
-			'url' => function($value, $format = null, array $options = array()) {
-				$options += array('flags' => array());
+			'url' => function($value, $format = null, array $options = []) {
+				$options += ['flags' => []];
 				return (boolean) filter_var($value, FILTER_VALIDATE_URL, $options);
 			}
-		);
+		];
 
-		$isEmpty = function($self, $params, $chain) {
+		$isEmpty = function($params, $next) {
 			extract($params);
-			return (empty($value) && $value !== '0') ? false : $chain->next($self, $params, $chain);
+			return (empty($value) && $value !== '0') ? false : $next($params);
 		};
 
-		static::$_methodFilters[$class]['alphaNumeric'] = array($isEmpty);
-		static::$_methodFilters[$class]['notEmpty'] = array($isEmpty);
+		Filters::apply($class, 'alphaNumeric', $isEmpty);
+		Filters::apply($class, 'notEmpty', $isEmpty);
 
-		static::$_methodFilters[$class]['creditCard'] = array(function($self, $params, $chain) {
+		Filters::apply($class, 'creditCard', function($params, $next) {
 			extract($params);
-			$options += array('deep' => false);
+			$options += ['deep' => false];
 
-			if (strlen($value = str_replace(array('-', ' '), '', $value)) < 13) {
+			if (strlen($value = str_replace(['-', ' '], '', $value)) < 13) {
 				return false;
 			}
-			if (!$chain->next($self, compact('value') + $params, $chain)) {
+			$params['value'] = $value;
+
+			if (!$next($params)) {
 				return false;
 			}
 			return $options['deep'] ? Validator::isLuhn($value) : true;
 		});
 
-		static::$_methodFilters[$class]['email'] = array(function($self, $params, $chain) {
+		Filters::apply($class, 'email', function($params, $next) {
 			extract($params);
-			$defaults = array('deep' => false);
+
+			$defaults = ['deep' => false];
 			$options += $defaults;
 
-			if (!$chain->next($self, $params, $chain)) {
+			if (!$next($params)) {
 				return false;
 			}
 			if (!$options['deep']) {
@@ -358,7 +363,7 @@ class Validator extends \lithium\core\StaticObject {
 			}
 			list($prefix, $host) = explode('@', $params['value']);
 
-			$mxhosts = array();
+			$mxhosts = [];
 			if (getmxrr($host, $mxhosts)) {
 				return is_array($mxhosts);
 			}
@@ -375,11 +380,11 @@ class Validator extends \lithium\core\StaticObject {
 	 * @param array $args
 	 * @return boolean
 	 */
-	public static function __callStatic($method, $args = array()) {
+	public static function __callStatic($method, $args = []) {
 		if (!isset($args[0])) {
 			return false;
 		}
-		$args = array_filter($args) + array(0 => $args[0], 1 => 'any', 2 => array());
+		$args = array_filter($args) + [0 => $args[0], 1 => 'any', 2 => []];
 		$rule = preg_replace("/^is([A-Z][A-Za-z0-9]+)$/", '$1', $method);
 		$rule[0] = strtolower($rule[0]);
 		return static::rule($rule, $args[0], $args[1], $args[2]);
@@ -419,7 +424,7 @@ class Validator extends \lithium\core\StaticObject {
 	 *          When specifying messages, it may be preferable to use a code string (i.e.
 	 *          `'ERR_NO_TITLE'`) instead of the full text of the validation error. These code
 	 *          strings may then be translated by the appropriate tools in the templating layer.
-	 *         - `array('credit_card' => array('creditCard', 'message' => 'Invalid CC #'))`:
+	 *         - `array('credit_card' => ['creditCard', 'message' => 'Invalid CC #'])`:
 	 *           In the second format, the validation rule (in this case `creditCard`) and
 	 *           associated configuration are specified as an array, where the rule to use is
 	 *           the first value in the array (no key), and additional settings are specified
@@ -427,10 +432,10 @@ class Validator extends \lithium\core\StaticObject {
 	 *           allowed keys.
 	 *         - The final format allows you to apply multiple validation rules to a single
 	 *           value, and it is specified as follows:
-	 *           `array('credit_card' => array(
-	 *                array('notEmpty', 'message' => 'You must include credit card number'),
-	 *                array('creditCard', 'message' => 'Your credit card number must be valid')
-	 *           ));`
+	 *           `array('credit_card' => [
+	 *                ['notEmpty', 'message' => 'You must include credit card number'],
+	 *                ['creditCard', 'message' => 'Your credit card number must be valid']
+	 *           ]);`
 	 * @param array $options Validator-specific options.
 	 *        Each rule defined as an array can contain any of the following settings
 	 *        (in addition to the first value, which represents the rule to be used):
@@ -453,8 +458,8 @@ class Validator extends \lithium\core\StaticObject {
 	 *         that element's validation errors.
 	 * @filter
 	 */
-	public static function check(array $values, array $rules, array $options = array()) {
-		$defaults = array(
+	public static function check(array $values, array $rules, array $options = []) {
+		$defaults = [
 			'notEmpty',
 			'message' => null,
 			'required' => true,
@@ -462,24 +467,24 @@ class Validator extends \lithium\core\StaticObject {
 			'format' => 'any',
 			'on' => null,
 			'last' => false
-		);
+		];
 
 		$options += $defaults;
 		$params = compact('values', 'rules', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$values = $params['values'];
 			$rules = $params['rules'];
 			$options = $params['options'];
 
-			$errors = array();
+			$errors = [];
 			$events = (array) (isset($options['events']) ? $options['events'] : null);
-			$values = Set::flatten($values);
+			$values = array_merge($values, Set::flatten($values));
 
 			foreach ($rules as $field => $rules) {
-				$rules = is_string($rules) ? array('message' => $rules) : $rules;
-				$rules = is_array(current($rules)) ? $rules : array($rules);
-				$errors[$field] = array();
+				$rules = is_string($rules) ? ['message' => $rules] : $rules;
+				$rules = is_array(current($rules)) ? $rules : [$rules];
+				$errors[$field] = [];
 				$options['field'] = $field;
 
 				foreach ($rules as $key => $rule) {
@@ -494,7 +499,7 @@ class Validator extends \lithium\core\StaticObject {
 					}
 					if (!array_key_exists($field, $values)) {
 						if ($rule['required']) {
-							$errors[$field][] = $rule['message'] ?: $key;
+							$errors[$field][$key] = $rule['message'] ?: $key;
 						}
 						if ($rule['last']) {
 							break;
@@ -505,8 +510,8 @@ class Validator extends \lithium\core\StaticObject {
 						continue;
 					}
 
-					if (!$self::rule($name, $values[$field], $rule['format'], $rule + $options)) {
-						$errors[$field][] = $rule['message'] ?: $key;
+					if (!static::rule($name, $values[$field], $rule['format'], $rule + $options)) {
+						$errors[$field][$key] = $rule['message'] ?: $key;
 
 						if ($rule['last']) {
 							break;
@@ -532,10 +537,10 @@ class Validator extends \lithium\core\StaticObject {
 	 * Alternatively, the first parameter may be an array of rules expressed as key/value pairs,
 	 * as in the following:
 	 * ```
-	 * Validator::add(array(
+	 * Validator::add([
 	 * 	'zeroToNine' => '/^[0-9]$/',
 	 * 	'tenToNineteen' => '/^1[0-9]$/',
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * In addition to regular expressions, validation rules can also be defined as full anonymous
@@ -548,7 +553,7 @@ class Validator extends \lithium\core\StaticObject {
 	 * 	return (boolean) $value->is_active;
 	 * });
 	 *
-	 * $testAccount = Account::create(array('is_active' => false));
+	 * $testAccount = Account::create(['is_active' => false]);
 	 * Validator::isAccountActive($testAccount); // returns false
 	 * ```
 	 *
@@ -575,9 +580,9 @@ class Validator extends \lithium\core\StaticObject {
 	 *        validated values to simply _contain_ a match to a rule, rather than exactly
 	 *        matching it in whole.
 	 */
-	public static function add($name, $rule = null, array $options = array()) {
+	public static function add($name, $rule = null, array $options = []) {
 		if (!is_array($name)) {
-			$name = array($name => $rule);
+			$name = [$name => $rule];
 		}
 		static::$_rules = Set::merge(static::$_rules, $name);
 
@@ -598,15 +603,15 @@ class Validator extends \lithium\core\StaticObject {
 	 *         succeeded or failed.
 	 * @filter
 	 */
-	public static function rule($rule, $value, $format = 'any', array $options = array()) {
+	public static function rule($rule, $value, $format = 'any', array $options = []) {
 		if (!isset(static::$_rules[$rule])) {
 			throw new InvalidArgumentException("Rule `{$rule}` is not a validation rule.");
 		}
-		$defaults = isset(static::$_options[$rule]) ? static::$_options[$rule] : array();
+		$defaults = isset(static::$_options[$rule]) ? static::$_options[$rule] : [];
 		$options = (array) $options + $defaults + static::$_options['defaults'];
 
 		$ruleCheck = static::$_rules[$rule];
-		$ruleCheck = is_array($ruleCheck) ? $ruleCheck : array($ruleCheck);
+		$ruleCheck = is_array($ruleCheck) ? $ruleCheck : [$ruleCheck];
 
 		if (!$options['contains'] && !empty($ruleCheck)) {
 			foreach ($ruleCheck as $key => $item) {
@@ -615,7 +620,7 @@ class Validator extends \lithium\core\StaticObject {
 		}
 
 		$params = compact('value', 'format', 'options');
-		return static::_filter($rule, $params, static::_checkFormats($ruleCheck));
+		return Filters::run(get_called_class(), $rule, $params, static::_checkFormats($ruleCheck));
 	}
 
 	/**
@@ -643,12 +648,12 @@ class Validator extends \lithium\core\StaticObject {
 	 * @return \Closure Function returning boolean `true` if validation succeeded, `false` otherwise.
 	 */
 	protected static function _checkFormats($rules) {
-		return function($self, $params, $chain) use ($rules) {
+		return function($params) use ($rules) {
 			$value = $params['value'];
 			$format = $params['format'];
 			$options = $params['options'];
 
-			$defaults = array('all' => true);
+			$defaults = ['all' => true];
 			$options += $defaults;
 
 			$formats = (array) $format;
@@ -672,4 +677,5 @@ class Validator extends \lithium\core\StaticObject {
 }
 
 Validator::reset();
+
 ?>

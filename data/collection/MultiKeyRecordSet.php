@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\data\collection;
@@ -20,7 +21,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 *
 	 * @var array
 	 */
-	protected $_index = array();
+	protected $_index = [];
 
 	/**
 	 * A 2D array of column-mapping information, where the top-level key is the fully-namespaced
@@ -28,7 +29,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 *
 	 * @var array
 	 */
-	protected $_columns = array();
+	protected $_columns = [];
 
 	/**
 	 * Initializes the record set and uses the database connection to get the column list contained
@@ -156,8 +157,8 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 * @param array $options
 	 * @return mixed
 	 */
-	public function to($format, array $options = array()) {
-		$default = array('indexed' => true);
+	public function to($format, array $options = []) {
+		$default = ['indexed' => true];
 		$options += $default;
 		$options['internal'] = !$options['indexed'];
 		unset($options['indexed']);
@@ -194,7 +195,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 * @return mixed The filtered items. Will be an array unless `'collect'` is defined in the
 	 *         `$options` argument, then an instance of this class will be returned.
 	 */
-	public function find($filter, array $options = array()) {
+	public function find($filter, array $options = []) {
 		$this->offsetGet(null);
 		return parent::find($filter, $options);
 	}
@@ -211,21 +212,21 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 *              in a new `Collection` object or subclass.
 	 * @return object The filtered data.
 	 */
-	public function map($filter, array $options = array()) {
+	public function map($filter, array $options = []) {
 		$this->offsetGet(null);
 		return parent::map($filter, $options);
 	}
 
-	protected function _set($data = null, $offset = null, $options = array()) {
+	protected function _set($data = null, $offset = null, $options = []) {
 		if ($model = $this->_model) {
-			$options += array('defaults' => false);
+			$options += ['defaults' => false];
 			$data = !is_object($data) ? $model::create($data, $options) : $data;
 			$key = $model::key($data);
 		} else {
 			$key = $offset;
 		}
 
-		if ($key === array() || $key === null || is_bool($key)) {
+		if ($key === [] || $key === null || is_bool($key)) {
 			$key = count($this->_data);
 		}
 
@@ -254,7 +255,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 */
 	protected function _keyIndex() {
 		if (!($model = $this->_model) || !isset($this->_columns[''])) {
-			return array();
+			return [];
 		}
 		$index = 0;
 
@@ -272,7 +273,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 			}
 			$index += count($fields);
 		}
-		return array();
+		return [];
 	}
 }
 

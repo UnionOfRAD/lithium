@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\template;
@@ -23,10 +24,10 @@ class HelperTest extends \lithium\test\Unit {
 	public function testObjectConstructionWithParameters() {
 		$this->assertNull($this->helper->_context);
 
-		$params = array(
+		$params = [
 			'context' => new MockRenderer(),
-			'handlers' => array('content' => function($value) { return "\n{$value}\n"; })
-		);
+			'handlers' => ['content' => function($value) { return "\n{$value}\n"; }]
+		];
 		$helper = new MockHelper($params);
 		$this->assertEqual($helper->_context, $params['context']);
 	}
@@ -40,19 +41,19 @@ class HelperTest extends \lithium\test\Unit {
 		$expected = '&lt;script&gt;alert(&quot;XSS!&quot;);&lt;/script&gt;';
 		$this->assertEqual($expected, $result);
 
-		$result = $this->helper->escape('<script>//alert("XSS!");</script>', null, array(
+		$result = $this->helper->escape('<script>//alert("XSS!");</script>', null, [
 			'escape' => false
-		));
+		]);
 		$expected = '<script>//alert("XSS!");</script>';
 		$this->assertEqual($expected, $result);
 
-		$result = $this->helper->escape(array(
+		$result = $this->helper->escape([
 			'<script>alert("XSS!");</script>', '<script>alert("XSS!");</script>'
-		));
-		$expected = array(
+		]);
+		$expected = [
 			'&lt;script&gt;alert(&quot;XSS!&quot;);&lt;/script&gt;',
 			'&lt;script&gt;alert(&quot;XSS!&quot;);&lt;/script&gt;'
-		);
+		];
 		$this->assertEqual($expected, $result);
 	}
 
@@ -62,23 +63,23 @@ class HelperTest extends \lithium\test\Unit {
 	 */
 	public function testUnescapedValue() {
 		$value  = '<blockquote>"Thou shalt not escape!"</blockquote>';
-		$result = $this->helper->escape($value, null, array('escape' => false));
+		$result = $this->helper->escape($value, null, ['escape' => false]);
 		$this->assertEqual($value, $result);
 	}
 
 	public function testOptions() {
-		$defaults = array('value' => null);
-		$options = array('value' => 1, 'title' => 'one');
-		$expected = array(
-			array('value' => 1, 'title' => 'one'),
-			array('title' => 'one')
-		);
+		$defaults = ['value' => null];
+		$options = ['value' => 1, 'title' => 'one'];
+		$expected = [
+			['value' => 1, 'title' => 'one'],
+			['title' => 'one']
+		];
 		$result = $this->helper->testOptions($defaults, $options);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testAttributes() {
-		$attributes = array('value' => 1, 'title' => 'one');
+		$attributes = ['value' => 1, 'title' => 'one'];
 		$expected = ' value="1" title="one"';
 		$result = $this->helper->testAttributes($attributes);
 		$this->assertEqual($expected, $result);
@@ -87,40 +88,40 @@ class HelperTest extends \lithium\test\Unit {
 		$result = $this->helper->testAttributes('value="1" title="one"');
 		$this->assertEqual($expected, $result);
 
-		$attributes = array('checked' => true, 'title' => 'one');
+		$attributes = ['checked' => true, 'title' => 'one'];
 		$expected = ' checked="checked" title="one"';
 		$result = $this->helper->testAttributes($attributes);
 		$this->assertEqual($expected, $result);
 
-		$attributes = array('checked' => false);
+		$attributes = ['checked' => false];
 		$result = $this->helper->testAttributes($attributes);
 		$this->assertEqual('', $result);
 	}
 
 	public function testAttributeEscaping() {
-		$attributes = array('checked' => true, 'title' => '<foo>');
+		$attributes = ['checked' => true, 'title' => '<foo>'];
 		$expected = ' checked="checked" title="&lt;foo&gt;"';
 		$result = $this->helper->testAttributes($attributes);
 		$this->assertEqual($expected, $result);
 
-		$attributes = array('checked' => true, 'title' => '<foo>');
+		$attributes = ['checked' => true, 'title' => '<foo>'];
 		$expected = ' checked="checked" title="<foo>"';
-		$result = $this->helper->testAttributes($attributes, null, array('escape' => false));
+		$result = $this->helper->testAttributes($attributes, null, ['escape' => false]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testAttributeMinimization() {
-		$attributes = array('selected' => 1);
+		$attributes = ['selected' => 1];
 		$expected = ' selected="selected"';
 		$result = $this->helper->testAttributes($attributes);
 		$this->assertEqual($expected, $result);
 
-		$attributes = array('selected' => true);
+		$attributes = ['selected' => true];
 		$expected = ' selected="selected"';
 		$result = $this->helper->testAttributes($attributes);
 		$this->assertEqual($expected, $result);
 
-		$attributes = array('selected' => 'true');
+		$attributes = ['selected' => 'true'];
 		$expected = ' selected="true"';
 		$result = $this->helper->testAttributes($attributes);
 		$this->assertEqual($expected, $result);
@@ -128,29 +129,29 @@ class HelperTest extends \lithium\test\Unit {
 
 	public function testInstantiationWithNoContext() {
 		$this->helper = new MockHelper();
-		$result = $this->helper->testRender(null, "foo {:bar}", array('bar' => 'baz'));
+		$result = $this->helper->testRender(null, "foo {:bar}", ['bar' => 'baz']);
 		$this->assertEqual("foo baz", $result);
 	}
 
 	public function testRender() {
-		$params = array(
+		$params = [
 			'context' => new MockRenderer(),
-			'handlers' => array('content' => function($value) { return "\n{$value}\n"; })
-		);
+			'handlers' => ['content' => function($value) { return "\n{$value}\n"; }]
+		];
 		$helper = new MockHelper($params);
-		$config = array(
+		$config = [
 			'title' => 'cool',
 			'url' => '/here',
-			'options' => array('value' => 1, 'title' => 'one')
-		);
+			'options' => ['value' => 1, 'title' => 'one']
+		];
 		$expected = '<a href="/here" value="1" title="one">cool</a>';
 		$result = $helper->testRender('link', 'link', $config);
 		$this->assertEqual($expected, $result);
 
-		$handlers = array('path' => function($path) { return "/webroot{$path}"; });
-		$params = array('context' => new MockRenderer(compact('handlers')));
+		$handlers = ['path' => function($path) { return "/webroot{$path}"; }];
+		$params = ['context' => new MockRenderer(compact('handlers'))];
 		$helper = new MockHelper($params);
-		$handlers = array('url' => 'path');
+		$handlers = ['url' => 'path'];
 		$expected = '<a href="/webroot/here" value="1" title="one">cool</a>';
 		$result = $helper->testRender('link', 'link', $config, compact('handlers'));
 		$this->assertEqual($expected, $result);

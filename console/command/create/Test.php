@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\console\command\create;
@@ -29,9 +30,9 @@ class Test extends \lithium\console\command\Create {
 	 * @param array $options
 	 * @return string
 	 */
-	protected function _namespace($request, $options = array()) {
+	protected function _namespace($request, $options = []) {
 		$request->params['command'] = $request->action;
-		return parent::_namespace($request, array('prepend' => 'tests.cases.'));
+		return parent::_namespace($request, ['prepend' => 'tests.cases.']);
 	}
 
 	/**
@@ -69,7 +70,7 @@ class Test extends \lithium\console\command\Create {
 			return "";
 		}
 		$methods = (array) Inspector::methods($use, 'extents');
-		$testMethods = array();
+		$testMethods = [];
 
 		foreach (array_keys($methods) as $method) {
 			$testMethods[] = "\tpublic function test" . ucwords($method) . "() {}";
@@ -95,7 +96,7 @@ class Test extends \lithium\console\command\Create {
 
 		if ($command) {
 			$request->params['action'] = $name;
-			$name = $command->invokeMethod('_class', array($request));
+			$name = $command->invokeMethod('_class', [$request]);
 		}
 		$request->params['action'] = $type;
 		return $name;

@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\test;
@@ -22,7 +23,7 @@ abstract class Filter extends \lithium\core\StaticObject {
 	 * @param array $options Options for how this filter should be applied.
 	 * @return object Returns the instance of `$tests`.
 	 */
-	public static function apply($report, $tests, array $options = array()) {}
+	public static function apply($report, $tests, array $options = []) {}
 
 	/**
 	 * Analyzes the results of a test run and returns the result of the analysis.
@@ -31,18 +32,9 @@ abstract class Filter extends \lithium\core\StaticObject {
 	 * @param array $options
 	 * @return array The results of the analysis.
 	 */
-	public static function analyze($report, array $options = array()) {
+	public static function analyze($report, array $options = []) {
 		return $report->results['filters'][get_called_class()];
 	}
-
-	/**
-	 * Returns data to be output by a reporter.
-	 *
-	 * @param string $format I.e. `'html'` or `'text'`.
-	 * @param array $analysis The results of the analysis.
-	 * @return string
-	 */
-	public static function output($format, $analysis) {}
 }
 
 ?>

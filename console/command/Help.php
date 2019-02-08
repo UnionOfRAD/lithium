@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\console\command;
@@ -27,10 +28,6 @@ class Help extends \lithium\console\Command {
 	 * @return boolean
 	 */
 	public function run($command = null) {
-		$message = 'Lithium console started in the ' . Environment::get() . ' environment.';
-		$message .= ' Use the --env=environment key to alter this.';
-		$this->out($message);
-
 		if (!$command) {
 			$this->_renderCommands();
 			return true;
@@ -65,6 +62,7 @@ class Help extends \lithium\console\Command {
 		foreach ($methods as $method) {
 			$this->_renderUsage($command, $method);
 		}
+		$this->out();
 
 		if (!empty($info['description'])) {
 			$this->nl();
@@ -84,6 +82,7 @@ class Help extends \lithium\console\Command {
 		if ($properties) {
 			$this->_render($properties);
 		}
+		$this->out();
 		return true;
 	}
 
@@ -101,10 +100,10 @@ class Help extends \lithium\console\Command {
 		switch ($type) {
 			default:
 				$info = Inspector::info($class);
-				$result = array('class' => array(
+				$result = ['class' => [
 					'name' => $info['shortName'],
 					'description' => trim($info['description'] . PHP_EOL . PHP_EOL . $info['text'])
-				));
+				]];
 			break;
 			case 'method':
 				$result = $this->_methods($class, compact('name'));
@@ -123,41 +122,41 @@ class Help extends \lithium\console\Command {
 	 * @param array $options
 	 * @return array
 	 */
-	protected function _methods($class, $options = array()) {
-		$defaults = array('name' => null);
+	protected function _methods($class, $options = []) {
+		$defaults = ['name' => null];
 		$options += $defaults;
 
 		$map = function($item) {
 			if ($item->name[0] === '_') {
 				return;
 			}
-			$modifiers = array_values(Inspector::invokeMethod('_modifiers', array($item)));
-			$setAccess = array_intersect($modifiers, array('private', 'protected')) != array();
+			$modifiers = array_values(Inspector::invokeMethod('_modifiers', [$item]));
+			$setAccess = array_intersect($modifiers, ['private', 'protected']) != [];
 
 			if ($setAccess) {
 				$item->setAccessible(true);
 			}
-			$args = array();
+			$args = [];
 
 			foreach ($item->getParameters() as $arg) {
-				$args[] = array(
+				$args[] = [
 					'name' => $arg->getName(),
 					'optional' => $arg->isOptional(),
 					'description' => null
-				);
+				];
 			}
-			$result = compact('modifiers', 'args') + array(
+			$result = compact('modifiers', 'args') + [
 				'docComment' => $item->getDocComment(),
 				'name' => $item->getName()
-			);
+			];
 			if ($setAccess) {
 				$item->setAccessible(false);
 			}
 			return $result;
 		};
 
-		$methods = Inspector::methods($class)->map($map, array('collect' => false));
-		$results = array();
+		$methods = Inspector::methods($class)->map($map, ['collect' => false]);
+		$results = [];
 
 		foreach (array_filter($methods) as $method) {
 			$comment = Docblock::comment($method['docComment']);
@@ -179,7 +178,7 @@ class Help extends \lithium\console\Command {
 			$results[$name] = compact('name', 'description', 'return', 'args');
 
 			if ($name && $name == $options['name']) {
-				return array($name => $results[$name]);
+				return [$name => $results[$name]];
 			}
 		}
 		return $results;
@@ -192,14 +191,17 @@ class Help extends \lithium\console\Command {
 	 * @param array $options
 	 * @return array
 	 */
-	protected function _properties($class, $options = array()) {
-		$defaults = array('name' => null);
+	protected function _properties($class, $options = []) {
+		$defaults = ['name' => null];
 		$options += $defaults;
 
-		$properties = Inspector::properties($class);
-		$results = array();
+		$properties = Inspector::properties(new $class(['init' => false]), ['self' => false]);
+		$results = [];
 
 		foreach ($properties as &$property) {
+			if ($property['name'] === 'request' || $property['name'] === 'response') {
+				continue;
+			}
 			$name = str_replace('_', '-', Inflector::underscore($property['name']));
 
 			$comment = Docblock::comment($property['docComment']);
@@ -216,7 +218,7 @@ class Help extends \lithium\console\Command {
 			$results[$name] = compact('name', 'description', 'type', 'usage');
 
 			if ($name == $options['name']) {
-				return array($name => $results[$name]);
+				return [$name => $results[$name]];
 			}
 		}
 		return $results;
@@ -251,7 +253,7 @@ class Help extends \lithium\console\Command {
 	 * @return void
 	 */
 	protected function _renderCommands() {
-		$commands = Libraries::locate('command', null, array('recursive' => false));
+		$commands = Libraries::locate('command', null, ['recursive' => false]);
 
 		foreach ($commands as $key => $command) {
 			$library = strtok($command, '\\');
@@ -281,7 +283,7 @@ class Help extends \lithium\console\Command {
 	 * @param array $properties From `_properties()`.
 	 * @return void
 	 */
-	protected function _renderUsage($command, $method, $properties = array()) {
+	protected function _renderUsage($command, $method, $properties = []) {
 		$params = array_reduce($properties, function($a, $b) {
 			return "{$a} {$b['usage']}";
 		});
@@ -303,7 +305,7 @@ class Help extends \lithium\console\Command {
 		$this->out('DESCRIPTION', 'heading');
 		$break = PHP_EOL . PHP_EOL;
 		$description = trim("{$info['description']}{$break}{$info['text']}");
-		$this->out($this->_pad($description, PHP_EOL));
+		$this->out($this->_pad($description), 2);
 	}
 
 	/**

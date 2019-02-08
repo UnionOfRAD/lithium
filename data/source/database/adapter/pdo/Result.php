@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\data\source\database\adapter\pdo;
@@ -34,7 +35,7 @@ class Result extends \lithium\data\source\Result {
 		}
 		try {
 			if ($result = $this->_resource->fetch(PDO::FETCH_NUM)) {
-				return array($this->_iterator++, $result);
+				return [$this->_iterator++, $result];
 			}
 		} catch (PDOException $e) {
 			$this->close();

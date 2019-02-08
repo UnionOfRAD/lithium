@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\net\http;
@@ -15,16 +16,16 @@ class RequestTest extends \lithium\test\Unit {
 	public $request = null;
 
 	public function setUp() {
-		$this->request = new Request(array('init' => false));
+		$this->request = new Request(['init' => false]);
 	}
 
 	public function testConstruct() {
-		$request = new Request(array(
+		$request = new Request([
 			'host' => 'localhost',
 			'port' => 443,
-			'headers' => array('Header' => 'Value'),
-			'body' => array('Part 1')
-		));
+			'headers' => ['Header' => 'Value'],
+			'body' => ['Part 1']
+		]);
 
 		$expected = 'localhost';
 		$result = $request->host;
@@ -50,16 +51,16 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $request->path;
 		$this->assertEqual($expected, $result);
 
-		$expected = array(
+		$expected = [
 			'Host: localhost:443',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Header: Value'
-		);
+		];
 		$result = $request->headers();
 		$this->assertEqual($expected, $result);
 
-		$expected = array();
+		$expected = [];
 		$result = $request->cookies;
 		$this->assertEqual($expected, $result);
 
@@ -69,26 +70,26 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructWithCookies() {
-		$request = new Request(array(
+		$request = new Request([
 			'host' => 'localhost',
 			'port' => 443,
-			'headers' => array('Cookie' => 'name1=value1; name2=value2'),
-			'body' => array('Part 1'),
-			'params' => array('param' => 'value')
-		));
+			'headers' => ['Cookie' => 'name1=value1; name2=value2'],
+			'body' => ['Part 1'],
+			'params' => ['param' => 'value']
+		]);
 
-		$expected = array('name1' => 'value1', 'name2' => 'value2');
+		$expected = ['name1' => 'value1', 'name2' => 'value2'];
 		$this->assertEqual($expected, $request->cookies());
 	}
 
 	public function testConstructWithPath() {
-		$request = new Request(array(
+		$request = new Request([
 			'host' => 'localhost/base/path',
 			'port' => 443,
-			'headers' => array('Header' => 'Value'),
-			'body' => array('Part 1'),
-			'params' => array('param' => 'value')
-		));
+			'headers' => ['Header' => 'Value'],
+			'body' => ['Part 1'],
+			'params' => ['param' => 'value']
+		]);
 
 		$expected = '/base/path';
 		$result = $request->path;
@@ -97,52 +98,52 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testQueryStringDefault() {
 		$expected = "?param=value&param1=value1";
-		$result = $this->request->queryString(array('param' => 'value', 'param1' => 'value1'));
+		$result = $this->request->queryString(['param' => 'value', 'param1' => 'value1']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testQueryStringFormat() {
 		$expected = "?param:value;param1:value1";
 		$result = $this->request->queryString(
-			array('param' => 'value', 'param1' => 'value1'), "{:key}:{:value};"
+			['param' => 'value', 'param1' => 'value1'], "{:key}:{:value};"
 		);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testQueryStringSetup() {
 		$expected = "?param=value";
-		$result = $this->request->queryString(array('param' => 'value'));
+		$result = $this->request->queryString(['param' => 'value']);
 		$this->assertEqual($expected, $result);
 
 		$expected = "?param=value";
-		$this->request->query = array('param' => 'value');
+		$this->request->query = ['param' => 'value'];
 		$result = $this->request->queryString();
 		$this->assertEqual($expected, $result);
 
 		$expected = "?param=value&param2=value2";
-		$result = $this->request->queryString(array('param2' => 'value2'));
+		$result = $this->request->queryString(['param2' => 'value2']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testQueryStringMerge() {
 		$expected = "?param=foo";
-		$this->request->query = array('param' => 'value');
-		$result = $this->request->queryString(array('param' => 'foo'));
+		$this->request->query = ['param' => 'value'];
+		$result = $this->request->queryString(['param' => 'foo']);
 		$this->assertEqual($expected, $result);
 
 		$expected = "?param=foo&param2=bar";
-		$result = $this->request->queryString(array('param' => 'foo', 'param2' => 'bar'));
+		$result = $this->request->queryString(['param' => 'foo', 'param2' => 'bar']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testToString() {
-		$expected = join("\r\n", array(
+		$expected = join("\r\n", [
 			'GET / HTTP/1.1',
 			'Host: localhost',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'', ''
-		));
+		]);
 		$result = (string) $this->request;
 		$this->assertEqual($expected, $result);
 
@@ -152,14 +153,14 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testPostToString() {
 		$this->request->method = 'POST';
-		$expected = join("\r\n", array(
+		$expected = join("\r\n", [
 			'POST / HTTP/1.1',
 			'Host: localhost',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Length: 0',
 			'', ''
-		));
+		]);
 		$result = (string) $this->request;
 		$this->assertEqual($expected, $result);
 
@@ -168,112 +169,112 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testToStringWithCookies() {
-		$request = new Request(array(
-			'cookies' => array('foo' => 'bar', 'bin' => 'baz')
-		));
-		$expected = join("\r\n", array(
+		$request = new Request([
+			'cookies' => ['foo' => 'bar', 'bin' => 'baz']
+		]);
+		$expected = join("\r\n", [
 			'GET / HTTP/1.1',
 			'Host: localhost',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Cookie: foo=bar; bin=baz',
 			'', ''
-		));
+		]);
 		$result = (string) $request;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testToContextWithCookies() {
-		$request = new Request(array(
-			'cookies' => array('sid' => '8f02d50ec2c4d47ab021d2a9a6aba4bb')
-		));
-		$expected = array('http' => array(
+		$request = new Request([
+			'cookies' => ['sid' => '8f02d50ec2c4d47ab021d2a9a6aba4bb']
+		]);
+		$expected = ['http' => [
 			'method' => 'GET',
-			'header' => array(
+			'header' => [
 				'Host: localhost',
 				'Connection: Close',
 				'User-Agent: Mozilla/5.0',
 				'Cookie: sid=8f02d50ec2c4d47ab021d2a9a6aba4bb'
-			),
+			],
 			'content' => '',
 			'protocol_version' => '1.1',
 			'ignore_errors' => true,
 			'follow_location' => true,
 			'request_fulluri' => false,
 			'proxy' => null
-		));
+		]];
 		$this->assertEqual($expected, $request->to('context'));
 	}
 
 	public function testToStringWithAuth() {
-		$request = new Request(array(
+		$request = new Request([
 			'auth' => 'Basic',
 			'username' => 'root',
 			'password' => 'something'
-		));
-		$expected = join("\r\n", array(
+		]);
+		$expected = join("\r\n", [
 			'GET / HTTP/1.1',
 			'Host: localhost',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Authorization: Basic ' . base64_encode('root:something'),
 			'', ''
-		));
+		]);
 		$result = (string) $request;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testToContextWithAuth() {
-		$request = new Request(array(
+		$request = new Request([
 			'auth' => 'Basic',
 			'username' => 'Aladdin',
 			'password' => 'open sesame'
-		));
-		$expected = array('http' => array(
+		]);
+		$expected = ['http' => [
 			'method' => 'GET',
-			'header' => array(
+			'header' => [
 				'Host: localhost',
 				'Connection: Close',
 				'User-Agent: Mozilla/5.0',
 				'Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=='
-			),
+			],
 			'content' => '',
 			'protocol_version' => '1.1',
 			'ignore_errors' => true,
 			'follow_location' => true,
 			'request_fulluri' => false,
 			'proxy' => null
-		));
+		]];
 		$this->assertEqual($expected, $request->to('context'));
 	}
 
 	public function testToStringWithBody() {
-		$expected = join("\r\n", array(
+		$expected = join("\r\n", [
 			'GET / HTTP/1.1',
 			'Host: localhost',
 			'Connection: Close',
 			'User-Agent: Mozilla/5.0',
 			'Content-Length: 11',
 			'', 'status=cool'
-		));
-		$this->request->body(array('status=cool'));
+		]);
+		$this->request->body(['status=cool']);
 		$result = (string) $this->request;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testToArray() {
-		$expected = array(
+		$expected = [
 			'method' => 'GET',
-			'query' => array(),
-			'headers' => array(
+			'query' => [],
+			'headers' => [
 				'Host' => 'localhost',
 				'Connection' => 'Close',
 				'User-Agent' => 'Mozilla/5.0'
-			),
-			'cookies' => array(),
+			],
+			'cookies' => [],
 			'protocol' => 'HTTP/1.1',
 			'version' => '1.1',
-			'body' => array(),
+			'body' => [],
 			'scheme' => 'http',
 			'host' => 'localhost',
 			'port' => null,
@@ -281,7 +282,7 @@ class RequestTest extends \lithium\test\Unit {
 			'auth' => null,
 			'username' => null,
 			'password' => null
-		);
+		];
 		$result = $this->request->to('array');
 		$this->assertEqual($expected, $result);
 	}
@@ -291,17 +292,17 @@ class RequestTest extends \lithium\test\Unit {
 	 * of exporting the `Request` to a stream context configuration.
 	 */
 	public function testWithProxy() {
-		$request = new Request(array('proxy' => 'tcp://proxy.example.com:5100'));
-		$expected = array('http' => array(
+		$request = new Request(['proxy' => 'tcp://proxy.example.com:5100']);
+		$expected = ['http' => [
 			'content' => '',
 			'method' => 'GET',
-			'header' => array('Host: localhost', 'Connection: Close', 'User-Agent: Mozilla/5.0'),
+			'header' => ['Host: localhost', 'Connection: Close', 'User-Agent: Mozilla/5.0'],
 			'protocol_version' => '1.1',
 			'ignore_errors' => true,
 			'follow_location' => true,
 			'request_fulluri' => true,
 			'proxy' => 'tcp://proxy.example.com:5100'
-		));
+		]];
 		$this->assertEqual($expected, $request->to('context'));
 	}
 
@@ -310,77 +311,77 @@ class RequestTest extends \lithium\test\Unit {
 		$result = $this->request->to('url');
 		$this->assertEqual($expected, $result);
 
-		$this->request = new Request(array('scheme' => 'https', 'port' => 443));
+		$this->request = new Request(['scheme' => 'https', 'port' => 443]);
 		$expected = 'https://localhost:443/';
 		$result = $this->request->to('url');
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testToUrlOverride() {
-		$request = new Request(array(
+		$request = new Request([
 			'scheme' => 'http',
 			'host' => 'localhost',
 			'port' => 80,
-			'query' => array('foo' => 'bar', 'bin' => 'baz')
-		));
+			'query' => ['foo' => 'bar', 'bin' => 'baz']
+		]);
 
-		$result = $request->to('url', array(
+		$result = $request->to('url', [
 			'scheme' => 'https',
 			'host' => 'lithium.com',
 			'port' => 443,
-			'query' => array('foo' => 'you')
-		));
+			'query' => ['foo' => 'you']
+		]);
 		$expected = 'https://lithium.com:443/?foo=you';
 
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testToContext() {
-		$expected = array('http' => array(
+		$expected = ['http' => [
 			'method' => 'GET',
 			'content' => '',
-			'header' => array(
+			'header' => [
 				'Host: localhost',
 				'Connection: Close',
 				'User-Agent: Mozilla/5.0'
-			),
+			],
 			'protocol_version' => '1.1',
 			'ignore_errors' => true,
 			'follow_location' => true,
 			'request_fulluri' => false,
 			'proxy' => null
-		));
+		]];
 		$result = $this->request->to('context');
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testQueryStringWithArrayValues() {
 		$expected = "?param%5B0%5D=value1&param%5B1%5D=value2";
-		$result = $this->request->queryString(array('param' => array('value1', 'value2')));
+		$result = $this->request->queryString(['param' => ['value1', 'value2']]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testQueryStringWithArrayValuesCustomFormat() {
 		$expected = "?param%5B%5D:value1/param%5B%5D:value2";
 		$result = $this->request->queryString(
-			array('param' => array('value1', 'value2')),
+			['param' => ['value1', 'value2']],
 			"{:key}:{:value}/"
 		);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testDigest() {
-		$request = new Request(array(
+		$request = new Request([
 			'path' => '/http_auth',
-			'auth' => array(
+			'auth' => [
 				'realm' => 'app',
 				'qop' => 'auth',
 				'nonce' => '4bca0fbca7bd0',
 				'opaque' => 'd3fb67a7aa4d887ec4bf83040a820a46'
-			),
+			],
 			'username' => 'gwoo',
 			'password' => 'li3'
-		));
+		]);
 		$cnonce = md5(time());
 		$user = md5("gwoo:app:li3");
 		$nonce = "4bca0fbca7bd0:00000001:{$cnonce}:auth";
@@ -424,15 +425,15 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$expected = "?param=1&param=2&param3=3";
-		$result = $request->queryString(array('param3' => 3));
+		$result = $request->queryString(['param3' => 3]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testKeepDefinedContentTypeHeaderOnPost() {
-		$request = new Request(array(
+		$request = new Request([
 			'method' => 'POST',
-			'headers' => array('Content-Type' => 'text/x-test')
-		));
+			'headers' => ['Content-Type' => 'text/x-test']
+		]);
 		$expected = 'Content-Type: text/x-test';
 		$result = $request->headers();
 		$message = "Expected value `{$expected}` not found in result.";
@@ -444,11 +445,11 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testKeepDefinedContentTypeHeaderWhenTypeIsSet() {
-		$request = new Request(array(
+		$request = new Request([
 			'method' => 'POST',
 			'type' => 'json',
-			'headers' => array('Content-Type' => 'text/x-test')
-		));
+			'headers' => ['Content-Type' => 'text/x-test']
+		]);
 		$expected = 'Content-Type: text/x-test';
 		$result = $request->headers();
 		$message = "Expected value `{$expected}` not found in result.";

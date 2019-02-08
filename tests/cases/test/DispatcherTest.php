@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\test;
@@ -27,11 +28,11 @@ class DispatcherTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithReporter() {
-		$report = Dispatcher::run(null, array(
+		$report = Dispatcher::run(null, [
 			'reporter' => function($info) {
 				return $info;
 			}
-		));
+		]);
 		$this->assertInstanceOf('lithium\test\Report', $report);
 
 		$result = $report->group;
@@ -61,13 +62,13 @@ class DispatcherTest extends \lithium\test\Unit {
 		$result = $report->title;
 		$this->assertEqual($expected, $result);
 
-		$expected = new Collection(array('data' => array(
+		$expected = new Collection(['data' => [
 			new MockErrorHandlingTest(),
 			new MockSetUpThrowsExceptionTest(),
 			new MockSkipThrowsExceptionTest(),
 			new MockTearDownThrowsExceptionTest(),
 			new MockTest()
-		)));
+		]]);
 		$result = $report->group->tests();
 		$this->assertEqual($expected, $result);
 		$expected = 'testNothing';

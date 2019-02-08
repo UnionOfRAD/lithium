@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\console;
@@ -26,14 +27,6 @@ use lithium\console\command\Help;
 class Command extends \lithium\core\Object {
 
 	/**
-	 * If -h or --help param exists a help screen will be returned.
-	 * Similar to running `li3 help COMMAND`.
-	 *
-	 * @var boolean
-	 */
-	public $help = false;
-
-	/**
 	 * A Request object.
 	 *
 	 * @see lithium\console\Request
@@ -50,34 +43,41 @@ class Command extends \lithium\core\Object {
 	public $response;
 
 	/**
-	 * Only shows only text output without styles.
-	 *
-	 * @var boolean
-	 */
-	public $plain = false;
-
-	/**
-	 * Only shows error output.
+	 * Surpresses all output except errors.
 	 *
 	 * @var boolean
 	 */
 	public $silent = false;
 
 	/**
+	 * Enables plain output by i.e. disabling colors. Useful when piping into other commands.
+	 *
+	 * @var boolean
+	 */
+	public $plain = false;
+
+	/**
+	 * Shows help for the command. Alternatively `-h` can be used.
+	 *
+	 * @var boolean
+	 */
+	public $help = false;
+
+	/**
 	 * Dynamic dependencies.
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'response' => 'lithium\console\Response'
-	);
+	];
 
 	/**
 	 * Auto configuration.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('classes' => 'merge');
+	protected $_autoConfig = ['classes' => 'merge'];
 
 	/**
 	 * Constructor.
@@ -88,8 +88,8 @@ class Command extends \lithium\core\Object {
 	 *        - `'classes'` _array_
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('request' => null, 'response' => array(), 'classes' => $this->_classes);
+	public function __construct(array $config = []) {
+		$defaults = ['request' => null, 'response' => [], 'classes' => $this->_classes];
 		parent::__construct($config + $defaults);
 	}
 
@@ -109,16 +109,18 @@ class Command extends \lithium\core\Object {
 		if (!is_object($this->request) || !$this->request->params) {
 			return;
 		}
-		$this->response = $this->_config['response'];
-
-		if (!is_object($this->response)) {
-			$this->response = $this->_instance('response', $this->response);
-		}
-		$default = array('command' => null, 'action' => null, 'args' => null);
+		$default = ['command' => null, 'action' => null, 'args' => null];
 		$params = array_diff_key((array) $this->request->params, $default);
 
 		foreach ($params as $key => $param) {
 			$this->{$key} = $param;
+		}
+		$this->response = $this->_config['response'];
+
+		if (!is_object($this->response)) {
+			$this->response = $this->_instance('response', $this->response + [
+				'plain' => $this->plain
+			]);
 		}
 	}
 
@@ -132,7 +134,7 @@ class Command extends \lithium\core\Object {
 	 * @return object The response object associated with this command.
 	 * @todo Implement filters.
 	 */
-	public function __invoke($action, $args = array()) {
+	public function __invoke($action, $args = []) {
 		try {
 			$this->response->status = 1;
 			$result = $this->invokeMethod($action, $args);
@@ -158,11 +160,11 @@ class Command extends \lithium\core\Object {
 	 * @return boolean
 	 */
 	protected function _help() {
-		$help = new Help(array(
+		$help = new Help([
 			'request' => $this->request,
 			'response' => $this->response,
 			'classes' => $this->_classes
-		));
+		]);
 		return $help->run(get_class($this));
 	}
 
@@ -178,7 +180,7 @@ class Command extends \lithium\core\Object {
 	 *                       - `'style'` _string_: the style name to wrap around the output.
 	 * @return integer
 	 */
-	public function out($output = null, $options = array('nl' => 1)) {
+	public function out($output = null, $options = ['nl' => 1]) {
 		if ($this->silent) {
 			return;
 		}
@@ -197,7 +199,7 @@ class Command extends \lithium\core\Object {
 	 *                       - `'style'` _string_: the style name to wrap around the output.
 	 * @return integer
 	 */
-	public function error($error = null, $options = array('nl' => 1)) {
+	public function error($error = null, $options = ['nl' => 1]) {
 		return $this->_response('error', $error, $options);
 	}
 
@@ -210,8 +212,8 @@ class Command extends \lithium\core\Object {
 	 * @return string|boolean Returns the result of the input data. If the input is
 	 *         equal to the `quit` option boolean `false` is returned.
 	 */
-	public function in($prompt = null, array $options = array()) {
-		$defaults = array('choices' => null, 'default' => null, 'quit' => 'q');
+	public function in($prompt = null, array $options = []) {
+		$defaults = ['choices' => null, 'default' => null, 'quit' => 'q'];
 		$options += $defaults;
 		$choices = null;
 
@@ -277,12 +279,12 @@ class Command extends \lithium\core\Object {
 	 * Example Usage:
 	 *
 	 * ```
-	 * $output = array(
-	 *     array('Name', 'Age'),
-	 *     array('----', '---'),
-	 * );
+	 * $output = [
+	 *     ['Name', 'Age'],
+	 *     ['----', '---'],
+	 * ];
 	 * foreach($users as $user) {
-	 *     $output[] = array($user->name, $user->age);
+	 *     $output[] = [$user->name, $user->age];
 	 * }
 	 * $this->columns($output);
 	 * ```
@@ -298,7 +300,7 @@ class Command extends \lithium\core\Object {
 	 *
 	 * This method also calculates the needed space between the columns. All option params given
 	 * also get passed down to the `out()` method, which allow custom formatting. Passing something
-	 * like `$this->columns($output, array('style' => 'red)` would print the table in red.
+	 * like `$this->columns($output, ['style' => 'red]` would print the table in red.
 	 *
 	 * @see lithium\console\Response::styles()
 	 * @param array $rows The rows to print, with each column as an array element.
@@ -307,8 +309,8 @@ class Command extends \lithium\core\Object {
 	 *      - style : the style name to wrap around the columns output
 	 * @return void
 	 */
-	public function columns($rows, $options = array()) {
-		$defaults = array('separator' => "\t", "error" => false);
+	public function columns($rows, $options = []) {
+		$defaults = ['separator' => "\t", "error" => false];
 		$options += $defaults;
 		$lengths = array_reduce($rows, function($columns, $row) {
 			foreach ((array) $row as $key => $val) {
@@ -391,17 +393,17 @@ class Command extends \lithium\core\Object {
 	 * @return void
 	 */
 	protected function _response($type, $string, $options) {
-		$defaults = array('nl' => 1, 'style' => null);
+		$defaults = ['nl' => 1, 'style' => null];
 
 		if (!is_array($options)) {
 			if (is_bool($options)) {
-				$options = array('nl' => (integer) $options);
+				$options = ['nl' => (integer) $options];
 			} elseif (is_int($options)) {
-				$options = array('nl' => $options);
+				$options = ['nl' => $options];
 			} elseif (is_string($options)) {
-				$options = array('style' => $options);
+				$options = ['style' => $options];
 			} else {
-				$options = array();
+				$options = [];
 			}
 		}
 		$options += $defaults;
@@ -413,7 +415,7 @@ class Command extends \lithium\core\Object {
 			}
 			return;
 		}
-		if ($options['style'] !== null && !$this->plain) {
+		if ($options['style'] !== null) {
 			$string = "{:{$options['style']}}{$string}{:end}";
 		}
 		if ($options['nl']) {

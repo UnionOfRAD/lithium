@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\data\collection;
@@ -19,7 +20,7 @@ class RecordSet extends \lithium\data\Collection {
 	 *
 	 * @var array
 	 */
-	protected $_columns = array();
+	protected $_columns = [];
 
 	/**
 	 * A recursive array of relation dependencies where key are relations
@@ -27,14 +28,14 @@ class RecordSet extends \lithium\data\Collection {
 	 *
 	 * @var array
 	 */
-	protected $_dependencies = array();
+	protected $_dependencies = [];
 
 	/**
 	 * Holds the relationships as returned via `$this->_query->relationships()`.
 	 *
 	 * @var array
 	 */
-	protected $_relationships = array();
+	protected $_relationships = [];
 
 	/**
 	 * Precompute index of the main model primary key(s) which allow to find
@@ -42,14 +43,14 @@ class RecordSet extends \lithium\data\Collection {
 	 *
 	 * @var array
 	 */
-	protected $_keyIndex = array();
+	protected $_keyIndex = [];
 
 	/**
 	 * Keeps a list of hydrated main record indexes values already seen.
 	 *
 	 * @var array
 	 */
-	protected $_seen = array();
+	protected $_seen = [];
 
 	/**
 	 * Initializes the record set and uses the database connection to get the column list contained
@@ -93,15 +94,15 @@ class RecordSet extends \lithium\data\Collection {
 		if ($this->_query) {
 			$data = $this->_mapRecord($data);
 		}
-		$result = $this->_set($data, null, array('exists' => true));
+		$result = $this->_set($data, null, ['exists' => true]);
 		$this->_result->next();
 
 		return $result;
 	}
 
-	protected function _set($data = null, $offset = null, $options = array()) {
+	protected function _set($data = null, $offset = null, $options = []) {
 		if ($model = $this->_model) {
-			$options += array('defaults' => false);
+			$options += ['defaults' => false];
 			$data = !is_object($data) ? $model::create($data, $options) : $data;
 			$key = $model::key($data);
 		} else {
@@ -143,7 +144,7 @@ class RecordSet extends \lithium\data\Collection {
 		}
 
 		$i = 0;
-		$record = array();
+		$record = [];
 
 		do {
 			$offset = 0;
@@ -179,7 +180,7 @@ class RecordSet extends \lithium\data\Collection {
 	 * @return \lithium\data\entity\Record Returns a `Record` object as created by the model.
 	 */
 	protected function _hydrateRecord(array $relations, $primary, array $record, $min, $max, $name) {
-		$options = array('exists' => true, 'defaults' => false);
+		$options = ['exists' => true, 'defaults' => false];
 
 		foreach ($relations as $relation => $subrelations) {
 			$relName  = $name ? "{$name}.{$relation}" : $relation;
@@ -189,12 +190,12 @@ class RecordSet extends \lithium\data\Collection {
 
 			if ($relType !== 'hasMany') {
 				$record[$min][$name][$relField] = $this->_hydrateRecord(
-					$subrelations ?: array(), $relModel, $record, $min, $max, $relName
+					$subrelations ?: [], $relModel, $record, $min, $max, $relName
 				);
 				continue;
 			}
 
-			$rel = array();
+			$rel = [];
 			$main = $relModel::key($record[$min][$relName]);
 
 			$i = $min;
@@ -205,7 +206,7 @@ class RecordSet extends \lithium\data\Collection {
 
 				if ($main != $keys) {
 					$rel[] = $this->_hydrateRecord(
-						$subrelations ?: array(), $relModel, $record, $i, $j, $relName
+						$subrelations ?: [], $relModel, $record, $i, $j, $relName
 					);
 					$main = $keys;
 					$i = $j;
@@ -214,15 +215,15 @@ class RecordSet extends \lithium\data\Collection {
 			}
 			if (array_filter($record[$i][$relName])) {
 				$rel[] = $this->_hydrateRecord(
-					$subrelations ?: array(), $relModel, $record, $i, $j, $relName
+					$subrelations ?: [], $relModel, $record, $i, $j, $relName
 				);
 			}
-			$record[$min][$name][$relField] = $relModel::create($rel, array(
+			$record[$min][$name][$relField] = $relModel::create($rel, [
 				'class' => 'set'
-			) + $options);
+			] + $options);
 		}
 		return $primary::create(
-			isset($record[$min][$name]) ? $record[$min][$name] : array(), $options
+			isset($record[$min][$name]) ? $record[$min][$name] : [], $options
 		);
 	}
 
@@ -231,7 +232,7 @@ class RecordSet extends \lithium\data\Collection {
 			return $map;
 		}
 		if (!($model = $this->_model)) {
-			return array();
+			return [];
 		}
 		if (!is_object($this->_query) || !$this->_query->join()) {
 			return $model::connection()->schema($this->_query);
@@ -251,20 +252,20 @@ class RecordSet extends \lithium\data\Collection {
 	 */
 	protected function _keyIndex() {
 		if (!($model = $this->_model) || !isset($this->_columns[''])) {
-			return array();
+			return [];
 		}
 		$index = 0;
 
 		foreach ($this->_columns as $name => $fields) {
 			if ($name === '') {
 				if (($offset = array_search($model::meta('key'), $fields)) === false) {
-					return array();
+					return [];
 				}
-				return array($index + $offset => $model::meta('key'));
+				return [$index + $offset => $model::meta('key')];
 			}
 			$index += count($fields);
 		}
-		return array();
+		return [];
 	}
 }
 

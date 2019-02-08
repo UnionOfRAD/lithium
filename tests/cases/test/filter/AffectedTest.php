@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\test\filter;
@@ -24,12 +25,12 @@ class AffectedTest extends \lithium\test\Unit {
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
-		$expected = array(
+		$expected = [
 			'lithium\tests\cases\g11n\CatalogTest',
 			'lithium\tests\cases\g11n\MessageTest',
 			'lithium\tests\cases\console\command\g11n\ExtractTest'
-		);
-		$result = $tests->map('get_class', array('collect' => false));
+		];
+		$result = $tests->map('get_class', ['collect' => false]);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -39,8 +40,8 @@ class AffectedTest extends \lithium\test\Unit {
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
-		$expected = array('lithium\tests\cases\core\StaticObjectTest');
-		$result = $tests->map('get_class', array('collect' => false));
+		$expected = ['lithium\tests\cases\core\StaticObjectTest'];
+		$result = $tests->map('get_class', ['collect' => false]);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -51,13 +52,13 @@ class AffectedTest extends \lithium\test\Unit {
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
-		$expected = array(
+		$expected = [
 			'lithium\tests\cases\g11n\CatalogTest',
 			'lithium\tests\cases\analysis\LoggerTest',
 			'lithium\tests\cases\g11n\MessageTest',
 			'lithium\tests\cases\console\command\g11n\ExtractTest'
-		);
-		$result = $tests->map('get_class', array('collect' => false));
+		];
+		$result = $tests->map('get_class', ['collect' => false]);
 		$this->assertEqual($expected, $result);
 	}
 
@@ -68,22 +69,22 @@ class AffectedTest extends \lithium\test\Unit {
 		$this->report->group = $group;
 		$tests = Affected::apply($this->report, $group->tests());
 
-		$expected = array(
+		$expected = [
 			'lithium\tests\cases\g11n\CatalogTest',
 			'lithium\tests\cases\g11n\MessageTest',
 			'lithium\tests\cases\console\command\g11n\ExtractTest'
-		);
-		$result = $tests->map('get_class', array('collect' => false));
+		];
+		$result = $tests->map('get_class', ['collect' => false]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testAnalyze() {
 		$ns = 'lithium\tests\cases';
 
-		$expected = array(
+		$expected = [
 			'lithium\g11n\Message' => "{$ns}\g11n\MessageTest",
 			'lithium\console\command\g11n\Extract' => "{$ns}\console\command\g11n\ExtractTest"
-		);
+		];
 
 		$group = new Group();
 		$group->add('lithium\tests\cases\g11n\CatalogTest');

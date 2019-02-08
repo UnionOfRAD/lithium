@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\storage\cache\adapter;
@@ -28,7 +29,7 @@ class MemoryTest extends \lithium\test\Unit {
 	public function testWriteAndRead() {
 		$key = 'key';
 		$data = 'data';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = null;
 
 		$result = $this->Memory->write($keys, $expiry);
@@ -37,11 +38,11 @@ class MemoryTest extends \lithium\test\Unit {
 
 		$result = $this->Memory->read(array_keys($keys));
 		$this->assertEqual($keys, $result);
-		$this->assertEqual($this->Memory->cache, array($key => $data));
+		$this->assertEqual($this->Memory->cache, [$key => $data]);
 	}
 
 	public function testMultiWriteAndRead() {
-		$keys = array('write1' => 'value1', 'write2' => 'value2');
+		$keys = ['write1' => 'value1', 'write2' => 'value2'];
 		$expiry = null;
 
 		$result = $this->Memory->write($keys, $expiry);
@@ -54,9 +55,9 @@ class MemoryTest extends \lithium\test\Unit {
 
 	public function testWriteAndReadNull() {
 		$expiry = '+1 minute';
-		$keys = array(
+		$keys = [
 			'key1' => null
-		);
+		];
 		$result = $this->Memory->write($keys);
 		$this->assertTrue($result);
 
@@ -67,10 +68,10 @@ class MemoryTest extends \lithium\test\Unit {
 
 	public function testWriteAndReadNullMulti() {
 		$expiry = '+1 minute';
-		$keys = array(
+		$keys = [
 			'key1' => null,
 			'key2' => 'data2'
-		);
+		];
 		$result = $this->Memory->write($keys);
 		$this->assertTrue($result);
 
@@ -78,10 +79,10 @@ class MemoryTest extends \lithium\test\Unit {
 		$result = $this->Memory->read(array_keys($keys));
 		$this->assertEqual($expected, $result);
 
-		$keys = array(
+		$keys = [
 			'key1' => null,
 			'key2' => null
-		);
+		];
 		$result = $this->Memory->write($keys);
 		$this->assertTrue($result);
 	}
@@ -89,17 +90,17 @@ class MemoryTest extends \lithium\test\Unit {
 	public function testWriteAndDelete() {
 		$key = 'key_to_delete';
 		$data = 'some data to be deleted';
-		$keys = array($key);
+		$keys = [$key];
 		$expiry = null;
 
-		$result = $this->Memory->write(array($key => $data), $expiry);
+		$result = $this->Memory->write([$key => $data], $expiry);
 		$this->assertTrue($result);
 		$this->assertEqual($this->Memory->cache, $result);
 
 		$result = $this->Memory->delete($keys);
 		$this->assertTrue($result);
 
-		$keys = array('non_existent');
+		$keys = ['non_existent'];
 		$result = $this->Memory->delete($keys);
 		$this->assertFalse($result);
 	}
@@ -107,37 +108,37 @@ class MemoryTest extends \lithium\test\Unit {
 	public function testWriteAndClear() {
 		$key = 'key_to_clear';
 		$data = 'data to be cleared';
-		$keys = array($key);
+		$keys = [$key];
 		$expiry = null;
 
-		$result = $this->Memory->write(array($key => $data), $expiry);
+		$result = $this->Memory->write([$key => $data], $expiry);
 		$this->assertTrue($result);
 		$this->assertEqual($this->Memory->cache, $result);
 
 		$key2 = 'key2_to_clear';
 		$data2 = 'data to be cleared';
 
-		$result = $this->Memory->write(array($key2 => $data2), $expiry);
+		$result = $this->Memory->write([$key2 => $data2], $expiry);
 		$this->assertTrue($result);
 		$this->assertEqual($this->Memory->cache, $result);
 
 		$result = $this->Memory->clear();
 		$this->assertTrue($result);
-		$this->assertEqual(array(), $this->Memory->cache);
+		$this->assertEqual([], $this->Memory->cache);
 
-		$result = $this->Memory->write(array($key => $data), $expiry);
+		$result = $this->Memory->write([$key => $data], $expiry);
 		$this->assertTrue($result);
 		$this->assertEqual($this->Memory->cache, $result);
 
 		$result = $this->Memory->clear();
 		$this->assertTrue($result);
-		$this->assertEqual(array(), $this->Memory->cache);
+		$this->assertEqual([], $this->Memory->cache);
 	}
 
 	public function testIncrement() {
 		$key = 'incremental';
 		$data = 5;
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = null;
 
 		$result = $this->Memory->write($keys, $expiry);
@@ -161,7 +162,7 @@ class MemoryTest extends \lithium\test\Unit {
 	public function testDecrement() {
 		$key = 'decrement';
 		$data = 5;
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = null;
 
 		$result = $this->Memory->write($keys, $expiry);
@@ -184,9 +185,9 @@ class MemoryTest extends \lithium\test\Unit {
 
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
-		$keys = array($key);
+		$keys = [$key];
 
-		$expected = array();
+		$expected = [];
 		$result = $this->Memory->read($keys);
 		$this->assertIdentical($expected, $result);
 	}

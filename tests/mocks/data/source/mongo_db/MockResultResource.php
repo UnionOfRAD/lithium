@@ -1,22 +1,23 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\data\source\mongo_db;
 
 class MockResultResource extends \lithium\core\Object {
 
-	protected $_data = array();
+	protected $_data = [];
 
-	protected $_autoConfig = array('data', 'name');
+	protected $_autoConfig = ['data', 'name'];
 
 	protected $_name = '';
 
-	public $query = array();
+	public $query = [];
 
 	public function hasNext() {
 		return (boolean) $this->_data;
@@ -30,7 +31,7 @@ class MockResultResource extends \lithium\core\Object {
 		return $this->_name;
 	}
 
-	public function fields(array $fields = array()) {
+	public function fields(array $fields = []) {
 		$this->query[__FUNCTION__] = $fields;
 		return $this;
 	}
@@ -45,7 +46,7 @@ class MockResultResource extends \lithium\core\Object {
 		return $this;
 	}
 
-	public function sort(array $fields = array()) {
+	public function sort(array $fields = []) {
 		$this->query[__FUNCTION__] = $fields;
 		return $this;
 	}

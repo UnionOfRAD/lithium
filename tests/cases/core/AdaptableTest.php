@@ -1,111 +1,105 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\core;
 
-use lithium\core\Adaptable;
 use lithium\storage\cache\adapter\Memory;
-use lithium\tests\mocks\core\MockAdapter;
-use lithium\tests\mocks\core\MockStrategy;
-use lithium\test\Mocker;
+use lithium\tests\mocks\core\MockAdaptable;
 
 class AdaptableTest extends \lithium\test\Unit {
 
-	public function setUp() {
-		$this->adaptable = new Adaptable();
-		Mocker::register();
+	public function tearDown() {
+		MockAdaptable::reset();
 	}
 
 	public function testConfig() {
-		$this->assertEmpty($this->adaptable->config());
+		$this->assertEmpty(MockAdaptable::config());
 
-		$items = array(array(
+		$items = [[
 			'adapter' => 'some\adapter',
-			'filters' => array('filter1', 'filter2')
-		));
-		$result = $this->adaptable->config($items);
+			'filters' => []
+		]];
+		$result = MockAdaptable::config($items);
 		$this->assertNull($result);
 
 		$expected = $items;
-		$result = $this->adaptable->config();
+		$result = MockAdaptable::config();
 		$this->assertEqual($expected, $result);
 
-		$items = array(array(
+		$items = [[
 			'adapter' => 'some\adapter',
-			'filters' => array('filter1', 'filter2')
-		));
-		$this->adaptable->config($items);
-		$result = $this->adaptable->config();
+			'filters' => []
+		]];
+		MockAdaptable::config($items);
+		$result = MockAdaptable::config();
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testReset() {
-		$items = array(array(
+		$items = [[
 			'adapter' => '\some\adapter',
-			'filters' => array('filter1', 'filter2')
-		));
-		$this->adaptable->config($items);
-		$result = $this->adaptable->config();
+			'filters' => []
+		]];
+		MockAdaptable::config($items);
+		$result = MockAdaptable::config();
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$result = $this->adaptable->reset();
+		$result = MockAdaptable::reset();
 		$this->assertNull($result);
-		$this->assertEmpty($this->adaptable->config());
+		$this->assertEmpty(MockAdaptable::config());
 	}
 
 	public function testNonExistentConfig() {
-		$adapter = new MockAdapter();
-		$this->assertException("Configuration `non_existent_config` has not been defined.", function() use ($adapter) {
-			$adapter::adapter('non_existent_config');
+		$this->assertException("Configuration `non_existent_config` has not been defined.", function() {
+			MockAdaptable::adapter('non_existent_config');
 		});
 	}
 
 	public function testAdapter() {
-		$adapter = new MockAdapter();
-		$items = array('default' => array('adapter' => 'Memory', 'filters' => array()));
-		$adapter::config($items);
-		$result = $adapter::config();
+		$items = ['default' => ['adapter' => 'Memory', 'filters' => []]];
+		MockAdaptable::config($items);
+		$result = MockAdaptable::config();
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$result = $adapter::adapter('default');
+		$result = MockAdaptable::adapter('default');
 		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testConfigAndAdapter() {
-		$adapter = new MockAdapter();
-		$items = array('default' => array('adapter' => 'Memory', 'filters' => array()));
-		$adapter::config($items);
-		$config = $adapter::config();
+		$items = ['default' => ['adapter' => 'Memory', 'filters' => []]];
+		MockAdaptable::config($items);
+		$config = MockAdaptable::config();
 
-		$intermediate = $adapter::adapter('default');
+		$intermediate = MockAdaptable::adapter('default');
 		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $intermediate);
 
-		$result = $adapter::config();
-		$modified['default'] = $config['default'] + array('object' => $intermediate);
+		$result = MockAdaptable::config();
+		$modified['default'] = $config['default'] + ['object' => $intermediate];
 		$this->assertEqual($modified, $result);
 
-		$adapter::config(array('default' => array('adapter' => 'Memory')));
-		$result = $adapter::config();
+		MockAdaptable::config(['default' => ['adapter' => 'Memory']]);
+		$result = MockAdaptable::config();
 		$this->assertEqual($config, $result);
 	}
 
 	public function testStrategy() {
-		$strategy = new MockStrategy();
-		$items = array('default' => array(
-			'strategies' => array('lithium\tests\mocks\storage\cache\strategy\MockSerializer'),
-			'filters' => array(),
+		$strategy = new MockAdaptable();
+		$items = ['default' => [
+			'strategies' => ['lithium\tests\mocks\storage\cache\strategy\MockSerializer'],
+			'filters' => [],
 			'adapter' => null
-		));
+		]];
 		$strategy::config($items);
 		$result = $strategy::config();
 		$expected = $items;
@@ -119,15 +113,15 @@ class AdaptableTest extends \lithium\test\Unit {
 	}
 
 	public function testInvalidStrategy() {
-		$strategy = new MockStrategy();
-		$items = array('default' => array(
-			'strategies' => array('InvalidStrategy'),
-			'filters' => array(),
+		$strategy = new MockAdaptable();
+		$items = ['default' => [
+			'strategies' => ['InvalidStrategy'],
+			'filters' => [],
 			'adapter' => null
-		));
+		]];
 		$strategy::config($items);
 
-		$class = 'lithium\tests\mocks\core\MockStrategy';
+		$class = 'lithium\tests\mocks\core\MockAdaptable';
 		$message = "Could not find strategy `InvalidStrategy` in class `{$class}`.";
 		$this->assertException($message, function() use ($strategy) {
 			$strategy::strategies('default');
@@ -136,16 +130,16 @@ class AdaptableTest extends \lithium\test\Unit {
 
 	public function testStrategyConstructionSettings() {
 		$mockConfigurizer = 'lithium\tests\mocks\storage\cache\strategy\MockConfigurizer';
-		$strategy = new MockStrategy();
-		$items = array('default' => array(
-			'strategies' => array(
-				$mockConfigurizer => array(
+		$strategy = new MockAdaptable();
+		$items = ['default' => [
+			'strategies' => [
+				$mockConfigurizer => [
 					'key1' => 'value1', 'key2' => 'value2'
-				)
-			),
-			'filters' => array(),
+				]
+			],
+			'filters' => [],
 			'adapter' => null
-		));
+		]];
 		$strategy::config($items);
 		$result = $strategy::config();
 		$expected = $items;
@@ -158,7 +152,7 @@ class AdaptableTest extends \lithium\test\Unit {
 	}
 
 	public function testNonExistentStrategyConfiguration() {
-		$strategy = new MockStrategy();
+		$strategy = new MockAdaptable();
 
 		$expected = "Configuration `non_existent_config` has not been defined.";
 		$this->assertException($expected, function() use ($strategy) {
@@ -167,7 +161,7 @@ class AdaptableTest extends \lithium\test\Unit {
 	}
 
 	public function testApplyStrategiesNonExistentConfiguration() {
-		$strategy = new MockStrategy();
+		$strategy = new MockAdaptable();
 
 		$expected = "Configuration `non_existent_config` has not been defined.";
 		$this->assertException($expected, function() use ($strategy) {
@@ -176,32 +170,32 @@ class AdaptableTest extends \lithium\test\Unit {
 	}
 
 	public function testApplySingleStrategy() {
-		$strategy = new MockStrategy();
-		$items = array('default' => array(
-			'filters' => array(),
+		$strategy = new MockAdaptable();
+		$items = ['default' => [
+			'filters' => [],
 			'adapter' => null,
-			'strategies' => array('lithium\tests\mocks\storage\cache\strategy\MockSerializer')
-		));
+			'strategies' => ['lithium\tests\mocks\storage\cache\strategy\MockSerializer']
+		]];
 		$strategy::config($items);
 		$result = $strategy::config();
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$data = array('some' => 'data');
+		$data = ['some' => 'data'];
 		$result = $strategy::applyStrategies('write', 'default', $data);
 		$this->assertEqual(serialize($data), $result);
 	}
 
 	public function testApplySingleStrategyWithConfiguration() {
-		$strategy = new MockStrategy();
-		$params = array('key1' => 'value1', 'key2' => 'value2');
-		$items = array('default' => array(
-			'filters' => array(),
+		$strategy = new MockAdaptable();
+		$params = ['key1' => 'value1', 'key2' => 'value2'];
+		$items = ['default' => [
+			'filters' => [],
 			'adapter' => null,
-			'strategies' => array(
+			'strategies' => [
 				'lithium\tests\mocks\storage\cache\strategy\MockConfigurizer' => $params
-			)
-		));
+			]
+		]];
 		$strategy::config($items);
 		$result = $strategy::config();
 		$expected = $items;
@@ -212,37 +206,37 @@ class AdaptableTest extends \lithium\test\Unit {
 	}
 
 	public function testApplyMultipleStrategies() {
-		$strategy = new MockStrategy();
-		$items = array('default' => array(
-			'filters' => array(),
+		$strategy = new MockAdaptable();
+		$items = ['default' => [
+			'filters' => [],
 			'adapter' => null,
-			'strategies' => array(
+			'strategies' => [
 				'lithium\tests\mocks\storage\cache\strategy\MockSerializer', 'Base64'
-			)
-		));
+			]
+		]];
 		$strategy::config($items);
 		$result = $strategy::config();
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$data = array('some' => 'data');
+		$data = ['some' => 'data'];
 		$result = $strategy::applyStrategies('write', 'default', $data);
 		$transformed = base64_encode(serialize($data));
 		$this->assertEqual($transformed, $result);
 
-		$options = array('mode' => 'LIFO');
+		$options = ['mode' => 'LIFO'];
 		$result = $strategy::applyStrategies('read', 'default', $transformed, $options);
 		$expected = $data;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testApplyStrategiesNoConfiguredStrategies() {
-		$strategy = new MockStrategy();
+		$strategy = new MockAdaptable();
 
-		$items = array('default' => array(
-			'filters' => array(),
+		$items = ['default' => [
+			'filters' => [],
 			'adapter' => null
-		));
+		]];
 		$strategy::config($items);
 		$result = $strategy::config();
 		$expected = $items;
@@ -251,102 +245,134 @@ class AdaptableTest extends \lithium\test\Unit {
 		$result = $strategy::applyStrategies('method', 'default', null);
 		$this->assertNull($result);
 
-		$items = array('default' => array(
-			'filters' => array(),
+		$items = ['default' => [
+			'filters' => [],
 			'adapter' => null,
-			'strategies' => array()
-		));
+			'strategies' => []
+		]];
 		$strategy::config($items);
 		$result = $strategy::config();
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$data = array('some' => 'data');
+		$data = ['some' => 'data'];
 		$result = $strategy::applyStrategies('method', 'default', $data);
 		$this->assertEqual($data, $result);
 	}
 
 	public function testEnabled() {
-		$adapter = new MockAdapter();
-
-		$items = array('default' => array('adapter' => 'Memory', 'filters' => array()));
-		$adapter::config($items);
-		$result = $adapter::config();
+		$items = ['default' => ['adapter' => 'Memory', 'filters' => []]];
+		MockAdaptable::config($items);
+		$result = MockAdaptable::config();
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
-		$result = $adapter::adapter('default');
+		$result = MockAdaptable::adapter('default');
 		$expected = new Memory($items['default']);
 		$this->assertEqual($expected, $result);
 
-		$this->assertIdentical(true, $adapter::enabled('default'));
-		$this->assertException('/No adapter set for configuration/', function() use ($adapter) {
-			$adapter::enabled('non-existent');
+		$this->assertIdentical(true, MockAdaptable::enabled('default'));
+		$this->assertException('/No adapter set for configuration/', function() {
+			MockAdaptable::enabled('non-existent');
 		});
 	}
 
 	public function testNonExistentAdapter() {
-		$adapter = new MockAdapter();
-
-		$items = array('default' => array('adapter' => 'NonExistent', 'filters' => array()));
-		$adapter::config($items);
-		$result = $adapter::config();
+		$items = ['default' => ['adapter' => 'NonExistent', 'filters' => []]];
+		MockAdaptable::config($items);
+		$result = MockAdaptable::config();
 		$expected = $items;
 		$this->assertEqual($expected, $result);
 
 		$message  = 'Could not find adapter `NonExistent` in ';
-		$message .= 'class `lithium\tests\mocks\core\MockAdapter`.';
-		$this->assertException($message, function() use ($adapter) {
-			$adapter::adapter('default');
+		$message .= 'class `lithium\tests\mocks\core\MockAdaptable`.';
+		$this->assertException($message, function() {
+			MockAdaptable::adapter('default');
 		});
 	}
 
 	public function testEnvironmentSpecificConfiguration() {
-		$adapter = new MockAdapter();
-		$config = array('adapter' => 'Memory', 'filters' => array());
-		$items = array('default' => array(
+		$config = ['adapter' => 'Memory', 'filters' => []];
+		$items = ['default' => [
 			'development' => $config, 'test' => $config, 'production' => $config
-		));
-		$adapter::config($items);
-		$result = $adapter::config();
-		$expected = array('default' => $config);
+		]];
+		MockAdaptable::config($items);
+		$result = MockAdaptable::config();
+		$expected = ['default' => $config];
 		$this->assertEqual($expected, $result);
 
-		$result = $adapter::config('default');
+		$result = MockAdaptable::config('default');
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 
-		$result = $adapter::adapter('default');
+		$result = MockAdaptable::adapter('default');
 		$expected = new Memory($config);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testConfigurationNoAdapter() {
-		$adapter = new MockAdapter();
-		$items = array('default' => array('filters' => array()));
-		$adapter::config($items);
+		$items = ['default' => ['filters' => []]];
+		MockAdaptable::config($items);
 
 		$message  = 'No adapter set for configuration in ';
-		$message .= 'class `lithium\tests\mocks\core\MockAdapter`.';
-		$this->assertException($message, function() use ($adapter) {
-			$adapter::adapter('default');
+		$message .= 'class `lithium\tests\mocks\core\MockAdaptable`.';
+		$this->assertException($message, function() {
+			MockAdaptable::adapter('default');
 		});
 	}
 
 	public function testNotCreateCacheWhenTestingEnabled() {
-		$adapter = 'lithium\tests\mocks\core\mockAdapter\Mock';
-		$adapter::config(array(
-			'default' => array(
-				array('adapter' => 'Memory'),
-			),
-		));
-
-		$adapter::enabled('default');
-		$chain = Mocker::chain($adapter);
-
-		$this->assertFalse($chain->called('adapter')->success());
+		MockAdaptable::config([
+			'default' => [
+				['adapter' => 'Memory']
+			]
+		]);
+		MockAdaptable::enabled('default');
+		$this->assertFalse(MockAdaptable::testInitialized('default'));
 	}
 
+	/* Deprecated / BC */
+
+	public function testDeprecatedConfig() {
+		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$items = [[
+			'adapter' => 'some\adapter',
+			'filters' => ['filter1', 'filter2']
+		]];
+		$result = MockAdaptable::config($items);
+		$this->assertNull($result);
+
+		$expected = $items;
+		$result = MockAdaptable::config();
+		$this->assertEqual($expected, $result);
+
+		$items = [[
+			'adapter' => 'some\adapter',
+			'filters' => ['filter1', 'filter2']
+		]];
+		MockAdaptable::config($items);
+		$result = MockAdaptable::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		error_reporting($original);
+	}
+
+	public function testDeprecatedReset() {
+		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$items = [[
+			'adapter' => '\some\adapter',
+			'filters' => ['filter1', 'filter2']
+		]];
+		MockAdaptable::config($items);
+		$result = MockAdaptable::config();
+		$expected = $items;
+		$this->assertEqual($expected, $result);
+
+		error_reporting($original);
+	}
 }
 
 ?>

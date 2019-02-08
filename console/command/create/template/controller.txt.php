@@ -19,7 +19,7 @@ class {:class} extends \lithium\action\Controller {
 		${:singular} = {:model}::create();
 
 		if (($this->request->data) && ${:singular}->save($this->request->data)) {
-			return $this->redirect(array('{:name}::view', 'args' => array(${:singular}->id)));
+			return $this->redirect(['{:name}::view', 'args' => [${:singular}->id]]);
 		}
 		return compact('{:singular}');
 	}
@@ -31,7 +31,7 @@ class {:class} extends \lithium\action\Controller {
 			return $this->redirect('{:name}::index');
 		}
 		if (($this->request->data) && ${:singular}->save($this->request->data)) {
-			return $this->redirect(array('{:name}::view', 'args' => array(${:singular}->id)));
+			return $this->redirect(['{:name}::view', 'args' => [${:singular}->id]]);
 		}
 		return compact('{:singular}');
 	}

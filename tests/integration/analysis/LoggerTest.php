@@ -1,16 +1,17 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\integration\analysis;
 
 use lithium\core\Libraries;
 use lithium\analysis\Logger;
-use lithium\util\collection\Filters;
+use lithium\aop\Filters;
 
 /**
  * Logger adapter integration test cases
@@ -18,18 +19,17 @@ use lithium\util\collection\Filters;
 class LoggerTest extends \lithium\test\Integration {
 
 	public function testWriteFilter() {
-
 		$base = Libraries::get(true, 'resources') . '/tmp/logs';
 		$this->skipIf(!is_writable($base), "Path `{$base}` is not writable.");
 
-		Filters::apply('lithium\analysis\Logger', 'write', function($self, $params, $chain) {
+		Filters::apply('lithium\analysis\Logger', 'write', function($params, $next) {
 			$params['message'] = 'Filtered Message';
-			return $chain->next($self, $params, $chain);
+			return $next($params);
 		});
 
-		$config = array('default' => array(
+		$config = ['default' => [
 			'adapter' => 'File', 'timestamp' => false, 'format' => "{:message}\n"
-		));
+		]];
 		Logger::config($config);
 
 		$result = Logger::write('info', 'Original Message');

@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\net\socket;
@@ -34,7 +35,7 @@ class Curl extends \lithium\net\Socket {
 	 * @see lithium\net\socket\Curl::set()
 	 * @var array
 	 */
-	public $options = array();
+	public $options = [];
 
 	/**
 	 * Constructor.
@@ -42,8 +43,8 @@ class Curl extends \lithium\net\Socket {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('ignoreExpect' => true);
+	public function __construct(array $config = []) {
+		$defaults = ['ignoreExpect' => true];
 		parent::__construct($config + $defaults);
 	}
 
@@ -56,8 +57,8 @@ class Curl extends \lithium\net\Socket {
 	 *         `'scheme'` or `'host'` settings, or if configuration fails, otherwise returns a
 	 *         resource stream.
 	 */
-	public function open(array $options = array()) {
-		$this->options = array();
+	public function open(array $options = []) {
+		$this->options = [];
 		parent::open($options);
 		$config = $this->_config;
 
@@ -70,11 +71,11 @@ class Curl extends \lithium\net\Socket {
 
 		$url = "{$config['scheme']}://{$config['host']}";
 		$this->_resource = curl_init($url);
-		$this->set(array(
+		$this->set([
 			CURLOPT_PORT => $config['port'],
 			CURLOPT_HEADER => true,
 			CURLOPT_RETURNTRANSFER => true
-		));
+		]);
 
 		if (!is_resource($this->_resource)) {
 			return false;
@@ -98,11 +99,7 @@ class Curl extends \lithium\net\Socket {
 			return true;
 		}
 		curl_close($this->_resource);
-
-		if (is_resource($this->_resource)) {
-			$this->close();
-		}
-		return true;
+		return !is_resource($this->_resource);
 	}
 
 	/**
@@ -152,13 +149,13 @@ class Curl extends \lithium\net\Socket {
 				$this->set(CURLOPT_HTTPHEADER, $data->headers());
 			}
 			if (isset($data->method) && $data->method === 'POST') {
-				$this->set(array(CURLOPT_POST => true, CURLOPT_POSTFIELDS => $data->body()));
+				$this->set([CURLOPT_POST => true, CURLOPT_POSTFIELDS => $data->body()]);
 			}
-			if (isset($data->method) && in_array($data->method,array('PUT','PATCH','DELETE'))) {
-				$this->set(array(
+			if (isset($data->method) && in_array($data->method,['PUT','PATCH','DELETE'])) {
+				$this->set([
 					CURLOPT_CUSTOMREQUEST => $data->method,
 					CURLOPT_POSTFIELDS => $data->body()
-				));
+				]);
 			}
 		}
 		return (boolean) curl_setopt_array($this->_resource, $this->options);
@@ -203,7 +200,7 @@ class Curl extends \lithium\net\Socket {
 	 */
 	public function set($flags, $value = null) {
 		if ($value !== null) {
-			$flags = array($flags => $value);
+			$flags = [$flags => $value];
 		}
 		$this->options = $flags + $this->options;
 	}

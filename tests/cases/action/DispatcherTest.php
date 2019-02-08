@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\action;
@@ -23,17 +24,17 @@ class DispatcherTest extends \lithium\test\Unit {
 	}
 
 	public function testRun() {
-		Router::connect('/', array('controller' => 'test', 'action' => 'test'));
-		MockDispatcher::run(new Request(array('url' => '/')));
+		Router::connect('/', ['controller' => 'test', 'action' => 'test']);
+		MockDispatcher::run(new Request(['url' => '/']));
 
 		$result = end(MockDispatcher::$dispatched);
-		$expected = array('controller' => 'Test', 'action' => 'test');
+		$expected = ['controller' => 'Test', 'action' => 'test'];
 		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testRunWithNoRouting() {
 		$this->assertException('/Could not route request/', function() {
-			MockDispatcher::run(new Request(array('url' => '/')));
+			MockDispatcher::run(new Request(['url' => '/']));
 		});
 	}
 
@@ -46,186 +47,186 @@ class DispatcherTest extends \lithium\test\Unit {
 	 * works as expected and returns the correct controller/action combination.
 	 */
 	public function testRunWithPostRoot() {
-		Router::connect('/', array('controller' => 'test', 'action' => 'test'));
-		$request = new Request(array('url' => '/', 'env' => array(
+		Router::connect('/', ['controller' => 'test', 'action' => 'test']);
+		$request = new Request(['url' => '/', 'env' => [
 			'REQUEST_METHOD' => 'POST'
-		)));
+		]]);
 		MockDispatcher::run($request);
-		$expected = array('controller' => 'Test', 'action' => 'test');
+		$expected = ['controller' => 'Test', 'action' => 'test'];
 		$result = end(MockDispatcher::$dispatched);
 		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testApplyRulesControllerCasing() {
-		$params = array('controller' => 'test', 'action' => 'test');
-		$expected = array('controller' => 'Test', 'action' => 'test');
+		$params = ['controller' => 'test', 'action' => 'test'];
+		$expected = ['controller' => 'Test', 'action' => 'test'];
 		$this->assertEqual($expected, Dispatcher::applyRules($params));
 
-		$params = array('controller' => 'Test', 'action' => 'test');
+		$params = ['controller' => 'Test', 'action' => 'test'];
 		$this->assertEqual($params, Dispatcher::applyRules($params));
 
-		$params = array('controller' => 'test_one', 'action' => 'test');
-		$expected = array('controller' => 'TestOne', 'action' => 'test');
+		$params = ['controller' => 'test_one', 'action' => 'test'];
+		$expected = ['controller' => 'TestOne', 'action' => 'test'];
 		$this->assertEqual($expected, Dispatcher::applyRules($params));
 	}
 
 	public function testApplyRulesWithNamespacedController() {
-		$params = array('controller' => 'li3_test\\Test', 'action' => 'test');
-		$expected = array('controller' => 'li3_test\\Test', 'action' => 'test');
+		$params = ['controller' => 'li3_test\\Test', 'action' => 'test'];
+		$expected = ['controller' => 'li3_test\\Test', 'action' => 'test'];
 		$this->assertEqual($expected, Dispatcher::applyRules($params));
 	}
 
 	public function testApplyRulesDotNamespacing() {
-		$params = array('controller' => 'li3_test.test', 'action' => 'test');
-		$expected = array(
+		$params = ['controller' => 'li3_test.test', 'action' => 'test'];
+		$expected = [
 			'library' => 'li3_test', 'controller' => 'li3_test.Test', 'action' => 'test'
-		);
+		];
 		$this->assertEqual($expected, Dispatcher::applyRules($params));
 	}
 
 	public function testApplyRulesLibraryKeyNamespacing() {
-		$params = array('library' => 'li3_test', 'controller' => 'test', 'action' => 'test');
-		$expected = array(
+		$params = ['library' => 'li3_test', 'controller' => 'test', 'action' => 'test'];
+		$expected = [
 			'library' => 'li3_test', 'controller' => 'li3_test.Test', 'action' => 'test'
-		);
+		];
 		$this->assertEqual($expected, Dispatcher::applyRules($params));
 	}
 
 	public function testApplyRulesNamespacingCollision() {
-		$params = array('library' => 'li3_one', 'controller' => 'li3_two.test', 'action' => 'test');
-		$expected = array(
+		$params = ['library' => 'li3_one', 'controller' => 'li3_two.test', 'action' => 'test'];
+		$expected = [
 			'library' => 'li3_one', 'controller' => 'li3_two.Test', 'action' => 'test'
-		);
+		];
 		$this->assertEqual($expected, Dispatcher::applyRules($params));
 
-		$params = array('library' => 'li3_one', 'controller' => 'li3_two\Test', 'action' => 'test');
-		$expected = array(
+		$params = ['library' => 'li3_one', 'controller' => 'li3_two\Test', 'action' => 'test'];
+		$expected = [
 			'library' => 'li3_one', 'controller' => 'li3_two\Test', 'action' => 'test'
-		);
+		];
 		$this->assertEqual($expected, Dispatcher::applyRules($params));
 	}
 
 	public function testRunWithoutRules() {
 		$config = MockDispatcher::config();
-		$expected = array('rules' => array());
+		$expected = ['rules' => []];
 		$this->assertEqual($expected, $config);
 	}
 
 	public function testRunWithAdminActionRule() {
-		MockDispatcher::config(array('rules' => array(
-			'admin' => array('action' => 'admin_{:action}')
-		)));
+		MockDispatcher::config(['rules' => [
+			'admin' => ['action' => 'admin_{:action}']
+		]]);
 
-		Router::connect('/', array('controller' => 'test', 'action' => 'test', 'admin' => true));
-		MockDispatcher::run(new Request(array('url' => '/')));
+		Router::connect('/', ['controller' => 'test', 'action' => 'test', 'admin' => true]);
+		MockDispatcher::run(new Request(['url' => '/']));
 
 		$result = end(MockDispatcher::$dispatched);
-		$expected = array('action' => 'admin_test', 'controller' => 'Test', 'admin' => true);
+		$expected = ['action' => 'admin_test', 'controller' => 'Test', 'admin' => true];
 		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testRunWithGenericActionRule() {
-		MockDispatcher::config(array('rules' => array(
-			'action' => array('action' => function($params) {
+		MockDispatcher::config(['rules' => [
+			'action' => ['action' => function($params) {
 				return Inflector::camelize(strtolower($params['action']), false);
-			})
-		)));
+			}]
+		]]);
 
-		Router::connect('/', array('controller' => 'test', 'action' => 'TeST-camelize'));
-		MockDispatcher::run(new Request(array('url' => '/')));
+		Router::connect('/', ['controller' => 'test', 'action' => 'TeST-camelize']);
+		MockDispatcher::run(new Request(['url' => '/']));
 
 		$result = end(MockDispatcher::$dispatched);
-		$expected = array('action' => 'testCamelize', 'controller' => 'Test');
+		$expected = ['action' => 'testCamelize', 'controller' => 'Test'];
 		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testRunWithSpecialRuleAsCallable() {
-		MockDispatcher::config(array('rules' => function($params) {
+		MockDispatcher::config(['rules' => function($params) {
 			if (isset($params['admin'])) {
-				return array('special' => array('action' => 'special_{:action}'));
+				return ['special' => ['action' => 'special_{:action}']];
 			}
-			return array();
-		}));
+			return [];
+		}]);
 
-		Router::connect('/', array('controller' => 'test', 'action' => 'test', 'admin' => true));
-		Router::connect('/special', array(
+		Router::connect('/', ['controller' => 'test', 'action' => 'test', 'admin' => true]);
+		Router::connect('/special', [
 			'controller' => 'test', 'action' => 'test',
 			'admin' => true, 'special' => true
-		));
-		MockDispatcher::run(new Request(array('url' => '/')));
+		]);
+		MockDispatcher::run(new Request(['url' => '/']));
 
 		$result = end(MockDispatcher::$dispatched);
-		$expected = array('action' => 'test', 'controller' => 'Test', 'admin' => true);
+		$expected = ['action' => 'test', 'controller' => 'Test', 'admin' => true];
 		$this->assertEqual($expected, $result->params);
 
-		MockDispatcher::run(new Request(array('url' => '/special')));
+		MockDispatcher::run(new Request(['url' => '/special']));
 
 		$result = end(MockDispatcher::$dispatched);
-		$expected = array(
+		$expected = [
 			'action' => 'special_test', 'controller' => 'Test',
 			'admin' => true, 'special' => true
-		);
+		];
 		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testRunWithContinuingRules() {
-		MockDispatcher::config(array('rules' => array(
-			'api' => array('action' => 'api_{:action}'),
-			'admin' => array('action' => 'admin_{:action}')
-		)));
+		MockDispatcher::config(['rules' => [
+			'api' => ['action' => 'api_{:action}'],
+			'admin' => ['action' => 'admin_{:action}']
+		]]);
 
-		Router::connect('/', array(
+		Router::connect('/', [
 			'controller' => 'test', 'action' => 'test', 'admin' => true, 'api' => true
-		));
-		MockDispatcher::run(new Request(array('url' => '/')));
+		]);
+		MockDispatcher::run(new Request(['url' => '/']));
 
 		$result = end(MockDispatcher::$dispatched);
-		$expected = array(
+		$expected = [
 			'action' => 'admin_api_test', 'controller' => 'Test', 'admin' => true, 'api' => true
-		);
+		];
 		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testControllerLookupFail() {
-		Dispatcher::config(array('classes' => array('router' => __CLASS__)));
+		Dispatcher::config(['classes' => ['router' => __CLASS__]]);
 
 		$this->assertException("/Controller `SomeNonExistentController` not found/", function() {
-			Dispatcher::run(new Request(array('url' => '/')));
+			Dispatcher::run(new Request(['url' => '/']));
 		});
 	}
 
 	public function testPluginControllerLookupFail() {
-		Dispatcher::config(array('classes' => array('router' => __CLASS__)));
+		Dispatcher::config(['classes' => ['router' => __CLASS__]]);
 
 		$this->assertException("/Controller `some_invalid_plugin.Controller` not found/", function() {
-			Dispatcher::run(new Request(array('url' => '/plugin')));
+			Dispatcher::run(new Request(['url' => '/plugin']));
 		});
 	}
 
 	public function testCall() {
-		$result = MockDispatcher::run(new Request(array('url' => '/call')));
+		$result = MockDispatcher::run(new Request(['url' => '/call']));
 		$this->assertEqual('Working', $result->body);
 	}
 
 	public function testAutoHandler() {
-		$result = MockDispatcher::run(new Request(array('url' => '/auto')));
-		$this->assertEqual(array('Location: /redirect'), $result->headers());
+		$result = MockDispatcher::run(new Request(['url' => '/auto']));
+		$this->assertEqual(['Location: /redirect'], $result->headers());
 	}
 
 	public static function process($request) {
 		if ($request->url === '/auto') {
-			return new Response(array('location' => '/redirect'));
+			return new Response(['location' => '/redirect']);
 		}
 
-		$params = array(
-			'/' => array('controller' => 'some_non_existent_controller', 'action' => 'index'),
-			'/plugin' => array(
+		$params = [
+			'/' => ['controller' => 'some_non_existent_controller', 'action' => 'index'],
+			'/plugin' => [
 				'controller' => 'some_invalid_plugin.controller', 'action' => 'index'
-			),
-			'/call' => array('action' => 'index', 'controller' => function($request) {
-				return new Response(array('body' => 'Working'));
-			})
-		);
+			],
+			'/call' => ['action' => 'index', 'controller' => function($request) {
+				return new Response(['body' => 'Working']);
+			}]
+		];
 
 		if (isset($params[$request->url])) {
 			$request->params = $params[$request->url];

@@ -1,7 +1,14 @@
 <?php
+/**
+ * li₃: the most RAD framework for PHP (http://li3.me)
+ *
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
+ */
 
 $render = function($self, $path, $parent = null) use ($base) {
-	$result = array("<ul class='menu'>");
+	$result = ["<ul class='menu'>"];
 
 	foreach ($path as $current => $value) {
 		$path = trim(str_replace("//", "/", "{$parent}/{$current}"), "/");

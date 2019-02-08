@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\data\source\database\adapter;
@@ -18,12 +19,12 @@ class PostgreSqlTest extends \lithium\test\Unit {
 	protected $_db = null;
 
 	public function setUp() {
-		Connections::add('mock', array(
+		Connections::add('mock', [
 			'object' => $this->_db = new MockPostgreSql()
-		));
-		MockDatabasePost::config(array(
-			'meta' => array('connection' => 'mock')
-		));
+		]);
+		MockDatabasePost::config([
+			'meta' => ['connection' => 'mock']
+		]);
 	}
 
 	public function tearDown() {
@@ -33,22 +34,22 @@ class PostgreSqlTest extends \lithium\test\Unit {
 
 	public function testHasManyRelationWithLimitAndOrder() {
 		$this->_db->log = true;
-		$this->_db->return['_execute'] = new MockResult(array(
-			'records' => array(
-				array(0 => 5)
-			)
-		));
+		$this->_db->return['_execute'] = new MockResult([
+			'records' => [
+				[0 => 5]
+			]
+		]);
 
-		MockDatabasePost::first(array(
-			'with' => array(
+		MockDatabasePost::first([
+			'with' => [
 				'MockDatabaseComment',
-			),
-			'order' => array(
+			],
+			'order' => [
 				'title',
 				'id',
 				'MockDatabaseComment.body' => 'DESC'
-			)
-		));
+			]
+		]);
 		$this->_db->log = false;
 
 		$result = $this->_db->logs;
@@ -77,6 +78,39 @@ SQL;
 		$expected = array_map(function($v) {
 			return preg_replace('/[\t\n]+/', ' ', $v);
 		}, $expected);
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDsnWithHostPort() {
+		$db = new MockPostgreSql([
+			'autoConnect' => false,
+			'database' => 'test',
+			'host' => 'localhost:1234',
+		]);
+		$expected = 'pgsql:host=localhost;port=1234;dbname=test';
+		$result = $db->dsn();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDsnWithHost() {
+		$db = new MockPostgreSql([
+			'autoConnect' => false,
+			'database' => 'test',
+			'host' => 'localhost',
+		]);
+		$expected = 'pgsql:host=localhost;port=5432;dbname=test';
+		$result = $db->dsn();
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testDsnWithPort() {
+		$db = new MockPostgreSql([
+			'autoConnect' => false,
+			'database' => 'test',
+			'host' => ':1234',
+		]);
+		$expected = 'pgsql:host=localhost;port=1234;dbname=test';
+		$result = $db->dsn();
 		$this->assertEqual($expected, $result);
 	}
 }

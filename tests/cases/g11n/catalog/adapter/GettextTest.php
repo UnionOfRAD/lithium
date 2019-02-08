@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\g11n\catalog\adapter;
@@ -36,7 +37,7 @@ class GettextTest extends \lithium\test\Unit {
 
 	public function testPathMustExist() {
 		try {
-			new MockGettext(array('path' => $this->_path));
+			new MockGettext(['path' => $this->_path]);
 			$result = true;
 		} catch (Exception $e) {
 			$result = false;
@@ -44,7 +45,7 @@ class GettextTest extends \lithium\test\Unit {
 		$this->assert($result);
 
 		try {
-			new MockGettext(array('path' => "{$this->_path}/i_do_not_exist"));
+			new MockGettext(['path' => "{$this->_path}/i_do_not_exist"]);
 			$result = false;
 		} catch (Exception $e) {
 			$result = true;
@@ -61,21 +62,21 @@ class GettextTest extends \lithium\test\Unit {
 		$message = 'Permissions cannot be modified on Windows.';
 		$this->skipIf(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN', $message);
 
-		$data = array(
-			'singular 1' => array(
+		$data = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
-				'flags' => array('fuzzy' => true),
-				'translated' => array(),
-				'occurrences' => array(
-					array('file' => 'test.php', 'line' => 1)
-				),
-				'comments' => array(
+				'ids' => ['singular' => 'singular 1', 'plural' => 'plural 1'],
+				'flags' => ['fuzzy' => true],
+				'translated' => [],
+				'occurrences' => [
+					['file' => 'test.php', 'line' => 1]
+				],
+				'comments' => [
 					'comment 1'
-				),
+				],
 				'context' => null
-			)
-		);
+			]
+		];
 
 		$this->adapter->mo = false;
 		$this->adapter->write('messageTemplate', 'root', null, $data);
@@ -96,17 +97,17 @@ msgstr "translated 1"
 EOD;
 		file_put_contents($file, $data);
 
-		$expected = array(
-			'singular 1' => array(
+		$expected = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1'),
-				'flags' => array(),
+				'ids' => ['singular' => 'singular 1'],
+				'flags' => [],
 				'translated' => 'translated 1',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$result = $this->adapter->read('message', 'de', null);
 		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
@@ -121,17 +122,17 @@ msgstr "translated 1"
 EOD;
 		file_put_contents($file, $data);
 
-		$expected = array(
-			'singular 1|A' => array(
+		$expected = [
+			'singular 1|A' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1'),
-				'flags' => array(),
+				'ids' => ['singular' => 'singular 1'],
+				'flags' => [],
 				'translated' => 'translated 1',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => 'A'
-			)
-		);
+			]
+		];
 		$result = $this->adapter->read('message', 'de', null);
 		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
@@ -159,53 +160,53 @@ msgstr "context B"
 EOD;
 		file_put_contents($file, $data);
 
-		$expected = array(
-			'singular 1' => array(
+		$expected = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1'),
-				'flags' => array(),
+				'ids' => ['singular' => 'singular 1'],
+				'flags' => [],
 				'translated' => 'translated 1',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			),
-			'singular 2' => array(
+			],
+			'singular 2' => [
 				'id' => 'singular 2',
-				'ids' => array('singular' => 'singular 2'),
-				'flags' => array(),
+				'ids' => ['singular' => 'singular 2'],
+				'flags' => [],
 				'translated' => 'translated 2',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			),
-			'context' => array(
+			],
+			'context' => [
 				'id' => 'context',
-				'ids' => array('singular' => 'context'),
-				'flags' => array(),
+				'ids' => ['singular' => 'context'],
+				'flags' => [],
 				'translated' => 'context (none specified)',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			),
-			'context|A' => array(
+			],
+			'context|A' => [
 				'id' => 'context',
-				'ids' => array('singular' => 'context'),
-				'flags' => array(),
+				'ids' => ['singular' => 'context'],
+				'flags' => [],
 				'translated' => 'context A',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => 'A'
-			),
-			'context|B' => array(
+			],
+			'context|B' => [
 				'id' => 'context',
-				'ids' => array('singular' => 'context'),
-				'flags' => array(),
+				'ids' => ['singular' => 'context'],
+				'flags' => [],
 				'translated' => 'context B',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => 'B'
-			)
-		);
+			]
+		];
 		$result = $this->adapter->read('message', 'de', null);
 		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
@@ -221,17 +222,17 @@ msgstr[1] "translated 1-1"
 EOD;
 		file_put_contents($file, $data);
 
-		$expected = array(
-			'singular 1' => array(
+		$expected = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
-				'flags' => array(),
-				'translated' => array('translated 1-0', 'translated 1-1'),
-				'occurrences' => array(),
-				'comments' => array(),
+				'ids' => ['singular' => 'singular 1', 'plural' => 'plural 1'],
+				'flags' => [],
+				'translated' => ['translated 1-0', 'translated 1-1'],
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$result = $this->adapter->read('message', 'de', null);
 		unset($result['pluralRule']);
 
@@ -265,17 +266,17 @@ msgstr "translated 1"
 EOD;
 		file_put_contents($file, $data);
 
-		$expected = array(
-			'singular 1' => array(
+		$expected = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1'),
-				'flags' => array(),
+				'ids' => ['singular' => 'singular 1'],
+				'flags' => [],
 				'translated' => 'translated 1',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$result = $this->adapter->read('message', 'de', null);
 		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
@@ -307,22 +308,22 @@ EOD;
 		$this->adapter->mo = false;
 
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
-		$catalog = array(
-			'singular 1' => array(
+		$catalog = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1'),
-				'flags' => array('fuzzy' => true, 'c-format' => true),
+				'ids' => ['singular' => 'singular 1'],
+				'flags' => ['fuzzy' => true, 'c-format' => true],
 				'translated' => 'translated 1',
-				'occurrences' => array(
-					array('file' => 'test.php', 'line' => 1)
-				),
-				'comments' => array(
+				'occurrences' => [
+					['file' => 'test.php', 'line' => 1]
+				],
+				'comments' => [
 					'extracted comment',
 					'translator comment'
-				),
+				],
 				'context' => null
-			)
-		);
+			]
+		];
 		$po = <<<EOD
 #: test.php:1
 #, fuzzy
@@ -363,19 +364,19 @@ msgstr ""
 EOD;
 		file_put_contents($file, $data);
 
-		$expected = array(
-			'An id' => array(
+		$expected = [
+			'An id' => [
 				'id' => 'An id',
-				'ids' => array(
+				'ids' => [
 					'singular' => 'An id'
-				),
-				'flags' => array(),
+				],
+				'flags' => [],
 				'translated' => 'This is a translation spanning multiple lines.',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$result = $this->adapter->read('message', 'de', null);
 		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
@@ -391,19 +392,19 @@ msgstr ""
 EOD;
 		file_put_contents($file, $data);
 
-		$expected = array(
-			'This is an id spanning multiple lines.' => array(
+		$expected = [
+			'This is an id spanning multiple lines.' => [
 				'id' => 'This is an id spanning multiple lines.',
-				'ids' => array(
+				'ids' => [
 					'singular' => 'This is an id spanning multiple lines.'
-				),
-				'flags' => array(),
+				],
+				'flags' => [],
 				'translated' => 'This is a translation spanning multiple lines.',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$result = $this->adapter->read('message', 'de', null);
 		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
@@ -424,23 +425,23 @@ msgstr[1] ""
 EOD;
 		file_put_contents($file, $data);
 
-		$expected = array(
-			'This is an id spanning multiple lines.' => array(
+		$expected = [
+			'This is an id spanning multiple lines.' => [
 				'id' => 'This is an id spanning multiple lines.',
-				'ids' => array(
+				'ids' => [
 					'singular' => 'This is an id spanning multiple lines.',
 					'plural' => 'This is a plural id spanning multiple lines.'
-				),
-				'flags' => array(),
-				'translated' => array(
+				],
+				'flags' => [],
+				'translated' => [
 					'This is a translation spanning multiple lines.',
 					'This is a plural translation spanning multiple lines.'
-				),
-				'occurrences' => array(),
-				'comments' => array(),
+				],
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$result = $this->adapter->read('message', 'de', null);
 		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
@@ -484,26 +485,26 @@ EOD;
 
 		file_put_contents($file, base64_decode($data));
 
-		$expected = array(
-			'singular 1' => array(
+		$expected = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
-				'flags' => array(),
-				'translated' => array('translated 1-0', 'translated 1-1'),
-				'occurrences' => array(),
-				'comments' => array(),
+				'ids' => ['singular' => 'singular 1', 'plural' => 'plural 1'],
+				'flags' => [],
+				'translated' => ['translated 1-0', 'translated 1-1'],
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			),
-			'singular 2' => array(
+			],
+			'singular 2' => [
 				'id' => 'singular 2',
-				'ids' => array('singular' => 'singular 2', 'plural' => null),
-				'flags' => array(),
+				'ids' => ['singular' => 'singular 2', 'plural' => null],
+				'flags' => [],
 				'translated' => 'translated 2',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$result = $this->adapter->read('message', 'de', null);
 		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
@@ -554,86 +555,86 @@ EOD;
 
 		file_put_contents($file, base64_decode($data));
 
-		$expected = array(
-			'singular 1' => array(
+		$expected = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => null),
-				'flags' => array(),
+				'ids' => ['singular' => 'singular 1', 'plural' => null],
+				'flags' => [],
 				'translated' => 'translated 1',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			),
-			'singular 2' => array(
+			],
+			'singular 2' => [
 				'id' => 'singular 2',
-				'ids' => array('singular' => 'singular 2', 'plural' => null),
-				'flags' => array(),
+				'ids' => ['singular' => 'singular 2', 'plural' => null],
+				'flags' => [],
 				'translated' => 'translated 2',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			),
-			'context' => array(
+			],
+			'context' => [
 				'id' => 'context',
-				'ids' => array('singular' => 'context', 'plural' => null),
-				'flags' => array(),
+				'ids' => ['singular' => 'context', 'plural' => null],
+				'flags' => [],
 				'translated' => 'context (none specified)',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			),
-			'context|A' => array(
+			],
+			'context|A' => [
 				'id' => 'context',
-				'ids' => array('singular' => 'context', 'plural' => null),
-				'flags' => array(),
+				'ids' => ['singular' => 'context', 'plural' => null],
+				'flags' => [],
 				'translated' => 'context A',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => 'A'
-			),
-			'context|B' => array(
+			],
+			'context|B' => [
 				'id' => 'context',
-				'ids' => array('singular' => 'context', 'plural' => null),
-				'flags' => array(),
+				'ids' => ['singular' => 'context', 'plural' => null],
+				'flags' => [],
 				'translated' => 'context B',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => 'B'
-			)
-		);
+			]
+		];
 		$result = $this->adapter->read('message', 'de', null);
 		unset($result['pluralRule']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testWriteMessageCompilesPo() {
-		$data = array(
-			'singular 1' => array(
+		$data = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => null),
-				'flags' => array(),
-				'translated' => array('translated 1'),
-				'occurrences' => array(),
-				'comments' => array(),
+				'ids' => ['singular' => 'singular 1', 'plural' => null],
+				'flags' => [],
+				'translated' => ['translated 1'],
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$this->adapter->write('message', 'de', null, $data);
 		$this->assertFileExists("{$this->_path}/de/LC_MESSAGES/default.po");
 	}
 
 	public function testWriteMessageTemplateCompilesPot() {
-		$data = array(
-			'singular 1' => array(
+		$data = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => null),
-				'flags' => array(),
-				'translated' => array(),
-				'occurrences' => array(),
-				'comments' => array(),
+				'ids' => ['singular' => 'singular 1', 'plural' => null],
+				'flags' => [],
+				'translated' => [],
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$this->adapter->write('messageTemplate', 'root', null, $data);
 		$this->assertFileExists("{$this->_path}/message_default.pot");
 	}
@@ -641,47 +642,47 @@ EOD;
 	public function testWriteReadPo() {
 		$this->adapter->mo = false;
 
-		$data = array(
-			'singular 1' => array(
+		$data = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
-				'flags' => array('fuzzy' => true),
-				'translated' => array('translated singular 1', 'translated plural 1'),
-				'occurrences' => array(
-					array('file' => 'test.php', 'line' => 1)
-				),
-				'comments' => array(
+				'ids' => ['singular' => 'singular 1', 'plural' => 'plural 1'],
+				'flags' => ['fuzzy' => true],
+				'translated' => ['translated singular 1', 'translated plural 1'],
+				'occurrences' => [
+					['file' => 'test.php', 'line' => 1]
+				],
+				'comments' => [
 					'comment 1'
-				),
+				],
 				'context' => null
-			),
-			'singular 1|A' => array(
+			],
+			'singular 1|A' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
-				'flags' => array('fuzzy' => true),
-				'translated' => array('translated singular 1A', 'translated plural 1A'),
-				'occurrences' => array(
-					array('file' => 'test.php', 'line' => 2)
-				),
-				'comments' => array(
+				'ids' => ['singular' => 'singular 1', 'plural' => 'plural 1'],
+				'flags' => ['fuzzy' => true],
+				'translated' => ['translated singular 1A', 'translated plural 1A'],
+				'occurrences' => [
+					['file' => 'test.php', 'line' => 2]
+				],
+				'comments' => [
 					'comment 1a'
-				),
+				],
 				'context' => 'A'
-			),
-			'singular 1|B' => array(
+			],
+			'singular 1|B' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
-				'flags' => array('fuzzy' => true),
-				'translated' => array('translated singular 1B', 'translated plural 1B'),
-				'occurrences' => array(
-					array('file' => 'test.php', 'line' => 2)
-				),
-				'comments' => array(
+				'ids' => ['singular' => 'singular 1', 'plural' => 'plural 1'],
+				'flags' => ['fuzzy' => true],
+				'translated' => ['translated singular 1B', 'translated plural 1B'],
+				'occurrences' => [
+					['file' => 'test.php', 'line' => 2]
+				],
+				'comments' => [
 					'comment 1b'
-				),
+				],
 				'context' => 'B'
-			)
-		);
+			]
+		];
 
 		$this->adapter->write('message', 'de', null, $data);
 		$result = $this->adapter->read('message', 'de', null);
@@ -697,26 +698,26 @@ EOD;
 	public function testWrittenPoHasGnuHeader() {
 		$this->adapter->mo = false;
 
-		$data = array(
-			'singular 1' => array(
+		$data = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
-				'flags' => array(),
-				'translated' => array('translated 1-0', 'translated 1-1'),
-				'occurrences' => array(),
-				'comments' => array(),
+				'ids' => ['singular' => 'singular 1', 'plural' => 'plural 1'],
+				'flags' => [],
+				'translated' => ['translated 1-0', 'translated 1-1'],
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			),
-			'singular 2' => array(
+			],
+			'singular 2' => [
 				'id' => 'singular 2',
-				'ids' => array('singular' => 'singular 2', 'plural' => null),
-				'flags' => array(),
-				'translated' => array('translated 2'),
-				'occurrences' => array(),
-				'comments' => array(),
+				'ids' => ['singular' => 'singular 2', 'plural' => null],
+				'flags' => [],
+				'translated' => ['translated 2'],
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$this->adapter->write('message', 'de', null, $data);
 		$result = file_get_contents("{$this->_path}/de/LC_MESSAGES/default.po");
 
@@ -756,17 +757,17 @@ EOD;
 		mkdir("{$this->_path}/de/LC_VALIDATION", 0755, true);
 
 		$file = "{$this->_path}/de/LC_VALIDATION/default.po";
-		$catalog = array(
-			'phone' => array(
+		$catalog = [
+			'phone' => [
 				'id' => 'phone',
-				'ids' => array('singular' => 'phone'),
-				'flags' => array(),
+				'ids' => ['singular' => 'phone'],
+				'flags' => [],
 				'translated' => '/[0-9].*/i',
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$po = <<<EOD
 msgid "phone"
 msgstr "/[0-9].*/i"
@@ -787,20 +788,20 @@ EOD;
 	public function testWrittenPoHasShortFilePaths() {
 		$this->adapter->mo = false;
 
-		$data = array(
-			'singular 1' => array(
+		$data = [
+			'singular 1' => [
 				'id' => 'singular 1',
-				'ids' => array('singular' => 'singular 1', 'plural' => 'plural 1'),
-				'flags' => array(),
-				'translated' => array('translated 1-0', 'translated 1-1'),
-				'occurrences' => array(
-					array('file' => Libraries::get(true, 'path') . '/testa.php', 'line' => 22),
-					array('file' => '/testb.php', 'line' => 23)
-				),
-				'comments' => array(),
+				'ids' => ['singular' => 'singular 1', 'plural' => 'plural 1'],
+				'flags' => [],
+				'translated' => ['translated 1-0', 'translated 1-1'],
+				'occurrences' => [
+					['file' => Libraries::get(true, 'path') . '/testa.php', 'line' => 22],
+					['file' => '/testb.php', 'line' => 23]
+				],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$this->adapter->write('messageTemplate', 'root', null, $data);
 		$result = file_get_contents("{$this->_path}/message_default.pot");
 
@@ -815,7 +816,7 @@ EOD;
 		$this->adapter->mo = false;
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
 
-		$chars = array(
+		$chars = [
 			"\0" => '\000',
 			"\1" => '\001',
 			"\2" => '\002',
@@ -849,22 +850,22 @@ EOD;
 			"\37" => '\037',
 			'"' => '\"',
 			'\\' => '\\\\'
-		);
+		];
 
 		foreach ($chars as $unescaped => $escaped) {
 			$ord = decoct(ord($unescaped));
 
-			$catalog = array(
-				"this is the{$unescaped}message" => array(
+			$catalog = [
+				"this is the{$unescaped}message" => [
 					'id' => "this is the{$unescaped}message",
-					'ids' => array('singular' => "this is the{$unescaped}message"),
-					'flags' => array(),
+					'ids' => ['singular' => "this is the{$unescaped}message"],
+					'flags' => [],
 					'translated' => "this is the{$unescaped}translation",
-					'occurrences' => array(),
-					'comments' => array(),
+					'occurrences' => [],
+					'comments' => [],
 					'context' => null
-				)
-			);
+				]
+			];
 			$po = <<<EOD
 msgid "this is the{$escaped}message"
 msgstr "this is the{$escaped}translation"
@@ -893,17 +894,17 @@ EOD;
 		$this->adapter->mo = false;
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
 
-		$catalog = array(
-			"this is the\r\nmessage" => array(
+		$catalog = [
+			"this is the\r\nmessage" => [
 				'id' => "this is the\r\nmessage",
-				'ids' => array('singular' => "this is the\r\nmessage"),
-				'flags' => array(),
+				'ids' => ['singular' => "this is the\r\nmessage"],
+				'flags' => [],
 				'translated' => "this is the\r\ntranslation",
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$po = <<<EOD
 msgid "this is the\\nmessage"
 msgstr "this is the\\ntranslation"
@@ -918,17 +919,17 @@ EOD;
 		$this->adapter->mo = false;
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
 
-		$catalog = array(
-			"this is the\\'message" => array(
+		$catalog = [
+			"this is the\\'message" => [
 				'id' => "this is the\\'message",
-				'ids' => array('singular' => "this is the\\'message"),
-				'flags' => array(),
+				'ids' => ['singular' => "this is the\\'message"],
+				'flags' => [],
 				'translated' => "this is the\\'translation",
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$po = <<<EOD
 msgid "this is the'message"
 msgstr "this is the'translation"
@@ -943,17 +944,17 @@ EOD;
 		$this->adapter->mo = false;
 		$file = "{$this->_path}/de/LC_MESSAGES/default.po";
 
-		$catalog = array(
-			"this is the\\\\message" => array(
+		$catalog = [
+			"this is the\\\\message" => [
 				'id' => "this is the\\\\message",
-				'ids' => array('singular' => "this is the\\\\message"),
-				'flags' => array(),
+				'ids' => ['singular' => "this is the\\\\message"],
+				'flags' => [],
 				'translated' => "this is the\\\\translation",
-				'occurrences' => array(),
-				'comments' => array(),
+				'occurrences' => [],
+				'comments' => [],
 				'context' => null
-			)
-		);
+			]
+		];
 		$po = <<<EOD
 msgid "this is the\\\\message"
 msgstr "this is the\\\\translation"

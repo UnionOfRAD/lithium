@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\net\http;
@@ -30,45 +31,45 @@ class MediaTest extends \lithium\test\Unit {
 	 */
 	public function testMediaTypes() {
 		// Get a list of all available media types:
-		$types = Media::types(); // returns array('html', 'json', 'rss', ...);
+		$types = Media::types(); // returns ['html', 'json', 'rss', ...];
 
-		$expected = array(
+		$expected = [
 			'html', 'htm', 'form', 'json', 'rss', 'atom', 'css', 'js', 'text', 'txt', 'xml'
-		);
+		];
 		$this->assertEqual($expected, $types);
 		$this->assertEqual($expected, Media::formats());
 
 		$result = Media::type('json');
-		$expected = array('application/json');
+		$expected = ['application/json'];
 		$this->assertEqual($expected, $result['content']);
 
-		$expected = array(
+		$expected = [
 			'cast' => true, 'encode' => 'json_encode', 'decode' => $result['options']['decode']
-		);
+		];
 		$this->assertEqual($expected, $result['options']);
 
 		// Add a custom media type with a custom view class:
-		Media::type('my', 'text/x-my', array(
+		Media::type('my', 'text/x-my', [
 			'view' => 'my\custom\View',
-			'paths' => array('layout' => false)
-		));
+			'paths' => ['layout' => false]
+		]);
 
 		$result = Media::types();
 		$this->assertTrue(in_array('my', $result));
 
 		$result = Media::type('my');
-		$expected = array('text/x-my');
+		$expected = ['text/x-my'];
 		$this->assertEqual($expected, $result['content']);
 
-		$expected = array(
+		$expected = [
 			'view' => 'my\custom\View',
-			'paths' => array(
+			'paths' => [
 				'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
 				'layout' => false,
 				'element' => '{:library}/views/elements/{:template}.{:type}.php'
-			),
-			'encode' => null, 'decode' => null, 'cast' => true, 'conditions' => array()
-		);
+			],
+			'encode' => null, 'decode' => null, 'cast' => true, 'conditions' => []
+		];
 		$this->assertEqual($expected, $result['options']);
 
 		// Remove a custom media type:
@@ -88,15 +89,15 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertEqual('json', Media::type('application/json; charset=UTF-8'));
 
 		$result = Media::type('json');
-		$expected = array('content' => array('application/json'), 'options' => array(
+		$expected = ['content' => ['application/json'], 'options' => [
 			'cast' => true, 'encode' => 'json_encode', 'decode' => $result['options']['decode']
-		));
+		]];
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testAssetTypeHandling() {
 		$result = Media::assets();
-		$expected = array('js', 'css', 'image', 'generic');
+		$expected = ['js', 'css', 'image', 'generic'];
 		$this->assertEqual($expected, array_keys($result));
 
 		$result = Media::assets('css');
@@ -107,9 +108,9 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::assets('my');
 		$this->assertNull($result);
 
-		$result = Media::assets('my', array('suffix' => '.my', 'paths' => array(
-			'{:base}/my/{:path}' => array('base', 'path')
-		)));
+		$result = Media::assets('my', ['suffix' => '.my', 'paths' => [
+			'{:base}/my/{:path}' => ['base', 'path']
+		]]);
 		$this->assertNull($result);
 
 		$result = Media::assets('my');
@@ -118,10 +119,10 @@ class MediaTest extends \lithium\test\Unit {
 		$this->assertTrue(isset($result['paths']['{:base}/my/{:path}']));
 
 		$this->assertNull($result['filter']);
-		Media::assets('my', array('filter' => array('/my/' => '/your/')));
+		Media::assets('my', ['filter' => ['/my/' => '/your/']]);
 
 		$result = Media::assets('my');
-		$expected = array('/my/' => '/your/');
+		$expected = ['/my/' => '/your/'];
 		$this->assertEqual($expected, $result['filter']);
 
 		$expected = '.my';
@@ -139,7 +140,7 @@ class MediaTest extends \lithium\test\Unit {
 		$expected = 'scheme://host/subpath/file';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('//host/subpath/file', 'js', array('base' => '/base'));
+		$result = Media::asset('//host/subpath/file', 'js', ['base' => '/base']);
 		$expected = '//host/subpath/file';
 		$this->assertEqual($expected, $result);
 
@@ -152,31 +153,31 @@ class MediaTest extends \lithium\test\Unit {
 		$env = Environment::get();
 
 		$path = Libraries::get(true, 'path');
-		Libraries::add('cdn_js_test', array(
+		Libraries::add('cdn_js_test', [
 			'path' => $path,
-			'assets' => array(
+			'assets' => [
 				'js' => 'http://static.cdn.com'
-			),
+			],
 			'bootstrap' => false
-		));
+		]);
 
-		Libraries::add('cdn_env_test', array(
+		Libraries::add('cdn_env_test', [
 			'path' => $path,
-			'assets' => array(
+			'assets' => [
 				'js' => 'wrong',
-				$env => array('js' => 'http://static.cdn.com/myapp')
-			),
+				$env => ['js' => 'http://static.cdn.com/myapp']
+			],
 			'bootstrap' => false
-		));
+		]);
 		$library = basename($path);
 
-		$result = Media::asset('foo', 'js', array('library' => 'cdn_js_test'));
+		$result = Media::asset('foo', 'js', ['library' => 'cdn_js_test']);
 		$this->assertEqual("http://static.cdn.com/{$library}/js/foo.js", $result);
 
-		$result = Media::asset('foo', 'css', array('library' => 'cdn_js_test'));
+		$result = Media::asset('foo', 'css', ['library' => 'cdn_js_test']);
 		$this->assertEqual("/{$library}/css/foo.css", $result);
 
-		$result = Media::asset('foo', 'js', array('library' => 'cdn_env_test'));
+		$result = Media::asset('foo', 'js', ['library' => 'cdn_env_test']);
 		$this->assertEqual("http://static.cdn.com/myapp/{$library}/js/foo.js", $result);
 
 		Libraries::remove('cdn_env_test');
@@ -186,7 +187,7 @@ class MediaTest extends \lithium\test\Unit {
 	public function testAssetPathGeneration() {
 		$resources = Libraries::get(true, 'resources');
 		$this->skipIf(!is_writable($resources), "Cannot write test app to resources directory.");
-		$paths = array("{$resources}/media_test/webroot/css", "{$resources}/media_test/webroot/js");
+		$paths = ["{$resources}/media_test/webroot/css", "{$resources}/media_test/webroot/js"];
 
 		foreach ($paths as $path) {
 			if (!is_dir($path)) {
@@ -195,77 +196,77 @@ class MediaTest extends \lithium\test\Unit {
 		}
 		touch("{$paths[0]}/debug.css");
 
-		Libraries::add('media_test', array('path' => "{$resources}/media_test"));
+		Libraries::add('media_test', ['path' => "{$resources}/media_test"]);
 
-		$result = Media::asset('debug', 'css', array('check' => true, 'library' => 'media_test'));
+		$result = Media::asset('debug', 'css', ['check' => true, 'library' => 'media_test']);
 		$this->assertEqual('/media_test/css/debug.css', $result);
 
-		$result = Media::asset('debug', 'css', array(
+		$result = Media::asset('debug', 'css', [
 			'timestamp' => true, 'library' => 'media_test'
-		));
+		]);
 		$this->assertPattern('%^/media_test/css/debug\.css\?\d+$%', $result);
 
-		$result = Media::asset('debug.css?type=test', 'css', array(
+		$result = Media::asset('debug.css?type=test', 'css', [
 			'check' => true, 'base' => 'foo', 'library' => 'media_test'
-		));
+		]);
 		$this->assertEqual('foo/media_test/css/debug.css?type=test', $result);
 
-		$result = Media::asset('debug.css?type=test', 'css', array(
+		$result = Media::asset('debug.css?type=test', 'css', [
 			'check' => true, 'base' => 'foo', 'timestamp' => true, 'library' => 'media_test'
-		));
+		]);
 		$this->assertPattern('%^foo/media_test/css/debug\.css\?type=test&\d+$%', $result);
 
-		$file = Media::path('css/debug.css', 'bar', array('library' => 'media_test'));
+		$file = Media::path('css/debug.css', 'bar', ['library' => 'media_test']);
 		$this->assertFileExists($file);
 
-		$result = Media::asset('this.file.should.not.exist', 'css', array('check' => true));
+		$result = Media::asset('this.file.should.not.exist', 'css', ['check' => true]);
 		$this->assertFalse($result);
 
 		unlink("{$paths[0]}/debug.css");
 
-		foreach (array_merge($paths, array(dirname($paths[0]))) as $path) {
+		foreach (array_merge($paths, [dirname($paths[0])]) as $path) {
 			rmdir($path);
 		}
 	}
 
 	public function testCustomAssetPathGeneration() {
-		Media::assets('my', array('suffix' => '.my', 'paths' => array(
-			'{:base}/my/{:path}' => array('base', 'path')
-		)));
+		Media::assets('my', ['suffix' => '.my', 'paths' => [
+			'{:base}/my/{:path}' => ['base', 'path']
+		]]);
 
 		$result = Media::asset('subpath/file', 'my');
 		$expected = '/my/subpath/file.my';
 		$this->assertEqual($expected, $result);
 
-		Media::assets('my', array('filter' => array('/my/' => '/your/')));
+		Media::assets('my', ['filter' => ['/my/' => '/your/']]);
 
 		$result = Media::asset('subpath/file', 'my');
 		$expected = '/your/subpath/file.my';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('subpath/file', 'my', array('base' => '/app/path'));
+		$result = Media::asset('subpath/file', 'my', ['base' => '/app/path']);
 		$expected = '/app/path/your/subpath/file.my';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('subpath/file', 'my', array('base' => '/app/path/'));
+		$result = Media::asset('subpath/file', 'my', ['base' => '/app/path/']);
 		$expected = '/app/path//your/subpath/file.my';
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMultiLibraryAssetPaths() {
-		$result = Media::asset('path/file', 'js', array('library' => true, 'base' => '/app/base'));
+		$result = Media::asset('path/file', 'js', ['library' => true, 'base' => '/app/base']);
 		$expected = '/app/base/js/path/file.js';
 		$this->assertEqual($expected, $result);
 
-		Libraries::add('li3_foo_blog', array(
+		Libraries::add('li3_foo_blog', [
 			'path' => Libraries::get(true, 'path') . '/libraries/plugins/blog',
 			'bootstrap' => false,
 			'route' => false
-		));
+		]);
 
-		$result = Media::asset('path/file', 'js', array(
+		$result = Media::asset('path/file', 'js', [
 			'library' => 'li3_foo_blog', 'base' => '/app/base'
-		));
+		]);
 		$expected = '/app/base/blog/js/path/file.js';
 		$this->assertEqual($expected, $result);
 
@@ -273,7 +274,7 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testManualAssetPaths() {
-		$result = Media::asset('/path/file', 'js', array('base' => '/base'));
+		$result = Media::asset('/path/file', 'js', ['base' => '/base']);
 		$expected = '/base/path/file.js';
 		$this->assertEqual($expected, $result);
 
@@ -285,34 +286,34 @@ class MediaTest extends \lithium\test\Unit {
 			mkdir($cssPath, 0777, true);
 		}
 
-		Libraries::add('media_test', array('path' => "{$resources}/media_test"));
+		Libraries::add('media_test', ['path' => "{$resources}/media_test"]);
 
-		$result = Media::asset('/foo/bar', 'js', array('base' => '/base', 'check' => true));
+		$result = Media::asset('/foo/bar', 'js', ['base' => '/base', 'check' => true]);
 		$this->assertFalse($result);
 
 		file_put_contents("{$cssPath}/debug.css", "html, body { background-color: black; }");
-		$result = Media::asset('/css/debug', 'css', array(
+		$result = Media::asset('/css/debug', 'css', [
 			'library' => 'media_test', 'base' => '/base', 'check' => true
-		));
+		]);
 		$expected = '/base/css/debug.css';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('/css/debug.css', 'css', array(
+		$result = Media::asset('/css/debug.css', 'css', [
 			'library' => 'media_test', 'base' => '/base', 'check' => true
-		));
+		]);
 		$expected = '/base/css/debug.css';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('/css/debug.css?foo', 'css', array(
+		$result = Media::asset('/css/debug.css?foo', 'css', [
 			'library' => 'media_test', 'base' => '/base', 'check' => true
-		));
+		]);
 		$expected = '/base/css/debug.css?foo';
 		$this->assertEqual($expected, $result);
 
 		Libraries::remove('media_test');
 		unlink("{$cssPath}/debug.css");
 
-		foreach (array($cssPath, dirname($cssPath)) as $path) {
+		foreach ([$cssPath, dirname($cssPath)] as $path) {
 			rmdir($path);
 		}
 	}
@@ -320,11 +321,11 @@ class MediaTest extends \lithium\test\Unit {
 	public function testRender() {
 		$response = new Response();
 		$response->type('json');
-		$data = array('something');
+		$data = ['something'];
 		Media::render($response, $data);
 
 		$result = $response->headers();
-		$this->assertEqual(array('Content-Type: application/json; charset=UTF-8'), $result);
+		$this->assertEqual(['Content-Type: application/json; charset=UTF-8'], $result);
 
 		$result = $response->body();
 		$this->assertEqual($data, $result);
@@ -334,7 +335,7 @@ class MediaTest extends \lithium\test\Unit {
 	 * Tests that a decode handler is not called when the Media type has none configured.
 	 */
 	public function testNoDecode() {
-		Media::type('my', 'text/x-my', array('decode' => false));
+		Media::type('my', 'text/x-my', ['decode' => false]);
 
 		$result = Media::decode('my', 'Hello World');
 		$this->assertEqual(null, $result);
@@ -344,10 +345,10 @@ class MediaTest extends \lithium\test\Unit {
 	 * Tests that types with decode handlers can properly decode content.
 	 */
 	public function testDecode() {
-		$data = array('movies' => array(
-			array('name' => 'Shaun of the Dead', 'year' => 2004),
-			array('name' => 'V for Vendetta', 'year' => 2005)
-		));
+		$data = ['movies' => [
+			['name' => 'Shaun of the Dead', 'year' => 2004],
+			['name' => 'V for Vendetta', 'year' => 2005]
+		]];
 		$jsonEncoded = '{"movies":[{"name":"Shaun of the Dead","year":2004},';
 		$jsonEncoded .= '{"name":"V for Vendetta","year":2005}]}';
 
@@ -364,7 +365,7 @@ class MediaTest extends \lithium\test\Unit {
 	public function testCustomEncodeHandler() {
 		$response = new Response();
 
-		Media::type('csv', 'application/csv', array(
+		Media::type('csv', 'application/csv', [
 			'encode' => function($data) {
 				ob_start();
 				$out = fopen('php://output', 'w');
@@ -374,18 +375,18 @@ class MediaTest extends \lithium\test\Unit {
 				fclose($out);
 				return ob_get_clean();
 			}
-		));
+		]);
 
-		$data = array(
-			array('John', 'Doe', '123 Main St.', 'Anytown, CA', '91724'),
-			array('Jane', 'Doe', '124 Main St.', 'Anytown, CA', '91724')
-		);
+		$data = [
+			['John', 'Doe', '123 Main St.', 'Anytown, CA', '91724'],
+			['Jane', 'Doe', '124 Main St.', 'Anytown, CA', '91724']
+		];
 		$response->type('csv');
 		Media::render($response, $data);
 		$result = $response->body;
 		$expected = 'John,Doe,"123 Main St.","Anytown, CA",91724' . "\n";
 		$expected .= 'Jane,Doe,"124 Main St.","Anytown, CA",91724' . "\n";
-		$this->assertEqual(array($expected), $result);
+		$this->assertEqual([$expected], $result);
 
 		$result = $response->headers['Content-Type'];
 		$this->assertEqual('application/csv; charset=UTF-8', $result);
@@ -393,22 +394,22 @@ class MediaTest extends \lithium\test\Unit {
 
 	public function testEmptyEncode() {
 		$handler = Media::type('empty', 'empty/encode');
-		$this->assertNull(Media::encode($handler, array()));
+		$this->assertNull(Media::encode($handler, []));
 
-		$handler = Media::type('empty', 'empty/encode', array(
+		$handler = Media::type('empty', 'empty/encode', [
 			'encode' => null
-		));
-		$this->assertNull(Media::encode($handler, array()));
+		]);
+		$this->assertNull(Media::encode($handler, []));
 
-		$handler = Media::type('empty', 'empty/encode', array(
+		$handler = Media::type('empty', 'empty/encode', [
 			'encode' => false
-		));
-		$this->assertNull(Media::encode($handler, array()));
+		]);
+		$this->assertNull(Media::encode($handler, []));
 
-		$handler = Media::type('empty', 'empty/encode', array(
+		$handler = Media::type('empty', 'empty/encode', [
 			'encode' => ""
-		));
-		$this->assertNull(Media::encode($handler, array()));
+		]);
+		$this->assertNull(Media::encode($handler, []));
 	}
 
 	/**
@@ -420,7 +421,7 @@ class MediaTest extends \lithium\test\Unit {
 		Media::render($response, "Hello, world!");
 
 		$result = $response->body;
-		$this->assertEqual(array("Hello, world!"), $result);
+		$this->assertEqual(["Hello, world!"], $result);
 	}
 
 	/**
@@ -432,7 +433,7 @@ class MediaTest extends \lithium\test\Unit {
 		$response->type('bad');
 
 		$this->assertException("Unhandled media type `bad`.", function() use ($response) {
-			Media::render($response, array('foo' => 'bar'));
+			Media::render($response, ['foo' => 'bar']);
 		});
 
 		$result = $response->body();
@@ -448,7 +449,7 @@ class MediaTest extends \lithium\test\Unit {
 		$response->type('xml');
 
 		$this->assertException("Unhandled media type `xml`.", function() use ($response) {
-			Media::render($response, array('foo' => 'bar'));
+			Media::render($response, ['foo' => 'bar']);
 		});
 
 		$result = $response->body;
@@ -464,14 +465,14 @@ class MediaTest extends \lithium\test\Unit {
 		$response = new Response();
 		$response->type('custom');
 
-		Media::render($response, 'Hello, world!', array(
+		Media::render($response, 'Hello, world!', [
 			'layout' => false,
 			'template' => false,
 			'encode' => function($data) { return "Message: {$data}"; }
-		));
+		]);
 
 		$result = $response->body;
-		$expected = array("Message: Hello, world!");
+		$expected = ["Message: Hello, world!"];
 		$this->assertEqual($expected, $result);
 
 		$this->assertException("/Template not found/", function() use ($response) {
@@ -492,16 +493,16 @@ class MediaTest extends \lithium\test\Unit {
 		$response = new Response();
 		$response->type('custom');
 
-		Media::render($response, null, compact('request') + array(
+		Media::render($response, null, compact('request') + [
 			'layout' => false,
 			'template' => false,
 			'encode' => function($data, $handler) { return $handler['request']->foo; }
-		));
-		$this->assertEqual(array('bar'), $response->body);
+		]);
+		$this->assertEqual(['bar'], $response->body);
 	}
 
 	public function testMediaEncoding() {
-		$data = array('hello', 'goodbye', 'foo' => array('bar', 'baz' => 'dib'));
+		$data = ['hello', 'goodbye', 'foo' => ['bar', 'baz' => 'dib']];
 		$expected = json_encode($data);
 		$result = Media::encode('json', $data);
 		$this->assertEqual($expected, $result);
@@ -531,20 +532,20 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testCustomWebroot() {
-		Libraries::add('defaultStyleApp', array(
+		Libraries::add('defaultStyleApp', [
 			'path' => Libraries::get(true, 'path'),
-			'bootstrap' => false)
+			'bootstrap' => false]
 		);
 		$this->assertEqual(
 			realpath(Libraries::get(true, 'path') . '/webroot'),
 			realpath(Media::webroot('defaultStyleApp'))
 		);
 
-		Libraries::add('customWebRootApp', array(
+		Libraries::add('customWebRootApp', [
 			'path' => Libraries::get(true, 'path'),
 			'webroot' => Libraries::get(true, 'path'),
 			'bootstrap' => false
-		));
+		]);
 
 		$this->assertEqual(Libraries::get(true, 'path'), Media::webroot('customWebRootApp'));
 
@@ -567,18 +568,18 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testEncodeRecordSet() {
-		$data = new RecordSet(array('data' => array(
-			1 => new Record(array('data' => array('id' => 1, 'foo' => 'bar'))),
-			2 => new Record(array('data' => array('id' => 2, 'foo' => 'baz'))),
-			3 => new Record(array('data' => array('id' => 3, 'baz' => 'dib')))
-		)));
+		$data = new RecordSet(['data' => [
+			1 => new Record(['data' => ['id' => 1, 'foo' => 'bar']]),
+			2 => new Record(['data' => ['id' => 2, 'foo' => 'baz']]),
+			3 => new Record(['data' => ['id' => 3, 'baz' => 'dib']])
+		]]);
 		$json = '{"1":{"id":1,"foo":"bar"},"2":{"id":2,"foo":"baz"},"3":{"id":3,"baz":"dib"}}';
-		$this->assertEqual($json, Media::encode(array('encode' => 'json_encode'), $data));
+		$this->assertEqual($json, Media::encode(['encode' => 'json_encode'], $data));
 	}
 
 	public function testEncodeNotCallable() {
-		$data = array('foo' => 'bar');
-		$result = Media::encode(array('encode' => false), $data);
+		$data = ['foo' => 'bar'];
+		$result = Media::encode(['encode' => false], $data);
 		$this->assertNull($result);
 	}
 
@@ -588,7 +589,7 @@ class MediaTest extends \lithium\test\Unit {
 	 */
 	public function testTypeAliasResolution() {
 		$resolved = Media::type('text');
-		$this->assertEqual(array('text/plain'), $resolved['content']);
+		$this->assertEqual(['text/plain'], $resolved['content']);
 		unset($resolved['options']['encode']);
 
 		$result = Media::type('txt');
@@ -609,7 +610,7 @@ class MediaTest extends \lithium\test\Unit {
 	public function testGetLibraryWebroot() {
 		$this->assertNull(Media::webroot('foobar'));
 
-		Libraries::add('foobar', array('path' => __DIR__, 'webroot' => __DIR__));
+		Libraries::add('foobar', ['path' => __DIR__, 'webroot' => __DIR__]);
 		$this->assertEqual(__DIR__, Media::webroot('foobar'));
 		Libraries::remove('foobar');
 
@@ -621,7 +622,7 @@ class MediaTest extends \lithium\test\Unit {
 			mkdir($webroot, 0777, true);
 		}
 
-		Libraries::add('media_test', array('path' => "{$resources}/media_test"));
+		Libraries::add('media_test', ['path' => "{$resources}/media_test"]);
 		$this->assertFileExists(Media::webroot('media_test'));
 		Libraries::remove('media_test');
 		rmdir($webroot);
@@ -632,10 +633,10 @@ class MediaTest extends \lithium\test\Unit {
 	 * function.
 	 */
 	public function testResponseModification() {
-		Media::type('my', 'text/x-my', array('view' => 'lithium\tests\mocks\net\http\Template'));
+		Media::type('my', 'text/x-my', ['view' => 'lithium\tests\mocks\net\http\Template']);
 		$response = new Response();
 
-		Media::render($response, null, array('type' => 'my'));
+		Media::render($response, null, ['type' => 'my']);
 		$this->assertEqual('Value', $response->headers('Custom'));
 	}
 
@@ -644,42 +645,42 @@ class MediaTest extends \lithium\test\Unit {
 	 * it has already been prepended.
 	 */
 	public function testDuplicateBasePathCheck() {
-		$result = Media::asset('/foo/bar/image.jpg', 'image', array('base' => '/bar'));
+		$result = Media::asset('/foo/bar/image.jpg', 'image', ['base' => '/bar']);
 		$this->assertEqual('/bar/foo/bar/image.jpg', $result);
 
-		$result = Media::asset('/foo/bar/image.jpg', 'image', array('base' => '/foo/bar'));
+		$result = Media::asset('/foo/bar/image.jpg', 'image', ['base' => '/foo/bar']);
 		$this->assertEqual('/foo/bar/image.jpg', $result);
 
-		$result = Media::asset('foo/bar/image.jpg', 'image', array('base' => 'foo'));
+		$result = Media::asset('foo/bar/image.jpg', 'image', ['base' => 'foo']);
 		$this->assertEqual('foo/img/foo/bar/image.jpg', $result);
 
-		$result = Media::asset('/foo/bar/image.jpg', 'image', array('base' => ''));
+		$result = Media::asset('/foo/bar/image.jpg', 'image', ['base' => '']);
 		$this->assertEqual('/foo/bar/image.jpg', $result);
 	}
 
 	public function testContentNegotiationSimple() {
-		$request = new Request(array('env' => array(
+		$request = new Request(['env' => [
 			'HTTP_ACCEPT' => 'text/html,text/plain;q=0.5'
-		)));
+		]]);
 		$this->assertEqual('html', Media::negotiate($request));
 
-		$request = new Request(array('env' => array(
+		$request = new Request(['env' => [
 			'HTTP_ACCEPT' => 'application/json'
-		)));
+		]]);
 		$this->assertEqual('json', Media::negotiate($request));
 	}
 
 	public function testContentNegotiationByType() {
 		$this->assertEqual('html', Media::type('text/html'));
 
-		Media::type('jsonp', 'text/html', array(
-			'conditions' => array('type' => true)
-		));
-		$this->assertEqual(array('jsonp', 'html'), Media::type('text/html'));
+		Media::type('jsonp', 'text/html', [
+			'conditions' => ['type' => true]
+		]);
+		$this->assertEqual(['jsonp', 'html'], Media::type('text/html'));
 
-		$config = array('env' => array('HTTP_ACCEPT' => 'text/html,text/plain;q=0.5'));
+		$config = ['env' => ['HTTP_ACCEPT' => 'text/html,text/plain;q=0.5']];
 		$request = new Request($config);
-		$request->params = array('type' => 'jsonp');
+		$request->params = ['type' => 'jsonp'];
 		$this->assertEqual('jsonp', Media::negotiate($request));
 
 		$request = new Request($config);
@@ -687,19 +688,19 @@ class MediaTest extends \lithium\test\Unit {
 	}
 
 	public function testContentNegotiationByUserAgent() {
-		Media::type('iphone', 'application/xhtml+xml', array(
-			'conditions' => array('mobile' => true)
-		));
-		$request = new Request(array('env' => array(
+		Media::type('iphone', 'application/xhtml+xml', [
+			'conditions' => ['mobile' => true]
+		]);
+		$request = new Request(['env' => [
 			'HTTP_USER_AGENT' => 'Safari',
 			'HTTP_ACCEPT' => 'application/xhtml+xml,text/html'
-		)));
+		]]);
 		$this->assertEqual('html', Media::negotiate($request));
 
-		$request = new Request(array('env' => array(
+		$request = new Request(['env' => [
 			'HTTP_USER_AGENT' => 'iPhone',
 			'HTTP_ACCEPT' => 'application/xhtml+xml,text/html'
-		)));
+		]]);
 		$this->assertEqual('iphone', Media::negotiate($request));
 	}
 
@@ -720,20 +721,20 @@ class MediaTest extends \lithium\test\Unit {
 
 		$webroot = realpath($webroot);
 		$this->assertNotEmpty($webroot);
-		Media::attach('tests', array(
+		Media::attach('tests', [
 			'absolute' => true,
 			'host' => 'www.hostname.com',
 			'scheme' => 'http://',
 			'prefix' => '/web/assets/tests',
 			'path' => $webroot
-		));
-		Media::attach('app', array(
+		]);
+		Media::attach('app', [
 			'absolute' => false,
 			'prefix' => '/web/assets/app',
 			'path' => $webroot
-		));
+		]);
 
-		$expected = array(
+		$expected = [
 			'absolute' => false,
 			'host' => 'localhost',
 			'scheme' => 'http://',
@@ -744,11 +745,11 @@ class MediaTest extends \lithium\test\Unit {
 			'filter' => null,
 			'suffix' => null,
 			'check' => false
-		);
+		];
 		$result = Media::attached('app');
 		$this->assertEqual($expected, $result);
 
-		$expected = array(
+		$expected = [
 			'absolute' => true,
 			'host' => 'www.hostname.com',
 			'scheme' => 'http://',
@@ -759,32 +760,32 @@ class MediaTest extends \lithium\test\Unit {
 			'filter' => null,
 			'suffix' => null,
 			'check' => false
-		);
+		];
 		$result = Media::attached('tests');
 		$this->assertEqual($expected, $result);
 		$this->_cleanUp();
 	}
 
 	public function testAssetWithAbsoluteLocation() {
-		Media::attach('appcdn', array(
+		Media::attach('appcdn', [
 			'absolute' => true,
 			'scheme' => 'http://',
 			'host' => 'my.cdn.com',
 			'prefix' => '/assets',
 			'path' => null
-		));
+		]);
 
 		$result = Media::asset('style','css');
 		$expected = '/css/style.css';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('style','css', array('scope' => 'appcdn'));
+		$result = Media::asset('style','css', ['scope' => 'appcdn']);
 		$expected = 'http://my.cdn.com/assets/css/style.css';
 		$this->assertEqual($expected, $result);
 
 		Media::scope('appcdn');
 
-		$result = Media::asset('style', 'css', array('scope' => false));
+		$result = Media::asset('style', 'css', ['scope' => false]);
 		$expected = '/css/style.css';
 		$this->assertEqual($expected, $result);
 
@@ -799,27 +800,27 @@ class MediaTest extends \lithium\test\Unit {
 	 * for the production environement
 	 */
 	public function testEnvironmentAsset1() {
-		Media::attach('appcdn', array(
-			'production' => array(
+		Media::attach('appcdn', [
+			'production' => [
 				'absolute' => true,
 				'path' => null,
 				'scheme' => 'http://',
 				'host' => 'my.cdnapp.com',
 				'prefix' => '/assets',
-			),
-			'test' => array(
+			],
+			'test' => [
 				'absolute' => true,
 				'path' => null,
 				'scheme' => 'http://',
 				'host' => 'my.cdntest.com',
 				'prefix' => '/assets',
-			)
-		));
+			]
+		]);
 
 		$env = Environment::get();
 
 		Environment::set('production');
-		$result = Media::asset('style', 'css', array('scope' => 'appcdn'));
+		$result = Media::asset('style', 'css', ['scope' => 'appcdn']);
 		$expected = 'http://my.cdnapp.com/assets/css/style.css';
 	}
 
@@ -829,26 +830,26 @@ class MediaTest extends \lithium\test\Unit {
 	 * for the test environement
 	 */
 	public function testEnvironmentAsset2() {
-		Media::attach('appcdn', array(
-			'production' => array(
+		Media::attach('appcdn', [
+			'production' => [
 				'absolute' => true,
 				'path' => null,
 				'scheme' => 'http://',
 				'host' => 'my.cdnapp.com',
 				'prefix' => 'assets',
-			),
-			'test' => array(
+			],
+			'test' => [
 				'absolute' => true,
 				'path' => null,
 				'scheme' => 'http://',
 				'host' => 'my.cdntest.com',
 				'prefix' => 'assets',
-			)
-		));
+			]
+		]);
 
 		$env = Environment::get();
 		Environment::set('test');
-		$result = Media::asset('style', 'css', array('scope' => 'appcdn'));
+		$result = Media::asset('style', 'css', ['scope' => 'appcdn']);
 		$expected = 'http://my.cdntest.com/assets/css/style.css';
 		$this->assertEqual($expected, $result);
 		Environment::is($env);
@@ -857,7 +858,7 @@ class MediaTest extends \lithium\test\Unit {
 	public function testAssetPathGenerationWithLocation() {
 		$resources = Libraries::get(true, 'resources') . '/tmp/tests';
 		$this->skipIf(!is_writable($resources), "Cannot write test app to resources directory.");
-		$paths = array("{$resources}/media_test/css", "{$resources}/media_test/js");
+		$paths = ["{$resources}/media_test/css", "{$resources}/media_test/js"];
 
 		foreach ($paths as $path) {
 			if (!is_dir($path)) {
@@ -866,118 +867,118 @@ class MediaTest extends \lithium\test\Unit {
 		}
 		touch("{$paths[0]}/debug.css");
 
-		Media::attach('media_test', array(
+		Media::attach('media_test', [
 			'prefix' => '',
-			'path' => "{$resources}/media_test")
+			'path' => "{$resources}/media_test"]
 		);
 
-		$result = Media::asset('debug', 'css', array('check' => true, 'scope' => 'media_test'));
+		$result = Media::asset('debug', 'css', ['check' => true, 'scope' => 'media_test']);
 
 		$this->assertEqual('/css/debug.css', $result);
 
-		Media::attach('media_test', array(
+		Media::attach('media_test', [
 			'prefix' => 'media_test',
-			'path' => "{$resources}/media_test")
+			'path' => "{$resources}/media_test"]
 		);
 
-		$result = Media::asset('debug', 'css', array('check' => true, 'scope' => 'media_test'));
+		$result = Media::asset('debug', 'css', ['check' => true, 'scope' => 'media_test']);
 		$this->assertEqual('/media_test/css/debug.css', $result);
 
-		$result = Media::asset('debug', 'css', array(
+		$result = Media::asset('debug', 'css', [
 			'timestamp' => true, 'scope' => 'media_test'
-		));
+		]);
 		$this->assertPattern('%^/media_test/css/debug\.css\?\d+$%', $result);
 
-		$result = Media::asset('/css/debug.css?type=test', 'css', array(
+		$result = Media::asset('/css/debug.css?type=test', 'css', [
 			'check' => true, 'base' => 'foo', 'scope' => 'media_test'
-		));
+		]);
 
 		$this->assertEqual('foo/media_test/css/debug.css?type=test', $result);
 
-		$result = Media::asset('/css/debug.css?type=test', 'css', array(
+		$result = Media::asset('/css/debug.css?type=test', 'css', [
 			'check' => true, 'base' => 'http://www.hostname.com/foo', 'scope' => 'media_test'
-		));
+		]);
 
 		$expected = 'http://www.hostname.com/foo/media_test/css/debug.css?type=test';
 		$this->assertEqual($expected, $result);
 
-		$result = Media::asset('/css/debug.css?type=test', 'css', array(
+		$result = Media::asset('/css/debug.css?type=test', 'css', [
 			'check' => true, 'base' => 'foo', 'timestamp' => true, 'scope' => 'media_test'
-		));
+		]);
 		$this->assertPattern('%^foo/media_test/css/debug\.css\?type=test&\d+$%', $result);
 
-		$result = Media::asset('this.file.should.not.exist.css', 'css', array('check' => true));
+		$result = Media::asset('this.file.should.not.exist.css', 'css', ['check' => true]);
 		$this->assertFalse($result);
 
-		Media::attach('media_test', array(
+		Media::attach('media_test', [
 			'prefix' => 'media_test',
-			'path' => "{$resources}/media_test")
+			'path' => "{$resources}/media_test"]
 		);
 
-		$result = Media::asset('debug', 'css', array('check' => true, 'scope' => 'media_test'));
+		$result = Media::asset('debug', 'css', ['check' => true, 'scope' => 'media_test']);
 		$this->assertEqual('/media_test/css/debug.css', $result);
 
-		$result = Media::asset('debug', 'css', array(
+		$result = Media::asset('debug', 'css', [
 			'timestamp' => true, 'scope' => 'media_test'
-		));
+		]);
 		$this->assertPattern('%^/media_test/css/debug\.css\?\d+$%', $result);
 
-		$result = Media::asset('/css/debug.css?type=test', 'css', array(
+		$result = Media::asset('/css/debug.css?type=test', 'css', [
 			'check' => true, 'base' => 'foo', 'scope' => 'media_test'
-		));
+		]);
 
 		$this->assertEqual('foo/media_test/css/debug.css?type=test', $result);
 
-		$result = Media::asset('/css/debug.css?type=test', 'css', array(
+		$result = Media::asset('/css/debug.css?type=test', 'css', [
 			'check' => true, 'base' => 'foo', 'timestamp' => true, 'scope' => 'media_test'
-		));
+		]);
 		$this->assertPattern('%^foo/media_test/css/debug\.css\?type=test&\d+$%', $result);
 
-		$result = Media::asset('this.file.should.not.exist.css', 'css', array('check' => true));
+		$result = Media::asset('this.file.should.not.exist.css', 'css', ['check' => true]);
 		$this->assertFalse($result);
 
 		unlink("{$paths[0]}/debug.css");
 
-		foreach (array_merge($paths, array(dirname($paths[0]))) as $path) {
+		foreach (array_merge($paths, [dirname($paths[0])]) as $path) {
 			rmdir($path);
 		}
 	}
 
 	public function testEmptyHostAndSchemeOptionLocation() {
-		Media::attach('app', array('absolute' => true));
+		Media::attach('app', ['absolute' => true]);
 
 		Media::scope('app');
-		$result = Media::asset('/js/path/file', 'js', array('base' => '/app/base'));
+		$result = Media::asset('/js/path/file', 'js', ['base' => '/app/base']);
 		$expected = 'http://localhost/app/base/js/path/file.js';
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testDeleteLocation() {
-		$result = Media::asset('/js/path/file', 'js', array('base' => '/app/base'));
+		$result = Media::asset('/js/path/file', 'js', ['base' => '/app/base']);
 		$expected = '/app/base/js/path/file.js';
 		$this->assertEqual($expected, $result);
 
-		Media::attach('foo_blog', array(
+		Media::attach('foo_blog', [
 			'prefix' => 'assets/plugin/blog'
-		));
+		]);
 
-		$result = Media::asset('/js/path/file', 'js', array(
+		$result = Media::asset('/js/path/file', 'js', [
 			'scope' => 'foo_blog', 'base' => '/app/base'
-		));
+		]);
 		$expected = '/app/base/assets/plugin/blog/js/path/file.js';
 		$this->assertEqual($expected, $result);
 
 		Media::attach('foo_blog', false);
-		$this->assertEqual(array(), Media::attached('foo_blog'));
+		$this->assertEqual([], Media::attached('foo_blog'));
 	}
 
 	public function testListAttached() {
-		Media::attach('media1', array('prefix' => 'media1', 'absolute' => true));
-		Media::attach('media2', array('prefix' => 'media2', 'check' => true));
-		Media::attach('media3', array('prefix' => 'media3'));
+		Media::attach('media1', ['prefix' => 'media1', 'absolute' => true]);
+		Media::attach('media2', ['prefix' => 'media2', 'check' => true]);
+		Media::attach('media3', ['prefix' => 'media3']);
 
-		$expected = array (
-			'media1' => array (
+		$expected = [
+			'media1' => [
 				'prefix' => 'media1',
 				'absolute' => true,
 				'host' => 'localhost',
@@ -988,8 +989,8 @@ class MediaTest extends \lithium\test\Unit {
 				'filter' => null,
 				'suffix' => null,
 				'check' => false
-			),
-			'media2' => array (
+			],
+			'media2' => [
 				'prefix' => 'media2',
 				'absolute' => false,
 				'host' => 'localhost',
@@ -1000,8 +1001,8 @@ class MediaTest extends \lithium\test\Unit {
 				'filter' => null,
 				'suffix' => null,
 				'check' => true
-			),
-			'media3' => array (
+			],
+			'media3' => [
 				'prefix' => 'media3',
 				'absolute' => false,
 				'host' => 'localhost',
@@ -1012,48 +1013,48 @@ class MediaTest extends \lithium\test\Unit {
 				'filter' => null,
 				'suffix' => null,
 				'check' => false
-			)
-		);
+			]
+		];
 
 		$this->assertEqual($expected, Media::attached());
 	}
 
 	public function testMultipleHostsAndSchemeSelectSameIndex() {
-		Media::attach('cdn', array(
+		Media::attach('cdn', [
 			'absolute' => true,
-			'host' => array('cdn.com', 'cdn.org'),
-			'scheme' => array('http://', 'https://'),
-		));
+			'host' => ['cdn.com', 'cdn.org'],
+			'scheme' => ['http://', 'https://'],
+		]);
 
-		$result = Media::asset('style.css', 'css', array('scope' => 'cdn'));
+		$result = Media::asset('style.css', 'css', ['scope' => 'cdn']);
 		$expected = '%https://cdn.org/css/style.css|http://cdn.com/css/style.css%';
 
 		$this->assertPattern($expected, $result);
 	}
 
 	public function testMultipleHostsAndSingleSchemePicksOnlyScheme() {
-		Media::attach('cdn', array(
+		Media::attach('cdn', [
 			'absolute' => true,
-			'host' => array('cdn.com', 'cdn.org'),
+			'host' => ['cdn.com', 'cdn.org'],
 			'scheme' => 'http://',
-		));
+		]);
 
-		$result = Media::asset('style.css', 'css', array('scope' => 'cdn'));
+		$result = Media::asset('style.css', 'css', ['scope' => 'cdn']);
 		$expected = '%http://cdn.org/css/style.css|http://cdn.com/css/style.css%';
 
 		$this->assertPattern($expected, $result);
 	}
 
 	public function testMultipleHostsPickSameHostForIdenticalAsset() {
-		Media::attach('cdn', array(
+		Media::attach('cdn', [
 			'absolute' => true,
-			'host' => array('cdn.com', 'cdn.org'),
+			'host' => ['cdn.com', 'cdn.org'],
 			'scheme' => 'http://',
-		));
+		]);
 
-		$first = Media::asset('style.css', 'css', array('scope' => 'cdn'));
-		$second = Media::asset('style.css', 'css', array('scope' => 'cdn'));
-		$third = Media::asset('style.css', 'css', array('scope' => 'cdn'));
+		$first = Media::asset('style.css', 'css', ['scope' => 'cdn']);
+		$second = Media::asset('style.css', 'css', ['scope' => 'cdn']);
+		$third = Media::asset('style.css', 'css', ['scope' => 'cdn']);
 
 		$this->assertIdentical($first, $second);
 		$this->assertIdentical($third, $second);
@@ -1063,7 +1064,7 @@ class MediaTest extends \lithium\test\Unit {
 		$result = Media::asset('style.css', 'css');
 		$this->assertEqual('/css/style.css', $result);
 
-		Media::attach(false, array('base' => 'lithium/app/webroot'));
+		Media::attach(false, ['base' => 'lithium/app/webroot']);
 		$result = Media::asset('style.css', 'css');
 		$this->assertEqual('/lithium/app/webroot/css/style.css', $result);
 	}

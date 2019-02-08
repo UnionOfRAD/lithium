@@ -1,4 +1,11 @@
 <?php
+/**
+ * li₃: the most RAD framework for PHP (http://li3.me)
+ *
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
+ */
 
 $passes = (integer) $count['passes'] ?: 0;
 $asserts = (integer) $count['asserts'] ?: 0;
@@ -15,7 +22,7 @@ $exceptions = (integer) $count['exceptions'] ?: 0;
 
 <?php foreach ((array) $stats['errors'] as $error): ?>
 	<?php if ($error['result'] == 'fail' || $error['result'] == 'exception'): ?>
-		<?php echo $self->render("{$error['result']}", compact('error')); ?>
+		<?php echo $this->render("{$error['result']}", compact('error')); ?>
 	<?php endif ?>
 <?php endforeach ?>
 

@@ -1,8 +1,9 @@
 #
-# Lithium: the most rad php framework
+# li₃: the most RAD framework for PHP (http://li3.me)
 #
-# @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
-# @license       http://opensource.org/licenses/bsd-license.php The BSD License
+# Copyright 2016, Union of RAD. All rights reserved. This source
+# code is distributed under the terms of the BSD 3-Clause License.
+# The full license text can be found in the LICENSE.txt file.
 #
 
 language: php
@@ -17,21 +18,51 @@ env:
   # Run one build with as many enabled and compatible extensions as possible.
   # Keep in-sync with potential partial excludes in the `matrix` section.
   - DB=sqlite PHP_EXT="opcache memcached redis apcu" TESTS=all
-  # Must be tested in isolation as it interferes with other opcaches.
-  - PHP_EXT=xcache TESTS=storage
   # Test each remaining database in isolation.
   - DB=mysql TESTS=data
   - DB=pgsql TESTS=data
-  - DB=mongodb PHP_EXT=mongo TESTS=data
   - DB=couchdb TESTS=data
+  # for mongodb tests see matrix definitions
 
 php:
-  - 5.3
-  - 5.4
   - 5.5
   - 5.6
+  - 7.0
+  - 7.1
 
 matrix:
+  exclude:
+  include:
+    # `mongo` extension is not supported on PHP 7
+    - php: 5.5
+      env: DB=mongodb PHP_EXT=mongo TESTS=data
+    - php: 5.6
+      env: DB=mongodb PHP_EXT=mongo TESTS=data
+    - php: 7.0
+      env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
+    - php: 7.1
+      env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
+    # XCache is not supported on PHP 7
+    # Must be tested in isolation as it interferes with other opcaches.
+    - php: 5.5
+      env: PHP_EXT=xcache TESTS=storage
+    - php: 5.6
+      env: PHP_EXT=xcache TESTS=storage
+    # Just one exemplaric job.
+    - php: hhvm
+      env: PHP_EXT=memcached TESTS=all
+    - php: nightly
+      env: PHP_EXT=memcached TESTS=all
+  allow_failures:
+    # We do not aim for full HHVM compatibilty now.
+    - php: hhvm
+      env: PHP_EXT=memcached TESTS=all
+    - php: nightly
+      env: PHP_EXT=memcached TESTS=all
+    - php: 7.0
+      env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
+    - php: 7.1
+      env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
   # Mark build as failed as soon as one job failed.
   fast_finish: true
 
@@ -40,7 +71,7 @@ before_script:
   - cp -r lithium/tests/ci/app .
   # Install libraries.
   - mv lithium app/libraries/
-  - git clone --branch=master --depth=1 --quiet git://github.com/UnionOfRAD/li3_fixtures.git app/libraries/li3_fixtures
+  - git clone --branch=1.1 --depth=1 --quiet git://github.com/UnionOfRAD/li3_fixtures.git app/libraries/li3_fixtures
   # Switch into the new app.
   - cd app
   # Install environment dependencies.
@@ -50,14 +81,14 @@ before_script:
 
 script:
   # Run all tests.
-  - sh -c "if [ '$TESTS' = 'all' ]; then libraries/lithium/console/li3 test --filters=Profiler libraries/lithium/tests/cases; fi"
-  - sh -c "if [ '$TESTS' = 'all' ]; then libraries/lithium/console/li3 test --filters=Profiler libraries/lithium/tests/integration; fi"
+  - sh -c "if [ '$TESTS' = 'all' ]; then libraries/lithium/console/li3 test libraries/lithium/tests/cases; fi"
+  - sh -c "if [ '$TESTS' = 'all' ]; then libraries/lithium/console/li3 test libraries/lithium/tests/integration; fi"
   # Run just the database related tests.
-  - sh -c "if [ '$TESTS' = 'data' ]; then libraries/lithium/console/li3 test --filters=Profiler libraries/lithium/tests/cases/data; fi"
-  - sh -c "if [ '$TESTS' = 'data' ]; then libraries/lithium/console/li3 test --filters=Profiler libraries/lithium/tests/integration/data; fi"
+  - sh -c "if [ '$TESTS' = 'data' ]; then libraries/lithium/console/li3 test libraries/lithium/tests/cases/data; fi"
+  - sh -c "if [ '$TESTS' = 'data' ]; then libraries/lithium/console/li3 test libraries/lithium/tests/integration/data; fi"
   # Run just the storage related tests.
-  - sh -c "if [ '$TESTS' = 'storage' ]; then libraries/lithium/console/li3 test --filters=Profiler libraries/lithium/tests/cases/storage; fi"
-  - sh -c "if [ '$TESTS' = 'storage' ]; then libraries/lithium/console/li3 test --filters=Profiler libraries/lithium/tests/integration/storage; fi"
+  - sh -c "if [ '$TESTS' = 'storage' ]; then libraries/lithium/console/li3 test libraries/lithium/tests/cases/storage; fi"
+  - sh -c "if [ '$TESTS' = 'storage' ]; then libraries/lithium/console/li3 test libraries/lithium/tests/integration/storage; fi"
 
 notifications:
   email: false

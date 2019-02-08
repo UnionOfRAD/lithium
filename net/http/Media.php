@@ -1,18 +1,20 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\net\http;
 
 use Closure;
 use lithium\util\Set;
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\core\Libraries;
 use lithium\core\Environment;
+use lithium\aop\Filters;
 use lithium\net\http\MediaException;
 
 /**
@@ -28,7 +30,7 @@ use lithium\net\http\MediaException;
  * you may do the following:
  *
  * ```
- * 	$this->render(array('csv' => Post::find('all')));
+ * 	$this->render(['csv' => Post::find('all')]);
  * ```
  */
 class Media extends \lithium\core\StaticObject {
@@ -56,14 +58,14 @@ class Media extends \lithium\core\StaticObject {
 	 * @var array
 	 * @see lithium\net\http\Media::type()
 	 */
-	protected static $_types = array();
+	protected static $_types = [];
 
 	/**
 	 * A map of media handler objects or callbacks, mapped to media types.
 	 *
 	 * @var array
 	 */
-	protected static $_handlers = array();
+	protected static $_handlers = [];
 
 	/**
 	 * Contains default path settings for various asset types.
@@ -75,7 +77,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @var array
 	 * @see lithium\net\http\Media::assets()
 	 */
-	protected static $_assets = array();
+	protected static $_assets = [];
 
 	/**
 	 * Placeholder for class dependencies. This class' dependencies (i.e. templating classes) are
@@ -83,9 +85,9 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * @var array
 	 */
-	protected static $_classes = array(
+	protected static $_classes = [
 		'configuration' => 'lithium\core\Configuration'
-	);
+	];
 
 	/**
 	 * Returns the list of registered media types.  New types can be set with the `type()` method.
@@ -122,7 +124,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @param array $options Additional handler-specific options to pass to the content handler.
 	 * @return mixed
 	 */
-	public static function to($format, $data, array $options = array()) {
+	public static function to($format, $data, array $options = []) {
 		return static::encode($format, $data, $options);
 	}
 
@@ -154,7 +156,7 @@ class Media extends \lithium\core\StaticObject {
 	 * browsers, you'd still want those templates served as HTML. You might add something like this:
 	 *
 	 * ```
-	 * Media::type('mobile', array('application/xhtml+xml', 'text/html'));
+	 * Media::type('mobile', ['application/xhtml+xml', 'text/html']);
 	 * ```
 	 *
 	 * However, this would cause _all_ requests for HTML content to be interpreted as
@@ -177,10 +179,10 @@ class Media extends \lithium\core\StaticObject {
 	 *   use the same template(s) or other settings. Therefore, when serving JSONP content, you
 	 *   can specify that the extension defined in the type must be present in the URL:
 	 *  ```
-	 *  Media::type('jsonp', array('application/json'), array(
+	 *  Media::type('jsonp', ['application/json'], [
 	 *  	// template settings...
-	 *  	'conditions' => array('type' => true)
-	 *  ));
+	 *  	'conditions' => ['type' => true]
+	 *  ]);
 	 *  ```
 	 *  Then, JSONP content will only ever be served when the request URL ends in `.jsonp`.
 	 *
@@ -203,7 +205,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @see lithium\action\Request::get()
 	 * @see lithium\action\Request::is()
 	 * @see lithium\action\Request::detect()
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @param string $type A file-extension-style type name, i.e. `'txt'`, `'js'`, or `'atom'`.
 	 *               Alternatively, a mapped content type, i.e. `'text/html'`,
 	 *               `'application/atom+xml'`, etc.; in which case, the matching type name (i.e.
@@ -225,8 +227,8 @@ class Media extends \lithium\core\StaticObject {
 	 *          specified encode function is first cast to array structures.
 	 *        - `'paths'` _array_: Optional key/value pairs mapping paths for
 	 *          `'template'`, `'layout'`, and `'element'` template files.  Any keys ommitted
-	 *          will use the default path.  The values should be `String::insert()`-style
-	 *          paths or an array of `String::insert()`-style paths.  If it is an array,
+	 *          will use the default path.  The values should be `Text::insert()`-style
+	 *          paths or an array of `Text::insert()`-style paths.  If it is an array,
 	 *          each path will be tried in the order specified until a template is found.
 	 *          This is useful for allowing custom templates while falling back on
 	 *          default templates if no custom template was found.  If you want to
@@ -239,19 +241,19 @@ class Media extends \lithium\core\StaticObject {
 	 *         `'options'` is the array of options which define how this content-type should be
 	 *         handled.  If `$content` or `$options` are non-empty, returns `null`.
 	 */
-	public static function type($type, $content = null, array $options = array()) {
-		$defaults = array(
+	public static function type($type, $content = null, array $options = []) {
+		$defaults = [
 			'view' => false,
-			'paths' => array(
+			'paths' => [
 				'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
 				'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
 				'element'  => '{:library}/views/elements/{:template}.{:type}.php'
-			),
+			],
 			'encode' => false,
 			'decode' => false,
 			'cast'   => true,
-			'conditions' => array()
-		);
+			'conditions' => []
+		];
 
 		if ($content === false) {
 			unset(static::$_types[$type], static::$_handlers[$type]);
@@ -266,12 +268,12 @@ class Media extends \lithium\core\StaticObject {
 			if (is_array($content) && isset($content['alias'])) {
 				return static::type($content['alias']);
 			}
-			return compact('content') + array('options' => static::handlers($type));
+			return compact('content') + ['options' => static::handlers($type)];
 		}
 		if ($content) {
 			static::$_types[$type] = (array) $content;
 		}
-		static::$_handlers[$type] = $options ? Set::merge($defaults, $options) : array();
+		static::$_handlers[$type] = $options ? Set::merge($defaults, $options) : [];
 	}
 
 	/**
@@ -291,10 +293,8 @@ class Media extends \lithium\core\StaticObject {
 	 *         no matching type is found returns `null`.
 	 */
 	public static function negotiate($request) {
-		$self = get_called_class();
-
-		$match = function($name) use ($self, $request) {
-			if (($cfg = $self::type($name)) && $self::match($request, compact('name') + $cfg)) {
+		$match = function($name) use ($request) {
+			if (($cfg = static::type($name)) && static::match($request, compact('name') + $cfg)) {
 				return true;
 			}
 			return false;
@@ -367,7 +367,7 @@ class Media extends \lithium\core\StaticObject {
 	/**
 	 * Gets or sets options for various asset types.
 	 *
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @param string $type The name of the asset type, i.e. `'js'` or `'css'`.
 	 * @param array $options If registering a new asset type or modifying an existing asset type,
 	 *        contains settings for the asset type, where the available keys are as follows:
@@ -375,7 +375,7 @@ class Media extends \lithium\core\StaticObject {
 	 *          applicable.
 	 *        - `'filter'`: An array of key/value pairs representing simple string replacements to
 	 *          be done on a path once it is generated.
-	 *        - `'paths'`: An array of key/value pairs where the keys are `String::insert()`
+	 *        - `'paths'`: An array of key/value pairs where the keys are `Text::insert()`
 	 *          compatible paths, and the values are array lists of keys to be inserted into the
 	 *          path string.
 	 * @return array If `$type` is empty, an associative array of all registered types and all
@@ -383,8 +383,8 @@ class Media extends \lithium\core\StaticObject {
 	 *         returns an associative array with the options for `$type`. If `$type` and `$options`
 	 *         are both non-empty, returns `null`.
 	 */
-	public static function assets($type = null, $options = array()) {
-		$defaults = array('suffix' => null, 'filter' => null, 'paths' => array());
+	public static function assets($type = null, $options = []) {
+		$defaults = ['suffix' => null, 'filter' => null, 'paths' => []];
 
 		if (!$type) {
 			return static::_assets();
@@ -422,7 +422,7 @@ class Media extends \lithium\core\StaticObject {
 	 *        - `'filter'`: An array of key/value pairs representing simple string replacements to
 	 *          be done on a path once it is generated.
 	 *        - `'paths'`: An array of paths to search for the asset in. The paths should use
-	 *          `String::insert()` formatting. See `Media::$_assets` for more.
+	 *          `Text::insert()` formatting. See `Media::$_assets` for more.
 	 *        - `suffix`: The suffix to attach to the path, generally a file extension.
 	 *        - `'timestamp'`: Appends the last modified time of the file to the path if `true`.
 	 *          Defaults to `false`.
@@ -434,11 +434,11 @@ class Media extends \lithium\core\StaticObject {
 	 *         plugins.
 	 * @filter
 	 */
-	public static function asset($path, $type, array $options = array()) {
+	public static function asset($path, $type, array $options = []) {
 		$options = static::_assetOptions($path, $type, $options);
 		$params = compact('path', 'type', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$path = $params['path'];
 			$type = $params['type'];
 			$options = $params['options'];
@@ -455,7 +455,7 @@ class Media extends \lithium\core\StaticObject {
 			if ($options['suffix'] && strpos($path, $options['suffix']) === false) {
 				$path .= $options['suffix'];
 			}
-			return $self::filterAssetPath($path, $paths, $config, compact('type') + $options);
+			return static::filterAssetPath($path, $paths, $config, compact('type') + $options);
 		});
 	}
 
@@ -468,18 +468,18 @@ class Media extends \lithium\core\StaticObject {
 	 * @return array The initialized options.
 	 */
 	protected static function _assetOptions($path, $type, $options) {
-		$defaults = array(
+		$defaults = [
 			'base' => null,
 			'timestamp' => false,
 			'filter' => null,
-			'paths' => array(),
+			'paths' => [],
 			'suffix' => null,
 			'check' => false,
 			'library' => true
-		);
+		];
 
 		$base = isset($options['base']) ? rtrim($options['base'], '/') : '';
-		$options += array('scope' => static::scope());
+		$options += ['scope' => static::scope()];
 		$name = $options['scope'];
 
 		if ($config = static::attached($name)) {
@@ -487,9 +487,9 @@ class Media extends \lithium\core\StaticObject {
 			$defaults = array_merge($defaults, $config);
 
 			if (preg_match('/^((?:[a-z0-9-]+:)?\/\/)([^\/]*)/i', $base, $match)) {
-				$options = array_merge($defaults, array(
+				$options = array_merge($defaults, [
 					'base' => rtrim($base . '/' . $defaults['prefix'], '/')
-				));
+				]);
 			} else {
 				$host = '';
 
@@ -535,8 +535,8 @@ class Media extends \lithium\core\StaticObject {
 	 *              of `Media::asset()`).
 	 * @return mixed Returns a modified path to a web asset, or `false`, if the path fails a check.
 	 */
-	public static function filterAssetPath($asset, $path, array $config, array $options = array()) {
-		$config += array('assets' => null);
+	public static function filterAssetPath($asset, $path, array $config, array $options = []) {
+		$config += ['assets' => null];
 
 		if ($options['check'] || $options['timestamp']) {
 			$file = static::path($asset, $options['type'], $options);
@@ -549,7 +549,7 @@ class Media extends \lithium\core\StaticObject {
 		if ($isAbsolute && $options['base'] && strpos($asset, $options['base']) !== 0) {
 			$asset = "{$options['base']}{$asset}";
 		} elseif (!$isAbsolute) {
-			$asset = String::insert(key($path), array('path' => $asset) + $options);
+			$asset = Text::insert(key($path), ['path' => $asset] + $options);
 		}
 
 		if (is_array($options['filter']) && !empty($options['filter'])) {
@@ -613,14 +613,14 @@ class Media extends \lithium\core\StaticObject {
 	 * @param array $options The options used to calculate the path to the file.
 	 * @return string Returns the physical filesystem path to an asset in the `/webroot` directory.
 	 */
-	public static function path($path, $type, array $options = array()) {
-		$defaults = array(
+	public static function path($path, $type, array $options = []) {
+		$defaults = [
 			'base' => null,
-			'paths' => array(),
+			'paths' => [],
 			'suffix' => null,
 			'library' => true,
 			'scope' => false
-		);
+		];
 		if (!$base = static::_assets($type)) {
 			$base = static::_assets('generic');
 		}
@@ -642,8 +642,8 @@ class Media extends \lithium\core\StaticObject {
 			$file = $root . $path;
 		} else {
 			$template = str_replace('{:library}/', '', key($paths));
-			$insert = array('base' => $root) + compact('path');
-			$file = String::insert($template, $insert);
+			$insert = ['base' => $root] + compact('path');
+			$file = Text::insert($template, $insert);
 		}
 		return realpath($file);
 	}
@@ -663,17 +663,17 @@ class Media extends \lithium\core\StaticObject {
 	 * @return object Returns a modified `Response` object with headers and body defined.
 	 * @filter
 	 */
-	public static function render($response, $data = null, array $options = array()) {
-		$params   = compact('response', 'data', 'options');
-		$types    = static::_types();
-		$handlers = static::handlers();
-		$func     = __FUNCTION__;
+	public static function render($response, $data = null, array $options = []) {
+		$params = compact('response', 'data', 'options');
 
-		return static::_filter($func, $params, function($self, $params) use ($types, $handlers) {
-			$defaults = array('encode' => null, 'template' => null, 'layout' => '', 'view' => null);
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
+			$types = static::_types();
+			$handlers = static::handlers();
+
+			$defaults = ['encode' => null, 'template' => null, 'layout' => '', 'view' => null];
 			$response = $params['response'];
 			$data = $params['data'];
-			$options = $params['options'] + array('type' => $response->type());
+			$options = $params['options'] + ['type' => $response->type()];
 
 			$result = null;
 			$type = $options['type'];
@@ -692,7 +692,7 @@ class Media extends \lithium\core\StaticObject {
 				$header .= $response->encoding ? "; charset={$response->encoding}" : '';
 				$response->headers('Content-Type', $header);
 			}
-			$response->body($self::invokeMethod('_handle', array($handler, $data, $response)));
+			$response->body(static::_handle($handler, $data, $response));
 
 			return $response;
 		});
@@ -715,19 +715,19 @@ class Media extends \lithium\core\StaticObject {
 	 * @return object Returns an instance of a templating object, usually `lithium\template\View`.
 	 * @filter
 	 */
-	public static function view($handler, $data, &$response = null, array $options = array()) {
-		$params = array('response' => &$response) + compact('handler', 'data', 'options');
+	public static function view($handler, $data, &$response = null, array $options = []) {
+		$params = ['response' => &$response] + compact('handler', 'data', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$handler = $params['handler'];
 			$response =& $params['response'];
 
-			$handler = is_array($handler) ? $handler : $self::handlers($handler);
+			$handler = is_array($handler) ? $handler : static::handlers($handler);
 			$class = $handler['view'];
 			unset($handler['view']);
 
-			$config = $handler + array('response' => &$response);
-			return $self::invokeMethod('_instance', array($class, $config));
+			$config = $handler + ['response' => &$response];
+			return static::_instance($class, $config);
 		});
 	}
 
@@ -749,13 +749,13 @@ class Media extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	public static function encode($handler, $data, &$response = null) {
-		$params = array('response' => &$response) + compact('handler', 'data');
+		$params = ['response' => &$response] + compact('handler', 'data');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$data = $params['data'];
 			$handler = $params['handler'];
 			$response =& $params['response'];
-			$handler = is_array($handler) ? $handler : $self::handlers($handler);
+			$handler = is_array($handler) ? $handler : static::handlers($handler);
 
 			if (!$handler || empty($handler['encode'])) {
 				return null;
@@ -788,7 +788,7 @@ class Media extends \lithium\core\StaticObject {
 	 * @param array $options Handler-specific options.
 	 * @return mixed
 	 */
-	public static function decode($type, $data, array $options = array()) {
+	public static function decode($type, $data, array $options = []) {
 		if ((!$handler = static::handlers($type)) || empty($handler['decode'])) {
 			return null;
 		}
@@ -801,8 +801,8 @@ class Media extends \lithium\core\StaticObject {
 	 * during testing.
 	 */
 	public static function reset() {
-		static::$_handlers = array();
-		static::$_types = array();
+		static::$_handlers = [];
+		static::$_types = [];
 		static::$_scope = false;
 		if (isset(static::$_scopes)) {
 			static::$_scopes->reset();
@@ -821,9 +821,9 @@ class Media extends \lithium\core\StaticObject {
 	 * @filter
 	 */
 	protected static function _handle($handler, $data, &$response) {
-		$params = array('response' => &$response) + compact('handler', 'data');
+		$params = ['response' => &$response] + compact('handler', 'data');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			$response = $params['response'];
 			$handler = $params['handler'];
 			$data = $params['data'];
@@ -836,12 +836,12 @@ class Media extends \lithium\core\StaticObject {
 
 			switch (true) {
 				case $handler['encode']:
-					return $self::encode($handler, $data, $response);
+					return static::encode($handler, $data, $response);
 				case ($handler['template'] === false) && is_string($data):
 					return $data;
 				case $handler['view']:
 					unset($options['view']);
-					$instance = $self::view($handler, $data, $response, $options);
+					$instance = static::view($handler, $data, $response, $options);
 					return $instance->render('all', (array) $data, $options);
 				default:
 					throw new MediaException("Could not interpret type settings for handler.");
@@ -858,19 +858,19 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed Array of types, or single type requested.
 	 */
 	protected static function _types($type = null) {
-		$types = static::$_types + array(
-			'html'         => array('text/html', 'application/xhtml+xml', '*/*'),
-			'htm'          => array('alias' => 'html'),
-			'form'         => array('application/x-www-form-urlencoded', 'multipart/form-data'),
-			'json'         => array('application/json'),
-			'rss'          => array('application/rss+xml'),
-			'atom'         => array('application/atom+xml'),
-			'css'          => array('text/css'),
-			'js'           => array('application/javascript', 'text/javascript'),
-			'text'         => array('text/plain'),
-			'txt'          => array('alias' => 'text'),
-			'xml'          => array('application/xml', 'application/soap+xml', 'text/xml')
-		);
+		$types = static::$_types + [
+			'html'         => ['text/html', 'application/xhtml+xml', '*/*'],
+			'htm'          => ['alias' => 'html'],
+			'form'         => ['application/x-www-form-urlencoded', 'multipart/form-data'],
+			'json'         => ['application/json'],
+			'rss'          => ['application/rss+xml'],
+			'atom'         => ['application/atom+xml'],
+			'css'          => ['text/css'],
+			'js'           => ['application/javascript', 'text/javascript'],
+			'text'         => ['text/plain'],
+			'txt'          => ['alias' => 'text'],
+			'xml'          => ['application/xml', 'application/soap+xml', 'text/xml']
+		];
 
 		if (!$type) {
 			return $types;
@@ -881,7 +881,7 @@ class Media extends \lithium\core\StaticObject {
 		if (strpos($type, ';')) {
 			list($type) = explode(';', $type, 2);
 		}
-		$result = array();
+		$result = [];
 
 		foreach ($types as $name => $cTypes) {
 			if ($type === $cTypes || (is_array($cTypes) && in_array($type, $cTypes))) {
@@ -902,37 +902,37 @@ class Media extends \lithium\core\StaticObject {
 	 * @return mixed Array of all handlers, or the handler for a specific type.
 	 */
 	public static function handlers($type = null) {
-		$handlers = static::$_handlers + array(
-			'default' => array(
+		$handlers = static::$_handlers + [
+			'default' => [
 				'view'     => 'lithium\template\View',
 				'encode'   => false,
 				'decode'   => false,
 				'cast'     => false,
-				'paths'    => array(
+				'paths'    => [
 					'template' => '{:library}/views/{:controller}/{:template}.{:type}.php',
 					'layout'   => '{:library}/views/layouts/{:layout}.{:type}.php',
 					'element'  => '{:library}/views/elements/{:template}.{:type}.php'
-				)
-			),
-			'html' => array(),
-			'json' => array(
+				]
+			],
+			'html' => [],
+			'json' => [
 				'cast' => true,
 				'encode' => 'json_encode',
 				'decode' => function($data) {
 					return json_decode($data, true);
 				}
-			),
-			'text' => array('cast' => false, 'encode' => function($s) { return $s; }),
-			'form' => array(
+			],
+			'text' => ['cast' => false, 'encode' => function($s) { return $s; }],
+			'form' => [
 				'cast' => true,
 				'encode' => 'http_build_query',
 				'decode' => function($data) {
-					$decoded = array();
+					$decoded = [];
 					parse_str($data, $decoded);
 					return $decoded;
 				}
-			)
-		);
+			]
+		];
 
 		if ($type) {
 			return isset($handlers[$type]) ? $handlers[$type] : null;
@@ -948,24 +948,24 @@ class Media extends \lithium\core\StaticObject {
 	 *               given type.
 	 */
 	protected static function _assets($type = null) {
-		$assets = static::$_assets + array(
-			'js' => array('suffix' => '.js', 'filter' => null, 'paths' => array(
-				'{:base}/{:library}/js/{:path}' => array('base', 'library', 'path'),
-				'{:base}/js/{:path}' => array('base', 'path')
-			)),
-			'css' => array('suffix' => '.css', 'filter' => null, 'paths' => array(
-				'{:base}/{:library}/css/{:path}' => array('base', 'library', 'path'),
-				'{:base}/css/{:path}' => array('base', 'path')
-			)),
-			'image' => array('suffix' => null, 'filter' => null, 'paths' => array(
-				'{:base}/{:library}/img/{:path}' => array('base', 'library', 'path'),
-				'{:base}/img/{:path}' => array('base', 'path')
-			)),
-			'generic' => array('suffix' => null, 'filter' => null, 'paths' => array(
-				'{:base}/{:library}/{:path}' => array('base', 'library', 'path'),
-				'{:base}/{:path}' => array('base', 'path')
-			))
-		);
+		$assets = static::$_assets + [
+			'js' => ['suffix' => '.js', 'filter' => null, 'paths' => [
+				'{:base}/{:library}/js/{:path}' => ['base', 'library', 'path'],
+				'{:base}/js/{:path}' => ['base', 'path']
+			]],
+			'css' => ['suffix' => '.css', 'filter' => null, 'paths' => [
+				'{:base}/{:library}/css/{:path}' => ['base', 'library', 'path'],
+				'{:base}/css/{:path}' => ['base', 'path']
+			]],
+			'image' => ['suffix' => null, 'filter' => null, 'paths' => [
+				'{:base}/{:library}/img/{:path}' => ['base', 'library', 'path'],
+				'{:base}/img/{:path}' => ['base', 'path']
+			]],
+			'generic' => ['suffix' => null, 'filter' => null, 'paths' => [
+				'{:base}/{:library}/{:path}' => ['base', 'library', 'path'],
+				'{:base}/{:path}' => ['base', 'path']
+			]]
+		];
 		if ($type) {
 			return isset($assets[$type]) ? $assets[$type] : null;
 		}
@@ -1005,39 +1005,39 @@ class Media extends \lithium\core\StaticObject {
 	 *
 	 * Example:
 	 * ```
-	 * Media::attach('app', array(
+	 * Media::attach('app', [
 	 *     'path' => '/var/www/website/app/webroot/extradir',
 	 *     'prefix' => 'extradir'
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * ```
-	 * Media::attach('cdn', array(
+	 * Media::attach('cdn', [
 	 *     'absolute' => true,
 	 *     'path' => null,
 	 *     'host' => 'http://my.cdn.com',
 	 *     'prefix' => 'project1/assets'
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * ```
-	 * Media::attach('cdn', array(
+	 * Media::attach('cdn', [
 	 *     'absolute' => true,
 	 *     'path' => null,
-	 *     'host' => array('my.cdn.com', 'secure.cdn.com'),
-	 *     'scheme' => array('http://', 'https://'),
+	 *     'host' => ['my.cdn.com', 'secure.cdn.com'],
+	 *     'scheme' => ['http://', 'https://'],
 	 *     'prefix' => 'project1/assets',
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * ```
-	 * Media::attach('cdn', array(
+	 * Media::attach('cdn', [
 	 *     'absolute' => true,
 	 *     'path' => null,
-	 *     'host' => array('my1.cdn.com', 'my2.cdn.com'),
+	 *     'host' => ['my1.cdn.com', 'my2.cdn.com'],
 	 *     'scheme' => 'http://',
 	 *     'prefix' => 'project1/assets',
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * @param  string $name The name of the media you wish to attach.
@@ -1083,7 +1083,7 @@ class Media extends \lithium\core\StaticObject {
 	protected static function _initScopes() {
 		static::$_scopes = static::_instance('configuration');
 		static::$_scopes->initConfig = function($name, $config) {
-			$defaults = array(
+			$defaults = [
 				'absolute' => false,
 				'host' => 'localhost',
 				'scheme' => 'http://',
@@ -1094,7 +1094,7 @@ class Media extends \lithium\core\StaticObject {
 				'filter' => null,
 				'suffix' => null,
 				'check' => false
-			);
+			];
 			$config += $defaults;
 			$config['prefix'] = trim($config['prefix'], '/');
 			$config['base'] = $config['base'] ? trim($config['base'], '/') : $config['base'];

@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\data\model;
@@ -17,36 +18,36 @@ class MockDatabase extends \lithium\data\source\Database {
 	 *
 	 * @var array
 	 */
-	protected $_columns = array(
-		'primary_key' => array('name' => 'NOT NULL AUTO_INCREMENT'),
-		'string' => array('name' => 'varchar', 'length' => 255),
-		'text' => array('name' => 'text'),
-		'integer' => array('name' => 'int', 'length' => 11, 'formatter' => 'intval'),
-		'float' => array('name' => 'float', 'formatter' => 'floatval'),
-		'datetime' => array('name' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
-		'timestamp' => array(
+	protected $_columns = [
+		'primary_key' => ['name' => 'NOT NULL AUTO_INCREMENT'],
+		'string' => ['name' => 'varchar', 'length' => 255],
+		'text' => ['name' => 'text'],
+		'integer' => ['name' => 'int', 'length' => 11, 'formatter' => 'intval'],
+		'float' => ['name' => 'float', 'formatter' => 'floatval'],
+		'datetime' => ['name' => 'datetime', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'],
+		'timestamp' => [
 			'name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'
-		),
-		'time' => array('name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'),
-		'date' => array('name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'),
-		'binary' => array('name' => 'blob'),
-		'boolean' => array('name' => 'tinyint', 'length' => 1)
-	);
+		],
+		'time' => ['name' => 'time', 'format' => 'H:i:s', 'formatter' => 'date'],
+		'date' => ['name' => 'date', 'format' => 'Y-m-d', 'formatter' => 'date'],
+		'binary' => ['name' => 'blob'],
+		'boolean' => ['name' => 'tinyint', 'length' => 1]
+	];
 
 	public $connection = null;
 
 	public $sql = null;
 
-	public $logs = array();
+	public $logs = [];
 
 	public $log = false;
 
-	public $return = array();
+	public $return = [];
 
-	protected $_quotes = array('{', '}');
+	protected $_quotes = ['{', '}'];
 
-	public function __construct(array $config = array()) {
-		parent::__construct($config);
+	public function __construct(array $config = []) {
+		parent::__construct($config + ['database' => 'mock']);
 		$this->connection = $this;
 	}
 
@@ -64,7 +65,7 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	public function sources($class = null) {}
 
-	public function describe($entity, $fields = array(), array $meta = array()) {
+	public function describe($entity, $fields = [], array $meta = []) {
 		return $this->_instance('schema', compact('fields'));
 	}
 
@@ -74,7 +75,7 @@ class MockDatabase extends \lithium\data\source\Database {
 
 	public function error() {}
 
-	public function value($value, array $schema = array()) {
+	public function value($value, array $schema = []) {
 		if (($result = parent::value($value, $schema)) !== null) {
 			return $result;
 		}
@@ -116,14 +117,14 @@ class MockDatabase extends \lithium\data\source\Database {
 		if (!$feature) {
 			return true;
 		}
-		$features = array(
+		$features = [
 			'arrays' => false,
 			'transactions' => true,
 			'booleans' => true,
 			'schema' => true,
 			'relationships' => true,
 			'sources' => true
-		);
+		];
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
 }

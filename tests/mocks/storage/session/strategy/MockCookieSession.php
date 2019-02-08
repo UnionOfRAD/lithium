@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\storage\session\strategy;
@@ -12,22 +13,22 @@ class MockCookieSession extends \lithium\core\Object {
 
 	protected static $_secret = 'foobar';
 
-	protected static $_data = array('one' => 'foo', 'two' => 'bar');
+	protected static $_data = ['one' => 'foo', 'two' => 'bar'];
 
-	public static function read($key = null, array $options = array()) {
+	public static function read($key = null, array $options = []) {
 		if (isset(static::$_data[$key])) {
 			return static::$_data[$key];
 		}
 		return static::$_data;
 	}
 
-	public static function write($key, $value = null, array $options = array()) {
+	public static function write($key, $value = null, array $options = []) {
 		static::$_data[$key] = $value;
 		return $value;
 	}
 
 	public static function reset() {
-		return static::$_data = array('one' => 'foo', 'two' => 'bar');
+		return static::$_data = ['one' => 'foo', 'two' => 'bar'];
 	}
 
 	/**

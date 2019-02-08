@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\integration\data;
@@ -18,9 +19,9 @@ class Base extends \lithium\test\Integration {
 
 	protected $_dbConfig = null;
 
-	public function connect($connection, $options = array()) {
-		$options += array('autoConnect' => true);
-		$this->_dbConfig = Connections::get($connection, array('config' => true));
+	public function connect($connection, $options = []) {
+		$options += ['autoConnect' => true];
+		$this->_dbConfig = Connections::get($connection, ['config' => true]);
 		$db = $this->_db = Connections::get($connection);
 
 		$this->skipIf(!$db, "The `{$connection}` connection is not correctly configured.");

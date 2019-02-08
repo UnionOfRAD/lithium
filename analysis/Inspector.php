@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\analysis;
@@ -12,8 +13,10 @@ use Exception;
 use ReflectionClass;
 use ReflectionProperty;
 use ReflectionException;
+use InvalidArgumentException;
 use SplFileObject;
 use lithium\core\Libraries;
+use lithium\analysis\Docblock;
 
 /**
  * General source code inspector.
@@ -29,16 +32,16 @@ class Inspector {
 	 *
 	 * @var array
 	 */
-	protected static $_classes = array(
+	protected static $_classes = [
 		'collection' => 'lithium\util\Collection'
-	);
+	];
 
 	/**
 	 * Maps reflect method names to result array keys.
 	 *
 	 * @var array
 	 */
-	protected static $_methodMap = array(
+	protected static $_methodMap = [
 		'name'      => 'getName',
 		'start'     => 'getStartLine',
 		'end'       => 'getEndLine',
@@ -46,7 +49,7 @@ class Inspector {
 		'comment'   => 'getDocComment',
 		'namespace' => 'getNamespaceName',
 		'shortName' => 'getShortName'
-	);
+	];
 
 	/**
 	 * Determines if a given method can be called on an object/class.
@@ -60,7 +63,7 @@ class Inspector {
 	 */
 	public static function isCallable($object, $method, $internal = false) {
 		$methodExists = method_exists($object, $method);
-		return $internal ? $methodExists : $methodExists && is_callable(array($object, $method));
+		return $internal ? $methodExists : $methodExists && is_callable([$object, $method]);
 	}
 
 	/**
@@ -97,10 +100,10 @@ class Inspector {
 	 *        Inspector.
 	 * @return array An array of the parsed meta-data information of the given identifier.
 	 */
-	public static function info($identifier, $info = array()) {
+	public static function info($identifier, $info = []) {
 		$info = $info ?: array_keys(static::$_methodMap);
 		$type = static::type($identifier);
-		$result = array();
+		$result = [];
 		$class = null;
 
 		if ($type === 'method' || $type === 'property') {
@@ -140,7 +143,7 @@ class Inspector {
 			if (method_exists($inspector, static::$_methodMap[$key])) {
 				$setAccess = (
 					($type === 'method' || $type === 'property') &&
-					array_intersect($result['modifiers'], array('private', 'protected')) !== array() &&
+					array_intersect($result['modifiers'], ['private', 'protected']) !== [] &&
 					method_exists($inspector, 'setAccessible')
 				);
 
@@ -189,15 +192,15 @@ class Inspector {
 	 *          statements, so they are filtered out as well.
 	 * @return array Returns an array of the executable line numbers of the class.
 	 */
-	public static function executable($class, array $options = array()) {
-		$defaults = array(
+	public static function executable($class, array $options = []) {
+		$defaults = [
 			'self' => true,
 			'filter' => true,
-			'methods' => array(),
-			'empty' => array(' ', "\t", '}', ')', ';'),
+			'methods' => [],
+			'empty' => [' ', "\t", '}', ')', ';'],
 			'pattern' => null,
-			'blockOpeners' => array('switch (', 'try {', '} else {', 'do {', '} while')
-		);
+			'blockOpeners' => ['switch (', 'try {', '} else {', 'do {', '} while']
+		];
 		$options += $defaults;
 
 		if (empty($options['pattern']) && $options['filter']) {
@@ -205,19 +208,19 @@ class Inspector {
 				function($str) { return preg_quote($str, '/'); },
 				$options['blockOpeners']
 			)));
-			$pattern = join('|', array(
+			$pattern = join('|', [
 				"({$pattern})",
 				"\\$(.+)\($",
 				"\s*['\"]\w+['\"]\s*=>\s*.+[\{\(]$",
 				"\s*['\"]\w+['\"]\s*=>\s*['\"]*.+['\"]*\s*"
-			));
+			]);
 			$options['pattern'] = "/^({$pattern})/";
 		}
 
 		if (!$class instanceof ReflectionClass) {
 			$class = new ReflectionClass(is_object($class) ? get_class($class) : $class);
 		}
-		$options += array('group' => false);
+		$options += ['group' => false];
 		$result = array_filter(static::methods($class, 'ranges', $options));
 
 		if ($options['filter'] && $class->getFileName() && $result) {
@@ -226,11 +229,11 @@ class Inspector {
 
 			$code = implode("\n", $lines);
 			$tokens = token_get_all('<' . '?php' . $code);
-			$tmp = array();
+			$tmp = [];
 
 			foreach ($tokens as $token) {
 				if (is_array($token)) {
-					if (!in_array($token[0], array(T_COMMENT, T_DOC_COMMENT, T_WHITESPACE))) {
+					if (!in_array($token[0], [T_COMMENT, T_DOC_COMMENT, T_WHITESPACE])) {
 						$tmp[] = $token[2];
 					}
 				}
@@ -255,7 +258,8 @@ class Inspector {
 	/**
 	 * Returns various information on the methods of an object, in different formats.
 	 *
-	 * @param mixed $class A string class name or an object instance, from which to get methods.
+	 * @param string|object $class A string class name for purely static classes or an object
+	 *        instance, from which to get methods.
 	 * @param string $format The type and format of data to return. Available options are:
 	 *        - `null`: Returns a `Collection` object containing a `ReflectionMethod` instance
 	 *         for each method.
@@ -275,8 +279,8 @@ class Inspector {
 	 *        - `lithium\util\Collection` if $format is `null`
 	 *        - `array` if $format is either `'extends'` or `'ranges'`.
 	 */
-	public static function methods($class, $format = null, array $options = array()) {
-		$defaults = array('methods' => array(), 'group' => true, 'self' => true);
+	public static function methods($class, $format = null, array $options = []) {
+		$defaults = ['methods' => [], 'group' => true, 'self' => true];
 		$options += $defaults;
 
 		if (!(is_object($class) && $class instanceof ReflectionClass)) {
@@ -286,19 +290,19 @@ class Inspector {
 				return null;
 			}
 		}
-		$options += array('names' => $options['methods']);
+		$options += ['names' => $options['methods']];
 		$methods = static::_items($class, 'getMethods', $options);
-		$result = array();
+		$result = [];
 
 		switch ($format) {
 			case null:
 				return $methods;
 			case 'extents':
-				if ($methods->getName() === array()) {
-					return array();
+				if ($methods->getName() === []) {
+					return [];
 				}
 
-				$extents = function($start, $end) { return array($start, $end); };
+				$extents = function($start, $end) { return [$start, $end]; };
 				$result = array_combine($methods->getName(), array_map(
 					$extents, $methods->getStartLine(), $methods->getEndLine()
 				));
@@ -306,10 +310,10 @@ class Inspector {
 			case 'ranges':
 				$ranges = function($lines) {
 					list($start, $end) = $lines;
-					return ($end <= $start + 1) ? array() : range($start + 1, $end - 1);
+					return ($end <= $start + 1) ? [] : range($start + 1, $end - 1);
 				};
 				$result = array_map($ranges, static::methods(
-					$class, 'extents', array('group' => true) + $options
+					$class, 'extents', ['group' => true] + $options
 				));
 			break;
 		}
@@ -318,7 +322,7 @@ class Inspector {
 			return $result;
 		}
 		$tmp = $result;
-		$result = array();
+		$result = [];
 
 		array_map(function($ln) use (&$result) { $result = array_merge($result, $ln); }, $tmp);
 		return $result;
@@ -327,7 +331,8 @@ class Inspector {
 	/**
 	 * Returns various information on the properties of an object.
 	 *
-	 * @param mixed $class A string class name or an object instance, from which to get methods.
+	 * @param string|object $class A string class name for purely static classes or an object
+	 *        instance, from which to get properties.
 	 * @param array $options Set of options applied directly (check `_items()` for more options):
 	 *        - `'properties'`: array of properties to gather information from.
 	 *        - `'self'`: If true (default), only returns properties defined in `$class`,
@@ -335,38 +340,43 @@ class Inspector {
 	 * @return mixed Returns an array with information about the properties from the class given in
 	 *               $class or null on error.
 	 */
-	public static function properties($class, array $options = array()) {
-		$defaults = array('properties' => array(), 'self' => true);
+	public static function properties($class, array $options = []) {
+		$defaults = ['properties' => [], 'self' => true];
 		$options += $defaults;
 
-		if (!(is_object($class) && $class instanceof ReflectionClass)) {
-			try {
-				$class = new ReflectionClass($class);
-			} catch (ReflectionException $e) {
-				return null;
-			}
+		try {
+			$reflClass = new ReflectionClass($class);
+		} catch (ReflectionException $e) {
+			return null;
 		}
-		$options += array('names' => $options['properties']);
+		$options += ['names' => $options['properties']];
 
-		return static::_items($class, 'getProperties', $options)->map(function($item) {
-			$class = __CLASS__;
-			$modifiers = array_values($class::invokeMethod('_modifiers', array($item)));
+		return static::_items($reflClass, 'getProperties', $options)->map(function($item) use ($class) {
+			$modifiers = array_values(Inspector::invokeMethod('_modifiers', [$item]));
 			$setAccess = (
-				array_intersect($modifiers, array('private', 'protected')) !== array()
+				array_intersect($modifiers, ['private', 'protected']) !== []
 			);
 			if ($setAccess) {
 				$item->setAccessible(true);
 			}
-			$result = compact('modifiers') + array(
+			if (is_string($class)) {
+				if (!$item->isStatic()) {
+					$message = 'Must provide an object instance for non-static properties.';
+					throw new InvalidArgumentException($message);
+				}
+				$value = $item->getValue($item->getDeclaringClass());
+			} else {
+				$value = $item->getValue($class);
+			}
+			$result = compact('modifiers', 'value') + [
 				'docComment' => $item->getDocComment(),
-				'name' => $item->getName(),
-				'value' => $item->getValue($item->getDeclaringClass())
-			);
+				'name' => $item->getName()
+			];
 			if ($setAccess) {
 				$item->setAccessible(false);
 			}
 			return $result;
-		}, array('collect' => false));
+		}, ['collect' => false]);
 	}
 
 	/**
@@ -385,7 +395,7 @@ class Inspector {
 	 * @todo Add an $options parameter with a 'context' flag, to pull in n lines of context.
 	 */
 	public static function lines($data, $lines) {
-		$c = array();
+		$c = [];
 
 		if (strpos($data, PHP_EOL) !== false) {
 			$c = explode(PHP_EOL, PHP_EOL . $data);
@@ -420,8 +430,8 @@ class Inspector {
 	 *         or `false` on error.
 	 * @link http://php.net/function.class-parents.php PHP Manual: `class_parents()`.
 	 */
-	public static function parents($class, array $options = array()) {
-		$defaults = array('autoLoad' => false);
+	public static function parents($class, array $options = []) {
+		$defaults = ['autoLoad' => false];
 		$options += $defaults;
 		$class = is_object($class) ? get_class($class) : $class;
 
@@ -441,22 +451,22 @@ class Inspector {
 	 *         - `'file': Valid file path for inspecting the containing classes.
 	 * @return array Associative of classes and their corresponding definition files
 	 */
-	public static function classes(array $options = array()) {
-		$defaults = array('group' => 'classes', 'file' => null);
+	public static function classes(array $options = []) {
+		$defaults = ['group' => 'classes', 'file' => null];
 		$options += $defaults;
 
 		$list = get_declared_classes();
 		$files = get_included_files();
-		$classes = array();
+		$classes = [];
 
 		if ($file = $options['file']) {
-			$loaded = static::_instance('collection', array('data' => array_map(
+			$loaded = static::_instance('collection', ['data' => array_map(
 				function($class) { return new ReflectionClass($class); }, $list
-			)));
+			)]);
 			$classFiles = $loaded->getFileName();
 
 			if (in_array($file, $files) && !in_array($file, $classFiles)) {
-				return array();
+				return [];
 			}
 			if (!in_array($file, $classFiles)) {
 				include $file;
@@ -465,7 +475,7 @@ class Inspector {
 				$filter = function($class) use ($file) { return $class->getFileName() === $file; };
 				$list = $loaded->find($filter)->map(function ($class) {
 					return $class->getName() ?: $class->name;
-				}, array('collect' => false));
+				}, ['collect' => false]);
 			}
 		}
 
@@ -493,10 +503,10 @@ class Inspector {
 	 * @return array An array of the static and dynamic class dependencies or each if `type` is
 	 *         defined in $options.
 	 */
-	public static function dependencies($classes, array $options = array()) {
-		$defaults = array('type' => null);
+	public static function dependencies($classes, array $options = []) {
+		$defaults = ['type' => null];
 		$options += $defaults;
-		$static = $dynamic = array();
+		$static = $dynamic = [];
 		$trim = function($c) { return trim(trim($c, '\\')); };
 		$join = function($i) { return join('', $i); };
 
@@ -504,17 +514,17 @@ class Inspector {
 			$data = explode("\n", file_get_contents(Libraries::path($class)));
 			$data = "<?php \n" . join("\n", preg_grep('/^\s*use /', $data)) . "\n ?>";
 
-			$classes = array_map($join, Parser::find($data, 'use *;', array(
+			$classes = array_map($join, Parser::find($data, 'use *;', [
 				'return'      => 'content',
 				'lineBreaks'  => true,
 				'startOfLine' => true,
-				'capture'     => array('T_STRING', 'T_NS_SEPARATOR')
-			)));
+				'capture'     => ['T_STRING', 'T_NS_SEPARATOR']
+			]));
 
 			if ($classes) {
 				$static = array_unique(array_merge($static, array_map($trim, $classes)));
 			}
-			$classes = static::info($class . '::$_classes', array('value'));
+			$classes = static::info($class . '::$_classes', ['value']);
 
 			if (isset($classes['value'])) {
 				$dynamic = array_merge($dynamic, array_map($trim, array_values($classes['value'])));
@@ -562,14 +572,14 @@ class Inspector {
 	 *         through the filters specified in `$options`.
 	 */
 	protected static function _items($class, $method, $options) {
-		$defaults = array('names' => array(), 'self' => true, 'public' => true);
+		$defaults = ['names' => [], 'self' => true, 'public' => true];
 		$options += $defaults;
 
-		$params = array(
+		$params = [
 			'getProperties' => ReflectionProperty::IS_PUBLIC | (
 				$options['public'] ? 0 : ReflectionProperty::IS_PROTECTED
 			)
-		);
+		];
 		$data = isset($params[$method]) ? $class->{$method}($params[$method]) : $class->{$method}();
 
 		if (!empty($options['names'])) {
@@ -597,8 +607,8 @@ class Inspector {
 	 * @param array|string $list List of modifiers to test.
 	 * @return boolean Test result.
 	 */
-	protected static function _modifiers($inspector, $list = array()) {
-		$list = $list ?: array('public', 'private', 'protected', 'abstract', 'final', 'static');
+	protected static function _modifiers($inspector, $list = []) {
+		$list = $list ?: ['public', 'private', 'protected', 'abstract', 'final', 'static'];
 		return array_filter($list, function($modifier) use ($inspector) {
 			$method = 'is' . ucfirst($modifier);
 			return (method_exists($inspector, $method) && $inspector->{$method}());
@@ -615,7 +625,7 @@ class Inspector {
 	 * @see  lithium\core\Libraries::instance()
 	 * @return object An object instance of the given value in `$name`.
 	 */
-	protected static function _instance($name, array $options = array()) {
+	protected static function _instance($name, array $options = []) {
 		if (is_string($name) && isset(static::$_classes[$name])) {
 			$name = static::$_classes[$name];
 		}
@@ -630,8 +640,8 @@ class Inspector {
 	 * @param array $params Parameter list to use when calling `$method`.
 	 * @return mixed Returns the result of the method call.
 	 */
-	public static function invokeMethod($method, $params = array()) {
-		return forward_static_call_array(array(get_called_class(), $method), $params);
+	public static function invokeMethod($method, $params = []) {
+		return forward_static_call_array([get_called_class(), $method], $params);
 	}
 
 }

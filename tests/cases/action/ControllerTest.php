@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\action;
@@ -32,30 +33,30 @@ class ControllerTest extends \lithium\test\Unit {
 	 */
 	public function testMethodInvocation() {
 		$postsController = new MockPostsController();
-		$result = $postsController->__invoke(null, array('action' => 'index', 'args' => array()));
+		$result = $postsController->__invoke(null, ['action' => 'index', 'args' => []]);
 
 		$this->assertInstanceOf('lithium\action\Response', $result);
 		$this->assertEqual('List of posts', $result->body());
-		$this->assertEqual(array('Content-Type' => 'text/plain; charset=UTF-8'), $result->headers);
+		$this->assertEqual(['Content-Type' => 'text/plain; charset=UTF-8'], $result->headers);
 
-		$result2 = $postsController(null, array('action' => 'index', 'args' => array()));
+		$result2 = $postsController(null, ['action' => 'index', 'args' => []]);
 		$this->assertEqual($result2, $result);
 
 		$postsController = new MockPostsController();
 		$this->assertException('/Unhandled media type/', function() use ($postsController) {
-			$postsController(null, array('action' => 'index', 'args' => array(true)));
+			$postsController(null, ['action' => 'index', 'args' => [true]]);
 		});
 
 		$result = $postsController->access('_render');
-		$this->assertEqual($result['data'], array('foo' => 'bar'));
+		$this->assertEqual($result['data'], ['foo' => 'bar']);
 
 		$postsController = new MockPostsController();
 		$this->assertException('/Unhandled media type/', function() use ($postsController) {
-			$postsController(null, array('action' => 'view', 'args' => array('2')));
+			$postsController(null, ['action' => 'view', 'args' => ['2']]);
 		});
 
 		$result = $postsController->access('_render');
-		$this->assertEqual($result['data'], array('This is a post'));
+		$this->assertEqual($result['data'], ['This is a post']);
 	}
 
 	/**
@@ -65,24 +66,24 @@ class ControllerTest extends \lithium\test\Unit {
 	public function testRedirectResponse() {
 		$postsController = new MockPostsController();
 
-		$result = $postsController(null, array('action' => 'delete'));
+		$result = $postsController(null, ['action' => 'delete']);
 		$this->assertEqual($result->body(), '');
 
-		$headers = array('Location' => '/posts', 'Content-Type' => 'text/html');
+		$headers = ['Location' => '/posts', 'Content-Type' => 'text/html'];
 		$this->assertEqual($result->headers, $headers);
 
 		$postsController = new MockPostsController();
-		$result = $postsController(null, array('action' => 'delete', 'args' => array('5')));
+		$result = $postsController(null, ['action' => 'delete', 'args' => ['5']]);
 
 		$this->assertEqual($result->body(), 'Deleted 5');
 		$this->assertFalse($postsController->stopped);
 
-		$postsController = new MockPostsController(array('classes' => array(
+		$postsController = new MockPostsController(['classes' => [
 			'response' => 'lithium\tests\mocks\action\MockControllerResponse'
-		)));
+		]]);
 		$this->assertFalse($postsController->stopped);
 
-		$postsController->__invoke(null, array('action' => 'send'));
+		$postsController->__invoke(null, ['action' => 'send']);
 		$this->assertTrue($postsController->stopped);
 
 		$result = $postsController->access('_render');
@@ -91,7 +92,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual($postsController->response->body(), null);
 		$this->assertEqual(
 			$postsController->response->headers,
-			array('Location' => '/posts', 'Content-Type' => 'text/html')
+			['Location' => '/posts', 'Content-Type' => 'text/html']
 		);
 	}
 
@@ -100,15 +101,15 @@ class ControllerTest extends \lithium\test\Unit {
 	 * the default.
 	 */
 	public function testRenderWithAlternateTemplate() {
-		$postsController = new MockPostsController(array('classes' => array(
+		$postsController = new MockPostsController(['classes' => [
 			'media' => 'lithium\tests\mocks\action\MockMediaClass'
-		)));
+		]]);
 
-		$result = $postsController(null, array('action' => 'view2'));
+		$result = $postsController(null, ['action' => 'view2']);
 		$this->assertEqual('view', $result->options['template']);
 		$this->assertEqual('default', $result->options['layout']);
 
-		$result = $postsController(null, array('action' => 'view3'));
+		$result = $postsController(null, ['action' => 'view3']);
 		$this->assertEqual('view', $result->options['template']);
 		$this->assertFalse($result->options['layout']);
 	}
@@ -121,9 +122,9 @@ class ControllerTest extends \lithium\test\Unit {
 		$request = new Request();
 		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
 
-		$controller = new MockPostsController(compact('request') + array('classes' => array(
+		$controller = new MockPostsController(compact('request') + ['classes' => [
 			'media' => 'lithium\tests\mocks\action\MockMediaClass'
-		)));
+		]]);
 
 		$controller->render();
 		$this->assertEqual('mock_posts', $controller->response->options['controller']);
@@ -136,17 +137,17 @@ class ControllerTest extends \lithium\test\Unit {
 		$request = new Request();
 		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
 
-		$controller = new MockPostsController(compact('request') + array('classes' => array(
+		$controller = new MockPostsController(compact('request') + ['classes' => [
 			'media' => 'lithium\tests\mocks\action\MockMediaClass'
-		)));
+		]]);
 
-		$controller->set(array('set' => 'data'));
-		$controller->render(array('data' => array('render' => 'data')));
+		$controller->set(['set' => 'data']);
+		$controller->render(['data' => ['render' => 'data']]);
 
-		$expected = array(
+		$expected = [
 			'set' => 'data',
 			'render' => 'data'
-		);
+		];
 		$this->assertEqual($expected, $controller->response->data);
 	}
 
@@ -158,12 +159,12 @@ class ControllerTest extends \lithium\test\Unit {
 		$request = new Request();
 		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
 
-		$controller = new MockPostsController(compact('request') + array('classes' => array(
+		$controller = new MockPostsController(compact('request') + ['classes' => [
 			'media' => 'lithium\tests\mocks\action\MockMediaClass'
-		)));
+		]]);
 
-		$expected = array(array('id' => 1));
-		$controller->render(array('data' => $expected));
+		$expected = [['id' => 1]];
+		$controller->render(['data' => $expected]);
 
 		$this->assertEqual($expected, $controller->response->data);
 	}
@@ -175,27 +176,27 @@ class ControllerTest extends \lithium\test\Unit {
 	public function testProtectedMethodAccessAttempt() {
 		$postsController = new MockPostsController();
 		$this->assertException('/^Attempted to invoke a private method/', function() use ($postsController) {
-			$postsController->__invoke(null, array('action' => 'redirect'));
+			$postsController->__invoke(null, ['action' => 'redirect']);
 		});
 
 		$postsController = new MockPostsController();
 		$this->assertException('/^Attempted to invoke a private method/', function() use ($postsController) {
-			$postsController->__invoke(null, array('action' => '_safe'));
+			$postsController->__invoke(null, ['action' => '_safe']);
 		});
 	}
 
 	public function testResponseStatus() {
-		$postsController = new MockPostsController(array('classes' => array(
+		$postsController = new MockPostsController(['classes' => [
 			'response' => 'lithium\tests\mocks\action\MockControllerResponse'
-		)));
+		]]);
 		$this->assertFalse($postsController->stopped);
 
-		$postsController(null, array('action' => 'notFound'));
+		$postsController(null, ['action' => 'notFound']);
 
 		$result = $postsController->access('_render');
 		$this->assertTrue($result['hasRendered']);
 
-		$expected = array('code' => 404, 'message' => 'Not Found');
+		$expected = ['code' => 404, 'message' => 'Not Found'];
 		$result = $postsController->response->status;
 		$this->assertEqual($expected, $result);
 		$result = $postsController->response->body();
@@ -206,20 +207,20 @@ class ControllerTest extends \lithium\test\Unit {
 		$request = new MockControllerRequest();
 		$request->params['type'] = 'json';
 
-		$postsController = new MockPostsController(array(
+		$postsController = new MockPostsController([
 			'request' => $request,
-			'classes' => array(
+			'classes' => [
 				'response' => 'lithium\tests\mocks\action\MockControllerResponse'
-			)
-		));
+			]
+		]);
 		$this->assertFalse($postsController->stopped);
 
-		$postsController($request, array('action' => 'type'));
+		$postsController($request, ['action' => 'type']);
 
-		$expected = array(
-			'type' => 'json', 'data' => array('data' => 'test'), 'auto' => true,
+		$expected = [
+			'type' => 'json', 'data' => ['data' => 'test'], 'auto' => true,
 			'layout' => 'default', 'template' => 'type', 'hasRendered' => true, 'negotiate' => false
-		);
+		];
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
 
@@ -227,34 +228,34 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual('application/json; charset=UTF-8', $result);
 
 		$result = $postsController->response->body();
-		$this->assertEqual(array('data' => 'test'), $result);
+		$this->assertEqual(['data' => 'test'], $result);
 	}
 
 	public function testResponseTypeBasedOnRequestParamsType() {
 		$request = new MockControllerRequest();
 		$request->params['type'] = 'json';
 
-		$postsController = new MockPostsController(array(
+		$postsController = new MockPostsController([
 			'request' => $request,
-			'classes' => array(
+			'classes' => [
 				'response' => 'lithium\tests\mocks\action\MockControllerResponse'
-			)
-		));
+			]
+		]);
 		$this->assertFalse($postsController->stopped);
 
-		$postsController->__invoke($request, array('action' => 'type'));
+		$postsController->__invoke($request, ['action' => 'type']);
 
-		$expected = array(
-			'type' => 'json', 'data' => array('data' => 'test'), 'auto' => true,
+		$expected = [
+			'type' => 'json', 'data' => ['data' => 'test'], 'auto' => true,
 			'layout' => 'default', 'template' => 'type', 'hasRendered' => true, 'negotiate' => false
-		);
+		];
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
 
 		$result = $postsController->response->headers('Content-Type');
 		$this->assertEqual('application/json; charset=UTF-8', $result);
 
-		$expected = array('data' => 'test');
+		$expected = ['data' => 'test'];
 		$result = $postsController->response->body();
 		$this->assertEqual($expected, $result);
 	}
@@ -264,10 +265,10 @@ class ControllerTest extends \lithium\test\Unit {
 	 * overwritten.
 	 */
 	public function testManuallySettingTemplate() {
-		$postsController = new MockPostsController(array('classes' => array(
+		$postsController = new MockPostsController(['classes' => [
 			'media' => 'lithium\tests\mocks\action\MockMediaClass'
-		)));
-		$postsController(new Request(), array('action' => 'changeTemplate'));
+		]]);
+		$postsController(new Request(), ['action' => 'changeTemplate']);
 		$result = $postsController->access('_render');
 		$this->assertEqual('foo', $result['template']);
 	}
@@ -275,10 +276,10 @@ class ControllerTest extends \lithium\test\Unit {
 	public function testRenderPropertyInheritance() {
 		$controller = new MockRenderAltController();
 
-		$expected = array(
-			'data' => array('foo' => 'bar'), 'layout' => 'alternate', 'type' => null,
+		$expected = [
+			'data' => ['foo' => 'bar'], 'layout' => 'alternate', 'type' => null,
 			'auto' => true, 'template' => null, 'hasRendered' => false, 'negotiate' => false
-		);
+		];
 		$result = $controller->access('_render');
 		$this->assertEqual($expected, $result);
 	}
@@ -286,14 +287,14 @@ class ControllerTest extends \lithium\test\Unit {
 	public function testSetData() {
 		$postController = new MockPostsController();
 
-		$setData = array('foo' => 'bar');
+		$setData = ['foo' => 'bar'];
 		$postController->set($setData);
 		$_render = $postController->access('_render');
 		$data = $_render['data'];
 		$expected = $setData;
 		$this->assertEqual($expected, $data);
 
-		$setData = array('foo' => 'baz');
+		$setData = ['foo' => 'baz'];
 		$postController->set($setData);
 		$_render = $postController->access('_render');
 		$data = $_render['data'];
@@ -302,23 +303,23 @@ class ControllerTest extends \lithium\test\Unit {
 	}
 
 	public function testResponseTypeBasedOnRequestHeaderType() {
-		$request = new MockControllerRequest(array(
-			'env' => array('HTTP_ACCEPT' => 'application/json,*/*')
-		));
+		$request = new MockControllerRequest([
+			'env' => ['HTTP_ACCEPT' => 'application/json,*/*']
+		]);
 
-		$postsController = new MockPostsController(array(
+		$postsController = new MockPostsController([
 			'request' => $request,
-			'classes' => array('response' => 'lithium\tests\mocks\action\MockControllerResponse'),
-			'render' => array('negotiate' => true)
-		));
+			'classes' => ['response' => 'lithium\tests\mocks\action\MockControllerResponse'],
+			'render' => ['negotiate' => true]
+		]);
 		$this->assertFalse($postsController->stopped);
 
-		$postsController($request, array('action' => 'type'));
+		$postsController($request, ['action' => 'type']);
 
-		$expected = array(
-			'type' => 'json', 'data' => array('data' => 'test'), 'auto' => true,
+		$expected = [
+			'type' => 'json', 'data' => ['data' => 'test'], 'auto' => true,
 			'layout' => 'default', 'template' => 'type', 'hasRendered' => true, 'negotiate' => true
-		);
+		];
 		$result = $postsController->access('_render');
 		$this->assertEqual($expected, $result);
 
@@ -326,7 +327,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$this->assertEqual('application/json; charset=UTF-8', $result);
 
 		$result = $postsController->response->body();
-		$this->assertEqual(array('data' => 'test'), $result);
+		$this->assertEqual(['data' => 'test'], $result);
 	}
 
 	/**
@@ -334,11 +335,11 @@ class ControllerTest extends \lithium\test\Unit {
 	 * a fully-qualified class name are able to locate their templates correctly.
 	 */
 	public function testDispatchingWithExplicitControllerName() {
-		$request = new Request(array('url' => '/'));
-		$request->params = array(
+		$request = new Request(['url' => '/']);
+		$request->params = [
 			'controller' => 'lithium\tests\mocks\action\MockPostsController',
 			'action' => 'index'
-		);
+		];
 
 		$postsController = new MockPostsController(compact('request'));
 		$postsController->__invoke($request, $request->params);
@@ -348,7 +349,7 @@ class ControllerTest extends \lithium\test\Unit {
 		$postsController = new MockPostsController();
 
 		$this->assertException("Action `foo` not found.", function() use ($postsController) {
-			$postsController(new Request(), array('action' => 'foo'));
+			$postsController(new Request(), ['action' => 'foo']);
 		});
 	}
 
@@ -360,9 +361,9 @@ class ControllerTest extends \lithium\test\Unit {
 		$request = new Request();
 		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
 
-		$controller = new MockPostsController(compact('request') + array('classes' => array(
+		$controller = new MockPostsController(compact('request') + ['classes' => [
 			'media' => 'lithium\tests\mocks\action\MockMediaClass'
-		)));
+		]]);
 
 		$controller->render();
 		$this->assertEqual('lithium', $controller->response->options['library']);

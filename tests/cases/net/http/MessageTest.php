@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\net\http;
@@ -20,7 +21,7 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testHeaderKey() {
 		$this->message->headers('Host: localhost:80');
-		$expected = array('Host: localhost:80');
+		$expected = ['Host: localhost:80'];
 		$result = $this->message->headers();
 		$this->assertEqual($expected, $result);
 
@@ -36,38 +37,38 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testHeaderKeyValue() {
 		$this->message->headers('Connection', 'Close');
-		$expected = array('Connection: Close');
+		$expected = ['Connection: Close'];
 		$result = $this->message->headers();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testHeaderArrayValue() {
-		$this->message->headers(array('User-Agent: Mozilla/5.0'));
-		$expected = array('User-Agent: Mozilla/5.0');
+		$this->message->headers(['User-Agent: Mozilla/5.0']);
+		$expected = ['User-Agent: Mozilla/5.0'];
 		$result = $this->message->headers();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testHeaderArrayKeyValue() {
-		$this->message->headers(array('Cache-Control' => 'no-cache'));
-		$expected = array('Cache-Control: no-cache');
+		$this->message->headers(['Cache-Control' => 'no-cache']);
+		$expected = ['Cache-Control: no-cache'];
 		$result = $this->message->headers();
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMultiValueHeader() {
-		$this->message->headers(array(
-			'Cache-Control' => array(
+		$this->message->headers([
+			'Cache-Control' => [
 				'no-store, no-cache, must-revalidate',
 				'post-check=0, pre-check=0',
 				'max-age=0'
-			)
-		));
-		$expected = array(
+			]
+		]);
+		$expected = [
 			'Cache-Control: no-store, no-cache, must-revalidate',
 			'Cache-Control: post-check=0, pre-check=0',
 			'Cache-Control: max-age=0'
-		);
+		];
 		$result = $this->message->headers();
 		$this->assertEqual($expected, $result);
 	}
@@ -83,73 +84,73 @@ class MessageTest extends \lithium\test\Unit {
 
 	public function testReturnJsonIfNoBufferAndEmptyBody() {
 		$this->message->type("json");
-		$result = $this->message->body("", array('encode' => true));
+		$result = $this->message->body("", ['encode' => true]);
 		$this->assertIdentical('[""]', $result);
 	}
 
 	public function testReturnMergedJsonWithEmptyBody() {
 		$this->message->type("json");
-		$result = $this->message->body("", array('encode' => true));
+		$result = $this->message->body("", ['encode' => true]);
 		$this->assertIdentical('[""]', $result);
 
-		$result = $this->message->body("", array('encode' => true));
+		$result = $this->message->body("", ['encode' => true]);
 		$this->assertIdentical('["",""]', $result);
 	}
 
 	public function testReturnMergedJson() {
 		$this->message->type("json");
-		$result = $this->message->body(array("myvar1" => "val1"), array('encode' => true));
+		$result = $this->message->body(["myvar1" => "val1"], ['encode' => true]);
 		$this->assertIdentical('{"myvar1":"val1"}', $result);
 
-		$result = $this->message->body(array("myvar2" => "val2"), array('encode' => true));
+		$result = $this->message->body(["myvar2" => "val2"], ['encode' => true]);
 		$this->assertIdentical('{"myvar1":"val1","myvar2":"val2"}', $result);
 	}
 
 	public function testReturnJsonIfNoBufferAndArrayBody() {
 		$this->message->type("json");
-		$result = $this->message->body(array(""), array('encode' => true));
+		$result = $this->message->body([""], ['encode' => true]);
 		$this->assertIdentical('[""]', $result);
 	}
 
 	public function testReturnProperlyWithEmptyValues() {
 		$this->message->type("json");
 
-		$result = $this->message->body(array(
+		$result = $this->message->body([
 			'active' => '0'
-		), array('encode' => true));
+		], ['encode' => true]);
 		$this->assertIdentical('{"active":"0"}', $result);
 
 		$this->message = new Message();
 		$this->message->type("json");
 
-		$result = $this->message->body(array(
+		$result = $this->message->body([
 			'myvar' => ''
-		), array('encode' => true));
+		], ['encode' => true]);
 		$this->assertIdentical('{"myvar":""}', $result);
 	}
 
 	public function testEmptyEncodeInJson() {
 		$this->message->type("json");
-		$result = $this->message->body(null, array('encode' => true));
+		$result = $this->message->body(null, ['encode' => true]);
 		$this->assertIdentical("", $result);
 	}
 
 	public function testEmptyArrayEncodeInJson() {
 		$this->message->type("json");
-		$result = $this->message->body(array(), array('encode' => true));
+		$result = $this->message->body([], ['encode' => true]);
 		$this->assertIdentical("[]", $result);
 	}
 
 	public function testEmptyJsonDecode() {
 		$this->message->type("json");
-		$result = $this->message->body("{}", array('decode' => true));
-		$this->assertIdentical(array(), $result);
+		$result = $this->message->body("{}", ['decode' => true]);
+		$this->assertIdentical([], $result);
 	}
 
 	public function testEmptyJsonArrayDecode() {
 		$this->message->type("json");
-		$result = $this->message->body("[]", array('decode' => true));
-		$this->assertIdentical(array(), $result);
+		$result = $this->message->body("[]", ['decode' => true]);
+		$this->assertIdentical([], $result);
 	}
 }
 

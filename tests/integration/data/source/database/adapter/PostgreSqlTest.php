@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\integration\data\source\database\adapter;
@@ -16,27 +17,27 @@ use lithium\tests\fixture\model\gallery\Galleries;
 
 class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 
-	protected $_schema = array('fields' => array(
-		'id' => array('type' => 'id'),
-		'name' => array('type' => 'string', 'length' => 255),
-		'active' => array('type' => 'boolean'),
-		'created' => array('type' => 'datetime', 'null' => true),
-		'modified' => array('type' => 'datetime', 'null' => true)
-	));
+	protected $_schema = ['fields' => [
+		'id' => ['type' => 'id'],
+		'name' => ['type' => 'string', 'length' => 255],
+		'active' => ['type' => 'boolean'],
+		'created' => ['type' => 'datetime', 'null' => true],
+		'modified' => ['type' => 'datetime', 'null' => true]
+	]];
 
 	/**
 	 * Skip the test if a PostgreSQL adapter configuration is unavailable.
 	 */
 	public function skip() {
 		parent::connect($this->_connection);
-		$this->skipIf(!$this->with(array('PostgreSql')));
+		$this->skipIf(!$this->with(['PostgreSql']));
 	}
 
 	public function setUp() {
 		$this->_db->dropSchema('galleries');
 		$schema = new Schema($this->_schema);
 		$this->_db->createSchema('galleries', $schema);
-		Galleries::config(array('meta' => array('connection' => $this->_connection)));
+		Galleries::config(['meta' => ['connection' => $this->_connection]]);
 	}
 
 	public function tearDown() {
@@ -45,8 +46,8 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testEnabledFeatures() {
-		$supported = array('booleans', 'schema', 'relationships', 'sources', 'transactions');
-		$notSupported = array('arrays');
+		$supported = ['booleans', 'schema', 'relationships', 'sources', 'transactions'];
+		$notSupported = ['arrays'];
 
 		foreach ($supported as $feature) {
 			$this->assertTrue(PostgreSql::enabled($feature));
@@ -63,14 +64,22 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	 * Tests that the object is initialized with the correct default values.
 	 */
 	public function testConstructorDefaults() {
-		$db = new MockPostgreSql(array('autoConnect' => false));
+		$db = new MockPostgreSql(['autoConnect' => false, 'init' =>  false]);
 		$result = $db->get('_config');
-		$expected = array(
-			'autoConnect' => false, 'encoding' => null,'persistent' => true,
-			'host' => 'localhost:5432', 'login' => 'root', 'password' => '',
-			'database' => null, 'dsn' => null, 'options' => array(),
-			'init' => true, 'schema' => 'public', 'timezone' => null
-		);
+		$expected = [
+			'autoConnect' => false,
+			'encoding' => null,
+			'persistent' => true,
+			'host' => 'localhost:5432',
+			'login' => 'root',
+			'password' => '',
+			'database' => null,
+			'dsn' => null,
+			'options' => [],
+			'init' => false,
+			'schema' => 'public',
+			'timezone' => null
+		];
 		$this->assertEqual($expected, $result);
 	}
 
@@ -79,7 +88,7 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	 * persisted.
 	 */
 	public function testDatabaseConnection() {
-		$db = new PostgreSql(array('autoConnect' => false) + $this->_dbConfig);
+		$db = new PostgreSql(['autoConnect' => false] + $this->_dbConfig);
 
 		$this->assertTrue($db->connect());
 		$this->assertTrue($db->isConnected());
@@ -87,11 +96,11 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 		$this->assertTrue($db->disconnect());
 		$this->assertFalse($db->isConnected());
 
-		$db = new PostgreSql(array(
+		$db = new PostgreSql([
 			'autoConnect' => false, 'encoding' => null,'persistent' => false,
 			'host' => 'localhost:5432', 'login' => 'garbage', 'password' => '',
 			'database' => 'garbage', 'init' => true, 'schema' => 'garbage'
-		) + $this->_dbConfig);
+		] + $this->_dbConfig);
 
 		$this->assertException('/.*/', function() use ($db) {
 			$db->connect();
@@ -104,10 +113,17 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 
 	public function testDatabaseEncoding() {
 		$this->assertTrue($this->_db->isConnected());
+
+		$this->assertTrue($this->_db->encoding('UTF8'));
+		$this->assertEqual('UTF-8', $this->_db->encoding());
+
 		$this->assertTrue($this->_db->encoding('utf8'));
 		$this->assertEqual('UTF-8', $this->_db->encoding());
 
 		$this->assertTrue($this->_db->encoding('UTF-8'));
+		$this->assertEqual('UTF-8', $this->_db->encoding());
+
+		$this->assertTrue($this->_db->encoding('utf-8'));
 		$this->assertEqual('UTF-8', $this->_db->encoding());
 	}
 
@@ -128,16 +144,16 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testValueWithSchema() {
-		$result = $this->_db->value('2013-01-07 13:57:03.621684', array('type' => 'timestamp'));
+		$result = $this->_db->value('2013-01-07 13:57:03.621684', ['type' => 'timestamp']);
 		$this->assertIdentical("'2013-01-07 13:57:03.621684'", $result);
 
-		$result = $this->_db->value('2012-05-25 22:44:00', array('type' => 'timestamp'));
+		$result = $this->_db->value('2012-05-25 22:44:00', ['type' => 'timestamp']);
 		$this->assertIdentical("'2012-05-25 22:44:00'", $result);
 
-		$result = $this->_db->value('2012-00-00', array('type' => 'date'));
+		$result = $this->_db->value('2012-00-00', ['type' => 'date']);
 		$this->assertIdentical("'2011-11-30'", $result);
 
-		$result = $this->_db->value((object) "'2012-00-00'", array('type' => 'date'));
+		$result = $this->_db->value((object) "'2012-00-00'", ['type' => 'date']);
 		$this->assertIdentical("'2012-00-00'", $result);
 	}
 
@@ -148,61 +164,61 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testColumnAbstraction() {
-		$result = $this->_db->invokeMethod('_column', array('varchar'));
-		$this->assertIdentical(array('type' => 'string'), $result);
+		$result = $this->_db->invokeMethod('_column', ['varchar']);
+		$this->assertIdentical(['type' => 'string'], $result);
 
-		$result = $this->_db->invokeMethod('_column', array('tinyint(1)'));
-		$this->assertIdentical(array('type' => 'boolean'), $result);
+		$result = $this->_db->invokeMethod('_column', ['tinyint(1)']);
+		$this->assertIdentical(['type' => 'boolean'], $result);
 
-		$result = $this->_db->invokeMethod('_column', array('varchar(255)'));
-		$this->assertIdentical(array('type' => 'string', 'length' => 255), $result);
+		$result = $this->_db->invokeMethod('_column', ['varchar(255)']);
+		$this->assertIdentical(['type' => 'string', 'length' => 255], $result);
 
-		$result = $this->_db->invokeMethod('_column', array('text'));
-		$this->assertIdentical(array('type' => 'text'), $result);
+		$result = $this->_db->invokeMethod('_column', ['text']);
+		$this->assertIdentical(['type' => 'text'], $result);
 
-		$result = $this->_db->invokeMethod('_column', array('text'));
-		$this->assertIdentical(array('type' => 'text'), $result);
+		$result = $this->_db->invokeMethod('_column', ['text']);
+		$this->assertIdentical(['type' => 'text'], $result);
 
-		$result = $this->_db->invokeMethod('_column', array('decimal(12,2)'));
-		$this->assertIdentical(array('type' => 'float', 'length' => 12, 'precision' => 2), $result);
+		$result = $this->_db->invokeMethod('_column', ['decimal(12,2)']);
+		$this->assertIdentical(['type' => 'float', 'length' => 12, 'precision' => 2], $result);
 
-		$result = $this->_db->invokeMethod('_column', array('int(11)'));
-		$this->assertIdentical(array('type' => 'integer', 'length' => 11), $result);
+		$result = $this->_db->invokeMethod('_column', ['int(11)']);
+		$this->assertIdentical(['type' => 'integer', 'length' => 11], $result);
 	}
 
 	public function testRawSqlQuerying() {
 		$this->assertTrue($this->_db->create(
 			'INSERT INTO galleries (name, active) VALUES (?, ?)',
-			array('Test', "t")
+			['Test', "t"]
 		));
 
-		$result = $this->_db->read('SELECT * FROM galleries AS Company WHERE name = {:name}', array(
+		$result = $this->_db->read('SELECT * FROM galleries AS Company WHERE name = {:name}', [
 			'name' => 'Test',
 			'return' => 'array'
-		));
+		]);
 		$this->assertCount(1, $result);
-		$expected = array('id', 'name', 'active', 'created', 'modified');
+		$expected = ['id', 'name', 'active', 'created', 'modified'];
 		$this->assertEqual($expected, array_keys($result[0]));
 
 		$this->assertInternalType('numeric', $result[0]['id']);
 		unset($result[0]['id']);
 
-		$expected = array(
+		$expected = [
 			'name' => 'Test',
 			'active' => true,
 			'created' => null,
 			'modified' => null
-		);
+		];
 		$this->assertIdentical($expected, $result[0]);
 
-		$this->assertTrue($this->_db->delete('DELETE FROM galleries WHERE name = {:name}', array(
+		$this->assertTrue($this->_db->delete('DELETE FROM galleries WHERE name = {:name}', [
 			'name' => 'Test'
-		)));
+		]));
 
-		$result = $this->_db->read('SELECT * FROM galleries AS Company WHERE name = {:name}', array(
+		$result = $this->_db->read('SELECT * FROM galleries AS Company WHERE name = {:name}', [
 			'name' => 'Test',
 			'return' => 'array'
-		));
+		]);
 		$this->assertEmpty($result);
 	}
 
@@ -221,53 +237,53 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testQueryOrdering() {
-		$insert = new Query(array(
+		$insert = new Query([
 			'type' => 'create',
 			'source' => 'galleries',
-			'data' => array(
+			'data' => [
 				'name' => 'Foo',
 				'active' => true,
 				'created' => date('Y-m-d H:i:s')
-			)
-		));
+			]
+		]);
 		$this->assertTrue($this->_db->create($insert));
 
-		$insert->data(array(
+		$insert->data([
 			'name' => 'Bar',
 			'created' => date('Y-m-d H:i:s', strtotime('-5 minutes'))
-		));
+		]);
 		$this->assertTrue($this->_db->create($insert));
 
-		$insert->data(array(
+		$insert->data([
 			'name' => 'Baz',
 			'created' => date('Y-m-d H:i:s', strtotime('-10 minutes'))
-		));
+		]);
 		$this->assertTrue($this->_db->create($insert));
 
-		$read = new Query(array(
+		$read = new Query([
 			'type' => 'read',
 			'source' => 'galleries',
-			'fields' => array('name'),
-			'order' => array('created' => 'asc')
-		));
-		$result = $this->_db->read($read, array('return' => 'array'));
-		$expected = array(
-			array('name' => 'Baz'),
-			array('name' => 'Bar'),
-			array('name' => 'Foo')
-		);
+			'fields' => ['name'],
+			'order' => ['created' => 'asc']
+		]);
+		$result = $this->_db->read($read, ['return' => 'array']);
+		$expected = [
+			['name' => 'Baz'],
+			['name' => 'Bar'],
+			['name' => 'Foo']
+		];
 		$this->assertEqual($expected, $result);
 
-		$read->order(array('created' => 'desc'));
-		$result = $this->_db->read($read, array('return' => 'array'));
-		$expected = array(
-			array('name' => 'Foo'),
-			array('name' => 'Bar'),
-			array('name' => 'Baz')
-		);
+		$read->order(['created' => 'desc']);
+		$result = $this->_db->read($read, ['return' => 'array']);
+		$expected = [
+			['name' => 'Foo'],
+			['name' => 'Bar'],
+			['name' => 'Baz']
+		];
 		$this->assertEqual($expected, $result);
 
-		$delete = new Query(array('type' => 'delete', 'source' => 'galleries'));
+		$delete = new Query(['type' => 'delete', 'source' => 'galleries']);
 		$this->assertTrue($this->_db->delete($delete));
 	}
 
@@ -276,7 +292,7 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	 * support this.
 	 */
 	public function testDeletesWithoutAliases() {
-		$delete = new Query(array('type' => 'delete', 'source' => 'galleries'));
+		$delete = new Query(['type' => 'delete', 'source' => 'galleries']);
 		$this->assertTrue($this->_db->delete($delete));
 	}
 
@@ -285,15 +301,15 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	 */
 	public function testDescribe() {
 		$result = $this->_db->describe('galleries');
-		$expected = array(
-			'id' => array('type' => 'integer', 'null' => false, 'default' => null),
-			'name' => array(
+		$expected = [
+			'id' => ['type' => 'integer', 'null' => false, 'default' => null],
+			'name' => [
 				'type' => 'string', 'length' => 255, 'null' => true, 'default' => null
-			),
-			'active' => array('type' => 'boolean', 'null' => true, 'default' => null),
-			'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
-			'modified' => array('type' => 'datetime', 'null' => true, 'default' => null)
-		);
+			],
+			'active' => ['type' => 'boolean', 'null' => true, 'default' => null],
+			'created' => ['type' => 'datetime', 'null' => true, 'default' => null],
+			'modified' => ['type' => 'datetime', 'null' => true, 'default' => null]
+		];
 		$this->assertEqual($expected, $result->fields());
 
 		unset($expected['name']);
@@ -313,7 +329,7 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 
 	public function testResultSet() {
 		for ($i = 1; $i < 9; $i++) {
-			Galleries::create(array('id' => $i, 'name' => "Title {$i}"))->save();
+			Galleries::create(['id' => $i, 'name' => "Title {$i}"])->save();
 		}
 
 		$galleries = Galleries::all();
@@ -329,19 +345,19 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	public function testDefaultValues() {
 		$this->_db->dropSchema('galleries');
 
-		$schema = new Schema(array('fields' => array(
-			'id' => array('type' => 'id'),
-			'name' => array('type' => 'string', 'length' => 255, 'default' => 'image'),
-			'active' => array('type' => 'boolean', 'default' => false),
-			'show' => array('type' => 'boolean', 'default' => true),
-			'empty' => array('type' => 'text', 'null' => true),
-			'created' => array(
+		$schema = new Schema(['fields' => [
+			'id' => ['type' => 'id'],
+			'name' => ['type' => 'string', 'length' => 255, 'default' => 'image'],
+			'active' => ['type' => 'boolean', 'default' => false],
+			'show' => ['type' => 'boolean', 'default' => true],
+			'empty' => ['type' => 'text', 'null' => true],
+			'created' => [
 				'type' => 'timestamp', 'null' => true, 'default' => (object) 'CURRENT_TIMESTAMP'
-			),
-			'modified' => array(
+			],
+			'modified' => [
 				'type' => 'timestamp', 'null' => false, 'default' => (object) 'CURRENT_TIMESTAMP'
-			)
-		)));
+			]
+		]]);
 
 		$this->_db->createSchema('galleries', $schema);
 

@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\storage;
@@ -24,7 +25,7 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::config();
 		$this->assertEmpty($result);
 
-		$config = array('default' => array('adapter' => '\some\adapter', 'filters' => array()));
+		$config = ['default' => ['adapter' => '\some\adapter', 'filters' => []]];
 		$result = Cache::config($config);
 		$this->assertNull($result);
 
@@ -35,7 +36,7 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::reset();
 		$this->assertNull($result);
 
-		$config = array('default' => array('adapter' => '\some\adapter', 'filters' => array()));
+		$config = ['default' => ['adapter' => '\some\adapter', 'filters' => []]];
 		Cache::config($config);
 
 		$result = Cache::config();
@@ -45,10 +46,10 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::reset();
 		$this->assertNull($result);
 
-		$config = array('default' => array(
+		$config = ['default' => [
 			'adapter' => '\some\adapter',
-			'filters' => array('Filter1', 'Filter2')
-		));
+			'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -86,13 +87,13 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = 'lambda key';
 		$this->assertIdentical($expected, $result);
 
-		$key = function($data = array()) {
-			$defaults = array('foo' => 'foo', 'bar' => 'bar');
+		$key = function($data = []) {
+			$defaults = ['foo' => 'foo', 'bar' => 'bar'];
 			$data += $defaults;
 			return 'composed_key_with_' . $data['foo'] . '_' . $data['bar'];
 		};
 
-		$result = Cache::key($key, array('foo' => 'boo', 'bar' => 'far'));
+		$result = Cache::key($key, ['foo' => 'boo', 'bar' => 'far']);
 		$expected = 'composed_key_with_boo_far';
 		$this->assertIdentical($expected, $result);
 	}
@@ -134,9 +135,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheWrite() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -150,37 +151,37 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheWriteMultipleItems() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => [], 'strategies' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 
-		$data = array(
+		$data = [
 			'key1' => 'value1',
 			'key2' => 'value2',
 			'key3' => 'value3'
-		);
+		];
 		$result = Cache::write('default', $data, '+1 minute');
 		$this->assertTrue($result);
 	}
 
 	public function testCacheReadMultipleItems() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array(), 'strategies' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => [], 'strategies' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 
-		$data = array(
+		$data = [
 			'read1' => 'value1',
 			'read2' => 'value2',
 			'read3' => 'value3'
-		);
+		];
 		$result = Cache::write('default', $data, '+1 minute');
 		$this->assertTrue($result);
 
@@ -190,16 +191,16 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheReadWithConditions() {
-		$config = array('default' => array('adapter' => 'Memory', 'filters' => array()));
+		$config = ['default' => ['adapter' => 'Memory', 'filters' => []]];
 		Cache::config($config);
 
 		$result = Cache::config();
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 
-		$result = Cache::read('default', 'some_key', array('conditions' => function() {
+		$result = Cache::read('default', 'some_key', ['conditions' => function() {
 			return false;
-		}));
+		}]);
 		$this->assertFalse($result);
 
 		$conditions = function() use (&$config) {
@@ -214,9 +215,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheIncrementDecrementWithConditions() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -253,9 +254,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheWriteWithConditions() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -285,16 +286,16 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheReadThroughWrite() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
 		$this->assertEqual($expected, $result);
 
 		$write = function() {
-			return array('+1 minute' => 'read-through write');
+			return ['+1 minute' => 'read-through write'];
 		};
 		$this->assertNull(Cache::read('default', 'read_through'));
 
@@ -304,7 +305,7 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::read('default', 'read_through');
 		$this->assertIdentical('read-through write', $result);
 
-		$write = array('+1 minute' => 'string read-through write');
+		$write = ['+1 minute' => 'string read-through write'];
 		$result = Cache::read('default', 'string_read_through', compact('write'));
 		$this->assertIdentical('string read-through write', $result);
 
@@ -313,18 +314,39 @@ class CacheTest extends \lithium\test\Unit {
 
 		$this->assertNull(Cache::read('default', 'string_read_through_2'));
 
-		$result = Cache::read('default', 'string_read_through_2', array('write' => array(
+		$result = Cache::read('default', 'string_read_through_2', ['write' => [
 			'+1 minute' => function() {
 				return 'read-through write 2';
 			}
-		)));
+		]]);
 		$this->assertIdentical('read-through write 2', $result);
 	}
 
+	public function testCacheReadThroughWriteNoCallWhenHasKey() {
+		Cache::config(['default' => ['adapter' => 'Memory']]);
+
+		$callCount = 0;
+		Cache::write('default', 'foo', 'bar');
+
+		$result = Cache::read('default', 'foo');
+		$this->assertEqual('bar', $result);
+
+		Cache::read('default', 'foo', ['write' => [
+			'+1 minute' => function() use (&$callCount) {
+				$callCount++;
+				return 'baz';
+			}
+		]]);
+		$this->assertIdentical(0, $callCount);
+
+		$result = Cache::read('default', 'foo');
+		$this->assertEqual('bar', $result);
+	}
+
 	public function testCacheReadAndWrite() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -340,29 +362,29 @@ class CacheTest extends \lithium\test\Unit {
 		$expected = 'some data';
 		$this->assertEqual($expected, $result);
 
-		$result = Cache::write('default', 'another', array('data' => 'take two'), '+1 minute');
+		$result = Cache::write('default', 'another', ['data' => 'take two'], '+1 minute');
 		$this->assertTrue($result);
 
 		$result = Cache::read('default', 'another');
-		$expected = array('data' => 'take two');
+		$expected = ['data' => 'take two'];
 		$this->assertEqual($expected, $result);
 
 		$result = Cache::write(
-			'default', 'another', (object) array('data' => 'take two'), '+1 minute'
+			'default', 'another', (object) ['data' => 'take two'], '+1 minute'
 		);
 		$this->assertTrue($result);
 
 		$result = Cache::read('default', 'another');
-		$expected = (object) array('data' => 'take two');
+		$expected = (object) ['data' => 'take two'];
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCacheWriteAndReadNull() {
-		Cache::config(array(
-			'default' => array(
+		Cache::config([
+			'default' => [
 				'adapter' => 'Memory'
-			)
-		));
+			]
+		]);
 
 		$result = Cache::write('default', 'some_key', null);
 		$this->assertTrue($result);
@@ -372,45 +394,45 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheWriteAndReadNullMulti() {
-		Cache::config(array(
-			'default' => array(
+		Cache::config([
+			'default' => [
 				'adapter' => 'Memory'
-			)
-		));
+			]
+		]);
 
-		$keys = array(
+		$keys = [
 			'key1' => null,
 			'key2' => 'data2'
-		);
+		];
 		$result = Cache::write('default', $keys);
 		$this->assertTrue($result);
 
-		$expected = array(
+		$expected = [
 			'key1' => null,
 			'key2' => 'data2'
-		);
+		];
 		$result = Cache::read('default', array_keys($keys));
 		$this->assertEqual($expected, $result);
 
-		$keys = array(
+		$keys = [
 			'key1' => null,
 			'key2' => null
-		);
+		];
 		$result = Cache::write('default', $keys);
 		$this->assertTrue($result);
 
-		$expected = array(
+		$expected = [
 			'key1' => null,
 			'key2' => null
-		);
+		];
 		$result = Cache::read('default', array_keys($keys));
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCacheReadAndWriteWithConditions() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -436,9 +458,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheWriteAndDelete() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -456,9 +478,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheWriteAndDeleteWithConditions() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -473,11 +495,11 @@ class CacheTest extends \lithium\test\Unit {
 		$result = Cache::write('default', 'to delete', 'dead data', '+1 minute');
 		$this->assertTrue($result);
 
-		$result = Cache::delete('default', 'to delete', array(
+		$result = Cache::delete('default', 'to delete', [
 			'conditions' => function() {
 				return false;
 			}
-		));
+		]);
 		$this->assertFalse($result);
 
 		$result = Cache::delete('default', 'to delete', compact('conditions'));
@@ -485,9 +507,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testCacheWriteAndClear() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -507,9 +529,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testClean() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -524,9 +546,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testReset() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -540,9 +562,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testIncrement() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -562,9 +584,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testDecrement() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;
@@ -584,9 +606,9 @@ class CacheTest extends \lithium\test\Unit {
 	}
 
 	public function testNonPortableCacheAdapterMethod() {
-		$config = array('default' => array(
-			'adapter' => 'Memory', 'filters' => array()
-		));
+		$config = ['default' => [
+			'adapter' => 'Memory', 'filters' => []
+		]];
 		Cache::config($config);
 		$result = Cache::config();
 		$expected = $config;

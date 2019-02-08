@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\action;
@@ -11,6 +12,7 @@ namespace lithium\action;
 use lithium\util\Inflector;
 use lithium\action\DispatchException;
 use lithium\core\Libraries;
+use lithium\aop\Filters;
 
 /**
  * The `Controller` class is the fundamental building block of your application's request/response
@@ -97,15 +99,15 @@ class Controller extends \lithium\core\Object {
 	 * @see lithium\net\http\Media::type()
 	 * @see lithium\net\http\Media::render()
 	 */
-	protected $_render = array(
+	protected $_render = [
 		'type'        => null,
-		'data'        => array(),
+		'data'        => [],
 		'auto'        => true,
 		'layout'      => 'default',
 		'template'    => null,
 		'hasRendered' => false,
 		'negotiate'   => false
-	);
+	];
 
 	/**
 	 * Lists `Controller`'s class dependencies. For details on extending or replacing a class,
@@ -113,18 +115,18 @@ class Controller extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'media' => 'lithium\net\http\Media',
 		'router' => 'lithium\net\http\Router',
 		'response' => 'lithium\action\Response'
-	);
+	];
 
 	/**
 	 * Auto configuration properties.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('render' => 'merge', 'classes' => 'merge');
+	protected $_autoConfig = ['render' => 'merge', 'classes' => 'merge'];
 
 	/**
 	 * Constructor.
@@ -140,10 +142,10 @@ class Controller extends \lithium\core\Object {
 	 *        - `'classes'` _array_
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
-			'request' => null, 'response' => array(), 'render' => array(), 'classes' => array()
-		);
+	public function __construct(array $config = []) {
+		$defaults = [
+			'request' => null, 'response' => [], 'render' => [], 'classes' => []
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -191,38 +193,37 @@ class Controller extends \lithium\core\Object {
 	 *         control) or after it has been called and has returned its response (i.e.
 	 *         for caching it).
 	 */
-	public function __invoke($request, $dispatchParams, array $options = array()) {
-		$render =& $this->_render;
+	public function __invoke($request, $dispatchParams, array $options = []) {
 		$params = compact('request', 'dispatchParams', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use (&$render) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$dispatchParams = $params['dispatchParams'];
 
 			$action = isset($dispatchParams['action']) ? $dispatchParams['action'] : 'index';
-			$args = isset($dispatchParams['args']) ? $dispatchParams['args'] : array();
+			$args = isset($dispatchParams['args']) ? $dispatchParams['args'] : [];
 
 			if (substr($action, 0, 1) === '_' || method_exists(__CLASS__, $action)) {
 				throw new DispatchException('Attempted to invoke a private method.');
 			}
-			if (!method_exists($self, $action)) {
+			if (!method_exists($this, $action)) {
 				throw new DispatchException("Action `{$action}` not found.");
 			}
-			$render['template'] = $render['template'] ?: $action;
+			$this->_render['template'] = $this->_render['template'] ?: $action;
 
-			if ($result = $self->invokeMethod($action, $args)) {
+			if ($result = $this->invokeMethod($action, $args)) {
 				if (is_string($result)) {
-					$self->render(array('text' => $result));
-					return $self->response;
+					$this->render(['text' => $result]);
+					return $this->response;
 				}
 				if (is_array($result)) {
-					$self->set($result);
+					$this->set($result);
 				}
 			}
 
-			if (!$render['hasRendered'] && $render['auto']) {
-				$self->render();
+			if (!$this->_render['hasRendered'] && $this->_render['auto']) {
+				$this->render();
 			}
-			return $self->response;
+			return $this->response;
 		});
 	}
 
@@ -232,7 +233,7 @@ class Controller extends \lithium\core\Object {
 	 * @param array $data sets of `<variable name> => <variable value>` to pass to view layer.
 	 * @return void
 	 */
-	public function set($data = array()) {
+	public function set($data = []) {
 		$this->_render['data'] = (array) $data + $this->_render['data'];
 	}
 
@@ -255,7 +256,7 @@ class Controller extends \lithium\core\Object {
 	 *          property. You may refer to it for other options accepted by this method.
 	 * @return object Returns the `Response` object associated with this `Controller` instance.
 	 */
-	public function render(array $options = array()) {
+	public function render(array $options = []) {
 		$media = $this->_classes['media'];
 		$class = get_class($this);
 		$name = preg_replace('/Controller$/', '', substr($class, strrpos($class, '\\') + 1));
@@ -265,14 +266,14 @@ class Controller extends \lithium\core\Object {
 			$this->set($options['data']);
 			unset($options['data']);
 		}
-		$defaults = array(
+		$defaults = [
 			'status'     => null,
 			'location'   => false,
 			'data'       => null,
 			'head'       => false,
 			'controller' => Inflector::underscore($name),
 			'library'    => Libraries::get($class)
-		);
+		];
 
 		$options += $this->_render + $defaults;
 
@@ -290,9 +291,9 @@ class Controller extends \lithium\core\Object {
 		if ($options['head']) {
 			return;
 		}
-		$response = $media::render($this->response, $this->_render['data'], $options + array(
+		$response = $media::render($this->response, $this->_render['data'], $options + [
 			'request' => $this->request
-		));
+		]);
 		return ($this->response = $response ?: $this->response);
 	}
 
@@ -317,16 +318,17 @@ class Controller extends \lithium\core\Object {
 	 * @filter Allows to intercept redirects, either stopping them completely i.e. during debugging
 	 *         or for logging purposes.
 	 */
-	public function redirect($url, array $options = array()) {
-		$router = $this->_classes['router'];
-		$defaults = array('location' => null, 'status' => 302, 'head' => true, 'exit' => false);
+	public function redirect($url, array $options = []) {
+		$defaults = ['location' => null, 'status' => 302, 'head' => true, 'exit' => false];
 		$options += $defaults;
 		$params = compact('url', 'options');
 
-		$this->_filter(__METHOD__, $params, function($self, $params) use ($router) {
+		Filters::run($this, __FUNCTION__, $params, function($params) {
+			$router = $this->_classes['router'];
+
 			$options = $params['options'];
-			$location = $options['location'] ?: $router::match($params['url'], $self->request);
-			$self->render(compact('location') + $options);
+			$location = $options['location'] ?: $router::match($params['url'], $this->request);
+			$this->render(compact('location') + $options);
 		});
 
 		if ($options['exit']) {

@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\util;
@@ -111,7 +112,7 @@ class InflectorTest extends \lithium\test\Unit {
         $this->assertEqual(Inflector::pluralize('tax'), 'taxes');
 
 		$result = Inflector::pluralize('errata');
-		$this->assertNull(Inflector::rules('plural', array('/rata/' => '\1ratum')));
+		$this->assertNull(Inflector::rules('plural', ['/rata/' => '\1ratum']));
 		$this->assertEqual(Inflector::pluralize('errata'), $result);
 
 		Inflector::reset();
@@ -152,18 +153,6 @@ class InflectorTest extends \lithium\test\Unit {
 		$expected = 'La-langue-francaise-est-un-attribut-de-souverainete-en-France';
 		$this->assertEqual($expected, $result);
 
-		$result = Inflector::slug('!@$#exciting stuff! - what !@-# was that?');
-		$expected = 'exciting-stuff-what-was-that';
-		$this->assertEqual($expected, $result);
-
-		$result = Inflector::slug('20% of profits went to me!');
-		$expected = '20-of-profits-went-to-me';
-		$this->assertEqual($expected, $result);
-
-		$result = Inflector::slug('#this melts your face1#2#3');
-		$expected = 'this-melts-your-face1-2-3';
-		$this->assertEqual($expected, $result);
-
 		$result = Inflector::slug('ThisMeltsYourFace');
 		$expected = 'This-Melts-Your-Face';
 		$this->assertEqual($expected, $result);
@@ -193,46 +182,76 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
+	public function testSlugRemoveUntransliterable() {
+		$result = Inflector::slug('!@$#exciting stuff! - what !@-# was that?');
+		$expected = 'exciting-stuff-what-was-that';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('20% of profits went to me!');
+		$expected = '20-of-profits-went-to-me';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('#this melts your face1#2#3');
+		$expected = 'this-melts-your-face1-2-3';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSlugRemoveUntransliterableMultibyte() {
+		$result = Inflector::slug('li₃ is great');
+		$expected = 'li-is-great';
+		$this->assertEqual($expected, $result);
+
+		$result = Inflector::slug('♥ nach Bern');
+		$expected = 'nach-Bern';
+		$this->assertEqual($expected, $result);
+	}
+
+	public function testSlugRemoveWhitespaceMultibyte() {
+		$result = Inflector::slug('X X');
+		$expected = 'X-X';
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testAddingInvalidRules() {
-		$before = array(
+		$before = [
 			Inflector::rules('singular'),
 			Inflector::rules('plural'),
 			Inflector::rules('transliteration')
-		);
+		];
 		$this->assertNull(Inflector::rules('foo'));
-		$this->assertIdentical($before, array(
+		$this->assertIdentical($before, [
 			Inflector::rules('singular'),
 			Inflector::rules('plural'),
 			Inflector::rules('transliteration')
-		));
+		]);
 	}
 
 	public function testAddingSingularizationRules() {
 		$before = Inflector::rules('singular');
 		$result = Inflector::singularize('errata');
-		$this->assertNull(Inflector::rules('singular', array('/rata/' => '\1ratus')));
+		$this->assertNull(Inflector::rules('singular', ['/rata/' => '\1ratus']));
 		$this->assertEqual(Inflector::singularize('errata'), $result);
 
 		Inflector::reset();
 		$this->assertNotEqual(Inflector::singularize('errata'), $result);
 
 		$after = Inflector::rules('singular');
-		$expected = array(
+		$expected = [
 			'rules', 'irregular', 'uninflected', 'regexUninflected', 'regexIrregular'
-		);
+		];
 		$this->assertEqual(array_keys($before), $expected);
 		$this->assertEqual(array_keys($after), $expected);
 
 		$result = array_diff($after['rules'], $before['rules']);
-		$this->assertEqual($result, array('/rata/' => '\1ratus'));
+		$this->assertEqual($result, ['/rata/' => '\1ratus']);
 
-		foreach (array('irregular', 'uninflected', 'regexUninflected', 'regexIrregular') as $key) {
+		foreach (['irregular', 'uninflected', 'regexUninflected', 'regexIrregular'] as $key) {
 			$this->assertIdentical($before[$key], $after[$key]);
 		}
 
-		$this->assertNull(Inflector::rules('singular', array('rules' => array(
+		$this->assertNull(Inflector::rules('singular', ['rules' => [
 			'/rata/' => '\1ratus'
-		))));
+		]]));
 		$this->assertIdentical(Inflector::rules('singular'), $after);
 	}
 
@@ -247,7 +266,7 @@ class InflectorTest extends \lithium\test\Unit {
 		$expectedSingular = Inflector::rules('singular');
 		$this->assertFalse(isset($expectedSingular['irregular']['foo']));
 
-		Inflector::rules('singular', array('irregular' => array('foo' => 'bar')));
+		Inflector::rules('singular', ['irregular' => ['foo' => 'bar']]);
 
 		$resultSingular = Inflector::rules('singular');
 		$this->assertEqual($resultSingular['irregular']['foo'], 'bar');
@@ -296,19 +315,19 @@ class InflectorTest extends \lithium\test\Unit {
 		$this->assertEqual(Inflector::slug('Montréal'), 'Montreal');
 		$this->assertNotEqual(Inflector::slug('Écaussines'), 'Ecaussines');
 
-		Inflector::rules('transliteration', array('/É|Ê/' => 'E'));
+		Inflector::rules('transliteration', ['/É|Ê/' => 'E']);
 		$this->assertEqual(Inflector::slug('Écaussines-d\'Enghien'), 'Ecaussines-d-Enghien');
 
 		$this->assertNotEqual(Inflector::slug('JØRGEN'), 'JORGEN');
-		Inflector::rules('transliteration', array('/Ø/' => 'O'));
+		Inflector::rules('transliteration', ['/Ø/' => 'O']);
 		$this->assertEqual(Inflector::slug('JØRGEN'), 'JORGEN');
 
 		$this->assertNotEqual(Inflector::slug('ÎÍ'), 'II');
-		Inflector::rules('transliteration', array('/Î|Í/' => 'I'));
+		Inflector::rules('transliteration', ['/Î|Í/' => 'I']);
 		$this->assertEqual(Inflector::slug('ÎÍ'), 'II');
 
 		$this->assertEqual(Inflector::slug('ABc'), 'ABc');
-		Inflector::rules('transliteration', array('AB' => 'a'));
+		Inflector::rules('transliteration', ['AB' => 'a']);
 		$this->assertEqual(Inflector::slug('ABc'), 'aac');
 	}
 
@@ -325,25 +344,25 @@ class InflectorTest extends \lithium\test\Unit {
 	public function testStorageMechanism() {
 		Inflector::reset();
 
-		$expected = array('TestField' => 'test_field');
+		$expected = ['TestField' => 'test_field'];
 		$this->assertEmpty($this->_getProtectedValue('$_underscored'));
 		$this->assertEqual(Inflector::underscore('TestField'), 'test_field');
 		$this->assertEqual($expected, $this->_getProtectedValue('$_underscored'));
 		$this->assertEqual(Inflector::underscore('TestField'), 'test_field');
 
-		$expected = array('test_field' => 'TestField');
+		$expected = ['test_field' => 'TestField'];
 		$this->assertEmpty($this->_getProtectedValue('$_camelized'));
 		$this->assertEqual(Inflector::camelize('test_field', true), 'TestField');
 		$this->assertEqual($expected, $this->_getProtectedValue('$_camelized'));
 		$this->assertEqual(Inflector::camelize('test_field', true), 'TestField');
 
-		$expected = array('test_field:_' => 'Test Field');
+		$expected = ['test_field:_' => 'Test Field'];
 		$this->assertEmpty($this->_getProtectedValue('$_humanized'));
 		$this->assertEqual(Inflector::humanize('test_field'), 'Test Field');
 		$this->assertEqual($expected, $this->_getProtectedValue('$_humanized'));
 		$this->assertEqual(Inflector::humanize('test_field'), 'Test Field');
 
-		$expected = array('field' => 'fields');
+		$expected = ['field' => 'fields'];
 		$this->assertEmpty($this->_getProtectedValue('$_pluralized'));
 		$this->assertEqual(Inflector::pluralize('field'), 'fields');
 		$this->assertEqual($expected, $this->_getProtectedValue('$_pluralized'));

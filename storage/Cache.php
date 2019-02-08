@@ -1,13 +1,15 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\storage;
 
+use lithium\aop\Filters;
 use lithium\core\ConfigException;
 
 /**
@@ -24,29 +26,29 @@ use lithium\core\ConfigException;
  * A simple example configuration:
  *
  * ```
- * Cache::config(array(
- *     'local' => array(
+ * Cache::config([
+ *     'local' => [
  *         'adapter' => 'Apc'
- *     ),
- *     'distributed' => array(
+ *     ],
+ *     'distributed' => [
  *         'adapter' => 'Memcached',
  *         'host' => '127.0.0.1:11211'
- *     ),
- *     'default' => array(
+ *     ],
+ *     'default' => [
  *         'adapter' => 'File',
- *         'strategies => array('Serializer')
- *     )
- * );
+ *         'strategies => ['Serializer']
+ *     ]
+ * ];
  * ```
  *
  * Adapter configurations can be scoped, adapters will then handle the
  * namespacing of the keys transparently for you:
  *
  * ```
- * Cache::config(array(
- *     'primary'   => array('adapter' => 'Apc', 'scope' => 'primary'),
- *     'secondary' => array('adapter' => 'Apc', 'scope' => 'secondary')
- * );
+ * Cache::config([
+ *     'primary'   => ['adapter' => 'Apc', 'scope' => 'primary'],
+ *     'secondary' => ['adapter' => 'Apc', 'scope' => 'secondary']
+ * ];
  * ```
  *
  * Cache adapters differ in the functionality they provide and how the provide it. To see
@@ -79,7 +81,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * @var array
 	 */
-	protected static $_configurations = array();
+	protected static $_configurations = [];
 
 	/**
 	 * Libraries::locate() compatible path to adapters for this class.
@@ -104,7 +106,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *                    pass them in here.
 	 * @return string The generated cache key.
 	 */
-	public static function key($key, $data = array()) {
+	public static function key($key, $data = []) {
 		return is_object($key) ? $key($data) : $key;
 	}
 
@@ -121,7 +123,7 @@ class Cache extends \lithium\core\Adaptable {
 	 *
 	 * // For multi-key writes the $data parameter's role becomes
 	 * // the one of the $expiry parameter.
-	 * Cache::write('default', array('foo' => 'bar', ... ), '+1 minute');
+	 * Cache::write('default', ['foo' => 'bar', ... ], '+1 minute');
 	 * ```
 	 *
 	 * These two calls are synonymical and demonstrate the two
@@ -149,8 +151,8 @@ class Cache extends \lithium\core\Adaptable {
 	 *                 whole operation fails and this method will return `false`.
 	 * @filter
 	 */
-	public static function write($name, $key, $data = null, $expiry = null, array $options = array()) {
-		$options += array('conditions' => null, 'strategies' => true);
+	public static function write($name, $key, $data = null, $expiry = null, array $options = []) {
+		$options += ['conditions' => null, 'strategies' => true];
 
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
@@ -166,19 +168,19 @@ class Cache extends \lithium\core\Adaptable {
 			$keys = $key;
 			$expiry = $data;
 		} else {
-			$keys = array($key => $data);
+			$keys = [$key => $data];
 		}
 
 		if ($options['strategies']) {
 			foreach ($keys as $key => &$value) {
-				$value = static::applyStrategies(__FUNCTION__, $name, $value, array(
+				$value = static::applyStrategies(__FUNCTION__, $name, $value, [
 					'key' => $key, 'class' => __CLASS__
-				));
+				]);
 			}
 		}
 		$params = compact('keys', 'expiry');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
 			return $adapter->write($params['keys'], $params['expiry']);
 		});
 	}
@@ -191,17 +193,17 @@ class Cache extends \lithium\core\Adaptable {
 	 * Read-through caching can be used by passing expiry and the to-be-cached value
 	 * in the `write` option. Following three ways to achieve this.
 	 * ```
-	 * Cache::read('default', 'foo', array(
-	 *	'write' => array('+5 days' => 'bar')
-	 * )); // returns `'bar'`
+	 * Cache::read('default', 'foo', [
+	 *	'write' => ['+5 days' => 'bar']
+	 * ]); // returns `'bar'`
 	 *
-	 * Cache::read('default', 'foo', array(
-	 *	'write' => array('+5 days' => function() { return 'bar'; })
-	 * ));
+	 * Cache::read('default', 'foo', [
+	 *	'write' => ['+5 days' => function() { return 'bar'; }]
+	 * ]);
 	 *
-	 * Cache::read('default', 'foo', array(
-	 *	'write' => function() { return array('+5 days' => 'bar'); }
-	 * ));
+	 * Cache::read('default', 'foo', [
+	 *	'write' => function() { return ['+5 days' => 'bar']; }
+	 * ]);
 	 * ```
 	 *
 	 * @param string $name Configuration to be used for reading.
@@ -220,8 +222,8 @@ class Cache extends \lithium\core\Adaptable {
 	 *               been read will not be contained in the results array.
 	 * @filter
 	 */
-	public static function read($name, $key, array $options = array()) {
-		$options += array('conditions' => null, 'strategies' => true, 'write' => null);
+	public static function read($name, $key, array $options = []) {
+		$options += ['conditions' => null, 'strategies' => true, 'write' => null];
 
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
@@ -236,37 +238,43 @@ class Cache extends \lithium\core\Adaptable {
 		if ($isMulti = is_array($key)) {
 			$keys = $key;
 		} else {
-			$keys = array($key);
+			$keys = [$key];
 		}
 		$params = compact('keys');
 
-		$results = static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+		$results = Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
 			return $adapter->read($params['keys']);
 		});
 
 		if ($write = $options['write']) {
-			$write = is_callable($write) ? $write() : $write;
-			list($expiry, $value) = each($write);
-			$value = is_callable($value) ? $value() : $value;
+			$isEvaluated = false;
 
 			foreach ($keys as $key) {
 				if (isset($results[$key])) {
 					continue;
 				}
+				if (!$isEvaluated) {
+					$write = is_callable($write) ? $write() : $write;
+					$expiry = key($write);
+					$value = current($write);
+					$value = is_callable($value) ? $value() : $value;
+
+					$isEvaluated = true;
+				}
 				if (!static::write($name, $key, $value, $expiry)) {
 					return false;
 				}
-				$results[$key] = static::applyStrategies('write', $name, $value, array(
+				$results[$key] = static::applyStrategies('write', $name, $value, [
 					'key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__
-				));
+				]);
 			}
 		}
 
 		if ($options['strategies']) {
 			foreach ($results as $key => &$result) {
-				$result = static::applyStrategies(__FUNCTION__, $name, $result, array(
+				$result = static::applyStrategies(__FUNCTION__, $name, $result, [
 					'key' => $key, 'mode' => 'LIFO', 'class' => __CLASS__
-				));
+				]);
 			}
 		}
 		return $isMulti ? $results : ($results ? reset($results) : null);
@@ -287,8 +295,8 @@ class Cache extends \lithium\core\Adaptable {
 	 *                 whole operation fails and this method will return `false`.
 	 * @filter
 	 */
-	public static function delete($name, $key, array $options = array()) {
-		$options += array('conditions' => null, 'strategies' => true);
+	public static function delete($name, $key, array $options = []) {
+		$options += ['conditions' => null, 'strategies' => true];
 
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
@@ -303,11 +311,11 @@ class Cache extends \lithium\core\Adaptable {
 		if (is_array($key)) {
 			$keys = $key;
 		} else {
-			$keys = array($key);
+			$keys = [$key];
 		}
 		$params = compact('keys');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
 			return $adapter->delete($params['keys']);
 		});
 	}
@@ -325,8 +333,8 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return integer|boolean Item's new value on successful increment, false otherwise.
 	 * @filter
 	 */
-	public static function increment($name, $key, $offset = 1, array $options = array()) {
-		$options += array('conditions' => null);
+	public static function increment($name, $key, $offset = 1, array $options = []) {
+		$options += ['conditions' => null];
 
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
@@ -339,7 +347,7 @@ class Cache extends \lithium\core\Adaptable {
 		$key = static::key($key);
 		$params = compact('key', 'offset');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
 			return $adapter->increment($params['key'], $params['offset']);
 		});
 	}
@@ -357,8 +365,8 @@ class Cache extends \lithium\core\Adaptable {
 	 * @return integer|boolean Item's new value on successful decrement, false otherwise.
 	 * @filter
 	 */
-	public static function decrement($name, $key, $offset = 1, array $options = array()) {
-		$options += array('conditions' => null);
+	public static function decrement($name, $key, $offset = 1, array $options = []) {
+		$options += ['conditions' => null];
 
 		if (is_callable($options['conditions']) && !$options['conditions']()) {
 			return false;
@@ -371,7 +379,7 @@ class Cache extends \lithium\core\Adaptable {
 		$key = static::key($key);
 		$params = compact('key', 'offset');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($adapter) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($adapter) {
 			return $adapter->decrement($params['key'], $params['offset']);
 		});
 	}

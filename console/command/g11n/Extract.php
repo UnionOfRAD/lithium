@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\console\command\g11n;
@@ -62,7 +63,7 @@ class Extract extends \lithium\console\Command {
 	 * @return array Returns the catalog specified. Returns boolean `false` when an error occurs.
 	 */
 	protected function _extract() {
-		$message = array();
+		$message = [];
 
 		$message[] = 'A `Catalog` class configuration with an adapter that is capable of';
 		$message[] = 'handling read requests for the `messageTemplate` category is needed';
@@ -70,18 +71,18 @@ class Extract extends \lithium\console\Command {
 		$this->out($message);
 		$this->out();
 
-		$name = $this->_configuration(array(
+		$name = $this->_configuration([
 			'adapter' => 'Code',
 			'path' => $this->source,
 			'scope' => $this->scope
-		));
+		]);
 		$configs = Catalog::config();
 
 		try {
-			return Catalog::read($name, 'messageTemplate', 'root', array(
+			return Catalog::read($name, 'messageTemplate', 'root', [
 				'scope' => $configs[$name]['scope'],
 				'lossy' => false
-			));
+			]);
 		} catch (Exception $e) {
 			return false;
 		}
@@ -94,7 +95,7 @@ class Extract extends \lithium\console\Command {
 	 * @return boolean|void Return `false` if writing the catalog failed.
 	 */
 	protected function _writeTemplate($data) {
-		$message = array();
+		$message = [];
 
 		$message[] = 'In order to proceed you need to choose a `Catalog` configuration';
 		$message[] = 'which is used for writing the template. The adapter for the configuration';
@@ -103,23 +104,23 @@ class Extract extends \lithium\console\Command {
 		$this->out($message);
 		$this->out();
 
-		$name = $this->_configuration(array(
+		$name = $this->_configuration([
 			'adapter' => 'Gettext',
 			'path' => $this->destination,
 			'scope' => $this->scope
-		));
+		]);
 
 		if ($name != 'temporary') {
-			$scope = $this->in('Scope:', array('default' => $this->scope));
+			$scope = $this->in('Scope:', ['default' => $this->scope]);
 		}
 
-		$message = array();
+		$message = [];
 		$message[] = 'The template is now ready to be saved.';
 		$message[] = 'Please note that an existing template will be overwritten.';
 		$this->out($message);
 		$this->out();
 
-		if ($this->in('Save?', array('choices' => array('y', 'n'), 'default' => 'y')) != 'y') {
+		if ($this->in('Save?', ['choices' => ['y', 'n'], 'default' => 'y']) != 'y') {
 			$this->out('Aborting upon user request.');
 			$this->stop(1);
 		}
@@ -139,7 +140,7 @@ class Extract extends \lithium\console\Command {
 	 * @param array $options Options paired with defaults to prompt for.
 	 * @return string The name of the selected or newly created configuration.
 	 */
-	protected function _configuration(array $options = array()) {
+	protected function _configuration(array $options = []) {
 		$configs = (array) Catalog::config();
 
 		if (isset($configs['temporary'])) {
@@ -159,10 +160,10 @@ class Extract extends \lithium\console\Command {
 		}
 		$this->out();
 
-		$name = $this->in($prompt, array(
+		$name = $this->in($prompt, [
 			'choices' => array_keys($configs),
 			'default' => 'temporary'
-		));
+		]);
 
 		if ($name == 'temporary') {
 			foreach ($options as $option => $default) {

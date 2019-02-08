@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\integration\net\socket;
@@ -13,24 +14,24 @@ use lithium\net\socket\Stream;
 
 class StreamTest extends \lithium\test\Integration {
 
-	protected $_testConfig = array(
+	protected $_testConfig = [
 		'persistent' => false,
 		'scheme' => 'http',
 		'host' => 'example.org',
 		'port' => 80,
 		'timeout' => 2,
-		'classes' => array(
+		'classes' => [
 			'request' => 'lithium\net\http\Request',
 			'response' => 'lithium\net\http\Response'
-		)
-	);
+		]
+	];
 
 	public function skip() {
 		$this->skipIf(!$this->_hasNetwork(), 'No network connection.');
 	}
 
 	public function testAllMethodsNoConnection() {
-		$stream = new Stream(array('scheme' => null));
+		$stream = new Stream(['scheme' => null]);
 		$this->assertFalse($stream->open());
 		$this->assertTrue($stream->close());
 		$this->assertFalse($stream->timeout(2));
@@ -77,7 +78,7 @@ class StreamTest extends \lithium\test\Integration {
 		$result = $stream->resource();
 		$this->assertInternalType('resource', $result);
 
-		$stream = new Stream($this->_testConfig + array('encoding' => 'UTF-8'));
+		$stream = new Stream($this->_testConfig + ['encoding' => 'UTF-8']);
 		$result = $stream->open();
 		$result = $stream->resource();
 		$this->assertInternalType('resource', $result);
@@ -98,7 +99,7 @@ class StreamTest extends \lithium\test\Integration {
 		$this->assertInternalType('resource', $stream->open());
 		$result = $stream->send(
 			new Request($this->_testConfig),
-			array('response' => 'lithium\net\http\Response')
+			['response' => 'lithium\net\http\Response']
 		);
 		$this->assertInstanceOf('lithium\net\http\Response', $result);
 		$this->assertPattern("/^HTTP/", (string) $result);
@@ -109,7 +110,7 @@ class StreamTest extends \lithium\test\Integration {
 		$stream = new Stream($this->_testConfig);
 		$this->assertInternalType('resource', $stream->open());
 		$result = $stream->send($this->_testConfig,
-			array('response' => 'lithium\net\http\Response')
+			['response' => 'lithium\net\http\Response']
 		);
 		$this->assertInstanceOf('lithium\net\http\Response', $result);
 		$this->assertPattern("/^HTTP/", (string) $result);
@@ -121,7 +122,7 @@ class StreamTest extends \lithium\test\Integration {
 		$this->assertInternalType('resource', $stream->open());
 		$result = $stream->send(
 			new Request($this->_testConfig),
-			array('response' => 'lithium\net\http\Response')
+			['response' => 'lithium\net\http\Response']
 		);
 		$this->assertInstanceOf('lithium\net\http\Response', $result);
 		$this->assertPattern("/^HTTP/", (string) $result);

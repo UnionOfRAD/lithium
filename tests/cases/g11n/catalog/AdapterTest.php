@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\g11n\catalog;
@@ -24,422 +25,422 @@ class AdapterTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteStubbed() {
-		$result = $this->adapter->write(null, null, null, array());
+		$result = $this->adapter->write(null, null, null, []);
 		$this->assertFalse($result);
 	}
 
 	public function testMergeSkipNoId() {
-		$item = array(
-			'ids' => array('singular' => 'test')
-		);
-		$expected = array();
-		$result = $this->adapter->merge(array(), $item);
+		$item = [
+			'ids' => ['singular' => 'test']
+		];
+		$expected = [];
+		$result = $this->adapter->merge([], $item);
 		$this->assertEqual($expected, $result);
 
-		$item = array(
-			'translated' => array('test')
-		);
-		$expected = array();
-		$result = $this->adapter->merge(array(), $item);
+		$item = [
+			'translated' => ['test']
+		];
+		$expected = [];
+		$result = $this->adapter->merge([], $item);
 		$this->assertEqual($expected, $result);
 
-		$item = array(
+		$item = [
 			'id' => null
-		);
-		$expected = array();
-		$result = $this->adapter->merge(array(), $item);
+		];
+		$expected = [];
+		$result = $this->adapter->merge([], $item);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMergeAcceptsSpecialIds() {
-		$item = array(
+		$item = [
 			'id' => '0'
-		);
-		$result = $this->adapter->merge(array(), $item);
+		];
+		$result = $this->adapter->merge([], $item);
 		$this->assertTrue(isset($result['0']));
 
-		$item = array(
+		$item = [
 			'id' => false
-		);
-		$result = $this->adapter->merge(array(), $item);
+		];
+		$result = $this->adapter->merge([], $item);
 		$this->assertTrue(isset($result[false]));
 
-		$item = array(
+		$item = [
 			'id' => 0
-		);
-		$result = $this->adapter->merge(array(), $item);
+		];
+		$result = $this->adapter->merge([], $item);
 		$this->assertTrue(isset($result[0]));
 
-		$item = array(
+		$item = [
 			'id' => 536
-		);
-		$result = $this->adapter->merge(array(), $item);
+		];
+		$result = $this->adapter->merge([], $item);
 		$this->assertTrue(isset($result[536]));
 
-		$item = array(
+		$item = [
 			'id' => ''
-		);
-		$result = $this->adapter->merge(array(), $item);
+		];
+		$result = $this->adapter->merge([], $item);
 		$this->assertTrue(isset($result['']));
 	}
 
 	public function testMergeTranslatedFillIn() {
-		$item = array(
+		$item = [
 			'id' => 'test'
-		);
-		$data = $this->adapter->merge(array(), $item);
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'translated' => array('a')
-		);
-		$expected = array(
-			'test' => array(
+			'translated' => ['a']
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
-				'translated' => array('a'),
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
-			)
-		);
+				'ids' => [],
+				'translated' => ['a'],
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => []
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 
-		$item = array(
+		$item = [
 			'id' => 'test'
-		);
-		$data = $this->adapter->merge(array(), $item);
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
 			'translated' => 'a'
-		);
-		$expected = array(
-			'test' => array(
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
+				'ids' => [],
 				'translated' => 'a',
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
-			)
-		);
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => []
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMergeTranslatedDoNotOverwriteNonArrays() {
-		$item = array(
+		$item = [
 			'id' => 'test',
 			'translated' => 'a'
-		);
-		$data = $this->adapter->merge(array(), $item);
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
 			'translated' => 'b'
-		);
-		$expected = array(
-			'test' => array(
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
+				'ids' => [],
 				'translated' => 'a',
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
-			)
-		);
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => []
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMergeTranslatedUnionArrays() {
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'translated' => array('a')
-		);
-		$data = $this->adapter->merge(array(), $item);
+			'translated' => ['a']
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'translated' => array('b')
-		);
-		$expected = array(
-			'test' => array(
+			'translated' => ['b']
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
-				'translated' => array('a'),
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
-			)
-		);
+				'ids' => [],
+				'translated' => ['a'],
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => []
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'translated' => array('a')
-		);
-		$data = $this->adapter->merge(array(), $item);
+			'translated' => ['a']
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'translated' => array('b', 'c')
-		);
-		$expected = array(
-			'test' => array(
+			'translated' => ['b', 'c']
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
-				'translated' => array('a', 'c'),
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
-			)
-		);
+				'ids' => [],
+				'translated' => ['a', 'c'],
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => []
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMergeTranslatedCastToArray() {
-		$item = array(
+		$item = [
 			'id' => 'test',
 			'translated' => 'a'
-		);
-		$data = $this->adapter->merge(array(), $item);
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'translated' => array('b', 'c')
-		);
-		$expected = array(
-			'test' => array(
+			'translated' => ['b', 'c']
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
-				'translated' => array('a', 'c'),
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
-			)
-		);
+				'ids' => [],
+				'translated' => ['a', 'c'],
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => []
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMergeEnsureDefaultFormat() {
-		$item = array(
+		$item = [
 			'id' => 'test'
-		);
-		$expected = array(
-			'test' => array(
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
+				'ids' => [],
 				'translated' => null,
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
-			)
-		);
-		$result = $this->adapter->merge(array(), $item);
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => []
+			]
+		];
+		$result = $this->adapter->merge([], $item);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMergeIds() {
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'ids' => array('singular' => 'a')
-		);
-		$data = $this->adapter->merge(array(), $item);
+			'ids' => ['singular' => 'a']
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'ids' => array('singular' => 'X', 'plural' => 'b')
-		);
-		$expected = array(
-			'test' => array(
+			'ids' => ['singular' => 'X', 'plural' => 'b']
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array('singular' => 'X', 'plural' => 'b'),
+				'ids' => ['singular' => 'X', 'plural' => 'b'],
 				'translated' => null,
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
-			)
-		);
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => []
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMergeFlags() {
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'flags' => array('fuzzy' => true)
-		);
-		$data = $this->adapter->merge(array(), $item);
+			'flags' => ['fuzzy' => true]
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'flags' => array('fuzzy' => false)
-		);
-		$expected = array(
-			'test' => array(
+			'flags' => ['fuzzy' => false]
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
+				'ids' => [],
 				'translated' => null,
-				'flags' => array('fuzzy' => false),
-				'comments' => array(),
-				'occurrences' => array()
-			)
-		);
+				'flags' => ['fuzzy' => false],
+				'comments' => [],
+				'occurrences' => []
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'flags' => array('fuzzy' => false)
-		);
-		$data = $this->adapter->merge(array(), $item);
+			'flags' => ['fuzzy' => false]
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'flags' => array('fuzzy' => true)
-		);
-		$expected = array(
-			'test' => array(
+			'flags' => ['fuzzy' => true]
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
+				'ids' => [],
 				'translated' => null,
-				'flags' => array('fuzzy' => true),
-				'comments' => array(),
-				'occurrences' => array()
-			)
-		);
+				'flags' => ['fuzzy' => true],
+				'comments' => [],
+				'occurrences' => []
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMergeComments() {
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'comments' => array('a')
-		);
-		$data = $this->adapter->merge(array(), $item);
+			'comments' => ['a']
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'comments' => array('b')
-		);
-		$expected = array(
-			'test' => array(
+			'comments' => ['b']
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
+				'ids' => [],
 				'translated' => null,
-				'flags' => array(),
-				'comments' => array('a', 'b'),
-				'occurrences' => array()
-			)
-		);
+				'flags' => [],
+				'comments' => ['a', 'b'],
+				'occurrences' => []
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMergeOccurrences() {
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'occurrences' => array(array('file' => 'a.php', 'line' => 2))
-		);
-		$data = $this->adapter->merge(array(), $item);
+			'occurrences' => [['file' => 'a.php', 'line' => 2]]
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'occurrences' => array(array('file' => 'b.php', 'line' => 55))
-		);
-		$expected = array(
-			'test' => array(
+			'occurrences' => [['file' => 'b.php', 'line' => 55]]
+		];
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array(),
+				'ids' => [],
 				'translated' => null,
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array(
-					array('file' => 'a.php', 'line' => 2),
-					array('file' => 'b.php', 'line' => 55)
-				)
-			)
-		);
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => [
+					['file' => 'a.php', 'line' => 2],
+					['file' => 'b.php', 'line' => 55]
+				]
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testMergeWithContexts() {
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'ids' => array('singular' => 'a')
-		);
-		$data = $this->adapter->merge(array(), $item);
+			'ids' => ['singular' => 'a']
+		];
+		$data = $this->adapter->merge([], $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'ids' => array('singular' => 'X', 'plural' => 'b')
-		);
+			'ids' => ['singular' => 'X', 'plural' => 'b']
+		];
 		$data = $this->adapter->merge($data, $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'ids' => array('singular' => 'a'),
+			'ids' => ['singular' => 'a'],
 			'context' => 'A'
-		);
+		];
 		$data = $this->adapter->merge($data, $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'ids' => array('singular' => 'X', 'plural' => 'b'),
+			'ids' => ['singular' => 'X', 'plural' => 'b'],
 			'context' => 'A'
-		);
+		];
 		$data = $this->adapter->merge($data, $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'ids' => array('singular' => 'a'),
+			'ids' => ['singular' => 'a'],
 			'context' => 'B'
-		);
+		];
 		$data = $this->adapter->merge($data, $item);
 
-		$item = array(
+		$item = [
 			'id' => 'test',
-			'ids' => array('singular' => 'X', 'plural' => 'b'),
+			'ids' => ['singular' => 'X', 'plural' => 'b'],
 			'context' => 'B'
-		);
+		];
 		$data = $this->adapter->merge($data, $item);
 
-		$expected = array(
-			'test' => array(
+		$expected = [
+			'test' => [
 				'id' => 'test',
-				'ids' => array('singular' => 'X', 'plural' => 'b'),
+				'ids' => ['singular' => 'X', 'plural' => 'b'],
 				'translated' => null,
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array()
-			),
-			'test|A' => array(
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => []
+			],
+			'test|A' => [
 				'id' => 'test',
-				'ids' => array('singular' => 'X', 'plural' => 'b'),
+				'ids' => ['singular' => 'X', 'plural' => 'b'],
 				'translated' => null,
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array(),
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => [],
 				'context' => 'A'
-			),
-			'test|B' => array(
+			],
+			'test|B' => [
 				'id' => 'test',
-				'ids' => array('singular' => 'X', 'plural' => 'b'),
+				'ids' => ['singular' => 'X', 'plural' => 'b'],
 				'translated' => null,
-				'flags' => array(),
-				'comments' => array(),
-				'occurrences' => array(),
+				'flags' => [],
+				'comments' => [],
+				'occurrences' => [],
 				'context' => 'B'
-			)
-		);
+			]
+		];
 		$result = $this->adapter->merge($data, $item);
 		$this->assertEqual($expected, $result);
 	}

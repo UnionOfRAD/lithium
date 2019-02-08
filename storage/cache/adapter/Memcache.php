@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\storage\cache\adapter;
@@ -11,6 +12,7 @@ namespace lithium\storage\cache\adapter;
 use Memcached;
 use lithium\util\Set;
 use lithium\storage\Cache;
+use lithium\net\HostString;
 
 /**
  * Memcache (libmemcached) cache adapter implementation using `pecl/memcached`.
@@ -30,12 +32,12 @@ use lithium\storage\Cache;
  * A simple configuration can be accomplished as follows:
  *
  * ```
- * Cache::config(array(
- *     'default' => array(
+ * Cache::config([
+ *     'default' => [
  *         'adapter' => 'Memcached',
  *         'host' => '127.0.0.1:11211'
- *     )
- * ));
+ *     ]
+ * ]);
  * ```
  *
  * The `'host'` key accepts entries in multiple formats, depending on the number of
@@ -51,9 +53,14 @@ use lithium\storage\Cache;
 class Memcache extends \lithium\storage\cache\Adapter {
 
 	/**
-	 * The default port used to connect to Memcache servers, if none is specified.
+	 * The default host used to connect to the server.
 	 */
-	const CONN_DEFAULT_PORT = 11211;
+	const DEFAULT_HOST = '127.0.0.1';
+
+	/**
+	 * The default port used to connect to the server.
+	 */
+	const DEFAULT_PORT = 11211;
 
 	/**
 	 * `Memcached` object instance used by this adapter.
@@ -64,18 +71,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 
 	/**
 	 * Constructor. Instantiates the `Memcached` object, adds appropriate servers to the pool,
-	 * and configures any optional settings passed (see the `_init()` method). When adding
-	 * servers, the following formats are valid for the `'host'` key:
-	 *
-	 *   - `'127.0.0.1'`
-	 *      Configure the adapter to connect to one Memcache server on the default port.
-	 *
-	 *   - `'127.0.0.1:11222'`
-	 *      Configure the adapter to connect to one Memcache server on a custom port.
-	 *
-	 *   - `array('167.221.1.5:11222' => 200, '167.221.1.6')`
-	 *      Connect to one server on a custom port with a high selection weight, and
-	 *      a second server on the default port with the default selection weight.
+	 * and configures any optional settings passed (see the `_init()` method).
 	 *
 	 * @see lithium\storage\Cache::config()
 	 * @param array $config Configuration for this cache adapter. These settings are queryable
@@ -85,16 +81,20 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 *          is otherwise set. Can be either a `strtotime()` compatible tring or TTL in
 	 *          seconds. To indicate items should not expire use `Cache::PERSIST`. Defaults
 	 *          to `+1 hour`.
-	 *        - `'host'` _mixed_: Specifies one or more Memcache servers to connect to, with
-	 *          optional server selection weights. See above for example values.
+	 *        - `'host'` _string|array_: A string in the form of `'<host>'`, `'<host>:<port>'` or
+	 *          `':<port>'` indicating the host and/or port to connect to. When one or both are
+	 *          not provided uses general server defaults.
+	 *          Use the array format for multiple hosts (optionally with server selection weights):
+	 *          `array('167.221.1.5:11222', '167.221.1.6')`
+	 *          `array('167.221.1.5:11222' => 200, '167.221.1.6')`
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'scope' => null,
 			'expiry' => '+1 hour',
-			'host' => '127.0.0.1'
-		);
+			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT
+		];
 		parent::__construct(Set::merge($defaults, $config));
 	}
 
@@ -107,12 +107,6 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 */
 	protected function _init() {
 		$this->connection = $this->connection ?: new Memcached();
-		$servers = array();
-
-		if (isset($this->_config['servers'])) {
-			$this->connection->addServers($this->_config['servers']);
-			return;
-		}
 		$this->connection->addServers($this->_formatHostList($this->_config['host']));
 
 		if ($this->_config['scope']) {
@@ -134,8 +128,8 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * @param array $params Parameter list to use when calling $method.
 	 * @return mixed Returns the result of the method call.
 	 */
-	public function __call($method, $params = array()) {
-		return call_user_func_array(array(&$this->connection, $method), $params);
+	public function __call($method, $params = []) {
+		return call_user_func_array([&$this->connection, $method], $params);
 	}
 
 	/**
@@ -151,7 +145,7 @@ class Memcache extends \lithium\storage\cache\Adapter {
 		if (parent::respondsTo($method, $internal)) {
 			return true;
 		}
-		return is_callable(array($this->connection, $method));
+		return is_callable([$this->connection, $method]);
 	}
 
 	/**
@@ -162,29 +156,21 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 * @return array Returns an array of `Memcached` server definitions.
 	 */
 	protected function _formatHostList($host) {
-		$fromString = function($host) {
-			if (strpos($host, ':')) {
-				list($host, $port) = explode(':', $host);
-				return array($host, (integer) $port);
-			}
-			return array($host, Memcache::CONN_DEFAULT_PORT);
-		};
+		$hosts = [];
 
-		if (is_string($host)) {
-			return array($fromString($host));
-		}
-		$servers = array();
+		foreach ((array) $this->_config['host'] as $host => $weight) {
+			$host = HostString::parse(($hasWeight = is_integer($weight)) ? $host : $weight) + [
+				'host' => static::DEFAULT_HOST,
+				'port' => static::DEFAULT_PORT
+			];
+			$host = [$host['host'], $host['port']];
 
-		while (list($server, $weight) = each($this->_config['host'])) {
-			if (is_string($weight)) {
-				$servers[] = $fromString($weight);
-				continue;
+			if ($hasWeight) {
+				$host[] = $weight;
 			}
-			$server = $fromString($server);
-			$server[] = $weight;
-			$servers[] = $server;
+			$hosts[] = $host;
 		}
-		return $servers;
+		return $hosts;
 	}
 
 	/**
@@ -227,15 +213,15 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	public function read(array $keys) {
 		if (count($keys) > 1) {
 			if (!$results = $this->connection->getMulti($keys)) {
-				return array();
+				return [];
 			}
 		} else {
 			$result = $this->connection->get($key = current($keys));
 
 			if ($result === false && $this->connection->getResultCode() === Memcached::RES_NOTFOUND) {
-				return array();
+				return [];
 			}
-			$results = array($key => $result);
+			$results = [$key => $result];
 		}
 		return $results;
 	}

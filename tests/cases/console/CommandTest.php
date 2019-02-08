@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\console;
@@ -16,25 +17,25 @@ class CommandTest extends \lithium\test\Unit {
 	public $request;
 
 	public function setUp() {
-		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->classes = array('response' => 'lithium\tests\mocks\console\MockResponse');
+		$this->request = new Request(['input' => fopen('php://temp', 'w+')]);
+		$this->classes = ['response' => 'lithium\tests\mocks\console\MockResponse'];
 	}
 
 	public function testConstruct() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$expected = $this->request->env();
 		$result = $command->request->env();
 		$this->assertEqual($expected, $result);
 
-		$this->request->params = array(
+		$this->request->params = [
 			'case' => 'lithium.tests.cases.console.CommandTest'
-		);
-		$command = new MockCommand(array('request' => $this->request));
+		];
+		$command = new MockCommand(['request' => $this->request]);
 		$this->assertNotEmpty($command->case);
 	}
 
 	public function testInvoke() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$response = $command('testRun');
 
 		$result = $response;
@@ -46,7 +47,7 @@ class CommandTest extends \lithium\test\Unit {
 	}
 
 	public function testInvokeSettingResponseStatus() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 
 		$expected = 0;
 		$result = $command('testReturnNull')->status;
@@ -86,45 +87,45 @@ class CommandTest extends \lithium\test\Unit {
 	}
 
 	public function testOut() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$expected = "ok\n";
 		$result = $command->out('ok');
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testOutArray() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 
 		$expected = "line 1\nline 2\n";
-		$command->out(array('line 1', 'line 2'));
+		$command->out(['line 1', 'line 2']);
 		$result = $command->response->output;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testError() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$expected = "ok\n";
 		$result = $command->error('ok');
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testErrorArray() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$expected = "line 1\nline 2\n";
-		$command->error(array('line 1', 'line 2'));
+		$command->error(['line 1', 'line 2']);
 		$result = $command->response->error;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testNl() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$expected = "\n\n\n";
 		$result = $command->nl(3);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testHr() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$expected = "----\n";
 		$command->hr(4);
 		$result = $command->response->output;
@@ -132,7 +133,7 @@ class CommandTest extends \lithium\test\Unit {
 	}
 
 	public function testHeader() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$expected = "----\nheader\n----\n";
 		$command->header('header', 4);
 		$result = $command->response->output;
@@ -140,15 +141,15 @@ class CommandTest extends \lithium\test\Unit {
 	}
 
 	public function testColumns() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$expected = "data1\t\ndata2\t\n";
-		$command->columns(array('col1' => 'data1', 'col2' => 'data2'));
+		$command->columns(['col1' => 'data1', 'col2' => 'data2']);
 		$result = $command->response->output;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testHelp() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$return = $command->__invoke('_help');
 
 		$this->assertInstanceOf('lithium\tests\mocks\console\MockResponse', $return);
@@ -157,7 +158,7 @@ class CommandTest extends \lithium\test\Unit {
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/s", $result);
 
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$return = $command->__invoke('_help');
 
 		$expected = "testRun";
@@ -166,7 +167,7 @@ class CommandTest extends \lithium\test\Unit {
 	}
 
 	public function testIn() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		fwrite($command->request->input, 'nada mucho');
 		rewind($command->request->input);
 
@@ -180,7 +181,7 @@ class CommandTest extends \lithium\test\Unit {
 	}
 
 	public function testQuit() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		fwrite($command->request->input, "q\n");
 		rewind($command->request->input);
 
@@ -189,12 +190,12 @@ class CommandTest extends \lithium\test\Unit {
 	}
 
 	public function testInWithDefaultOption() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		fwrite($command->request->input, '  ');
 		rewind($command->request->input);
 
 		$expected = "y";
-		$result = $command->in('What up dog?', array('default' => 'y'));
+		$result = $command->in('What up dog?', ['default' => 'y']);
 		$this->assertEqual($expected, $result);
 
 		$expected = "What up dog?  \n [y] > ";
@@ -206,17 +207,17 @@ class CommandTest extends \lithium\test\Unit {
 		rewind($command->request->input);
 
 		$expected = "y";
-		$result = $command->in('R U Sure?', array('choices' => array('y', 'n'), 'default' => 'y'));
+		$result = $command->in('R U Sure?', ['choices' => ['y', 'n'], 'default' => 'y']);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testInWithOptions() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		fwrite($command->request->input, 'y');
 		rewind($command->request->input);
 
 		$expected = "y";
-		$result = $command->in('Everything Cool?', array('choices' => array('y', 'n')));
+		$result = $command->in('Everything Cool?', ['choices' => ['y', 'n']]);
 		$this->assertEqual($expected, $result);
 
 		$expected = "Everything Cool? (y/n) \n > ";
@@ -225,33 +226,25 @@ class CommandTest extends \lithium\test\Unit {
 	}
 
 	public function testInWithBadInput(){
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		fwrite($command->request->input, "f\n");
 		fwrite($command->request->input, 'y');
 		rewind($command->request->input);
 
 		$expected = "y";
-		$result = $command->in('Everything Cool?', array('choices' => array('y', 'n')));
+		$result = $command->in('Everything Cool?', ['choices' => ['y', 'n']]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testOutWithStyles() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$expected = "{:some-style}ok\n";
 		$result = $command->out('ok', 'some-style');
 		$this->assertEqual($expected, $result);
 	}
 
-	public function testOutWithoutStyles() {
-		$command = new MockCommand(array('request' => $this->request));
-		$command->plain = true;
-		$expected = "ok\n";
-		$result = $command->out('ok', 'some-style');
-		$this->assertEqual($expected, $result);
-	}
-
 	public function testOutWithSilent() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$command->silent = true;
 		$expected = "";
 		$result = $command->out('ok', 'some-style');
@@ -259,9 +252,9 @@ class CommandTest extends \lithium\test\Unit {
 	}
 
 	public function testColumnsOnErrorOutput() {
-		$command = new MockCommand(array('request' => $this->request));
+		$command = new MockCommand(['request' => $this->request]);
 		$expected = "data1\t\ndata2\t\n";
-		$command->columns(array('col1' => 'data1', 'col2' => 'data2'), array('error' => true));
+		$command->columns(['col1' => 'data1', 'col2' => 'data2'], ['error' => true]);
 		$result = $command->response->error;
 		$this->assertEqual($expected, $result);
 	}

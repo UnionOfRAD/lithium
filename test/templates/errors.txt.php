@@ -1,4 +1,11 @@
 <?php
+/**
+ * li₃: the most RAD framework for PHP (http://li3.me)
+ *
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
+ */
 
 $i = 0;
 foreach ((array) $stats['errors'] as $error) {
@@ -15,7 +22,11 @@ foreach ((array) $stats['errors'] as $error) {
 		echo " ________\n";
 		echo "\n";
 	} elseif ($error['result'] == 'exception') {
-		echo "{:purple}Exception{:end} thrown.\n";
+		if ($error['code'] !== 0) {
+			echo "{:purple}{$error['name']} ({$error['code']}){:end} thrown.\n";
+		} else {
+			echo "{:purple}{$error['name']}{:end} thrown.\n";
+		}
 		echo " File    : {$error['file']}\n";
 		echo " Class   : {$error['class']}\n";
 		echo " Method  : {$error['method']}()\n";

@@ -1,0 +1,22 @@
+#
+# li₃: the most RAD framework for PHP (http://li3.me)
+#
+# Copyright 2016, Union of RAD. All rights reserved. This source
+# code is distributed under the terms of the BSD 3-Clause License.
+# The full license text can be found in the LICENSE.txt file.
+#
+
+# See http://editorconfig.org on how to put this file to good use.
+# See http://li3.me/docs/book/specs/1.x/accepted/LSR-0-coding
+
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+
+[*.php]
+indent_style = tab
+tab_width = 4
+insert_final_newline = false
+trim_trailing_whitespace = true

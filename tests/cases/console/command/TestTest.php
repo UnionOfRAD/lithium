@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\console\command;
@@ -16,24 +17,24 @@ class TestTest extends \lithium\test\Unit {
 
 	public $request;
 
-	public $classes = array();
+	public $classes = [];
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	public function setUp() {
 		Libraries::cache(false);
 
-		$this->classes = array(
+		$this->classes = [
 			'response' => 'lithium\tests\mocks\console\MockResponse'
-		);
+		];
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
-		$_SERVER['argv'] = array();
+		$_SERVER['argv'] = [];
 
 		chdir(Libraries::get('lithium', 'path'));
 
-		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->request->params = array('library' => 'build_test');
+		$this->request = new Request(['input' => fopen('php://temp', 'w+')]);
+		$this->request->params = ['library' => 'build_test'];
 	}
 
 	public function tearDown() {
@@ -47,17 +48,17 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithoutPath() {
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$result = $command->run();
 		$this->assertFalse($result);
 	}
 
 	public function testRunWithInvalidPath() {
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$path = 'Foobar/lithium/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
 		$expected = "Path `.*` not found.\n";
@@ -66,10 +67,10 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithInvalidLibrary() {
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request,
 			'classes' => $this->classes
-		));
+		]);
 		$command->format = 'foobar';
 		$path = LITHIUM_LIBRARY_PATH . '/bob/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
@@ -79,10 +80,10 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithInvalidHandler() {
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request,
 			'classes' => $this->classes
-		));
+		]);
 		$command->format = 'foobar';
 		$lithium = Libraries::get('lithium', 'path');
 		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
@@ -93,9 +94,9 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testRunSingleTestWithAbsolutePath() {
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$lithium = Libraries::get('lithium', 'path');
 		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
@@ -107,9 +108,9 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testRunSingleTestWithRelativePath() {
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 
 		$path = 'tests/mocks/test/cases/MockTest.php';
 		$command->run($path);
@@ -119,9 +120,9 @@ class TestTest extends \lithium\test\Unit {
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 
 		$current = basename(getcwd());
 		$path = "../{$current}/tests/mocks/test/cases/MockTest.php";
@@ -146,9 +147,9 @@ class TestTest extends \lithium\test\Unit {
 		$backup = error_reporting();
 		error_reporting(E_ALL);
 
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$lithium = Libraries::get('lithium', 'path');
 		$path = $lithium . '/tests/mocks/test/cases';
 		$command->run($path);
@@ -162,9 +163,9 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testReturnRunTestPasses() {
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$lithium = Libraries::get('lithium', 'path');
 		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$result = $command->run($path);
@@ -172,9 +173,9 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testReturnRunTestFails() {
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$lithium = Libraries::get('lithium', 'path');
 		$path = $lithium . '/tests/mocks/test/cases/MockTestErrorHandling.php';
 		$result = $command->run($path);
@@ -182,9 +183,9 @@ class TestTest extends \lithium\test\Unit {
 	}
 
 	public function testJsonFormat() {
-		$command = new Test(array(
+		$command = new Test([
 			'request' => $this->request, 'classes' => $this->classes
-		));
+		]);
 		$lithium = Libraries::get('lithium', 'path');
 		$path = $lithium . '/tests/mocks/test/cases/MockTest.php';
 		$command->format = 'json';
@@ -201,13 +202,13 @@ class TestTest extends \lithium\test\Unit {
 		$testApp = Libraries::get(true, 'resources') . '/tmp/tests/custom_dir';
 		$testDir = $testApp . '/tests/cases/models';
 		mkdir($testDir, 0777, true);
-		Libraries::add('test_app', array('path' => $testApp));
-		$request = new Request(array('env' => array('working' => $testApp)));
-		$command = new Test(array(
+		Libraries::add('test_app', ['path' => $testApp]);
+		$request = new Request(['env' => ['working' => $testApp]]);
+		$command = new Test([
 			'request' => $request, 'classes' => $this->classes
-		));
+		]);
 		$expected = 'test_app\tests\cases\models';
-		$result = $command->invokeMethod('_path', array('tests\cases\models'));
+		$result = $command->invokeMethod('_path', ['tests\cases\models']);
 		$this->assertIdentical($expected, $result);
 		Libraries::remove('test_app');
 		$this->_cleanUp();

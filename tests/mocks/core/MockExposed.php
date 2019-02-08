@@ -1,13 +1,17 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\core;
 
+/**
+ * @deprecated
+ */
 class MockExposed extends \lithium\core\Object {
 
 	protected $_internal = 'secret';
@@ -15,7 +19,7 @@ class MockExposed extends \lithium\core\Object {
 	public function tamper() {
 		$internal =& $this->_internal;
 
-		return $this->_filter(__METHOD__, array(), function() use (&$internal) {
+		return $this->_filter(__METHOD__, [], function() use (&$internal) {
 			$internal = 'tampered';
 			return true;
 		});

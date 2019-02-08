@@ -1,14 +1,15 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\template\view\adapter;
 
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\core\Libraries;
 use lithium\template\TemplateException;
 
@@ -31,10 +32,10 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array(
+	protected $_autoConfig = [
 		'classes' => 'merge', 'request', 'response', 'context',
 		'strings', 'handlers', 'view', 'compile', 'paths'
-	);
+	];
 
 	/**
 	 * Boolean flag indicating whether templates should be pre-compiled before inclusion. For more
@@ -52,7 +53,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 *
 	 * @var array
 	 */
-	protected $_data = array();
+	protected $_data = [];
 
 	/**
 	 * Variables that have been set from a view/element/layout/etc. that should be available to the
@@ -60,9 +61,9 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 *
 	 * @var array Key/value pairs of variables
 	 */
-	protected $_vars = array();
+	protected $_vars = [];
 
-	protected $_paths = array();
+	protected $_paths = [];
 
 	/**
 	 * `File`'s dependencies. These classes are used by the output handlers to generate URLs
@@ -71,11 +72,11 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @see Renderer::$_handlers
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'compiler' => 'lithium\template\view\Compiler',
 		'router' => 'lithium\net\http\Router',
 		'media'  => 'lithium\net\http\Media'
-	);
+	];
 
 	/**
 	 * Constructor.
@@ -83,14 +84,14 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @param array $config Configuration options.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
-			'classes' => array(),
+	public function __construct(array $config = []) {
+		$defaults = [
+			'classes' => [],
 			'compile' => true,
-			'compiler' => array(),
+			'compiler' => [],
 			'extract' => true,
-			'paths' => array()
-		);
+			'paths' => []
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -102,8 +103,8 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @param array $options
 	 * @return string
 	 */
-	public function render($template, $data = array(), array $options = array()) {
-		$defaults = array('context' => array());
+	public function render($template, $data = [], array $options = []) {
+		$defaults = ['context' => []];
 		$options += $defaults;
 
 		$this->_context = $options['context'] + $this->_context;
@@ -226,7 +227,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 		}
 
 		foreach ((array) $this->_paths[$type] as $path) {
-			if (!file_exists($path = String::insert($path, $params))) {
+			if (!file_exists($path = Text::insert($path, $params))) {
 				continue;
 			}
 			return $path;

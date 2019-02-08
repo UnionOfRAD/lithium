@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\g11n;
@@ -23,7 +24,7 @@ class Catalog extends \lithium\core\Adaptable {
 	 *
 	 * @var Collection
 	 */
-	protected static $_configurations = array();
+	protected static $_configurations = [];
 
 	/**
 	 * Libraries::locate() compatible path to adapters for this class.
@@ -40,7 +41,7 @@ class Catalog extends \lithium\core\Adaptable {
 	 * @return array `Collection` of configurations or void if setting configurations.
 	 */
 	public static function config($config = null) {
-		$defaults = array('scope' => null);
+		$defaults = ['scope' => null];
 
 		if (is_array($config)) {
 			foreach ($config as $i => $item) {
@@ -75,15 +76,15 @@ class Catalog extends \lithium\core\Adaptable {
 	 *        - `'lossy'`: Whether or not to use the compact and lossy format, defaults to `true`.
 	 * @return array If available the requested data, else `null`.
 	 */
-	public static function read($name, $category, $locale, array $options = array()) {
-		$defaults = array('scope' => null, 'lossy' => true);
+	public static function read($name, $category, $locale, array $options = []) {
+		$defaults = ['scope' => null, 'lossy' => true];
 		$options += $defaults;
 
 		$category = strtok($category, '.');
 		$id = strtok('.');
 
 		$names = $name === true ? array_keys(static::$_configurations) : (array) $name;
-		$results = array();
+		$results = [];
 
 		foreach (Locale::cascade($locale) as $cascaded) {
 			foreach ($names as $name) {
@@ -111,9 +112,9 @@ class Catalog extends \lithium\core\Adaptable {
 	 *
 	 * Usage:
 	 * ```
-	 * $data = array(
+	 * $data = [
 	 * 	'color' => '色'
-	 * );
+	 * ];
 	 * Catalog::write('runtime', 'message', 'ja', $data);
 	 * ```
 	 *
@@ -125,20 +126,20 @@ class Catalog extends \lithium\core\Adaptable {
 	 *        - `'scope'`: The scope to use.
 	 * @return boolean Success.
 	 */
-	public static function write($name, $category, $locale, $data, array $options = array()) {
-		$defaults = array('scope' => null);
+	public static function write($name, $category, $locale, $data, array $options = []) {
+		$defaults = ['scope' => null];
 		$options += $defaults;
 
 		$category = strtok($category, '.');
 		$id = strtok('.');
 
 		if ($id) {
-			$data = array($id => $data);
+			$data = [$id => $data];
 		}
 
 		array_walk($data, function(&$value, $key) {
 			if (!is_array($value) || !array_key_exists('translated', $value)) {
-				$value = array('id' => $key, 'translated' => $value);
+				$value = ['id' => $key, 'translated' => $value];
 			}
 		});
 

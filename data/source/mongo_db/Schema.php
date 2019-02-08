@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\data\source\mongo_db;
@@ -16,9 +17,9 @@ use MongoBinData;
 
 class Schema extends \lithium\data\DocumentSchema {
 
-	protected $_handlers = array();
+	protected $_handlers = [];
 
-	protected $_types = array(
+	protected $_types = [
 		'MongoId'      => 'id',
 		'MongoDate'    => 'date',
 		'MongoCode'    => 'code',
@@ -26,7 +27,7 @@ class Schema extends \lithium\data\DocumentSchema {
 		'datetime'     => 'date',
 		'timestamp'    => 'date',
 		'int'          => 'integer'
-	);
+	];
 
 	/**
 	 * Constructor.
@@ -35,8 +36,8 @@ class Schema extends \lithium\data\DocumentSchema {
 	 *        - `'fields'` _array_
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('fields' => array('_id' => array('type' => 'id')));
+	public function __construct(array $config = []) {
+		$defaults = ['fields' => ['_id' => ['type' => 'id']]];
 		parent::__construct(array_filter($config) + $defaults);
 	}
 
@@ -44,7 +45,7 @@ class Schema extends \lithium\data\DocumentSchema {
 		$this->_autoConfig[] = 'handlers';
 		parent::_init();
 
-		$this->_handlers += array(
+		$this->_handlers += [
 			'id' => function($v) {
 				return is_string($v) && preg_match('/^[0-9a-f]{24}$/', $v) ? new MongoId($v) : $v;
 			},
@@ -58,7 +59,7 @@ class Schema extends \lithium\data\DocumentSchema {
 			'boolean' => function($v) { return (boolean) $v; },
 			'code'    => function($v) { return new MongoCode($v); },
 			'binary'  => function($v) { return new MongoBinData($v); }
-		);
+		];
 	}
 }
 

@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\storage\cache\adapter;
@@ -38,7 +39,7 @@ class ApcTest extends \lithium\test\Unit {
 	public function testSimpleWrite() {
 		$key = 'key';
 		$data = 'value';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = '+5 seconds';
 
 		$result = $this->Apc->write($keys, $expiry);
@@ -53,7 +54,7 @@ class ApcTest extends \lithium\test\Unit {
 
 		$key = 'another_key';
 		$data = 'more_data';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = '+1 minute';
 
 		$expected = $keys;
@@ -77,8 +78,8 @@ class ApcTest extends \lithium\test\Unit {
 	 * _page request_.
 	 */
 	public function testWriteExpiryDefault() {
-		$apc = new Apc(array('expiry' => '+5 seconds'));
-		$keys = array('key1' => 'data1');
+		$apc = new Apc(['expiry' => '+5 seconds']);
+		$keys = ['key1' => 'data1'];
 		$expiry = null;
 
 		$result = $apc->write($keys, $expiry);
@@ -89,9 +90,9 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteNoExpiry() {
-		$keys = array('key1' => 'data1');
+		$keys = ['key1' => 'data1'];
 
-		$apc = new Apc(array('expiry' => null));
+		$apc = new Apc(['expiry' => null]);
 		$expiry = null;
 		$result = $apc->write($keys, $expiry);
 		$this->assertTrue($result);
@@ -101,7 +102,7 @@ class ApcTest extends \lithium\test\Unit {
 
 		apc_delete('key1');
 
-		$apc = new Apc(array('expiry' => Cache::PERSIST));
+		$apc = new Apc(['expiry' => Cache::PERSIST]);
 		$expiry = Cache::PERSIST;
 
 		$result = $apc->write($keys, $expiry);
@@ -130,7 +131,7 @@ class ApcTest extends \lithium\test\Unit {
 	 * _page request_.
 	 */
 	public function testWriteExpiryExpires() {
-		$keys = array('key1' => 'data1');
+		$keys = ['key1' => 'data1'];
 		$expiry = '+5 seconds';
 		$this->Apc->write($keys, $expiry);
 
@@ -147,7 +148,7 @@ class ApcTest extends \lithium\test\Unit {
 	 * _page request_.
 	 */
 	public function testWriteExpiryTtl() {
-		$keys = array('key1' => 'data1');
+		$keys = ['key1' => 'data1'];
 		$expiry = 5;
 		$this->Apc->write($keys, $expiry);
 
@@ -157,11 +158,11 @@ class ApcTest extends \lithium\test\Unit {
 
 	public function testWriteMulti() {
 		$expiry = '+1 minute';
-		$keys = array(
+		$keys = [
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
-		);
+		];
 		$result = $this->Apc->write($keys, $expiry);
 		$this->assertTrue($result);
 
@@ -169,18 +170,18 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertEqual($keys, $result);
 
 		$result = apc_delete(array_keys($keys));
-		$this->assertEqual(array(), $result);
+		$this->assertEqual([], $result);
 	}
 
 	public function testSimpleRead() {
 		$key = 'read_key';
 		$data = 'read data';
-		$keys = array($key);
+		$keys = [$key];
 
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
 
-		$expected = array($key => $data);
+		$expected = [$key => $data];
 		$result = $this->Apc->read($keys);
 		$this->assertEqual($expected, $result);
 
@@ -189,12 +190,12 @@ class ApcTest extends \lithium\test\Unit {
 
 		$key = 'another_read_key';
 		$data = 'read data';
-		$keys = array($key);
+		$keys = [$key];
 
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
 
-		$expected = array($key => $data);
+		$expected = [$key => $data];
 		$result = $this->Apc->read($keys);
 		$this->assertEqual($expected, $result);
 
@@ -203,56 +204,56 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testReadMulti() {
-		$keys = array(
+		$keys = [
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
-		);
+		];
 		apc_store($keys, null, 60);
 
-		$expected = array(
+		$expected = [
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
-		);
-		$keys = array(
+		];
+		$keys = [
 			'key1',
 			'key2',
 			'key3'
-		);
+		];
 		$result = $this->Apc->read($keys);
 		$this->assertEqual($expected, $result);
 
 		$result = apc_delete($keys);
-		$this->assertEqual(array(), $result);
+		$this->assertEqual([], $result);
 	}
 
 	public function testReadKeyThatDoesNotExist() {
 		$key = 'does_not_exist';
-		$keys = array($key);
+		$keys = [$key];
 
-		$expected = array();
+		$expected = [];
 		$result = $this->Apc->read($keys);
 		$this->assertIdentical($expected, $result);
 	}
 
 	public function testReadWithScope() {
-		$adapter = new Apc(array('scope' => 'primary'));
+		$adapter = new Apc(['scope' => 'primary']);
 
 		apc_store('primary:key1', 'test1', 60);
 		apc_store('key1', 'test2', 60);
 
-		$keys = array('key1');
-		$expected = array('key1' => 'test1');
+		$keys = ['key1'];
+		$expected = ['key1' => 'test1'];
 		$result = $adapter->read($keys);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testWriteAndReadNull() {
 		$expiry = '+1 minute';
-		$keys = array(
+		$keys = [
 			'key1' => null
-		);
+		];
 		$result = $this->Apc->write($keys);
 		$this->assertTrue($result);
 
@@ -263,10 +264,10 @@ class ApcTest extends \lithium\test\Unit {
 
 	public function testWriteAndReadNullMulti() {
 		$expiry = '+1 minute';
-		$keys = array(
+		$keys = [
 			'key1' => null,
 			'key2' => 'data2'
-		);
+		];
 		$result = $this->Apc->write($keys);
 		$this->assertTrue($result);
 
@@ -274,19 +275,19 @@ class ApcTest extends \lithium\test\Unit {
 		$result = $this->Apc->read(array_keys($keys));
 		$this->assertEqual($expected, $result);
 
-		$keys = array(
+		$keys = [
 			'key1' => null,
 			'key2' => null
-		);
+		];
 		$result = $this->Apc->write($keys);
 		$this->assertTrue($result);
 	}
 
 	public function testWriteAndReadArray() {
 		$expiry = '+1 minute';
-		$keys = array(
-			'key1' => array('foo' => 'bar')
-		);
+		$keys = [
+			'key1' => ['foo' => 'bar']
+		];
 		$result = $this->Apc->write($keys);
 		$this->assertTrue($result);
 
@@ -296,9 +297,9 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testWriteWithScope() {
-		$adapter = new Apc(array('scope' => 'primary'));
+		$adapter = new Apc(['scope' => 'primary']);
 
-		$keys = array('key1' => 'test1');
+		$keys = ['key1' => 'test1'];
 		$expiry = '+1 minute';
 		$adapter->write($keys, $expiry);
 
@@ -313,7 +314,7 @@ class ApcTest extends \lithium\test\Unit {
 	public function testDelete() {
 		$key = 'delete_key';
 		$data = 'data to delete';
-		$keys = array($key);
+		$keys = [$key];
 
 		$result = apc_store($key, $data, 60);
 		$this->assertTrue($result);
@@ -324,18 +325,18 @@ class ApcTest extends \lithium\test\Unit {
 
 	public function testDeleteMulti() {
 		$expiry = '+1 minute';
-		$keys = array(
+		$keys = [
 			'key1' => 'data1',
 			'key2' => 'data2',
 			'key3' => 'data3'
-		);
+		];
 		apc_store($keys, null, 60);
 
-		$keys = array(
+		$keys = [
 			'key1',
 			'key2',
 			'key3'
-		);
+		];
 		$result = $this->Apc->delete($keys);
 		$this->assertTrue($result);
 
@@ -346,20 +347,20 @@ class ApcTest extends \lithium\test\Unit {
 	public function testDeleteNonExistentKey() {
 		$key = 'delete_key';
 		$data = 'data to delete';
-		$keys = array($key);
+		$keys = [$key];
 
 		$result = $this->Apc->delete($keys);
 		$this->assertFalse($result);
 	}
 
 	public function testDeleteWithScope() {
-		$adapter = new Apc(array('scope' => 'primary'));
+		$adapter = new Apc(['scope' => 'primary']);
 
 		apc_store('primary:key1', 'test1', 60);
 		apc_store('key1', 'test2', 60);
 
-		$keys = array('key1');
-		$expected = array('key1' => 'test1');
+		$keys = ['key1'];
+		$expected = ['key1' => 'test1'];
 		$adapter->delete($keys);
 
 		$result = apc_exists('key1');
@@ -372,7 +373,7 @@ class ApcTest extends \lithium\test\Unit {
 	public function testWriteReadAndDeleteRoundtrip() {
 		$key = 'write_read_key';
 		$data = 'write/read value';
-		$keys = array($key => $data);
+		$keys = [$key => $data];
 		$expiry = '+5 seconds';
 
 		$result = $this->Apc->write($keys, $expiry);
@@ -441,7 +442,7 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testDecrementWithScope() {
-		$adapter = new Apc(array('scope' => 'primary'));
+		$adapter = new Apc(['scope' => 'primary']);
 
 		apc_store('primary:key1', 1, 60);
 		apc_store('key1', 1, 60);
@@ -491,7 +492,7 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function testIncrementWithScope() {
-		$adapter = new Apc(array('scope' => 'primary'));
+		$adapter = new Apc(['scope' => 'primary']);
 
 		apc_store('primary:key1', 1, 60);
 		apc_store('key1', 1, 60);

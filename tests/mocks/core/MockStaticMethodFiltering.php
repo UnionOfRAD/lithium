@@ -1,13 +1,17 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\core;
 
+/**
+ * @deprecated
+ */
 class MockStaticMethodFiltering extends \lithium\core\StaticObject {
 
 	public static function method($data) {
@@ -25,35 +29,20 @@ class MockStaticMethodFiltering extends \lithium\core\StaticObject {
 		$method = function($self, $params, $chain) use (&$filters) {
 			return $filters;
 		};
-		return static::_filter(__FUNCTION__, array(), $method);
+		return static::_filter(__FUNCTION__, [], $method);
 	}
 
 	public static function manual($filters) {
 		$method = function($self, $params, $chain) {
 			return "Working";
 		};
-		return static::_filter(__FUNCTION__, array(), $method, $filters);
+		return static::_filter(__FUNCTION__, [], $method, $filters);
 	}
 
 	public static function callSubclassMethod() {
-		return static::_filter(__FUNCTION__, array(), function($self, $params, $chain) {
+		return static::_filter(__FUNCTION__, [], function($self, $params, $chain) {
 			return $self::childMethod();
 		});
-	}
-
-	public static function foo() {
-		$args = func_get_args();
-		return $args;
-	}
-
-	public static function parents($get = false) {
-		if ($get === null) {
-			static::$_parents = array();
-		}
-		if ($get) {
-			return static::$_parents;
-		}
-		return static::_parents();
 	}
 }
 

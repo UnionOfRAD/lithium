@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\security\validation;
@@ -33,9 +34,9 @@ class FormSignature {
 	 *
 	 * @var array
 	 */
-	protected static $_classes = array(
-		'string' => 'lithium\util\String'
-	);
+	protected static $_classes = [
+		'hash' => 'lithium\security\Hash'
+	];
 
 	/**
 	 * Must be set manually to a unique string i.e.
@@ -53,12 +54,12 @@ class FormSignature {
 	 *        - `'secret'` _string_: *Must* be provided.
 	 * @return array|void If `$config` is empty, returns an array with the current configurations.
 	 */
-	public static function config(array $config = array()) {
+	public static function config(array $config = []) {
 		if (!$config) {
-			return array(
+			return [
 				'classes' => static::$_classes,
 				'secret' => static::$_secret
-			);
+			];
 		}
 		if (isset($config['classes'])) {
 			static::$_classes = $config['classes'] + static::$_classes;
@@ -75,11 +76,11 @@ class FormSignature {
 	 * @return string The form signature string.
 	 */
 	public static function key(array $data) {
-		$data += array(
-			'fields' => array(),
-			'locked' => array(),
-			'excluded' => array()
-		);
+		$data += [
+			'fields' => [],
+			'locked' => [],
+			'excluded' => []
+		];
 		return static::_compile(
 			array_keys(Set::flatten($data['fields'])),
 			$data['locked'],
@@ -137,16 +138,16 @@ class FormSignature {
 	 *         `<serialized locked>::<serialized excluded>::<signature>`.
 	 */
 	protected static function _compile(array $fields, array $locked, array $excluded) {
-		$string = static::$_classes['string'];
+		$hash = static::$_classes['hash'];
 
 		sort($fields, SORT_STRING);
 		ksort($locked, SORT_STRING);
 		sort($excluded, SORT_STRING);
 
-		foreach (array('fields', 'excluded', 'locked') as $list) {
+		foreach (['fields', 'excluded', 'locked'] as $list) {
 			${$list} = urlencode(serialize(${$list}));
 		}
-		$hash = $string::hash($fields);
+		$hash = $hash::calculate($fields);
 		$signature = static::_signature("{$locked}::{$excluded}::{$hash}");
 
 		return "{$locked}::{$excluded}::{$signature}";
@@ -173,7 +174,7 @@ class FormSignature {
 	 * @return string The signature.
 	 */
 	protected static function _signature($data) {
-		$string = static::$_classes['string'];
+		$hash = static::$_classes['hash'];
 
 		if (empty(static::$_secret)) {
 			$message  = 'Form signature requires a secret key. ';
@@ -181,10 +182,10 @@ class FormSignature {
 			throw new ConfigException($message);
 		}
 		$key = 'li3,1' . static::$_secret;
-		$key = $string::hash(date('YMD'), array('key' => $key, 'raw' => true));
-		$key = $string::hash('li3,1_form', array('key' => $key, 'raw' => true));
+		$key = $hash::calculate(date('YMD'), ['key' => $key, 'raw' => true]);
+		$key = $hash::calculate('li3,1_form', ['key' => $key, 'raw' => true]);
 
-		return $string::hash($data, array('key' => $key));
+		return $hash::calculate($data, ['key' => $key]);
 	}
 
 	/**
@@ -203,10 +204,10 @@ class FormSignature {
 		}
 		list($locked, $excluded) = explode('::', $string, 3);
 
-		return array(
+		return [
 			'locked' => unserialize(urldecode($locked)),
 			'excluded' => unserialize(urldecode($excluded))
-		);
+		];
 	}
 }
 

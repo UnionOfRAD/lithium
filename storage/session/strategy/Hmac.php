@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\storage\session\strategy;
@@ -11,7 +12,7 @@ namespace lithium\storage\session\strategy;
 use RuntimeException;
 use lithium\core\ConfigException;
 use lithium\storage\session\strategy\MissingSignatureException;
-use lithium\util\String;
+use lithium\security\Hash;
 
 /**
  * This strategy allows you to sign your `Session` and / or `Cookie` data with a passphrase
@@ -20,10 +21,10 @@ use lithium\util\String;
  * Example configuration:
  *
  * ```
- * Session::config(array('default' => array(
+ * Session::config(['default' => [
  *    'adapter' => 'Cookie',
- *    'strategies' => array('Hmac' => array('secret' => 'foobar'))
- * )));
+ *    'strategies' => ['Hmac' => ['secret' => 'foobar']]
+ * ]]);
  * ```
  *
  * This will configure the `HMAC` strategy to be used for all `Session` operations with the
@@ -55,7 +56,7 @@ class Hmac extends \lithium\core\Object {
 	 *        configuration key is not set.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		if (!isset($config['secret'])) {
 			throw new ConfigException("HMAC strategy requires a secret key.");
 		}
@@ -76,15 +77,15 @@ class Hmac extends \lithium\core\Object {
 	 * @param array $options Options for this method.
 	 * @return array Data & signature.
 	 */
-	public function write($data, array $options = array()) {
+	public function write($data, array $options = []) {
 		$class = $options['class'];
 
-		$futureData = $class::read(null, array('strategies' => false));
-		$futureData = array($options['key'] => $data) + $futureData;
+		$futureData = $class::read(null, ['strategies' => false]);
+		$futureData = [$options['key'] => $data] + $futureData;
 		unset($futureData['__signature']);
 
 		$signature = static::_signature($futureData);
-		$class::write('__signature', $signature, array('strategies' => false) + $options);
+		$class::write('__signature', $signature, ['strategies' => false] + $options);
 		return $data;
 	}
 
@@ -106,18 +107,18 @@ class Hmac extends \lithium\core\Object {
 	 * @param array $options Options for this method.
 	 * @return array Validated data.
 	 */
-	public function read($data, array $options = array()) {
+	public function read($data, array $options = []) {
 		if ($data === null) {
 			return $data;
 		}
 		$class = $options['class'];
 
-		$currentData = $class::read(null, array('strategies' => false));
+		$currentData = $class::read(null, ['strategies' => false]);
 
 		if (!isset($currentData['__signature'])) {
 			throw new MissingSignatureException('HMAC signature not found.');
 		}
-		if (String::compare($currentData['__signature'], static::_signature($currentData))) {
+		if (Hash::compare($currentData['__signature'], static::_signature($currentData))) {
 			return $data;
 		}
 		throw new RuntimeException('Possible data tampering: HMAC signature does not match data.');
@@ -133,14 +134,14 @@ class Hmac extends \lithium\core\Object {
 	 * @param array $options Options for this method.
 	 * @return array Data & signature.
 	 */
-	public function delete($data, array $options = array()) {
+	public function delete($data, array $options = []) {
 		$class = $options['class'];
 
-		$futureData = $class::read(null, array('strategies' => false));
+		$futureData = $class::read(null, ['strategies' => false]);
 		unset($futureData[$options['key']]);
 
 		$signature = static::_signature($futureData);
-		$class::write('__signature', $signature, array('strategies' => false) + $options);
+		$class::write('__signature', $signature, ['strategies' => false] + $options);
 		return $data;
 	}
 

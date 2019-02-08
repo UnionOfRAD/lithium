@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\console\command;
@@ -17,7 +18,7 @@ class CreateTest extends \lithium\test\Unit {
 
 	public $request;
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	protected $_testPath = null;
 
@@ -29,16 +30,16 @@ class CreateTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_backup['cwd'] = getcwd();
 		$this->_backup['_SERVER'] = $_SERVER;
-		$_SERVER['argv'] = array();
+		$_SERVER['argv'] = [];
 
-		Libraries::add('create_test', array('path' => $this->_testPath . '/create_test'));
-		$this->request = new Request(array('input' => fopen('php://temp', 'w+')));
-		$this->request->params = array('library' => 'create_test', 'action' => null);
+		Libraries::add('create_test', ['path' => $this->_testPath . '/create_test']);
+		$this->request = new Request(['input' => fopen('php://temp', 'w+')]);
+		$this->request->params = ['library' => 'create_test', 'action' => null];
 
-		Connections::add('default', array(
+		Connections::add('default', [
 			'type' => null,
 			'adapter' => 'lithium\tests\mocks\data\model\MockDatabase'
-		));
+		]);
 	}
 
 	public function tearDown() {
@@ -48,7 +49,7 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testConstruct() {
-		$create = new MockCreate(array('request' => $this->request));
+		$create = new MockCreate(['request' => $this->request]);
 
 		$expected = 'create_test';
 		$result = $create->library;
@@ -56,8 +57,8 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testNonExistentCommand() {
-		$this->request->params['args'] = array('does_not_exist', 'anywhere');
-		$create = new MockCreate(array('request' => $this->request));
+		$this->request->params['args'] = ['does_not_exist', 'anywhere'];
+		$create = new MockCreate(['request' => $this->request]);
 
 		$result = $create->run('does_not_exist');
 		$this->assertFalse($result);
@@ -68,28 +69,28 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testNamespace() {
-		$create = new MockCreate(array('request' => $this->request));
+		$create = new MockCreate(['request' => $this->request]);
 		$this->request->params['command'] = 'one';
 
 		$expected = 'create_test\\two';
-		$result = $create->invokeMethod('_namespace', array(
-			$this->request, array(
-				'spaces' => array('one' => 'two')
-			)
-		));
+		$result = $create->invokeMethod('_namespace', [
+			$this->request, [
+				'spaces' => ['one' => 'two']
+			]
+		]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testSave() {
 		chdir($this->_testPath);
-		$this->request->params = array('library' => 'create_test', 'template' => 'test');
-		$create = new MockCreate(array('request' => $this->request));
-		$result = $create->save(array(
+		$this->request->params = ['library' => 'create_test', 'template' => 'test'];
+		$create = new MockCreate(['request' => $this->request]);
+		$result = $create->save([
 			'namespace' => 'create_test\tests\cases\models',
 			'use' => 'create_test\models\Posts',
 			'class' => 'PostTest',
 			'methods' => "\tpublic function testCreate() {\n\n\t}\n"
-		));
+		]);
 		$this->assertNotEmpty($result);
 
 		$result = $this->_testPath . '/create_test/tests/cases/models/PostTest.php';
@@ -99,7 +100,7 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithoutCommand() {
-		$create = new MockCreate(array('request' => $this->request));
+		$create = new MockCreate(['request' => $this->request]);
 
 		$result = $create->run();
 		$this->assertFalse($result);
@@ -109,11 +110,11 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testRunNotSaved() {
-		$this->request->params = array(
+		$this->request->params = [
 			'library' => 'not_here', 'command' => 'create', 'action' => 'model',
-			'args' => array('model', 'Posts')
-		);
-		$create = new MockCreate(array('request' => $this->request));
+			'args' => ['model', 'Posts']
+		];
+		$create = new MockCreate(['request' => $this->request]);
 
 		$result = $create->run('model');
 		$this->assertFalse($result);
@@ -124,12 +125,12 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithModelCommand() {
-		$this->request->params = array(
+		$this->request->params = [
 			'library' => 'create_test', 'command' => 'create', 'action' => 'model',
-			'args' => array('Posts')
-		);
+			'args' => ['Posts']
+		];
 
-		$create = new MockCreate(array('request' => $this->request));
+		$create = new MockCreate(['request' => $this->request]);
 
 		$create->run('model');
 
@@ -142,12 +143,12 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithTestModelCommand() {
-		$this->request->params = array(
+		$this->request->params = [
 			'library' => 'create_test', 'command' => 'create', 'action' => 'test',
-			'args' => array('model', 'Posts')
-		);
+			'args' => ['model', 'Posts']
+		];
 
-		$create = new MockCreate(array('request' => $this->request));
+		$create = new MockCreate(['request' => $this->request]);
 
 		$create->run('test');
 
@@ -160,12 +161,12 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithTestControllerCommand() {
-		$this->request->params = array(
+		$this->request->params = [
 			'library' => 'create_test', 'command' => 'create', 'action' => 'test',
-			'args' => array('controller', 'Posts')
-		);
+			'args' => ['controller', 'Posts']
+		];
 
-		$create = new MockCreate(array('request' => $this->request));
+		$create = new MockCreate(['request' => $this->request]);
 
 		$create->run('test');
 
@@ -178,12 +179,12 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testRunWithTestOtherCommand() {
-		$this->request->params = array(
+		$this->request->params = [
 			'library' => 'create_test', 'command' => 'create', 'action' => 'test',
-			'args' => array('something', 'Posts')
-		);
+			'args' => ['something', 'Posts']
+		];
 
-		$create = new MockCreate(array('request' => $this->request));
+		$create = new MockCreate(['request' => $this->request]);
 		$create->run('test');
 
 		$expected = 'something';
@@ -195,12 +196,12 @@ class CreateTest extends \lithium\test\Unit {
 	}
 
 	public function testRunAll() {
-		$this->request->params = array(
+		$this->request->params = [
 			'library' => 'create_test', 'command' => 'create', 'action' => 'Posts',
-			'args' => array()
-		);
+			'args' => []
+		];
 
-		$create = new MockCreate(array('request' => $this->request));
+		$create = new MockCreate(['request' => $this->request]);
 		$create->run('Posts');
 
 		$result = $this->_testPath . '/create_test/models/Posts.php';

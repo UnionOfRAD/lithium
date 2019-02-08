@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\integration\data;
@@ -13,10 +14,10 @@ use li3_fixtures\test\Fixtures;
 
 class CrudTest extends \lithium\tests\integration\data\Base {
 
-	protected $_fixtures = array(
+	protected $_fixtures = [
 		'images' => 'lithium\tests\fixture\model\gallery\ImagesFixture',
 		'galleries' => 'lithium\tests\fixture\model\gallery\GalleriesFixture',
-	);
+	];
 
 	/**
 	 * Skip the test if no test database connection available.
@@ -33,14 +34,14 @@ class CrudTest extends \lithium\tests\integration\data\Base {
 	 * Creating the test database
 	 */
 	public function setUp() {
-		Fixtures::config(array(
-			'db' => array(
+		Fixtures::config([
+			'db' => [
 				'adapter' => 'Connection',
 				'connection' => $this->_connection,
 				'fixtures' => $this->_fixtures
-			)
-		));
-		Fixtures::create('db', array('galleries'));
+			]
+		]);
+		Fixtures::create('db', ['galleries']);
 	}
 
 	/**
@@ -56,21 +57,21 @@ class CrudTest extends \lithium\tests\integration\data\Base {
 	 */
 	public function testCreate() {
 		$this->assertIdentical(0, Galleries::count());
-		$new = Galleries::create(array('name' => 'Flowers', 'active' => true));
-		$expected = array('name' => 'Flowers', 'active' => true);
+		$new = Galleries::create(['name' => 'Flowers', 'active' => true]);
+		$expected = ['name' => 'Flowers', 'active' => true];
 		$result = $new->data();
 		$this->assertEqual($expected['name'], $result['name']);
 		$this->assertEqual($expected['active'], $result['active']);
 
 		$this->assertEqual(
-			array(false, true, true),
-			array($new->exists(), $new->save(), $new->exists())
+			[false, true, true],
+			[$new->exists(), $new->save(), $new->exists()]
 		);
 		$this->assertIdentical(1, Galleries::count());
 	}
 
 	public function testRead() {
-		Galleries::create(array('name' => 'Flowers', 'active' => true))->save();
+		Galleries::create(['name' => 'Flowers', 'active' => true])->save();
 		$existing = Galleries::first();
 		foreach (Galleries::key($existing) as $val) {
 			$this->assertNotEmpty($val);
@@ -81,7 +82,7 @@ class CrudTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testUpdate() {
-		Galleries::create(array('name' => 'Flowers', 'active' => true))->save();
+		Galleries::create(['name' => 'Flowers', 'active' => true])->save();
 		$existing = Galleries::first();
 		$this->assertEqual($existing->name, 'Flowers');
 		$existing->name = 'Flowers & Poneys';
@@ -97,20 +98,20 @@ class CrudTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testDelete() {
-		Galleries::create(array('name' => 'Flowers', 'active' => true))->save();
+		Galleries::create(['name' => 'Flowers', 'active' => true])->save();
 		$existing = Galleries::first();
 		$this->assertTrue($existing->exists());
 		$this->assertTrue($existing->delete());
-		$this->assertNull(Galleries::first(array('conditions' => Galleries::key($existing))));
+		$this->assertNull(Galleries::first(['conditions' => Galleries::key($existing)]));
 		$this->assertIdentical(0, Galleries::count());
 	}
 
 	public function testCrudMulti() {
-		$records = array(
-			'cities'  => Galleries::create(array('name' => 'Cities', 'active' => true)),
-			'flowers' => Galleries::create(array('name' => 'Flowers', 'active' => true)),
-			'poneys'  => Galleries::create(array('name' => 'Poneys', 'active' => true))
-		);
+		$records = [
+			'cities'  => Galleries::create(['name' => 'Cities', 'active' => true]),
+			'flowers' => Galleries::create(['name' => 'Flowers', 'active' => true]),
+			'poneys'  => Galleries::create(['name' => 'Poneys', 'active' => true])
+		];
 
 		foreach ($records as $key => $record) {
 			$this->assertFalse($record->exists());
@@ -125,10 +126,10 @@ class CrudTest extends \lithium\tests\integration\data\Base {
 		$match = 'Cities';
 		$filter = function($entity) use (&$match) { return $entity->name === $match; };
 
-		foreach (array('Cities', 'Flowers', 'Poneys') as $match) {
+		foreach (['Cities', 'Flowers', 'Poneys'] as $match) {
 			$this->assertTrue($all->first($filter)->exists());
 		}
-		$this->assertEqual(array(true, true, true), array_values($all->delete()));
+		$this->assertEqual([true, true, true], array_values($all->delete()));
 		$this->assertEqual(0, Galleries::count());
 	}
 
@@ -136,22 +137,22 @@ class CrudTest extends \lithium\tests\integration\data\Base {
 		$db = $this->_db;
 		$this->skipIf($db::enabled('schema'));
 
-		$new = Galleries::create(array('name' => 'Flowers', 'active' => true));
+		$new = Galleries::create(['name' => 'Flowers', 'active' => true]);
 
-		$expected = array('name' => 'Flowers', 'active' => true);
+		$expected = ['name' => 'Flowers', 'active' => true];
 		$result = $new->data();
 		$this->assertEqual($expected, $result);
 
 		$new->foo = 'bar';
-		$expected = array('name' => 'Flowers', 'active' => true, 'foo' => 'bar');
+		$expected = ['name' => 'Flowers', 'active' => true, 'foo' => 'bar'];
 		$result = $new->data();
 		$this->assertEqual($expected, $result);
 
 		$this->assertTrue($new->save());
 
-		$updated = Galleries::find('first', array(
+		$updated = Galleries::find('first', [
 			'conditions' => Galleries::key($new)
-		));
+		]);
 		$expected = 'bar';
 		$result = $updated->foo;
 		$this->assertEqual($expected, $result);

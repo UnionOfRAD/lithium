@@ -1,19 +1,28 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\test;
 
 use lithium\test\Mocker;
 
+/**
+ * @deprecated
+ */
 class MockerChainTest extends \lithium\test\Unit {
 
 	public function setUp() {
+		error_reporting(($this->_backup = error_reporting()) & ~E_USER_DEPRECATED);
 		Mocker::register();
+	}
+
+	public function tearDown() {
+		error_reporting($this->_backup);
 	}
 
 	public function testStartSuccessful() {
@@ -156,13 +165,13 @@ class MockerChainTest extends \lithium\test\Unit {
 	}
 
 	public function testRespondsToParentCall() {
-		$chain = Mocker::chain(array());
+		$chain = Mocker::chain([]);
 		$this->assertTrue($chain->respondsTo('applyFilter'));
 		$this->assertFalse($chain->respondsTo('fooBarBaz'));
 	}
 
 	public function testRespondsToMagic() {
-		$chain = Mocker::chain(array());
+		$chain = Mocker::chain([]);
 		$this->assertTrue($chain->respondsTo('gt'));
 		$this->assertTrue($chain->respondsTo('lt'));
 		$this->assertFalse($chain->respondsTo('et'));

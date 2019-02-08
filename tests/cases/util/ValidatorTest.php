@@ -1,23 +1,20 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\util;
 
 use lithium\util\Validator;
-use lithium\test\Mocker;
 
 class ValidatorTest extends \lithium\test\Unit {
 
-	public function setUp() {}
-
 	public function tearDown() {
 		Validator::reset();
-		Mocker::overwriteFunction(false);
 	}
 
 	/**
@@ -33,35 +30,35 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	public function testFieldOption() {
 		Validator::add('isInArray', function($data, $params, $options) {
-			$existing = array(
-				'number' => array('one', 'two', 'three'),
-				'name' => array('bob', 'bill')
-			);
+			$existing = [
+				'number' => ['one', 'two', 'three'],
+				'name' => ['bob', 'bill']
+			];
 
 			$isSet = isset($existing[$options['field']]);
 			$inArray = in_array($data,$existing[$options['field']]);
 			return isset($options['field']) && $isSet && $inArray;
 		});
 
-		$fieldValidationRules = array(
-			'number' => array('rule' => array('isInArray')),
-			'name' => array('rule' => array('isInArray'))
-		);
+		$fieldValidationRules = [
+			'number' => ['rule' => ['isInArray']],
+			'name' => ['rule' => ['isInArray']]
+		];
 
 		$result = Validator::check(
-			array('number' => 'one', 'name' => 'bob'),
+			['number' => 'one', 'name' => 'bob'],
 			$fieldValidationRules
 		);
 		$this->assertEmpty($result);
 
 		$result = Validator::check(
-			array('number' => 'four', 'name' => 'bob'),
+			['number' => 'four', 'name' => 'bob'],
 			$fieldValidationRules
 		);
 		$this->assertNotEmpty($result);
 
 		$result = Validator::check(
-			array('number' => 'one', 'name' => 'rex'),
+			['number' => 'one', 'name' => 'rex'],
 			$fieldValidationRules
 		);
 		$this->assertNotEmpty($result);
@@ -110,19 +107,19 @@ class ValidatorTest extends \lithium\test\Unit {
 
 	public function testCustomWithFormat() {
 		$rFormat = null;
-		$function = function(&$value, $format = null, array $options = array()) use (&$rFormat) {
+		$function = function(&$value, $format = null, array $options = []) use (&$rFormat) {
 			$rFormat = $format;
 			if ($format === 'string') {
 				return true;
 			}
 		};
 		Validator::add('test', $function);
-		$validations = array(
-			'inputName' => array(array('test', 'message' => 'foobar', 'format' => 'string'))
-		);
-		$values = array(
+		$validations = [
+			'inputName' => [['test', 'message' => 'foobar', 'format' => 'string']]
+		];
+		$values = [
 			'inputName' => 'blah'
-		);
+		];
 		$this->assertFalse((boolean) Validator::check($values, $validations));
 		$this->assertEqual($rFormat, 'string');
 	}
@@ -135,7 +132,7 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isPhone('+1234567890'));
 
 		$this->assertFalse(Validator::isPhone('0800-LITHIUM'));
-		Validator::add(array('phone' => array('foo' => '/^0800-[A-Z]+$/')));
+		Validator::add(['phone' => ['foo' => '/^0800-[A-Z]+$/']]);
 
 		$this->assertTrue(Validator::isPhone('0800-LITHIUM'));
 		$this->assertTrue(Validator::isPhone('0800-LITHIUM', 'foo'));
@@ -147,12 +144,12 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * an exact match of the regex, with no additional characters outside.
 	 */
 	public function testRegexContainment() {
-		$this->assertTrue(Validator::isIp('127.0.0.1', null, array('contains' => false)));
+		$this->assertTrue(Validator::isIp('127.0.0.1', null, ['contains' => false]));
 
-		Validator::add('foo', '/foo/', array('contains' => true));
+		Validator::add('foo', '/foo/', ['contains' => true]);
 		$this->assertTrue(Validator::isFoo('foobar'));
 
-		Validator::add('foo', 'foo', array('contains' => false));
+		Validator::add('foo', 'foo', ['contains' => false]);
 		$this->assertFalse(Validator::isFoo('foobar'));
 		$this->assertTrue(Validator::isFoo('foo'));
 	}
@@ -237,9 +234,9 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * Tests the the 'lengthBetween' rule validates correct values.
 	 */
 	public function testIsLengthBetweenRule() {
-		$this->assertTrue(Validator::isLengthBetween('abcde', null, array('min' => 1, 'max' => 7)));
-		$this->assertTrue(Validator::isLengthBetween('', null, array('min' => 0, 'max' => 7)));
-		$this->assertFalse(Validator::isLengthBetween('abcd', null, array('min' => 1, 'max' => 3)));
+		$this->assertTrue(Validator::isLengthBetween('abcde', null, ['min' => 1, 'max' => 7]));
+		$this->assertTrue(Validator::isLengthBetween('', null, ['min' => 0, 'max' => 7]));
+		$this->assertFalse(Validator::isLengthBetween('abcd', null, ['min' => 1, 'max' => 3]));
 	}
 
 	public function testIsNumericRule() {
@@ -298,22 +295,22 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * Test decimal validation with precision specified.
 	 */
 	public function testDecimalWithPlaces() {
-		$this->assertTrue(Validator::isDecimal('.27', null, array('precision' => '2')));
-		$this->assertTrue(Validator::isDecimal(.27, null, array('precision' => 2)));
-		$this->assertTrue(Validator::isDecimal(-.27, null, array('precision' => 2)));
-		$this->assertTrue(Validator::isDecimal(+.27, null, array('precision' => 2)));
-		$this->assertTrue(Validator::isDecimal('.277', null, array('precision' => '3')));
-		$this->assertTrue(Validator::isDecimal(.277, null, array('precision' => 3)));
-		$this->assertTrue(Validator::isDecimal(-.277, null, array('precision' => 3)));
-		$this->assertTrue(Validator::isDecimal(+.277, null, array('precision' => 3)));
-		$this->assertTrue(Validator::isDecimal('1234.5678', null, array('precision' => '4')));
-		$this->assertTrue(Validator::isDecimal(1234.5678, null, array('precision' => 4)));
-		$this->assertTrue(Validator::isDecimal(-1234.5678, null, array('precision' => 4)));
-		$this->assertTrue(Validator::isDecimal(+1234.5678, null, array('precision' => 4)));
-		$this->assertFalse(Validator::isDecimal('1234.5678', null, array('precision' => '3')));
-		$this->assertFalse(Validator::isDecimal(1234.5678, null, array('precision' => 3)));
-		$this->assertFalse(Validator::isDecimal(-1234.5678, null, array('precision' => 3)));
-		$this->assertFalse(Validator::isDecimal(+1234.5678, null, array('precision' => 3)));
+		$this->assertTrue(Validator::isDecimal('.27', null, ['precision' => '2']));
+		$this->assertTrue(Validator::isDecimal(.27, null, ['precision' => 2]));
+		$this->assertTrue(Validator::isDecimal(-.27, null, ['precision' => 2]));
+		$this->assertTrue(Validator::isDecimal(+.27, null, ['precision' => 2]));
+		$this->assertTrue(Validator::isDecimal('.277', null, ['precision' => '3']));
+		$this->assertTrue(Validator::isDecimal(.277, null, ['precision' => 3]));
+		$this->assertTrue(Validator::isDecimal(-.277, null, ['precision' => 3]));
+		$this->assertTrue(Validator::isDecimal(+.277, null, ['precision' => 3]));
+		$this->assertTrue(Validator::isDecimal('1234.5678', null, ['precision' => '4']));
+		$this->assertTrue(Validator::isDecimal(1234.5678, null, ['precision' => 4]));
+		$this->assertTrue(Validator::isDecimal(-1234.5678, null, ['precision' => 4]));
+		$this->assertTrue(Validator::isDecimal(+1234.5678, null, ['precision' => 4]));
+		$this->assertFalse(Validator::isDecimal('1234.5678', null, ['precision' => '3']));
+		$this->assertFalse(Validator::isDecimal(1234.5678, null, ['precision' => 3]));
+		$this->assertFalse(Validator::isDecimal(-1234.5678, null, ['precision' => 3]));
+		$this->assertFalse(Validator::isDecimal(+1234.5678, null, ['precision' => 3]));
 	}
 
 	public function testEmailValidation() {
@@ -393,56 +390,34 @@ class ValidatorTest extends \lithium\test\Unit {
 	}
 
 	/**
-	 * Tests email address validation, with additional hostname lookup
-	 */
-	public function testEmailDomainCheckGoodMxrr() {
-		Mocker::overwriteFunction('lithium\util\getmxrr', function($host, &$mxhosts) {
-			return false;
-		});
-		$this->assertFalse(Validator::isEmail('abc.efg@rad-dev.org', null, array(
-			'deep' => true,
-		)));
-	}
-
-	public function testEmailDomainCheckBadMxrr() {
-		Mocker::overwriteFunction('lithium\util\getmxrr', function($host, &$mxhosts) {
-			$mxhosts = array();
-			return true;
-		});
-		$this->assertTrue(Validator::isEmail('abc.efg@invalidfoo.com', null, array(
-			'deep' => true,
-		)));
-	}
-
-	/**
 	 * Tests 'inList' validation.
 	 */
 	public function testInList() {
-		$this->assertTrue(Validator::isInList('one', null, array('list' => array('one', 'two'))));
-		$this->assertTrue(Validator::isInList('two', null, array('list' => array('one', 'two'))));
-		$this->assertFalse(Validator::isInList('3', null, array('list' => array('one', 'two'))));
+		$this->assertTrue(Validator::isInList('one', null, ['list' => ['one', 'two']]));
+		$this->assertTrue(Validator::isInList('two', null, ['list' => ['one', 'two']]));
+		$this->assertFalse(Validator::isInList('3', null, ['list' => ['one', 'two']]));
 
-		$this->assertFalse(Validator::isInList('', null, array('list' => array('0', '1'))));
-		$this->assertFalse(Validator::isInList(null, null, array('list' => array('0', '1'))));
-		$this->assertFalse(Validator::isInList(false, null, array('list' => array('0', '1'))));
-		$this->assertFalse(Validator::isInList(true, null, array('list' => array('0', '1'))));
+		$this->assertFalse(Validator::isInList('', null, ['list' => ['0', '1']]));
+		$this->assertFalse(Validator::isInList(null, null, ['list' => ['0', '1']]));
+		$this->assertFalse(Validator::isInList(false, null, ['list' => ['0', '1']]));
+		$this->assertFalse(Validator::isInList(true, null, ['list' => ['0', '1']]));
 
-		$this->assertFalse(Validator::isInList('', null, array('list' => array(0, 1))));
-		$this->assertFalse(Validator::isInList(null, null, array('list' => array(0, 1))));
-		$this->assertFalse(Validator::isInList(false, null, array('list' => array(0, 1))));
-		$this->assertFalse(Validator::isInList(true, null, array('list' => array(0, 1))));
-		$this->assertTrue(Validator::isInList(0, null, array('list' => array(0, 1))));
-		$this->assertTrue(Validator::isInList(1, null, array('list' => array(0, 1))));
-		$this->assertFalse(Validator::isInList(2, null, array('list' => array(0, 1))));
+		$this->assertFalse(Validator::isInList('', null, ['list' => [0, 1]]));
+		$this->assertFalse(Validator::isInList(null, null, ['list' => [0, 1]]));
+		$this->assertFalse(Validator::isInList(false, null, ['list' => [0, 1]]));
+		$this->assertFalse(Validator::isInList(true, null, ['list' => [0, 1]]));
+		$this->assertTrue(Validator::isInList(0, null, ['list' => [0, 1]]));
+		$this->assertTrue(Validator::isInList(1, null, ['list' => [0, 1]]));
+		$this->assertFalse(Validator::isInList(2, null, ['list' => [0, 1]]));
 
-		$this->assertTrue(Validator::isInList(0, null, array('list' => array('0', '1'))));
-		$this->assertTrue(Validator::isInList('1', null, array('list' => array('0', '1'))));
+		$this->assertTrue(Validator::isInList(0, null, ['list' => ['0', '1']]));
+		$this->assertTrue(Validator::isInList('1', null, ['list' => ['0', '1']]));
 
-		$this->assertTrue(Validator::isInList(1, null, array('list' => array('0', '1'))));
-		$this->assertTrue(Validator::isInList('1', null, array('list' => array('0', '1'))));
+		$this->assertTrue(Validator::isInList(1, null, ['list' => ['0', '1']]));
+		$this->assertTrue(Validator::isInList('1', null, ['list' => ['0', '1']]));
 
-		$this->assertFalse(Validator::isInList(2, null, array('list' => array('0', '1'))));
-		$this->assertFalse(Validator::isInList('2', null, array('list' => array('0', '1'))));
+		$this->assertFalse(Validator::isInList(2, null, ['list' => ['0', '1']]));
+		$this->assertFalse(Validator::isInList('2', null, ['list' => ['0', '1']]));
 	}
 
 	/**
@@ -460,9 +435,9 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertTrue(Validator::isCreditCard('376294341957707', 'amex'));
 		$this->assertTrue(Validator::isCreditCard('341779292230411', 'amex'));
 		$this->assertTrue(Validator::isCreditCard('341646919853372', 'amex'));
-		$this->assertTrue(Validator::isCreditCard('348498616319346', 'amex', array(
+		$this->assertTrue(Validator::isCreditCard('348498616319346', 'amex', [
 			'deep' => true
-		)));
+		]));
 		$this->assertFalse(Validator::isCreditCard('5610376649499352', 'amex'));
 
 		/* BankCard */
@@ -960,52 +935,65 @@ class ValidatorTest extends \lithium\test\Unit {
 	}
 
 	public function testCheckHasErrors() {
-		$rules = array('title' => 'please enter a title');
-		$result = Validator::check(array(), $rules);
+		$rules = ['title' => 'please enter a title'];
+		$result = Validator::check([], $rules);
 		$this->assertNotEmpty($result);
 
-		$expected = array('title' => array('please enter a title'));
+		$expected = ['title' => ['please enter a title']];
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCheckPasses() {
-		$rules = array('title' => 'please enter a title');
-		$data = array('title' => 'new title');
+		$rules = ['title' => 'please enter a title'];
+		$data = ['title' => 'new title'];
 		$result = Validator::check($data, $rules);
 		$this->assertEmpty($result);
 	}
 
 	public function testRuleFormatMessageOnly() {
-		$rules = array('title' => 'please enter a title');
-		$data = array();
+		$rules = ['title' => 'please enter a title'];
+		$data = [];
 
-		$expected = array('title' => array('please enter a title'));
+		$expected = ['title' => ['please enter a title']];
 		$result = Validator::check($data, $rules);
 		$this->assertEqual($expected, $result);
 
-		$data = array('title' => 'new title');
+		$data = ['title' => 'new title'];
 
 		$result = Validator::check($data, $rules);
 		$this->assertEmpty($result);
 	}
 
+	public function testNamedRules() {
+		$rules = [
+			'title' => [
+				'one' => ['notEmpty', 'message' => 'please enter a title']
+			]
+		];
+		$data = [];
+
+		$expected = ['title' => ['one' => 'please enter a title']];
+		$result = Validator::check($data, $rules);
+		$this->assertEqual($expected, $result);
+	}
+
 	public function testCheckSkipEmpty() {
-		$rules = array(
-			'email' => array('email', 'skipEmpty' => true, 'message' => 'email is not valid')
-		);
+		$rules = [
+			'email' => ['email', 'skipEmpty' => true, 'message' => 'email is not valid']
+		];
 
 		// empty string should pass
-		$data = array('email' => '');
+		$data = ['email' => ''];
 		$result = Validator::check($data, $rules);
 		$this->assertEmpty($result);
 
 		// null value should pass
-		$data = array('email' => null);
+		$data = ['email' => null];
 		$result = Validator::check($data, $rules);
 		$this->assertEmpty($result);
 
 		// string with spaces should NOT pass
-		$data = array('email' => ' ');
+		$data = ['email' => ' '];
 		$result = Validator::check($data, $rules);
 		$this->assertNotEmpty($result);
 	}
@@ -1020,90 +1008,90 @@ class ValidatorTest extends \lithium\test\Unit {
 	}
 
 	public function testCheckMultipleHasErrors() {
-		$rules = array(
+		$rules = [
 			'title' => 'please enter a title',
-			'email' => array(
-				array('notEmpty', 'message' => 'email is empty'),
-				array('email', 'message' => 'email is not valid')
-			)
-		);
-		$result = Validator::check(array(), $rules);
+			'email' => [
+				['notEmpty', 'message' => 'email is empty'],
+				['email', 'message' => 'email is not valid']
+			]
+		];
+		$result = Validator::check([], $rules);
 		$this->assertNotEmpty($result);
 
-		$expected = array(
-			'title' => array('please enter a title'),
-			'email' => array('email is empty', 'email is not valid')
-		);
+		$expected = [
+			'title' => ['please enter a title'],
+			'email' => ['email is empty', 'email is not valid']
+		];
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCheckWithLastRule() {
-		$rules = array(
+		$rules = [
 			'title' => 'please enter a title',
-			'email' => array(
-				array('notEmpty', 'message' => 'email is empty', 'last' => true),
-				array('email', 'message' => 'email is invalid')
-			)
-		);
-		$result = Validator::check(array(), $rules);
+			'email' => [
+				['notEmpty', 'message' => 'email is empty', 'last' => true],
+				['email', 'message' => 'email is invalid']
+			]
+		];
+		$result = Validator::check([], $rules);
 		$this->assertNotEmpty($result);
 
-		$expected = array(
-			'title' => array('please enter a title'),
-			'email' => array('email is empty')
-		);
+		$expected = [
+			'title' => ['please enter a title'],
+			'email' => ['email is empty']
+		];
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCheckMultipleHasFirstError() {
-		$rules = array(
+		$rules = [
 			'title' => 'please enter a title',
-			'email' => array(
-				array('notEmpty', 'message' => 'email is empty'),
-				array('email', 'message' => 'email is not valid')
-			)
-		);
-		$data = array('email' => 'something');
+			'email' => [
+				['notEmpty', 'message' => 'email is empty'],
+				['email', 'message' => 'email is not valid']
+			]
+		];
+		$data = ['email' => 'something'];
 		$result = Validator::check($data, $rules);
 
 		// result:
-		$errors = array(
-			'title' => array('please enter a title'),
-			'email' => array('email is not valid')
-		);
+		$errors = [
+			'title' => [0 => 'please enter a title'],
+			'email' => [1 => 'email is not valid']
+		];
 		$this->assertNotEmpty($result);
 		$this->assertEqual($errors, $result);
 	}
 
 	public function testCheckMultipleHasOneError() {
-		$rules = array(
+		$rules = [
 			'title' => 'please enter a title',
-			'email' => array(
-				array('notEmpty', 'message' => 'email is empty'),
-				array('email', 'message' => 'email is not valid')
-			)
-		);
-		$data = array('title' => 'new title', 'email' => 'something');
+			'email' => [
+				['notEmpty', 'message' => 'email is empty'],
+				['email', 'message' => 'email is not valid']
+			]
+		];
+		$data = ['title' => 'new title', 'email' => 'something'];
 		$result = Validator::check($data, $rules);
 		$this->assertNotEmpty($result);
 
-		$expected = array('email' => array('email is not valid'));
+		$expected = ['email' => [1 => 'email is not valid']];
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCheckMultiplePasses() {
-		$rules = array(
+		$rules = [
 			'title' => 'please enter a title',
-			'email' => array(
-				array('notEmpty', 'message' => 'email is empty'),
-				array('email', 'message' => 'email is not valid')
-			)
-		);
-		$data = array('title' => 'new title', 'email' => 'something@test.com');
+			'email' => [
+				['notEmpty', 'message' => 'email is empty'],
+				['email', 'message' => 'email is not valid']
+			]
+		];
+		$data = ['title' => 'new title', 'email' => 'something@test.com'];
 		$result = Validator::check($data, $rules);
 		$this->assertEmpty($result);
 
-		$expected = array();
+		$expected = [];
 		$this->assertEqual($expected, $result);
 	}
 
@@ -1131,22 +1119,22 @@ class ValidatorTest extends \lithium\test\Unit {
 		$result = Validator::isInRange($value, null, compact('lower', 'upper'));
 		$this->assertFalse($result);
 
-		$result = Validator::isInRange(-1, null, array('upper' => 1));
+		$result = Validator::isInRange(-1, null, ['upper' => 1]);
 		$this->assertTrue($result);
 
-		$result = Validator::isInRange(1, null, array('upper' => 1));
+		$result = Validator::isInRange(1, null, ['upper' => 1]);
 		$this->assertTrue($result);
 
-		$result = Validator::isInRange(2, null, array('upper' => 1));
+		$result = Validator::isInRange(2, null, ['upper' => 1]);
 		$this->assertFalse($result);
 
-		$result = Validator::isInRange(2, null, array('lower' => 1));
+		$result = Validator::isInRange(2, null, ['lower' => 1]);
 		$this->assertTrue($result);
 
-		$result = Validator::isInRange(1, null, array('lower' => 1));
+		$result = Validator::isInRange(1, null, ['lower' => 1]);
 		$this->assertTrue($result);
 
-		$result = Validator::isInRange(0, null, array('lower' => 1));
+		$result = Validator::isInRange(0, null, ['lower' => 1]);
 		$this->assertFalse($result);
 
 		$this->assertTrue(Validator::isInRange(0));
@@ -1158,16 +1146,16 @@ class ValidatorTest extends \lithium\test\Unit {
 		});
 
 		$result = Validator::check(
-			array('title' => 'Title', 'body' => 'Body'),
-			array('title' => array('someModelRule'))
+			['title' => 'Title', 'body' => 'Body'],
+			['title' => ['someModelRule']]
 		);
-		$this->assertIdentical(array(), $result);
+		$this->assertIdentical([], $result);
 
 		$result = Validator::check(
-			array('title' => 'Title', 'body' => 'Not Body'),
-			array('title' => array('someModelRule'))
+			['title' => 'Title', 'body' => 'Not Body'],
+			['title' => ['someModelRule']]
 		);
-		$this->assertIdentical(array('title' => array(0)), $result);
+		$this->assertIdentical(['title' => [0]], $result);
 	}
 
 	/**
@@ -1175,58 +1163,79 @@ class ValidatorTest extends \lithium\test\Unit {
 	 * in the `$options` parameter of `check()`.
 	 */
 	public function testEvents() {
-		$rules = array('number' => array('numeric', 'message' => 'Badness!'));
-		$expected = array('number' => array('Badness!'));
+		$rules = ['number' => ['numeric', 'message' => 'Badness!']];
+		$expected = ['number' => ['Badness!']];
 
-		$result = Validator::check(array('number' => 'o'), $rules);
+		$result = Validator::check(['number' => 'o'], $rules);
 		$this->assertEqual($expected, $result);
 
 		$rules['number']['on'] = 'foo';
-		$result = Validator::check(array('number' => 'o'), $rules, array('events' => 'foo'));
+		$result = Validator::check(['number' => 'o'], $rules, ['events' => 'foo']);
 		$this->assertEqual($expected, $result);
 
-		$result = Validator::check(array('number' => 'o'), $rules, array('events' => 'bar'));
-		$this->assertEqual(array(), $result);
+		$result = Validator::check(['number' => 'o'], $rules, ['events' => 'bar']);
+		$this->assertEqual([], $result);
 
-		$result = Validator::check(array('number' => 'o'), $rules, array(
-			'events' => array('foo', 'bar')
-		));
+		$result = Validator::check(['number' => 'o'], $rules, [
+			'events' => ['foo', 'bar']
+		]);
 		$this->assertEqual($expected, $result);
 
-		$result = Validator::check(array('number' => 'o'), $rules, array(
-			'events' => array('bar', 'baz')
-		));
-		$this->assertEqual(array(), $result);
+		$result = Validator::check(['number' => 'o'], $rules, [
+			'events' => ['bar', 'baz']
+		]);
+		$this->assertEqual([], $result);
 
 		unset($rules['number']['on']);
-		$result = Validator::check(array('number' => 'o'), $rules, array('events' => 'foo'));
+		$result = Validator::check(['number' => 'o'], $rules, ['events' => 'foo']);
 		$this->assertEqual($expected, $result);
+	}
+
+	public function testValidationWithArrays() {
+		$rules = [
+			'foo' => ['arrayTest', 'message' => 'fail']
+		];
+		Validator::add('arrayTest', function($value, $format, $options) {
+			return ($value == ['bar' => 1]);
+		});
+
+		$data = ['foo' => ['bar' => 1]];
+		$result = Validator::check($data, $rules);
+		$this->assertTrue(empty($result));
+
+		$data = ['foo' => null];
+		$result = Validator::check($data, $rules);
+		$this->assertFalse(empty($result));
+
+		$data = ['foo' => ['bar' => 'baz']];
+		$result = Validator::check($data, $rules);
+		$this->assertFalse(empty($result));
 	}
 
 	/**
 	 * Tests validating nested fields using dot-separated paths.
 	 */
 	public function testNestedFields() {
-		$rules = array(
-			'id' => array('numeric', 'message' => 'Bad ID'),
+		$rules = [
+			'id' => ['numeric', 'message' => 'Bad ID'],
 			'profile.name' => "Can't be empty",
-			'profile.email' => array('email', 'message' => 'Must be a valid email')
-		);
-		$data = array('id' => 1, 'profile' => array('email' => 'foo'));
+			'profile.email' => ['email', 'message' => 'Must be a valid email']
+		];
+		$data = ['id' => 1, 'profile' => ['email' => 'foo']];
 		$result = Validator::check($data, $rules);
-		$expected = array(
-			'profile.name' => array("Can't be empty"),
-			'profile.email' => array('Must be a valid email')
-		);
+		$expected = [
+			'profile.name' => ["Can't be empty"],
+			'profile.email' => ['Must be a valid email']
+		];
 		$this->assertEqual($expected, $result);
 
-		$data = array('id' => '.', 'profile' => array('email' => 'foo@bar.com', 'name' => 'Bob'));
+		$data = ['id' => '.', 'profile' => ['email' => 'foo@bar.com', 'name' => 'Bob']];
 		$result = Validator::check($data, $rules);
-		$this->assertEqual(array('id' => array('Bad ID')), $result);
+		$this->assertEqual(['id' => ['Bad ID']], $result);
 	}
 
 	public function testRespondsToParentCall() {
-		$this->assertTrue(Validator::respondsTo('applyFilter'));
+		$this->assertTrue(Validator::respondsTo('invokeMethod'));
 		$this->assertFalse(Validator::respondsTo('fooBarBaz'));
 	}
 

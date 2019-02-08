@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\integration\data\source\database\adapter\pdo;
@@ -14,20 +15,20 @@ use lithium\data\source\database\adapter\pdo\Result;
 
 class ResultTest extends \lithium\tests\integration\data\Base {
 
-	protected $_schema = array(
-		'fields' => array(
-			'id' => array('type' => 'id'),
-			'name' => array('type' => 'string', 'length' => 255),
-			'active' => array('type' => 'boolean'),
-			'created' => array('type' => 'datetime', 'null' => true),
-			'modified' => array('type' => 'datetime', 'null' => true)
-		)
-	);
+	protected $_schema = [
+		'fields' => [
+			'id' => ['type' => 'id'],
+			'name' => ['type' => 'string', 'length' => 255],
+			'active' => ['type' => 'boolean'],
+			'created' => ['type' => 'datetime', 'null' => true],
+			'modified' => ['type' => 'datetime', 'null' => true]
+		]
+	];
 
-	protected $_mockData = array(
-		1 => array(1, 'Foo Gallery'),
-		2 => array(2, 'Bar Gallery')
-	);
+	protected $_mockData = [
+		1 => [1, 'Foo Gallery'],
+		2 => [2, 'Bar Gallery']
+	];
 
 	/**
 	 * Skip the test if a MySQL adapter configuration is unavailable.
@@ -36,7 +37,7 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 	 */
 	public function skip() {
 		parent::connect($this->_connection);
-		$this->skipIf(!$this->with(array('MySql', 'PostgreSql', 'Sqlite3')));
+		$this->skipIf(!$this->with(['MySql', 'PostgreSql', 'Sqlite3']));
 	}
 
 	/**
@@ -48,7 +49,7 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 		$this->_db->createSchema('galleries', $schema);
 		foreach ($this->_mockData as $entry) {
 			$sql = "INSERT INTO galleries (name) VALUES ('" . $entry[1] . "')";
-			$this->_db->read($sql, array('return' => 'resource'));
+			$this->_db->read($sql, ['return' => 'resource']);
 		}
 	}
 
@@ -122,19 +123,19 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 	 */
 	public function testResultForeach() {
 
-		$result = $this->_db->read('SELECT name, active FROM galleries', array(
+		$result = $this->_db->read('SELECT name, active FROM galleries', [
 			'return' => 'resource'
-		));
+		]);
 
-		$rows = array();
+		$rows = [];
 		foreach ($result as $row) {
 			$rows[] = $row;
 		}
 
-		$expected = array(
-			array('Foo Gallery', null),
-			array('Bar Gallery', null)
-		);
+		$expected = [
+			['Foo Gallery', null],
+			['Bar Gallery', null]
+		];
 
 		$this->assertEqual($expected, $rows);
 	}
@@ -146,16 +147,16 @@ class ResultTest extends \lithium\tests\integration\data\Base {
 
 		$this->_db->delete('DELETE FROM galleries');
 
-		$result = $this->_db->read('SELECT name, active FROM galleries', array(
+		$result = $this->_db->read('SELECT name, active FROM galleries', [
 			'return' => 'resource'
-		));
+		]);
 
-		$rows = array();
+		$rows = [];
 		foreach ($result as $row) {
 			$rows[] = $row;
 		}
 
-		$expected = array();
+		$expected = [];
 
 		$this->assertEqual($expected, $rows);
 	}

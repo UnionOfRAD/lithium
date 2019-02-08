@@ -1,13 +1,15 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\template\helper;
 
+use lithium\aop\Filters;
 use lithium\action\Request;
 use lithium\template\helper\Form;
 use lithium\template\helper\Security;
@@ -20,6 +22,10 @@ class SecurityTest extends \lithium\test\Unit {
 
 	public $context;
 
+	public function tearDown() {
+		Filters::clear('lithium\template\helper\Form');
+	}
+
 	public static function key($token) {
 		return 'WORKING';
 	}
@@ -30,11 +36,11 @@ class SecurityTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->context = new MockFormRenderer(compact('request'));
-		$this->subject = new Security(array('context' => $this->context));
+		$this->subject = new Security(['context' => $this->context]);
 
-		FormSignature::config(array(
+		FormSignature::config([
 			'secret' => 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY'
-		));
+		]);
 	}
 
 	/**
@@ -59,10 +65,10 @@ class SecurityTest extends \lithium\test\Unit {
 	 * Tests that the helper can be constructed with a custom configuration.
 	 */
 	public function testConstruct() {
-		$this->subject = new Security(array('context' => $this->context, 'classes' => array(
+		$this->subject = new Security(['context' => $this->context, 'classes' => [
 			'password' => __CLASS__,
 			'requestToken' => __CLASS__
-		)));
+		]]);
 		$this->assertPattern('/value="WORKING"/', $this->subject->requestToken());
 	}
 
@@ -71,84 +77,84 @@ class SecurityTest extends \lithium\test\Unit {
 	 * information and generate a signature.
 	 */
 	public function testFormSignatureGeneration() {
-		$form = new Form(array('context' => $this->context));
+		$form = new Form(['context' => $this->context]);
 		$this->subject->sign($form);
 
 		ob_start();
-		$content = array(
-			$form->create(null, array('url' => 'http:///')),
-			$form->text('email', array('value' => 'foo@bar')),
+		$content = [
+			$form->create(null, ['url' => 'http:///']),
+			$form->text('email', ['value' => 'foo@bar']),
 			$form->password('pass'),
-			$form->hidden('active', array('value' => 'true')),
+			$form->hidden('active', ['value' => 'true']),
 			$form->end()
-		);
+		];
 		$signature = ob_get_clean();
 		preg_match('/value="([^"]+)"/', $signature, $match);
 		list(, $signature) = $match;
 
-		$expected = array(
+		$expected = [
 			'#a%3A1%3A%7Bs%3A6%3A%22active%22%3Bs%3A4%3A%22true%22%3B%7D',
 			'a%3A0%3A%7B%7D',
 			'[a-z0-9]{128}#'
-		);
+		];
 		$this->assertPattern(join('::', $expected), $signature);
 
-		$request = new Request(array('data' => array(
+		$request = new Request(['data' => [
 			'email' => 'foo@baz',
 			'pass' => 'whatever',
 			'active' => 'true',
 			'security' => compact('signature')
-		)));
+		]]);
 		$this->assertTrue(FormSignature::check($request));
 	}
 
 	public function testFormSignatureWithLockedAndExcluded() {
-		$form = new Form(array('context' => $this->context));
+		$form = new Form(['context' => $this->context]);
 		$validator = 'lithium\tests\mocks\security\validation\MockFormSignature';
 
-		$helper = new Security(array(
+		$helper = new Security([
 			'context' => $this->context,
-			'classes' => array(
+			'classes' => [
 				'formSignature' => $validator
-			)
-		));
+			]
+		]);
 
 		$helper->sign($form);
 
 		ob_start();
-		$content = array(
-			$form->create(null, array('url' => 'http:///')),
-			$form->text('email', array('value' => 'foo@bar')),
+		$content = [
+			$form->create(null, ['url' => 'http:///']),
+			$form->text('email', ['value' => 'foo@bar']),
 			$form->password('pass'),
-			$form->hidden('id', array('value' => 23)),
-			$form->text('foo', array('value' => 'bar', 'exclude' => true)),
-			$form->hidden('active', array('value' => 'true', 'exclude' => true, 'locked' => false)),
+			$form->hidden('id', ['value' => 23]),
+			$form->text('foo', ['value' => 'bar', 'exclude' => true]),
+			$form->hidden('active', ['value' => 'true', 'exclude' => true, 'locked' => false]),
 			$form->end()
-		);
+		];
 		ob_get_clean();
 
 		$result = $validator::$compile[0]['in'];
-		$expected = array(
-			'fields' => array(
+		$expected = [
+			'fields' => [
 				'email', 'pass'
-			),
-			'excluded' => array(
+			],
+			'excluded' => [
 				'foo',
 				'active'
-			),
-			'locked' => array(
+			],
+			'locked' => [
 				'id' => 23
-			)
-		);
+			]
+		];
 		$compiledSignature = $validator::$compile[0]['out'];
 
 		$this->assertEqual($expected, $result);
 
-		$request = new Request(array(
-			'data' => array(
-				'security' => array('signature' => $compiledSignature)
-			)
-		));
+		$request = new Request([
+			'data' => [
+				'security' => ['signature' => $compiledSignature]
+			]
+		]);
 		$validator::check($request);
 
 		$expected = $compiledSignature;
@@ -156,64 +162,64 @@ class SecurityTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 
 		$result = $validator::$parse[0]['out'];
-		$expected = array(
-			'excluded' => array(
+		$expected = [
+			'excluded' => [
 				'active',
 				'foo'
-			),
-			'locked' => array(
+			],
+			'locked' => [
 				'id' => 23
-			)
-		);
+			]
+		];
 		$this->assertEqual($expected, $result);
 
 		$validator::reset();
 	}
 
 	public function testFormSignatureWithLabelField() {
-		$form = new Form(array('context' => $this->context));
+		$form = new Form(['context' => $this->context]);
 		$this->subject->sign($form);
 
 		ob_start();
-		$content = array(
-			$form->create(null, array('url' => 'http:///')),
+		$content = [
+			$form->create(null, ['url' => 'http:///']),
 			$form->label('foo'),
-			$form->text('email', array('value' => 'foo@bar')),
+			$form->text('email', ['value' => 'foo@bar']),
 			$form->end()
-		);
+		];
 		$signature = ob_get_clean();
 		preg_match('/value="([^"]+)"/', $signature, $match);
 		list(, $signature) = $match;
 		$result = $signature;
 
-		$data = array(
-			'fields' => array(
+		$data = [
+			'fields' => [
 				'email' => 'foo@bar',
-			)
-		);
+			]
+		];
 		$expected = FormSignature::key($data);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testFormSignatureWithMethodPUT() {
-		$form = new Form(array('context' => $this->context));
+		$form = new Form(['context' => $this->context]);
 		$this->subject->sign($form);
 
 		ob_start();
-		$content = array(
-			$form->create(null, array('url' => 'http:///', 'method' => 'PUT')),
-			$form->text('email', array('value' => 'foo@bar')),
+		$content = [
+			$form->create(null, ['url' => 'http:///', 'method' => 'PUT']),
+			$form->text('email', ['value' => 'foo@bar']),
 			$form->end()
-		);
+		];
 		$signature = ob_get_clean();
 		preg_match('/value="([^"]+)"/', $signature, $match);
 		list(, $signature) = $match;
 
-		$request = new Request(array('data' => array(
+		$request = new Request(['data' => [
 			'_method' => 'PUT',
 			'email' => 'foo@baz',
 			'security' => compact('signature')
-		)));
+		]]);
 		$this->assertTrue(FormSignature::check($request));
 	}
 }

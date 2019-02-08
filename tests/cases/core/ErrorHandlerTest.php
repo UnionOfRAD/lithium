@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\core;
@@ -12,18 +13,20 @@ use Closure;
 use Exception;
 use UnexpectedValueException;
 use lithium\core\ErrorHandler;
+use lithium\aop\Filters;
+use lithium\tests\mocks\core\MockStaticObject;
 use lithium\tests\mocks\core\MockErrorHandler;
 
 class ErrorHandlerTest extends \lithium\test\Unit {
 
-	public $errors = array();
+	public $errors = [];
 
 	public function setUp() {
 		if (!ErrorHandler::isRunning()) {
 			ErrorHandler::run();
 		}
 		ErrorHandler::reset();
-		$this->errors = array();
+		$this->errors = [];
 	}
 
 	public function tearDown() {
@@ -34,12 +37,12 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 
 	public function testExceptionCatching() {
 		$self = $this;
-		ErrorHandler::config(array(array(
+		ErrorHandler::config([[
 			'type' => 'Exception',
 			'handler' => function($info) use ($self) {
 				$self->errors[] = $info;
 			}
-		)));
+		]]);
 
 		ErrorHandler::handle(new Exception('Test!'));
 
@@ -61,12 +64,12 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 
 	public function testExceptionSubclassCatching() {
 		$self = $this;
-		ErrorHandler::config(array(array(
+		ErrorHandler::config([[
 			'type' => 'Exception',
 			'handler' => function($info) use ($self) {
 				$self->errors[] = $info;
 			}
-		)));
+		]]);
 		ErrorHandler::handle(new UnexpectedValueException('Test subclass'));
 
 		$this->assertCount(1, $this->errors);
@@ -79,12 +82,12 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		$this->skipIf(true, 'Refactoring original error-handling iteration.');
 
 		$self = $this;
-		ErrorHandler::config(array(array(
+		ErrorHandler::config([[
 			'code' => E_WARNING | E_USER_WARNING,
 			'handler' => function($info) use ($self) {
 				$self->errors[] = $info;
 			}
-		)));
+		]]);
 
 		file_get_contents(false);
 		$this->assertCount(1, $this->errors);
@@ -103,18 +106,14 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 	}
 
 	public function testApply() {
-		$subject = new ErrorHandlerTest();
-		ErrorHandler::apply(array($subject, 'throwException'), array(), function($details) {
+		$class = 'lithium\tests\mocks\core\MockStaticObject';
+
+		ErrorHandler::apply("{$class}::throwException", [], function($details) {
 			return $details['exception']->getMessage();
 		});
-		$this->assertEqual('foo', $subject->throwException());
-	}
+		$this->assertEqual('foo', MockStaticObject::throwException());
 
-	public function throwException() {
-		return $this->_filter(__METHOD__, array(), function($self, $params) {
-			throw new Exception('foo');
-			return 'bar';
-		});
+		Filters::clear('lithium\tests\mocks\core\MockStaticObject');
 	}
 
 	public function testTrace() {
@@ -143,7 +142,7 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 		$this->assertEqual($defaultChecks, count($checks));
 		$this->assertInstanceOf('Closure', $checks['type']);
 
-		$checks = MockErrorHandler::checks(array('foo' => 'bar'));
+		$checks = MockErrorHandler::checks(['foo' => 'bar']);
 		$this->assertCount(1, $checks);
 		$this->assertFalse(isset($checks['type']));
 
@@ -157,24 +156,25 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 	public function testErrorTrapping() {
 		ErrorHandler::stop();
 		$self = $this;
-		ErrorHandler::config(array(array(
+		ErrorHandler::config([[
 			'handler' => function($info) use ($self) {
 				$self->errors[] = $info;
-			})
-		));
-		ErrorHandler::run(array('trapErrors' => true));
+			}]
+		]);
+		ErrorHandler::run(['trapErrors' => true]);
 
 		$this->assertCount(0, $this->errors);
-		list($foo, $bar) = array('baz');
+		list($foo, $bar) = ['baz'];
 		$this->assertCount(1, $this->errors);
 	}
 
 	public function testRenderedOutput() {
+		$class = 'lithium\tests\mocks\core\MockStaticObject';
+
 		ob_start();
 		echo 'Some Output';
-		$subject = new ErrorHandlerTest();
-		ErrorHandler::apply(array($subject, 'throwException'), array(), function($details) {});
-		$subject->throwException();
+		ErrorHandler::apply("{$class}::throwException", [], function($details) {});
+		MockStaticObject::throwException();
 		$this->assertEmpty(ob_get_length());
 	}
 }

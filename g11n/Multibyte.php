@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 namespace lithium\g11n;
 
@@ -38,7 +39,7 @@ class Multibyte extends \lithium\core\Adaptable {
 	 *
 	 * @var array
 	 */
-	protected static $_configurations = array();
+	protected static $_configurations = [];
 
 	/**
 	 * `Libraries::locate()`-compatible path to adapters for this class.
@@ -72,8 +73,8 @@ class Multibyte extends \lithium\core\Adaptable {
 	 * @param array $options Allows to toggle mode via the `'quick'` option, defaults to `false`.
 	 * @return boolean Returns `true` if the string is UTF-8.
 	 */
-	public static function is($string, array $options = array()) {
-		$defaults = array('quick' => false);
+	public static function is($string, array $options = []) {
+		$defaults = ['quick' => false];
 		$options += $defaults;
 
 		if ($options['quick']) {
@@ -102,8 +103,8 @@ class Multibyte extends \lithium\core\Adaptable {
 	 *               `name` options. Will use the `'default'` adapter by default.
 	 * @return integer The length of the string on success.
 	 */
-	public static function strlen($string, array $options = array()) {
-		$defaults = array('name' => 'default');
+	public static function strlen($string, array $options = []) {
+		$defaults = ['name' => 'default'];
 		$options += $defaults;
 		return static::adapter($options['name'])->strlen($string);
 	}
@@ -127,8 +128,8 @@ class Multibyte extends \lithium\core\Adaptable {
 	 *                 the needle in the haystack string. If needle is not found,
 	 *                 it returns `false`.
 	 */
-	public static function strpos($haystack, $needle, $offset = 0, array $options = array()) {
-		$defaults = array('name' => 'default');
+	public static function strpos($haystack, $needle, $offset = 0, array $options = []) {
+		$defaults = ['name' => 'default'];
 		$options += $defaults;
 		return static::adapter($options['name'])->strpos($haystack, $needle, $offset);
 	}
@@ -151,8 +152,8 @@ class Multibyte extends \lithium\core\Adaptable {
 	 *                 the needle in the haystack string. If needle is not found,
 	 *                 it returns `false`.
 	 */
-	public static function strrpos($haystack, $needle, array $options = array()) {
-		$defaults = array('name' => 'default');
+	public static function strrpos($haystack, $needle, array $options = []) {
+		$defaults = ['name' => 'default'];
 		$options += $defaults;
 		return static::adapter($options['name'])->strrpos($haystack, $needle);
 	}
@@ -169,8 +170,8 @@ class Multibyte extends \lithium\core\Adaptable {
 	 *               `name` options. Will use the `'default'` adapter by default.
 	 * @return string The substring extracted from given string.
 	 */
-	public static function substr($string, $start, $length = null, array $options = array()) {
-		$defaults = array('name' => 'default');
+	public static function substr($string, $start, $length = null, array $options = []) {
+		$defaults = ['name' => 'default'];
 		$options += $defaults;
 		return static::adapter($options['name'])->substr($string, $start, $length);
 	}

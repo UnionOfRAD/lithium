@@ -1,10 +1,17 @@
 <?php
+/**
+ * li₃: the most RAD framework for PHP (http://li3.me)
+ *
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
+ */
 
 namespace lithium\tests\mocks\test;
 
 class MockStdClass extends \lithium\core\Object {
 
-	protected $_data = array();
+	protected $_data = [];
 
 	public function __set($key, $value) {
 		return $this->_data[$key] = $value;
@@ -58,7 +65,7 @@ class MockStdClass extends \lithium\core\Object {
 
 	public function methodBar() {
 		$this->methodBaz(1);
-		return $this->__call('methodBaz', array(2));
+		return $this->__call('methodBaz', [2]);
 	}
 
 }

@@ -1,12 +1,18 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\test;
+
+$message  = 'lithium\test\MockerChain has been deprecated, as alternatives ';
+$message .= 'exist (i.e. Mockery) which take the task of maintaining a ';
+$message .= 'mocking framework from us.';
+trigger_error($message, E_USER_DEPRECATED);
 
 /**
  * Mocker chain is used to aid in assertion of method calls.
@@ -37,6 +43,7 @@ namespace lithium\test;
  * 	->called('method2')->with('foo', 'bar')
  * 		->success());
  * ```
+ * @deprecated Please use an alternative mocking framework, i.e. Mockery.
  */
 class MockerChain extends \lithium\core\Object {
 
@@ -51,13 +58,13 @@ class MockerChain extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_data = array(
+	protected $_data = [
 		'results' => null,
 		'method' => false,
 		'args' => false,
 		'success' => true,
 		'callTime' => 0,
-	);
+	];
 
 	/**
 	 * Constructor. Saves the results from the mock.
@@ -77,7 +84,7 @@ class MockerChain extends \lithium\core\Object {
 	 * @return object
 	 */
 	public function __call($comparison, $args) {
-		$methodExists = in_array($comparison, array('gt', 'gte', 'lt', 'lte', 'eq'), true);
+		$methodExists = in_array($comparison, ['gt', 'gte', 'lt', 'lte', 'eq'], true);
 		if (!$this->_data['success'] || !$methodExists) {
 			return $this;
 		}
@@ -127,7 +134,7 @@ class MockerChain extends \lithium\core\Object {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
-		$methodExists = in_array($method, array('gt', 'gte', 'lt', 'lte', 'eq'), true);
+		$methodExists = in_array($method, ['gt', 'gte', 'lt', 'lte', 'eq'], true);
 		return $methodExists || parent::respondsTo($method, $internal);
 	}
 
@@ -196,13 +203,13 @@ class MockerChain extends \lithium\core\Object {
 	 */
 	public function success() {
 		$success = $this->_data['success'];
-		$this->_data = array(
+		$this->_data = [
 			'results' => $this->_data['results'],
 			'method' => false,
 			'args' => false,
 			'success' => true,
 			'callTime' => 0,
-		);
+		];
 		return $success;
 	}
 

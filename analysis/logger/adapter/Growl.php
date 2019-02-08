@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\analysis\logger\adapter;
@@ -25,7 +26,7 @@ class Growl extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_priorities = array(
+	protected $_priorities = [
 		'emergency' => 2,
 		'alert'     => 1,
 		'critical'  => 1,
@@ -34,7 +35,7 @@ class Growl extends \lithium\core\Object {
 		'notice'    => -1,
 		'info'      => -2,
 		'debug'     => -2
-	);
+	];
 
 	/**
 	 * The Growl protocol version used to send messages.
@@ -73,7 +74,7 @@ class Growl extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('connection', 'registered');
+	protected $_autoConfig = ['connection', 'registered'];
 
 	/**
 	 * Constructor. Growl logger constructor. Accepts an array of settings which are merged
@@ -101,18 +102,18 @@ class Growl extends \lithium\core\Object {
 	 *          Growl to be able to send. Defaults to `array('Errors', 'Messages')`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		$name = basename(Libraries::get(true, 'path'));
 
-		$defaults = compact('name') + array(
+		$defaults = compact('name') + [
 			'host'     => '127.0.0.1',
 			'port'     => 9887,
 			'password' => null,
 			'protocol' => 'udp',
 			'title'    => Inflector::humanize($name),
-			'notifications' => array('Errors', 'Messages'),
+			'notifications' => ['Errors', 'Messages'],
 			'registered' => false
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -126,18 +127,15 @@ class Growl extends \lithium\core\Object {
 	 *              `$options` parameter of `notify()`.
 	 * @return \Closure Function returning boolean `true` on successful write, `false` otherwise.
 	 */
-	public function write($priority, $message, array $options = array()) {
-		$_self =& $this;
-		$_priorities = $this->_priorities;
-
-		return function($self, $params) use (&$_self, $_priorities) {
+	public function write($priority, $message, array $options = []) {
+		return function($params) {
 			$priority = 0;
 			$options = $params['options'];
 
-			if (isset($options['priority']) && isset($_priorities[$options['priority']])) {
-				$priority = $_priorities[$options['priority']];
+			if (isset($options['priority']) && isset($this->_priorities[$options['priority']])) {
+				$priority = $this->_priorities[$options['priority']];
 			}
-			return $_self->notify($params['message'], compact('priority') + $options);
+			return $this->notify($params['message'], compact('priority') + $options);
 		};
 	}
 
@@ -150,22 +148,22 @@ class Growl extends \lithium\core\Object {
 	 *         name of the application's parent folder by default.
 	 * @return boolean Always returns `true`.
 	 */
-	public function notify($description = '', $options = array()) {
+	public function notify($description = '', $options = []) {
 		$this->_register();
 
-		$defaults = array('sticky' => false, 'priority' => 0, 'type' => 'Messages');
-		$options += $defaults + array('title' => $this->_config['title']);
+		$defaults = ['sticky' => false, 'priority' => 0, 'type' => 'Messages'];
+		$options += $defaults + ['title' => $this->_config['title']];
 		$type = $options['type'];
 		$title = $options['title'];
 
-		$message = compact('type', 'title', 'description') + array('app' => $this->_config['name']);
+		$message = compact('type', 'title', 'description') + ['app' => $this->_config['name']];
 		$message = array_map('utf8_encode', $message);
 
 		$flags = ($options['priority'] & 7) * 2;
 		$flags = ($options['priority'] < 0) ? $flags |= 8 : $flags;
 		$flags = ($options['sticky']) ? $flags | 256 : $flags;
 
-		$params = array('c2n5', static::PROTOCOL_VERSION, static::TYPE_NOTIFY, $flags);
+		$params = ['c2n5', static::PROTOCOL_VERSION, static::TYPE_NOTIFY, $flags];
 		$lengths = array_map('strlen', $message);
 
 		$data = call_user_func_array('pack', array_merge($params, $lengths));

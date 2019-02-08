@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\core;
@@ -23,7 +24,7 @@ class Configuration extends \lithium\core\Object {
 	 *
 	 * @var array of configurations, indexed by name.
 	 */
-	public $_configurations = array();
+	protected $_configurations = [];
 
 	/**
 	 * A closure called by `_config()` which allows to automatically
@@ -67,7 +68,7 @@ class Configuration extends \lithium\core\Object {
 	 */
 	public function get($name = null) {
 		if ($name === null) {
-			$result = array();
+			$result = [];
 			$this->_configurations = array_filter($this->_configurations);
 
 			foreach ($this->_configurations as $key => $value) {
@@ -98,7 +99,7 @@ class Configuration extends \lithium\core\Object {
 	 * Clears all configurations.
 	 */
 	public function reset() {
-		$this->_configurations = array();
+		$this->_configurations = [];
 	}
 }
 

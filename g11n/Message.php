@@ -1,15 +1,17 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\g11n;
 
+use lithium\aop\Filters;
 use lithium\core\Environment;
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\g11n\Catalog;
 
 /**
@@ -53,7 +55,7 @@ class Message extends \lithium\core\StaticObject {
 	 * @var array
 	 * @see lithium\g11n\Message::_translated()
 	 */
-	protected static $_cachedPages = array();
+	protected static $_cachedPages = [];
 
 	/**
 	 * Translates a message according to the current or provided locale
@@ -62,21 +64,21 @@ class Message extends \lithium\core\StaticObject {
 	 * Usage:
 	 * ```
 	 * Message::translate('Mind the gap.');
-	 * Message::translate('house', array('count' => 23));
+	 * Message::translate('house', ['count' => 23]);
 	 * ```
 	 *
-	 * `String::insert()`-style placeholders may be used within the message
+	 * `Text::insert()`-style placeholders may be used within the message
 	 * and replacements provided directly within the `options`  argument.
 	 *
 	 * Example:
 	 * ```
 	 * Message::translate('I can see {:count} bike.');
-	 * Message::translate('This painting is {:color}.', array(
+	 * Message::translate('This painting is {:color}.', [
 	 * 	'color' => Message::translate('silver'),
-	 * ));
+	 * ]);
 	 * ```
 	 *
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @param string $id The id to use when looking up the translation.
 	 * @param array $options Valid options are:
 	 *              - `'count'`: Used to determine the correct plural form. You can either pass
@@ -95,28 +97,28 @@ class Message extends \lithium\core\StaticObject {
 	 * @return string The translation or the value of the `'default'` option if none
 	 *                     could be found.
 	 */
-	public static function translate($id, array $options = array()) {
-		$defaults = array(
+	public static function translate($id, array $options = []) {
+		$defaults = [
 			'count' => 1,
 			'locale' => Environment::get('locale'),
 			'scope' => null,
 			'context' => null,
 			'default' => null,
 			'noop' => false
-		);
+		];
 		$options += $defaults;
 
 		if ($options['noop']) {
 			$result = null;
 		} else {
-			$result = static::_translated($id, abs($options['count']), $options['locale'], array(
+			$result = static::_translated($id, abs($options['count']), $options['locale'], [
 				'scope' => $options['scope'],
 				'context' => $options['context']
-			));
+			]);
 		}
 
 		if ($result = $result ?: $options['default']) {
-			return strpos($result, '{:') !== false ? String::insert($result, $options) : $result;
+			return strpos($result, '{:') !== false ? Text::insert($result, $options) : $result;
 		}
 	}
 
@@ -143,13 +145,13 @@ class Message extends \lithium\core\StaticObject {
 	 * @return array Named aliases (`'t'` and `'tn'`) for translation functions.
 	 */
 	public static function aliases() {
-		$t = function($message, array $options = array()) {
-			return Message::translate($message, $options + array('default' => $message));
+		$t = function($message, array $options = []) {
+			return Message::translate($message, $options + ['default' => $message]);
 		};
-		$tn = function($message1, $message2, $count, array $options = array()) {
-			return Message::translate($message1, $options + compact('count') + array(
+		$tn = function($message1, $message2, $count, array $options = []) {
+			return Message::translate($message1, $options + compact('count') + [
 				'default' => $count === 1 ? $message1 : $message2
-			));
+			]);
 		};
 		return compact('t', 'tn');
 	}
@@ -163,7 +165,7 @@ class Message extends \lithium\core\StaticObject {
 	 */
 	public static function cache($cache = null) {
 		if ($cache === false) {
-			static::$_cachedPages = array();
+			static::$_cachedPages = [];
 		}
 		if (is_array($cache)) {
 			static::$_cachedPages += $cache;
@@ -188,11 +190,10 @@ class Message extends \lithium\core\StaticObject {
 	 *         form could not be determined.
 	 * @filter
 	 */
-	protected static function _translated($id, $count, $locale, array $options = array()) {
+	protected static function _translated($id, $count, $locale, array $options = []) {
 		$params = compact('id', 'count', 'locale', 'options');
 
-		$cache =& static::$_cachedPages;
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use (&$cache) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			extract($params);
 
 			if (isset($options['context']) && $options['context'] !== null) {
@@ -200,12 +201,12 @@ class Message extends \lithium\core\StaticObject {
 				$id = "{$id}|{$context}";
 			}
 
-			if (!isset($cache[$options['scope']][$locale])) {
-				$cache[$options['scope']][$locale] = Catalog::read(
+			if (!isset(static::$_cachedPages[$options['scope']][$locale])) {
+				static::$_cachedPages[$options['scope']][$locale] = Catalog::read(
 					true, 'message', $locale, $options
 				);
 			}
-			$page = $cache[$options['scope']][$locale];
+			$page = static::$_cachedPages[$options['scope']][$locale];
 
 			if (!isset($page[$id])) {
 				return null;

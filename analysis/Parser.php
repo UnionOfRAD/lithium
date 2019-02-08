@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\analysis;
@@ -25,8 +26,8 @@ class Parser extends \lithium\core\StaticObject {
 	 * @param array $options
 	 * @return mixed
 	 */
-	public static function token($string, array $options = array()) {
-		$defaults = array('id' => false);
+	public static function token($string, array $options = []) {
+		$defaults = ['id' => false];
 		$options += $defaults;
 
 		if (empty($string) && $string !== '0') {
@@ -48,17 +49,17 @@ class Parser extends \lithium\core\StaticObject {
 	 *         to include in the output.
 	 * @return array An array of tokens in the supplied source code.
 	 */
-	public static function tokenize($code, array $options = array()) {
-		$defaults = array('wrap' => true, 'ignore' => array(), 'include' => array());
+	public static function tokenize($code, array $options = []) {
+		$defaults = ['wrap' => true, 'ignore' => [], 'include' => []];
 		$options += $defaults;
-		$tokens = array();
+		$tokens = [];
 		$line = 1;
 
 		if ($options['wrap']) {
 			$code = "<?php {$code}?>";
 		}
 		foreach (token_get_all($code) as $token) {
-			$token = (isset($token[1])) ? $token : array(null, $token, $line);
+			$token = (isset($token[1])) ? $token : [null, $token, $line];
 			list($id, $content, $line) = $token;
 			$name = $id ? token_name($id) : $content;
 
@@ -73,7 +74,7 @@ class Parser extends \lithium\core\StaticObject {
 					continue;
 				}
 			}
-			$tokens[] = array('id' => $id, 'name' => $name, 'content' => $content, 'line' => $line);
+			$tokens[] = ['id' => $id, 'name' => $name, 'content' => $content, 'line' => $line];
 
 			$line += count(preg_split('/\r\n|\r|\n/', $content)) - 1;
 		}
@@ -98,19 +99,19 @@ class Parser extends \lithium\core\StaticObject {
 	 *                the line of code to be matched, defaults to false
 	 * @return array
 	 */
-	public static function find($code, $pattern, array $options = array()) {
-		$defaults = array(
-			'all' => true, 'capture' => array(), 'ignore' => array('T_WHITESPACE'),
+	public static function find($code, $pattern, array $options = []) {
+		$defaults = [
+			'all' => true, 'capture' => [], 'ignore' => ['T_WHITESPACE'],
 			'return' => true, 'lineBreaks' => false, 'startOfLine' => false
-		);
+		];
 		$options += $defaults;
-		$results = array();
-		$matches = array();
-		$patternMatch = array();
+		$results = [];
+		$matches = [];
+		$patternMatch = [];
 		$ret = $options['return'];
 
-		$tokens = new Collection(array('data' => static::tokenize($code, $options)));
-		$pattern = new Collection(array('data' => static::tokenize($pattern, $options)));
+		$tokens = new Collection(['data' => static::tokenize($code, $options)]);
+		$pattern = new Collection(['data' => static::tokenize($pattern, $options)]);
 
 		$breaks = function($token) use (&$tokens, &$matches, &$patternMatch, $options) {
 			if (!$options['lineBreaks']) {
@@ -135,7 +136,7 @@ class Parser extends \lithium\core\StaticObject {
 
 		$capture = function($token) use (&$matches, &$patternMatch, $tokens, $breaks, $options) {
 			if ($token === null) {
-				$matches = $patternMatch = array();
+				$matches = $patternMatch = [];
 				return false;
 			}
 
@@ -143,7 +144,7 @@ class Parser extends \lithium\core\StaticObject {
 				$prev = $tokens->prev();
 				$tokens->next();
 				if ($options['startOfLine'] && $token['line'] === $prev['line']) {
-					$patternMatch = $matches = array();
+					$patternMatch = $matches = [];
 					return false;
 				}
 			}
@@ -153,14 +154,14 @@ class Parser extends \lithium\core\StaticObject {
 				return true;
 			}
 			if (!$breaks($token)) {
-				$matches = array();
+				$matches = [];
 				return true;
 			}
 			$matches[] = $token;
 			return true;
 		};
 
-		$executors = array(
+		$executors = [
 			'*' => function(&$tokens, &$pattern) use ($options, $capture) {
 				$closing = $pattern->next();
 				$tokens->prev();
@@ -170,7 +171,7 @@ class Parser extends \lithium\core\StaticObject {
 				}
 				$pattern->next();
 			}
-		);
+		];
 
 		$tokens->rewind();
 		$pattern->rewind();
@@ -219,13 +220,13 @@ class Parser extends \lithium\core\StaticObject {
 	 *              - 'return': If set to 'content' returns an array of matching tokens.
 	 * @return array Array of matching tokens.
 	 */
-	public static function match($code, $parameters, array $options = array()) {
-		$defaults = array('ignore' => array('T_WHITESPACE'), 'return' => true);
+	public static function match($code, $parameters, array $options = []) {
+		$defaults = ['ignore' => ['T_WHITESPACE'], 'return' => true];
 		$options += $defaults;
 		$parameters = static::_prepareMatchParams($parameters);
 
 		$tokens = is_array($code) ? $code : static::tokenize($code, $options);
-		$results = array();
+		$results = [];
 
 		foreach ($tokens as $i => $token) {
 			if (!array_key_exists($token['name'], $parameters)) {
@@ -294,11 +295,11 @@ class Parser extends \lithium\core\StaticObject {
 			if (strpos($token, 'T_') !== 0) {
 				unset($parameters[$token]);
 
-				foreach (array('before', 'after') as $key) {
+				foreach (['before', 'after'] as $key) {
 					if (!isset($scope[$key])) {
 						continue;
 					}
-					$items = array();
+					$items = [];
 
 					foreach ((array) $scope[$key] as $item) {
 						$items[] = (strpos($item, 'T_') !== 0)  ? static::token($item) : $item;

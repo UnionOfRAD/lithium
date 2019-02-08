@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\data\entity;
@@ -19,18 +20,18 @@ class RecordTest extends \lithium\test\Unit {
 	protected $_record = null;
 
 	public function setUp() {
-		Connections::add('mockconn', array('object' => new MockSource()));
+		Connections::add('mockconn', ['object' => new MockSource()]);
 
-		$schema = new Schema(array(
-			'fields' => array(
+		$schema = new Schema([
+			'fields' => [
 				'id' => 'int', 'title' => 'string', 'body' => 'text'
-			)
-		));
-		MockPost::config(array(
-			'meta' => array('connection' => 'mockconn', 'key' => 'id', 'locked' => true),
+			]
+		]);
+		MockPost::config([
+			'meta' => ['connection' => 'mockconn', 'key' => 'id', 'locked' => true],
 			'schema' => $schema
-		));
-		$this->_record = new Record(array('model' => 'lithium\tests\mocks\data\MockPost'));
+		]);
+		$this->_record = new Record(['model' => 'lithium\tests\mocks\data\MockPost']);
 	}
 
 	public function tearDown() {
@@ -42,7 +43,7 @@ class RecordTest extends \lithium\test\Unit {
 	 * Tests that a record's fields are accessible as object properties.
 	 */
 	public function testDataPropertyAccess() {
-		$data = array('title' => 'Test record', 'body' => 'Some test record data');
+		$data = ['title' => 'Test record', 'body' => 'Some test record data'];
 		$this->_record = new Record(compact('data'));
 
 		$this->assertEqual('Test record', $this->_record->title);
@@ -59,7 +60,7 @@ class RecordTest extends \lithium\test\Unit {
 	 * Tests that a record can be exported to a given series of formats.
 	 */
 	public function testRecordFormatExport() {
-		$data = array('foo' => 'bar');
+		$data = ['foo' => 'bar'];
 		$this->_record = new Record(compact('data'));
 
 		$this->assertEqual($data, $this->_record->to('array'));
@@ -67,10 +68,10 @@ class RecordTest extends \lithium\test\Unit {
 	}
 
 	public function testErrorsPropertyAccess() {
-		$errors = array(
+		$errors = [
 			'title' => 'please enter a title',
-			'email' => array('email is empty', 'email is not valid')
-		);
+			'email' => ['email is empty', 'email is not valid']
+		];
 
 		$record = new Record();
 		$result = $record->errors($errors);
@@ -83,7 +84,7 @@ class RecordTest extends \lithium\test\Unit {
 		$result = $record->errors('title');
 		$this->assertEqual($expected, $result);
 
-		$expected = array('email is empty', 'email is not valid');
+		$expected = ['email is empty', 'email is not valid'];
 		$result = $record->errors('email');
 		$this->assertEqual($expected, $result);
 
@@ -99,7 +100,7 @@ class RecordTest extends \lithium\test\Unit {
 	 */
 	public function testSetData() {
 		$this->assertEmpty($this->_record->data());
-		$expected = array('id' => 1, 'name' => 'Joe Bloggs', 'address' => 'The Park');
+		$expected = ['id' => 1, 'name' => 'Joe Bloggs', 'address' => 'The Park'];
 		$this->_record->set($expected);
 		$this->assertEqual($expected, $this->_record->data());
 		$this->assertEqual($expected, $this->_record->to('array'));
@@ -112,14 +113,14 @@ class RecordTest extends \lithium\test\Unit {
 		$this->assertIdentical(313, $this->_record->id);
 		$this->assertTrue($this->_record->exists());
 
-		$this->_record = new Record(array('exists' => true));
+		$this->_record = new Record(['exists' => true]);
 		$this->assertTrue($this->_record->exists());
 	}
 
 	public function testMethodDispatch() {
-		$result = $this->_record->save(array('title' => 'foo'));
+		$result = $this->_record->save(['title' => 'foo']);
 		$this->assertEqual('create', $result['query']->type());
-		$this->assertEqual(array('title' => 'foo'), $result['query']->data());
+		$this->assertEqual(['title' => 'foo'], $result['query']->data());
 
 		$record = $this->_record;
 		$this->assertException("Unhandled method call `invalid`.", function() use ($record) {

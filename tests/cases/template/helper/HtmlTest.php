@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\template\helper;
@@ -23,7 +24,7 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public $html = null;
 
-	protected $_routes = array();
+	protected $_routes = [];
 
 	/**
 	 * Initialize test by creating a new object instance with a default context.
@@ -34,13 +35,13 @@ class HtmlTest extends \lithium\test\Unit {
 		Router::connect('/{:controller}/{:action}/{:id}.{:type}');
 		Router::connect('/{:controller}/{:action}.{:type}');
 
-		$this->context = new MockRenderer(array(
-			'request' => new Request(array(
-				'base' => '', 'env' => array('HTTP_HOST' => 'foo.local')
-			)),
+		$this->context = new MockRenderer([
+			'request' => new Request([
+				'base' => '', 'env' => ['HTTP_HOST' => 'foo.local']
+			]),
 			'response' => new Response()
-		));
-		$this->html = new Html(array('context' => &$this->context));
+		]);
+		$this->html = new Html(['context' => &$this->context]);
 	}
 
 	/**
@@ -64,19 +65,19 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function testCharset() {
 		$result = $this->html->charset();
-		$this->assertTags($result, array('meta' => array(
+		$this->assertTags($result, ['meta' => [
 			'charset' => 'UTF-8'
-		)));
+		]]);
 
 		$result = $this->html->charset('utf-8');
-		$this->assertTags($result, array('meta' => array(
+		$this->assertTags($result, ['meta' => [
 			'charset' => 'utf-8'
-		)));
+		]]);
 
 		$result = $this->html->charset('UTF-7');
-		$this->assertTags($result, array('meta' => array(
+		$this->assertTags($result, ['meta' => [
 			'charset' => 'UTF-7'
-		)));
+		]]);
 	}
 
 	/**
@@ -85,55 +86,55 @@ class HtmlTest extends \lithium\test\Unit {
 	public function testMetaLink() {
 		$result = $this->html->link(
 			'RSS Feed',
-			array('controller' => 'posts', 'type' => 'rss'),
-			array('type' => 'rss')
+			['controller' => 'posts', 'type' => 'rss'],
+			['type' => 'rss']
 		);
-		$this->assertTags($result, array('link' => array(
+		$this->assertTags($result, ['link' => [
 			'href' => 'regex:/.*\/posts\/index\.rss/',
 			'type' => 'application/rss+xml',
 			'rel' => 'alternate',
 			'title' => 'RSS Feed'
-		)));
+		]]);
 
 		$result = $this->html->link(
-			'Atom Feed', array('controller' => 'posts', 'type' => 'xml'), array('type' => 'atom')
+			'Atom Feed', ['controller' => 'posts', 'type' => 'xml'], ['type' => 'atom']
 		);
-		$this->assertTags($result, array('link' => array(
+		$this->assertTags($result, ['link' => [
 			'href' => 'regex:/.*\/posts\/index\.xml/',
 			'type' => 'application/atom+xml',
 			'title' => 'Atom Feed',
 			'rel' => 'alternate'
-		)));
+		]]);
 
-		$result = $this->html->link('No-existy', '/posts.xmp', array('type' => 'rong'));
-		$this->assertTags($result, array('link' => array(
+		$result = $this->html->link('No-existy', '/posts.xmp', ['type' => 'rong']);
+		$this->assertTags($result, ['link' => [
 			'href' => 'regex:/.*\/posts\.xmp/',
 			'title' => 'No-existy'
-		)));
+		]]);
 
-		$result = $this->html->link('No-existy', '/posts.xpp', array('type' => 'atom'));
-		$this->assertTags($result, array('link' => array(
+		$result = $this->html->link('No-existy', '/posts.xpp', ['type' => 'atom']);
+		$this->assertTags($result, ['link' => [
 			'href' => 'regex:/.*\/posts\.xpp/',
 			'type' => 'application/atom+xml',
 			'title' => 'No-existy',
 			'rel' => 'alternate'
-		)));
+		]]);
 
-		$result = $this->html->link('Favicon', array(), array('type' => 'icon'));
-		$expected = array(
-			'link' => array(
+		$result = $this->html->link('Favicon', [], ['type' => 'icon']);
+		$expected = [
+			'link' => [
 				'href' => 'regex:/.*favicon\.ico/',
 				'type' => 'image/x-icon',
 				'rel' => 'icon',
 				'title' => 'Favicon'
-			),
-			array('link' => array(
+			],
+			['link' => [
 				'href' => 'regex:/.*favicon\.ico/',
 				'type' => 'image/x-icon',
 				'rel' => 'shortcut icon',
 				'title' => 'Favicon'
-			))
-		);
+			]]
+		];
 		$this->assertTags($result, $expected);
 	}
 
@@ -142,52 +143,52 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function testLink() {
 		$result = $this->html->link('/home');
-		$expected = array('a' => array('href' => '/home'), 'regex:/\/home/', '/a');
+		$expected = ['a' => ['href' => '/home'], 'regex:/\/home/', '/a'];
 		$this->assertTags($result, $expected);
 
 		$result = $this->html->link('Next >', '#');
-		$expected = array('a' => array('href' => '#'), 'Next &gt;', '/a');
+		$expected = ['a' => ['href' => '#'], 'Next &gt;', '/a'];
 		$this->assertTags($result, $expected);
 
-		$result = $this->html->link('Next >', '#', array('escape' => true));
-		$expected = array(
-			'a' => array('href' => '#'),
+		$result = $this->html->link('Next >', '#', ['escape' => true]);
+		$expected = [
+			'a' => ['href' => '#'],
 			'Next &gt;',
 			'/a'
-		);
+		];
 		$this->assertTags($result, $expected);
 
-		$result = $this->html->link('Next >', '#', array('escape' => 'utf-8'));
-		$expected = array(
-			'a' => array('href' => '#'),
+		$result = $this->html->link('Next >', '#', ['escape' => 'utf-8']);
+		$expected = [
+			'a' => ['href' => '#'],
 			'Next &gt;',
 			'/a'
-		);
+		];
 		$this->assertTags($result, $expected);
 
-		$result = $this->html->link('Next >', '#', array('escape' => false));
-		$expected = array('a' => array('href' => '#'), 'Next >', '/a');
+		$result = $this->html->link('Next >', '#', ['escape' => false]);
+		$expected = ['a' => ['href' => '#'], 'Next >', '/a'];
 		$this->assertTags($result, $expected);
 
-		$result = $this->html->link('Next >', '#', array(
+		$result = $this->html->link('Next >', '#', [
 			'title' => 'to escape &#8230; or not escape?',
 			'escape' => false
-		));
-		$expected = array(
-			'a' => array('href' => '#', 'title' => 'to escape &#8230; or not escape?'),
+		]);
+		$expected = [
+			'a' => ['href' => '#', 'title' => 'to escape &#8230; or not escape?'],
 			'Next >',
 			'/a'
-		);
+		];
 		$this->assertTags($result, $expected);
 
-		$result = $this->html->link('Next >', '#', array(
+		$result = $this->html->link('Next >', '#', [
 			'title' => 'to escape &#8230; or not escape?', 'escape' => true
-		));
-		$expected = array(
-			'a' => array('href' => '#', 'title' => 'to escape &amp;#8230; or not escape?'),
+		]);
+		$expected = [
+			'a' => ['href' => '#', 'title' => 'to escape &amp;#8230; or not escape?'],
 			'Next &gt;',
 			'/a'
-		);
+		];
 		$this->assertTags($result, $expected);
 	}
 
@@ -243,7 +244,7 @@ class HtmlTest extends \lithium\test\Unit {
 		$expected = '<script type="text/javascript" src="//example.com/jquery.js"></script>';
 		$this->assertEqual($result, $expected);
 
-		$result = $this->html->script(array('prototype', 'scriptaculous'));
+		$result = $this->html->script(['prototype', 'scriptaculous']);
 		$this->assertPattern(
 			'/^\s*<script\s+type="text\/javascript"\s+src=".*js\/prototype\.js"[^<>]*><\/script>/',
 			$result
@@ -255,17 +256,17 @@ class HtmlTest extends \lithium\test\Unit {
 			$result
 		);
 
-		$result = $this->html->script("foo", array(
+		$result = $this->html->script("foo", [
 			'async' => true, 'defer' => true, 'onload' => 'init()'
-		));
+		]);
 
-		$this->assertTags($result, array('script' => array(
+		$this->assertTags($result, ['script' => [
 			'type' => 'text/javascript',
 			'src' => '/js/foo.js',
 			'async' => 'async',
 			'defer' => 'defer',
 			'onload' => 'init()'
-		)));
+		]]);
 	}
 
 	/**
@@ -273,20 +274,20 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function testImage() {
 		$result = $this->html->image('test.gif');
-		$this->assertTags($result, array('img' => array('src' => '/img/test.gif', 'alt' => '')));
+		$this->assertTags($result, ['img' => ['src' => '/img/test.gif', 'alt' => '']]);
 
 		$result = $this->html->image('http://example.com/logo.gif');
-		$this->assertTags($result, array('img' => array(
+		$this->assertTags($result, ['img' => [
 			'src' => 'http://example.com/logo.gif', 'alt' => ''
-		)));
+		]]);
 
-		$result = $this->html->image(array(
+		$result = $this->html->image([
 			'controller' => 'test', 'action' => 'view', 'id' => '1', 'type' => 'gif'
-		));
-		$this->assertTags($result, array('img' => array('src' => '/test/view/1.gif', 'alt' => '')));
+		]);
+		$this->assertTags($result, ['img' => ['src' => '/test/view/1.gif', 'alt' => '']]);
 
 		$result = $this->html->image('/test/view/1.gif');
-		$this->assertTags($result, array('img' => array('src' => '/test/view/1.gif', 'alt' => '')));
+		$this->assertTags($result, ['img' => ['src' => '/test/view/1.gif', 'alt' => '']]);
 	}
 
 	/**
@@ -294,9 +295,9 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function testStyleLink() {
 		$result = $this->html->style('screen');
-		$expected = array('link' => array(
+		$expected = ['link' => [
 			'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'regex:/.*css\/screen\.css/'
-		));
+		]];
 		$this->assertTags($result, $expected);
 
 		$result = $this->html->style('screen.css');
@@ -314,13 +315,13 @@ class HtmlTest extends \lithium\test\Unit {
 	 * Tests generating random tags for the <head> section
 	 */
 	public function testHead() {
-		$result = $this->html->head('meta', array('options' => array('author' => 'foo')));
-		$expected = array('meta' => array('author' => 'foo'));
+		$result = $this->html->head('meta', ['options' => ['author' => 'foo']]);
+		$expected = ['meta' => ['author' => 'foo']];
 		$this->assertTags($result, $expected);
 
-		$result = $this->html->head('unexisting-name', array(
-			'options' => array('author' => 'foo')
-		));
+		$result = $this->html->head('unexisting-name', [
+			'options' => ['author' => 'foo']
+		]);
 		$this->assertNull($result);
 	}
 
@@ -328,18 +329,18 @@ class HtmlTest extends \lithium\test\Unit {
 	 * Tests generating multiple <link /> or <style /> tags in a single call with an array
 	 */
 	public function testStyleMulti() {
-		$result = $this->html->style(array('base', 'layout'));
-		$expected = array(
-			'link' => array(
+		$result = $this->html->style(['base', 'layout']);
+		$expected = [
+			'link' => [
 				'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'regex:/.*css\/base\.css/'
-			),
-			array(
-				'link' => array(
+			],
+			[
+				'link' => [
 					'rel' => 'stylesheet', 'type' => 'text/css',
 					'href' => 'regex:/.*css\/layout\.css/'
-				)
-			)
-		);
+				]
+			]
+		];
 		$this->assertTags($result, $expected);
 	}
 
@@ -351,24 +352,24 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = trim($this->context->scripts());
 		$this->assertEmpty($result);
 
-		$result = $this->html->script('application', array('inline' => false));
+		$result = $this->html->script('application', ['inline' => false]);
 		$this->assertEmpty($result);
 
 		$result = $this->context->scripts();
-		$this->assertTags($result, array('script' => array(
+		$this->assertTags($result, ['script' => [
 			'type' => 'text/javascript', 'src' => 'regex:/.*js\/application\.js/'
-		)));
+		]]);
 
 		$result = trim($this->context->styles());
 		$this->assertEmpty($result);
 
-		$result = $this->html->style('base', array('inline' => false));
+		$result = $this->html->style('base', ['inline' => false]);
 		$this->assertEmpty($result);
 
 		$result = $this->context->styles();
-		$this->assertTags($result, array('link' => array(
+		$this->assertTags($result, ['link' => [
 			'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'regex:/.*css\/base\.css/'
-		)));
+		]]);
 	}
 
 	/**
@@ -376,77 +377,77 @@ class HtmlTest extends \lithium\test\Unit {
 	 * passing multiple scripts or styles to a single method call.
 	 */
 	public function testMultiNonInlineScriptsAndStyles() {
-		$result = $this->html->script(array('foo', 'bar'));
-		$expected = array(
-			array('script' => array('type' => 'text/javascript', 'src' => 'regex:/.*\/foo\.js/')),
+		$result = $this->html->script(['foo', 'bar']);
+		$expected = [
+			['script' => ['type' => 'text/javascript', 'src' => 'regex:/.*\/foo\.js/']],
 			'/script',
-			array('script' => array('type' => 'text/javascript', 'src' => 'regex:/.*\/bar\.js/')),
+			['script' => ['type' => 'text/javascript', 'src' => 'regex:/.*\/bar\.js/']],
 			'/script'
-		);
+		];
 		$this->assertTags($result, $expected);
 
-		$this->assertNull($this->html->script(array('foo', 'bar'), array('inline' => false)));
+		$this->assertNull($this->html->script(['foo', 'bar'], ['inline' => false]));
 		$result = $this->context->scripts();
 		$this->assertTags($result, $expected);
 	}
 
 	public function testScopeOption() {
-		$result = array();
+		$result = [];
 
-		$this->context = new MockRenderer(array(
-			'request' => new Request(array(
+		$this->context = new MockRenderer([
+			'request' => new Request([
 				'base' => '', 'host' => 'foo.local'
-			)),
+			]),
 			'response' => new Response(),
-			'handlers' => array(
-				'url' => function($url, $ref, array $options = array()) use (&$result) {
+			'handlers' => [
+				'url' => function($url, $ref, array $options = []) use (&$result) {
 					$result = compact('options');
 				},
-				'path' => function($path, $ref, array $options = array()) use (&$result) {
+				'path' => function($path, $ref, array $options = []) use (&$result) {
 					$result = compact('options');
 				}
-			)
-		));
-		$this->html = new Html(array('context' => &$this->context));
+			]
+		]);
+		$this->html = new Html(['context' => &$this->context]);
 
 		$this->html->link('home', '/home');
 		$this->assertFalse(isset($result['options']['scope']));
-		$this->html->link('home', '/home', array('scope' => 'app'));
+		$this->html->link('home', '/home', ['scope' => 'app']);
 		$this->assertEqual('app', $result['options']['scope']);
 
 		$this->html->link(
 			'RSS Feed',
-			array('controller' => 'posts', 'type' => 'rss'),
-			array('type' => 'rss')
+			['controller' => 'posts', 'type' => 'rss'],
+			['type' => 'rss']
 		);
 		$this->assertFalse(isset($result['options']['scope']));
 		$this->html->link(
 			'RSS Feed',
-			array('controller' => 'posts', 'type' => 'rss'),
-			array('type' => 'rss', 'scope' => 'app')
+			['controller' => 'posts', 'type' => 'rss'],
+			['type' => 'rss', 'scope' => 'app']
 		);
 		$this->assertEqual('app', $result['options']['scope']);
 
 		$this->html->script('script.js');
 		$this->assertFalse(isset($result['options']['scope']));
-		$this->html->script('script.js', array('scope' => 'app'));
+		$this->html->script('script.js', ['scope' => 'app']);
 		$this->assertEqual('app', $result['options']['scope']);
 
 		$this->html->image('test.gif');
 		$this->assertFalse(isset($result['options']['scope']));
-		$this->html->image('test.gif', array('scope' => 'app'));
+		$this->html->image('test.gif', ['scope' => 'app']);
 		$this->assertEqual('app', $result['options']['scope']);
 
 		$this->html->style('screen');
 		$this->assertFalse(isset($result['options']['scope']));
-		$this->html->style('screen', array('scope' => 'app'));
+		$this->html->style('screen', ['scope' => 'app']);
 		$this->assertEqual('app', $result['options']['scope']);
 
 		$this->html->link('home', '/home');
 		$this->assertFalse(isset($result['options']['scope']));
 
-		$expected = array('app' => array('domain' => 'bob'));
-		$this->html->link('home', '/home', array('scope' => $expected));
+		$expected = ['app' => ['domain' => 'bob']];
+		$this->html->link('home', '/home', ['scope' => $expected]);
 		$this->assertEqual($expected, $result['options']['scope']);
 	}
 }

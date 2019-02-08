@@ -1,15 +1,15 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\analysis\logger\adapter;
 
 use lithium\core\Libraries;
-use lithium\util\collection\Filters;
 use lithium\analysis\logger\adapter\File;
 
 class FileTest extends \lithium\test\Unit {
@@ -33,26 +33,26 @@ class FileTest extends \lithium\test\Unit {
 	}
 
 	public function testWriting() {
-		$this->subject = new File(array('path' => $this->path));
+		$this->subject = new File(['path' => $this->path]);
 		$priority = 'debug';
 		$message = 'This is a debug message';
 		$function = $this->subject->write($priority, $message);
 		$now = date('Y-m-d H:i:s');
-		$function('lithium\analysis\Logger', compact('priority', 'message'), new Filters());
+		$function(compact('priority', 'message'));
 
 		$log = file_get_contents("{$this->path}/debug.log");
 		$this->assertEqual("{$now} This is a debug message\n", $log);
 	}
 
 	public function testWithoutTimestamp() {
-		$this->subject = new File(array(
+		$this->subject = new File([
 			'path' => $this->path, 'timestamp' => false, 'format' => "{:message}\n"
-		));
+		]);
 		$priority = 'debug';
 		$message = 'This is a debug message';
 		$function = $this->subject->write($priority, $message);
 		$now = date('Y-m-d H:i:s');
-		$function('lithium\analysis\Logger', compact('priority', 'message'), new Filters());
+		$function(compact('priority', 'message'));
 
 		$log = file_get_contents("{$this->path}/debug.log");
 		$this->assertEqual("This is a debug message\n", $log);

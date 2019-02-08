@@ -1,16 +1,18 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\action;
 
-use lithium\util\String;
+use lithium\util\Text;
 use lithium\util\Inflector;
 use lithium\core\Libraries;
+use lithium\aop\Filters;
 use lithium\action\DispatchException;
 use lithium\core\ClassNotFoundException;
 
@@ -40,9 +42,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @see lithium\net\http\Router::parse()
 	 * @var array
 	 */
-	protected static $_classes = array(
+	protected static $_classes = [
 		'router' => 'lithium\net\http\Router'
-	);
+	];
 
 	/**
 	 * Contains pre-process format strings for changing Dispatcher's behavior based on `'rules'`.
@@ -51,8 +53,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * (and not empty) in a route, (i.e. the result of `Router::parse()`) then the rule's
 	 * value will be applied to the route before it is dispatched. When applying a rule, any
 	 * array elements of the flag which are present in the route will be modified using a
-	 * `String::insert()`-formatted string. Alternatively, a callback can be used to do custom
-	 * transformations other than the default `String::insert()`.
+	 * `Text::insert()`-formatted string. Alternatively, a callback can be used to do custom
+	 * transformations other than the default `Text::insert()`.
 	 *
 	 * For example, to implement action prefixes (i.e. `admin_index`), set a rule named
 	 * `'admin'`, with a value array containing a modifier key for the `action` element of
@@ -60,11 +62,11 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * present and not empty in the parameters returned from routing, the value of `'action'`
 	 * will be rewritten per the settings in the rule:
 	 * ```
-	 * Dispatcher::config(array(
-	 *	'rules' => array(
+	 * Dispatcher::config([
+	 *	'rules' => [
 	 *		'admin' => 'admin_{:action}'
-	 *	)
-	 * ));
+	 *	]
+	 * ]);
 	 * ```
 	 *
 	 * The following example shows two rules that continuously or independently transform the
@@ -82,27 +84,27 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * action:
 	 * ```
 	 * // ...
-	 *		'action' => array('action' => function($params) {
+	 *		'action' => ['action' => function($params) {
 	 *			return Inflector::camelize(strtolower($params['action']), false);
-	 *		})
+	 *		}]
 	 * // ...
 	 * ```
 	 *
 	 * The entires rules can become a callback as well:
 	 * ```
-	 * Dispatcher::config(array(
+	 * Dispatcher::config([
 	 *	'rules' => function($params) {
 	 *		// ...
 	 *	}
-	 * ));
+	 * ]);
 	 * ```
 	 *
 	 * @see lithium\action\Dispatcher::config()
-	 * @see lithium\util\String::insert()
+	 * @see lithium\util\Text::insert()
 	 * @see lithium\util\Inflector
 	 * @var array
 	 */
-	protected static $_rules = array();
+	protected static $_rules = [];
 
 	/**
 	 * Used to set configuration parameters for the `Dispatcher`.
@@ -115,9 +117,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return array If no parameters are passed, returns an associative array with the current
 	 *         configuration, otherwise returns `null`.
 	 */
-	public static function config(array $config = array()) {
+	public static function config(array $config = []) {
 		if (!$config) {
-			return array('rules' => static::$_rules);
+			return ['rules' => static::$_rules];
 		}
 
 		foreach ($config as $key => $val) {
@@ -146,24 +148,25 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 *         `lithium\action\Response`.
 	 * @filter Allows to perform actions very early or late in the request.
 	 */
-	public static function run($request, array $options = array()) {
-		$router = static::$_classes['router'];
+	public static function run($request, array $options = []) {
 		$params = compact('request', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) use ($router) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
+			$router = static::$_classes['router'];
+
 			$request = $params['request'];
 			$options = $params['options'];
 
 			if (($result = $router::process($request)) instanceof Response) {
 				return $result;
 			}
-			$params = $self::applyRules($result->params);
+			$params = static::applyRules($result->params);
 
 			if (!$params) {
 				throw new DispatchException('Could not route request.');
 			}
-			$callable = $self::invokeMethod('_callable', array($result, $params, $options));
-			return $self::invokeMethod('_call', array($callable, $result, $params));
+			$callable = static::_callable($result, $params, $options);
+			return static::_call($callable, $result, $params);
 		});
 	}
 
@@ -177,7 +180,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return array Returns the `$params` array with formatting rules applied to array values.
 	 */
 	public static function applyRules(&$params) {
-		$values = array();
+		$values = [];
 		$rules = static::$_rules;
 
 		if (!$params) {
@@ -220,7 +223,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 				if (preg_match('/' . $match . '/i', $values[$k])) {
 					continue;
 				}
-				$values[$k] = String::insert($v, $values);
+				$values[$k] = Text::insert($v, $values);
 			}
 		}
 		return $values;
@@ -241,8 +244,8 @@ class Dispatcher extends \lithium\core\StaticObject {
 	protected static function _callable($request, $params, $options) {
 		$params = compact('request', 'params', 'options');
 
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
-			$options = array('request' => $params['request']) + $params['options'];
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
+			$options = ['request' => $params['request']] + $params['options'];
 			$controller = $params['params']['controller'];
 
 			try {
@@ -269,7 +272,7 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 */
 	protected static function _call($callable, $request, $params) {
 		$params = compact('callable', 'request', 'params');
-		return static::_filter(__FUNCTION__, $params, function($self, $params) {
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) {
 			if (is_callable($callable = $params['callable'])) {
 				return $callable($params['request'], $params['params']);
 			}

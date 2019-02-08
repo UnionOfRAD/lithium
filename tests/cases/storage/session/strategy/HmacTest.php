@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\storage\session\strategy;
@@ -15,7 +16,7 @@ class HmacTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->secret = 'foobar';
-		$this->Hmac = new Hmac(array('secret' => $this->secret));
+		$this->Hmac = new Hmac(['secret' => $this->secret]);
 		$this->mock = 'lithium\tests\mocks\storage\session\strategy\MockCookieSession';
 		MockCookieSession::reset();
 	}
@@ -41,9 +42,9 @@ class HmacTest extends \lithium\test\Unit {
 		$result = $this->Hmac->write($value, compact('key', 'class'));
 		$this->assertEqual($value, $result);
 
-		$signature = hash_hmac('sha1', serialize(array($key => $value) + $oldData), $this->secret);
+		$signature = hash_hmac('sha1', serialize([$key => $value] + $oldData), $this->secret);
 		$signedData = MockCookieSession::data();
-		$this->assertEqual($signedData, $oldData + array('__signature' => $signature));
+		$this->assertEqual($signedData, $oldData + ['__signature' => $signature]);
 	}
 
 	public function testReadWithValidSignature() {

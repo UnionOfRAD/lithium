@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\net\http;
@@ -18,18 +19,18 @@ class RouteTest extends \lithium\test\Unit {
 	 * properly given the correct parameters.
 	 */
 	public function testBaseRouteMatching() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/',
-			'params' => array('controller' => 'posts', 'action' => 'archive', 'page' => 1)
-		));
+			'params' => ['controller' => 'posts', 'action' => 'archive', 'page' => 1]
+		]);
 
-		$result = $route->match(array('controller' => 'posts', 'action' => 'archive', 'page' => 1));
+		$result = $route->match(['controller' => 'posts', 'action' => 'archive', 'page' => 1]);
 		$this->assertEqual('/', $result);
 
-		$result = $route->match(array('controller' => 'posts', 'action' => 'archive', 'page' => 2));
+		$result = $route->match(['controller' => 'posts', 'action' => 'archive', 'page' => 2]);
 		$this->assertFalse($result);
 
-		$result = $route->match(array());
+		$result = $route->match([]);
 		$this->assertFalse($result);
 	}
 
@@ -38,19 +39,19 @@ class RouteTest extends \lithium\test\Unit {
 	 * by the base route.
 	 */
 	public function testBaseRouteParsing() {
-		$params = array('controller' => 'posts', 'action' => 'archive', 'page' => 1);
-		$route = new Route(array('template' => '/', 'params' => $params));
+		$params = ['controller' => 'posts', 'action' => 'archive', 'page' => 1];
+		$route = new Route(['template' => '/', 'params' => $params]);
 		$request = new Request();
 		$request->url = '/';
 
 		$result = $route->parse($request);
 		$this->assertEqual($params, $result->params);
-		$this->assertEqual(array('controller'), $result->persist);
+		$this->assertEqual(['controller'], $result->persist);
 
 		$request->url = '';
 		$result = $route->parse($request);
 		$this->assertEqual($params, $result->params);
-		$this->assertEqual(array('controller'), $result->persist);
+		$this->assertEqual(['controller'], $result->persist);
 
 		$request->url = '/posts';
 		$this->assertFalse($route->parse($request));
@@ -61,16 +62,16 @@ class RouteTest extends \lithium\test\Unit {
 	 * anything including extra parameters or an action other than the default action are ignored.
 	 */
 	public function testSimpleRouteMatching() {
-		$route = new Route(array('template' => '/{:controller}'));
-		$result = $route->match(array('controller' => 'posts', 'action' => 'index'));
+		$route = new Route(['template' => '/{:controller}']);
+		$result = $route->match(['controller' => 'posts', 'action' => 'index']);
 		$this->assertEqual('/posts', $result);
 
-		$result = $route->match(array('controller' => 'users'));
+		$result = $route->match(['controller' => 'users']);
 		$this->assertEqual('/users', $result);
 
-		$this->assertFalse($route->match(array('controller' => 'posts', 'action' => 'view')));
-		$this->assertFalse($route->match(array('controller' => 'posts', 'id' => 5)));
-		$this->assertFalse($route->match(array('action' => 'index')));
+		$this->assertFalse($route->match(['controller' => 'posts', 'action' => 'view']));
+		$this->assertFalse($route->match(['controller' => 'posts', 'id' => 5]));
+		$this->assertFalse($route->match(['action' => 'index']));
 	}
 
 	/**
@@ -78,71 +79,71 @@ class RouteTest extends \lithium\test\Unit {
 	 * the correct controller and action parameters.
 	 */
 	public function testSimpleRouteParsing() {
-		$route = new Route(array('template' => '/{:controller}'));
+		$route = new Route(['template' => '/{:controller}']);
 		$request = new Request();
-		$default = array('action' => 'index');
+		$default = ['action' => 'index'];
 
 		$request->url = '/posts';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'posts') + $default, $result->params);
+		$this->assertEqual(['controller' => 'posts'] + $default, $result->params);
 
 		$request->url = '/users';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'users') + $default, $result->params);
+		$this->assertEqual(['controller' => 'users'] + $default, $result->params);
 
 		$request->url = '/users/index';
 		$this->assertFalse($route->parse($request));
 	}
 
 	public function testRouteMatchingWithOptionalParam() {
-		$route = new Route(array('template' => '/{:controller}/{:action}'));
+		$route = new Route(['template' => '/{:controller}/{:action}']);
 
-		$result = $route->match(array('controller' => 'posts'));
+		$result = $route->match(['controller' => 'posts']);
 		$this->assertEqual('/posts', $result);
 
-		$result = $route->match(array('controller' => 'users', 'action' => 'index'));
+		$result = $route->match(['controller' => 'users', 'action' => 'index']);
 		$this->assertEqual('/users', $result);
 
-		$result = $route->match(array('controller' => '1'));
+		$result = $route->match(['controller' => '1']);
 		$this->assertEqual('/1', $result);
 
-		$result = $route->match(array('controller' => '1', 'action' => 'view'));
+		$result = $route->match(['controller' => '1', 'action' => 'view']);
 		$this->assertEqual('/1/view', $result);
 
-		$result = $route->match(array('controller' => 'users', 'action' => 'view'));
+		$result = $route->match(['controller' => 'users', 'action' => 'view']);
 		$this->assertEqual('/users/view', $result);
 
-		$result = $route->match(array('controller' => 'users', 'action' => 'view', 'id' => '5'));
+		$result = $route->match(['controller' => 'users', 'action' => 'view', 'id' => '5']);
 		$this->assertFalse($result);
 
-		$result = $route->match(array());
+		$result = $route->match([]);
 		$this->assertFalse($result);
 	}
 
 	public function testRouteParsingWithOptionalParam() {
-		$route = new Route(array('template' => '/{:controller}/{:action}'));
+		$route = new Route(['template' => '/{:controller}/{:action}']);
 		$request = new Request();
-		$default = array('action' => 'index');
+		$default = ['action' => 'index'];
 
 		$request->url = '/posts';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'posts') + $default, $result->params);
+		$this->assertEqual(['controller' => 'posts'] + $default, $result->params);
 
 		$request->url = '/users';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'users') + $default, $result->params);
+		$this->assertEqual(['controller' => 'users'] + $default, $result->params);
 
 		$request->url = '/1';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => '1') + $default, $result->params);
+		$this->assertEqual(['controller' => '1'] + $default, $result->params);
 
 		$request->url = '/users/index';
 		$result = $route->parse($request);
-		$this->assertEqual(array('controller' => 'users') + $default, $result->params);
+		$this->assertEqual(['controller' => 'users'] + $default, $result->params);
 
 		$request->url = '/users/view';
 		$result = $route->parse($request);
-		$expected = array('controller' => 'users', 'action' => 'view');
+		$expected = ['controller' => 'users', 'action' => 'view'];
 		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/users/view/5';
@@ -153,14 +154,14 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	public function testRouteParsingWithOptionalParams() {
-		$route = new Route(array(
-			'template' => '/{:controller}/{:action}/{:id}', 'params' => array('id' => null)
-		));
+		$route = new Route([
+			'template' => '/{:controller}/{:action}/{:id}', 'params' => ['id' => null]
+		]);
 		$request = new Request();
 
 		$request->url = '/posts';
 		$result = $route->parse($request);
-		$expected = array('controller' => 'posts', 'action' => 'index', 'id' => null);
+		$expected = ['controller' => 'posts', 'action' => 'index', 'id' => null];
 		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/posts/index';
@@ -173,12 +174,12 @@ class RouteTest extends \lithium\test\Unit {
 
 		$request->url = '/posts/view/0';
 		$result = $route->parse($request);
-		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '0');
+		$expected = ['controller' => 'posts', 'action' => 'view', 'id' => '0'];
 		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/posts/view/5';
 		$result = $route->parse($request);
-		$expected = array('controller' => 'posts', 'action' => 'view', 'id' => '5');
+		$expected = ['controller' => 'posts', 'action' => 'view', 'id' => '5'];
 		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/';
@@ -189,90 +190,90 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	public function testRouteParsingWithOptionalParamsAndType() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:controller}/{:action}/{:id}.{:type}',
-			'params' => array('id' => null)
-		));
+			'params' => ['id' => null]
+		]);
 		$request = new Request();
-		$default = array('controller' => 'posts');
+		$default = ['controller' => 'posts'];
 
 		$request->url = '/posts/view/5.xml';
 		$result = $route->parse($request);
-		$expected = array('action' => 'view', 'id' => '5', 'type' => 'xml') + $default;
+		$expected = ['action' => 'view', 'id' => '5', 'type' => 'xml'] + $default;
 		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/posts/index.xml';
 		$result = $route->parse($request);
-		$expected = array('action' => 'index', 'id' => '', 'type' => 'xml') + $default;
+		$expected = ['action' => 'index', 'id' => '', 'type' => 'xml'] + $default;
 		$this->assertEqual($expected, $result->params);
 
 		$request->url = '/posts.xml';
 		$result = $route->parse($request);
-		$expected = array('action' => 'index', 'id' => '', 'type' => 'xml') + $default;
+		$expected = ['action' => 'index', 'id' => '', 'type' => 'xml'] + $default;
 		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testRouteParsingWithParamsEqualsToZero() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:controller}/{:action}/{:value}/{:id}.{:type}',
-			'params' => array('id' => null)
-		));
+			'params' => ['id' => null]
+		]);
 		$request = new Request();
-		$default = array('controller' => 'posts');
+		$default = ['controller' => 'posts'];
 
 		$request->url = '/posts/action/0/123.json';
 		$result = $route->parse($request);
-		$expected = array(
+		$expected = [
 			'action' => 'action',
 			'value' => 0,
 			'id' => '123',
 			'type' => 'json'
-		) + $default;
+		] + $default;
 		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testRouteMatchingWithEmptyTrailingParams() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:controller}/{:action}/{:args}',
-			'modifiers' => array('args' => function($value) {
+			'modifiers' => ['args' => function($value) {
 				return explode('/', $value);
-			}),
-			'formatters' => array('args' => function($value) {
+			}],
+			'formatters' => ['args' => function($value) {
 				return is_array($value) ? join('/', $value) : $value;
-			})
-		));
+			}]
+		]);
 
-		$result = $route->match(array('controller' => 'posts'));
+		$result = $route->match(['controller' => 'posts']);
 		$this->assertEqual('/posts', $result);
 
-		$result = $route->match(array('controller' => 'posts', 'args' => 'foo'));
+		$result = $route->match(['controller' => 'posts', 'args' => 'foo']);
 		$this->assertEqual('/posts/index/foo', $result);
 
-		$result = $route->match(array('controller' => 'posts', 'args' => array('foo', 'bar')));
+		$result = $route->match(['controller' => 'posts', 'args' => ['foo', 'bar']]);
 		$this->assertEqual('/posts/index/foo/bar', $result);
 
 		$request = new Request();
 		$request->url = '/posts/index/foo/bar';
 
 		$result = $route->parse($request);
-		$expected = array(
-			'controller' => 'posts', 'action' => 'index', 'args' => array('foo', 'bar')
-		);
+		$expected = [
+			'controller' => 'posts', 'action' => 'index', 'args' => ['foo', 'bar']
+		];
 		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testStaticRouteMatching() {
-		$route = new Route(array('template' => '/login', 'params' => array(
+		$route = new Route(['template' => '/login', 'params' => [
 			'controller' => 'sessions', 'action' => 'add'
-		)));
-		$result = $route->match(array('controller' => 'sessions', 'action' => 'add'));
+		]]);
+		$result = $route->match(['controller' => 'sessions', 'action' => 'add']);
 		$this->assertEqual('/login', $result);
 
-		$result = $route->match(array());
+		$result = $route->match([]);
 		$this->assertFalse($result);
 
 		$request = new Request();
-		$expected = array('controller' => 'sessions', 'action' => 'add');
+		$expected = ['controller' => 'sessions', 'action' => 'add'];
 
 		$request->url = '/login';
 		$result = $route->parse($request);
@@ -287,22 +288,22 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests that routes can be composed of manual regular expressions.
 	 */
 	public function testManualRouteDefinition() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:controller}',
 			'pattern' => '/(?P<controller>[A-Za-z0-9_-]+)/',
-			'keys' => array('controller' => 'controller'),
-			'match' => array('action' => 'index'),
-			'options' => array('wrap' => false, 'compile' => false)
-		));
+			'keys' => ['controller' => 'controller'],
+			'match' => ['action' => 'index'],
+			'options' => ['wrap' => false, 'compile' => false]
+		]);
 
 		$request = new Request();
 		$request->url = '/posts';
 
 		$result = $route->parse($request);
-		$expected = array('controller' => 'posts', 'action' => 'index');
+		$expected = ['controller' => 'posts', 'action' => 'index'];
 		$this->assertEqual($expected, $result->params);
 
-		$result = $route->match(array('controller' => 'posts', 'action' => 'index'));
+		$result = $route->match(['controller' => 'posts', 'action' => 'index']);
 		$expected = '/posts';
 		$this->assertEqual($expected, $result);
 	}
@@ -311,44 +312,44 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests exporting a the details of a compiled route to an array.
 	 */
 	public function testRouteExporting() {
-		$result = new Route(array(
+		$result = new Route([
 			'template' => '/{:controller}/{:action}',
-			'params' => array('action' => 'view')
-		));
+			'params' => ['action' => 'view']
+		]);
 		$result = $result->export();
 
-		$expected = array(
+		$expected = [
 			'template' => '/{:controller}/{:action}',
 			'pattern' => '@^(?:/(?P<controller>[^\\/]+))(?:/(?P<action>[^\\/]+)?)?$@u',
-			'params' => array('action' => 'view'),
-			'defaults' => array('action' => 'view'),
-			'match' => array(),
-			'meta' => array(),
-			'keys' => array('controller' => 'controller', 'action' => 'action'),
-			'subPatterns' => array(),
-			'persist' => array('controller'),
+			'params' => ['action' => 'view'],
+			'defaults' => ['action' => 'view'],
+			'match' => [],
+			'meta' => [],
+			'keys' => ['controller' => 'controller', 'action' => 'action'],
+			'subPatterns' => [],
+			'persist' => ['controller'],
 			'handler' => null
-		);
+		];
 		$this->assertEqual($expected, $result);
 
-		$result = new Route(array(
+		$result = new Route([
 			'template' => '/images/image_{:width}x{:height}.{:format}',
-			'params' => array('format' => 'png')
-		));
+			'params' => ['format' => 'png']
+		]);
 
 		$ptrn = '@^/images/image_(?P<width>[^\\/]+)x(?P<height>[^\\/]+)\\.(?P<format>[^\\/]+)?$@u';
-		$expected = array(
+		$expected = [
 			'template' => '/images/image_{:width}x{:height}.{:format}',
 			'pattern' => $ptrn,
-			'params' => array('format' => 'png', 'action' => 'index'),
-			'match' => array('action' => 'index'),
-			'meta' => array(),
-			'keys' => array('width' => 'width', 'height' => 'height', 'format' => 'format'),
-			'defaults' => array('format' => 'png'),
-			'subPatterns' => array(),
-			'persist' => array(),
+			'params' => ['format' => 'png', 'action' => 'index'],
+			'match' => ['action' => 'index'],
+			'meta' => [],
+			'keys' => ['width' => 'width', 'height' => 'height', 'format' => 'format'],
+			'defaults' => ['format' => 'png'],
+			'subPatterns' => [],
+			'persist' => [],
 			'handler' => null
-		);
+		];
 		$result = $result->export();
 		$this->assertEqual($expected, $result);
 	}
@@ -358,23 +359,23 @@ class RouteTest extends \lithium\test\Unit {
 	 * generates them in one.
 	 */
 	public function testRoutingMultipleMatch() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/users/{:user}',
 			'pattern' => '@^/u(?:sers)?(?:/(?P<user>[^\/]+))$@',
-			'params' => array('controller' => 'users', 'action' => 'index'),
-			'match' => array('controller' => 'users', 'action' => 'index'),
-			'defaults' => array('controller' => 'users'),
-			'keys' => array('user' => 'user'),
+			'params' => ['controller' => 'users', 'action' => 'index'],
+			'match' => ['controller' => 'users', 'action' => 'index'],
+			'defaults' => ['controller' => 'users'],
+			'keys' => ['user' => 'user'],
 			'compile' => false
-		));
+		]);
 
-		$result = $route->match(array('controller' => 'users', 'user' => 'alke'));
+		$result = $route->match(['controller' => 'users', 'user' => 'alke']);
 		$expected = '/users/alke';
 		$this->assertEqual($expected, $result);
 
 		$request = new Request();
 		$request->url = '/users/alke';
-		$expected = array('controller' => 'users', 'action' => 'index', 'user' => 'alke');
+		$expected = ['controller' => 'users', 'action' => 'index', 'user' => 'alke'];
 
 		$result = $route->parse($request);
 		$this->assertEqual($expected, $result->params);
@@ -388,11 +389,11 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests creating a route with a custom regex sub-pattern in a template.
 	 */
 	public function testCustomSubPattern() {
-		$route = new Route(array('template' => '/{:controller}/{:action}/{:user:\d+}'));
+		$route = new Route(['template' => '/{:controller}/{:action}/{:user:\d+}']);
 
 		$request = new Request();
 		$request->url = '/users/view/10';
-		$expected = array('controller' => 'users', 'action' => 'view', 'user' => '10');
+		$expected = ['controller' => 'users', 'action' => 'view', 'user' => '10'];
 
 		$result = $route->parse($request);
 		$this->assertEqual($expected, $result->params);
@@ -406,13 +407,13 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests creating a route with a custom sub-pattern and trailing route
 	 */
 	public function testCustomSubPatternWithTrailing() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:controller}/{:action}/{:id:[0-9]+}/abcdefghijklm'
-		));
+		]);
 
 		$request = new Request();
 		$request->url = '/users/view/10/abcdefghijklm';
-		$expected = array('controller' => 'users', 'action' => 'view', 'id' => '10');
+		$expected = ['controller' => 'users', 'action' => 'view', 'id' => '10'];
 
 		$result = $route->parse($request);
 		$this->assertEqual($expected, $result->params);
@@ -426,94 +427,94 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests that routes with querystrings are correctly processed.
 	 */
 	public function testRoutesWithQueryStrings() {
-		$route = new Route(array('template' => '/{:controller}/{:action}/{:args}'));
+		$route = new Route(['template' => '/{:controller}/{:action}/{:args}']);
 
 		$expected = '/posts?foo=bar';
-		$result = $route->match(array('controller' => 'posts', '?' => 'foo=bar'));
+		$result = $route->match(['controller' => 'posts', '?' => 'foo=bar']);
 		$this->assertEqual($expected, $result);
 
 		$expected = '/posts?foo=bar&baz=dib';
-		$result = $route->match(array('controller' => 'posts', '?' => 'foo=bar&baz=dib'));
+		$result = $route->match(['controller' => 'posts', '?' => 'foo=bar&baz=dib']);
 		$this->assertEqual($expected, $result);
 
 		$expected = '/posts?foo=bar';
-		$result = $route->match(array('controller' => 'posts', '?' => array('foo' => 'bar')));
+		$result = $route->match(['controller' => 'posts', '?' => ['foo' => 'bar']]);
 		$this->assertEqual($expected, $result);
 
 		$expected = '/posts/archive?foo=bar&baz=dib';
-		$result = $route->match(array('controller' => 'posts', 'action' => 'archive', '?' => array(
+		$result = $route->match(['controller' => 'posts', 'action' => 'archive', '?' => [
 			'foo' => 'bar', 'baz' => 'dib'
-		)));
+		]]);
 		$this->assertEqual($expected, $result);
 
 		$expected = '/posts/archive?foo[]=bar&foo[]=baz';
-		$result = $route->match(array(
+		$result = $route->match([
 			'controller' => 'posts',
 			'action' => 'archive',
 			'?' => 'foo[]=bar&foo[]=baz'
-		));
+		]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testReversingRegexRoutes() {
-		$route = new Route(array('template' => '/{:controller}/{:id:[0-7]+}'));
+		$route = new Route(['template' => '/{:controller}/{:id:[0-7]+}']);
 
-		$result = $route->match(array('controller' => 'posts', 'id' => '007'));
+		$result = $route->match(['controller' => 'posts', 'id' => '007']);
 		$this->assertEqual('/posts/007', $result);
 
-		$this->assertFalse($route->match(array('controller' => 'posts', 'id' => '009')));
+		$this->assertFalse($route->match(['controller' => 'posts', 'id' => '009']));
 	}
 
 	/**
 	 * Tests that route templates with elements containing repetition patterns are correctly parsed.
 	 */
 	public function testPatternsWithRepetition() {
-		$route = new Route(array('template' => '/{:id:[0-9a-f]{24}}.{:type}'));
+		$route = new Route(['template' => '/{:id:[0-9a-f]{24}}.{:type}']);
 		$data = $route->export();
 		$this->assertEqual('@^(?:/(?P<id>[0-9a-f]{24}))\.(?P<type>[^\/]+)$@u', $data['pattern']);
 
-		$this->assertEqual(array('id' => 'id', 'type' => 'type'), $data['keys']);
-		$this->assertEqual(array('id' => '[0-9a-f]{24}'), $data['subPatterns']);
+		$this->assertEqual(['id' => 'id', 'type' => 'type'], $data['keys']);
+		$this->assertEqual(['id' => '[0-9a-f]{24}'], $data['subPatterns']);
 
-		$route = new Route(array('template' => '/{:key:[a-z]{5}[0-9]{2,3}}'));
+		$route = new Route(['template' => '/{:key:[a-z]{5}[0-9]{2,3}}']);
 		$data = $route->export();
 		$this->assertEqual('@^(?:/(?P<key>[a-z]{5}[0-9]{2,3}))$@u', $data['pattern']);
-		$this->assertEqual(array('key' => '[a-z]{5}[0-9]{2,3}'), $data['subPatterns']);
+		$this->assertEqual(['key' => '[a-z]{5}[0-9]{2,3}'], $data['subPatterns']);
 
-		$this->assertEqual('/abcde13', $route->match(array('key' => 'abcde13')));
-		$this->assertFalse($route->match(array('key' => 'abcdef13')));
+		$this->assertEqual('/abcde13', $route->match(['key' => 'abcde13']));
+		$this->assertFalse($route->match(['key' => 'abcdef13']));
 
-		$route = new Route(array('template' => '/{:key:z[a-z]{5}[0-9]{2,3}0}/{:val:[0-9]{2}}'));
+		$route = new Route(['template' => '/{:key:z[a-z]{5}[0-9]{2,3}0}/{:val:[0-9]{2}}']);
 		$data = $route->export();
 
 		$expected = '@^(?:/(?P<key>z[a-z]{5}[0-9]{2,3}0))(?:/(?P<val>[0-9]{2}))$@u';
 		$this->assertEqual($expected, $data['pattern']);
 
-		$expected = array('key' => 'z[a-z]{5}[0-9]{2,3}0', 'val' => '[0-9]{2}');
+		$expected = ['key' => 'z[a-z]{5}[0-9]{2,3}0', 'val' => '[0-9]{2}'];
 		$this->assertEqual($expected, $data['subPatterns']);
 
-		$result = $route->match(array('key' => 'zgheug910', 'val' => '13'));
+		$result = $route->match(['key' => 'zgheug910', 'val' => '13']);
 		$this->assertEqual('/zgheug910/13', $result);
-		$this->assertFalse($route->match(array('key' => 'zgheu910', 'val' => '13')));
+		$this->assertFalse($route->match(['key' => 'zgheu910', 'val' => '13']));
 
-		$result = $route->match(array('key' => 'zgheug9410', 'val' => '13'));
+		$result = $route->match(['key' => 'zgheug9410', 'val' => '13']);
 		$this->assertEqual('/zgheug9410/13', $result);
-		$this->assertFalse($route->match(array('key' => 'zgheug941', 'val' => '13')));
+		$this->assertFalse($route->match(['key' => 'zgheug941', 'val' => '13']));
 	}
 
 	/**
 	 * Tests that route handlers are able to modify route parameters.
 	 */
 	public function testHandlerModification() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:id:[0-9a-f]{24}}.{:type}',
 			'handler' => function($request) {
-				$request->params += array('lang' => $request->env('ACCEPT_LANG') ?: 'en');
+				$request->params += ['lang' => $request->env('ACCEPT_LANG') ?: 'en'];
 				return $request;
 			}
-		));
+		]);
 
-		$request = new Request(array('url' => '/4bbf25bd8ead0e5180120000.json'));
+		$request = new Request(['url' => '/4bbf25bd8ead0e5180120000.json']);
 		$result = $route->parse($request);
 		$lang = $request->env('ACCEPT_LANG') ?: 'en';
 		$this->assertEqual($lang, $result->params['lang']);
@@ -523,32 +524,32 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests that requests can be routed based on HTTP method verbs or HTTP headers.
 	 */
 	public function testHeaderAndMethodBasedRouting() {
-		$parameters = array('controller' => 'users', 'action' => 'edit');
+		$parameters = ['controller' => 'users', 'action' => 'edit'];
 
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/',
-			'params' => $parameters + array('http:method' => 'POST')
-		));
+			'params' => $parameters + ['http:method' => 'POST']
+		]);
 
-		$request = new Request(array('env' => array('HTTP_METHOD' => 'GET')));
+		$request = new Request(['env' => ['HTTP_METHOD' => 'GET']]);
 		$request->url = '/';
 		$this->assertFalse($route->parse($request));
 
-		$request = new Request(array('env' => array('REQUEST_METHOD' => 'POST')));
+		$request = new Request(['env' => ['REQUEST_METHOD' => 'POST']]);
 		$request->url = '/';
 		$this->assertEqual($parameters, $route->parse($request)->params);
 
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:controller}/{:id:[0-9]+}',
-			'params' => $parameters + array('http:method' => array('POST', 'PUT'))
-		));
+			'params' => $parameters + ['http:method' => ['POST', 'PUT']]
+		]);
 
-		$request = new Request(array('env' => array('REQUEST_METHOD' => 'PUT')));
+		$request = new Request(['env' => ['REQUEST_METHOD' => 'PUT']]);
 		$request->url = '/users/abc';
 		$this->assertFalse($route->parse($request));
 
 		$request->url = '/users/54';
-		$this->assertEqual($parameters + array('id' => '54'), $route->parse($request)->params);
+		$this->assertEqual($parameters + ['id' => '54'], $route->parse($request)->params);
 	}
 
 	/**
@@ -556,17 +557,17 @@ class RouteTest extends \lithium\test\Unit {
 	 * a domain never returns an empty string.
 	 */
 	public function testMatchingEmptyRoute() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/',
-			'params' => array('controller' => 'users', 'action' => 'view')
-		));
+			'params' => ['controller' => 'users', 'action' => 'view']
+		]);
 
-		$request = new Request(array('base' => '/'));
-		$url = $route->match(array('controller' => 'users', 'action' => 'view'), $request);
+		$request = new Request(['base' => '/']);
+		$url = $route->match(['controller' => 'users', 'action' => 'view'], $request);
 		$this->assertEqual('/', $url);
 
-		$request = new Request(array('base' => ''));
-		$url = $route->match(array('controller' => 'users', 'action' => 'view'), $request);
+		$request = new Request(['base' => '']);
+		$url = $route->match(['controller' => 'users', 'action' => 'view'], $request);
 		$this->assertEqual('/', $url);
 	}
 
@@ -574,19 +575,19 @@ class RouteTest extends \lithium\test\Unit {
 	 * Test route matching for routes with specified request method (http:method)
 	 */
 	public function testMatchWithRequestMethod() {
-		$parameters = array('controller' => 'resource', 'action' => 'create');
+		$parameters = ['controller' => 'resource', 'action' => 'create'];
 
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/resource',
-			'params' => $parameters + array('http:method' => 'POST')
-		));
+			'params' => $parameters + ['http:method' => 'POST']
+		]);
 
-		$result = $route->match(array(
+		$result = $route->match([
 			'controller' => 'resource', 'action' => 'create', 'http:method' => 'POST'
-		));
+		]);
 		$this->assertEqual('/resource', $result);
 
-		$result = $route->match(array('controller' => 'resource', 'action' => 'create'));
+		$result = $route->match(['controller' => 'resource', 'action' => 'create']);
 		$this->assertEqual(false, $result);
 	}
 
@@ -594,24 +595,24 @@ class RouteTest extends \lithium\test\Unit {
 	 * Test route matching for routes with specified request method (http:method) and a param
 	 */
 	public function testMatchWithRequestMethodWithParam() {
-		$parameters = array('controller' => 'resource', 'action' => 'create');
+		$parameters = ['controller' => 'resource', 'action' => 'create'];
 
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:param}',
-			'params' => $parameters + array('http:method' => 'POST')
-		));
+			'params' => $parameters + ['http:method' => 'POST']
+		]);
 
-		$result = $route->match(array(
+		$result = $route->match([
 			'controller' => 'resource',
 			'action' => 'create',
 			'param' => 'value',
 			'http:method' => 'POST'
-		));
+		]);
 		$this->assertEqual('/value', $result);
 
-		$result = $route->match(array(
+		$result = $route->match([
 			'controller' => 'resource', 'action' => 'create', 'param' => 'value'
-		));
+		]);
 		$this->assertEqual(false, $result);
 	}
 
@@ -619,26 +620,26 @@ class RouteTest extends \lithium\test\Unit {
 	 * Test route matching for routes with no request method (http:method)
 	 */
 	public function testMatchWithNoRequestMethod() {
-		$parameters = array('controller' => 'resource', 'action' => 'create');
+		$parameters = ['controller' => 'resource', 'action' => 'create'];
 
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/resource',
 			'params' => $parameters
-		));
+		]);
 
-		$result = $route->match(array('controller' => 'resource', 'action' => 'create'));
+		$result = $route->match(['controller' => 'resource', 'action' => 'create']);
 		$this->assertEqual('/resource', $result);
-		$result = $route->match(array(
+		$result = $route->match([
 			'controller' => 'resource', 'action' => 'create', 'http:method' => 'GET'
-		));
+		]);
 		$this->assertEqual('/resource', $result);
-		$result = $route->match(array(
+		$result = $route->match([
 			'controller' => 'resource', 'action' => 'create', 'http:method' => 'POST'
-		));
+		]);
 		$this->assertEqual('/resource', $result);
-		$result = $route->match(array(
+		$result = $route->match([
 			'controller' => 'resource', 'action' => 'create', 'http:method' => 'PUT'
-		));
+		]);
 		$this->assertEqual('/resource', $result);
 	}
 
@@ -646,27 +647,27 @@ class RouteTest extends \lithium\test\Unit {
 	 * Test route matching for routes with request method (http:method) GET
 	 */
 	public function testMatchWithRequestMethodGet() {
-		$parameters = array('controller' => 'resource', 'action' => 'create');
+		$parameters = ['controller' => 'resource', 'action' => 'create'];
 
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/resource',
-			'params' => $parameters + array('http:method' => 'GET')
-		));
+			'params' => $parameters + ['http:method' => 'GET']
+		]);
 
-		$result = $route->match(array(
-			'controller' => 'resource', 'action' => 'create', 'http:method' => 'GET')
+		$result = $route->match([
+			'controller' => 'resource', 'action' => 'create', 'http:method' => 'GET']
 		);
 		$this->assertEqual('/resource', $result);
 
-		$result = $route->match(array('controller' => 'resource', 'action' => 'create'));
+		$result = $route->match(['controller' => 'resource', 'action' => 'create']);
 		$this->assertEqual('/resource', $result);
 
-		$result = $route->match(array(
-			'controller' => 'resource', 'action' => 'create', 'http:method' => 'POST')
+		$result = $route->match([
+			'controller' => 'resource', 'action' => 'create', 'http:method' => 'POST']
 		);
 		$this->assertEqual(false, $result);
-		$result = $route->match(array(
-			'controller' => 'resource', 'action' => 'create', 'http:method' => 'PUT')
+		$result = $route->match([
+			'controller' => 'resource', 'action' => 'create', 'http:method' => 'PUT']
 		);
 		$this->assertEqual(false, $result);
 	}
@@ -675,32 +676,32 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests that routes with optional trailing elements have unnecessary slashes trimmed.
 	 */
 	public function testTrimmingEmptyPathElements() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:controller}/{:id:[0-9]+}',
-			'params' => array('action' => 'index', 'id' => null)
-		));
+			'params' => ['action' => 'index', 'id' => null]
+		]);
 
-		$url = $route->match(array('controller' => 'posts', 'id' => '13'));
+		$url = $route->match(['controller' => 'posts', 'id' => '13']);
 		$this->assertEqual("/posts/13", $url);
 
-		$url = $route->match(array('controller' => 'posts'));
+		$url = $route->match(['controller' => 'posts']);
 		$this->assertEqual("/posts", $url);
 	}
 
 	public function testRouteMatchParseSymmetryWithoutTrimming() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:language:(de|en)}/{:country:(DE|NL)}/home',
-			'params' => array('controller' => 'pages', 'action' => 'home'),
-			'defaults' => array(
+			'params' => ['controller' => 'pages', 'action' => 'home'],
+			'defaults' => [
 				'language' => 'de',
 				'country' => 'DE'
-			)
-		));
+			]
+		]);
 
-		$params = array(
+		$params = [
 			'controller' => 'pages', 'action' => 'home',
 			'language' => 'en', 'country' => 'DE'
-		);
+		];
 		$url = $route->match($params);
 
 		$this->assertEqual('/en/DE/home', $url);
@@ -713,19 +714,19 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	public function testRouteMatchParseSymmetryWithRootTrimming() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:language:(de|en)}/{:country:(DE|NL)}',
-			'params' => array('controller' => 'pages', 'action' => 'home', 'country' => true),
-			'defaults' => array(
+			'params' => ['controller' => 'pages', 'action' => 'home', 'country' => true],
+			'defaults' => [
 				'language' => 'de',
 				'country' => 'DE'
-			)
-		));
+			]
+		]);
 
-		$params = array(
+		$params = [
 			'controller' => 'pages', 'action' => 'home',
 			'language' => 'en', 'country' => 'DE'
-		);
+		];
 		$url = $route->match($params);
 
 		$this->assertEqual('/en', $url);
@@ -738,18 +739,18 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	public function testUrlEncodedArgs() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:controller}/{:action}/{:args}',
-			'modifiers' => array('args' => function($value) {
+			'modifiers' => ['args' => function($value) {
 				return explode('/', $value);
-			})
-		));
+			}]
+		]);
 		$request = new Request();
 		$request->url = '/posts/index/Food%20%26%20Dining';
 		$result = $route->parse($request);
-		$expected = array(
-			'controller' => 'posts', 'action' => 'index', 'args' => array('Food%20%26%20Dining')
-		);
+		$expected = [
+			'controller' => 'posts', 'action' => 'index', 'args' => ['Food%20%26%20Dining']
+		];
 		$this->assertEqual($expected, $result->params);
 	}
 
@@ -757,32 +758,32 @@ class RouteTest extends \lithium\test\Unit {
 		$route = new Route();
 		$this->assertFalse($route->canContinue());
 
-		$route = new Route(array('continue' => true));
+		$route = new Route(['continue' => true]);
 		$this->assertTrue($route->canContinue());
 
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/admin/{:args}',
 			'continue' => true,
-			'params' => array('admin' => true)
-		));
+			'params' => ['admin' => true]
+		]);
 
-		$result = $route->match(array('admin' => true, 'args' => ''));
+		$result = $route->match(['admin' => true, 'args' => '']);
 		$this->assertEqual('/admin/{:args}', $result);
 	}
 
 	public function testContinuationRouteWithParameters() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/admin/{:args}',
 			'continue' => true,
-			'params' => array('admin' => true)
-		));
+			'params' => ['admin' => true]
+		]);
 
-		$result = $route->match(array(
+		$result = $route->match([
 			'admin' => true, 'controller' => 'users', 'action' => 'login'
-		));
+		]);
 		$this->assertEqual('/admin/{:args}', $result);
 
-		$result = $route->match(array('controller' => 'users', 'action' => 'login'));
+		$result = $route->match(['controller' => 'users', 'action' => 'login']);
 		$this->assertFalse($result);
 	}
 
@@ -790,13 +791,13 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests that continuation routes don't append query strings.
 	 */
 	public function testContinuationRouteWithQueryString() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/admin/{:args}',
 			'continue' => true,
-			'params' => array('admin' => true)
-		));
+			'params' => ['admin' => true]
+		]);
 
-		$result = $route->match(array('Posts::index', 'admin' => true, '?' => array('page' => 2)));
+		$result = $route->match(['Posts::index', 'admin' => true, '?' => ['page' => 2]]);
 		$this->assertEqual('/admin/{:args}', $result);
 	}
 
@@ -804,10 +805,10 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests correct regex backtracking.
 	 */
 	public function testValidPatternGeneration() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/posts/list/{:foobar:[0-9a-f]{5}}/todday/fooo',
-			'params' => array('controller' => 'posts', 'action' => 'archive')
-		));
+			'params' => ['controller' => 'posts', 'action' => 'archive']
+		]);
 
 		$expected = '@^/posts/list(?:/(?P<foobar>[0-9a-f]{5}))/todday/fooo$@u';
 		$result = $route->export();
@@ -818,27 +819,27 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests that routes with Unicode characters are correctly parsed.
 	 */
 	public function testUnicodeParameters() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/{:slug:[\pL\pN\-\%]+}',
-			'params' => array('controller' => 'users', 'action' => 'view')
-		));
+			'params' => ['controller' => 'users', 'action' => 'view']
+		]);
 
 		$unicode = 'clément';
 		$slug = rawurlencode($unicode);
-		$params = array('controller' => 'users', 'action' => 'view') + compact('slug');
+		$params = ['controller' => 'users', 'action' => 'view'] + compact('slug');
 
 		$result = $route->match($params);
 		$this->assertEqual("/{$slug}", $result);
 
-		$request = new Request(array('url' => "/{$slug}"));
-		$result = $route->parse($request, array('url' => $request->url));
+		$request = new Request(['url' => "/{$slug}"]);
+		$result = $route->parse($request, ['url' => $request->url]);
 
-		$expected = array('controller' => 'users', 'action' => 'view') + compact('slug');
+		$expected = ['controller' => 'users', 'action' => 'view'] + compact('slug');
 		$this->assertEqual($expected, $result->params);
 
-		$request = new Request(array('url' => "/{$slug}"));
-		$result = $route->parse($request, array('url' => $request->url));
-		$expected = array('controller' => 'users', 'action' => 'view') + compact('slug');
+		$request = new Request(['url' => "/{$slug}"]);
+		$result = $route->parse($request, ['url' => $request->url]);
+		$expected = ['controller' => 'users', 'action' => 'view'] + compact('slug');
 		$this->assertEqual($expected, $result->params);
 	}
 
@@ -846,10 +847,10 @@ class RouteTest extends \lithium\test\Unit {
 	 * Tests fix for route parameter matching.
 	 */
 	public function testTwoParameterRoutes() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/personnel/{:personnel_id}/position/{:position_id}/actions/create',
-			'params' => array('controller' => 'actions', 'action' => 'create')
-		));
+			'params' => ['controller' => 'actions', 'action' => 'create']
+		]);
 
 		$route->compile();
 		$data = $route->export(); $actual = $data['pattern'];
@@ -864,18 +865,18 @@ class RouteTest extends \lithium\test\Unit {
 	 * non-default parameters.
 	 */
 	public function testSingleRouteWithDefaultValues() {
-		$defaults = array('controller' => 'Admin', 'action' => 'index');
+		$defaults = ['controller' => 'Admin', 'action' => 'index'];
 
-		$route = new Route(compact('defaults') + array(
+		$route = new Route(compact('defaults') + [
 			'template' => '/{:controller}/{:action}',
 			'pattern' => '@^(?:/(?P[^\\/]+)?)?(?:/(?P[^\\/]+)?)?$@u',
-			'params' => array('controller' => 'Admin', 'action' => 'index'),
-			'keys' => array('controller' => 'controller', 'action' => 'action'),
-			'match' => array()
-		));
+			'params' => ['controller' => 'Admin', 'action' => 'index'],
+			'keys' => ['controller' => 'controller', 'action' => 'action'],
+			'match' => []
+		]);
 		$this->assertIdentical('/', $route->match($defaults));
 
-		$nonDefault = array('controller' => 'Admin', 'action' => 'view');
+		$nonDefault = ['controller' => 'Admin', 'action' => 'view'];
 		$this->assertIdentical('/Admin/view', $route->match($nonDefault));
 	}
 
@@ -887,50 +888,50 @@ class RouteTest extends \lithium\test\Unit {
 		$request = new Request();
 		$request->url = '/shop/pay/123';
 
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/shop/pay/{:uuid}',
-			'params' => array('controller' => 'orders', 'action' => 'pay'),
-			'defaults' => array('language' => 'de')
-		));
+			'params' => ['controller' => 'orders', 'action' => 'pay'],
+			'defaults' => ['language' => 'de']
+		]);
 		$result = $route->parse($request);
 		$this->assertArrayHasKey('language', $result->params);
 
 		$request = new Request();
 		$request->url = '/shop/pay/123';
 
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/shop/pay/{:uuid:[0-9]+}',
-			'params' => array('controller' => 'orders', 'action' => 'pay'),
-			'defaults' => array('language' => 'de')
-		));
+			'params' => ['controller' => 'orders', 'action' => 'pay'],
+			'defaults' => ['language' => 'de']
+		]);
 		$result = $route->parse($request);
 		$this->assertArrayHasKey('language', $result->params);
 
 		$request = new Request();
 		$request->url = '/shop/pay';
 
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/shop/pay',
-			'params' => array('controller' => 'orders', 'action' => 'pay'),
-			'defaults' => array('language' => 'de')
-		));
+			'params' => ['controller' => 'orders', 'action' => 'pay'],
+			'defaults' => ['language' => 'de']
+		]);
 		$result = $route->parse($request);
 		$this->assertArrayHasKey('language', $result->params);
 	}
 
 	public function testRouteParsingWithRegexAction() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/products/{:action:add|edit|remove}/{:category}',
-			'params' => array('controller' => 'Products')
-		));
+			'params' => ['controller' => 'Products']
+		]);
 		$request = new Request();
 		$request->url = '/products/add/computer';
 		$result = $route->parse($request);
-		$expected = array(
+		$expected = [
 			'controller' => 'Products',
 			'action' => 'add',
 			'category' => 'computer'
-		);
+		];
 		$this->assertEqual($expected, $result->params);
 
 		$request = new Request();
@@ -940,26 +941,26 @@ class RouteTest extends \lithium\test\Unit {
 	}
 
 	public function testRouteParsingWithRegexActionAndParamWithAction() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/products/{:action:add|edit|remove}/{:category}',
-			'params' => array('controller' => 'Products', 'action' => 'index')
-		));
+			'params' => ['controller' => 'Products', 'action' => 'index']
+		]);
 		$request = new Request();
 		$request->url = '/products/hello';
 		$result = $route->parse($request);
-		$expected = array(
+		$expected = [
 			'controller' => 'Products',
 			'action' => 'index',
 			'category' => 'hello'
-		);
+		];
 		$this->assertEqual($expected, $result->params);
 	}
 
 	public function testRouteParsingWithRegexActionAndParamWithoutAction() {
-		$route = new Route(array(
+		$route = new Route([
 			'template' => '/products/{:action:add|edit|remove}/{:category}',
-			'params' => array('controller' => 'Products')
-		));
+			'params' => ['controller' => 'Products']
+		]);
 		$request = new Request();
 		$request->url = '/products/hello';
 		$result = $route->parse($request);

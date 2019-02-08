@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\integration\net\http;
@@ -13,37 +14,37 @@ use lithium\net\http\Service;
 class ServiceTest extends \lithium\test\Integration {
 
 	public function testStreamGet() {
-		$service = new Service(array(
+		$service = new Service([
 			'host' => 'example.org',
-			'classes' => array('socket' => 'lithium\net\socket\Stream')
-		));
+			'classes' => ['socket' => 'lithium\net\socket\Stream']
+		]);
 		$service->head();
 
-		$expected = array('code' => 200, 'message' => 'OK');
+		$expected = ['code' => 200, 'message' => 'OK'];
 		$result = $service->last->response->status;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testContextGet() {
-		$service = new Service(array(
+		$service = new Service([
 			'host' => 'example.org',
-			'classes' => array('socket' => 'lithium\net\socket\Context')
-		));
+			'classes' => ['socket' => 'lithium\net\socket\Context']
+		]);
 		$service->head();
 
-		$expected = array('code' => 200, 'message' => 'OK');
+		$expected = ['code' => 200, 'message' => 'OK'];
 		$result = $service->last->response->status;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testCurlGet() {
-		$service = new Service(array(
+		$service = new Service([
 			'host' => 'example.org',
-			'classes' => array('socket' => 'lithium\net\socket\Curl')
-		));
+			'classes' => ['socket' => 'lithium\net\socket\Curl']
+		]);
 		$service->head();
 
-		$expected = array('code' => 200, 'message' => 'OK');
+		$expected = ['code' => 200, 'message' => 'OK'];
 		$result = $service->last->response->status;
 		$this->assertEqual($expected, $result);
 	}

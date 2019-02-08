@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\storage\cache\adapter;
@@ -28,9 +29,9 @@ use lithium\storage\Cache;
  * A simple configuration can be accomplished as follows:
  *
  * ```
- * Cache::config(array(
- *     'default' => array('adapter' => 'Memory')
- * ));
+ * Cache::config([
+ *     'default' => ['adapter' => 'Memory']
+ * ]);
  * ```
  */
 class Memory extends \lithium\storage\cache\Adapter {
@@ -40,7 +41,7 @@ class Memory extends \lithium\storage\cache\Adapter {
 	 *
 	 * @var array
 	 */
-	protected $_cache = array();
+	protected $_cache = [];
 
 	/**
 	 * Magic method to provide an accessor (getter) to protected class variables.
@@ -64,7 +65,7 @@ class Memory extends \lithium\storage\cache\Adapter {
 	 *               the results array.
 	 */
 	public function read(array $keys) {
-		$results = array();
+		$results = [];
 
 		foreach ($keys as $key) {
 			if (array_key_exists($key, $this->_cache)) {

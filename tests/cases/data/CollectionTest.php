@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\data;
@@ -35,10 +36,10 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::stats()`.
 	 */
 	public function testGetStats() {
-		$collection = new MockCollection(array('stats' => array('foo' => 'bar')));
+		$collection = new MockCollection(['stats' => ['foo' => 'bar']]);
 		$this->assertNull($collection->stats('bar'));
 		$this->assertEqual('bar', $collection->stats('foo'));
-		$this->assertEqual(array('foo' => 'bar'), $collection->stats());
+		$this->assertEqual(['foo' => 'bar'], $collection->stats());
 	}
 
 	/**
@@ -46,7 +47,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 */
 	public function testAccessorMethods() {
 		$model = $this->_model;
-		$model::config(array('meta' => array('connection' => false, 'key' => 'id')));
+		$model::config(['meta' => ['connection' => false, 'key' => 'id']]);
 		$collection = new MockCollection(compact('model'));
 		$this->assertEqual($model, $collection->model());
 		$this->assertEqual(compact('model'), $collection->meta());
@@ -59,7 +60,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$collection = new MockCollection();
 		$this->assertEqual($collection->offsetExists(0), false);
 
-		$collection = new MockCollection(array('data' => array('bar', 'baz', 'bob' => 'bill')));
+		$collection = new MockCollection(['data' => ['bar', 'baz', 'bob' => 'bill']]);
 		$this->assertEqual($collection->offsetExists(0), true);
 		$this->assertEqual($collection->offsetExists(1), true);
 	}
@@ -68,11 +69,11 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::rewind` and `Collection::current`.
 	 */
 	public function testNextRewindCurrent() {
-		$collection = new MockCollection(array('data' => array(
+		$collection = new MockCollection(['data' => [
 			'title' => 'Lorem Ipsum',
 			'value' => 42,
 			'foo'   => 'bar'
-		)));
+		]]);
 		$this->assertEqual('Lorem Ipsum', $collection->current());
 		$this->assertEqual(42, $collection->next());
 		$this->assertEqual('bar', $collection->next());
@@ -84,19 +85,19 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::each`.
 	 */
 	public function testEach() {
-		$collection = new MockCollection(array('data' => array(
+		$collection = new MockCollection(['data' => [
 			'Lorem Ipsum',
 			'value',
 			'bar'
-		)));
+		]]);
 		$collection->each(function($value) {
 			return $value . ' test';
 		});
-		$expected = array(
+		$expected = [
 			'Lorem Ipsum test',
 			'value test',
 			'bar test'
-		);
+		];
 		$this->assertEqual($expected, $collection->to('array'));
 	}
 
@@ -104,19 +105,19 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::map`.
 	 */
 	public function testMap() {
-		$collection = new MockCollection(array('data' => array(
+		$collection = new MockCollection(['data' => [
 			'Lorem Ipsum',
 			'value',
 			'bar'
-		)));
+		]]);
 		$results = $collection->map(function($value) {
 			return $value . ' test';
 		});
-		$expected = array(
+		$expected = [
 			'Lorem Ipsum test',
 			'value test',
 			'bar test'
-		);
+		];
 		$this->assertEqual($results->to('array'), $expected);
 		$this->assertNotEqual($results->to('array'), $collection->to('array'));
 	}
@@ -126,11 +127,11 @@ class CollectionTest extends \lithium\test\Unit {
 	 */
 	public function testReduce() {
 		$collection = new MockCollection();
-		$collection->set(array(
+		$collection->set([
 			'title' => 'Lorem Ipsum',
 			'key'   => 'value',
 			'foo'   => 'bar'
-		));
+		]);
 		$result = $collection->reduce(function($memo, $value) {
 			return trim($memo . ' ' . $value);
 		}, '');
@@ -142,12 +143,12 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests `Collection::data`.
 	 */
 	public function testData() {
-		$data = array(
+		$data = [
 			'Lorem Ipsum',
 			'value',
 			'bar'
-		);
-		$collection = new MockCollection(array('data' => $data));
+		];
+		$collection = new MockCollection(['data' => $data]);
 		$this->assertEqual($data, $collection->data());
 	}
 
@@ -155,44 +156,44 @@ class CollectionTest extends \lithium\test\Unit {
 	 * Tests the sort method in `lithium\data\Collection`.
 	 */
 	public function testSort() {
-		$collection = new MockCollection(array('data' => array(
-			array('id' => 1, 'name' => 'Annie'),
-			array('id' => 2, 'name' => 'Zilean'),
-			array('id' => 3, 'name' => 'Trynamere'),
-			array('id' => 4, 'name' => 'Katarina'),
-			array('id' => 5, 'name' => 'Nunu')
-		)));
+		$collection = new MockCollection(['data' => [
+			['id' => 1, 'name' => 'Annie'],
+			['id' => 2, 'name' => 'Zilean'],
+			['id' => 3, 'name' => 'Trynamere'],
+			['id' => 4, 'name' => 'Katarina'],
+			['id' => 5, 'name' => 'Nunu']
+		]]);
 
 		$collection->sort('name');
 		$idsSorted = $collection->map(function ($v) { return $v['id']; })->to('array');
-		$this->assertEqual($idsSorted, array(1, 4, 5, 3, 2));
+		$this->assertEqual($idsSorted, [1, 4, 5, 3, 2]);
 	}
 
 	/**
 	 * Tests that arrays can be used to filter objects in `find()` and `first()` methods.
 	 */
 	public function testArrayFiltering() {
-		$collection = new MockCollection(array('data' => array(
-			new Entity(array('data' => array('id' => 1, 'name' => 'Annie', 'active' => 1))),
-			new Entity(array('data' => array('id' => 2, 'name' => 'Zilean', 'active' => 1))),
-			new Entity(array('data' => array('id' => 3, 'name' => 'Trynamere', 'active' => 0))),
-			new Entity(array('data' => array('id' => 4, 'name' => 'Katarina', 'active' => 1))),
-			new Entity(array('data' => array('id' => 5, 'name' => 'Nunu', 'active' => 0)))
-		)));
-		$result = $collection->find(array('active' => 1))->data();
-		$expected = array(
-			0 => array('id' => 1, 'name' => 'Annie', 'active' => 1),
-			1 => array('id' => 2, 'name' => 'Zilean', 'active' => 1),
-			3 => array('id' => 4, 'name' => 'Katarina', 'active' => 1)
-		);
+		$collection = new MockCollection(['data' => [
+			new Entity(['data' => ['id' => 1, 'name' => 'Annie', 'active' => 1]]),
+			new Entity(['data' => ['id' => 2, 'name' => 'Zilean', 'active' => 1]]),
+			new Entity(['data' => ['id' => 3, 'name' => 'Trynamere', 'active' => 0]]),
+			new Entity(['data' => ['id' => 4, 'name' => 'Katarina', 'active' => 1]]),
+			new Entity(['data' => ['id' => 5, 'name' => 'Nunu', 'active' => 0]])
+		]]);
+		$result = $collection->find(['active' => 1])->data();
+		$expected = [
+			0 => ['id' => 1, 'name' => 'Annie', 'active' => 1],
+			1 => ['id' => 2, 'name' => 'Zilean', 'active' => 1],
+			3 => ['id' => 4, 'name' => 'Katarina', 'active' => 1]
+		];
 		$this->assertEqual($expected, $result);
 
-		$result = $collection->first(array('active' => 1))->data();
-		$expected = array('id' => 1, 'name' => 'Annie', 'active' => 1);
+		$result = $collection->first(['active' => 1])->data();
+		$expected = ['id' => 1, 'name' => 'Annie', 'active' => 1];
 		$this->assertEqual($expected, $result);
 
-		$result = $collection->first(array('name' => 'Nunu'))->data();
-		$expected = array('id' => 5, 'name' => 'Nunu', 'active' => 0);
+		$result = $collection->first(['name' => 'Nunu'])->data();
+		$expected = ['id' => 5, 'name' => 'Nunu', 'active' => 0];
 		$this->assertEqual($expected, $result);
 	}
 
@@ -203,7 +204,7 @@ class CollectionTest extends \lithium\test\Unit {
 		$collection = new MockCollection();
 		$this->assertTrue($collection->closed());
 
-		$collection = new MockCollection(array('result' => 'foo'));
+		$collection = new MockCollection(['result' => 'foo']);
 		$this->assertFalse($collection->closed());
 		$collection->close();
 		$this->assertTrue($collection->closed());
@@ -214,7 +215,7 @@ class CollectionTest extends \lithium\test\Unit {
 	 */
 	public function testAssignTo() {
 		$parent = new stdClass();
-		$config = array('valid' => false, 'model' => $this->_model);
+		$config = ['valid' => false, 'model' => $this->_model];
 		$collection = new MockCollection();
 		$collection->assignTo($parent, $config);
 		$this->assertEqual($this->_model, $collection->model());
@@ -222,22 +223,22 @@ class CollectionTest extends \lithium\test\Unit {
 	}
 
 	public function testHandlers() {
-		$handlers = array(
+		$handlers = [
 			'stdClass' => function($value) { return substr($value->scalar, -1); }
-		);
-		$array = new MockCollection(compact('handlers') + array(
-			'data' => array(
-				array(
+		];
+		$array = new MockCollection(compact('handlers') + [
+			'data' => [
+				[
 					'value' => (object) 'hello'
-				),
-				array(
+				],
+				[
 					'value' => (object) 'world'
-				)
-			)
-		));
+				]
+			]
+		]);
 
-		$expected = array(array('value' => 'o'), array('value' => 'd'));
-		$this->assertIdentical($expected, $array->to('array', array('indexed' => false)));
+		$expected = [['value' => 'o'], ['value' => 'd']];
+		$this->assertIdentical($expected, $array->to('array', ['indexed' => false]));
 	}
 }
 

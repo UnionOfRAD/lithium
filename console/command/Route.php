@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 namespace lithium\console\command;
 
@@ -36,8 +37,8 @@ class Route extends \lithium\console\Command {
 	 * @param array $config The default configuration, wherein the absolute path to the
 	 *        routes file to load may be specified, using the `'routes'` key.
 	 */
-	public function __construct($config = array()) {
-		$defaults = array('routes' => Libraries::get(true, 'path') . '/config/routes.php');
+	public function __construct($config = []) {
+		$defaults = ['routes' => Libraries::get(true, 'path') . '/config/routes.php'];
 		parent::__construct($config + $defaults);
 	}
 
@@ -86,11 +87,11 @@ class Route extends \lithium\console\Command {
 	 */
 	public function all($scope = true) {
 		$routes = Router::get(null, true);
-		$columns = array(array('Template', 'Params'), array('--------', '------'));
+		$columns = [['Template', 'Params'], ['--------', '------']];
 
 		foreach ($routes As $route) {
 			$info = $route->export();
-			$columns[] = array($info['template'], json_encode($info['params']));
+			$columns[] = [$info['template'], json_encode($info['params'])];
 		}
 		$this->columns($columns);
 	}
@@ -131,7 +132,7 @@ class Route extends \lithium\console\Command {
 			$url = $matches[2];
 		}
 
-		$request = new Request(compact('url') + array('env' => array('REQUEST_METHOD' => $method)));
+		$request = new Request(compact('url') + ['env' => ['REQUEST_METHOD' => $method]]);
 		$result = Router::process($request);
 		$this->out($result->params ? json_encode($result->params) : "No route found.");
 	}

@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\g11n;
@@ -50,12 +51,12 @@ class Locale extends \lithium\core\StaticObject {
 	 *
 	 * @var array
 	 */
-	protected static $_tags = array(
-		'language' => array('formatter' => 'strtolower'),
-		'script' => array('formatter' => array('strtolower', 'ucfirst')),
-		'territory' => array('formatter' => 'strtoupper'),
-		'variant' => array('formatter' => 'strtoupper')
-	);
+	protected static $_tags = [
+		'language' => ['formatter' => 'strtolower'],
+		'script' => ['formatter' => ['strtolower', 'ucfirst']],
+		'territory' => ['formatter' => 'strtoupper'],
+		'variant' => ['formatter' => 'strtoupper']
+	];
 
 	/**
 	 * Magic method enabling `language`, `script`, `territory` and `variant`
@@ -72,7 +73,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * @param array $params
 	 * @return mixed
 	 */
-	public static function __callStatic($method, $params = array()) {
+	public static function __callStatic($method, $params = []) {
 		$tags = static::invokeMethod('decompose', $params);
 
 		if (!isset(static::$_tags[$method])) {
@@ -102,7 +103,7 @@ class Locale extends \lithium\core\StaticObject {
 	 *         if none of the passed tags could be used to compose a locale.
 	 */
 	public static function compose($tags) {
-		$result = array();
+		$result = [];
 
 		foreach (static::$_tags as $name => $tag) {
 			if (isset($tags[$name])) {
@@ -156,10 +157,10 @@ class Locale extends \lithium\core\StaticObject {
 	 * Usage:
 	 * ```
 	 * Locale::cascade('en_US');
-	 * // returns array('en_US', 'en', 'root')
+	 * // returns ['en_US', 'en', 'root']
 	 *
 	 * Locale::cascade('zh_Hans_HK_REVISED');
-	 * // returns array('zh_Hans_HK_REVISED', 'zh_Hans_HK', 'zh_Hans', 'zh', 'root')
+	 * // returns ['zh_Hans_HK_REVISED', 'zh_Hans_HK', 'zh_Hans', 'zh', 'root']
 	 * ```
 	 *
 	 * @link http://www.unicode.org/reports/tr35/tr35-13.html#Locale_Inheritance
@@ -264,7 +265,7 @@ class Locale extends \lithium\core\StaticObject {
 	 * @return array Preferred locales in their canonical form (i.e. `'fr_CA'`).
 	 */
 	protected static function _preferredAction($request) {
-		$result = array();
+		$result = [];
 		$regex  = "/^\s*(?P<locale>\w\w(?:[-]\w\w)?)(?:;q=(?P<quality>(0|1|0\.\d+)))?\s*$/";
 
 		foreach (explode(',', $request->env('HTTP_ACCEPT_LANGUAGE')) as $part) {
@@ -278,7 +279,7 @@ class Locale extends \lithium\core\StaticObject {
 
 		return array_reduce($result, function($carry, $item) {
 			return array_merge($carry, array_values($item));
-		}, array());
+		}, []);
 	}
 
 	/**
@@ -298,12 +299,12 @@ class Locale extends \lithium\core\StaticObject {
 	 */
 	protected static function _preferredConsole($request) {
 		$regex = '(?P<locale>[\w\_]+)(\.|@|$)+';
-		$result = array();
+		$result = [];
 
 		if ($value = $request->env('LANGUAGE')) {
 			return explode(':', $value);
 		}
-		foreach (array('LC_ALL', 'LANG') as $variable) {
+		foreach (['LC_ALL', 'LANG'] as $variable) {
 			$value = $request->env($variable);
 
 			if (!$value || $value === 'C' || $value === 'POSIX') {

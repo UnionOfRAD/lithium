@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\security\auth\adapter;
@@ -14,15 +15,15 @@ use lithium\core\Libraries;
  * The `Http` adapter provides basic and digest authentication based on the HTTP protocol.
  * By default, the adapter uses Http Digest based authentication.
  * ```
- * Auth::config(array('name' => array('adapter' => 'Http', 'users' => array('gwoo' => 'li3'))))
+ * Auth::config(['name' => ['adapter' => 'Http', 'users' => ['gwoo' => 'li3']]])
  * ```
  *
  * To use Basic authentication, set the `method` to basic.
  * ```
- * Auth::config(array('name' => array(
- *     'adapter' => 'Http', 'users' => array('gwoo' => 'li3'),
+ * Auth::config(['name' => [
+ *     'adapter' => 'Http', 'users' => ['gwoo' => 'li3'],
  *     'method' => 'basic'
- * )))
+ * ]])
  * ```
  *
  * When running PHP as a CGI/FCGI PHP doesn't automatically parse the authorization
@@ -45,9 +46,9 @@ class Http extends \lithium\core\Object {
 	 *
 	 * @var array Associative array of class names & their namespaces.
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'auth' => 'lithium\net\http\Auth'
-	);
+	];
 
 	/**
 	 * Constructor.
@@ -58,11 +59,11 @@ class Http extends \lithium\core\Object {
 	 *        - `'users'`: the users to permit. key => value pair of username => password
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		$realm = basename(Libraries::get(true, 'path'));
-		$defaults = array(
-			'method' => 'digest', 'realm' => $realm, 'users' => array()
-		);
+		$defaults = [
+			'method' => 'digest', 'realm' => $realm, 'users' => []
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -78,7 +79,7 @@ class Http extends \lithium\core\Object {
 	 *              adapter.
 	 * @return array Returns an array containing user information on success, or `false` on failure.
 	 */
-	public function check($request, array $options = array()) {
+	public function check($request, array $options = []) {
 		$method = "_{$this->_config['method']}";
 		return $this->{$method}($request);
 	}
@@ -92,7 +93,7 @@ class Http extends \lithium\core\Object {
 	 * @param array $options Adapter-specific options. Not implemented in the `Form` adapter.
 	 * @return array Returns the value of `$data`.
 	 */
-	public function set($data, array $options = array()) {
+	public function set($data, array $options = []) {
 		return $data;
 	}
 
@@ -102,7 +103,7 @@ class Http extends \lithium\core\Object {
 	 * @param array $options Adapter-specific options. Not implemented in the `Form` adapter.
 	 * @return void
 	 */
-	public function clear(array $options = array()) {}
+	public function clear(array $options = []) {}
 
 	/**
 	 * Handler for HTTP Basic Authentication
@@ -115,7 +116,7 @@ class Http extends \lithium\core\Object {
 		$username = $request->env('PHP_AUTH_USER');
 		$auth = $this->_classes['auth'];
 		$basic = $auth::encode($username, $request->env('PHP_AUTH_PW'));
-		$encoded = array('response' => null);
+		$encoded = ['response' => null];
 
 		if (isset($users[$username])) {
 			$encoded = $auth::encode($username, $users[$username]);

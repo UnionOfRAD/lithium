@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 /**
@@ -15,7 +16,7 @@
  * looking for a `config` directory with a `bootstrap.php` file in it.  If no
  * application context is found, just boot up the core framework.
  */
-$params = getopt("", array("app::"));
+$params = getopt("", ["app::"]);
 $working = $params ? array_pop($params) : getcwd();
 $app = null;
 
@@ -41,11 +42,11 @@ $bootstrap = function() use ($working) {
 	}
 
 	lithium\core\Libraries::add('lithium');
-	lithium\core\Libraries::add(basename($working), array(
+	lithium\core\Libraries::add(basename($working), [
 		'default' => true,
 		'path' => $working,
 		'resources' => $resources
-	));
+	]);
 };
 
 /**
@@ -90,7 +91,7 @@ if (file_exists("{$working}/config/bootstrap.php")) {
  * bootstrap.
  */
 if ($app) {
-	foreach (array('bootstrap.php', 'bootstrap/libraries.php') as $file) {
+	foreach (['bootstrap.php', 'bootstrap/libraries.php'] as $file) {
 		if (!file_exists($path = "{$app}/config/{$file}")) {
 			continue;
 		}

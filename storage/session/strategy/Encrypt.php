@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\storage\session\strategy;
@@ -20,10 +21,10 @@ use lithium\core\ConfigException;
  * Example configuration:
  *
  * ```
- * Session::config(array('default' => array(
+ * Session::config(['default' => [
  *    'adapter' => 'Cookie',
- *    'strategies' => array('Encrypt' => array('secret' => 'f00bar$l1thium'))
- * )));
+ *    'strategies' => ['Encrypt' => ['secret' => 'f00bar$l1thium']]
+ * ]]);
  * ```
  *
  * By default, this strategy uses the AES algorithm in the CBC mode. This means that an
@@ -33,14 +34,14 @@ use lithium\core\ConfigException;
  * defaults by passing a different `cipher` and/or `mode` to the config like this:
  *
  * ```
- * Session::config(array('default' => array(
+ * Session::config(['default' => [
  *     'adapter' => 'Cookie',
- *     'strategies' => array('Encrypt' => array(
+ *     'strategies' => ['Encrypt' => [
  *         'cipher' => MCRYPT_RIJNDAEL_256,
  *         'mode' => MCRYPT_MODE_ECB, // Don't use ECB when you don't have to!
  *         'secret' => 'f00bar$l1thium'
- *     ))
- * )));
+ *     ]]
+ * ]]);
  * ```
  *
  * Please keep in mind that it is generally not a good idea to store sensitive information in
@@ -71,10 +72,10 @@ class Encrypt extends \lithium\core\Object {
 	/**
 	 * Default configuration.
 	 */
-	protected $_defaults = array(
+	protected $_defaults = [
 		'cipher' => MCRYPT_RIJNDAEL_128,
 		'mode' => MCRYPT_MODE_CBC
-	);
+	];
 
 	/**
 	 * Constructor.
@@ -82,12 +83,12 @@ class Encrypt extends \lithium\core\Object {
 	 * @param array $config Configuration array. You can override the default cipher and mode.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
+	public function __construct(array $config = []) {
 		if (!static::enabled()) {
-			throw new ConfigException("The Mcrypt extension is not installed or enabled.");
+			throw new ConfigException('The mcrypt extension is not installed or enabled.');
 		}
 		if (!isset($config['secret'])) {
-			throw new ConfigException("Encrypt strategy requires a secret key.");
+			throw new ConfigException('Encrypt strategy requires a secret key.');
 		}
 		parent::__construct($config + $this->_defaults);
 
@@ -114,10 +115,10 @@ class Encrypt extends \lithium\core\Object {
 	 * @param array $options Options for this method.
 	 * @return mixed Returns the decrypted key or the dataset.
 	 */
-	public function read($data, array $options = array()) {
+	public function read($data, array $options = []) {
 		$class = $options['class'];
 
-		$encrypted = $class::read(null, array('strategies' => false));
+		$encrypted = $class::read(null, ['strategies' => false]);
 		$key = isset($options['key']) ? $options['key'] : null;
 
 		if (!isset($encrypted['__encrypted']) || !$encrypted['__encrypted']) {
@@ -140,15 +141,15 @@ class Encrypt extends \lithium\core\Object {
 	 * @param array $options Options for this method.
 	 * @return string Returns the written data in cleartext.
 	 */
-	public function write($data, array $options = array()) {
+	public function write($data, array $options = []) {
 		$class = $options['class'];
 
-		$futureData = $this->read(null, array('key' => null) + $options) ?: array();
-		$futureData = array($options['key'] => $data) + $futureData;
+		$futureData = $this->read(null, ['key' => null] + $options) ?: [];
+		$futureData = [$options['key'] => $data] + $futureData;
 
 		$payload = empty($futureData) ? null : $this->_encrypt($futureData);
 
-		$class::write('__encrypted', $payload, array('strategies' => false) + $options);
+		$class::write('__encrypted', $payload, ['strategies' => false] + $options);
 		return $payload;
 	}
 
@@ -159,15 +160,15 @@ class Encrypt extends \lithium\core\Object {
 	 * @param array $options Options for this method.
 	 * @return string Returns the deleted data in cleartext.
 	 */
-	public function delete($data, array $options = array()) {
+	public function delete($data, array $options = []) {
 		$class = $options['class'];
 
-		$futureData = $this->read(null, array('key' => null) + $options) ?: array();
+		$futureData = $this->read(null, ['key' => null] + $options) ?: [];
 		unset($futureData[$options['key']]);
 
 		$payload = empty($futureData) ? null : $this->_encrypt($futureData);
 
-		$class::write('__encrypted', $payload, array('strategies' => false) + $options);
+		$class::write('__encrypted', $payload, ['strategies' => false] + $options);
 		return $data;
 	}
 
@@ -177,7 +178,7 @@ class Encrypt extends \lithium\core\Object {
 	 * @param array $decrypted The cleartext data to be encrypted.
 	 * @return string A Base64 encoded and encrypted string.
 	 */
-	protected function _encrypt($decrypted = array()) {
+	protected function _encrypt($decrypted = []) {
 		$vector = $this->_config['vector'];
 		$secret = $this->_hashSecret($this->_config['secret']);
 

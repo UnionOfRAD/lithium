@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\data\model;
@@ -13,15 +14,15 @@ use lithium\data\collection\DocumentSet;
 
 class MockDocumentPost extends \lithium\data\Model {
 
-	protected $_meta = array('connection' => false, 'initialized' => true, 'key' => '_id');
+	protected $_meta = ['connection' => false, 'initialized' => true, 'key' => '_id'];
 
 	public static function schema($field = null) {
 		$schema = parent::schema();
-		$schema->append(array(
-			'_id' => array('type' => 'id'),
-			'foo' => array('type' => 'object'),
-			'foo.bar' => array('type' => 'int')
-		));
+		$schema->append([
+			'_id' => ['type' => 'id'],
+			'foo' => ['type' => 'object'],
+			'foo.bar' => ['type' => 'int']
+		]);
 		return $schema;
 	}
 
@@ -39,24 +40,24 @@ class MockDocumentPost extends \lithium\data\Model {
 		return 'lithium';
 	}
 
-	public static function find($type = 'all', array $options = array()) {
+	public static function find($type = 'all', array $options = []) {
 		switch ($type) {
 			case 'first':
-				return new Document(array(
-					'data' => array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
+				return new Document([
+					'data' => ['_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'],
 					'model' => __CLASS__
-				));
+				]);
 			break;
 			case 'all':
 			default:
-				return new DocumentSet(array(
-					'data' => array(
-						array('_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'),
-						array('_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'),
-						array('_id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three')
-					),
+				return new DocumentSet([
+					'data' => [
+						['_id' => 1, 'name' => 'One', 'content' => 'Lorem ipsum one'],
+						['_id' => 2, 'name' => 'Two', 'content' => 'Lorem ipsum two'],
+						['_id' => 3, 'name' => 'Three', 'content' => 'Lorem ipsum three']
+					],
 					'model' => __CLASS__
-				));
+				]);
 			break;
 		}
 	}

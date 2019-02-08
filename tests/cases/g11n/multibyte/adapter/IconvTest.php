@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\g11n\multibyte\adapter;
@@ -14,7 +15,7 @@ class IconvTest extends \lithium\test\Unit {
 
 	public $adapter;
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	public function skip() {
 		$this->skipIf(!Iconv::enabled(), 'The `Iconv` adapter is not enabled.');
@@ -141,18 +142,6 @@ class IconvTest extends \lithium\test\Unit {
 		$adapter = $this->adapter;
 
 		$expected = '/Detected an illegal character in input string/';
-		$this->assertException($expected, function() use ($adapter, $haystack, $needle, $offset) {
-			$adapter->strpos($haystack, $needle, $offset);
-		});
-	}
-
-	public function testStrposInvalidOffset() {
-		$haystack = 'abäab';
-		$needle = 'a';
-		$offset = -1;
-		$adapter = $this->adapter;
-
-		$expected = '/Offset not contained in string/';
 		$this->assertException($expected, function() use ($adapter, $haystack, $needle, $offset) {
 			$adapter->strpos($haystack, $needle, $offset);
 		});

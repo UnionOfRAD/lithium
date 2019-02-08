@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\data;
@@ -46,7 +47,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 *
 	 * @var array
 	 */
-	protected $_data = array();
+	protected $_data = [];
 
 	/**
 	 * An array containing all related records and recordsets, keyed by relationship name, as
@@ -54,7 +55,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 *
 	 * @var array
 	 */
-	protected $_relationships = array();
+	protected $_relationships = [];
 
 	/**
 	 * If this record is chained off of another, contains the origin object.
@@ -70,7 +71,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * @see lithium\data\Entity::errors()
 	 * @var array
 	 */
-	protected $_errors = array();
+	protected $_errors = [];
 
 	/**
 	 * Contains the values of updated fields. These values will be persisted to the backend data
@@ -78,7 +79,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 *
 	 * @var array
 	 */
-	protected $_updated = array();
+	protected $_updated = [];
 
 	/**
 	 * An array of key/value pairs corresponding to fields that should be updated using atomic
@@ -89,7 +90,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * @see lithium\data\Entity::decrement()
 	 * @var array
 	 */
-	protected $_increment = array();
+	protected $_increment = [];
 
 	/**
 	 * A flag indicating whether or not this entity exists. Set to `false` if this is a
@@ -108,7 +109,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 *
 	 * @var array
 	 */
-	protected $_schema = array();
+	protected $_schema = [];
 
 	/**
 	 * Hold the "data export" handlers where the keys are fully-namespaced class
@@ -118,14 +119,14 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * @see lithium\data\Entity::to()
 	 * @var array
 	 */
-	protected $_handlers = array();
+	protected $_handlers = [];
 
 	/**
 	 * Auto configuration.
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array(
+	protected $_autoConfig = [
 		'parent',
 		'schema',
 		'data',
@@ -134,21 +135,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 		'pathKey',
 		'relationships',
 		'handlers'
-	);
-
-	/**
-	 * Constructor.
-	 *
-	 * @param array $config Available configuration options are:
-	 *        - `'data'` _array_: Data to enter into the record. Defaults to an empty array.
-	 *        - `'model'` _string_: Class name that provides the data-source for this record.
-	 *           Defaults to `null`.
-	 * @return void
-	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('model' => null, 'data' => array(), 'relationships' => array());
-		parent::__construct($config + $defaults);
-	}
+	];
 
 	protected function _init() {
 		parent::_init();
@@ -209,7 +196,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 		if (($model = $this->_model) && method_exists($model, '_object')) {
 			array_unshift($params, $this);
 			$class = $model::invokeMethod('_object');
-			return call_user_func_array(array(&$class, $method), $params);
+			return call_user_func_array([&$class, $method], $params);
 		}
 		$message = "No model bound to call `{$method}`.";
 		throw new BadMethodCallException($message);
@@ -239,7 +226,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	/**
 	 * Allows several properties to be assigned at once, i.e.:
 	 * ```
-	 * $record->set(array('title' => 'Lorem Ipsum', 'value' => 42));
+	 * $record->set(['title' => 'Lorem Ipsum', 'value' => 42]);
 	 * ```
 	 *
 	 * @param array $data An associative array of fields and values to assign to this `Entity`
@@ -297,7 +284,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 		if ($schema) {
 			return $field ? $schema->fields($field) : $schema;
 		}
-		return array();
+		return [];
 	}
 
 	/**
@@ -313,7 +300,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 */
 	public function errors($field = null, $value = null) {
 		if ($field === false) {
-			return ($this->_errors = array());
+			return ($this->_errors = []);
 		}
 		if ($field === null) {
 			return $this->_errors;
@@ -359,11 +346,11 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 *        - `'dematerialize'` _boolean_: If set to `true`, indicates that this entity has
 	 *          been deleted from the data store and no longer exists. Defaults to `false`.
 	 */
-	public function sync($id = null, array $data = array(), array $options = array()) {
-		$defaults = array('materialize' => true, 'dematerialize' => false);
+	public function sync($id = null, array $data = [], array $options = []) {
+		$defaults = ['materialize' => true, 'dematerialize' => false];
 		$options += $defaults;
 		$model = $this->_model;
-		$key = array();
+		$key = [];
 
 		if ($options['materialize']) {
 			$this->_exists = true;
@@ -373,9 +360,9 @@ class Entity extends \lithium\core\Object implements \Serializable {
 		}
 		if ($id && $model) {
 			$key = $model::meta('key');
-			$key = is_array($key) ? array_combine($key, $id) : array($key => $id);
+			$key = is_array($key) ? array_combine($key, $id) : [$key => $id];
 		}
-		$this->_increment = array();
+		$this->_increment = [];
 		$this->_data = $this->_updated = ($key + $data + $this->_updated);
 	}
 
@@ -385,8 +372,8 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * non-numeric.
 	 *
 	 * @param string $field The name of the field to be incremented.
-	 * @param integer|string $value The value to increment the field by. Defaults to `1` if this
-	 *               parameter is not specified.
+	 * @param integer|string $value The value to increment the field by. Defaults to `1` if
+	 *        this parameter is not specified.
 	 * @return integer Returns the current value of `$field`, based on the value retrieved from the
 	 *         data source when the entity was loaded, plus any increments applied. Note that it may
 	 *         not reflect the most current value in the persistent backend data source.
@@ -397,7 +384,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 		if (!isset($this->_updated[$field])) {
 			$this->_updated[$field] = 0;
 		} elseif (!is_numeric($this->_updated[$field])) {
-			throw new UnexpectedValueException("Field '{$field}' cannot be incremented.");
+			throw new UnexpectedValueException("Field `'{$field}'` cannot be incremented.");
 		}
 
 		if (!isset($this->_increment[$field])) {
@@ -473,13 +460,13 @@ class Entity extends \lithium\core\Object implements \Serializable {
 		return $fields;
 	}
 
-	public function export(array $options = array()) {
-		return array(
+	public function export(array $options = []) {
+		return [
 			'exists'    => $this->_exists,
 			'data'      => $this->_data,
 			'update'    => $this->_updated,
 			'increment' => $this->_increment
-		);
+		];
 	}
 
 	/**
@@ -488,7 +475,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * @param object $parent
 	 * @param array $config
 	 */
-	public function assignTo($parent, array $config = array()) {
+	public function assignTo($parent, array $config = []) {
 		foreach ($config as $key => $val) {
 			$this->{'_' . $key} = $val;
 		}
@@ -505,8 +492,8 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 *          data. By default `false` which will only index the root level.
 	 * @return mixed
 	 */
-	public function to($format, array $options = array()) {
-		$defaults = array('handlers' => array());
+	public function to($format, array $options = []) {
+		$defaults = ['handlers' => []];
 		$options += $defaults;
 
 		$options['handlers'] += $this->_handlers;
@@ -535,7 +522,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * @return string Returns the generated title of the object.
 	 */
 	public function __toString() {
-		return (string) $this->__call('title', array());
+		return (string) $this->__call('title', []);
 	}
 
 	/**
@@ -545,8 +532,7 @@ class Entity extends \lithium\core\Object implements \Serializable {
 	 * and schema are ignored with serialized objects.
 	 *
 	 * Properties that hold anonymous functions are also skipped. Some of these
-	 * can almost be reconstructed (`_handlers`) others cannot (`_methodFilters`
-	 * and `schema`).
+	 * can almost be reconstructed (`_handlers`) others cannot (`schema`).
 	 *
 	 * @return string Serialized properties of the object.
 	 */
@@ -555,7 +541,6 @@ class Entity extends \lithium\core\Object implements \Serializable {
 		unset($vars['_schema']);
 		unset($vars['_config']['schema']);
 		unset($vars['_handlers']);
-		unset($vars['_methodFilters']);
 
 		return serialize($vars);
 	}

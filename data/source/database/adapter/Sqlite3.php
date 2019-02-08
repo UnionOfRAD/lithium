@@ -1,14 +1,16 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\data\source\database\adapter;
 
 use PDOException;
+use lithium\aop\Filters;
 use lithium\core\ConfigException;
 
 /**
@@ -20,7 +22,7 @@ use lithium\core\ConfigException;
  * For more information on configuring the database connection, see
  * the `__construct()` method.
  *
- * @see lithium\data\source\database\adapter\Sqlite::__construct()
+ * @see lithium\data\source\database\adapter\Sqlite3::__construct()
  */
 class Sqlite3 extends \lithium\data\source\Database {
 
@@ -30,26 +32,26 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @link http://www.sqlite.org/lang_keywords.html
 	 * @var array
 	 */
-	protected $_quotes = array('"', '"');
+	protected $_quotes = ['"', '"'];
 
 	/**
 	 * Sqlite3 column type definitions.
 	 *
 	 * @var array
 	 */
-	protected $_columns = array(
-		'id' => array('use' => 'integer'),
-		'string' => array('use' => 'varchar', 'length' => 255),
-		'text' => array('use' => 'text'),
-		'integer' => array('use' => 'integer', 'formatter' => 'intval'),
-		'float' => array('use' => 'real', 'formatter' => 'floatval'),
-		'datetime' => array('use' => 'text', 'format' => 'Y-m-d H:i:s'),
-		'timestamp' => array('use' => 'text', 'format' => 'Y-m-d H:i:s'),
-		'time' => array('use' => 'text', 'format' => 'H:i:s', 'formatter' => 'date'),
-		'date' => array('use' => 'text', 'format' => 'Y-m-d', 'formatter' => 'date'),
-		'binary' => array('use' => 'blob'),
-		'boolean' => array('use' => 'boolean', 'length' => 1)
-	);
+	protected $_columns = [
+		'id' => ['use' => 'integer'],
+		'string' => ['use' => 'varchar', 'length' => 255],
+		'text' => ['use' => 'text'],
+		'integer' => ['use' => 'integer', 'formatter' => 'intval'],
+		'float' => ['use' => 'real', 'formatter' => 'floatval'],
+		'datetime' => ['use' => 'text', 'format' => 'Y-m-d H:i:s'],
+		'timestamp' => ['use' => 'text', 'format' => 'Y-m-d H:i:s'],
+		'time' => ['use' => 'text', 'format' => 'H:i:s', 'formatter' => 'date'],
+		'date' => ['use' => 'text', 'format' => 'Y-m-d', 'formatter' => 'date'],
+		'binary' => ['use' => 'blob'],
+		'boolean' => ['use' => 'boolean', 'length' => 1]
+	];
 
 	/**
 	 * Column specific metas used on table creating
@@ -57,26 +59,26 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *
 	 * @var array
 	 */
-	protected $_metas = array(
-		'column' => array(
-			'collate' => array('keyword' => 'COLLATE', 'escape' => true)
-		)
-	);
+	protected $_metas = [
+		'column' => [
+			'collate' => ['keyword' => 'COLLATE', 'escape' => true]
+		]
+	];
 	/**
 	 * Column contraints
 	 *
 	 * @var array
 	 */
-	protected $_constraints = array(
-		'primary' => array('template' => 'PRIMARY KEY ({:column})'),
-		'foreign_key' => array(
+	protected $_constraints = [
+		'primary' => ['template' => 'PRIMARY KEY ({:column})'],
+		'foreign_key' => [
 			'template' => 'FOREIGN KEY ({:column}) REFERENCES {:to} ({:toColumn}) {:on}'
-		),
-		'unique' => array(
+		],
+		'unique' => [
 			'template' => 'UNIQUE {:index} ({:column})'
-		),
-		'check' => array('template' => 'CHECK ({:expr})')
-	);
+		],
+		'check' => ['template' => 'CHECK ({:expr})']
+	];
 
 	/**
 	 * Holds commonly regular expressions used in this class.
@@ -85,27 +87,9 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @see lithium\data\source\database\adapter\Sqlite3::_column()
 	 * @var array
 	 */
-	protected $_regex = array(
+	protected $_regex = [
 		'column' => '(?P<type>[^(]+)(?:\((?P<length>[^)]+)\))?'
-	);
-
-	/**
-	 * Constructor.
-	 *
-	 * @see lithium\data\source\Database::__construct()
-	 * @see lithium\data\Source::__construct()
-	 * @see lithium\data\Connections::add()
-	 * @param array $config The available configuration options are the following. Further
-	 *        options are inherited from the parent classes. Typically, these parameters are
-	 *        set in `Connections::add()`, when adding the adapter to the list of active
-	 *        connections.
-	 *        - `'database'` _string_: Defaults to in-memory database `':memory:'`.
-	 * @return void
-	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('database' => ':memory:');
-		parent::__construct($config + $defaults);
-	}
+	];
 
 	/**
 	 * Check for required PHP extension, or supported database feature.
@@ -118,34 +102,44 @@ class Sqlite3 extends \lithium\data\source\Database {
 		if (!$feature) {
 			return extension_loaded('pdo_sqlite');
 		}
-		$features = array(
+		$features = [
 			'arrays' => false,
 			'transactions' => false,
 			'booleans' => true,
 			'schema' => true,
 			'relationships' => true,
 			'sources' => true
-		);
+		];
 		return isset($features[$feature]) ? $features[$feature] : null;
 	}
 
 	/**
-	 * Connects to the database by constructing DSN string and creating a PDO intance using
-	 * the parent class. Will set specific options on the connection as provided.
+	 * Constructor.
 	 *
-	 * @return boolean Returns `true` if a database connection could be established,
-	 *         otherwise `false`.
+	 * @see lithium\data\source\Database::__construct()
+	 * @see lithium\data\Source::__construct()
+	 * @see lithium\data\Connections::add()
+	 * @param array $config The available configuration options are the following. Further
+	 *        options are inherited from the parent classes. Typically, these parameters are
+	 *        set in `Connections::add()`, when adding the adapter to the list of active
+	 *        connections.
+	 *        - `'database'` _string_: Can be either a path to a database file or the special
+	 *          `':memory'` string. Defaults to in-memory database `':memory:'`.
+	 * @return void
 	 */
-	public function connect() {
-		if (!$this->_config['database']) {
-			throw new ConfigException('No Database configured');
-		}
+	public function __construct(array $config = []) {
+		$defaults = ['database' => ':memory:'];
+		parent::__construct($config + $defaults);
+	}
 
-		if (empty($this->_config['dsn'])) {
-			$this->_config['dsn'] = sprintf("sqlite:%s", $this->_config['database']);
-		}
-
-		return parent::connect();
+	/**
+	 * Initializer. Constructs a DSN from configuration.
+	 *
+	 * @return void
+	 */
+	protected function _init() {
+		$this->_config['dsn'] = sprintf("sqlite:%s", $this->_config['database']);
+		parent::_init();
 	}
 
 	/**
@@ -169,12 +163,12 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @filter
 	 */
 	public function sources($model = null) {
-		$config = $this->_config;
+		$params = compact('model');
 
-		return $this->_filter(__METHOD__, compact('model'), function($self, $params) use ($config) {
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			$sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
-			$result = $self->invokeMethod('_execute', array($sql));
-			$sources = array();
+			$result = $this->_execute($sql);
+			$sources = [];
 
 			foreach ($result as $row) {
 				$sources[] = $row[0];
@@ -203,21 +197,21 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 *         - `'type'`: The field type name
 	 * @filter
 	 */
-	public function describe($entity, $fields = array(), array $meta = array()) {
+	public function describe($entity, $fields = [], array $meta = []) {
 		$params = compact('entity', 'meta', 'fields');
-		$regex = $this->_regex;
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($regex) {
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			extract($params);
 
 			if ($fields) {
-				return $self->invokeMethod('_instance', array('schema', compact('fields')));
+				return $this->_instance('schema', compact('fields'));
 			}
-			$name = $self->invokeMethod('_entityName', array($entity, array('quoted' => true)));
-			$columns = $self->read("PRAGMA table_info({$name})", array('return' => 'array'));
-			$fields = array();
+			$name = $this->_entityName($entity, ['quoted' => true]);
+			$columns = $this->read("PRAGMA table_info({$name})", ['return' => 'array']);
+			$fields = [];
 
 			foreach ($columns as $column) {
-				$schema = $self->invokeMethod('_column', array($column['type']));
+				$schema = $this->_column($column['type']);
 				$default = $column['dflt_value'];
 
 				if (preg_match("/^'(.*)'/", $default, $match)) {
@@ -227,12 +221,12 @@ class Sqlite3 extends \lithium\data\source\Database {
 				} else {
 					$default = null;
 				}
-				$fields[$column['name']] = $schema + array(
+				$fields[$column['name']] = $schema + [
 					'null' => $column['notnull'] === '1',
 					'default' => $default
-				);
+				];
 			}
-			return $self->invokeMethod('_instance', array('schema', compact('fields')));
+			return $this->_instance('schema', compact('fields'));
 		});
 	}
 
@@ -248,29 +242,32 @@ class Sqlite3 extends \lithium\data\source\Database {
 	}
 
 	/**
-	 * Gets or sets the encoding for the connection.
+	 * Getter/Setter for the connection's encoding.
 	 *
-	 * @param string $encoding If setting the encoding, this is the name of the encoding to set,
-	 *               i.e. `'utf8'` or `'UTF-8'` (both formats are valid).
-	 * @return mixed If setting the encoding; returns `true` on success, or `false` on
-	 *         failure. When getting, returns the encoding as a string.
+	 * Sqlite uses the string `utf8` to identify the UTF-8 encoding. In general `UTF-8` is used
+	 * to identify that encoding. This methods allows both strings to be used for _setting_ the
+	 * encoding (in lower and uppercase, with or without dash) and will transparently convert
+	 * to Sqlite native format. When _getting_ the encoding, it is converted back into `UTF-8`.
+	 * So that this method should ever only return `UTF-8` when the encoding is used.
+	 *
+	 * @param null|string $encoding Either `null` to retrieve the current encoding, or
+	 *        a string to set the current encoding to. For UTF-8 accepts any permutation.
+	 * @return string|boolean When $encoding is `null` returns the current encoding
+	 *         in effect, otherwise a boolean indicating if setting the encoding
+	 *         succeeded or failed. Returns `'UTF-8'` when this encoding is used.
 	 */
 	public function encoding($encoding = null) {
-		$encodingMap = array('UTF-8' => 'utf8');
+		if ($encoding === null) {
+			$encoding = $this->connection
+				->query('PRAGMA encoding')
+				->fetchColumn();
 
-		if (!$encoding) {
-			$query = $this->connection->query('PRAGMA encoding');
-			$encoding = $query->fetchColumn();
-			return ($key = array_search($encoding, $encodingMap)) ? $key : $encoding;
+			return $encoding === 'utf8' ? 'UTF-8' : $encoding;
 		}
-		$encoding = isset($encodingMap[$encoding]) ? $encodingMap[$encoding] : $encoding;
-
-		try {
-			$this->connection->exec("PRAGMA encoding = \"{$encoding}\"");
-			return true;
-		} catch (PDOException $e) {
-			return false;
+		if (strcasecmp($encoding, 'utf-8') === 0 || strcasecmp($encoding, 'utf8') === 0) {
+			$encoding = 'utf8';
 		}
+		return $this->connection->exec("PRAGMA encoding = \"{$encoding}\"") !== false;
 	}
 
 	/**
@@ -280,7 +277,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 */
 	public function error() {
 		if ($error = $this->connection->errorInfo()) {
-			return array($error[1], $error[2]);
+			return [$error[1], $error[2]];
 		}
 	}
 
@@ -293,19 +290,16 @@ class Sqlite3 extends \lithium\data\source\Database {
 	 * @return \lithium\data\source\Result Returns a result object if the query was successful.
 	 * @filter
 	 */
-	protected function _execute($sql, array $options = array()) {
-		$conn = $this->connection;
+	protected function _execute($sql, array $options = []) {
 		$params = compact('sql', 'options');
 
-		return $this->_filter(__METHOD__, $params, function($self, $params) use ($conn) {
-			$sql = $params['sql'];
-
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			try {
-				$resource = $conn->query($sql);
+				$resource = $this->connection->query($params['sql']);
 			} catch (PDOException $e) {
-				$self->invokeMethod('_error', array($sql));
+				$this->_error($params['sql']);
 			};
-			return $self->invokeMethod('_instance', array('result', compact('resource')));
+			return $this->_instance('result', compact('resource'));
 		});
 	}
 
@@ -324,19 +318,19 @@ class Sqlite3 extends \lithium\data\source\Database {
 			return $real;
 		}
 
-		$column = array_intersect_key($column, array('type' => null, 'length' => null));
+		$column = array_intersect_key($column, ['type' => null, 'length' => null]);
 		if (isset($column['length']) && $column['length']) {
-			$length = explode(',', $column['length']) + array(null, null);
+			$length = explode(',', $column['length']) + [null, null];
 			$column['length'] = $length[0] ? (integer) $length[0] : null;
 			$length[1] ? $column['precision'] = (integer) $length[1] : null;
 		}
 
 		switch (true) {
-			case in_array($column['type'], array('date', 'time', 'datetime', 'timestamp')):
+			case in_array($column['type'], ['date', 'time', 'datetime', 'timestamp']):
 				return $column;
 			case ($column['type'] === 'tinyint' && $column['length'] == '1'):
 			case ($column['type'] === 'boolean'):
-				return array('type' => 'boolean');
+				return ['type' => 'boolean'];
 			break;
 			case (strpos($column['type'], 'int') !== false):
 				$column['type'] = 'integer';
@@ -384,7 +378,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 			$out .= "({$length}{$precision})";
 		}
 
-		$out .= $this->_buildMetas('column', $field, array('collate'));
+		$out .= $this->_buildMetas('column', $field, ['collate']);
 
 		if ($type !== 'id') {
 			$out .= is_bool($null) ? ($null ? ' NULL' : ' NOT NULL') : '' ;

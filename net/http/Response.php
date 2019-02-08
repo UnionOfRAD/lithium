@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\net\http;
@@ -18,7 +19,7 @@ class Response extends \lithium\net\http\Message {
 	 *
 	 * @var array
 	 */
-	public $status = array('code' => 200, 'message' => 'OK');
+	public $status = ['code' => 200, 'message' => 'OK'];
 
 	/**
 	 * Character encoding.
@@ -36,17 +37,17 @@ class Response extends \lithium\net\http\Message {
 	 * of PHP `setcookie()`.
 	 *
 	 * @see lithium\net\http\Response::cookies()
-	 * @see http://php.net/function.setcookie.php
+	 * @link http://php.net/function.setcookie.php
 	 * @var array
 	 */
-	public $cookies = array();
+	public $cookies = [];
 
 	/**
 	 * Status codes.
 	 *
 	 * @var array
 	 */
-	protected $_statuses = array(
+	protected $_statuses = [
 		100 => 'Continue',
 		101 => 'Switching Protocols',
 		102 => 'Processing',
@@ -97,7 +98,7 @@ class Response extends \lithium\net\http\Message {
 		504 => 'Gateway Time-out',
 		507 => 'Insufficient Storage',
 		511 => 'Network Authentication Required'
-	);
+	];
 
 	/**
 	 * Constructor. Adds config values to the public properties when a new object is created.
@@ -112,13 +113,13 @@ class Response extends \lithium\net\http\Message {
 	 *        - `'cookies'` _array_: Defaults to `array()`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'message' => null,
 			'status' => null,
 			'type' => null,
-			'cookies' => array()
-		);
+			'cookies' => []
+		];
 		parent::__construct($config + $defaults);
 
 		if ($this->_config['message']) {
@@ -166,8 +167,8 @@ class Response extends \lithium\net\http\Message {
 	 *        - `'decode'` _boolean_: decode the body based on the content type
 	 * @return array
 	 */
-	public function body($data = null, $options = array()) {
-		$defaults = array('decode' => true);
+	public function body($data = null, $options = []) {
+		$defaults = ['decode' => true];
 		return parent::body($data, $options + $defaults);
 	}
 
@@ -176,8 +177,8 @@ class Response extends \lithium\net\http\Message {
 	 *
 	 * @param string $key Optional. Set to `'code'` or `'message'` to return just the code
 	 *        or message of the status, otherwise returns the full status header.
-	 * @param string $status The code or message of the status you wish to set.
-	 * @return string Returns the full HTTP status, with version, code and message or
+	 * @param string|null $status The code or message of the status you wish to set.
+	 * @return string|boolean Returns the full HTTP status, with version, code and message or
 	 *         dending on $key just the code or message.
 	 */
 	public function status($key = null, $status = null) {
@@ -185,18 +186,18 @@ class Response extends \lithium\net\http\Message {
 			$status = $key;
 		}
 		if ($status) {
-			$this->status = array('code' => null, 'message' => null);
+			$this->status = ['code' => null, 'message' => null];
 
 			if (is_array($status)) {
 				$key = null;
 				$this->status = $status + $this->status;
 			} elseif (is_numeric($status) && isset($this->_statuses[$status])) {
-				$this->status = array('code' => $status, 'message' => $this->_statuses[$status]);
+				$this->status = ['code' => $status, 'message' => $this->_statuses[$status]];
 			} else {
 				$statuses = array_flip($this->_statuses);
 
 				if (isset($statuses[$status])) {
-					$this->status = array('code' => $statuses[$status], 'message' => $status);
+					$this->status = ['code' => $statuses[$status], 'message' => $status];
 				}
 			}
 		}
@@ -223,7 +224,7 @@ class Response extends \lithium\net\http\Message {
 	 * Cookies which have been set multiple times do not overwrite each other.  Rather they are stored
 	 * as an array of associative arrays.
 	 *
-	 * @see http://php.net/function.setcookie.php
+	 * @link http://php.net/function.setcookie.php
 	 * @param string $key
 	 * @param string $value
 	 * @return mixed
@@ -231,7 +232,7 @@ class Response extends \lithium\net\http\Message {
 	public function cookies($key = null, $value = null) {
 		if (!$key) {
 			$key = $this->cookies;
-			$this->cookies = array();
+			$this->cookies = [];
 		}
 		if (is_array($key)) {
 			foreach ($key as $cookie => $value) {
@@ -248,20 +249,20 @@ class Response extends \lithium\net\http\Message {
 					if (array_values($value) === $value) {
 						foreach ($value as $i => $set) {
 							if (!is_array($set)) {
-								$value[$i] = array('value' => $set);
+								$value[$i] = ['value' => $set];
 							}
 						}
 					}
 				} else {
-					$value = array('value' => $value);
+					$value = ['value' => $value];
 				}
 				if (isset($this->cookies[$key])) {
 					$orig = $this->cookies[$key];
 					if (array_values($orig) !== $orig) {
-						$orig = array($orig);
+						$orig = [$orig];
 					}
 					if (array_values($value) !== $value) {
-						$value = array($value);
+						$value = [$value];
 					}
 					$this->cookies[$key] = array_merge($orig, $value);
 				} else {
@@ -281,7 +282,7 @@ class Response extends \lithium\net\http\Message {
 	 * @return array Array of `Set-Cookie` headers or `null` if no cookies to set.
 	 */
 	protected function _cookies() {
-		$cookies = array();
+		$cookies = [];
 		foreach ($this->cookies() as $name => $value) {
 			if (!isset($value['value'])) {
 				foreach ($value as $set) {
@@ -334,7 +335,7 @@ class Response extends \lithium\net\http\Message {
 	 */
 	public function digest() {
 		if (empty($this->headers['WWW-Authenticate'])) {
-			return array();
+			return [];
 		}
 		$auth = $this->_classes['auth'];
 		return $auth::decode($this->headers['WWW-Authenticate']);
@@ -354,7 +355,7 @@ class Response extends \lithium\net\http\Message {
 		list($headers, $body) = $parts;
 		$headers = str_replace("\r", "", explode("\n", $headers));
 
-		if (array_filter($headers) === array()) {
+		if (array_filter($headers) === []) {
 			return trim($body);
 		}
 		preg_match('/HTTP\/(\d+\.\d+)\s+(\d+)(?:\s+(.*))?/i', array_shift($headers), $match);
@@ -384,11 +385,11 @@ class Response extends \lithium\net\http\Message {
 		foreach ((array) $headers as $header) {
 			$parts = array_map('trim', array_filter(explode('; ', $header)));
 			$cookie = array_shift($parts);
-			list($name, $value) = array_map('urldecode', explode('=', $cookie, 2)) + array('','');
+			list($name, $value) = array_map('urldecode', explode('=', $cookie, 2)) + ['',''];
 
-			$options = array();
+			$options = [];
 			foreach ($parts as $part) {
-				$part = array_map('urldecode', explode('=', $part, 2)) + array('','');
+				$part = array_map('urldecode', explode('=', $part, 2)) + ['',''];
 				$options[strtolower($part[0])] = $part[1] ?: true;
 			}
 			if (isset($options['expires'])) {
@@ -430,7 +431,7 @@ class Response extends \lithium\net\http\Message {
 		}
 		$body = join("\r\n", (array) $this->body);
 		$headers = join("\r\n", $this->headers());
-		$response = array($this->status(), $headers, "", $body);
+		$response = [$this->status(), $headers, "", $body];
 		return join("\r\n", $response);
 	}
 }

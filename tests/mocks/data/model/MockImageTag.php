@@ -1,32 +1,33 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\data\model;
 
 class MockImageTag extends \lithium\data\Model {
 
-	public $belongsTo = array(
-		'Image' => array('to' => 'lithium\tests\mocks\data\model\MockImage'),
-		'Tag' => array('to' => 'lithium\tests\mocks\data\model\MockTag')
-	);
+	public $belongsTo = [
+		'Image' => ['to' => 'lithium\tests\mocks\data\model\MockImage'],
+		'Tag' => ['to' => 'lithium\tests\mocks\data\model\MockTag']
+	];
 
-	protected $_meta = array(
+	protected $_meta = [
 		'key' => 'id',
 		'name' => 'ImageTag',
 		'source' => 'mock_image_tag',
 		'connection' => false
-	);
+	];
 
-	protected $_schema = array(
-		'id' => array('type' => 'integer'),
-		'image_id' => array('type' => 'integer'),
-		'tag_id' => array('type' => 'integer')
-	);
+	protected $_schema = [
+		'id' => ['type' => 'integer'],
+		'image_id' => ['type' => 'integer'],
+		'tag_id' => ['type' => 'integer']
+	];
 }
 
 ?>

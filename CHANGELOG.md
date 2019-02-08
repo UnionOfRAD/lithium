@@ -1,5 +1,416 @@
 # Change Log
 
+## v1.1.1
+
+### Added
+
+- PHP 7.1 support
+
+### Fixed
+
+- Test report filters are now fully normalized before passing them into `Report`.
+- Removed debug code in exception handling of `Database` (Alex Bowers).
+
+## v1.1.0
+
+### Added
+
+- PHP 7.0 support
+
+- `Database` now supports the `NOT BETWEEN` operator. #1208 (Eric Cholis)
+
+- Restrictions on library search paths for i.e. adapters inside non-core libraries have been
+  relaxed. This fixes an inconvenience where adapters (and other classes) always had to be placed
+  under the `extensions` directory. Even in cases where it didn't feel natural to put them there.
+
+  This is best demonstrated using the `li3_access` plugin as an example. This plugin
+  defines a new adaptable class (`security\Access`).
+
+  Before:
+  ```
+  li3_access
+  ├── security
+  │   ├── Access.php
+  │   └── access
+  │       └── Adapter.php
+  └── extensions
+      └── adapter
+          └── access
+              ├── Resources.php
+              └── Rules.php
+  ```
+
+  After:
+  ```
+  li3_access
+  └── security
+      ├── Access.php
+      └── access
+          ├── Adapter.php
+          └── adapter
+              ├── Resources.php
+              └── Rules.php
+  ```
+
+
+- Filters and related classes have been refactored and extracted into the new
+  `lithium\aop` namespace.
+
+  **Shallow hirarchy.** With the new `Filters`, classes that need filter functionality
+  don't need to inherit from `Object`/`StaticObject` anymore and don't need to have
+  special methods or properties defined. This is possible by entirely relying on a central
+  filters manager and using `spl_object_hash()` internally.
+
+  **Simplified filters context.** By integrating PHP 5.5's new `::class` keyword with `use`,
+  references to the static context are now made with `Context::class`, removing the need
+  for a static `$self` and repeating the full class name across filters in the same file.
+
+  **Simplified filters signature.** By using PHP 5.4's new context binding feature for
+  closures, we were able to simplify the signature of filters - i.e. by dropping the
+  `$self`.
+
+  This - as a sideeffect - reduces the requirement of using `invokeMethod()` to access
+  protected members of the context. `$this` and `Context::class` can be used to access
+  the filtered object. Also makes better stacktraces.
+
+  **Simplified chain advancing.**
+  Instead of advancing the chain via `$chain->next()`, a callable (`$next()`) is used.
+  The advancing function just requires one argument.
+
+  ```php
+  function($self, $params, $chain) { // old
+      $self->invokeMethod('_foo');
+      $params['bar'] = 'baz';
+      return $chain->next($self, $params, $chain);
+  }
+
+  function($params, $next) { // new
+      $this->_foo();
+      $params['bar'] = 'baz';
+      return $next($params);
+  }
+  ```
+
+  **Strict separation of filters and implementation.** The implementation function (the one
+  being filtered) now takes just a single `$params` argument. It doesn't have access to
+  the chain anymore.
+
+  **Everything is lazy.** The new filter manager will now by default apply any filters -
+  for both concrete and static classes - lazily.
+
+  **Better filtering of concrete classes.** It is now possible to apply
+  filters to both all and/or specific instances of a concrete class.
+
+  ```php
+  $foo = new Foo();
+
+  // Executes filter only for `$foo`'s `bar` method.
+  Filters::apply($foo, 'bar', function($params, $next) {});
+
+  // Executes filter for all `Foo`'s `bar` methods.
+  Filters::apply('Foo', 'bar', function($params, $next) {});
+  ```
+
+  **Performance** for filtered methods - especially when there are no filters applied to it -
+  has been improved, so that there is only a minimal penality for making a method
+  filterable.
+
+- `Router::match()` now additionaly supports the magic schemes `tel` and `sms`. This
+  allows to create `tel:+49401234567` style links.
+
+- `Model::save()` using a relational database adapter will now only save updated fields,
+  instead of blindly saving all. #1121 (Hamid Reza Koushki)
+
+- `Hash::calculate()` learned to hash over arbitrary data (scalar and non-scalar, closures). #1196 (David Persson)
+
+- Introduced new `lithium\net\HostString` class to help parse `<host>:<port>` strings.
+
+- `Cache` together with the `File` adapter can now be used to store BLOBs. 
+
+  ```php
+  Cache::config([
+    'blob' => [
+      'adapter' => 'File', 
+      'streams' => true // Enable this option for BLOB support.
+    ]
+  ]);
+  
+  $stream = fopen('php://temp', 'wb');
+  $pdf->generate()->store($stream); // some expensive action
+  
+  // We must rewind the stream, as Cache will not do this for us.
+  rewind($stream);
+  
+  // Store the contents of $stream into a cache item.
+  Cache::write('blob', 'productCatalogPdf', $stream);
+  
+  // ... later somewhere else in the galaxy ...
+  $stream = Cache::read('blob', 'productCatalogPdf');
+  ```
+
+- `mcrypt_create_iv()` and PHP7's `random_bytes()` have been added as new RNG sources.
+
+- Enable custom error messages in form helper. This feature allows to provide messages
+  for validation error inside the template. This allows easier translation of messages and
+  customization in case there is no control over the model (i.e. developing a "theme" for a
+  customer without changing the basic functionality). #1167 (David Persson)
+
+- Strict mode can now be enabled for MySQL via the `'strict'` option. Read more about the
+  feature at http://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-strict. #1171 (David Persson)
+
+- Added drain option to action request allowing to disable auto stream reading. When the
+  drain option is disabled, action request will not drain stream data - when sent. This reduces
+  memory usage and is a first step in enabling streaming very large files (i.e. uploading video
+  content). The option is enabled by default to keep current behavior, but future versions may
+  disable it. #1110 (David Persson)
+
+  With draining disabled, streams must be read manually:
+
+  ```php
+  $stream = fopen('php://input', 'r');
+  // Do something with $stream.
+  fclose($stream);
+  ```
+
+  Note that with draining disabled, automatic content decoding is not supported
+  anymore. It must be manually decoded as follows.
+
+  ```php
+  $data = Media::decode($request->type, stream_get_contents($stream));
+  ```
+
+- Text form fields now support generating corresponding `<datalist>` elements for autocompletion.
+
+  ```php
+  $this->form->field('region', [
+      'type' => 'text',
+      'list' => ['foo', 'bar', 'baz']
+  ]);
+  ```
+
+- It is now guaranteed that `Random::generate()` will use a cryptographic strong RNG. It 
+  no longer falls back to a less strong source. 
+
+- Due to a new host string parser implementation and framework wide rollout, first 
+  any class accepting a host string in the form of `<host>` or `<host>:<port>` now
+  also accepts the port only notation `:<port>`. This allows to change just the
+  port but keep using the default host name. Second, host strings will now also handle 
+  IPv6 addresses correctly.
+
+- Console command help now shows inherited options i.e. `[--silent] [--plain] [--help]`.
+
+- Reduced `preg_match()` call count in `Router` in favor of `strpos()` for performance reasons.
+
+- Improved database encoding, timezone and searchPath methods. #1172 (David Persson)
+
+- Multi-word console command arguments are now parsed into camelized versions.
+  `--no-color`, will be available as `noColor` and assigned to a `$noColor` property if
+  present in the command class definition. Previously `--no-color` was made available as
+  `no-color`. This has been deprecated.
+
+- New `lithium\util\Text`, `lithium\security\Random` and `lithium\security\Hash` 
+  classes which were extracted from `String`. #1184 (David Persson)
+
+- The bulitin test framework now handles circular references in expectations or results
+  correctly. The display format of fails has been changed to that of `print_r()`.
+
+- Validator can now validate whole arrays:
+  ```
+  $value = array('complex' => true, 'foo' => 'bar');
+  Validator::add('arrayHasComplexFooKeys', function($value, $format, $options) {
+      return isset($value['complex'], $value['foo']);
+  });
+  ```
+
+- Switched to short array syntax.
+
+### Changed
+
+- The `persist` option for the MongoDb adapter has been removed. Persistent connection
+  configuration is not compatible with mongo ext >= 1.2.0. 1.2.0 was released in 
+  2011 and it is expected that almost all users already have a more recent 
+  version. (Eric Cholis)
+
+- When failing to close an established network connection via the `Socket` subclasses 
+  `Context`, `Stream` and `Curl` (i.e. `$socket->close()`), the close operation will
+  not be retried anymore. Instead `false` is returned.
+
+- To skip decoration in the console test command use `--just-assertions` instead of `--plain`.
+
+- When no suitable RNG is found (rare), `Random::generate()` will throw an exception.
+
+- Database encoding, timezone, and searchPath methods may now throw exceptions. Please
+  wrap code calling these methods directly in try/catch blocks - if needed. #1172
+  (David Persson)
+
+- Instance filters are now not cleaned up automatically anymore, that
+  is when the instance was destroyed, its filters went away with it.
+
+- `Inspector::properties()` and `Inspector::methdos()` now requires an instance when 
+  inspecting concrete classes.
+
+- When calculating test coverage dead code is not ignored anymore. `XDEBUG_CC_DEAD_CODE`
+  causes problems with PHP 7.0 + opcache and cannot be relieably used. 
+
+- The undocumented and deprecated `'servers'` option in the `Memcache` cache adapter has been
+  removed. `'host'` should be used in all cases.
+
+### Deprecated
+
+- Multi-word console command arguments i.e. `--no-color` were made available as
+  `no-color`. This has been deprecated. 
+
+- The XCache caching adapter has been deprecated as it is not compatible with the wildly
+  deployed OPcache and does not perform better.
+
+- The FirePhp logging adapter has been deprecated as Firebug's usage share is shrinking
+  in favor of builtin developer tools.
+
+- The builtin mocking framework (`lithium\test\Mocker`) has been deprecated as alternatives
+  exist and it is not needed as a core test dependency. This takes the task of maintaining full
+  blown mocking from us. You might want to have a look at 
+  [Mockery](https://github.com/padraic/mockery).
+
+- Per adapter filters in `Logger` and `Session` have been deprecated. Please apply filters 
+  directly to the static `Logger::*` and `Session::*` methods instead.
+
+  ```php
+  // deprecated usage
+  Session::config([
+    'default' => [
+       'filters' => [function($self, $params, $chain) { /* ... */ }]
+    ]
+  ]);
+
+  // always use this
+  use lithium\storage\Session;
+
+  Filters::apply(Session::class, 'write', function($params, $next) { 
+    /* ... */ 
+  });
+  ```
+
+-  Methods in an adapter of `Logger` and `Session`, which returned a closure taking
+  `$self` as the first parameter, should now drop that parameter expectation.
+
+- The String class has been renamed to `Text` while RNG and hashing functionality
+  have been extracted into `lithium\security\Random` and `lithium\security\Hash`. #1184 (David Persson)
+
+  This is mainly to achieve PHP 7.0 compatibilty as `String`
+  [will become a reserved name](https://wiki.php.net/rfc/reserve_even_more_types_in_php_7).
+
+  Old methods are deprecated but continue to work and redirect to new methods. It wont be
+  possible to use the old String class with PHP >= 7.0. You must use the new names before
+  switching to PHP 7.0.
+
+  | old | new |
+  | --- | --- |
+  | `lithium\util\String::hash()` | `lithium\security\Hash::calculate()` |
+  | `lithium\util\String::compare()` | `lithium\security\Hash::compare()` |
+  | `lithium\util\String::random()` | `lithium\security\Random::generate()` |
+  | `lithium\util\String::ENCODE_BASE_64` | `lithium\security\Random::ENCODE_BASE_64` |
+  | `lithium\util\String::uuid()` | `lithium\util\Text::uuid()` |
+  | `lithium\util\String::insert()` | `lithium\util\Text::insert()` |
+  | `lithium\util\String::clean()` | `lithium\util\Text::clean()` |
+  | `lithium\util\String::extract()` | `lithium\util\Text::extract()` |
+  | `lithium\util\String::tokenize()` | `lithium\util\Text::tokenize()` |
+
+- The `lithium\util\collection\Filters` class has been deprecated in favor
+  of `lithium\aop\Filters`.There have also been changes in how filters should
+  be implemented and advanced. **Everything old keeps on working** and calls are
+  forwarded to the new implementations. Methods for filtering functionality in
+  `Object`/`StaticObject` have also been deprecated.
+
+  | old | new |
+  | --- | --- |
+  | `lithium\core\*Object::applyFilter()` | `lithium\aop\Filters::apply()` |
+  | `lithium\core\*Object::_filter()` | `lithium\aop\Filters::run()` |
+  | `lithium\util\collection\Filters::apply()` | `lithium\aop\Filters::apply()` |
+  | `lithium\util\collection\Filters::run()` | `lithium\aop\Filters::run()` |
+  | `lithium\util\collection\Filters::hasApplied()` | `lithium\aop\Filters::hasApplied()` |
+
+  **Changes in making a method filterable**:
+  ```
+  $this->_filter(__METHOD__, $params, function($self, $params) { // old (instance)
+  static::_filter(__METHOD__, $params, function($self, $params) { // old (static)
+
+  Filters::run($this, __FUNCTION__, $params, function($params) { // new (instance)
+  Filters::run(get_called_class(), __FUNCTION__, $params, function($params) { // new (static)
+  ```
+
+  **Changes in applying filters**:
+  ```
+  $foo::applyFilter(/* ... */) // old (instance)
+  Foo::applyFilter(/* ... */) // old (static)
+
+  Filters::apply($foo, 'bar', /* ... */) // new (instance)
+  Filters::apply('Foo', 'bar', /* ... */) // new (any instance)
+  Filters::apply('Foo', 'bar', /* ... */) // new (static)
+  ```
+
+  **Changes in the filter signature**:
+  ```php
+  // old
+  Filters::apply('Foo', 'bar', function($self, $params, $chain) {
+    $self->invokeMethod('_qux');
+    return $chain->next($self, $params, $chain);
+  });
+
+  // new
+  Filters::apply('Foo', 'bar', function($params, $next) {
+    $this->_qux();
+    return $next($params);
+  });
+  ```
+
+  Accessing the currently filtered class/method from inside a filter function
+  (via `$chain->method()`) has been deprecated. 
+
+### Fixed
+
+- Fixed possible infinite retry loop when failing to close an established network 
+  connection in the `Socket` subclasses `Context`, `Stream` and `Curl`.
+
+- Fixed slug generation by `Inflector` for strings containing multibyte characters or
+  (unprintable) whitespaces.
+
+- Added missing uppercase transliteration pairs used by `Inflector::slug()`.
+
+- Fixed edge case when using `Collection::prev()` and the collection contained
+  a falsey value (i.e. `null`, `false`, `''`).
+
+- Fixed parsing certain exception details in `Database` i.e. `pgsql unknown role exception`.
+
+- Fixed retrieval of property default values in concrete classes through `Inspector`.
+
+- Fixed write through caching via `Cache::read()`. When passing in a closure for the `'write'`
+  option, the closure was called even when the key was already present in cache.
+
+  - Fixed and enabled modification of the default query options through `Model::query()`.
+
+## v1.0.3
+
+### Fixed
+
+- Fixed write through caching via `Cache::read()`. When passing in a closure for the `'write'`
+  option, the closure was called even when the key was already present in cache.
+
+- Fixed and enabled modification of the default query options through `Model::query()`.
+
+## v1.0.2
+
+### Deprecated
+
+- Brace globbing support has been deprecated in `Libraries`. This feature
+  cannot be reliably be provided crossplatform and will already not work
+  if `GLOB_BRACE` is not available. (reported by Aaron Santiago)
+
+### Fixed
+
+- Optimized searching for a library's namespaces has been reenabled. 
+
+- Per connection read preference settings for MongoDB were ignored. (Fitz Agard)
+
 ## v1.0.1
 
 ### Fixed
@@ -86,7 +497,6 @@
 - Performance optimization of `DocumentSet::_set()` #1144 (Warren Seymour)
 - Removed most `extract()`-usage 651d07a, f74b691 (David Persson)
 - String::compare() will use native `hash_equals()` if possible. #1138 (David Persson)
-  instead of blindly saving all. #1121 (Hamid Reza Koushki)
 - Better cookie support in Request/Response #618, #1123 (Ali Farhadi)
 - We're now using standard tripple-backtick markdown syntax for fenced code blocks. (David Persson)
 - When using `isset()` nested documents are now supported using the dot notation #1094 (Warren Seymour)

@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\storage\cache\strategy;
@@ -17,14 +18,14 @@ class JsonTest extends \lithium\test\Unit {
 	}
 
 	public function testWrite() {
-		$data = array('some' => 'data');
+		$data = ['some' => 'data'];
 		$result = $this->Json->write($data);
 		$expected = json_encode($data);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testRead() {
-		$expected = array('some' => 'data');
+		$expected = ['some' => 'data'];
 		$encoded = json_encode($expected);
 		$result = $this->Json->read($encoded);
 		$this->assertEqual($expected, $result);

@@ -1,25 +1,26 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\util;
 
 class MockCollectionObject extends \lithium\core\Object {
 
-	public $data = array(1 => 2);
+	public $data = [1 => 2];
 
 	public function testFoo() {
 		return 'testFoo';
 	}
 
-	public function to($format, array $options = array()) {
+	public function to($format, array $options = []) {
 		switch ($format) {
 			case 'array':
-				return $this->data + array(2 => 3);
+				return $this->data + [2 => 3];
 		}
 	}
 }

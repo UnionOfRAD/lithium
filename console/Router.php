@@ -1,12 +1,15 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\console;
+
+use lithium\util\Inflector;
 
 /**
  * The `Router` class uses an instance of `lithium\console\Request`, which represents an incoming
@@ -21,11 +24,15 @@ class Router extends \lithium\core\Object {
 	 * XF68-style long options (i.e. `-foo`) are not supported but support
 	 * can be added by extending this class.
 	 *
+	 * If passing through `--foo-bar` this previously (pre 1.1) resulted in
+	 * the option `foo-bar` being available. This has been deprecated in favor
+	 * of `fooBar` being created.
+	 *
 	 * @param \lithium\console\Request $request
 	 * @return array $params
 	 */
 	public static function parse($request = null) {
-		$defaults = array('command' => null, 'action' => 'run', 'args' => array());
+		$defaults = ['command' => null, 'action' => 'run', 'args' => []];
 		$params = $request ? (array) $request->params + $defaults : $defaults;
 
 		if (!empty($request->argv)) {
@@ -34,17 +41,19 @@ class Router extends \lithium\core\Object {
 			while ($args) {
 				$arg = array_shift($args);
 				if (preg_match('/^-(?P<key>[a-zA-Z0-9])$/i', $arg, $match)) {
-					$params[$match['key']] = true;
+					$key = Inflector::camelize($match['key'], false);
+					$params[$key] = $params[$match['key']] = true;
 					continue;
 				}
 				if (preg_match('/^--(?P<key>[a-z0-9-]+)(?:=(?P<val>.+))?$/i', $arg, $match)) {
-					$params[$match['key']] = !isset($match['val']) ? true : $match['val'];
+					$key = Inflector::camelize($match['key'], false);
+					$params[$key] = $params[$match['key']] = !isset($match['val']) ? true : $match['val'];
 					continue;
 				}
 				$params['args'][] = $arg;
 			}
 		}
-		foreach (array('command', 'action') as $param) {
+		foreach (['command', 'action'] as $param) {
 			if (!empty($params['args'])) {
 				$params[$param] = array_shift($params['args']);
 			}

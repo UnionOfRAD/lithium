@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\console\command;
@@ -59,12 +60,12 @@ class Test extends \lithium\console\Command {
 	public $verbose = false;
 
 	/**
-	 * Enable plain mode to prevent any headers or similar decoration being output.
+	 * Prevent any headers or similar decoration being output.
 	 * Good for command calls embedded into other scripts.
 	 *
 	 * @var boolean
 	 */
-	public $plain = false;
+	public $justAssertions = false;
 
 	/**
 	 * An array of closures, mapped by type, which are set up to handle different test output
@@ -72,7 +73,7 @@ class Test extends \lithium\console\Command {
 	 *
 	 * @var array
 	 */
-	protected $_handlers = array();
+	protected $_handlers = [];
 
 	/**
 	 * Initializes the output handlers.
@@ -84,9 +85,9 @@ class Test extends \lithium\console\Command {
 		parent::_init();
 		$command = $this;
 
-		$this->_handlers += array(
+		$this->_handlers += [
 			'txt' => function($runner, $path) use ($command) {
-				if (!$command->plain) {
+				if (!$command->justAssertions) {
 					$command->header('Test');
 					$command->out(null, 1);
 				}
@@ -125,7 +126,7 @@ class Test extends \lithium\console\Command {
 					$columns = 60;
 
 					$reporter = function($result) use ($command, &$i, $columns, $colorize) {
-						$shorten = array('fail', 'skip', 'exception');
+						$shorten = ['fail', 'skip', 'exception'];
 
 						if ($result['result'] === 'pass') {
 							$symbol = '.';
@@ -144,7 +145,7 @@ class Test extends \lithium\console\Command {
 				}
 				$report = $runner(compact('reporter'));
 
-				if (!$command->plain) {
+				if (!$command->justAssertions) {
 					$stats = $report->stats();
 
 					$command->out(null, 2);
@@ -166,7 +167,7 @@ class Test extends \lithium\console\Command {
 				$report = $runner();
 
 				if ($results = $report->filters()) {
-					$filters = array();
+					$filters = [];
 
 					foreach ($results as $filter => $options) {
 						$filters[$options['name']] = $report->results['filters'][$filter];
@@ -175,7 +176,7 @@ class Test extends \lithium\console\Command {
 				$command->out($report->render('stats', $report->stats() + compact('filters')));
 				return $report;
 			}
-		);
+		];
 	}
 
 	/**
@@ -230,9 +231,9 @@ class Test extends \lithium\console\Command {
 			$this->error(sprintf('No handler for format `%s`... ', $this->format));
 			return false;
 		}
-		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : array();
-		$params = compact('filters') + array('format' => $this->format);
-		$runner = function($options = array()) use ($path, $params) {
+		$filters = $this->filters ? array_map('trim', explode(',', $this->filters)) : [];
+		$params = compact('filters') + ['format' => $this->format];
+		$runner = function($options = []) use ($path, $params) {
 			return Dispatcher::run($path, $params + $options);
 		};
 		$report = $handlers[$this->format]($runner, $path);

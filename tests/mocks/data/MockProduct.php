@@ -1,49 +1,50 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\mocks\data;
 
 class MockProduct extends \lithium\data\Model {
 
-	protected $_meta = array('source' => 'mock_products', 'connection' => false);
+	protected $_meta = ['source' => 'mock_products', 'connection' => false];
 
-	protected $_inherits = array('_custom');
+	protected $_inherits = ['_custom'];
 
-	protected $_custom = array(
+	protected $_custom = [
 		'prop1' => 'value1'
-	);
+	];
 
-	protected $_schema = array(
-		'id' => array('type' => 'id'),
-		'name' => array('type' => 'string', 'null' => false),
-		'price' => array('type' => 'string', 'null' => false),
-	);
+	protected $_schema = [
+		'id' => ['type' => 'id'],
+		'name' => ['type' => 'string', 'null' => false],
+		'price' => ['type' => 'string', 'null' => false],
+	];
 
-	public $hasOne = array('MockCreator');
+	public $hasOne = ['MockCreator'];
 
-	public $validates = array(
-		'name' => array(
-			array(
+	public $validates = [
+		'name' => [
+			[
 				'notEmpty',
 				'message' => 'Name cannot be empty.'
-			)
-		),
-		'price' => array(
-			array(
+			]
+		],
+		'price' => [
+			[
 				'notEmpty',
 				'message' => 'Price cannot be empty.'
-			),
-			array(
+			],
+			[
 				'numeric',
 				'message' => 'Price must have a numeric value.'
-			)
-		)
-	);
+			]
+		]
+	];
 
 	public static function finders() {
 		$self = static::_object();

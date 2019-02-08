@@ -1,14 +1,16 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\data\source;
 
-use lithium\util\String;
+use lithium\util\Text;
+use lithium\aop\Filters;
 use lithium\data\model\Query;
 
 /**
@@ -29,18 +31,18 @@ class Http extends \lithium\data\Source {
 	 *
 	 * @var array
 	 */
-	protected $_autoConfig = array('classes' => 'merge', 'methods' => 'merge');
+	protected $_autoConfig = ['classes' => 'merge', 'methods' => 'merge'];
 
 	/**
 	 * Fully-namespaced class references
 	 *
 	 * @var array
 	 */
-	protected $_classes = array(
+	protected $_classes = [
 		'schema'  => 'lithium\data\Schema',
 		'service' => 'lithium\net\http\Service',
 		'relationship' => 'lithium\data\model\Relationship'
-	);
+	];
 
 	/**
 	 * Is Connected?
@@ -54,12 +56,12 @@ class Http extends \lithium\data\Source {
 	 *
 	 * @var array
 	 */
-	protected $_methods = array(
-		'create' => array('method' => 'post', 'path' => "/{:source}"),
-		'read'   => array('method' => 'get', 'path' => "/{:source}"),
-		'update' => array('method' => 'put', 'path' => "/{:source}/{:id}"),
-		'delete' => array('method' => 'delete', 'path' => "/{:source}/{:id}")
-	);
+	protected $_methods = [
+		'create' => ['method' => 'post', 'path' => "/{:source}"],
+		'read'   => ['method' => 'get', 'path' => "/{:source}"],
+		'update' => ['method' => 'put', 'path' => "/{:source}/{:id}"],
+		'delete' => ['method' => 'delete', 'path' => "/{:source}/{:id}"]
+	];
 
 	/**
 	 * Constructor.
@@ -67,8 +69,8 @@ class Http extends \lithium\data\Source {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
+	public function __construct(array $config = []) {
+		$defaults = [
 			'adapter'    => null,
 			'persistent' => false,
 			'scheme'     => 'http',
@@ -80,8 +82,8 @@ class Http extends \lithium\data\Source {
 			'port'       => 80,
 			'timeout'    => 30,
 			'encoding'   => 'UTF-8',
-			'methods'    => array()
-		);
+			'methods'    => []
+		];
 		$config = $config + $defaults;
 		$config['username'] = $config['login'];
 		parent::__construct($config);
@@ -119,23 +121,23 @@ class Http extends \lithium\data\Source {
 			if (method_exists($this->connection, $method)) {
 				return $this->connection->invokeMethod($method, $params);
 			}
-			$this->_methods[$method] = array('path' => "/{$method}");
+			$this->_methods[$method] = ['path' => "/{$method}"];
 		}
-		$params += array(array(), array());
+		$params += [[], []];
 
 		if (!is_object($params[0])) {
 			$config = (array) $params[0];
 
 			if (count($config) === count($config, COUNT_RECURSIVE)) {
-				$config = array('data' => $config);
+				$config = ['data' => $config];
 			}
 			$params[0] = new Query($this->_methods[$method] + $config);
 		}
 		$params[0] = new Query($params[0]->export($this) + $this->_methods[$method]);
 
-		return $this->_filter(__CLASS__ . "::" . $method, $params, function($self, $params) {
+		return Filters::run($this, $method, $params, function($params) {
 			list($query, $options) = $params;
-			return $self->send($query, $options);
+			return $this->send($query, $options);
 		});
 	}
 
@@ -159,7 +161,7 @@ class Http extends \lithium\data\Source {
 	 * @param array $options array.
 	 * @return mixed
 	 */
-	public function send($query = null, array $options = array()) {
+	public function send($query = null, array $options = []) {
 		$query = !is_object($query) ? new Query((array) $query) : $query;
 		$method = $query->method() ?: "get";
 		$path = $query->path();
@@ -170,8 +172,8 @@ class Http extends \lithium\data\Source {
 			$data = array_diff_key($data,  array_flip($matches[1]));
 		}
 		return $this->connection->{$method}(
-			String::insert($path, $insert, array('clean' => true)),
-			$data + (array) $query->conditions() + array('limit' => $query->limit()),
+			Text::insert($path, $insert, ['clean' => true]),
+			$data + (array) $query->conditions() + ['limit' => $query->limit()],
 			(array) $options
 		);
 	}
@@ -207,7 +209,7 @@ class Http extends \lithium\data\Source {
 	 * @return array
 	 */
 	public function sources($class = null) {
-		return array();
+		return [];
 	}
 
 	/**
@@ -218,7 +220,7 @@ class Http extends \lithium\data\Source {
 	 * @param array $meta
 	 * @return array - returns an empty array
 	 */
-	public function describe($entity, $fields = array(), array $meta = array()) {
+	public function describe($entity, $fields = [], array $meta = []) {
 		return $this->_instance('schema', compact('fields', 'meta'));
 	}
 
@@ -230,13 +232,16 @@ class Http extends \lithium\data\Source {
 	 * @return mixed
 	 * @filter
 	 */
-	public function create($query, array $options = array()) {
+	public function create($query, array $options = []) {
 		$query = !is_object($query) ? new Query() : $query;
 		$query->method() ?: $query->method("post");
 		$query->path() ?: $query->path("/{:source}");
-		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+
+		$params = [$query, $options];
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			list($query, $options) = $params;
-			return $self->send($query, $options);
+			return $this->send($query, $options);
 		});
 	}
 
@@ -248,13 +253,16 @@ class Http extends \lithium\data\Source {
 	 * @return string
 	 * @filter
 	 */
-	public function read($query, array $options = array()) {
+	public function read($query, array $options = []) {
 		$query = !is_object($query) ? new Query() : $query;
 		$query->method() ?: $query->method("get");
 		$query->path() ?: $query->path("/{:source}");
-		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+
+		$params = [$query, $options];
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			list($query, $options) = $params;
-			return $self->send($query, $options);
+			return $this->send($query, $options);
 		});
 	}
 
@@ -266,13 +274,16 @@ class Http extends \lithium\data\Source {
 	 * @return string
 	 * @filter
 	 */
-	public function update($query, array $options = array()) {
+	public function update($query, array $options = []) {
 		$query = !is_object($query) ? new Query() : $query;
 		$query->method() ?: $query->method("put");
 		$query->path() ?: $query->path("/{:source}/{:id}");
-		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
+
+		$params = [$query, $options];
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
 			list($query, $options) = $params;
-			return $self->send($query, $options);
+			return $this->send($query, $options);
 		});
 	}
 
@@ -284,15 +295,17 @@ class Http extends \lithium\data\Source {
 	 * @return string
 	 * @filter
 	 */
-	public function delete($query, array $options = array()) {
+	public function delete($query, array $options = []) {
 		$query = !is_object($query) ? new Query() : $query;
 		$query->method() ?: $query->method("delete");
 		$query->path() ?: $query->path("/{:source}/{:id}");
-		return $this->_filter(__METHOD__, array($query, $options), function($self, $params) {
-			list($query, $options) = $params;
-			return $self->send($query, $options);
-		});
 
+		$params = [$query, $options];
+
+		return Filters::run($this, __FUNCTION__, $params, function($params) {
+			list($query, $options) = $params;
+			return $this->send($query, $options);
+		});
 	}
 
 	/**
@@ -304,7 +317,7 @@ class Http extends \lithium\data\Source {
 	 * @param array $options
 	 * @return array Returns an array containing the configuration for a model relationship.
 	 */
-	public function relationship($class, $type, $name, array $options = array()) {
+	public function relationship($class, $type, $name, array $options = []) {
 		if (isset($this->_classes['relationship'])) {
 			return $this->_instance('relationship', compact('type', 'name') + $options);
 		}

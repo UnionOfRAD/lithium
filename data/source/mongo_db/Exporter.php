@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\data\source\mongo_db;
@@ -12,31 +13,31 @@ use lithium\util\Set;
 
 class Exporter extends \lithium\core\StaticObject {
 
-	protected static $_classes = array(
+	protected static $_classes = [
 		'set' => 'lithium\data\collection\DocumentSet',
 		'entity' => 'lithium\data\collection\Document',
-	);
+	];
 
-	protected static $_commands = array(
+	protected static $_commands = [
 		'create'    => null,
 		'update'    => '$set',
 		'increment' => '$inc',
 		'remove'    => '$unset',
 		'rename'    => '$rename'
-	);
+	];
 
-	public static function get($type, $export, array $options = array()) {
-		$defaults = array('whitelist' => array());
+	public static function get($type, $export, array $options = []) {
+		$defaults = ['whitelist' => []];
 		$options += $defaults;
 
 		if (!method_exists(get_called_class(), $method = "_{$type}") || !$export) {
 			return;
 		}
-		return static::$method($export, array('finalize' => true) + $options);
+		return static::$method($export, ['finalize' => true] + $options);
 	}
 
 	public static function toCommand($changes) {
-		$result = array();
+		$result = [];
 
 		foreach (static::$_commands as $from => $to) {
 			if (!isset($changes[$from])) {
@@ -52,20 +53,20 @@ class Exporter extends \lithium\core\StaticObject {
 	}
 
 	protected static function _create($export, array $options) {
-		$export += array('data' => array(), 'update' => array(), 'key' => '');
+		$export += ['data' => [], 'update' => [], 'key' => ''];
 		$data = Set::merge($export['data'], $export['update']);
 
 		if (array_keys($data) == range(0, count($data) - 1)) {
 			$data = $export['update'];
 		}
-		$localOpts = array('finalize' => false) + $options;
+		$localOpts = ['finalize' => false] + $options;
 
 		foreach ($data as $key => $val) {
 			if (is_object($val) && method_exists($val, 'export')) {
 				$data[$key] = static::_create($val->export($options), $localOpts);
 			}
 		}
-		return ($options['finalize']) ? array('create' => $data) : $data;
+		return ($options['finalize']) ? ['create' => $data] : $data;
 	}
 
 	/**
@@ -85,15 +86,15 @@ class Exporter extends \lithium\core\StaticObject {
 	 *         are converted to database-native commands by the `toCommand()` method.
 	 */
 	protected static function _update($export) {
-		$export += array(
-			'data' => array(),
-			'update' => array(),
-			'remove' => array(),
-			'rename' => array(),
+		$export += [
+			'data' => [],
+			'update' => [],
+			'remove' => [],
+			'rename' => [],
 			'key' => ''
-		);
+		];
 		$path = $export['key'] ? "{$export['key']}." : "";
-		$result = array('update' => array(), 'remove' => array());
+		$result = ['update' => [], 'remove' => []];
 		$left = static::_diff($export['data'], $export['update']);
 		$right = static::_diff($export['update'], $export['data']);
 
@@ -111,13 +112,13 @@ class Exporter extends \lithium\core\StaticObject {
 			$original = $export['data'];
 			$isArray = is_object($value) && $value instanceof static::$_classes['set'];
 
-			$options = array(
+			$options = [
 				'indexed' => null,
-				'handlers' => array(
+				'handlers' => [
 					'MongoDate' => function($value) { return $value; },
 					'MongoId' => function($value) { return $value; }
-				)
-			);
+				]
+			];
 
 			if ($isArray) {
 				$newValue = $value->to('array', $options);
@@ -147,7 +148,7 @@ class Exporter extends \lithium\core\StaticObject {
 	 * @return array Returns an array of the differences of `$left` compared to `$right`.
 	 */
 	protected static function _diff($left, $right) {
-		$result = array();
+		$result = [];
 
 		foreach ($left as $key => $value) {
 			if (!array_key_exists($key, $right) || $left[$key] !== $right[$key]) {
@@ -169,7 +170,7 @@ class Exporter extends \lithium\core\StaticObject {
 	 * @return array Returns the value of `$changes`, with any new changed values appended.
 	 */
 	protected static function _append($changes, $key, $value, $change) {
-		$options = array('finalize' => false);
+		$options = ['finalize' => false];
 
 		if (!is_object($value) || !method_exists($value, 'export')) {
 			$changes[$change][$key] = ($change === 'update') ? $value : true;

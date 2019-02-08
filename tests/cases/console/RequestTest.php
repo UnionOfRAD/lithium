@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\tests\cases\console;
@@ -15,16 +16,16 @@ class RequestTest extends \lithium\test\Unit {
 
 	public $streams;
 
-	protected $_backup = array();
+	protected $_backup = [];
 
 	public function setUp() {
-		$this->streams = array(
+		$this->streams = [
 			'input' => Libraries::get(true, 'resources') . '/tmp/tests/input.txt'
-		);
+		];
 
 		$this->_backup['cwd'] = str_replace('\\', '/', getcwd()) ?: null;
 		$this->_backup['_SERVER'] = $_SERVER;
-		$_SERVER['argv'] = array();
+		$_SERVER['argv'] = [];
 	}
 
 	public function tearDown() {
@@ -40,7 +41,7 @@ class RequestTest extends \lithium\test\Unit {
 	public function testConstructWithoutConfig() {
 		$request = new Request();
 
-		$expected = array();
+		$expected = [];
 		$result = $request->args;
 		$this->assertEqual($expected, $result);
 
@@ -65,54 +66,54 @@ class RequestTest extends \lithium\test\Unit {
 	}
 
 	public function testConstructWithServer() {
-		$_SERVER['argv'] = array('/path/to/lithium.php', 'one', 'two');
+		$_SERVER['argv'] = ['/path/to/lithium.php', 'one', 'two'];
 		$request = new Request();
 
 		$expected = '/path/to/lithium.php';
 		$result = $request->env('script');
 		$this->assertEqual($expected, $result);
 
-		$expected = array('one', 'two');
+		$expected = ['one', 'two'];
 		$result = $request->argv;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testConstructWithConfigArgv() {
-		$request = new Request(array('args' => array('/path/to/lithium.php', 'wrong')));
+		$request = new Request(['args' => ['/path/to/lithium.php', 'wrong']]);
 
-		$expected = array('/path/to/lithium.php', 'wrong');
+		$expected = ['/path/to/lithium.php', 'wrong'];
 		$result = $request->argv;
 		$this->assertEqual($expected, $result);
 
-		$_SERVER['argv'] = array('/path/to/lithium.php');
-		$request = new Request(array('args' => array('one', 'two')));
+		$_SERVER['argv'] = ['/path/to/lithium.php'];
+		$request = new Request(['args' => ['one', 'two']]);
 
 		$expected = '/path/to/lithium.php';
 		$result = $request->env('script');
 		$this->assertEqual($expected, $result);
 
-		$expected = array('one', 'two');
+		$expected = ['one', 'two'];
 		$result = $request->argv;
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testConstructWithConfigArgs() {
-		$request = new Request(array(
-			'args' => array('ok')
-		));
-		$expected = array('ok');
+		$request = new Request([
+			'args' => ['ok']
+		]);
+		$expected = ['ok'];
 		$this->assertEqual($expected, $request->argv);
 
-		$request = new Request(array(
-			'env' => array('script' => '/path/to/lithium.php'),
-			'args' => array('one', 'two', 'three', 'four')
-		));
+		$request = new Request([
+			'env' => ['script' => '/path/to/lithium.php'],
+			'args' => ['one', 'two', 'three', 'four']
+		]);
 
 		$expected = '/path/to/lithium.php';
 		$result = $request->env('script');
 		$this->assertEqual($expected, $result);
 
-		$expected = array('one', 'two', 'three', 'four');
+		$expected = ['one', 'two', 'three', 'four'];
 		$this->assertEqual($expected, $request->argv);
 	}
 
@@ -121,7 +122,7 @@ class RequestTest extends \lithium\test\Unit {
 		$this->skipIf(!is_readable($base), "Path `{$base}` is not readable.");
 
 		chdir(Libraries::get(true, 'resources') . '/tmp');
-		$request = new Request(array('env' => array('working' => '/some/other/path')));
+		$request = new Request(['env' => ['working' => '/some/other/path']]);
 
 		$expected = '/some/other/path';
 		$result = $request->env('working');
@@ -133,7 +134,7 @@ class RequestTest extends \lithium\test\Unit {
 		$this->skipIf(!is_writable($base), "{$base} is not writable.");
 
 		$stream = fopen($this->streams['input'], 'w+');
-		$request = new Request(array('input' => $stream));
+		$request = new Request(['input' => $stream]);
 		$this->assertInternalType('resource', $request->input);
 		$this->assertEqual($stream, $request->input);
 
@@ -145,33 +146,33 @@ class RequestTest extends \lithium\test\Unit {
 
 	public function testArgs() {
 		$request = new Request();
-		$request->params = array(
-			'command' => 'one', 'action' => 'two', 'args' => array('three', 'four', 'five')
-		);
+		$request->params = [
+			'command' => 'one', 'action' => 'two', 'args' => ['three', 'four', 'five']
+		];
 		$this->assertEqual('five', $request->args(2));
 	}
 
 	public function testShiftDefaultOne() {
 		$request = new Request();
-		$request->params = array(
+		$request->params = [
 			'command' => 'one', 'action' => 'two',
-			'args' => array('three', 'four', 'five')
-		);
+			'args' => ['three', 'four', 'five']
+		];
 		$request->shift();
 
-		$expected = array('command' => 'two', 'action' => 'three', 'args' => array('four', 'five'));
+		$expected = ['command' => 'two', 'action' => 'three', 'args' => ['four', 'five']];
 		$this->assertEqual($expected, $request->params);
 	}
 
 	public function testShiftTwo() {
 		$request = new Request();
-		$request->params = array(
+		$request->params = [
 			'command' => 'one', 'action' => 'two',
-			'args' => array('three', 'four', 'five')
-		);
+			'args' => ['three', 'four', 'five']
+		];
 		$request->shift(2);
 
-		$expected = array('command' => 'three', 'action' => 'four', 'args' => array('five'));
+		$expected = ['command' => 'three', 'action' => 'four', 'args' => ['five']];
 		$result = $request->params;
 		$this->assertEqual($expected, $result);
 	}

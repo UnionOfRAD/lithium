@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\template\view;
@@ -34,11 +35,11 @@ class Compiler extends \lithium\core\StaticObject {
 	 *
 	 * @var array
 	 */
-	protected static $_processors = array(
+	protected static $_processors = [
 		'/\<\?=\s*\$this->(.+?)\s*;?\s*\?>/msx' => '<?php echo $this->$1; ?>',
 		'/\<\?=\s*(\$h\(.+?)\s*;?\s*\?>/msx' => '<?php echo $1; ?>',
 		'/\<\?=\s*(.+?)\s*;?\s*\?>/msx' => '<?php echo $h($1); ?>'
-	);
+	];
 
 	/**
 	 * Compiles a template and writes it to a cache file, which is used for inclusion.
@@ -51,9 +52,9 @@ class Compiler extends \lithium\core\StaticObject {
 	 *                      should still be returned and no exception be thrown.
 	 * @return string The compiled template.
 	 */
-	public static function template($file, array $options = array()) {
+	public static function template($file, array $options = []) {
 		$cachePath = Libraries::get(true, 'resources') . '/tmp/cache/templates';
-		$defaults = array('path' => $cachePath, 'fallback' => false);
+		$defaults = ['path' => $cachePath, 'fallback' => false];
 		$options += $defaults;
 
 		$stats = stat($file);

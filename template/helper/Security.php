@@ -1,12 +1,15 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\template\helper;
+
+use lithium\aop\Filters;
 
 /**
  * The `Security` helper is responsible for various tasks associated with verifying the authenticity
@@ -17,12 +20,12 @@ namespace lithium\template\helper;
  */
 class Security extends \lithium\template\Helper {
 
-	protected $_classes = array(
+	protected $_classes = [
 		'requestToken' => 'lithium\security\validation\RequestToken',
 		'formSignature' => 'lithium\security\validation\FormSignature'
-	);
+	];
 
-	protected $_state = array();
+	protected $_state = [];
 
 	/**
 	 * Constructor. Configures the helper with the default settings for interacting with
@@ -31,8 +34,8 @@ class Security extends \lithium\template\Helper {
 	 * @param array $config
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('sessionKey' => 'security.token', 'salt' => null);
+	public function __construct(array $config = []) {
+		$defaults = ['sessionKey' => 'security.token', 'salt' => null];
 		parent::__construct($config + $defaults);
 	}
 
@@ -45,12 +48,12 @@ class Security extends \lithium\template\Helper {
 	 * @return string Returns a hidden `<input />` field containing a request-specific CSRF token
 	 *         key.
 	 */
-	public function requestToken(array $options = array()) {
-		$defaults = array('name' => 'security.token', 'id' => false);
+	public function requestToken(array $options = []) {
+		$defaults = ['name' => 'security.token', 'id' => false];
 		$options += $defaults;
 		$requestToken = $this->_classes['requestToken'];
 
-		$flags = array_intersect_key($this->_config, array('sessionKey' => '', 'salt' => ''));
+		$flags = array_intersect_key($this->_config, ['sessionKey' => '', 'salt' => '']);
 		$value = $requestToken::key($flags);
 
 		$name = $options['name'];
@@ -66,7 +69,7 @@ class Security extends \lithium\template\Helper {
 	 * done in the bootstrap process. The secret key should be a random lengthy string.
 	 * ```php
 	 * use lithium\security\validation\FormSignature;
-	 * FormSignature::config(array('secret' => 'a long secret key'));
+	 * FormSignature::config(['secret' => 'a long secret key']);
 	 * ```
 	 *
 	 * In the view call the `sign()` method before creating the form.
@@ -101,60 +104,61 @@ class Security extends \lithium\template\Helper {
 	 * @return void
 	 */
 	public function sign($form = null) {
-		$state =& $this->_state;
-		$classes = $this->_classes;
 		$form = $form ?: $this->_context->form;
-		$id = spl_object_hash($form);
-		$hasBound = isset($state[$id]);
 
-		if ($hasBound) {
+		if (isset($state[spl_object_hash($form)])) {
 			return;
 		}
 
-		$form->applyFilter('create', function($self, $params, $chain) use ($form, &$state) {
-			$id = spl_object_hash($form);
-			$state[$id] = array('fields' => array(), 'locked' => array(), 'excluded' => array());
-			return $chain->next($self, $params, $chain);
+		Filters::apply($form, 'create', function($params, $next) use ($form) {
+			$this->_state[spl_object_hash($form)] = [
+				'fields' => [],
+				'locked' => [],
+				'excluded' => []
+			];
+			return $next($params);
 		});
 
-		$form->applyFilter('end', function($self, $params, $chain) use ($form, &$state, $classes) {
+		Filters::apply($form, 'end', function($params, $next) use ($form) {
 			$id = spl_object_hash($form);
 
-			if (!$state[$id]) {
-				return $chain->next($self, $params, $chain);
+			if (!$this->_state[$id]) {
+				return $next($params);
 			}
-			$value = $classes['formSignature']::key($state[$id]);
+			$formSignature = $this->_classes['formSignature'];
+
+			$value = $formSignature::key($this->_state[$id]);
 			echo $form->hidden('security.signature', compact('value'));
 
-			$state[$id] = array();
-			return $chain->next($self, $params, $chain);
+			$this->_state[$id] = [];
+			return $next($params);
 		});
 
-		$form->applyFilter('_defaults', function($self, $params, $chain) use ($form, &$state) {
-			$defaults = array(
+		Filters::apply($form, '_defaults', function($params, $next) use ($form) {
+			$defaults = [
 				'locked' => ($params['method'] === 'hidden' && $params['name'] !== '_method'),
 				'exclude' => $params['name'] === '_method'
-			);
+			];
 			$options = $params['options'];
 
 			$options += $defaults;
 			$params['options'] = array_diff_key($options, $defaults);
-			$result = $chain->next($self, $params, $chain);
+			$result = $next($params);
 
 			if ($params['method'] === 'label') {
 				return $result;
 			}
 			$value = isset($params['options']['value']) ? $params['options']['value'] : "";
 
-			$type = array(
+			$type = [
 				$options['exclude']  => 'excluded',
 				!$options['exclude'] => 'fields',
 				$options['locked']   => 'locked'
-			);
+			];
 			if (!$name = preg_replace('/(\.\d+)+$/', '', $params['name'])) {
 				return $result;
 			}
-			$state[spl_object_hash($form)][$type[true]][$name] = $value;
+			$this->_state[spl_object_hash($form)][$type[true]][$name] = $value;
 			return $result;
 		});
 	}

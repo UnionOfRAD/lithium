@@ -137,17 +137,17 @@ echo $this->_render('element', 'menu');
 Where `menu` is the name of your element file, in this example `views/elements/menu.html.php`.  When using `$this->_render()`, all of the variables set in the controller are available to the element template.  You can pass variables declared in the view or additional static content using the third parameter to `$this->_render()`:
 ```
 $var1 = 'something';
-echo $this->_render('element', 'menu', array(
+echo $this->_render('element', 'menu', [
 	'var1' => $var1,
 	'var2' => 'something else'
-));
+]);
 ```
 
 If you need the element template to not have access to existing data passed to the parent template, use the alternate syntax that calls the `View` render method directly:
 ```
 echo $this->view()->render(
-	array('element' => 'menu'),
-	array('var1' => $var1, 'var2' => $var2)
+	['element' => 'menu'],
+	['var1' => $var1, 'var2' => $var2]
 );
 ```
 

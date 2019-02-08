@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\data\source\mongo_db;
@@ -34,9 +35,9 @@ class Result extends \lithium\data\source\Result {
 		$result = $this->_resource->getNext();
 
 		if ($result instanceof MongoGridFSFile) {
-			$result = array('file' => $result) + $result->file;
+			$result = ['file' => $result] + $result->file;
 		}
-		return array($this->_iterator, $result);
+		return [$this->_iterator, $result];
 	}
 }
 

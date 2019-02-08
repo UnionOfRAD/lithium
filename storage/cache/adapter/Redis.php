@@ -1,14 +1,16 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\storage\cache\adapter;
 
 use lithium\storage\Cache;
+use lithium\net\HostString;
 use Redis as RedisCore;
 
 /**
@@ -32,13 +34,13 @@ use Redis as RedisCore;
  * A simple configuration can be accomplished as follows:
  *
  * ```
- * Cache::config(array(
- *     'cache-config-name' => array(
+ * Cache::config([
+ *     'cache-config-name' => [
  *         'adapter' => 'Redis',
  *         'host' => '127.0.0.1:6379',
- *         'strategies => array('Serializer')
- *     )
- * ));
+ *         'strategies => ['Serializer']
+ *     ]
+ * ]);
  * ```
  *
  * The `'host'` key accepts a string argument in the format of ip:port where
@@ -51,9 +53,14 @@ use Redis as RedisCore;
 class Redis extends \lithium\storage\cache\Adapter {
 
 	/**
-	 * The default port used to connect to Redis servers, if none is specified.
+	 * The default host used to connect to the server.
 	 */
-	const CONN_DEFAULT_PORT = 6379;
+	const DEFAULT_HOST = '127.0.0.1';
+
+	/**
+	 * The default port used to connect to the server.
+	 */
+	const DEFAULT_PORT = 6379;
 
 	/**
 	 * Redis object instance used by this adapter.
@@ -75,21 +82,23 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 *          is otherwise set. Can be either a `strtotime()` compatible tring or TTL in
 	 *          seconds. To indicate items should not expire use `Cache::PERSIST`. Defaults
 	 *          to `+1 hour`.
-	 *        - `'host'` _string_: A string in the form of `'host:port'` indicating the Redis server
-	 *          to connect to. Defaults to `'127.0.0.1:6379'`.
+	 *        - `'host'` _string_: A string in the form of `'<host>'`, `'<host>:<port>'` or
+	 *          `':<port>'` indicating the host and/or port to connect to. When one or both are
+	 *          not provided uses general server defaults.
+	 *          To use Unix sockets specify the path to the socket (i.e. `'/path/to/socket'`).
 	 *        - `'persistent'` _boolean_: Indicates whether the adapter should use a persistent
 	 *          connection when attempting to connect to the Redis server. If `true`, it will
 	 *          attempt to reuse an existing connection when connecting, and the connection will
 	 *          not close when the request is terminated. Defaults to `false`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array(
-			'host' => '127.0.0.1:6379',
+	public function __construct(array $config = []) {
+		$defaults = [
 			'scope' => null,
 			'expiry' => '+1 hour',
+			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT,
 			'persistent' => false
-		);
+		];
 		parent::__construct($config + $defaults);
 	}
 
@@ -103,12 +112,16 @@ class Redis extends \lithium\storage\cache\Adapter {
 		if (!$this->connection) {
 			$this->connection = new RedisCore();
 		}
-		list($address, $port) = $this->_formatHost($this->_config['host']);
 		$method = $this->_config['persistent'] ? 'pconnect' : 'connect';
-		if ($port) {
-			$this->connection->{$method}($address, $port);
+
+		if (HostString::isSocket($this->_config['host'])) {
+			$this->connection->{$method}($this->_config['host']);
 		} else {
-			$this->connection->{$method}($address);
+			$host = HostString::parse($this->_config['host']) + [
+				'host' => static::DEFAULT_HOST,
+				'port' => static::DEFAULT_PORT
+			];
+			$this->connection->{$method}($host['host'], $host['port']);
 		}
 
 		if ($this->_config['scope']) {
@@ -136,8 +149,8 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 * @param array $params Parameter list to use when calling $method.
 	 * @return mixed Returns the result of the method call.
 	 */
-	public function __call($method, $params = array()) {
-		return call_user_func_array(array(&$this->connection, $method), $params);
+	public function __call($method, $params = []) {
+		return call_user_func_array([&$this->connection, $method], $params);
 	}
 
 	/**
@@ -153,23 +166,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 		if (parent::respondsTo($method, $internal)) {
 			return true;
 		}
-		return is_callable(array($this->connection, $method));
-	}
-
-	/**
-	 * Formats standard `'host:port'` or `'/path/to/socket'` strings
-	 *
-	 * @param mixed $host A host string in `'host:port'` or `'/path/to/socket'` format
-	 * @return array Returns an array of `Redis` connection definitions.
-	 */
-	protected function _formatHost($host) {
-		if (strpos($host, ':') > 0) {
-			list($address, $port) = explode(':', $host);
-		} else {
-			$address = $host;
-			$port = strpos($host, '/') === 0 ? null : self::CONN_DEFAULT_PORT;
-		}
-		return array($address, $port);
+		return is_callable([$this->connection, $method]);
 	}
 
 	/**
@@ -226,7 +223,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 */
 	public function read(array $keys) {
 		if (count($keys) > 1) {
-			$results = array();
+			$results = [];
 			$data = $this->connection->mGet($keys);
 
 			foreach ($data as $key => $item) {
@@ -240,7 +237,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 			return $results;
 		}
 		$result = $this->connection->get($key = current($keys));
-		return $result === false ? array() : array($key => $result);
+		return $result === false ? [] : [$key => $result];
 	}
 
 	/**

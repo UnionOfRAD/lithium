@@ -1,9 +1,10 @@
 <?php
 /**
- * Lithium: the most rad php framework
+ * li₃: the most RAD framework for PHP (http://li3.me)
  *
- * @copyright     Copyright 2016, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ * Copyright 2016, Union of RAD. All rights reserved. This source
+ * code is distributed under the terms of the BSD 3-Clause License.
+ * The full license text can be found in the LICENSE.txt file.
  */
 
 namespace lithium\analysis\logger\adapter;
@@ -28,7 +29,7 @@ class Syslog extends \lithium\core\Object {
 	 *
 	 * @var array
 	 */
-	protected $_priorities = array(
+	protected $_priorities = [
 		'emergency' => LOG_EMERG,
 		'alert'     => LOG_ALERT,
 		'critical'  => LOG_CRIT,
@@ -37,7 +38,7 @@ class Syslog extends \lithium\core\Object {
 		'notice'    => LOG_NOTICE,
 		'info'      => LOG_INFO,
 		'debug'     => LOG_DEBUG
-	);
+	];
 
 	/**
 	 * Constructor. Configures the `Syslog` adapter instance with the default settings. For
@@ -55,8 +56,8 @@ class Syslog extends \lithium\core\Object {
 	 *          `LOG_USER`.
 	 * @return void
 	 */
-	public function __construct(array $config = array()) {
-		$defaults = array('identity' => false, 'options'  => LOG_ODELAY, 'facility' => LOG_USER);
+	public function __construct(array $config = []) {
+		$defaults = ['identity' => false, 'options'  => LOG_ODELAY, 'facility' => LOG_USER];
 		parent::__construct($config + $defaults);
 	}
 
@@ -69,7 +70,6 @@ class Syslog extends \lithium\core\Object {
 	 */
 	public function write($priority, $message) {
 		$config = $this->_config;
-		$_priorities = $this->_priorities;
 
 		if (!$this->_isConnected) {
 			closelog();
@@ -77,8 +77,8 @@ class Syslog extends \lithium\core\Object {
 			$this->_isConnected = true;
 		}
 
-		return function($self, $params) use ($_priorities) {
-			$priority = $_priorities[$params['priority']];
+		return function($params) {
+			$priority = $this->_priorities[$params['priority']];
 			return syslog($priority, $params['message']);
 		};
 	}
