@@ -28,6 +28,7 @@
 	- Support for old-style rendering instructions i.e. `['template' => '/path/to/template']`
 	- The `FirePhp` logging adapter
 	- Support for old-style AOP filters
+	- Support for retrieving class parents via `_parents()`
 
 ## v1.2.0
 

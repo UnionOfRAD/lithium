@@ -855,8 +855,8 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testClassHasStaticAttributeTrue() {
-		$class = '\lithium\core\StaticObject';
-		$this->assertTrue($this->test->assertClassHasStaticAttribute('_parents', $class));
+		$class = '\lithium\test\Dispatcher';
+		$this->assertTrue($this->test->assertClassHasStaticAttribute('_classes', $class));
 
 		$results = $this->test->results();
 		$result = array_pop($results);
@@ -865,7 +865,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testClassHasStaticAttributeFalse() {
-		$class = '\lithium\core\StaticObject';
+		$class = '\lithium\test\Dispatcher';
 		$this->assertFalse($this->test->assertClassHasStaticAttribute('foobar', $class));
 
 		$results = $this->test->results();
@@ -875,7 +875,7 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual([
 			'expected' => 'foobar',
 			'result' => [
-				new \ReflectionProperty('lithium\core\StaticObject', '_parents')
+				new \ReflectionProperty('lithium\test\Dispatcher', '_classes')
 			]
 		], $result['data']);
 	}
@@ -888,7 +888,7 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testClassNotHasStaticAttributeTrue() {
-		$class = '\lithium\core\StaticObject';
+		$class = '\lithium\test\Dispatcher';
 		$this->assertTrue($this->test->assertClassNotHasStaticAttribute('foobar', $class));
 
 		$results = $this->test->results();
@@ -898,17 +898,17 @@ class UnitTest extends \lithium\test\Unit {
 	}
 
 	public function testClassNotHasStaticAttributeFalse() {
-		$class = '\lithium\core\StaticObject';
-		$this->assertFalse($this->test->assertClassNotHasStaticAttribute('_parents', $class));
+		$class = '\lithium\test\Dispatcher';
+		$this->assertFalse($this->test->assertClassNotHasStaticAttribute('_classes', $class));
 
 		$results = $this->test->results();
 		$result = array_pop($results);
 
 		$this->assertEqual('fail', $result['result']);
 		$this->assertEqual([
-			'expected' => '_parents',
+			'expected' => '_classes',
 			'result' => [
-				new \ReflectionProperty('lithium\core\StaticObject', '_parents')
+				new \ReflectionProperty('lithium\test\Dispatcher', '_classes')
 			]
 		], $result['data']);
 	}

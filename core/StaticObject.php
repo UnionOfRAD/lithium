@@ -82,14 +82,6 @@ class StaticObject {
 	/* Deprecated / BC */
 
 	/**
-	 * Keeps a cached list of each class' inheritance tree.
-	 *
-	 * @deprecated
-	 * @var array
-	 */
-	protected static $_parents = [];
-
-	/**
 	 * Exit immediately. Primarily used for overrides during testing.
 	 *
 	 * @deprecated
@@ -100,25 +92,6 @@ class StaticObject {
 		$message  = '`' . __METHOD__ . '()` has been deprecated.';
 		trigger_error($message, E_USER_DEPRECATED);
 		exit($status);
-	}
-
-	/**
-	 * Gets and caches an array of the parent methods of a class.
-	 *
-	 * @deprecated
-	 * @return array Returns an array of parent classes for the current class.
-	 */
-	protected static function _parents() {
-		$message  = '`' . __METHOD__ . '()` has been deprecated. For property merging ';
-		$message .= 'use `\lithium\core\MergeInheritable::_inherit()`';
-		trigger_error($message, E_USER_DEPRECATED);
-
-		$class = get_called_class();
-
-		if (!isset(self::$_parents[$class])) {
-			static::$_parents[$class] = class_parents($class);
-		}
-		return static::$_parents[$class];
 	}
 }
 

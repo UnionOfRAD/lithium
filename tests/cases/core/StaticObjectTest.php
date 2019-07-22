@@ -95,20 +95,6 @@ class StaticObjectTest extends \lithium\test\Unit {
 		$this->assertFalse(MockStaticInstantiator::respondsTo('_foo'));
 		$this->assertTrue(MockStaticInstantiator::respondsTo('_foo', 1));
 	}
-
-	/* Deprecated / BC */
-
-	public function testClassParents() {
-		$class = 'lithium\tests\mocks\core\MockStaticObject';
-		$class::parents(null);
-
-		$result = $class::parents();
-		$expected = ['lithium\core\StaticObject' => 'lithium\core\StaticObject'];
-		$this->assertEqual($expected, $result);
-
-		$cache = $class::parents(true);
-		$this->assertEqual([$class => $expected], $cache);
-	}
 }
 
 ?>

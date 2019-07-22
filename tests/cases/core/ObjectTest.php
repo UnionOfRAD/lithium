@@ -140,21 +140,11 @@ class ObjectTest extends \lithium\test\Unit {
 
 	public function testRespondsToProtectedMethod() {
 		$obj = new MockRequest();
-		$this->assertFalse($obj->respondsTo('_parents'));
-		$this->assertTrue($obj->respondsTo('_parents', 1));
+		$this->assertFalse($obj->respondsTo('_instance'));
+		$this->assertTrue($obj->respondsTo('_instance', 1));
 	}
 
 	/* Deprecated / BC */
-
-	public function testParents() {
-		$expected = ['lithium\core\Object' => 'lithium\core\Object'];
-
-		$result = MockObjectForParents::parents();
-		$this->assertEqual($expected, $result);
-
-		$result = MockObjectForParents::parents();
-		$this->assertEqual($expected, $result);
-	}
 
 	/**
 	 * Tests that an object can be instantiated using the magic `__set_state()` method.
