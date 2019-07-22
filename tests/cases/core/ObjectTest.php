@@ -143,23 +143,6 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->assertFalse($obj->respondsTo('_instance'));
 		$this->assertTrue($obj->respondsTo('_instance', 1));
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * Tests that an object can be instantiated using the magic `__set_state()` method.
-	 *
-	 * @deprecated
-	 */
-	public function testStateBasedInstantiation() {
-		$result = MockObjectConfiguration::__set_state([
-			'key' => 'value', '_protected' => 'test'
-		]);
-		$expected = 'lithium\tests\mocks\core\MockObjectConfiguration';
-		$this->assertEqual($expected, get_class($result));
-
-		$this->assertEqual('test', $result->getProtected());
-	}
 }
 
 ?>

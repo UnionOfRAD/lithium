@@ -26,10 +26,6 @@ use lithium\analysis\Inspector;
  *   automatically by `Object::__construct()`, but may be disabled by passing `'init' => false` to
  *   the constructor. The initializer is also used for automatically assigning object properties.
  *   See the documentation on the `_init()` method for more details.
- * - **Testing / misc.**: The `__set_state()` method provides a default implementation of the PHP
- *   magic method (works with `var_export()`) which can instantiate an object with a static method
- *   call. Finally, the `_stop()` method may be used instead of `exit()`, as it can be overridden
- *   for testing purposes.
  *
  * @link http://php.net/manual/en/language.oop5.magic.php#object.set-state
  * @see lithium\core\StaticObject
@@ -170,28 +166,6 @@ class Object {
 			$name = $this->_classes[$name];
 		}
 		return Libraries::instance(null, $name, $options);
-	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * PHP magic method used in conjunction with `var_export()` to allow objects to be
-	 * re-instantiated with their pre-existing properties and values intact. This method can be
-	 * called statically on any class that extends `Object` to return an instance of it.
-	 *
-	 * @deprecated
-	 * @param array $data An array of properties and values with which to re-instantiate the object.
-	 *        These properties can be both public and protected.
-	 * @return object Returns an instance of the requested object with the given properties set.
-	 */
-	public static function __set_state($data) {
-		$class = get_called_class();
-		$object = new $class();
-
-		foreach ($data as $property => $value) {
-			$object->{$property} = $value;
-		}
-		return $object;
 	}
 }
 

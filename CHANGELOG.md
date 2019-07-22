@@ -32,6 +32,7 @@
 	  this method in subclasses of `Controller` and `Model`.
 	- Support for generally halting executing via `_stop()`, it is still possible to call
 	  this method in subclasses of `Controller` and `Command.
+	- Support for generally using `__set_state()`.
 
 ## v1.2.0
 
