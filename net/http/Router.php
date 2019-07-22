@@ -9,8 +9,9 @@
 
 namespace lithium\net\http;
 
-use lithium\util\Inflector;
+use lithium\core\Libraries;
 use lithium\net\http\RoutingException;
+use lithium\util\Inflector;
 
 /**
  * The two primary responsibilities of the `Router` are to determine the correct set of
@@ -194,7 +195,9 @@ class Router extends \lithium\core\StaticObject {
 			'modifiers' => static::modifiers(),
 			'unicode' => static::$_unicode
 		];
-		return (static::$_configurations[$name][] = static::_instance('route', $config));
+		return static::$_configurations[$name][] = Libraries::instance(
+			null, 'route', $config, static::$_classes
+		);
 	}
 
 	/**
@@ -874,8 +877,7 @@ class Router extends \lithium\core\StaticObject {
 	 * Initialize `static::$_scopes` with a `lithium\core\Configuration` instance.
 	 */
 	protected static function _initScopes() {
-		static::$_scopes = static::_instance('configuration');
-
+		static::$_scopes = Libraries::instance(null, 'configuration', [], static::$_classes);
 		static::$_scopes->initConfig = function($name, $config) {
 			$defaults = [
 				'absolute' => false,

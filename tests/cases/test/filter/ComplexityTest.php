@@ -36,7 +36,6 @@ class ComplexityTest extends \lithium\test\Unit {
 	 * Helper array which stores the expected results to clean up the tests.
 	 */
 	protected $_metrics = [
-		'invokeMethod' => 7,
 		'respondsTo' => 1,
 		'_instance' => 2
 	];

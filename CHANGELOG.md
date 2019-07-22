@@ -85,6 +85,14 @@
 
 - The credit card validator now supports MasterCard 2-series. (Grayson Scherer)
 
+- `Libraries::instance()` now accepts a class map as a 4th parameter.
+
+- `Helper::attributes()` is now part of the public API.
+
+- `Model::hasFinder()` checks if a given finder is available, works for magic finders, too.
+
+- `Validator::has()` checks if a rule is available under given name.
+
 ### Changed
 
 - The undocumented feature in `Cache::{write,read,delete,increment,decrement}()`, where 
@@ -99,6 +107,10 @@
   operate in _legacy_ mode (see above). In this case it also doesn't depend on the 
   `mcrypt` extension anymore.
 
+- With HTML5 stating the type when linking or embedding scripts and styles using
+  `text/css` and `text/javascript` has become unnecessary. The `Html` helper will 
+  now generate `<link>`, `<style>` and `<script>` tags without such types.
+
 ### Deprecated
 
 - Short rendering instructions have now been officially deprecated and trigger a
@@ -109,19 +121,30 @@
   ['template' => ['path' => '/path/to/template']] // full valid syntax
   ```
 
-- `Object` and `StaticObject` are being step by step deprecated, as
+- `Object` and `StaticObject` are being deprecated, as
   `Object` is soft-reserved in PHP >=7. Chance is taken for a cleanup of the
-  class-hirarchy and unused/obsolete methods.
+  class-hirarchy and unused/obsolete methods. Newly created classes should
+  not inherit from `Object`/`StaticObject` anymore.
 
   | old | new |
   | --- | --- |
+  | `*Object::_instance()` | replaced, use `lithium\core\Libraries::instance()` |
+  | `analysis\Inspector::_instance()` |  replaced, use `lithium\core\Libraries::instance()` |
+  | `data\Model::_instance()` |  replaced, use `lithium\core\Libraries::instance()` |
   | `*Object::_parents()` | replaced, use `lithium\core\MergeInheritable::_inherit()` |
   | `*Object::_stop()` | _no replacement_, must reimplement |
   | `Object::__set_state()` | _no replacement_ |
+  | `*Object::invokeMethod()` | _no replacement_, use `call_user_func_array()` |
+  | `analysis\Inspector::invokeMethod()` | _no replacement_ |
+  | `Model::respondsTo()` | use `Model::hasFinder()` instead |
+  | `Validator::respondsTo()` | use `Validator::has()` instead |
+  | `*::respondsTo()` | use `is_callable()` instead |
 
 - Changing the default cipher and/or mode for the `Encrypt` strategy has been 
   deprecated and will cause the strategy to switch into _legacy_ mode. In legacy
   mode the deprecated `mcrypt` extension will still be used.
+
+- Deprecated the non-flatten mode in `Set::extract()` as it is rarely used.
 
 ### Fixed
 

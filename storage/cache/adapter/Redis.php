@@ -156,6 +156,7 @@ class Redis extends \lithium\storage\cache\Adapter {
 	/**
 	 * Determines if a given method can be called.
 	 *
+	 * @deprecated
 	 * @param string $method Name of the method.
 	 * @param boolean $internal Provide `true` to perform check from inside the
 	 *                class/object. When `false` checks also for public visibility;
@@ -163,6 +164,10 @@ class Redis extends \lithium\storage\cache\Adapter {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= 'Use `is_callable([$adapter->connection, \'<method>\'])` instead.';
+		trigger_error($message, E_USER_DEPRECATED);
+
 		if (parent::respondsTo($method, $internal)) {
 			return true;
 		}

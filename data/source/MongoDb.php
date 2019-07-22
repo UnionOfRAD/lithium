@@ -25,6 +25,7 @@ use lithium\aop\Filters;
 use lithium\util\Set;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
+use lithium\core\Libraries;
 use lithium\core\NetworkException;
 use lithium\net\HostString;
 
@@ -437,7 +438,7 @@ class MongoDb extends \lithium\data\Source {
 		if (!$fields && ($func = $this->_schema)) {
 			$fields = $func($this, $collection, $meta);
 		}
-		return $this->_instance('schema', compact('fields'));
+		return Libraries::instance(null, 'schema', compact('fields'), $this->_classes);
 	}
 
 	/**
@@ -474,6 +475,7 @@ class MongoDb extends \lithium\data\Source {
 	/**
 	 * Determines if a given method can be called.
 	 *
+	 * @deprecated
 	 * @param string $method Name of the method.
 	 * @param boolean $internal Provide `true` to perform check from inside the
 	 *                class/object. When `false` checks also for public visibility;
@@ -481,6 +483,10 @@ class MongoDb extends \lithium\data\Source {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= 'Use `is_callable([$adapter->server, \'<method>\'])` instead.';
+		trigger_error($message, E_USER_DEPRECATED);
+
 		$childRespondsTo = is_object($this->manager) && is_callable([$this->manager, $method]);
 		return parent::respondsTo($method, $internal) || $childRespondsTo;
 	}
@@ -587,7 +593,8 @@ class MongoDb extends \lithium\data\Source {
 			$readPreference = new ReadPreference($options['readPreference'], $options['readPreferenceTags']);
 			$resource = $this->manager->executeQuery("{$this->_config['database']}.{$source}", $readQuery, $readPreference);
 
-			$result = $this->_instance('result', compact('resource'));
+			$result = Libraries::instance(null, 'result', compact('resource'), $this->_classes);
+
 			$config = compact('result', 'query') + ['class' => 'set', 'defaults' => false];
 			$collection = $model::create([], $config);
 
@@ -757,7 +764,7 @@ class MongoDb extends \lithium\data\Source {
 		$config += compact('name', 'type', 'key', 'fieldName');
 		$config['from'] = $class;
 
-		return $this->_instance('relationship', $config + [
+		return Libraries::instance(null, 'relationship', $config + [
 			'strategy' => function($rel) use ($config, $class, $name, $type) {
 				if (isset($config['key'])) {
 					return [];
@@ -802,7 +809,7 @@ class MongoDb extends \lithium\data\Source {
 				}
 				return $result + ($hasLink ? [] : compact('link'));
 			}
-		]);
+		], $this->_classes);
 	}
 
 	/**

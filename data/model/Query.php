@@ -9,10 +9,11 @@
 
 namespace lithium\data\model;
 
-use lithium\util\Set;
-use lithium\data\Source;
-use lithium\core\ConfigException;
 use InvalidArgumentException;
+use lithium\core\ConfigException;
+use lithium\core\Libraries;
+use lithium\data\Source;
+use lithium\util\Set;
 
 /**
  * The `Query` class acts as a container for all information necessary to perform a particular
@@ -662,9 +663,8 @@ class Query extends \lithium\core\Object {
 		}
 		if ($model = $this->model()) {
 			return $model::schema($field);
-		} else {
-			return $this->_instance('schema');
 		}
+		return Libraries::instance(null, 'schema', [], $this->_classes);
 	}
 
 	/**
@@ -755,6 +755,7 @@ class Query extends \lithium\core\Object {
 	/**
 	 * Determines if a given method can be called.
 	 *
+	 * @deprecated
 	 * @param string $method Name of the method.
 	 * @param boolean $internal Provide `true` to perform check from inside the
 	 *                class/object. When `false` checks also for public visibility;
@@ -762,6 +763,10 @@ class Query extends \lithium\core\Object {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= "Use `is_callable([<class>, '<method>'])` instead.";
+		trigger_error($message, E_USER_DEPRECATED);
+
 		return isset($this->_config[$method]) || parent::respondsTo($method, $internal);
 	}
 

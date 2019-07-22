@@ -9,6 +9,8 @@
 
 namespace lithium\tests\mocks\net\http;
 
+use lithium\core\Libraries;
+
 class MockSocket extends \lithium\net\Socket {
 
 	public $data = null;
@@ -64,7 +66,9 @@ class MockSocket extends \lithium\net\Socket {
 
 	public function write($data) {
 		if (!is_object($data)) {
-			$data = $this->_instance($this->_classes['request'], (array) $data + $this->_config);
+			$data = Libraries::instance(
+				null, 'request', (array) $data + $this->_config, $this->_classes
+			);
 		}
 		$this->data = $data;
 		return true;

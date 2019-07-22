@@ -35,16 +35,6 @@ class RelationshipTest extends \lithium\test\Unit {
 		MockImage::reset();
 	}
 
-	public function testRespondsTo() {
-		$query = new Relationship([
-			'type' => 'belongsTo',
-			'fieldName' => 'bob',
-			'to' => $this->_image
-		]);
-		$this->assertTrue($query->respondsTo('foobarbaz'));
-		$this->assertFalse($query->respondsTo(0));
-	}
-
 	public function testHasManyKey() {
 		$config = [
 			'from' => $this->_gallery,
@@ -202,6 +192,25 @@ class RelationshipTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $relationship->query((object) [
 			'users' => new Collection(['data' => $keys])
 		]));
+	}
+
+	/* Deprecated / BC */
+
+	/**
+	 * @deprecated
+	 */
+	public function testRespondsTo() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$query = new Relationship([
+			'type' => 'belongsTo',
+			'fieldName' => 'bob',
+			'to' => $this->_image
+		]);
+		$this->assertTrue($query->respondsTo('foobarbaz'));
+		$this->assertFalse($query->respondsTo(0));
+
+		error_reporting($backup);
 	}
 }
 

@@ -9,8 +9,9 @@
 
 namespace lithium\tests\cases\console\command\create;
 
-use lithium\console\command\create\Controller;
+use ReflectionMethod;
 use lithium\console\Request;
+use lithium\console\command\create\Controller;
 use lithium\core\Libraries;
 
 class ControllerTest extends \lithium\test\Unit {
@@ -50,9 +51,11 @@ class ControllerTest extends \lithium\test\Unit {
 		$model = new Controller([
 			'request' => $this->request, 'classes' => $this->classes
 		]);
+		$method = new ReflectionMethod($model, '_class');
+		$method->setAccessible(true);
 
 		$expected = 'PostsController';
-		$result = $model->invokeMethod('_class', [$this->request]);
+		$result = $method->invokeArgs($model, [$this->request]);
 		$this->assertEqual($expected, $result);
 	}
 

@@ -127,12 +127,13 @@ class Service extends \lithium\core\Object {
 	 */
 	public function __call($method, $params = []) {
 		array_unshift($params, $method);
-		return $this->invokeMethod('send', $params);
+		return call_user_func_array(array($this, 'send'), $params);
 	}
 
 	/**
 	 * Determines if a given method can be called.
 	 *
+	 * @deprecated
 	 * @param string $method Name of the method.
 	 * @param boolean $internal Provide `true` to perform check from inside the
 	 *                class/object. When `false` checks also for public visibility;
@@ -140,6 +141,10 @@ class Service extends \lithium\core\Object {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= "Use `is_callable([<class>, '<method>'])` instead.";
+		trigger_error($message, E_USER_DEPRECATED);
+
 		return is_callable([$this, $method], true);
 	}
 
@@ -244,7 +249,7 @@ class Service extends \lithium\core\Object {
 		$response = $this->connection->send($request, $options);
 		$this->connection->close();
 
-		if ($response->status['code'] == 401 && $auth = $response->digest()) {
+		if ($response->status['code'] == 401 && ($auth = $response->digest())) {
 			$request->auth = $auth;
 			$this->connection->open(['message' => $request] + $options);
 			$response = $this->connection->send($request, $options);
@@ -274,7 +279,7 @@ class Service extends \lithium\core\Object {
 		$defaults = ['type' => 'form'];
 		$options += $defaults + $this->_config;
 
-		$request = $this->_instance('request', $options);
+		$request = Libraries::instance(null, 'request', $options, $this->_classes);
 		$request->path = str_replace('//', '/', "{$request->path}{$path}");
 		$request->method = $method = strtoupper($method);
 		$hasBody = in_array($method, ['POST', 'PUT', 'PATCH']);

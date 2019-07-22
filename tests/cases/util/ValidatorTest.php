@@ -1240,15 +1240,28 @@ class ValidatorTest extends \lithium\test\Unit {
 		$this->assertEqual(['id' => ['Bad ID']], $result);
 	}
 
-	public function testRespondsToParentCall() {
-		$this->assertTrue(Validator::respondsTo('invokeMethod'));
-		$this->assertFalse(Validator::respondsTo('fooBarBaz'));
+	public function testHas() {
+		$this->assertTrue(Validator::has('isAlphaNumeric'));
+		$this->assertTrue(Validator::has('isCreditCard'));
+
+		$this->assertTrue(Validator::has('creditCard'));
+		$this->assertTrue(Validator::has('CreditCard'));
+
+		$this->assertFalse(Validator::has('isFoobar'));
 	}
 
-	public function testRespondsToMagic() {
-		$this->assertTrue(Validator::respondsTo('isAlphaNumeric'));
-		$this->assertTrue(Validator::respondsTo('isCreditCard'));
-		$this->assertFalse(Validator::respondsTo('isFoobar'));
+	/* Deprecated / BC */
+
+	/**
+	 * @deprecated
+	 */
+	public function testRespondsToParentCall() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$this->assertTrue(Validator::respondsTo('invokeMethod'));
+		$this->assertFalse(Validator::respondsTo('fooBarBaz'));
+
+		error_reporting($backup);
 	}
 }
 

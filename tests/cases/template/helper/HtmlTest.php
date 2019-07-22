@@ -197,61 +197,57 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public function testScriptLinking() {
 		$result = $this->html->script('script.js');
-		$expected = '<script type="text/javascript" src="/js/script.js"></script>';
+		$expected = '<script src="/js/script.js"></script>';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->html->script('script');
-		$expected = '<script type="text/javascript" src="/js/script.js"></script>';
+		$expected = '<script src="/js/script.js"></script>';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->html->script('scriptaculous.js?load=effects');
-		$expected = '<script type="text/javascript"';
-		$expected .= ' src="/js/scriptaculous.js?load=effects"></script>';
+		$expected = '<script src="/js/scriptaculous.js?load=effects"></script>';
 		$this->assertEqual($expected, $result);
 
 		$result = $this->html->script('jquery-1.1.2');
-		$expected = '<script type="text/javascript" src="/js/jquery-1.1.2.js"></script>';
+		$expected = '<script src="/js/jquery-1.1.2.js"></script>';
 		$this->assertEqual($result, $expected);
 
 		$result = $this->html->script('jquery-1.1.2');
-		$expected = '<script type="text/javascript" src="/js/jquery-1.1.2.js"></script>';
+		$expected = '<script src="/js/jquery-1.1.2.js"></script>';
 		$this->assertEqual($result, $expected);
 
 		$result = $this->html->script('/plugin/js/jquery-1.1.2');
-		$expected = '<script type="text/javascript" src="/plugin/js/jquery-1.1.2.js"></script>';
+		$expected = '<script src="/plugin/js/jquery-1.1.2.js"></script>';
 		$this->assertEqual($result, $expected);
 
 		$result = $this->html->script('/some_other_path/myfile.1.2.2.min.js');
-		$expected = '<script type="text/javascript"';
-		$expected .= ' src="/some_other_path/myfile.1.2.2.min.js"></script>';
+		$expected = '<script src="/some_other_path/myfile.1.2.2.min.js"></script>';
 		$this->assertEqual($result, $expected);
 
 		$result = $this->html->script('some_other_path/myfile.1.2.2.min.js');
-		$expected = '<script type="text/javascript"';
-		$expected .= ' src="/js/some_other_path/myfile.1.2.2.min.js"></script>';
+		$expected = '<script src="/js/some_other_path/myfile.1.2.2.min.js"></script>';
 		$this->assertEqual($result, $expected);
 
 		$result = $this->html->script('some_other_path/myfile.1.2.2.min');
-		$expected = '<script type="text/javascript"';
-		$expected .= ' src="/js/some_other_path/myfile.1.2.2.min.js"></script>';
+		$expected = '<script src="/js/some_other_path/myfile.1.2.2.min.js"></script>';
 		$this->assertEqual($result, $expected);
 
 		$result = $this->html->script('http://example.com/jquery.js');
-		$expected = '<script type="text/javascript" src="http://example.com/jquery.js"></script>';
+		$expected = '<script src="http://example.com/jquery.js"></script>';
 		$this->assertEqual($result, $expected);
 
 		$result = $this->html->script('//example.com/jquery.js');
-		$expected = '<script type="text/javascript" src="//example.com/jquery.js"></script>';
+		$expected = '<script src="//example.com/jquery.js"></script>';
 		$this->assertEqual($result, $expected);
 
 		$result = $this->html->script(['prototype', 'scriptaculous']);
 		$this->assertPattern(
-			'/^\s*<script\s+type="text\/javascript"\s+src=".*js\/prototype\.js"[^<>]*><\/script>/',
+			'/^\s*<script\s+src=".*js\/prototype\.js"[^<>]*><\/script>/',
 			$result
 		);
 		$this->assertPattern('/<\/script>\s*<script[^<>]+>/', $result);
 		$this->assertPattern(
-			'/<script\s+type="text\/javascript"\s+src=".*js\/scriptaculous\.js"[^<>]*>' .
+			'/<script\s+src=".*js\/scriptaculous\.js"[^<>]*>' .
 			'<\/script>\s*$/',
 			$result
 		);
@@ -261,7 +257,6 @@ class HtmlTest extends \lithium\test\Unit {
 		]);
 
 		$this->assertTags($result, ['script' => [
-			'type' => 'text/javascript',
 			'src' => '/js/foo.js',
 			'async' => 'async',
 			'defer' => 'defer',
@@ -296,7 +291,7 @@ class HtmlTest extends \lithium\test\Unit {
 	public function testStyleLink() {
 		$result = $this->html->style('screen');
 		$expected = ['link' => [
-			'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'regex:/.*css\/screen\.css/'
+			'rel' => 'stylesheet', 'href' => 'regex:/.*css\/screen\.css/'
 		]];
 		$this->assertTags($result, $expected);
 
@@ -332,11 +327,11 @@ class HtmlTest extends \lithium\test\Unit {
 		$result = $this->html->style(['base', 'layout']);
 		$expected = [
 			'link' => [
-				'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'regex:/.*css\/base\.css/'
+				'rel' => 'stylesheet', 'href' => 'regex:/.*css\/base\.css/'
 			],
 			[
 				'link' => [
-					'rel' => 'stylesheet', 'type' => 'text/css',
+					'rel' => 'stylesheet',
 					'href' => 'regex:/.*css\/layout\.css/'
 				]
 			]
@@ -357,7 +352,7 @@ class HtmlTest extends \lithium\test\Unit {
 
 		$result = $this->context->scripts();
 		$this->assertTags($result, ['script' => [
-			'type' => 'text/javascript', 'src' => 'regex:/.*js\/application\.js/'
+			'src' => 'regex:/.*js\/application\.js/'
 		]]);
 
 		$result = trim($this->context->styles());
@@ -368,7 +363,7 @@ class HtmlTest extends \lithium\test\Unit {
 
 		$result = $this->context->styles();
 		$this->assertTags($result, ['link' => [
-			'rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'regex:/.*css\/base\.css/'
+			'rel' => 'stylesheet', 'href' => 'regex:/.*css\/base\.css/'
 		]]);
 	}
 
@@ -379,9 +374,9 @@ class HtmlTest extends \lithium\test\Unit {
 	public function testMultiNonInlineScriptsAndStyles() {
 		$result = $this->html->script(['foo', 'bar']);
 		$expected = [
-			['script' => ['type' => 'text/javascript', 'src' => 'regex:/.*\/foo\.js/']],
+			['script' => ['src' => 'regex:/.*\/foo\.js/']],
 			'/script',
-			['script' => ['type' => 'text/javascript', 'src' => 'regex:/.*\/bar\.js/']],
+			['script' => ['src' => 'regex:/.*\/bar\.js/']],
 			'/script'
 		];
 		$this->assertTags($result, $expected);

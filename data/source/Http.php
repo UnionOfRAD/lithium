@@ -9,9 +9,10 @@
 
 namespace lithium\data\source;
 
-use lithium\util\Text;
 use lithium\aop\Filters;
+use lithium\core\Libraries;
 use lithium\data\model\Query;
+use lithium\util\Text;
 
 /**
  * Http class to access data sources using `lithium\net\http\Service`.
@@ -92,7 +93,7 @@ class Http extends \lithium\data\Source {
 	protected function _init() {
 		$config = $this->_config;
 		unset($config['type']);
-		$this->connection = $this->_instance('service', $config);
+		$this->connection = Libraries::instance(null, 'service', $config, $this->_classes);
 		parent::_init();
 	}
 
@@ -119,7 +120,7 @@ class Http extends \lithium\data\Source {
 	public function __call($method, $params) {
 		if (!isset($this->_methods[$method])) {
 			if (method_exists($this->connection, $method)) {
-				return $this->connection->invokeMethod($method, $params);
+				return call_user_func_array(array($this->connection, $method), $params);
 			}
 			$this->_methods[$method] = ['path' => "/{$method}"];
 		}
@@ -144,6 +145,7 @@ class Http extends \lithium\data\Source {
 	/**
 	 * Determines if a given method can be called.
 	 *
+	 * @deprecated
 	 * @param string $method Name of the method.
 	 * @param boolean $internal Provide `true` to perform check from inside the
 	 *                class/object. When `false` checks also for public visibility;
@@ -151,6 +153,10 @@ class Http extends \lithium\data\Source {
 	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
 	 */
 	public function respondsTo($method, $internal = false) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= "Use `is_callable([<class>, '<method>'])` instead.";
+		trigger_error($message, E_USER_DEPRECATED);
+
 		return isset($this->_methods[$method]) || parent::respondsTo($method, $internal);
 	}
 
@@ -221,7 +227,7 @@ class Http extends \lithium\data\Source {
 	 * @return array - returns an empty array
 	 */
 	public function describe($entity, $fields = [], array $meta = []) {
-		return $this->_instance('schema', compact('fields', 'meta'));
+		return Libraries::instance(null, 'schema', compact('fields', 'meta'), $this->_classes);
 	}
 
 	/**
@@ -319,7 +325,9 @@ class Http extends \lithium\data\Source {
 	 */
 	public function relationship($class, $type, $name, array $options = []) {
 		if (isset($this->_classes['relationship'])) {
-			return $this->_instance('relationship', compact('type', 'name') + $options);
+			return Libraries::instance(
+				null, 'relationship', compact('type', 'name') + $options, $this->_classes
+			);
 		}
 		return null;
 	}

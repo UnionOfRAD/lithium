@@ -81,50 +81,64 @@ class HelperTest extends \lithium\test\Unit {
 	public function testAttributes() {
 		$attributes = ['value' => 1, 'title' => 'one'];
 		$expected = ' value="1" title="one"';
-		$result = $this->helper->testAttributes($attributes);
+		$result = $this->helper->attributes($attributes);
 		$this->assertEqual($expected, $result);
 
 		$attributes = ' value="1" title="one"';
-		$result = $this->helper->testAttributes('value="1" title="one"');
+		$result = $this->helper->attributes('value="1" title="one"');
 		$this->assertEqual($expected, $result);
 
 		$attributes = ['checked' => true, 'title' => 'one'];
 		$expected = ' checked="checked" title="one"';
-		$result = $this->helper->testAttributes($attributes);
+		$result = $this->helper->attributes($attributes);
 		$this->assertEqual($expected, $result);
 
 		$attributes = ['checked' => false];
-		$result = $this->helper->testAttributes($attributes);
+		$result = $this->helper->attributes($attributes);
 		$this->assertEqual('', $result);
 	}
 
 	public function testAttributeEscaping() {
 		$attributes = ['checked' => true, 'title' => '<foo>'];
 		$expected = ' checked="checked" title="&lt;foo&gt;"';
-		$result = $this->helper->testAttributes($attributes);
+		$result = $this->helper->attributes($attributes);
 		$this->assertEqual($expected, $result);
 
 		$attributes = ['checked' => true, 'title' => '<foo>'];
 		$expected = ' checked="checked" title="<foo>"';
-		$result = $this->helper->testAttributes($attributes, null, ['escape' => false]);
+		$result = $this->helper->attributes($attributes, null, ['escape' => false]);
 		$this->assertEqual($expected, $result);
 	}
 
 	public function testAttributeMinimization() {
 		$attributes = ['selected' => 1];
 		$expected = ' selected="selected"';
-		$result = $this->helper->testAttributes($attributes);
+		$result = $this->helper->attributes($attributes);
 		$this->assertEqual($expected, $result);
 
 		$attributes = ['selected' => true];
 		$expected = ' selected="selected"';
-		$result = $this->helper->testAttributes($attributes);
+		$result = $this->helper->attributes($attributes);
 		$this->assertEqual($expected, $result);
 
 		$attributes = ['selected' => 'true'];
 		$expected = ' selected="true"';
-		$result = $this->helper->testAttributes($attributes);
+		$result = $this->helper->attributes($attributes);
 		$this->assertEqual($expected, $result);
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public function testDeprecatedAttributes() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$attributes = ['value' => 1, 'title' => 'one'];
+		$expected = ' value="1" title="one"';
+		$result = $this->helper->testProtectedAttributes($attributes);
+		$this->assertEqual($expected, $result);
+
+		error_reporting($backup);
 	}
 
 	public function testInstantiationWithNoContext() {

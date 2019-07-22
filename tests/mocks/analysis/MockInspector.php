@@ -15,7 +15,6 @@ class MockInspector extends \lithium\analysis\Inspector {
 		$args = func_get_args();
 		return $args;
 	}
-
 }
 
 ?>

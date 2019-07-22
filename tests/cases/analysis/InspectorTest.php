@@ -340,8 +340,12 @@ class InspectorTest extends \lithium\test\Unit {
 	/**
 	 * Tests that the correct parameters are always passed in `Inspector::invokeMethod()`,
 	 * regardless of the number.
+	 *
+	 * @deprecated
 	 */
 	public function testMethodInvocationWithParameters() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
 		$class = 'lithium\tests\mocks\analysis\MockInspector';
 
 		$this->assertEqual($class::invokeMethod('foo'), []);
@@ -370,8 +374,9 @@ class InspectorTest extends \lithium\test\Unit {
 			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
 		];
 		$this->assertEqual($class::invokeMethod('foo', $params), $params);
-	}
 
+		error_reporting($backup);
+	}
 }
 
 ?>

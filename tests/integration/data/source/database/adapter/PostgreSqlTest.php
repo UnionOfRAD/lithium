@@ -9,11 +9,12 @@
 
 namespace lithium\tests\integration\data\source\database\adapter;
 
+use ReflectionMethod;
 use lithium\data\Schema;
 use lithium\data\model\Query;
 use lithium\data\source\database\adapter\PostgreSql;
-use lithium\tests\mocks\data\source\database\adapter\MockPostgreSql;
 use lithium\tests\fixture\model\gallery\Galleries;
+use lithium\tests\mocks\data\source\database\adapter\MockPostgreSql;
 
 class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 
@@ -164,25 +165,28 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testColumnAbstraction() {
-		$result = $this->_db->invokeMethod('_column', ['varchar']);
+		$method = new ReflectionMethod($this->_db, '_column');
+		$method->setAccessible(true);
+
+		$result = $method->invokeArgs($this->_db, ['varchar']);
 		$this->assertIdentical(['type' => 'string'], $result);
 
-		$result = $this->_db->invokeMethod('_column', ['tinyint(1)']);
+		$result = $method->invokeArgs($this->_db, ['tinyint(1)']);
 		$this->assertIdentical(['type' => 'boolean'], $result);
 
-		$result = $this->_db->invokeMethod('_column', ['varchar(255)']);
+		$result = $method->invokeArgs($this->_db, ['varchar(255)']);
 		$this->assertIdentical(['type' => 'string', 'length' => 255], $result);
 
-		$result = $this->_db->invokeMethod('_column', ['text']);
+		$result = $method->invokeArgs($this->_db, ['text']);
 		$this->assertIdentical(['type' => 'text'], $result);
 
-		$result = $this->_db->invokeMethod('_column', ['text']);
+		$result = $method->invokeArgs($this->_db, ['text']);
 		$this->assertIdentical(['type' => 'text'], $result);
 
-		$result = $this->_db->invokeMethod('_column', ['decimal(12,2)']);
+		$result = $method->invokeArgs($this->_db, ['decimal(12,2)']);
 		$this->assertIdentical(['type' => 'float', 'length' => 12, 'precision' => 2], $result);
 
-		$result = $this->_db->invokeMethod('_column', ['int(11)']);
+		$result = $method->invokeArgs($this->_db, ['int(11)']);
 		$this->assertIdentical(['type' => 'integer', 'length' => 11], $result);
 	}
 

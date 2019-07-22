@@ -9,18 +9,19 @@
 
 namespace lithium\data\source;
 
+use InvalidArgumentException;
 use PDO;
 use PDOException;
+use UnexpectedValueException;
+use lithium\aop\Filters;
+use lithium\core\ConfigException;
+use lithium\core\Libraries;
+use lithium\core\NetworkException;
+use lithium\data\model\Query;
+use lithium\data\model\QueryException;
+use lithium\util\Inflector;
 use lithium\util\Set;
 use lithium\util\Text;
-use lithium\util\Inflector;
-use lithium\core\ConfigException;
-use lithium\core\NetworkException;
-use lithium\aop\Filters;
-use lithium\data\model\QueryException;
-use lithium\data\model\Query;
-use InvalidArgumentException;
-use UnexpectedValueException;
 
 /**
  * The `Database` class provides the base-level abstraction for SQL-oriented relational
@@ -805,7 +806,7 @@ abstract class Database extends \lithium\data\Source {
 		$from = $class;
 		$fieldName = $this->relationFieldName($type, $name);
 		$config += compact('type', 'name', 'key', 'from', 'fieldName');
-		return $this->_instance('relationship', $config);
+		return Libraries::instance(null, 'relationship', $config, $this->_classes);
 	}
 
 	/**
@@ -1333,7 +1334,9 @@ abstract class Database extends \lithium\data\Source {
 			if ($result) {
 				$result .= ' ';
 			}
-			$join = is_array($join) ? $this->_instance('query', $join) : $join;
+			if (is_array($join)) {
+				$join = Libraries::instance(null, 'query', $join, $this->_classes);
+			}
 			$options['keys'] = ['mode', 'source', 'alias', 'constraints'];
 			$result .= $this->renderCommand('join', $join->export($this, $options));
 		}

@@ -9,6 +9,8 @@
 
 namespace lithium\tests\mocks\data\model;
 
+use lithium\core\Libraries;
+
 class MockDocumentSource extends \lithium\data\Source {
 
 	protected $_classes = [
@@ -22,7 +24,7 @@ class MockDocumentSource extends \lithium\data\Source {
 	public function disconnect() {}
 	public function sources($class = null) {}
 	public function describe($entity, $schema = [], array $meta = []) {
-		return $this->_instance('schema');
+		return Libraries::instance(null, 'schema', [], $this->_classes);
 	}
 	public function create($query, array $options = []) {}
 	public function update($query, array $options = []) {}

@@ -47,17 +47,17 @@ class MockProduct extends \lithium\data\Model {
 	];
 
 	public static function finders() {
-		$self = static::_object();
+		$self = static::object();
 		return $self->_finders;
 	}
 
 	public static function initializers() {
-		$self = static::_object();
+		$self = static::object();
 		return $self->_initializers;
 	}
 
 	public static function attribute($name) {
-		$self = static::_object();
+		$self = static::object();
 		return isset($self->$name) ? $self->$name : null;
 	}
 }

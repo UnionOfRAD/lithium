@@ -9,6 +9,8 @@
 
 namespace lithium\data;
 
+use lithium\core\Libraries;
+
 class DocumentSchema extends \lithium\data\Schema {
 
 	protected $_classes = [
@@ -92,7 +94,7 @@ class DocumentSchema extends \lithium\data\Schema {
 				$val = $model::create($val, $config);
 			} else {
 				$config['data'] = $val;
-				$val = $this->_instance($class, $config);
+				$val = Libraries::instance(null, $class, $config, $this->_classes);
 			}
 		} elseif ($class === 'set') {
 			$val = $val ?: [];

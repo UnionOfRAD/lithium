@@ -118,59 +118,6 @@ abstract class Helper extends \lithium\core\Object {
 	}
 
 	/**
-	 * Takes the defaults and current options, merges them and returns options which have
-	 * the default keys removed and full set of options as the scope.
-	 *
-	 * @param array $defaults
-	 * @param array $scope the complete set of options
-	 * @return array $scope, $options
-	 */
-	protected function _options(array $defaults, array $scope) {
-		$scope += $defaults;
-		$options = array_diff_key($scope, $defaults);
-		return [$scope, $options];
-	}
-
-	/**
-	 * Render a string template after applying context filters
-	 * Use examples in the Html::link() method:
-	 * `return $this->_render(__METHOD__, 'link', compact('title', 'url', 'options'), $scope);`
-	 *
-	 * @param string $method name of method that is calling the render (for context filters)
-	 * @param string $string template key (in Helper::_strings) to render
-	 * @param array $params associated array of template inserts {:key} will be replaced by value
-	 * @param array $options Available options:
-	 *              - `'handlers'` _array_: Before inserting `$params` inside the string template,
-	 *              `$this->_context`'s handlers are applied to each value of `$params` according
-	 *              to the key (e.g `$params['url']`, which is processed by the `'url'` handler
-	 *              via `$this->_context->applyHandler()`).
-	 *              The `'handlers'` option allow to set custom mapping beetween `$params`'s key and
-	 *              `$this->_context`'s handlers. e.g. the following handler:
-	 *              `'handlers' => ['url' => 'path']` will make `$params['url']` to be
-	 *              processed by the `'path'` handler instead of the `'url'` one.
-	 * @return string Rendered HTML
-	 */
-	protected function _render($method, $string, $params, array $options = []) {
-		$strings = $this->_strings;
-
-		if (isset($params['options']['scope'])) {
-			$options['scope'] = $params['options']['scope'];
-			unset($params['options']['scope']);
-		}
-
-		if ($this->_context) {
-			foreach ($params as $key => $value) {
-				$handler = isset($options['handlers'][$key]) ? $options['handlers'][$key] : $key;
-				$params[$key] = $this->_context->applyHandler(
-					$this, $method, $handler, $value, $options
-				);
-			}
-			$strings = $this->_context->strings();
-		}
-		return Text::insert(isset($strings[$string]) ? $strings[$string] : $string, $params);
-	}
-
-	/**
 	 * Converts a set of parameters to HTML attributes into a string.
 	 *
 	 * @see lithium\template\view\Renderer::__call()
@@ -189,7 +136,7 @@ abstract class Helper extends \lithium\core\Object {
 	 *        - `'append'` _string_: String to append to result. Defaults to `''`.
 	 * @return string Attribute string.
 	 */
-	protected function _attributes($params, $method = null, array $options = []) {
+	public function attributes($params, $method = null, array $options = []) {
 		$defaults = ['escape' => true, 'prepend' => ' ', 'append' => ''];
 		$options += $defaults;
 		$result = [];
@@ -232,6 +179,67 @@ abstract class Helper extends \lithium\core\Object {
 			return sprintf($options['format'], $this->escape($key), $this->escape($value));
 		}
 		return sprintf($options['format'], $key, $value);
+	}
+
+	/**
+	 * Takes the defaults and current options, merges them and returns options which have
+	 * the default keys removed and full set of options as the scope.
+	 *
+	 * @param array $defaults
+	 * @param array $scope the complete set of options
+	 * @return array $scope, $options
+	 */
+	protected function _options(array $defaults, array $scope) {
+		$scope += $defaults;
+		$options = array_diff_key($scope, $defaults);
+		return [$scope, $options];
+	}
+
+	/**
+	 * Render a string template after applying context filters
+	 * Use examples in the Html::link() method:
+	 * `return $this->_render(__METHOD__, 'link', compact('title', 'url', 'options'), $scope);`
+	 *
+	 * @param string $method name of method that is calling the render (for context filters)
+	 * @param string $string template key (in Helper::_strings) to render
+	 * @param array $params associated array of template inserts {:key} will be replaced by value
+	 * @param array $options Available options:
+	 *              - `'handlers'` _array_: Before inserting `$params` inside the string template,
+	 *              `$this->_context`'s handlers are applied to each value of `$params` according
+	 *              to the key (e.g `$params['url']`, which is processed by the `'url'` handler
+	 *              via `$this->_context->applyHandler()`).
+	 *              The `'handlers'` option allow to set custom mapping beetween `$params`'s key and
+	 *              `$this->_context`'s handlers. e.g. the following handler:
+	 *              `'handlers' => array('url' => 'path')` will make `$params['url']` to be
+	 *              processed by the `'path'` handler instead of the `'url'` one.
+	 * @return string Rendered HTML
+	 */
+	protected function _render($method, $string, $params, array $options = []) {
+		$strings = $this->_strings;
+
+		if (isset($params['options']['scope'])) {
+			$options['scope'] = $params['options']['scope'];
+			unset($params['options']['scope']);
+		}
+
+		if ($this->_context) {
+			foreach ($params as $key => $value) {
+				$handler = isset($options['handlers'][$key]) ? $options['handlers'][$key] : $key;
+				$params[$key] = $this->_context->applyHandler(
+					$this, $method, $handler, $value, $options
+				);
+			}
+			$strings = $this->_context->strings();
+		}
+		return Text::insert(isset($strings[$string]) ? $strings[$string] : $string, $params);
+	}
+
+	/* Deprecated / BC */
+
+	protected function _attributes($params, $method = null, array $options = []) {
+		$message  = '`' . __METHOD__ . '()` has been made public, use `Helper::attributes()`.';
+		trigger_error($message, E_USER_DEPRECATED);
+		return $this->attributes($params, $method, $options);
 	}
 }
 

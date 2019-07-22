@@ -12,6 +12,7 @@ namespace lithium\tests\cases\console\command;
 use lithium\console\command\Test;
 use lithium\console\Request;
 use lithium\core\Libraries;
+use lithium\tests\mocks\console\command\MockTest;
 
 class TestTest extends \lithium\test\Unit {
 
@@ -204,11 +205,11 @@ class TestTest extends \lithium\test\Unit {
 		mkdir($testDir, 0777, true);
 		Libraries::add('test_app', ['path' => $testApp]);
 		$request = new Request(['env' => ['working' => $testApp]]);
-		$command = new Test([
+		$command = new MockTest([
 			'request' => $request, 'classes' => $this->classes
 		]);
 		$expected = 'test_app\tests\cases\models';
-		$result = $command->invokeMethod('_path', ['tests\cases\models']);
+		$result = $command->path('tests\cases\models');
 		$this->assertIdentical($expected, $result);
 		Libraries::remove('test_app');
 		$this->_cleanUp();

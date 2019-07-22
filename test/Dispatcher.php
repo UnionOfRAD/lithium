@@ -86,9 +86,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return object Group object constructed with `$data`.
 	 */
 	protected static function _group($data) {
-		$group = Libraries::locate('test', static::$_classes['group']);
-		$class = static::_instance($group, compact('data'));
-		return $class;
+		return Libraries::instance(
+			'test', static::$_classes['group'], compact('data')
+		);
 	}
 
 	/**
@@ -102,9 +102,9 @@ class Dispatcher extends \lithium\core\StaticObject {
 	 * @return object Group object constructed with the test case or group passed in $options.
 	 */
 	protected static function _report($group, $options) {
-		$report = Libraries::locate('test', static::$_classes['report']);
-		$class = static::_instance($report, compact('group') + $options);
-		return $class;
+		return Libraries::instance(
+			'test', static::$_classes['report'], compact('group') + $options
+		);
 	}
 }
 

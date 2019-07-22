@@ -352,7 +352,7 @@ class Inspector {
 		$options += ['names' => $options['properties']];
 
 		return static::_items($reflClass, 'getProperties', $options)->map(function($item) use ($class) {
-			$modifiers = array_values(Inspector::invokeMethod('_modifiers', [$item]));
+			$modifiers = array_values(static::_modifiers($item));
 			$setAccess = (
 				array_intersect($modifiers, ['private', 'protected']) !== []
 			);
@@ -460,9 +460,9 @@ class Inspector {
 		$classes = [];
 
 		if ($file = $options['file']) {
-			$loaded = static::_instance('collection', ['data' => array_map(
+			$loaded = Libraries::instance(null, 'collection', ['data' => array_map(
 				function($class) { return new ReflectionClass($class); }, $list
-			)]);
+			)], static::$_classes);
 			$classFiles = $loaded->getFileName();
 
 			if (in_array($file, $files) && !in_array($file, $classFiles)) {
@@ -597,7 +597,7 @@ class Inspector {
 		if ($options['public']) {
 			$data = array_filter($data, function($item) { return $item->isPublic(); });
 		}
-		return static::_instance('collection', compact('data'));
+		return Libraries::instance(null, 'collection', compact('data'), static::$_classes);
 	}
 
 	/**
@@ -615,35 +615,41 @@ class Inspector {
 		});
 	}
 
+	/* Deprecated / BC */
+
+	/**
+	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
+	 * `forward_static_call_array()`.
+	 *
+	 * @deprecated
+	 * @param string $method Name of the method to call.
+	 * @param array $params Parameter list to use when calling `$method`.
+	 * @return mixed Returns the result of the method call.
+	 */
+	public static function invokeMethod($method, $params = []) {
+		$message  = '`' . __METHOD__ . '()` has been deprecated.';
+		trigger_error($message, E_USER_DEPRECATED);
+
+		return forward_static_call_array([get_called_class(), $method], $params);
+	}
+
 	/**
 	 * Returns an instance of a class with given `config`. The `name` could be a key from the
 	 * `classes` array, a fully namespaced class name, or an object. Typically this method is used
 	 * in `_init` to create the dependencies used in the current class.
 	 *
+	 * @deprecated
 	 * @param string|object $name A `$_classes` key or fully-namespaced class name.
 	 * @param array $options The configuration passed to the constructor.
 	 * @see  lithium\core\Libraries::instance()
 	 * @return object An object instance of the given value in `$name`.
 	 */
 	protected static function _instance($name, array $options = []) {
-		if (is_string($name) && isset(static::$_classes[$name])) {
-			$name = static::$_classes[$name];
-		}
-		return Libraries::instance(null, $name, $options);
+		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
+		$message .= 'Please use Libraries::instance(), with the 4th parameter instead.';
+		trigger_error($message, E_USER_DEPRECATED);
+		return Libraries::instance(null, $name, $options, static::$_classes);
 	}
-
-	/**
-	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
-	 * `forward_static_call_array()`.
-	 *
-	 * @param string $method Name of the method to call.
-	 * @param array $params Parameter list to use when calling `$method`.
-	 * @return mixed Returns the result of the method call.
-	 */
-	public static function invokeMethod($method, $params = []) {
-		return forward_static_call_array([get_called_class(), $method], $params);
-	}
-
 }
 
 ?>

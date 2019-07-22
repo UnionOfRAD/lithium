@@ -9,6 +9,7 @@
 
 namespace lithium\tests\mocks\data;
 
+use lithium\core\Libraries;
 use lithium\util\Inflector;
 
 class MockSource extends \lithium\data\Source {
@@ -127,7 +128,7 @@ class MockSource extends \lithium\data\Source {
 	public function describe($entity, $schema = [], array $meta = []) {
 		$source = '_' . Inflector::camelize($entity, false);
 		$fields = isset($this->$source) ? $this->$source : [];
-		return $this->_instance('schema', compact('fields'));
+		return Libraries::instance(null, 'schema', compact('fields'), $this->_classes);
 	}
 
 	public function create($query, array $options = []) {
@@ -172,7 +173,7 @@ class MockSource extends \lithium\data\Source {
 		$from = $class;
 		$fieldName = $field;
 		$config += compact('type', 'name', 'key', 'from', 'fieldName');
-		return $this->_instance('relationship', $config);
+		return Libraries::instance(null, 'relationship', $config, $this->_classes);
 	}
 
 	public function calculation($type, $query, array $options = []) {

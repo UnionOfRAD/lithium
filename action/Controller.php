@@ -9,10 +9,10 @@
 
 namespace lithium\action;
 
-use lithium\util\Inflector;
 use lithium\action\DispatchException;
-use lithium\core\Libraries;
 use lithium\aop\Filters;
+use lithium\core\Libraries;
+use lithium\util\Inflector;
 
 /**
  * The `Controller` class is the fundamental building block of your application's request/response
@@ -146,7 +146,10 @@ class Controller extends \lithium\core\Object {
 	 */
 	public function __construct(array $config = []) {
 		$defaults = [
-			'request' => null, 'response' => [], 'render' => [], 'classes' => []
+			'request' => null,
+			'response' => [],
+			'render' => [],
+			'classes' => []
 		];
 		parent::__construct($config + $defaults);
 	}
@@ -163,7 +166,9 @@ class Controller extends \lithium\core\Object {
 		$this->_inherit(['_render']);
 
 		$this->request = $this->request ?: $this->_config['request'];
-		$this->response = $this->_instance('response', $this->_config['response']);
+		$this->response = Libraries::instance(
+			null, 'response', $this->_config['response'], $this->_classes
+		);
 
 		if (!$this->request || $this->_render['type']) {
 			return;
@@ -203,7 +208,7 @@ class Controller extends \lithium\core\Object {
 			}
 			$this->_render['template'] = $this->_render['template'] ?: $action;
 
-			if ($result = $this->invokeMethod($action, $args)) {
+			if ($result = call_user_func_array(array($this, $action), $args)) {
 				if (is_string($result)) {
 					$this->render(['text' => $result]);
 					return $this->response;

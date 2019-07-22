@@ -31,8 +31,42 @@ class ObjectTest extends \lithium\test\Unit {
 	}
 
 	/**
+	 * Test configuration handling
+	 */
+	public function testObjectConfiguration() {
+		$expected = ['testScalar' => 'default', 'testArray' => ['default']];
+		$config = new MockObjectConfiguration();
+		$this->assertEqual($expected, $config->getConfig());
+
+		$config = new MockObjectConfiguration(['autoConfig' => ['testInvalid']]);
+		$this->assertEqual($expected, $config->getConfig());
+
+		$expected = ['testScalar' => 'override', 'testArray' => ['default', 'override']];
+		$config = new MockObjectConfiguration(['autoConfig' => [
+			'testScalar', 'testArray' => 'merge'
+		]] + $expected);
+		$this->assertEqual($expected, $config->getConfig());
+	}
+
+	/* Deprecated / BC */
+
+	public function testRespondsTo() {
+		$obj = new MockRequest();
+		$this->assertTrue($this->respondsTo('get'));
+		$this->assertFalse($this->respondsTo('fooBarBaz'));
+	}
+
+	public function testRespondsToProtectedMethod() {
+		$obj = new MockRequest();
+		$this->assertFalse($obj->respondsTo('_instance'));
+		$this->assertTrue($obj->respondsTo('_instance', 1));
+	}
+
+	/**
 	 * Tests that the correct parameters are always passed in Object::invokeMethod(), regardless of
 	 * the number.
+	 *
+	 * @deprecated
 	 */
 	public function testMethodInvocationWithParameters() {
 		$callable = new MockCallable();
@@ -85,24 +119,6 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->assertEqual($result['params'], $expected);
 	}
 
-	/**
-	 * Test configuration handling
-	 */
-	public function testObjectConfiguration() {
-		$expected = ['testScalar' => 'default', 'testArray' => ['default']];
-		$config = new MockObjectConfiguration();
-		$this->assertEqual($expected, $config->getConfig());
-
-		$config = new MockObjectConfiguration(['autoConfig' => ['testInvalid']]);
-		$this->assertEqual($expected, $config->getConfig());
-
-		$expected = ['testScalar' => 'override', 'testArray' => ['default', 'override']];
-		$config = new MockObjectConfiguration(['autoConfig' => [
-			'testScalar', 'testArray' => 'merge'
-		]] + $expected);
-		$this->assertEqual($expected, $config->getConfig());
-	}
-
 	public function testInstanceWithClassesKey() {
 		$object = new MockInstantiator();
 		$expected = 'lithium\tests\mocks\core\MockRequest';
@@ -130,18 +146,6 @@ class ObjectTest extends \lithium\test\Unit {
 		$this->assertException('/^Invalid class lookup/', function() use ($object) {
 			$object->instance(false);
 		});
-	}
-
-	public function testRespondsTo() {
-		$obj = new MockRequest();
-		$this->assertTrue($this->respondsTo('get'));
-		$this->assertFalse($this->respondsTo('fooBarBaz'));
-	}
-
-	public function testRespondsToProtectedMethod() {
-		$obj = new MockRequest();
-		$this->assertFalse($obj->respondsTo('_instance'));
-		$this->assertTrue($obj->respondsTo('_instance', 1));
 	}
 }
 

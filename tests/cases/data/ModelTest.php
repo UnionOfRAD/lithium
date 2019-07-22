@@ -1086,10 +1086,10 @@ class ModelTest extends \lithium\test\Unit {
 	}
 
 	public function testLazyLoad() {
-		$object = MockPost::invokeMethod('_object');
+		$object = MockPost::object();
 		$object->belongsTo = ['Unexisting'];
 		MockPost::config();
-		MockPost::invokeMethod('_initialize', ['lithium\tests\mocks\data\MockPost']);
+		MockPost::initialize('lithium\tests\mocks\data\MockPost');
 		$exception = 'Related model class \'lithium\tests\mocks\data\Unexisting\' not found.';
 		$this->assertException($exception, function() {
 			MockPost::relations('Unexisting');
@@ -1165,23 +1165,17 @@ class ModelTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, MockPost::meta());
 	}
 
-	public function testRespondsTo() {
-		$this->assertTrue(MockPost::respondsTo('findByFoo'));
-		$this->assertTrue(MockPost::respondsTo('findFooByBar'));
-		$this->assertFalse(MockPost::respondsTo('fooBarBaz'));
-	}
+	public function testHasFinder() {
+		$this->assertTrue(MockPost::hasFinder('all'));
+		$this->assertTrue(MockPost::hasFinder('count'));
 
-	public function testRespondsToParentCall() {
-		$this->assertTrue(MockPost::respondsTo('invokeMethod'));
-		$this->assertFalse(MockPost::respondsTo('fooBarBaz'));
-	}
+		$this->assertTrue(MockPost::hasFinder('findByFoo'));
+		$this->assertTrue(MockPost::hasFinder('findFooByBar'));
 
-	public function testRespondsToInstanceMethod() {
-		$this->assertFalse(MockPost::respondsTo('foo_Bar_Baz'));
-		MockPost::instanceMethods([
-			'foo_Bar_Baz' => function($entity) {}
-		]);
-		$this->assertTrue(MockPost::respondsTo('foo_Bar_Baz'));
+		$this->assertTrue(MockPost::hasFinder('fooByBar'));
+		$this->assertTrue(MockPost::hasFinder('FooByBar'));
+
+		$this->assertFalse(MockPost::hasFinder('fooBarBaz'));
 	}
 
 	public function testFieldName() {
@@ -1249,6 +1243,35 @@ class ModelTest extends \lithium\test\Unit {
 		$post->sync(1);
 		$post->validates(['rules' => $validates]);
 		$this->assertEmpty($post->errors());
+	}
+
+	/* Deprecated / BC */
+
+	/**
+	 * @deprecated
+	 */
+	public function testRespondsToParentCall() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$this->assertTrue(MockPost::respondsTo('invokeMethod'));
+		$this->assertFalse(MockPost::respondsTo('fooBarBaz'));
+
+		error_reporting($backup);
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public function testRespondsToInstanceMethod() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
+		$this->assertFalse(MockPost::respondsTo('foo_Bar_Baz'));
+		MockPost::instanceMethods([
+			'foo_Bar_Baz' => function($entity) {}
+		]);
+		$this->assertTrue(MockPost::respondsTo('foo_Bar_Baz'));
+
+		error_reporting($backup);
 	}
 }
 

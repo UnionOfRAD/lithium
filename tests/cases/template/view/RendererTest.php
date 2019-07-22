@@ -288,11 +288,19 @@ class RendererTest extends \lithium\test\Unit {
 		$this->assertEqual("foo\n\tbar", trim($this->subject->head()));
 	}
 
+	/* Deprecated / BC */
+
+	/**
+	 * @deprecated
+	 */
 	public function testRespondsTo() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
 		$this->assertTrue($this->subject->respondsTo('foobarbaz'));
 		$this->assertFalse($this->subject->respondsTo(0));
-	}
 
+		error_reporting($backup);
+	}
 }
 
 ?>

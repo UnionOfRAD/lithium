@@ -9,6 +9,8 @@
 
 namespace lithium\tests\mocks\data\source\database\adapter;
 
+use lithium\core\Libraries;
+
 class MockAdapter extends \lithium\data\source\Database {
 
 	/**
@@ -64,7 +66,7 @@ class MockAdapter extends \lithium\data\source\Database {
 	}
 
 	public function describe($entity, $fields = [], array $meta = []) {
-		return $this->_instance('schema', compact('fields', 'meta'));
+		return Libraries::instance(null, 'schema', compact('fields', 'meta'), $this->_classes);
 	}
 
 	public function create($record, array $options = []) {

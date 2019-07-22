@@ -257,6 +257,11 @@ class Set {
 		$defaults = ['flatten' => true];
 		$options += $defaults;
 
+		if (!$options['flatten']) {
+			$message = 'Non-flatten mode in `Set::extract()` has been deprecated.';
+			trigger_error($message, E_USER_DEPRECATED);
+		}
+
 		if (!$data) {
 			return [];
 		}

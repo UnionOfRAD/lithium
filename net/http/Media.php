@@ -727,7 +727,7 @@ class Media extends \lithium\core\StaticObject {
 			unset($handler['view']);
 
 			$config = $handler + ['response' => &$response];
-			return static::_instance($class, $config);
+			return Libraries::instance(null, $class, $config, static::$_classes);
 		});
 	}
 
@@ -1081,7 +1081,7 @@ class Media extends \lithium\core\StaticObject {
 	 * Initialize `static::$_scopes` with a `lithium\core\Configuration` instance.
 	 */
 	protected static function _initScopes() {
-		static::$_scopes = static::_instance('configuration');
+		static::$_scopes = Libraries::instance(null, 'configuration', [], static::$_classes);
 		static::$_scopes->initConfig = function($name, $config) {
 			$defaults = [
 				'absolute' => false,

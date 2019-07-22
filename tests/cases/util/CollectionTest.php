@@ -489,13 +489,27 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertTrue($collection->valid());
 	}
 
+	/* Deprecated / BC */
+
+	/**
+	 * @deprecated
+	 */
 	public function testRespondsToParent() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
 		$collection = new Collection();
 		$this->assertTrue($collection->respondsTo('invokeMethod'));
 		$this->assertFalse($collection->respondsTo('fooBarBaz'));
+
+		error_reporting($backup);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function testRespondsToMagic() {
+		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
+
 		$collection = new Collection([
 			'data' => [
 				new Entity([
@@ -507,6 +521,8 @@ class CollectionTest extends \lithium\test\Unit {
 		$this->assertTrue($collection->respondsTo('instances'));
 		$this->assertTrue($collection->respondsTo('foobar'));
 		$this->assertFalse($collection->respondsTo('foobarbaz'));
+
+		error_reporting($backup);
 	}
 }
 

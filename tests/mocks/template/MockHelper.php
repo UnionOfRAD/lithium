@@ -27,7 +27,10 @@ class MockHelper extends \lithium\template\Helper {
 		return $this->_options($defaults, $options);
 	}
 
-	public function testAttributes($params, $method = null, array $options = []) {
+	/**
+	 * @deprecated
+	 */
+	public function testProtectedAttributes($params, $method = null, array $options = []) {
 		return $this->_attributes($params, $method, $options);
 	}
 
