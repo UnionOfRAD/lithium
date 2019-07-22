@@ -28,16 +28,17 @@ class ComplexityTest extends \lithium\test\Unit {
 	 */
 	protected $_paths = [
 		'complexity' => 'lithium\test\filter\Complexity',
-		'testClass' => 'lithium\core\StaticObject',
-		'testClassTest' => 'lithium\tests\cases\core\StaticObjectTest'
+		'testClass' => 'lithium\test\Dispatcher',
+		'testClassTest' => 'lithium\tests\cases\test\DispatcherTest'
 	];
 
 	/**
 	 * Helper array which stores the expected results to clean up the tests.
 	 */
 	protected $_metrics = [
-		'respondsTo' => 1,
-		'_instance' => 2
+		'run' => 1,
+		'_group' => 1,
+		'_report' => 1
 	];
 
 	/**
@@ -51,7 +52,7 @@ class ComplexityTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests the `apply` method which provides a high-level interface to the complexity generation.
-	 * It tests the cyclomatic complexity of the lithium\core\StaticObject class and its methods.
+	 * It tests the cyclomatic complexity of the lithium\test\Dispatcher class and its methods.
 	 *
 	 * @see lithium\test\filter\Complexity::apply()
 	 */
@@ -83,7 +84,7 @@ class ComplexityTest extends \lithium\test\Unit {
 		Complexity::apply($this->report, $group->tests());
 
 		$results = Complexity::analyze($this->report);
-		$expected = ['class' => [$this->_paths['testClass'] => 3.3]];
+		$expected = ['class' => [$this->_paths['testClass'] => 1.0]];
 		foreach ($this->_metrics as $method => $metric) {
 			$expected['max'][$this->_paths['testClass'] . '::' . $method . '()'] = $metric;
 		}
