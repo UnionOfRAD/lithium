@@ -11,7 +11,6 @@ namespace lithium\tests\cases\core;
 
 use lithium\aop\Filters;
 use lithium\tests\mocks\core\MockRequest;
-use lithium\tests\mocks\core\MockStaticInstantiator;
 use lithium\tests\mocks\core\MockStaticObject;
 
 /**
@@ -27,33 +26,6 @@ class StaticObjectTest extends \lithium\test\Unit {
 
 	public function tearDown() {
 		error_reporting($this->_backup);
-	}
-
-	public function testInstanceWithClassesKey() {
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class(MockStaticInstantiator::instance('request'));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceWithNamespacedClass() {
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class(MockStaticInstantiator::instance(
-			'lithium\tests\mocks\core\MockRequest'
-		));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceWithObject() {
-		$request = new MockRequest();
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class(MockStaticInstantiator::instance($request));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceFalse() {
-		$this->assertException('/^Invalid class lookup/', function() {
-			MockStaticInstantiator::instance(false);
-		});
 	}
 }
 

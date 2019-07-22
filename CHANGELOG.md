@@ -35,6 +35,7 @@
 	- Support for generally using `__set_state()`.
 	- Support for generally using `respondsTo()`.
 	- Support for generally using `invokeMethod()`.
+	- Support for generally using `_instance()`.
 
 
 ## v1.2.0

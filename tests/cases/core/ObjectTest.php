@@ -16,7 +16,6 @@ use lithium\tests\mocks\core\MockExposed;
 use lithium\tests\mocks\core\MockCallable;
 use lithium\tests\mocks\core\MockObjectForParents;
 use lithium\tests\mocks\core\MockObjectConfiguration;
-use lithium\tests\mocks\core\MockInstantiator;
 
 class ObjectTest extends \lithium\test\Unit {
 
@@ -46,37 +45,6 @@ class ObjectTest extends \lithium\test\Unit {
 			'testScalar', 'testArray' => 'merge'
 		]] + $expected);
 		$this->assertEqual($expected, $config->getConfig());
-	}
-
-	/* Deprecated / BC */
-
-	public function testInstanceWithClassesKey() {
-		$object = new MockInstantiator();
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class($object->instance('request'));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceWithNamespacedClass() {
-		$object = new MockInstantiator();
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class($object->instance('lithium\tests\mocks\core\MockRequest'));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceWithObject() {
-		$object = new MockInstantiator();
-		$request = new MockRequest();
-		$expected = 'lithium\tests\mocks\core\MockRequest';
-		$result = get_class($object->instance($request));
-		$this->assertEqual($expected, $result);
-	}
-
-	public function testInstanceFalse() {
-		$object = new MockInstantiator();
-		$this->assertException('/^Invalid class lookup/', function() use ($object) {
-			$object->instance(false);
-		});
 	}
 }
 
