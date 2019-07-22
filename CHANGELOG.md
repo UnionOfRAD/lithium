@@ -28,7 +28,10 @@
 	- Support for old-style rendering instructions i.e. `['template' => '/path/to/template']`
 	- The `FirePhp` logging adapter
 	- Support for old-style AOP filters
-	- Support for retrieving class parents via `_parents()`
+	- Support for gernally retrieving class parents via `_parents()`, it is still possible to call
+	  this method in subclasses of `Controller` and `Model`.
+	- Support for generally halting executing via `_stop()`, it is still possible to call
+	  this method in subclasses of `Controller` and `Command.
 
 ## v1.2.0
 

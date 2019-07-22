@@ -78,21 +78,6 @@ class StaticObject {
 		}
 		return Libraries::instance(null, $name, $options);
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * Exit immediately. Primarily used for overrides during testing.
-	 *
-	 * @deprecated
-	 * @param integer|string $status integer range 0 to 254, string printed on exit
-	 * @return void
-	 */
-	protected static function _stop($status = 0) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated.';
-		trigger_error($message, E_USER_DEPRECATED);
-		exit($status);
-	}
 }
 
 ?>

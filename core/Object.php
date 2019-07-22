@@ -193,19 +193,6 @@ class Object {
 		}
 		return $object;
 	}
-
-	/**
-	 * Exit immediately. Primarily used for overrides during testing.
-	 *
-	 * @deprecated
-	 * @param integer|string $status integer range 0 to 254, string printed on exit
-	 * @return void
-	 */
-	protected function _stop($status = 0) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated.';
-		trigger_error($message, E_USER_DEPRECATED);
-		exit($status);
-	}
 }
 
 ?>
