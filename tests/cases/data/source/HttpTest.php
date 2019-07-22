@@ -340,35 +340,6 @@ class HttpTest extends \lithium\test\Unit {
 		$result = (string) $http->last->request;
 		$this->assertEqual($expected, $result);
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsTo() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$http = new Http();
-		$this->assertFalse($http->respondsTo('refactor'));
-		$this->assertTrue($http->respondsTo('create'));
-		$this->assertTrue($http->respondsTo('read'));
-
-		error_reporting($backup);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsToParentCall() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$http = new Http();
-		$this->assertTrue($http->respondsTo('invokeMethod'));
-		$this->assertFalse($http->respondsTo('fooBarBaz'));
-
-		error_reporting($backup);
-	}
 }
 
 ?>

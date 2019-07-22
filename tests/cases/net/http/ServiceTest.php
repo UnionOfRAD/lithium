@@ -290,21 +290,6 @@ class ServiceTest extends \lithium\test\Unit {
 		$response = $http->get('/http_auth/', [], ['return' => 'response']);
 		$this->assertEqual('success', $response->body());
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsTo() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$query = new Service();
-		$this->assertTrue($query->respondsTo('foobarbaz'));
-		$this->assertFalse($query->respondsTo(0));
-
-		error_reporting($backup);
-	}
 }
 
 ?>

@@ -406,26 +406,6 @@ class Validator extends \lithium\core\StaticObject {
 	}
 
 	/**
-	 * Determines if a given method can be called.
-	 *
-	 * @deprecated
-	 * @param string $method Name of the method.
-	 * @param boolean $internal Provide `true` to perform check from inside the
-	 *                class/object. When `false` checks also for public visibility;
-	 *                defaults to `false`.
-	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
-	 */
-	public static function respondsTo($method, $internal = false) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
-		$message .= "Use `Validator::has()` or `is_callable([<class>, '<method>'])` instead.";
-		trigger_error($message, E_USER_DEPRECATED);
-
-		$rule = preg_replace("/^is([A-Z][A-Za-z0-9]+)$/", '$1', $method);
-		$rule[0] = strtolower($rule[0]);
-		return isset(static::$_rules[$rule]) || parent::respondsTo($method, $internal);
-	}
-
-	/**
 	 * Checks a set of values against a specified rules list. This method may be used to validate
 	 * any arbitrary array of data against a set of validation rules.
 	 *

@@ -584,32 +584,6 @@ class MemcacheTest extends \lithium\test\Integration {
 		$result = $this->_conn->get('primary:key1');
 		$this->assertEqual($expected, $result);
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsTo() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$this->assertTrue($this->memcache->respondsTo('touch'));
-		$this->assertFalse($this->memcache->respondsTo('foobarbaz'));
-
-		error_reporting($backup);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsToParentCall() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$this->assertTrue($this->memcache->respondsTo('invokeMethod'));
-		$this->assertFalse($this->memcache->respondsTo('fooBarBaz'));
-
-		error_reporting($backup);
-	}
 }
 
 ?>

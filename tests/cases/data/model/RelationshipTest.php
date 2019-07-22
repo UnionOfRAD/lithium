@@ -193,25 +193,6 @@ class RelationshipTest extends \lithium\test\Unit {
 			'users' => new Collection(['data' => $keys])
 		]));
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsTo() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$query = new Relationship([
-			'type' => 'belongsTo',
-			'fieldName' => 'bob',
-			'to' => $this->_image
-		]);
-		$this->assertTrue($query->respondsTo('foobarbaz'));
-		$this->assertFalse($query->respondsTo(0));
-
-		error_reporting($backup);
-	}
 }
 
 ?>

@@ -252,21 +252,6 @@ class CouchDbTest extends \lithium\test\Unit {
 		$this->assertEqual(CouchDb::enabled('booleans'), true);
 		$this->assertEqual(CouchDb::enabled('relationships'), false);
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsTo() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$couchdb = new CouchDb($this->_testConfig);
-		$this->assertTrue($couchdb->respondsTo('foobarbaz'));
-		$this->assertFalse($couchdb->respondsTo(0));
-
-		error_reporting($backup);
-	}
 }
 
 ?>

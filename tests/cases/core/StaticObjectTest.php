@@ -29,16 +29,6 @@ class StaticObjectTest extends \lithium\test\Unit {
 		error_reporting($this->_backup);
 	}
 
-	public function testRespondsTo() {
-		$this->assertTrue(MockStaticInstantiator::respondsTo('invokeMethod'));
-		$this->assertFalse(MockStaticInstantiator::respondsTo('fooBarBaz'));
-	}
-
-	public function testRespondsToProtectedMethod() {
-		$this->assertFalse(MockStaticInstantiator::respondsTo('_foo'));
-		$this->assertTrue(MockStaticInstantiator::respondsTo('_foo', 1));
-	}
-
 	/**
 	 * Tests that the correct parameters are always passed in `StaticObject::invokeMethod()`,
 	 * regardless of the number.

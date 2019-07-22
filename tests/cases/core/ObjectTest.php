@@ -50,18 +50,6 @@ class ObjectTest extends \lithium\test\Unit {
 
 	/* Deprecated / BC */
 
-	public function testRespondsTo() {
-		$obj = new MockRequest();
-		$this->assertTrue($this->respondsTo('get'));
-		$this->assertFalse($this->respondsTo('fooBarBaz'));
-	}
-
-	public function testRespondsToProtectedMethod() {
-		$obj = new MockRequest();
-		$this->assertFalse($obj->respondsTo('_instance'));
-		$this->assertTrue($obj->respondsTo('_instance', 1));
-	}
-
 	/**
 	 * Tests that the correct parameters are always passed in Object::invokeMethod(), regardless of
 	 * the number.

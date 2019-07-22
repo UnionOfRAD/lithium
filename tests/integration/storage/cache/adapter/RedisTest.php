@@ -567,33 +567,6 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->redis->info();
 		$this->assertInternalType('array', $result, 'redis method dispatch failed');
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsTo() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$this->assertTrue($this->redis->respondsTo('bgsave'));
-		$this->assertTrue($this->redis->respondsTo('dbSize'));
-		$this->assertFalse($this->redis->respondsTo('foobarbaz'));
-
-		error_reporting($backup);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsToParentCall() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$this->assertTrue($this->redis->respondsTo('invokeMethod'));
-		$this->assertFalse($this->redis->respondsTo('fooBarBaz'));
-
-		error_reporting($backup);
-	}
 }
 
 ?>

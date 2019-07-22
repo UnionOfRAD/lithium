@@ -1594,20 +1594,6 @@ class FormTest extends \lithium\test\Unit {
 		$this->assertEqual($post, $this->form->binding('post'));
 		$this->assertEqual($info, $this->form->binding('info'));
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsTo() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$this->assertTrue($this->form->respondsTo('foobarbaz'));
-		$this->assertFalse($this->form->respondsTo(0));
-
-		error_reporting($backup);
-	}
 }
 
 ?>

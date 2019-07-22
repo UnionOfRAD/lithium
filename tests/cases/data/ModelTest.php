@@ -1244,35 +1244,6 @@ class ModelTest extends \lithium\test\Unit {
 		$post->validates(['rules' => $validates]);
 		$this->assertEmpty($post->errors());
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsToParentCall() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$this->assertTrue(MockPost::respondsTo('invokeMethod'));
-		$this->assertFalse(MockPost::respondsTo('fooBarBaz'));
-
-		error_reporting($backup);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsToInstanceMethod() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$this->assertFalse(MockPost::respondsTo('foo_Bar_Baz'));
-		MockPost::instanceMethods([
-			'foo_Bar_Baz' => function($entity) {}
-		]);
-		$this->assertTrue(MockPost::respondsTo('foo_Bar_Baz'));
-
-		error_reporting($backup);
-	}
 }
 
 ?>

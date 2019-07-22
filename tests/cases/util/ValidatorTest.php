@@ -1249,20 +1249,6 @@ class ValidatorTest extends \lithium\test\Unit {
 
 		$this->assertFalse(Validator::has('isFoobar'));
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsToParentCall() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$this->assertTrue(Validator::respondsTo('invokeMethod'));
-		$this->assertFalse(Validator::respondsTo('fooBarBaz'));
-
-		error_reporting($backup);
-	}
 }
 
 ?>

@@ -765,22 +765,6 @@ class QueryTest extends \lithium\test\Unit {
 			$query->export($db);
 		});
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsTo() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$query = new Query();
-		$this->assertTrue($query->respondsTo('calculate'));
-		$this->assertFalse($query->respondsTo('foobarbaz'));
-
-		error_reporting($backup);
-	}
-
 }
 
 ?>

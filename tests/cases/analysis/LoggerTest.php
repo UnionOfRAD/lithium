@@ -199,33 +199,6 @@ class LoggerTest extends \lithium\test\Unit {
 		unlink($base . '/info_secondary.log');
 
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsToParentCall() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$this->assertTrue(Logger::respondsTo('invokeMethod'));
-		$this->assertFalse(Logger::respondsTo('fooBarBaz'));
-
-		error_reporting($backup);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function testRespondsToMagic() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$this->assertTrue(Logger::respondsTo('emergency'));
-		$this->assertTrue(Logger::respondsTo('debug'));
-		$this->assertFalse(Logger::respondsTo('foobar'));
-
-		error_reporting($backup);
-	}
 }
 
 ?>
