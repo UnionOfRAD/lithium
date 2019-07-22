@@ -114,38 +114,6 @@ class Object {
 	/* Deprecated / BC */
 
 	/**
-	 * Calls a method on this object with the given parameters. Provides an OO wrapper
-	 * for call_user_func_array, and improves performance by using straight method calls
-	 * in most cases.
-	 *
-	 * @deprecated
-	 * @param string $method  Name of the method to call
-	 * @param array $params  Parameter list to use when calling $method
-	 * @return mixed  Returns the result of the method call
-	 */
-	public function invokeMethod($method, $params = []) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated.';
-		trigger_error($message, E_USER_DEPRECATED);
-
-		switch (count($params)) {
-			case 0:
-				return $this->{$method}();
-			case 1:
-				return $this->{$method}($params[0]);
-			case 2:
-				return $this->{$method}($params[0], $params[1]);
-			case 3:
-				return $this->{$method}($params[0], $params[1], $params[2]);
-			case 4:
-				return $this->{$method}($params[0], $params[1], $params[2], $params[3]);
-			case 5:
-				return $this->{$method}($params[0], $params[1], $params[2], $params[3], $params[4]);
-			default:
-				return call_user_func_array([&$this, $method], $params);
-		}
-	}
-
-	/**
 	 * Returns an instance of a class with given `config`. The `name` could be a key from the
 	 * `classes` array, a fully-namespaced class name, or an object. Typically this method is used
 	 * in `_init` to create the dependencies used in the current class.

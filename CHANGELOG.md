@@ -34,6 +34,8 @@
 	  this method in subclasses of `Controller` and `Command.
 	- Support for generally using `__set_state()`.
 	- Support for generally using `respondsTo()`.
+	- Support for generally using `invokeMethod()`.
+
 
 ## v1.2.0
 

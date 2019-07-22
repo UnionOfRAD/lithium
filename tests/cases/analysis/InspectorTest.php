@@ -336,47 +336,6 @@ class InspectorTest extends \lithium\test\Unit {
 		$this->assertFalse(Inspector::isCallable('lithium\action\Dispatcher', '_callable', 0));
 		$this->assertTrue(Inspector::isCallable('lithium\action\Dispatcher', '_callable', 1));
 	}
-
-	/**
-	 * Tests that the correct parameters are always passed in `Inspector::invokeMethod()`,
-	 * regardless of the number.
-	 *
-	 * @deprecated
-	 */
-	public function testMethodInvocationWithParameters() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$class = 'lithium\tests\mocks\analysis\MockInspector';
-
-		$this->assertEqual($class::invokeMethod('foo'), []);
-		$this->assertEqual($class::invokeMethod('foo', ['bar']), ['bar']);
-
-		$params = ['one', 'two'];
-		$this->assertEqual($class::invokeMethod('foo', $params), $params);
-
-		$params = ['short', 'parameter', 'list'];
-		$this->assertEqual($class::invokeMethod('foo', $params), $params);
-
-		$params = ['a', 'longer', 'parameter', 'list'];
-		$this->assertEqual($class::invokeMethod('foo', $params), $params);
-
-		$params = ['a', 'much', 'longer', 'parameter', 'list'];
-		$this->assertEqual($class::invokeMethod('foo', $params), $params);
-
-		$params = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
-		$this->assertEqual($class::invokeMethod('foo', $params), $params);
-
-		$params = ['an', 'extremely', 'long', 'list', 'of', 'parameters'];
-		$this->assertEqual($class::invokeMethod('foo', $params), $params);
-
-		$params = [
-			'if', 'you', 'have', 'a', 'parameter', 'list', 'this',
-			'long', 'then', 'UR', 'DOIN', 'IT', 'RONG'
-		];
-		$this->assertEqual($class::invokeMethod('foo', $params), $params);
-
-		error_reporting($backup);
-	}
 }
 
 ?>

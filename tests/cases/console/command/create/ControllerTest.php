@@ -67,8 +67,11 @@ class ControllerTest extends \lithium\test\Unit {
 			'request' => $this->request, 'classes' => $this->classes
 		]);
 
+		$method = new ReflectionMethod($model, '_use');
+		$method->setAccessible(true);
+
 		$expected = 'create_test\\models\\Posts';
-		$result = $model->invokeMethod('_use', [$this->request]);
+		$result = $method->invokeArgs($model, [$this->request]);
 		$this->assertEqual($expected, $result);
 	}
 

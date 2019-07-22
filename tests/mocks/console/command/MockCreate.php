@@ -18,6 +18,10 @@ class MockCreate extends \lithium\console\command\Create {
 	public function save($template, $params = []) {
 		return $this->_save($template, $params);
 	}
+
+	public function namespace($request, $options  = []) {
+		return parent::_namespace($request, $options);
+	}
 }
 
 ?>

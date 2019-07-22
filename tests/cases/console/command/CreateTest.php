@@ -73,11 +73,11 @@ class CreateTest extends \lithium\test\Unit {
 		$this->request->params['command'] = 'one';
 
 		$expected = 'create_test\\two';
-		$result = $create->invokeMethod('_namespace', [
+		$result = $create->namespace(
 			$this->request, [
 				'spaces' => ['one' => 'two']
 			]
-		]);
+		);
 		$this->assertEqual($expected, $result);
 	}
 
