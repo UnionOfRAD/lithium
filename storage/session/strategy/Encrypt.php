@@ -73,7 +73,7 @@ use lithium\security\Random;
  * @link http://php.net/mcrypt.ciphers.php List of supported ciphers.
  * @link http://php.net/mcrypt.constants.php List of supported modes.
  */
-class Encrypt extends \lithium\core\Object {
+class Encrypt extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Default configuration.

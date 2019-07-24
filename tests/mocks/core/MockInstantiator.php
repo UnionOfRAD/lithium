@@ -12,7 +12,7 @@ namespace lithium\tests\mocks\core;
 /**
  * @deprecated
  */
-class MockInstantiator extends \lithium\core\Object {
+class MockInstantiator extends \lithium\core\ObjectDeprecated {
 
 	protected $_classes = ['request' => 'lithium\tests\mocks\core\MockRequest'];
 

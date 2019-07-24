@@ -21,7 +21,7 @@ use lithium\core\Libraries;
  * session handling, as well as allowing these three methods to be filtered as
  * per the Lithium filtering system.
  */
-class Php extends \lithium\core\Object {
+class Php extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Default ini settings for this session adapter. Will disabl cookie lifetime,

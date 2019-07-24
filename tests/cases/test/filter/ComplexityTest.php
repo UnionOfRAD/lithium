@@ -28,8 +28,8 @@ class ComplexityTest extends \lithium\test\Unit {
 	 */
 	protected $_paths = [
 		'complexity' => 'lithium\test\filter\Complexity',
-		'testClass' => 'lithium\core\StaticObject',
-		'testClassTest' => 'lithium\tests\cases\core\StaticObjectTest'
+		'testClass' => 'lithium\core\StaticObjectDeprecated',
+		'testClassTest' => 'lithium\tests\cases\core\StaticObjectDeprecatedTest'
 	];
 
 	/**

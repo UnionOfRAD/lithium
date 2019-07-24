@@ -813,14 +813,14 @@ EOD;
 			],
 		]);
 
-		$analysis = list($docblock, $debugger) = Libraries::locate('analysis', null, [
+		$analysis = Libraries::locate('analysis', null, [
 			'recursive' => false,
 			'format' => false,
 		]);
+		sort($analysis);
 
-		$this->assertCount(2, $analysis);
-		$this->assertPattern('/Docblock\.php/', $docblock);
-		$this->assertPattern('/Debugger\.php/', $debugger);
+		$this->assertPattern('/Debugger\.php/', $analysis[0]);
+		$this->assertPattern('/Docblock\.php/', $analysis[1]);
 
 		error_reporting($original);
 	}

@@ -33,7 +33,7 @@ use lithium\core\ClassNotFoundException;
  * @see lithium\action\Response
  * @see lithium\action\Controller
  */
-class Dispatcher extends \lithium\core\StaticObject {
+class Dispatcher extends \lithium\core\StaticObjectDeprecated {
 
 	/**
 	 * Fully-namespaced router class reference.  Class must implement a `parse()` method,

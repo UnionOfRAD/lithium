@@ -12,7 +12,7 @@ namespace lithium\g11n\catalog;
 /**
  * This is the foundation class for all g11n catalog adapters.
  */
-class Adapter extends \lithium\core\Object {
+class Adapter extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Reads data.

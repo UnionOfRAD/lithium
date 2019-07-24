@@ -28,7 +28,7 @@ class InspectorTest extends \lithium\test\Unit {
 	 */
 	public function testBasicMethodInspection() {
 		$class = 'lithium\analysis\Debugger';
-		$parent = 'lithium\core\StaticObject';
+		$parent = 'lithium\core\StaticObjectDeprecated';
 
 		$expected = array_diff(get_class_methods($class), get_class_methods($parent));
 		$result = array_keys(Inspector::methods($class, 'extents'));
@@ -49,7 +49,7 @@ class InspectorTest extends \lithium\test\Unit {
 		$result = Inspector::methods($this, null);
 		$this->assertInstanceOf('ReflectionMethod', $result[0]);
 
-		$result = Inspector::info('lithium\core\Object::_init()');
+		$result = Inspector::info('lithium\core\ObjectDeprecated::_init()');
 		$expected = '_init';
 		$this->assertEqual($expected, $result['name']);
 

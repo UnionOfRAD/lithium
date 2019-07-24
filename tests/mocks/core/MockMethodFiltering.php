@@ -12,7 +12,7 @@ namespace lithium\tests\mocks\core;
 /**
  * @deprecated
  */
-class MockMethodFiltering extends \lithium\core\Object {
+class MockMethodFiltering extends \lithium\core\ObjectDeprecated {
 
 	public function method($data) {
 		$data[] = 'Starting outer method call';

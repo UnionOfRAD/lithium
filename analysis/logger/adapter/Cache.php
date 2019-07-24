@@ -34,7 +34,7 @@ use lithium\util\Text;
  *
  * @see lithium\storage\Cache
  */
-class Cache extends \lithium\core\Object {
+class Cache extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Classes used by `Cache`.

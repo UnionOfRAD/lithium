@@ -25,7 +25,7 @@ use lithium\core\Libraries;
  * ```
  *
  */
-class Command extends \lithium\core\Object {
+class Command extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * A Request object.

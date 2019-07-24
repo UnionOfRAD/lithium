@@ -12,7 +12,7 @@ namespace lithium\tests\mocks\core;
 /**
  * @deprecated
  */
-class MockExposed extends \lithium\core\Object {
+class MockExposed extends \lithium\core\ObjectDeprecated {
 
 	protected $_internal = 'secret';
 

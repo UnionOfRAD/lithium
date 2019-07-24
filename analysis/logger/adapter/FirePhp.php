@@ -78,7 +78,7 @@ trigger_error($message, E_USER_DEPRECATED);
  * @link http://www.firephp.org/Wiki/Reference/Protocol FirePHP Protocol Reference
  * @link http://php.net/function.json-encode.php PHP Manual: `json_encode()`
  */
-class FirePhp extends \lithium\core\Object {
+class FirePhp extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * These headers are specified by FirePHP and get added as headers to the response.

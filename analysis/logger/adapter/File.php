@@ -31,7 +31,7 @@ use lithium\core\Libraries;
  *
  * @see lithium\analysis\logger\adapter\File::__construct()
  */
-class File extends \lithium\core\Object {
+class File extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Constructor.

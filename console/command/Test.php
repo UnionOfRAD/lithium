@@ -30,8 +30,8 @@ class Test extends \lithium\console\Command {
 	 *
 	 * For example:
 	 * ```sh
-	 * lithium test lithium/tests/cases/core/ObjectTest.php --filters=Coverage
-	 * lithium test lithium/tests/cases/core/ObjectTest.php --filters=Coverage,Profiler
+	 * lithium test lithium/tests/cases/core/LibrariesTest.php --filters=Coverage
+	 * lithium test lithium/tests/cases/core/LibrariesTest.php --filters=Coverage,Profiler
 	 * ```
 	 *
 	 * @var string Name of a filter or a comma separated list of filter names. Builtin filters:
@@ -184,7 +184,7 @@ class Test extends \lithium\console\Command {
 	 * test(s) may be absolute or relative to the current working directory.
 	 *
 	 * ```sh
-	 * li3 test lithium/tests/cases/core/ObjectTest.php
+	 * li3 test lithium/tests/cases/core/LibrariesTest.php
 	 * li3 test lithium/tests/cases/core
 	 * ```
 	 *
@@ -270,11 +270,11 @@ class Test extends \lithium\console\Command {
 	 * This method can be thought of the reverse of `Libraries::path()`.
 	 *
 	 * ```
-	 * lithium/tests/cases/core/ObjectTest.php -> lithium\tests\cases\core\ObjectTest
-	 * lithium/tests/cases/core                -> lithium\tests\cases\core
-	 * lithium/core/Object.php                 -> lithium\core\Object
-	 * lithium/core/                           -> lithium\core
-	 * lithium/core                            -> lithium\core
+	 * lithium/tests/cases/core/LibrariesTest.php -> lithium\tests\cases\core\LibrariesTest
+	 * lithium/tests/cases/core                   -> lithium\tests\cases\core
+	 * lithium/core/Libraries.php                 -> lithium\core\Libraries
+	 * lithium/core/                              -> lithium\core
+	 * lithium/core                               -> lithium\core
 	 * ```
 	 *
 	 * @see lithium\core\Libraries::path()

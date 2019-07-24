@@ -45,7 +45,7 @@ trigger_error($message, E_USER_DEPRECATED);
  * ```
  * @deprecated Please use an alternative mocking framework, i.e. Mockery.
  */
-class MockerChain extends \lithium\core\Object {
+class MockerChain extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Data to be used in the class.

@@ -27,7 +27,7 @@ use lithium\core\ClassNotFoundException;
  * @see lithium\template\adapter\File
  * @see lithium\template\adapter\Simple
  */
-abstract class Renderer extends \lithium\core\Object {
+abstract class Renderer extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * These configuration variables will automatically be assigned to their corresponding protected

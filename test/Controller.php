@@ -20,7 +20,7 @@ use lithium\net\http\Router;
  * The Test Controller for running the html version of the test suite
  *
  */
-class Controller extends \lithium\core\Object {
+class Controller extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Saved context.

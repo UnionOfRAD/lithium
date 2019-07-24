@@ -16,7 +16,7 @@ use lithium\util\Text;
  * resources for writing output and errors, as well as shell coloring information, and the response
  * status code for the currently-executing command.
  */
-class Response extends \lithium\core\Object {
+class Response extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Output stream, STDOUT

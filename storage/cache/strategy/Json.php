@@ -12,7 +12,7 @@ namespace lithium\storage\cache\strategy;
 /**
  * A JSON encoder/decoder strategy.
  */
-class Json extends \lithium\core\Object {
+class Json extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Write strategy method.

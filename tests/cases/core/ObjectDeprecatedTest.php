@@ -14,11 +14,14 @@ use lithium\tests\mocks\core\MockRequest;
 use lithium\tests\mocks\core\MockMethodFiltering;
 use lithium\tests\mocks\core\MockExposed;
 use lithium\tests\mocks\core\MockCallable;
-use lithium\tests\mocks\core\MockObjectForParents;
-use lithium\tests\mocks\core\MockObjectConfiguration;
+use lithium\tests\mocks\core\MockObjectDeprecatedForParents;
+use lithium\tests\mocks\core\MockObjectDeprecatedConfiguration;
 use lithium\tests\mocks\core\MockInstantiator;
 
-class ObjectTest extends \lithium\test\Unit {
+/**
+ * @deprecated
+ */
+class ObjectDeprecatedTest extends \lithium\test\Unit {
 
 	protected $_backup = null;
 
@@ -35,14 +38,14 @@ class ObjectTest extends \lithium\test\Unit {
 	 */
 	public function testObjectConfiguration() {
 		$expected = ['testScalar' => 'default', 'testArray' => ['default']];
-		$config = new MockObjectConfiguration();
+		$config = new MockObjectDeprecatedConfiguration();
 		$this->assertEqual($expected, $config->getConfig());
 
-		$config = new MockObjectConfiguration(['autoConfig' => ['testInvalid']]);
+		$config = new MockObjectDeprecatedConfiguration(['autoConfig' => ['testInvalid']]);
 		$this->assertEqual($expected, $config->getConfig());
 
 		$expected = ['testScalar' => 'override', 'testArray' => ['default', 'override']];
-		$config = new MockObjectConfiguration(['autoConfig' => [
+		$config = new MockObjectDeprecatedConfiguration(['autoConfig' => [
 			'testScalar', 'testArray' => 'merge'
 		]] + $expected);
 		$this->assertEqual($expected, $config->getConfig());
@@ -63,12 +66,12 @@ class ObjectTest extends \lithium\test\Unit {
 	}
 
 	public function testParents() {
-		$expected = ['lithium\core\Object' => 'lithium\core\Object'];
+		$expected = ['lithium\core\ObjectDeprecated' => 'lithium\core\ObjectDeprecated'];
 
-		$result = MockObjectForParents::parents();
+		$result = MockObjectDeprecatedForParents::parents();
 		$this->assertEqual($expected, $result);
 
-		$result = MockObjectForParents::parents();
+		$result = MockObjectDeprecatedForParents::parents();
 		$this->assertEqual($expected, $result);
 	}
 
@@ -78,10 +81,10 @@ class ObjectTest extends \lithium\test\Unit {
 	 * @deprecated
 	 */
 	public function testStateBasedInstantiation() {
-		$result = MockObjectConfiguration::__set_state([
+		$result = MockObjectDeprecatedConfiguration::__set_state([
 			'key' => 'value', '_protected' => 'test'
 		]);
-		$expected = 'lithium\tests\mocks\core\MockObjectConfiguration';
+		$expected = 'lithium\tests\mocks\core\MockObjectDeprecatedConfiguration';
 		$this->assertEqual($expected, get_class($result));
 
 		$this->assertEqual('test', $result->getProtected());

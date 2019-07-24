@@ -18,7 +18,7 @@ namespace lithium\g11n\multibyte\adapter;
  *
  * @link http://php.net/book.mbstring.php
  */
-class Mbstring extends \lithium\core\Object {
+class Mbstring extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Determines if this adapter is enabled by checking if the `mbstring` extension is loaded.

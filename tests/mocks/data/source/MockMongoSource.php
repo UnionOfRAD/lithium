@@ -12,7 +12,7 @@ namespace lithium\tests\mocks\data\source;
 use MongoId;
 use lithium\tests\mocks\data\source\mongo_db\MockResultResource;
 
-class MockMongoSource extends \lithium\core\Object {
+class MockMongoSource extends \lithium\core\ObjectDeprecated {
 
 	public $resultSets = [];
 

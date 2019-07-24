@@ -29,7 +29,7 @@ use lithium\util\Set;
  * @see lithium\data\Model
  * @see lithium\data\Source
  */
-class Query extends \lithium\core\Object {
+class Query extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Array containing mappings of relationship and field names, which allow database results to

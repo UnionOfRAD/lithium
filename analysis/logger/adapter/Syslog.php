@@ -15,7 +15,7 @@ namespace lithium\analysis\logger\adapter;
  *
  * @see lithium\analysis\logger\adapter\Syslog::__construct()
  */
-class Syslog extends \lithium\core\Object {
+class Syslog extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Flag indicating whether or not the connection to `syslogd` has been opened yet.

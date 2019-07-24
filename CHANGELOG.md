@@ -91,6 +91,10 @@
   `Object` is soft-reserved in PHP >=7. Chance is taken for a cleanup of the
   class-hirarchy and unused/obsolete methods. Newly created classes should
   not inherit from `Object`/`StaticObject` anymore. 
+
+  When using the framework with PHP >=7.2, ensure you are extending
+  `ObjectDeprecated` and `StaticObjectDeprecated`, for all other PHP versions
+  this change is not required.
   
   Auto calling `_init()' and its auto-configuration functionality is left
   in tact, but will be removed without a replacement in 2.0.

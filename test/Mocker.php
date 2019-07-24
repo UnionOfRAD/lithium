@@ -477,7 +477,7 @@ class Mocker {
 		}
 
 		$mocker = static::_mocker($mockee);
-		$isStatic = is_subclass_of($mocker, 'lithium\core\StaticObject');
+		$isStatic = is_subclass_of($mocker, 'lithium\core\StaticObjectDeprecated');
 
 		$tokens = [
 			'namespace' => static::_namespace($mockee),
