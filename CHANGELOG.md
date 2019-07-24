@@ -96,11 +96,10 @@
   `ObjectDeprecated` and `StaticObjectDeprecated`, for all other PHP versions
   this change is not required.
   
-  Auto calling `_init()' and its auto-configuration functionality is left
-  in tact, but will be removed without a replacement in 2.0.
-
   | old | new |
   | --- | --- |
+  | `*Object::$_autoConfig` | use `lithium\core\AutoConfigurable` |
+  | `*Object::_init()` | _no replacement_ |
   | `*Object::_instance()` | replaced, use `lithium\core\Libraries::instance()` |
   | `analysis\Inspector::_instance()` |  replaced, use `lithium\core\Libraries::instance()` |
   | `data\Model::_instance()` |  replaced, use `lithium\core\Libraries::instance()` |
