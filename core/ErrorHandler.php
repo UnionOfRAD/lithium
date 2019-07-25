@@ -23,7 +23,7 @@ use lithium\aop\Filters;
  * Using a series of cascading rules and handlers, it is possible to capture and handle very
  * specific errors and exceptions.
  */
-class ErrorHandler extends \lithium\core\StaticObject {
+class ErrorHandler extends \lithium\core\StaticObjectDeprecated {
 
 	/**
 	 * Configuration parameters.

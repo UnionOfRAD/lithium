@@ -19,7 +19,7 @@ use lithium\core\Libraries;
  *
  * @link http://growl.info
  */
-class Growl extends \lithium\core\Object {
+class Growl extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Array that maps `Logger` message priority names to Growl-compatible priority levels.

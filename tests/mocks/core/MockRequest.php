@@ -9,7 +9,7 @@
 
 namespace lithium\tests\mocks\core;
 
-class MockRequest extends \lithium\core\Object {
+class MockRequest extends \lithium\core\ObjectDeprecated {
 
 	public $url = null;
 

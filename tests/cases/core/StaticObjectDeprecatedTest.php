@@ -11,12 +11,12 @@ namespace lithium\tests\cases\core;
 
 use lithium\aop\Filters;
 use lithium\tests\mocks\core\MockRequest;
-use lithium\tests\mocks\core\MockStaticObject;
+use lithium\tests\mocks\core\MockStaticObjectDeprecated;
 
 /**
  * @deprecated
  */
-class StaticObjectTest extends \lithium\test\Unit {
+class StaticObjectDeprecatedTest extends \lithium\test\Unit {
 
 	protected $_backup = null;
 

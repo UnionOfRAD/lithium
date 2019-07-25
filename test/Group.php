@@ -23,7 +23,7 @@ use lithium\util\Collection;
  * ```
  * $group = new Group(['data' => [
  *     'data\ModelTest',
- *     new \lithium\tests\cases\core\ObjectTest()
+ *     new \lithium\tests\cases\core\LibrariesTest()
  * ]]);
  * ```
  *

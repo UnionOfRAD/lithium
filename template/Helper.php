@@ -17,7 +17,7 @@ use lithium\util\Text;
  * as well as escaping.
  *
  */
-abstract class Helper extends \lithium\core\Object {
+abstract class Helper extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Maps helper method names to content types as defined by the `Media` class, where key are

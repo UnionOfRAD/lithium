@@ -13,7 +13,7 @@ use lithium\test\Group;
 use lithium\core\Libraries;
 use lithium\util\Collection;
 use lithium\tests\cases\data\ModelTest;
-use lithium\tests\cases\core\ObjectTest;
+use lithium\tests\cases\core\ObjectDeprecatedTest;
 use lithium\tests\mocks\test\cases\MockTest;
 use lithium\tests\mocks\test\cases\MockErrorHandlingTest;
 use lithium\tests\mocks\test\cases\MockSkipThrowsExceptionTest;
@@ -94,9 +94,9 @@ class GroupTest extends \lithium\test\Unit {
 
 	public function testAddByMixedThroughConstructor() {
 		$group = new Group(['data' => [
-			'lithium\tests\cases\data\ModelTest', new ObjectTest()
+			'lithium\tests\cases\data\ModelTest', new ObjectDeprecatedTest()
 		]]);
-		$expected = new Collection(['data' => [new ModelTest(), new ObjectTest()]]);
+		$expected = new Collection(['data' => [new ModelTest(), new ObjectDeprecatedTest()]]);
 		$result = $group->tests();
 		$this->assertEqual($expected, $result);
 	}

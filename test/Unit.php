@@ -38,7 +38,7 @@ use RecursiveIteratorIterator;
  *
  * @see lithium\test\Unit::assertException()
  */
-class Unit extends \lithium\core\Object {
+class Unit extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * The Reference to a test reporter class.
@@ -1467,8 +1467,8 @@ class Unit extends \lithium\core\Object {
 	 * Assert that a class does have a given _static_ attribute.
 	 *
 	 * ```
-	 * $this->assertClassHasStaticAttribute('_methodFilters', '\lithium\core\StaticObject'); // succeeds
-	 * $this->assertClassHasStaticAttribute('foobar', '\lithium\core\StaticObject'); // fails
+	 * $this->assertClassHasStaticAttribute('_methodFilters', '\lithium\core\StaticObjectDeprecated'); // succeeds
+	 * $this->assertClassHasStaticAttribute('foobar', '\lithium\core\StaticObjectDeprecated'); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()
@@ -1498,8 +1498,8 @@ class Unit extends \lithium\core\Object {
 	 * Assert that a class does *not* have a given _static_ attribute.
 	 *
 	 * ```
-	 * $this->assertClassNotHasStaticAttribute('foobar', '\lithium\core\StaticObject'); // succeeds
-	 * $this->assertClassNotHasStaticAttribute('_methodFilters', '\lithium\core\StaticObject'); // fails
+	 * $this->assertClassNotHasStaticAttribute('foobar', '\lithium\core\StaticObjectDeprecated'); // succeeds
+	 * $this->assertClassNotHasStaticAttribute('_methodFilters', '\lithium\core\StaticObjectDeprecated'); // fails
 	 * ```
 	 *
 	 * @see lithium\test\Unit::assert()

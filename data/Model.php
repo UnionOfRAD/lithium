@@ -75,7 +75,7 @@ use lithium\util\Set;
  * @see lithium\data\collection\DocumentSet
  * @see lithium\data\Connections
  */
-class Model extends \lithium\core\StaticObject {
+class Model extends \lithium\core\StaticObjectDeprecated {
 
 	use \lithium\core\MergeInheritable;
 

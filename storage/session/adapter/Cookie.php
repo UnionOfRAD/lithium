@@ -21,7 +21,7 @@ use lithium\core\Libraries;
  * per the Lithium filtering system.
  *
  */
-class Cookie extends \lithium\core\Object {
+class Cookie extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Default settings for this session adapter.

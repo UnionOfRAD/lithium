@@ -9,13 +9,13 @@
 
 namespace lithium\core;
 
-/**
- * Provides a base class for all static classes in the Lithium framework. Similar to its
- * counterpart, the `Object` class, `StaticObject` defines some utility useful for testing purposes.
- *
- * @deprecated
- * @see lithium\core\Object
- */
-class StaticObject {}
+$message  = "lithium\core\StaticObject has been deprecated.";
+$message .= "The old class and methods continue to work and redirect calls. ";
+$message .= "It is possible to use this class as `StaticObjectDeprecated` with PHP >=7.2.";
+trigger_error($message, E_USER_DEPRECATED);
+
+if (PHP_VERSION_ID < 70200) {
+	class_alias('StaticObjectDeprecated', 'StaticObject');
+}
 
 ?>

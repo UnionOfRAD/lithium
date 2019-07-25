@@ -14,10 +14,13 @@ use lithium\tests\mocks\core\MockRequest;
 use lithium\tests\mocks\core\MockMethodFiltering;
 use lithium\tests\mocks\core\MockExposed;
 use lithium\tests\mocks\core\MockCallable;
-use lithium\tests\mocks\core\MockObjectForParents;
-use lithium\tests\mocks\core\MockObjectConfiguration;
+use lithium\tests\mocks\core\MockObjectDeprecatedForParents;
+use lithium\tests\mocks\core\MockObjectDeprecatedConfiguration;
 
-class ObjectTest extends \lithium\test\Unit {
+/**
+ * @deprecated
+ */
+class ObjectDeprecatedTest extends \lithium\test\Unit {
 
 	protected $_backup = null;
 
@@ -34,14 +37,14 @@ class ObjectTest extends \lithium\test\Unit {
 	 */
 	public function testObjectConfiguration() {
 		$expected = ['testScalar' => 'default', 'testArray' => ['default']];
-		$config = new MockObjectConfiguration();
+		$config = new MockObjectDeprecatedConfiguration();
 		$this->assertEqual($expected, $config->getConfig());
 
-		$config = new MockObjectConfiguration(['autoConfig' => ['testInvalid']]);
+		$config = new MockObjectDeprecatedConfiguration(['autoConfig' => ['testInvalid']]);
 		$this->assertEqual($expected, $config->getConfig());
 
 		$expected = ['testScalar' => 'override', 'testArray' => ['default', 'override']];
-		$config = new MockObjectConfiguration(['autoConfig' => [
+		$config = new MockObjectDeprecatedConfiguration(['autoConfig' => [
 			'testScalar', 'testArray' => 'merge'
 		]] + $expected);
 		$this->assertEqual($expected, $config->getConfig());

@@ -29,7 +29,7 @@ use lithium\analysis\Inspector;
  * @see lithium\template\helper\Form
  * @see lithium\data\Entity::serialize()
  */
-class Entity extends \lithium\core\Object implements \Serializable {
+class Entity extends \lithium\core\ObjectDeprecated implements \Serializable {
 
 	/**
 	 * Fully-namespaced class name of model that this record is bound to. Instance methods declared

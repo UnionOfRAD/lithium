@@ -140,7 +140,7 @@ use lithium\util\Inflector;
  * @see lithium\data\Model::find()
  * @see lithium\security\Hash::calculate()
  */
-class Form extends \lithium\core\Object {
+class Form extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * The name of the model class to query against. This can either be a model name (i.e.

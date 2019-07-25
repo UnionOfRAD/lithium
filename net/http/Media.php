@@ -33,7 +33,7 @@ use lithium\net\http\MediaException;
  * 	$this->render(['csv' => Post::find('all')]);
  * ```
  */
-class Media extends \lithium\core\StaticObject {
+class Media extends \lithium\core\StaticObjectDeprecated {
 
 	/**
 	 * Contain the configuration of scopes.

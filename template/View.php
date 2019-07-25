@@ -76,7 +76,7 @@ use lithium\template\TemplateException;
  * @see lithium\template\view\adapter
  * @see lithium\net\http\Media
  */
-class View extends \lithium\core\Object {
+class View extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Output filters for view rendering.

@@ -20,7 +20,7 @@ use lithium\core\Environment;
  * This Dispatcher is used exclusively for the purpose of running, organizing and compiling
  * statistics for the built-in Lithium test suite.
  */
-class Dispatcher extends \lithium\core\StaticObject {
+class Dispatcher extends \lithium\core\StaticObjectDeprecated {
 
 	/**
 	 * Composed classes used by the Dispatcher.

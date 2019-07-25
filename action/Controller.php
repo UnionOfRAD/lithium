@@ -41,7 +41,7 @@ use lithium\util\Inflector;
  * @see lithium\action\Dispatcher
  * @see lithium\action\Controller::$_render
  */
-class Controller extends \lithium\core\Object {
+class Controller extends \lithium\core\ObjectDeprecated {
 
 	use \lithium\core\MergeInheritable;
 

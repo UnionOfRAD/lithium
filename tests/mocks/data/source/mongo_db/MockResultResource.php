@@ -9,7 +9,7 @@
 
 namespace lithium\tests\mocks\data\source\mongo_db;
 
-class MockResultResource extends \lithium\core\Object {
+class MockResultResource extends \lithium\core\ObjectDeprecated {
 
 	protected $_data = [];
 

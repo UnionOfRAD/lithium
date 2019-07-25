@@ -16,7 +16,7 @@ use lithium\core\Libraries;
  *
  * Currently, Curl, Stream and Context adapters are available.
  */
-abstract class Socket extends \lithium\core\Object {
+abstract class Socket extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * The resource for the current connection.

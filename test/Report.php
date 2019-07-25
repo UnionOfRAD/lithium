@@ -62,7 +62,7 @@ use lithium\template\TemplateException;
  * @see lithium\test\filter
  * @see lithium\test\templates
  */
-class Report extends \lithium\core\Object {
+class Report extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Contains an instance of `lithium\test\Group`, which contains all unit tests to be executed

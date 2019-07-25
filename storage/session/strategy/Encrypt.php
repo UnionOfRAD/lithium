@@ -44,7 +44,7 @@ use lithium\security\Random;
  *
  * @link http://php.net/book.openssl.php
  */
-class Encrypt extends \lithium\core\Object {
+class Encrypt extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Default configuration.

@@ -46,7 +46,7 @@ use lithium\g11n\Catalog;
  * @see lithium\console\command\G11n
  * @see lithium\g11n\catalog\adapter\Code
  */
-class Message extends \lithium\core\StaticObject {
+class Message extends \lithium\core\StaticObjectDeprecated {
 
 	/**
 	 * Holds cached message pages generated and used

@@ -9,7 +9,10 @@
 
 namespace lithium\tests\mocks\core;
 
-class MockObjectConfiguration extends \lithium\core\Object {
+/**
+ * @deprecated
+ */
+class MockObjectDeprecatedConfiguration extends \lithium\core\ObjectDeprecated {
 
 	protected $_testScalar = 'default';
 

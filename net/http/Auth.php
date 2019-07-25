@@ -18,7 +18,7 @@ namespace lithium\net\http;
  * @see lithium\net\http\Response::digest()
  * @see lithium\security\auth\adapter\Http
  */
-class Auth extends \lithium\core\StaticObject {
+class Auth extends \lithium\core\StaticObjectDeprecated {
 
 	/**
 	 * The NC value needed for digest authentication

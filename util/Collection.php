@@ -75,7 +75,7 @@ namespace lithium\util;
  * @link http://php.net/class.iterator.php PHP Manual: Iterator Interface
  * @link http://php.net/class.countable.php PHP Manual: Countable Interface
  */
-class Collection extends \lithium\core\Object implements \ArrayAccess, \Iterator, \Countable {
+class Collection extends \lithium\core\ObjectDeprecated implements \ArrayAccess, \Iterator, \Countable {
 
 	/**
 	 * A central registry of global format handlers for `Collection` objects and subclasses.

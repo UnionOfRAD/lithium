@@ -15,7 +15,7 @@ use RuntimeException;
  * This class encapsulates a schema definition, usually for a model class, and is comprised
  * of named fields and types.
  */
-class Schema extends \lithium\core\Object implements \ArrayAccess {
+class Schema extends \lithium\core\ObjectDeprecated implements \ArrayAccess {
 
 	protected $_fields = [];
 

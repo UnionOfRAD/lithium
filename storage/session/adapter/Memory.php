@@ -14,7 +14,7 @@ use lithium\util\Text;
 /**
  * Simple memory session storage engine. Used for testing.
  */
-class Memory extends \lithium\core\Object {
+class Memory extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Holds the array that corresponds to session keys & values.

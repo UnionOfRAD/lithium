@@ -38,7 +38,7 @@ namespace lithium\data\source;
  * @link http://php.net/manual/class.iterator.php The Iterator interface.
  * @link http://php.net/manual/norewinditerator.rewind.php
  */
-abstract class Result extends \lithium\core\Object implements \Iterator {
+abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterator {
 
 	/**
 	 * The current position of the iterator.

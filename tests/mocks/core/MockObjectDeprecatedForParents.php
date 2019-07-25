@@ -12,21 +12,10 @@ namespace lithium\tests\mocks\core;
 /**
  * @deprecated
  */
-class MockExposed extends \lithium\core\ObjectDeprecated {
+class MockObjectDeprecatedForParents extends \lithium\core\ObjectDeprecated {
 
-	protected $_internal = 'secret';
-
-	public function tamper() {
-		$internal =& $this->_internal;
-
-		return $this->_filter(__METHOD__, [], function() use (&$internal) {
-			$internal = 'tampered';
-			return true;
-		});
-	}
-
-	public function get() {
-		return $this->_internal;
+	public static function parents() {
+		return static::_parents();
 	}
 }
 

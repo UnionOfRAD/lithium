@@ -24,7 +24,7 @@ use lithium\util\Inflector;
  * Subclasses may implement any other non-standard functionality, but the above methods define the
  * requirements for interacting with `Model` objects, and other classes within `lithium\data`.
  */
-abstract class Source extends \lithium\core\Object {
+abstract class Source extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * The list of object properties to be automatically assigned from configuration passed to

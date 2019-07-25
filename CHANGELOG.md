@@ -128,10 +128,16 @@
 - `Object` and `StaticObject` are being deprecated, as
   `Object` is soft-reserved in PHP >=7. Chance is taken for a cleanup of the
   class-hirarchy and unused/obsolete methods. Newly created classes should
-  not inherit from `Object`/`StaticObject` anymore.
+  not inherit from `Object`/`StaticObject` anymore. 
 
+  When using the framework with PHP >=7.2, ensure you are extending
+  `ObjectDeprecated` and `StaticObjectDeprecated`, for all other PHP versions
+  this change is not required.
+  
   | old | new |
   | --- | --- |
+  | `*Object::$_autoConfig` | use `lithium\core\AutoConfigurable` |
+  | `*Object::_init()` | _no replacement_ |
   | `*Object::_instance()` | replaced, use `lithium\core\Libraries::instance()` |
   | `analysis\Inspector::_instance()` |  replaced, use `lithium\core\Libraries::instance()` |
   | `data\Model::_instance()` |  replaced, use `lithium\core\Libraries::instance()` |
