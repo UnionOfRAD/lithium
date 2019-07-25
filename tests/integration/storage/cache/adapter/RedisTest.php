@@ -163,7 +163,7 @@ class RedisTest extends \lithium\test\Integration {
 		$this->assertTrue($result);
 
 		$result = $this->_redis->exists($key);
-		$this->assertTrue($result);
+		$this->assertTrue((boolean) $result);
 
 		$expected = -1;
 		$result = $this->_redis->ttl($key);
@@ -178,7 +178,7 @@ class RedisTest extends \lithium\test\Integration {
 		$this->assertTrue($result);
 
 		$result = $this->_redis->exists($key);
-		$this->assertTrue($result);
+		$this->assertTrue((boolean) $result);
 
 		$expected = -1;
 		$result = $this->_redis->ttl($key);
@@ -193,7 +193,7 @@ class RedisTest extends \lithium\test\Integration {
 		$this->assertTrue($result);
 
 		$result = $this->_redis->exists($key);
-		$this->assertTrue($result);
+		$this->assertTrue((boolean) $result);
 
 		$expected = -1;
 		$result = $this->_redis->ttl($key);
@@ -208,7 +208,7 @@ class RedisTest extends \lithium\test\Integration {
 		$this->redis->write($keys, $expiry);
 
 		$result = $this->_redis->exists('key1');
-		$this->assertTrue($result);
+		$this->assertTrue((boolean) $result);
 
 		$this->_redis->delete('key1');
 
@@ -219,7 +219,7 @@ class RedisTest extends \lithium\test\Integration {
 		sleep(2);
 
 		$result = $this->_redis->exists('key1');
-		$this->assertFalse($result);
+		$this->assertFalse((boolean) $result);
 	}
 
 	public function testWriteExpiryTtl() {
@@ -228,7 +228,7 @@ class RedisTest extends \lithium\test\Integration {
 		$this->redis->write($keys, $expiry);
 
 		$result = $this->_redis->exists('key1');
-		$this->assertTrue($result);
+		$this->assertTrue((boolean) $result);
 
 		$this->_redis->delete('key1');
 
@@ -239,7 +239,7 @@ class RedisTest extends \lithium\test\Integration {
 		sleep(2);
 
 		$result = $this->_redis->exists('key1');
-		$this->assertFalse($result);
+		$this->assertFalse((boolean) $result);
 	}
 
 	public function testWriteWithScope() {

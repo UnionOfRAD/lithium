@@ -15,7 +15,7 @@ use lithium\data\model\Query;
 use lithium\tests\fixture\model\gallery\Images;
 use lithium\tests\fixture\model\gallery\Galleries;
 use lithium\util\Text;
-use li3_fixtures\test\Fixtures;
+use lithium\test\Fixtures;
 use lithium\data\Schema;
 
 class DatabaseTest extends \lithium\tests\integration\data\Base {
@@ -32,9 +32,6 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 	 */
 	public function skip() {
 		parent::connect($this->_connection);
-		if (!class_exists('li3_fixtures\test\Fixtures')) {
-			$this->skipIf(true, 'Need `li3_fixtures` to run tests.');
-		}
 		$this->skipIf(!$this->with(['MySql', 'PostgreSql', 'Sqlite3']));
 		$this->_export = Libraries::path('lithium\tests\fixture\model\gallery\export', [
 			'dirs' => true

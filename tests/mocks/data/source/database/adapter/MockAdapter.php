@@ -144,7 +144,7 @@ class MockAdapter extends \lithium\data\source\Database {
 	public function key() {
 	}
 
-	protected function _execute($sql) {
+	protected function _execute($sql, $options = []) {
 		return $sql;
 	}
 

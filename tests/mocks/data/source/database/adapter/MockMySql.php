@@ -15,7 +15,7 @@ class MockMySql extends \lithium\data\source\database\adapter\MySql {
 		return $this->{$var};
 	}
 
-	protected function _execute($sql) {
+	protected function _execute($sql, $options = []) {
 		return $sql;
 	}
 }

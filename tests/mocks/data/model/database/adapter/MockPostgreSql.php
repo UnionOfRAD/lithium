@@ -26,7 +26,7 @@ class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 		return true;
 	}
 
-	protected function _execute($sql) {
+	protected function _execute($sql, $options = []) {
 		$this->sql = $sql;
 		if ($this->log) {
 			$this->logs[] = $sql;

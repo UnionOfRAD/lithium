@@ -87,7 +87,7 @@ class MockDatabase extends \lithium\data\source\Database {
 		return $this->_config;
 	}
 
-	protected function _execute($sql) {
+	protected function _execute($sql, $options = []) {
 		$this->sql = $sql;
 		if ($this->log) {
 			$this->logs[] = $sql;

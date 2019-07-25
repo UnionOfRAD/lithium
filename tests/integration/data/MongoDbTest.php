@@ -14,7 +14,7 @@ use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\tests\fixture\model\mongodb\Images;
 use lithium\tests\fixture\model\mongodb\Galleries;
-use li3_fixtures\test\Fixtures;
+use lithium\test\Fixtures;
 
 class MongoDbTest extends \lithium\tests\integration\data\Base {
 
@@ -27,9 +27,6 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 
 	public function skip() {
 		parent::connect($this->_connection);
-		if (!class_exists('li3_fixtures\test\Fixtures')) {
-			$this->skipIf(true, 'Need `li3_fixtures` to run tests.');
-		}
 		$this->skipIf(!$this->with(['MongoDb']));
 		$this->_export = Libraries::path('lithium\tests\fixture\model\mongodb\export', [
 			'dirs' => true
