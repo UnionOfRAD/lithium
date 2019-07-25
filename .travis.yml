@@ -8,6 +8,8 @@
 
 language: php
 
+dist: trusty
+
 services:
   - mongodb
   - memcache
