@@ -9,7 +9,7 @@
 
 namespace lithium\tests\fixture\model\mongodb;
 
-class ImagesFixture extends \li3_fixtures\test\Fixture {
+class ImagesFixture extends \lithium\test\Fixture {
 
 	protected $_model = 'lithium\tests\fixture\model\mongodb\Images';
 

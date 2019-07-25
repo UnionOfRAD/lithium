@@ -9,7 +9,7 @@
 
 namespace lithium\tests\fixture\model\gallery;
 
-class ImagesTagsFixture extends \li3_fixtures\test\Fixture {
+class ImagesTagsFixture extends \lithium\test\Fixture {
 
 	protected $_model = 'lithium\tests\fixture\model\gallery\ImagesTags';
 

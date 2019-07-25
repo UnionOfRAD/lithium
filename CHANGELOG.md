@@ -6,6 +6,8 @@
 
 - PHP 7.1 support
 
+- The `li3_fixtures` library is now part of the framework `test` package.
+
 - Data sources now support the `nested` strategy which will embed related records/documents by
   fetching them using additional queries. (jails) 
 	

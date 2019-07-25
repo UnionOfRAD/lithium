@@ -11,7 +11,7 @@ namespace lithium\tests\integration\data;
 
 use lithium\tests\fixture\model\gallery\Images;
 use lithium\tests\fixture\model\gallery\Galleries;
-use li3_fixtures\test\Fixtures;
+use lithium\test\Fixtures;
 use Exception;
 
 class SourceTest extends \lithium\tests\integration\data\Base {
@@ -36,9 +36,6 @@ class SourceTest extends \lithium\tests\integration\data\Base {
 	 */
 	public function skip() {
 		parent::connect($this->_connection);
-		if (!class_exists('li3_fixtures\test\Fixtures')) {
-			$this->skipIf(true, 'Need `li3_fixtures` to run tests.');
-		}
 	}
 
 	/**

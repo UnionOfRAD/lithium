@@ -61,7 +61,6 @@ before_script:
   - cp -r lithium/tests/ci/app .
   # Install libraries.
   - mv lithium app/libraries/
-  - git clone --branch=1.2 --depth=1 --quiet git://github.com/UnionOfRAD/li3_fixtures.git app/libraries/li3_fixtures
   # Switch into the new app.
   - cd app
   # Install environment dependencies.

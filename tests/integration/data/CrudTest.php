@@ -10,7 +10,7 @@
 namespace lithium\tests\integration\data;
 
 use lithium\tests\fixture\model\gallery\Galleries;
-use li3_fixtures\test\Fixtures;
+use lithium\test\Fixtures;
 
 class CrudTest extends \lithium\tests\integration\data\Base {
 
@@ -24,10 +24,6 @@ class CrudTest extends \lithium\tests\integration\data\Base {
 	 */
 	public function skip() {
 		parent::connect($this->_connection);
-
-		if (!class_exists('li3_fixtures\test\Fixtures')) {
-			$this->skipIf(true, 'Need `li3_fixtures` to run tests.');
-		}
 	}
 
 	/**
