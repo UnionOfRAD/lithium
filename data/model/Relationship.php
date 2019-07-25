@@ -365,7 +365,8 @@ class Relationship extends \lithium\core\ObjectDeprecated {
 	 */
 	protected function _embedBelongsTo(&$collection, $options) {
 		$keys = $this->key();
-		list($formKey, $toKey) = each($keys);
+		$formKey = key($keys);
+		$toKey = current($keys);
 
 		$related = [];
 
