@@ -6,6 +6,8 @@
 
 - PHP 7.1 support
 
+- PHP 7.2 partial support, please read the note on extending from `*Object` below
+
 - The `li3_fixtures` library is now part of the framework `test` package.
 
 - Data sources now support the `nested` strategy which will embed related records/documents by

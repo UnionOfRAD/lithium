@@ -15,7 +15,7 @@ class MockSqlite3 extends \lithium\data\source\database\adapter\Sqlite3 {
 		return $this->{$var};
 	}
 
-	protected function _execute($sql) {
+	protected function _execute($sql, $options = []) {
 		return $sql;
 	}
 }
