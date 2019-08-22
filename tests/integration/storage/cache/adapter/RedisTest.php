@@ -106,7 +106,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->ttl($key);
 		$this->assertTrue($result == 5 || $result == 4);
 
-		$result = $this->_redis->delete($key);
+		$result = $this->_redis->del($key);
 		$this->assertEqual(1, $result);
 
 		$key = 'another_key';
@@ -126,7 +126,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->ttl($key);
 		$this->assertTrue($result == 60 || $result == 59);
 
-		$result = $this->_redis->delete($key);
+		$result = $this->_redis->del($key);
 		$this->assertEqual(1, $result);
 	}
 
@@ -147,7 +147,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->ttl($key);
 		$this->assertTrue($result == 5 || $result == 4);
 
-		$result = $this->_redis->delete($key);
+		$result = $this->_redis->del($key);
 		$this->assertEqual(1, $result);
 	}
 
@@ -169,7 +169,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->ttl($key);
 		$this->assertEqual($expected, $result);
 
-		$this->_redis->delete($key);
+		$this->_redis->del($key);
 
 		$redis = new Redis(['expiry' => Cache::PERSIST]);
 		$expiry = Cache::PERSIST;
@@ -184,7 +184,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->ttl($key);
 		$this->assertEqual($expected, $result);
 
-		$this->_redis->delete($key);
+		$this->_redis->del($key);
 
 		$redis = new Redis();
 		$expiry = Cache::PERSIST;
@@ -199,7 +199,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->ttl($key);
 		$this->assertEqual($expected, $result);
 
-		$this->_redis->delete($key);
+		$this->_redis->del($key);
 	}
 
 	public function testWriteExpiryExpires() {
@@ -210,7 +210,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->exists('key1');
 		$this->assertTrue((boolean) $result);
 
-		$this->_redis->delete('key1');
+		$this->_redis->del('key1');
 
 		$keys = ['key1' => 'data1'];
 		$expiry = '+1 second';
@@ -230,7 +230,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->exists('key1');
 		$this->assertTrue((boolean) $result);
 
-		$this->_redis->delete('key1');
+		$this->_redis->del('key1');
 
 		$keys = ['key1' => 'data1'];
 		$expiry = 1;
@@ -269,7 +269,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->redis->read($keys);
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_redis->delete($key);
+		$result = $this->_redis->del($key);
 		$this->assertEqual(1, $result);
 
 		$key = 'another_read_key';
@@ -289,7 +289,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->redis->read($keys);
 		$this->assertEqual($expected, $result);
 
-		$result = $this->_redis->delete($key);
+		$result = $this->_redis->del($key);
 		$this->assertEqual(1, $result);
 	}
 
@@ -303,7 +303,7 @@ class RedisTest extends \lithium\test\Integration {
 		$this->assertEqual($expected, $result);
 
 		foreach ($data as $k => $v) {
-			$result = $this->_redis->delete($k);
+			$result = $this->_redis->del($k);
 			$this->assertEqual(1, $result);
 		}
 	}
@@ -316,7 +316,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->redis->write($keys, $expiry);
 		$this->assertTrue($result);
 
-		$result = $this->_redis->getMultiple(array_keys($keys));
+		$result = $this->_redis->mGet(array_keys($keys));
 		$expected = array_values($keys);
 		$this->assertEqual($expected, $result);
 	}
@@ -388,7 +388,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->redis->delete($keys);
 		$this->assertTrue($result);
 
-		$this->assertEqual(0, $this->_redis->delete($key));
+		$this->assertEqual(0, $this->_redis->del($key));
 	}
 
 	public function testDeleteNonExistentKey() {
@@ -468,7 +468,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->get($key);
 		$this->assertEqual($value - 1, $result);
 
-		$result = $this->_redis->delete($key);
+		$result = $this->_redis->del($key);
 		$this->assertEqual(1, $result);
 	}
 
@@ -485,7 +485,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->get($key);
 		$this->assertEqual($value, $result);
 
-		$result = $this->_redis->delete($key);
+		$result = $this->_redis->del($key);
 		$this->assertEqual(1, $result);
 	}
 
@@ -519,7 +519,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->get($key);
 		$this->assertEqual($value + 1, $result);
 
-		$result = $this->_redis->delete($key);
+		$result = $this->_redis->del($key);
 		$this->assertEqual(1, $result);
 	}
 
@@ -536,7 +536,7 @@ class RedisTest extends \lithium\test\Integration {
 		$result = $this->_redis->get($key);
 		$this->assertEqual($value, $result);
 
-		$result = $this->_redis->delete($key);
+		$result = $this->_redis->del($key);
 		$this->assertEqual(1, $result);
 	}
 
