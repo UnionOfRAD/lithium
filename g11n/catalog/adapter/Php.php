@@ -96,8 +96,11 @@ class Php extends \lithium\g11n\catalog\Adapter {
 			foreach (require $file as $id => $translated) {
 				if (strpos($id, '|') !== false) {
 					list($id, $context) = explode('|', $id);
+
+					$data = $this->_merge($data, compact('id', 'translated', 'context'));
+				} else {
+					$data = $this->_merge($data, compact('id', 'translated'));
 				}
-				$data = $this->_merge($data, compact('id', 'translated', 'context'));
 			}
 		}
 		return $data;
