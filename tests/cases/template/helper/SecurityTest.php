@@ -35,7 +35,7 @@ class SecurityTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
-		$this->context = new MockFormRenderer(compact('request'));
+		$this->context = new MockFormRenderer();
 		$this->subject = new Security(['context' => $this->context]);
 
 		FormSignature::config([

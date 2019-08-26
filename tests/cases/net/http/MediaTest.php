@@ -525,7 +525,7 @@ class MediaTest extends \lithium\test\Unit {
 		$response->type('html');
 
 		$this->assertException("/Template not found/", function() use ($response) {
-			Media::render($response, null, compact('request'));
+			Media::render($response, null);
 		});
 
 		$this->_cleanUp();

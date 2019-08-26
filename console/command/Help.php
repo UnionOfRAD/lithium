@@ -142,7 +142,7 @@ class Help extends \lithium\console\Command {
 					'description' => null
 				];
 			}
-			$result = compact('modifiers', 'args') + [
+			$result = compact('args') + [
 				'docComment' => $item->getDocComment(),
 				'name' => $item->getName()
 			];

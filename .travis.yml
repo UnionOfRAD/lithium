@@ -31,6 +31,7 @@ php:
   - 7.0
   - 7.1
   - 7.2
+  - 7.3
 
 matrix:
   exclude:
@@ -43,6 +44,8 @@ matrix:
     - php: 7.1
       env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
     - php: 7.2
+      env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
+    - php: 7.3
       env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
     # XCache is not supported on PHP 7
     # Must be tested in isolation as it interferes with other opcaches.
@@ -59,6 +62,8 @@ matrix:
     - php: 7.1
       env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
     - php: 7.2
+      env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
+    - php: 7.3
       env: DB=mongodb PHP_EXT=mongodb COMPOSER_PKG=alcaeus/mongo-php-adapter TESTS=data
   # Mark build as failed as soon as one job failed.
   fast_finish: true

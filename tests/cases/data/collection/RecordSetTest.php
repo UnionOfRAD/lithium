@@ -644,15 +644,13 @@ class RecordSetTest extends \lithium\test\Unit {
 			0 => ['id' => 4, 'data' => 'data4'],
 			7 => ['id' => 5, 'data' => 'delete'],
 			8 => ['id' => 6, 'data' => 'delete'],
-			10 => ['id' => 7, 'data' => 'data7'],
-			50 => ['id' => 8, 'data' => 'delete']
+			10 => ['id' => 7, 'data' => 'data7']
 		];
 		$result = new MockResult(['records' => $records]);
 
 		$model = $this->_model;
 
 		$recordSet = new MockRecordSet(compact('result', 'model') + ['exists' => true]);
-
 		foreach ($recordSet as $i => $word) {
 			$array = $word->to('array');
 			if ($array['data'] === 'delete') {

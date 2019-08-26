@@ -165,10 +165,9 @@ class Test extends \lithium\console\Command {
 			},
 			'json' => function($runner, $path) use ($command) {
 				$report = $runner();
+				$filters = [];
 
 				if ($results = $report->filters()) {
-					$filters = [];
-
 					foreach ($results as $filter => $options) {
 						$filters[$options['name']] = $report->results['filters'][$filter];
 					}
