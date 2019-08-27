@@ -112,6 +112,8 @@ class Extract extends \lithium\console\Command {
 
 		if ($name != 'temporary') {
 			$scope = $this->in('Scope:', ['default' => $this->scope]);
+		} else {
+			$scope = null;
 		}
 
 		$message = [];

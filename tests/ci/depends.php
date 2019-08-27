@@ -53,7 +53,7 @@ class PhpExtensions {
 
 	protected static function _apcu() {
 		if (version_compare(PHP_VERSION, '7.0.0') >= 0) {
-			static::_pecl('apcu', '5.1.8', true);
+			static::_pecl('apcu', '5.1.17', true);
 		} else {
 			static::_pecl('apcu', '4.0.11', true);
 		}

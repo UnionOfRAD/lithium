@@ -465,6 +465,8 @@ class Unit extends \lithium\core\ObjectDeprecated {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertException($expected, $closure, $message = '{:message}') {
+		$result = null;
+
 		try {
 			$closure();
 			$message = sprintf('An exception "%s" was expected but not thrown.', $expected);
@@ -512,6 +514,8 @@ class Unit extends \lithium\core\ObjectDeprecated {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertNotException($expected, $closure, $message = '{:message}') {
+		$result = null;
+
 		try {
 			$closure();
 		} catch (Exception $e) {
@@ -823,6 +827,7 @@ class Unit extends \lithium\core\ObjectDeprecated {
 	 * @return boolean `true` if the assertion succeeded, `false` otherwise.
 	 */
 	public function assertCookie($expected, $headers = null) {
+		$result = null;
 		$matched = $this->_cookieMatch($expected, $headers);
 		if (!$matched['match']) {
 			$message = sprintf('%s - Cookie not found in headers.', $matched['pattern']);

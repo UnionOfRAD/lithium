@@ -96,7 +96,7 @@ class ErrorHandler extends \lithium\core\StaticObjectDeprecated {
 		$trap = function($code, $message, $file, $line = 0, $context = null) {
 			$trace = debug_backtrace();
 			$trace = array_slice($trace, 1, count($trace));
-			static::handle(compact('type', 'code', 'message', 'file', 'line', 'trace', 'context'));
+			static::handle(compact('code', 'message', 'file', 'line', 'trace', 'context'));
 		};
 
 		$convert = function($code, $message, $file, $line = 0, $context = null) {

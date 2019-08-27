@@ -401,7 +401,7 @@ class Form extends \lithium\template\Helper {
 		list($name, $options) = $params;
 		list($name, $options, $template) = $this->_defaults($type, $name, $options);
 		$template = $this->_context->strings($template) ? $template : 'input';
-		return $this->_render($type, $template, compact('type', 'name', 'options', 'value'));
+		return $this->_render($type, $template, compact('type', 'name', 'options'));
 	}
 
 	/**
@@ -489,13 +489,12 @@ class Form extends \lithium\template\Helper {
 			$label = $this->label(isset($options['id']) ? $options['id'] : '', $options['label']);
 		}
 
+		$datalist = null;
 		if ($type === 'text' && $list) {
 			if (is_array($list)) {
 				list($list, $datalist) = $this->_datalist($list, $options);
 			}
 			$field['list'] = $list;
-		} else {
-			$datalist = null;
 		}
 
 		$call = ($type === 'select') ? [$name, $list, $field] : [$name, $field];
@@ -525,10 +524,10 @@ class Form extends \lithium\template\Helper {
 
 		foreach ($fields as $field => $label) {
 			if (is_numeric($field)) {
-				$field = $label;
-				unset($label);
+				$result[] = $this->field($label, $options);
+			} else {
+				$result[] = $this->field($field, compact('label') + $options);
 			}
-			$result[] = $this->field($field, compact('label') + $options);
 		}
 		return join("\n", $result);
 	}
@@ -546,7 +545,7 @@ class Form extends \lithium\template\Helper {
 		list($scope, $options) = $this->_options($defaults, $options);
 		list($title, $options, $template) = $this->_defaults(__METHOD__, $title, $options);
 
-		$arguments = compact('type', 'title', 'options', 'value');
+		$arguments = compact('title', 'options');
 		return $this->_render(__METHOD__, 'button', $arguments, $scope);
 	}
 

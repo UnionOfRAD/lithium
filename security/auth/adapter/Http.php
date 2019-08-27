@@ -125,7 +125,7 @@ class Http extends \lithium\core\ObjectDeprecated {
 			$this->_writeHeader("WWW-Authenticate: Basic realm=\"{$this->_config['realm']}\"");
 			return;
 		}
-		return compact('username', 'password');
+		return compact('username') + ['password' => null];
 	}
 
 	/**
