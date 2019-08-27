@@ -34,7 +34,6 @@ env:
   - DB=mongodb PHP_EXT=mongodb TESTS=data
 
 php:
-  - 7.0
   - 7.1
   - 7.2
   - 7.3
