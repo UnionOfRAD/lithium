@@ -100,6 +100,20 @@ class RecordSet extends \lithium\data\Collection {
 		return $result;
 	}
 
+	/**
+	 * Sets item to passed data with the key from the query object or a given offset.
+	 *
+	 * Due to behaviour changes in PHP 7.3 and above the internal array pointer of the
+	 * `$_data` property might not be updated after setting a value by key. To preserve
+	 * the behavior the internal array pointer is updated manually using `reset()` and
+	 * `end()`.
+	 *
+	 * @link https://bugs.php.net/bug.php?id=78529
+	 * @param mixed $data
+	 * @param integer $offset
+	 * @param array $options
+	 * @return mixed $data
+	 */
 	protected function _set($data = null, $offset = null, $options = []) {
 		if ($model = $this->_model) {
 			$options += ['defaults' => false];
@@ -111,7 +125,13 @@ class RecordSet extends \lithium\data\Collection {
 		if (is_array($key)) {
 			$key = count($key) === 1 ? current($key) : null;
 		}
-		return $key !== null ? $this->_data[$key] = $data : $this->_data[] = $data;
+		if ($key === null) {
+			return $this->_data[] = $data;
+		}
+		reset($this->_data);
+		$this->_data[$key] = $data;
+		end($this->_data);
+		return $data;
 	}
 
 	/**
