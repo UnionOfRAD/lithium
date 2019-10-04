@@ -620,9 +620,17 @@ class Request extends \lithium\net\http\Request {
 
 	/**
 	 * Sets/Gets the content type. If `'type'` is null, the method will attempt to determine the
-	 * type from the params, then from the environment setting
+	 * type from the params, then from the environment setting.
 	 *
-	 * @param string $type a full content type i.e. `'application/json'` or simple name `'json'`
+	 * Handle the case where a single type could not be determined by a call to
+	 * `lithium\net\http\Media::type` in `lithium\net\nttp\Message::type`.
+	 * In that case, the value of `$type` is returned from the parent as it
+	 * was passed in. Attempt to use `lithium\net\http\Media::match` to
+	 * distinguish which type to use for the request. The type is later used to
+	 * decode the request body. Not handling this case leads to the correct
+	 * type's decoder not being invoked on the body of the request.
+	 *
+	 * @param string $type A full content type i.e. `'application/json'` or simple name `'json'`
 	 * @return string A simple content type name, i.e. `'html'`, `'xml'`, `'json'`, etc., depending
 	 *         on the content type of the request.
 	 */
@@ -630,7 +638,22 @@ class Request extends \lithium\net\http\Request {
 		if (!$type && !empty($this->params['type'])) {
 			$type = $this->params['type'];
 		}
-		return parent::type($type);
+		$_type = parent::type($type);
+		if (is_string($type) && $_type === $type) {
+			$media = $this->_classes['media'];
+			$content = $media::type($type);
+			if (is_array($content) && !isset($content['content'])) {
+				foreach ($content as $short_type) {
+					$conf = $media::type($short_type);
+					$conf['name'] = $short_type;
+					if ($media::match($this, $conf)) {
+						$_type = $short_type;
+						break;
+					}
+				}
+			}
+		}
+		return ($this->_type = $_type);
 	}
 
 	/**
