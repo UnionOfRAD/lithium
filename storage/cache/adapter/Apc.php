@@ -16,6 +16,7 @@ if (!class_exists('\lithium\storage\cache\Adapter')) {
 	$message .= 'bootstrap directory to the most recent version or remove the line where ';
 	$message .= 'this file was originally included. ';
 	$message .= 'See https://git.io/voxgh for the most recent version.';
+
 	trigger_error($message, E_USER_DEPRECATED);
 
 	require_once LITHIUM_LIBRARY_PATH . '/lithium/storage/cache/Adapter.php';

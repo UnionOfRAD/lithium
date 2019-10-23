@@ -118,9 +118,25 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param array $params
 	 * @return mixed
 	 */
-	public function __call($method, $params = []) {
-		list($path, $data, $options) = ($params + ['/', [], []]);
-		return json_decode($this->connection->{$method}($path, $data, $options));
+
+	public function __call($method, $params = array()) {
+		list($path, $data, $options) = ($params + array('/', array(), array()));
+                $result = $this->connection->{$method}($path, $data, $options);
+                if (is_array($result)) {
+                        return (object) $result;
+                }
+                else if (is_string($result)){
+                        return json_decode($result);
+                }
+                else {
+                        $message  = "CouchDB connection returns datatype : ".gettype($result)." . ";
+                        $message .= 'We are unable to handle that.';
+                        trigger_error($message, E_USER_ERROR);
+
+
+                }
+
+
 	}
 
 	/**
