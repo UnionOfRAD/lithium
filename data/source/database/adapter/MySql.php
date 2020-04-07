@@ -446,7 +446,7 @@ class MySql extends \lithium\data\source\Database {
 		switch (true) {
 			case in_array($column['type'], ['date', 'time', 'datetime', 'timestamp']):
 				return $column;
-			case ($column['type'] === 'tinyint' && $column['length'] == '1'):
+			case ($column['type'] === 'tinyint' && isset($column['length']) && $column['length'] == '1'):
 			case ($column['type'] === 'boolean'):
 				return ['type' => 'boolean'];
 			break;
