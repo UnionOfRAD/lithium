@@ -63,6 +63,11 @@ class Redis extends \lithium\storage\cache\Adapter {
 	const DEFAULT_PORT = 6379;
 
 	/**
+	 * The default database used to current connection.
+	 */
+	const DEFAULT_DATABASE = 0;
+
+	/**
 	 * Redis object instance used by this adapter.
 	 *
 	 * @var object Redis object
@@ -97,7 +102,8 @@ class Redis extends \lithium\storage\cache\Adapter {
 			'scope' => null,
 			'expiry' => '+1 hour',
 			'host' => static::DEFAULT_HOST . ':' . static::DEFAULT_PORT,
-			'persistent' => false
+			'persistent' => false,
+			'database' => static::DEFAULT_DATABASE
 		];
 		parent::__construct($config + $defaults);
 	}
@@ -122,6 +128,10 @@ class Redis extends \lithium\storage\cache\Adapter {
 				'port' => static::DEFAULT_PORT
 			];
 			$this->connection->{$method}($host['host'], $host['port']);
+		}
+
+		if ($this->_config['database']) {
+			$this->connection->select($this->_config['database']);
 		}
 
 		if ($this->_config['scope']) {
