@@ -1,0 +1,17 @@
+name: Test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Runs Lithium tests
+    timeout-minutes: 10
+    container:
+      image: php:7.3.33-cli-bullseye
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Run tests
+        run:  echo hello
