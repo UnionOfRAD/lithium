@@ -1,6 +1,9 @@
 name: Test
 
-on: [push]
+on:
+  push:
+    branches:
+      - github-actions
 
 jobs:
   test:
