@@ -1,0 +1,26 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - github-actions
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Runs Lithium tests
+    timeout-minutes: 10
+    container:
+      image: php:7.3.33-cli-bullseye
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Run tests
+        run: |
+          cd ..
+          cp -r lithium/tests/ci/app .
+          mv lithium app/libraries/
+          cd app
+          ./libraries/lithium/console/li3 test libraries/lithium/tests
+
