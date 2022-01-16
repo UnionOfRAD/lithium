@@ -19,8 +19,8 @@ jobs:
 
       - name: Publish container
         run: |
-          docker build --cache-from ghcr.io/phishy/lithium -f .devcontainer/Dockerfile-php -t ghcr.io/phishy/lithium .devcontainer
-          docker push ghcr.io/phishy/lithium
+          docker build --cache-from ghcr.io/unionofrad/lithium -f .devcontainer/Dockerfile-php -t ghcr.io/unionofrad/lithium .devcontainer
+          docker push ghcr.io/unionofrad/lithium
 
   test:
     name: Runs Lithium tests
@@ -28,7 +28,7 @@ jobs:
     needs: ['build']
     timeout-minutes: 10
     container:
-      image: ghcr.io/phishy/lithium
+      image: ghcr.io/unionofrad/lithium
     services:
       mysql:
         image: bitnami/mysql:5
