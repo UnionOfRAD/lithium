@@ -1,0 +1,76 @@
+name: Test
+
+on: ['push']
+
+jobs:
+  build:
+    name: Builds container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish container
+        run: |
+          docker build --cache-from ghcr.io/phishy/lithium -f .devcontainer/Dockerfile-php -t ghcr.io/phishy/lithium .devcontainer
+          docker push ghcr.io/phishy/lithium
+
+  test:
+    name: Runs Lithium tests
+    runs-on: ubuntu-latest
+    needs: ['build']
+    timeout-minutes: 10
+    container:
+      image: ghcr.io/phishy/lithium
+    services:
+      mysql:
+        image: bitnami/mysql:5
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306
+      redis:
+        image: redis
+        ports:
+          - 6379
+      mongodb:
+        image: mongo
+        ports:
+          - 27017
+      memcached:
+        image: memcached
+        ports:
+          - 11211
+      couchdb:
+        image: couchdb:2
+        ports:
+          - 5984
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Run tests
+        run: |
+          ./tests/ci/install.sh
+          ./tests/ci/test.sh
+
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+      #   with:
+      #     sudo: false
+

@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:5
+    command: mysqld --sql_mode="" --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - 3306:3306
+  redis:
+    image: redis:4
+    ports:
+      - 6379:6379
+  mongo:
+    image: mongo
+    ports:
+      - 27017:27017
+  memcached:
+    image: memcached
+    ports:
+      - 11211:11211
+  couchdb:
+    image: couchdb:2
+    ports:
+      - 5984:5984
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - 5432:5432
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+
+    volumes:
+      # Forwards the local Docker socket to the container.
+      - /var/run/docker.sock:/var/run/docker-host.sock 
+      # Update this to wherever you want VS Code to mount the folder of your project
+      - ..:/workspace:cached
+
+    # Overrides default command so things don't shut down after the process ends.
+    entrypoint: /usr/local/share/docker-init.sh
+    command: sleep infinity 
+
+    # Uncomment the next four lines if you will use a ptrace-based debuggers like C++, Go, and Rust.
+    # cap_add:
+    #  - SYS_PTRACE
+    # security_opt:
+    #   - seccomp:unconfined
+
+    # Uncomment the next line to use a non-root user for all processes.
+    # user: vscode
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
+    # (Adding the "ports" property to this file will not forward from a Codespace.)

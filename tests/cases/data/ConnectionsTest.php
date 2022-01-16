@@ -67,14 +67,16 @@ class ConnectionsTest extends \lithium\test\Unit {
 		$this->skipIf(!$enabled, 'MySql or PostgreSQL is not enabled');
 
 		if (MySql::enabled()) {
+			$this->_host = 'mysql';
 			$this->_port = 3306;
 		}
 		if (PostgreSql::enabled()) {
+			$this->_host = 'postgres';
 			$this->_port = 5432;
 		}
 
 		$msg = "Cannot connect to localhost:{$this->_port}";
-		$this->skipIf(!$this->_canConnect('localhost', $this->_port), $msg);
+		$this->skipIf(!$this->_canConnect($this->_host, $this->_port), $msg);
 
 		$expected = $this->config + ['type' => 'database', 'filters' => []];
 		$this->assertEqual($expected, Connections::get('conn-test', ['config' => true]));
