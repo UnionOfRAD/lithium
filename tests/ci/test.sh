@@ -1,6 +1,7 @@
 #/bin/bash
-set -xeuf
+./tests/ci/install.sh
 
+set -xeuf
 cd ../app
 
 DB=sqlite ./libraries/lithium/console/li3 test libraries/lithium/tests --verbose
