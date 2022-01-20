@@ -11,8 +11,6 @@ cd app
 
 set +e
 
-composer require alcaeus/mongo-php-adapter
-
 mkdir -p /tmp/tmp/logs
 mkdir -p /tmp/tmp/tests
 mkdir -p /tmp/tmp/cache/templates

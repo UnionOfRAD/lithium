@@ -1,5 +1,5 @@
 # Note: You can use any Debian/Ubuntu based image you want. 
-FROM php:7.3.33-cli-bullseye
+FROM php:8-cli-bullseye
 
 # [Option] Install zsh
 ARG INSTALL_ZSH="true"
