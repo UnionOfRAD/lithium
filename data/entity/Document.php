@@ -356,7 +356,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *              or the name of a field in an individual document.
 	 * @return mixed Returns either a sub-object in the document, or a scalar field value.
 	 */
-	public function offsetGet($offset) {
+	public function offsetGet($offset): mixed {
 		return $this->__get($offset);
 	}
 
@@ -368,8 +368,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @param mixed $value The value to assign to the field.
 	 * @return void
 	 */
-	public function offsetSet($offset, $value) {
-		return $this->set([$offset => $value]);
+	public function offsetSet($offset, $value): void {
+		$this->set([$offset => $value]);
 	}
 
 	/**
@@ -379,7 +379,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *              individual document.
 	 * @return boolean Returns `true` if `$offset` is a field in the document, otherwise `false`.
 	 */
-	public function offsetExists($offset) {
+	public function offsetExists($offset): bool {
 		return $this->__isset($offset);
 	}
 
@@ -389,8 +389,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @param string $key The name of a field in an individual document.
 	 * @return void
 	 */
-	public function offsetUnset($key) {
-		return $this->__unset($key);
+	public function offsetUnset($key): void {
+		$this->__unset($key);
 	}
 
 	/**
@@ -398,10 +398,18 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *
 	 * @return mixed The current item after rewinding.
 	 */
-	public function rewind() {
+	public function rewind(): void {
 		reset($this->_data);
 		reset($this->_updated);
 		$this->_valid = (count($this->_updated) > 0);
+	}
+
+	/**
+	 * Rewinds to the first item.
+	 *
+	 * @return mixed The current item after rewinding.
+	 */
+	public function getRewind(): mixed {
 		return current($this->_updated);
 	}
 
@@ -411,16 +419,16 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *
 	 * @return boolean
 	 */
-	public function valid() {
+	public function valid(): bool {
 		return $this->_valid;
 	}
 
-	public function current() {
+	public function current(): mixed {
 		$current = current($this->_data);
 		return isset($this->_removed[key($this->_data)]) ? null : $current;
 	}
 
-	public function key() {
+	public function key(): mixed {
 		$key = key($this->_data);
 		return isset($this->_removed[$key]) ? false : $key;
 	}
@@ -438,6 +446,28 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	}
 
 	/**
+	 * Advances the object's internal pointer. If the
+	 * end of the set is reached, a new document will be fetched from the data source connection
+	 * handle (`$_handle`).
+	 *
+	 * @return void
+	 */
+	public function next(): void {
+		$prev = key($this->_data);
+		$this->_valid = (next($this->_data) !== false);
+		$cur = key($this->_data);
+
+		if (isset($this->_removed[$cur])) {
+			$this->next();
+			return;
+		}
+		if (!$this->_valid && $cur !== $prev && $cur !== null) {
+			$this->_valid = true;
+		}
+		return;
+	}
+
+	/**
 	 * Returns the next `Document` in the set, and advances the object's internal pointer. If the
 	 * end of the set is reached, a new document will be fetched from the data source connection
 	 * handle (`$_handle`). If no more records can be fetched, returns `null`.
@@ -445,18 +475,18 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @return mixed Returns the next record in the set, or `null`, if no more records are
 	 *         available.
 	 */
-	public function next() {
-		$prev = key($this->_data);
-		$this->_valid = (next($this->_data) !== false);
-		$cur = key($this->_data);
+	public function getNext(): mixed {
+		$this->next();
 
-		if (isset($this->_removed[$cur])) {
-			return $this->next();
-		}
-		if (!$this->_valid && $cur !== $prev && $cur !== null) {
-			$this->_valid = true;
-		}
 		return $this->_valid ? $this->__get(key($this->_data)) : null;
+	}
+
+	public function __serialize(): array {
+		return [];
+	}
+
+	public function __unserialize(array $data): void {
+
 	}
 }
 

@@ -155,8 +155,8 @@ class Unit extends \lithium\core\ObjectDeprecated {
 	 * @return array
 	 */
 	public function methods() {
-		static $methods;
-		return $methods ?: $methods = array_values(preg_grep('/^test/', get_class_methods($this)));
+		// static $methods;
+		return $methods = array_values(preg_grep('/^test/', get_class_methods($this)));
 	}
 
 	/**

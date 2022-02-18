@@ -162,22 +162,22 @@ class Schema extends \lithium\core\ObjectDeprecated implements \ArrayAccess {
 		$this->_fields += $schema->fields();
 	}
 
-	public function offsetGet($key) {
+	public function offsetGet($key): mixed {
 		return $this->fields($key);
 	}
 
-	public function offsetSet($key, $value) {
+	public function offsetSet($key, $value): void {
 		if ($this->_locked) {
 			throw new RuntimeException("Schema cannot be modified.");
 		}
 		$this->_fields[$key] = $value;
 	}
 
-	public function offsetExists($key) {
+	public function offsetExists($key): bool {
 		return isset($this->_fields[$key]);
 	}
 
-	public function offsetUnset($key) {
+	public function offsetUnset($key): void {
 		unset($this->_fields[$key]);
 	}
 }

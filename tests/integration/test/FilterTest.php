@@ -74,7 +74,7 @@ class FilterTest extends \lithium\test\Integration {
 
 				$result = $report->results['filters'];
 
-				$message = "Filter(s): '" . join(array_keys($filters), ", ") . "'";
+				$message = "Filter(s): '" . join(", ", array_keys($filters)) . "'";
 				$message .= "returned no Coverage results.";
 				$this->assertTrue(isset($result['lithium\test\filter\Coverage']), $message);
 				$percentage = $result['lithium\test\filter\Coverage'];

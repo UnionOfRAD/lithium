@@ -114,7 +114,7 @@ abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterato
 	 *
 	 * @return array The current result (or `null` if there is none).
 	 */
-	public function current() {
+	public function current(): mixed {
 		return $this->_current;
 	}
 
@@ -123,19 +123,19 @@ abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterato
 	 *
 	 * @return integer|null The current key position or `null` if there is none.
 	 */
-	public function key() {
+	public function key(): mixed {
 		return $this->_key;
 	}
 
 	/**
 	 * Fetches the next element from the resource.
 	 *
-	 * @return mixed The next result (or `null` if there is none).
+	 * @return void
 	 */
-	public function next() {
+	public function next(): void {
 		if ($this->_buffer) {
 			list($this->_key, $this->_current) = array_shift($this->_buffer);
-			return $this->_current;
+			return;
 		}
 
 		if (!$next = $this->_fetch()) {
@@ -143,11 +143,21 @@ abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterato
 			$this->_current = null;
 			$this->_valid = false;
 
-			return null;
+			return;
 		} else {
 			list($this->_key, $this->_current) = $next;
 			$this->_valid = true;
 		}
+		return;
+	}
+
+	/**
+	 * Fetches the next element from the resource.
+	 *
+	 * @return mixed The next result (or `null` if there is none).
+	 */
+	public function getNext(): mixed {
+		$this->next();
 		return $this->_current;
 	}
 
@@ -173,14 +183,14 @@ abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterato
 	 *
 	 * @return void
 	 */
-	public function rewind() {}
+	public function rewind(): void {}
 
 	/**
 	 * Checks if current position is valid.
 	 *
 	 * @return boolean `true` if valid, `false` otherwise.
 	 */
-	public function valid() {
+	public function valid(): bool {
 		return $this->_valid;
 	}
 

@@ -316,7 +316,7 @@ class Test extends \lithium\console\Command {
 			$this->error("Library `{$library}` does not exist.");
 			return false;
 		}
-		$path = str_replace($config['path'], null, $path);
+		$path = str_replace($config['path'], "", $path);
 		$realpath = $config['path'] . '/' . $path;
 
 		if (!realpath($realpath)) {

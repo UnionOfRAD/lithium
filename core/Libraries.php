@@ -857,7 +857,7 @@ class Libraries {
 				$params['library'] = rtrim($config['prefix'], '\\');
 				$class = str_replace('\\*', '', Text::insert($tpl, $params));
 
-				if (file_exists($file = Libraries::path($class, $options))) {
+				if (file_exists($file = Libraries::path($class, $options) ?? "")) {
 					return ($options['type'] === 'file') ? $file : $class;
 				}
 			}
