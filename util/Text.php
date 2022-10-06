@@ -287,7 +287,7 @@ class Text {
 				$results[] = $buffer;
 				$buffer = '';
 			} else {
-				$buffer .= $data{$tmpOffset};
+				$buffer .= $data[$tmpOffset];
 			}
 
 			if ($options['leftBound'] !== $options['rightBound']) {
