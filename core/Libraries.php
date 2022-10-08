@@ -849,7 +849,7 @@ class Libraries {
 			$libraries = static::get((array) $options['library']);
 		}
 		foreach ($libraries as $library => $config) {
-			if ($config['defer'] !== $defer && $defer !== null) {
+			if ($config === null || $config['defer'] !== $defer && $defer !== null) {
 				continue;
 			}
 
@@ -907,6 +907,9 @@ class Libraries {
 		$classes = [];
 
 		foreach ($libraries as $library => $config) {
+			if (!$config) {
+				continue;
+			}
 			$params['library'] = $config['path'];
 
 			foreach (static::_searchPaths($paths, $library) as $tpl) {
