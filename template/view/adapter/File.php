@@ -9,6 +9,7 @@
 
 namespace lithium\template\view\adapter;
 
+use ReturnTypeWillChange;
 use lithium\util\Text;
 use lithium\core\Libraries;
 use lithium\template\TemplateException;
@@ -156,6 +157,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @param  string  $offset Key / variable name to check.
 	 * @return boolean Returns `true` if the value is set, otherwise `false`.
 	 */
+	#[ReturnTypeWillChange]
 	public function offsetExists($offset) {
 		return array_key_exists($offset, $this->_data);
 	}
@@ -173,6 +175,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @param  string $offset Key / variable name to check.
 	 * @return mixed
 	 */
+	#[ReturnTypeWillChange]
 	public function offsetGet($offset) {
 		return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
 	}
@@ -191,6 +194,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @param  mixed  $value  Value you wish to set to `$offset`.
 	 * @return void
 	 */
+	#[ReturnTypeWillChange]
 	public function offsetSet($offset, $value) {
 		$this->_data[$offset] = $value;
 	}
@@ -208,6 +212,7 @@ class File extends \lithium\template\view\Renderer implements \ArrayAccess {
 	 * @param  string $offset Key / variable name to check.
 	 * @return void
 	 */
+	#[ReturnTypeWillChange]
 	public function offsetUnset($offset) {
 		unset($this->_data[$offset]);
 	}
