@@ -500,7 +500,8 @@ class Mocker {
 					$key = 'constructor';
 					$constructor = true;
 				}
-				$docs = ReflectionMethod::export($mocker, $method->name, true);
+				$reflected = new ReflectionMethod($mocker, $method->name);
+				$docs = (string) $reflected;
 				if (preg_match('/&' . $method->name . '/', $docs) === 1) {
 					continue;
 				}
@@ -515,7 +516,8 @@ class Mocker {
 				$mockDelegate .= static::_dynamicCode('mockDelegate', $key, $tokens);
 				$mock .= static::_dynamicCode('mock', $key, $tokens);
 			} elseif ($method->name === '__get') {
-				$docs = ReflectionMethod::export($mocker, '__get', true);
+				$reflected = new ReflectionMethod($mocker, '__get');
+				$docs = (string) $reflected;
 				$getByReference = preg_match('/&__get/', $docs) === 1;
 			} elseif ($method->name === 'applyFilter') {
 				$staticApplyFilter = $method->isStatic();
