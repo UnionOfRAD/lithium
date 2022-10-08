@@ -31,7 +31,7 @@ class Base extends \lithium\test\Integration {
 	}
 
 	public function with($adapters) {
-		$type = $this->_dbConfig['adapter'] ?: $this->_dbConfig['type'];
+		$type = isset($this->_dbConfig['adapter']) ? $this->_dbConfig['type'] : null;
 
 		foreach ((array) $adapters as $adapter) {
 			if ($type === $adapter) {
@@ -43,8 +43,8 @@ class Base extends \lithium\test\Integration {
 
 	public function skipIf($condition, $message = false) {
 		if ($message === false) {
-			$type = $this->_dbConfig['adapter'];
-			$type = $type ?: $this->_dbConfig['type'];
+			$type = isset($this->_dbConfig['adapter']) ? $this->_dbConfig['adapter'] : null;
+			$type = $type ?: (isset($this->_dbConfig['type']) ? $this->_dbConfig['type'] : null);
 			$class = basename(str_replace('\\', '/', get_called_class()));
 			$callers = debug_backtrace();
 			$caller = $callers[1]['function'];

@@ -128,10 +128,11 @@ class Auth extends \lithium\core\Adaptable {
 	 */
 	public static function check($name, $credentials = null, array $options = []) {
 		$config = static::config($name);
+
 		$defaults = [
 			'checkSession' => true,
 			'writeSession' => true,
-			'persist' => $config['session']['persist'] ?: static::_config('persist')
+			'persist' => isset($config['session']['persist']) ? $config['session']['persist'] : static::_config('persist')
 		];
 
 		$options += $defaults;
