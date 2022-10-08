@@ -43,7 +43,7 @@ class Unit extends \lithium\core\ObjectDeprecated {
 	/**
 	 * The Reference to a test reporter class.
 	 *
-	 * @var string
+	 * @var object
 	 */
 	protected $_reporter = null;
 
@@ -1994,7 +1994,7 @@ class Unit extends \lithium\core\ObjectDeprecated {
 	 * The list of expected exceptions.
 	 *
 	 * @deprecated
-	 * @var string
+	 * @var array
 	 */
 	protected $_expected = [];
 

@@ -621,7 +621,7 @@ class Mocker {
 	 * Will generate the mocker from the current mockee.
 	 *
 	 * @param  string $mockee The fully namespaced `\Mock` class
-	 * @return array
+	 * @return string
 	 */
 	protected static function _mocker($mockee) {
 		$sections = explode('\\', $mockee);
