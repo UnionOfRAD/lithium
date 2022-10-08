@@ -272,7 +272,7 @@ class Collection extends \lithium\core\ObjectDeprecated implements \ArrayAccess,
 	/**
 	 * Filters a copy of the items in the collection.
 	 *
-	 * @param callback $filter Callback to use for filtering.
+	 * @param callable $filter Callback to use for filtering.
 	 * @param array $options The available options are:
 	 *        - `'collect'`: If `true`, the results will be returned wrapped in a new
 	 *          `Collection` object or subclass. Defaults to `true`.
@@ -318,7 +318,7 @@ class Collection extends \lithium\core\ObjectDeprecated implements \ArrayAccess,
 	 * Applies a callback to all items in the collection.
 	 *
 	 * @link http://php.net/array_map
-	 * @param callback $filter The filter to apply.
+	 * @param callable $filter The filter to apply.
 	 * @return Collection This collection instance.
 	 */
 	public function each($filter) {
@@ -331,7 +331,7 @@ class Collection extends \lithium\core\ObjectDeprecated implements \ArrayAccess,
 	 * and returns the result.
 	 *
 	 * @link http://php.net/array_map
-	 * @param callback $filter The filter to apply.
+	 * @param callable $filter The filter to apply.
 	 * @param array $options The available options are:
 	 *        - `'collect'`: If `true`, the results will be returned wrapped
 	 *        in a new `Collection` object or subclass.
@@ -354,7 +354,7 @@ class Collection extends \lithium\core\ObjectDeprecated implements \ArrayAccess,
 	 * Reduce, or fold, a collection down to a single value
 	 *
 	 * @link http://php.net/array_reduce
-	 * @param callback $reducer The reduce function, i.e. `function($carry, $item) { return ... }`
+	 * @param callable $reducer The reduce function, i.e. `function($carry, $item) { return ... }`
 	 * @param mixed $initial Initial value passed to the reduce function as `$carry`,
 	 *        defaults to `false`.
 	 * @return mixed A single reduced value.

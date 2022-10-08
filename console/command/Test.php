@@ -281,7 +281,7 @@ class Test extends \lithium\console\Command {
 	 * @return string Returns a fully-namespaced class path, or `false`, if an error occurs.
 	 */
 	protected function _path($path) {
-		$path = rtrim(str_replace('\\', '/', $path), '/');
+		$path = $path ? rtrim(str_replace('\\', '/', $path), '/') : null;
 
 		if (!$path) {
 			$this->error('Please provide a path to tests.');
@@ -316,7 +316,7 @@ class Test extends \lithium\console\Command {
 			$this->error("Library `{$library}` does not exist.");
 			return false;
 		}
-		$path = str_replace($config['path'], null, $path);
+		$path = str_replace($config['path'], "", $path);
 		$realpath = $config['path'] . '/' . $path;
 
 		if (!realpath($realpath)) {

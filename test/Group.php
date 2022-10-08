@@ -79,7 +79,7 @@ class Group extends \lithium\util\Collection {
 					return [];
 				case is_object($test) && $test instanceof Unit:
 					return [get_class($test)];
-				case is_string($test) && !file_exists(Libraries::path($test)):
+				case is_string($test) && Libraries::path($test) && !file_exists(Libraries::path($test)):
 					return $this->_resolve($test);
 				default:
 					return (array) $test;

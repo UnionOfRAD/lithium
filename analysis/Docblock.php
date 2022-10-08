@@ -51,7 +51,7 @@ class Docblock extends \lithium\core\StaticObjectDeprecated {
 		if (strpos($description, "\n\n")) {
 			list($description, $text) = explode("\n\n", $description, 2);
 		}
-		$text = trim($text);
+		$text = trim($text ?? "");
 		$description = trim($description);
 		return compact('description', 'text', 'tags');
 	}

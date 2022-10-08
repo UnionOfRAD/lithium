@@ -767,7 +767,7 @@ class Libraries {
 	 *         found which match `$type`.
 	 */
 	public static function locate($type, $name = null, array $options = []) {
-		if (is_object($name) || strpos($name, '\\') !== false) {
+		if (!$name || is_object($name) || strpos($name, '\\') !== false) {
 			return $name;
 		}
 		$ident  = $name ? ($type . '.' . $name) : ($type . '.*');
@@ -856,8 +856,9 @@ class Libraries {
 			foreach (static::_searchPaths($paths, $library) as $tpl) {
 				$params['library'] = rtrim($config['prefix'], '\\');
 				$class = str_replace('\\*', '', Text::insert($tpl, $params));
+				$file = Libraries::path($class, $options);
 
-				if (file_exists($file = Libraries::path($class, $options))) {
+				if ($file && file_exists($file)) {
 					return ($options['type'] === 'file') ? $file : $class;
 				}
 			}
