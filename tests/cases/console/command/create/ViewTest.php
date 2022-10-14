@@ -17,6 +17,8 @@ class ViewTest extends \lithium\test\Unit {
 
 	public $request;
 
+	public $classes = [];
+
 	protected $_backup = [];
 
 	protected $_testPath = null;
@@ -58,7 +60,6 @@ class ViewTest extends \lithium\test\Unit {
 		$view = new View([
 			'request' => $this->request, 'classes' => $this->classes
 		]);
-		$view->path = $this->_testPath;
 		$view->run('view');
 		$expected = "index.html.php created in views/posts.\n";
 		$result = $view->response->output;

@@ -94,7 +94,7 @@ class Auth extends \lithium\core\StaticObjectDeprecated {
 		];
 		$keys = implode('|', array_keys($data));
 		$regex = '@(' . $keys . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@';
-		preg_match_all($regex, $header, $matches, PREG_SET_ORDER);
+		preg_match_all($regex, $header ?? '', $matches, PREG_SET_ORDER);
 
 		foreach ($matches as $m) {
 			if (!isset($m[3]) && !isset($m[4])) {

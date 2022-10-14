@@ -23,6 +23,8 @@ use lithium\test\Report;
  */
 class ComplexityTest extends \lithium\test\Unit {
 
+	public $report;
+
 	/**
 	 * Helper array to shorten the methods up a bit.
 	 */

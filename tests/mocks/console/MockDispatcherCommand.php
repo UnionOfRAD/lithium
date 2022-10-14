@@ -13,6 +13,8 @@ use lithium\core\Environment;
 
 class MockDispatcherCommand extends \lithium\console\Command {
 
+	public $env = [];
+
 	protected $_classes = [
 		'response' => 'lithium\tests\mocks\console\MockResponse'
 	];

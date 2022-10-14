@@ -37,7 +37,7 @@ class Mbstring extends \lithium\core\ObjectDeprecated {
 	 * @return integer
 	 */
 	public function strlen($string) {
-		return mb_strlen($string, 'UTF-8');
+		return mb_strlen($string ?? '', 'UTF-8');
 	}
 
 	/**

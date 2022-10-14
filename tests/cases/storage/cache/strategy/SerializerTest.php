@@ -13,6 +13,8 @@ use lithium\storage\cache\strategy\Serializer;
 
 class SerializerTest extends \lithium\test\Unit {
 
+	public $Serializer;
+
 	public function setUp() {
 		$this->Serializer = new Serializer();
 	}

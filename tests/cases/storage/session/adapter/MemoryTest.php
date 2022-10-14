@@ -13,6 +13,8 @@ use lithium\storage\session\adapter\Memory;
 
 class MemoryTest extends \lithium\test\Unit {
 
+	public $Memory;
+
 	/**
 	 * Initializes a new `Memory` adapter.
 	 */

@@ -195,7 +195,7 @@ class Environment {
 			$host = method_exists($request, 'get') ? $request->get('http:host') : '.console';
 
 			foreach ($detect as $environment => $hosts) {
-				if (is_string($hosts) && preg_match($hosts, $host)) {
+				if ($host && is_string($hosts) && preg_match($hosts, $host)) {
 					return $environment;
 				}
 				if (is_array($hosts) && in_array($host, $hosts)) {
@@ -341,11 +341,11 @@ class Environment {
 					return 'test';
 				case ($request->env('PLATFORM') == 'CLI'):
 					return 'development';
-				case (preg_match('/^\/test/', $request->url) && $isLocal):
+				case $request->url && (preg_match('/^\/test/', $request->url) && $isLocal):
 					return 'test';
 				case ($isLocal):
 					return 'development';
-				case (preg_match('/^test/', $request->env('HTTP_HOST'))):
+				case $request->env('HTTP_HOST') && preg_match('/^test/', $request->env('HTTP_HOST')):
 					return 'test';
 				default:
 					return 'production';

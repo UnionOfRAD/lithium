@@ -300,7 +300,7 @@ class File extends \lithium\storage\cache\Adapter {
 		if (is_resource($value)) {
 			stream_copy_to_stream($value, $stream);
 		} else {
-			fwrite($stream, $value);
+			fwrite($stream, $value ?? '');
 		}
 		return fclose($stream);
 	}

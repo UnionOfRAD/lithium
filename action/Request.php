@@ -414,7 +414,7 @@ class Request extends \lithium\net\http\Request {
 				$val = $this->env('PLATFORM') === 'CGI';
 			break;
 			case 'HTTP_BASE':
-				$val = preg_replace('/^([^.])*/i', null, $this->env('HTTP_HOST'));
+				$val = preg_replace('/^([^.])*/i', "", $this->env('HTTP_HOST'));
 			break;
 			case 'PHP_AUTH_USER':
 			case 'PHP_AUTH_PW':
@@ -488,7 +488,7 @@ class Request extends \lithium\net\http\Request {
 	 */
 	protected function _parseAccept() {
 		$accept = $this->env('HTTP_ACCEPT');
-		$accept = (preg_match('/[a-z,-]/i', $accept)) ? explode(',', $accept) : ['text/html'];
+		$accept = ($accept && preg_match('/[a-z,-]/i', $accept)) ? explode(',', $accept) : ['text/html'];
 
 		foreach (array_reverse($accept) as $i => $type) {
 			unset($accept[$i]);

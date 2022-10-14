@@ -24,6 +24,8 @@ class HtmlTest extends \lithium\test\Unit {
 	 */
 	public $html = null;
 
+	public $context;
+
 	protected $_routes = [];
 
 	/**

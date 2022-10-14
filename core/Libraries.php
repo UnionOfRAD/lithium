@@ -767,7 +767,7 @@ class Libraries {
 	 *         found which match `$type`.
 	 */
 	public static function locate($type, $name = null, array $options = []) {
-		if (!$name || is_object($name) || strpos($name, '\\') !== false) {
+		if (is_object($name) || is_string($name) && strpos($name, '\\') !== false) {
 			return $name;
 		}
 		$ident  = $name ? ($type . '.' . $name) : ($type . '.*');
@@ -1050,7 +1050,7 @@ class Libraries {
 		}
 		$library = $namespace = $class = '*';
 
-		if (strpos($type, '.') !== false) {
+		if ($type && strpos($type, '.') !== false) {
 			$parts = explode('.', $type);
 			$type = array_shift($parts);
 

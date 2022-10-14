@@ -37,7 +37,7 @@ class Json extends \lithium\core\ObjectDeprecated {
 	 * @return mixed Result of unserialization.
 	 */
 	public function read($data) {
-		return json_decode($data, true);
+		return json_decode($data ?? '', true);
 	}
 }
 

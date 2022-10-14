@@ -24,7 +24,7 @@ class View extends \lithium\console\command\Create {
 	/**
 	 * Returns the name of the controller class, minus `'Controller'`.
 	 *
-	 * @param string $request
+	 * @param object $request
 	 * @return string
 	 */
 	protected function _name($request) {
@@ -34,7 +34,7 @@ class View extends \lithium\console\command\Create {
 	/**
 	 * Get the plural data variable that is sent down from controller method.
 	 *
-	 * @param string $request
+	 * @param object $request
 	 * @return string
 	 */
 	protected function _plural($request) {
@@ -44,7 +44,7 @@ class View extends \lithium\console\command\Create {
 	/**
 	 * Get the singular data variable that is sent down from controller methods.
 	 *
-	 * @param string $request
+	 * @param object $request
 	 * @return string
 	 */
 	protected function _singular($request) {

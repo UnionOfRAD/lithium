@@ -14,6 +14,8 @@ use lithium\tests\mocks\template\MockRenderer;
 
 class HelperTest extends \lithium\test\Unit {
 
+	public $helper;
+
 	public function setUp() {
 		$this->helper = new MockHelper();
 	}

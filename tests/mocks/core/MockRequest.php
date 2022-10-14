@@ -17,6 +17,8 @@ class MockRequest extends \lithium\core\ObjectDeprecated {
 
 	public $argv = [];
 
+	public $command;
+
 	public function __get($key) {
 		if (isset($this->params[$key])) {
 			return $this->params[$key];

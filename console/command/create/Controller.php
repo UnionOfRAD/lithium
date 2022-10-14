@@ -20,10 +20,12 @@ use lithium\util\Inflector;
  */
 class Controller extends \lithium\console\command\Create {
 
+	public $path;
+
 	/**
 	 * Get the fully-qualified model class that is used by the controller.
 	 *
-	 * @param string $request
+	 * @param object $request
 	 * @return string
 	 */
 	protected function _use($request) {

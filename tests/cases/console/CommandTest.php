@@ -16,6 +16,8 @@ class CommandTest extends \lithium\test\Unit {
 
 	public $request;
 
+	public $classes;
+
 	public function setUp() {
 		$this->request = new Request(['input' => fopen('php://temp', 'w+')]);
 		$this->classes = ['response' => 'lithium\tests\mocks\console\MockResponse'];

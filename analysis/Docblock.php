@@ -68,7 +68,7 @@ class Docblock extends \lithium\core\StaticObjectDeprecated {
 	 */
 	public static function tags($string) {
 		$regex = '/\n@(?P<type>' . join('|', static::$tags) . ")/msi";
-		$string = trim($string);
+		$string = trim($string ?? "");
 
 		$result = preg_split($regex, "\n$string", -1, PREG_SPLIT_DELIM_CAPTURE);
 		$tags = [];

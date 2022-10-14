@@ -11,6 +11,8 @@ namespace lithium\tests\mocks\data\collection;
 
 class MockMultiKeyRecordSet extends \lithium\data\collection\MultiKeyRecordSet {
 
+	protected $_closed = false;
+
 	public function close() {
 		$this->_closed = true;
 	}

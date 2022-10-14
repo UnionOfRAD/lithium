@@ -14,6 +14,8 @@ use lithium\analysis\logger\adapter\File;
 
 class FileTest extends \lithium\test\Unit {
 
+	public $path;
+
 	public $subject;
 
 	public function skip() {

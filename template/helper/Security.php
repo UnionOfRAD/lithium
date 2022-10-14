@@ -155,7 +155,7 @@ class Security extends \lithium\template\Helper {
 				!$options['exclude'] => 'fields',
 				$options['locked']   => 'locked'
 			];
-			if (!$name = preg_replace('/(\.\d+)+$/', '', $params['name'])) {
+			if (!$name = preg_replace('/(\.\d+)+$/', '', $params['name'] ?? '')) {
 				return $result;
 			}
 			$this->_state[spl_object_hash($form)][$type[true]][$name] = $value;

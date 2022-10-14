@@ -313,7 +313,9 @@ class Form extends \lithium\core\ObjectDeprecated {
 				$this->_fields[$val] = $val;
 			}
 		}
-		if (!class_exists($model = Libraries::locate('models', $this->_model))) {
+		$model = Libraries::locate('models', $this->_model);
+
+		if (!$model || !class_exists($model)) {
 			throw new ClassNotFoundException("Model class '{$this->_model}' not found.");
 		}
 		$this->_model = $model;

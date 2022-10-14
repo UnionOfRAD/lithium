@@ -39,7 +39,7 @@ class Intl extends \lithium\core\ObjectDeprecated {
 	 * @return integer|void
 	 */
 	public function strlen($string) {
-		return grapheme_strlen($string);
+		return grapheme_strlen($string ?? '');
 	}
 
 	/**

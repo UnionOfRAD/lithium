@@ -159,7 +159,7 @@ class Form extends \lithium\template\Helper {
 					return $model ? basename(str_replace('\\', '/', $model)) . $id : $id;
 				},
 				'name' => function($method, $name, $options) {
-					if (!strpos($name, '.')) {
+					if (!strpos($name ?? '', '.')) {
 						return $name;
 					}
 					$name = explode('.', $name);

@@ -13,6 +13,10 @@ class MockResponse extends \lithium\action\Response {
 
 	public $testHeaders = [];
 
+	public $data = [];
+
+	public $options = [];
+
 	public function render() {
 		$this->testHeaders = [];
 		parent::render();

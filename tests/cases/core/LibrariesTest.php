@@ -18,6 +18,8 @@ use stdClass;
 
 class LibrariesTest extends \lithium\test\Unit {
 
+	public $hasApp;
+
 	protected $_cache = [];
 
 	public function setUp() {

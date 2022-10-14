@@ -165,7 +165,7 @@ class Create extends \lithium\console\Command {
 	/**
 	 * Get the namespace.
 	 *
-	 * @param string $request
+	 * @param object $request
 	 * @param array $options
 	 * @return string
 	 */

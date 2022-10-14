@@ -565,7 +565,7 @@ class Unit extends \lithium\core\ObjectDeprecated {
 	public function assertNotPattern($expected, $result, $message = '{:message}') {
 		list($expected, $result) = $this->_normalizeLineEndings($expected, $result);
 		$params = compact('expected', 'result');
-		return $this->assert(!preg_match($expected, $result), $message, $params);
+		return $this->assert(!preg_match($expected, $result ?? ''), $message, $params);
 	}
 
 	/**

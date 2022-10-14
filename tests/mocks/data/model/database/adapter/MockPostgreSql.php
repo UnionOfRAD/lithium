@@ -11,6 +11,14 @@ namespace lithium\tests\mocks\data\model\database\adapter;
 
 class MockPostgreSql extends \lithium\data\source\database\adapter\PostgreSql {
 
+	public $log = false;
+
+	public $logs = [];
+
+	public $return;
+
+	public $sql;
+
 	protected $_quotes = ['{', '}'];
 
 	public function __construct(array $config = []) {

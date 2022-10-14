@@ -120,7 +120,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 */
 	public function __call($method, $params = []) {
 		list($path, $data, $options) = ($params + ['/', [], []]);
-		return json_decode($this->connection->{$method}($path, $data, $options));
+		return json_decode($this->connection->{$method}($path, $data, $options) ?? '');
 	}
 
 	/**
@@ -181,7 +181,7 @@ class CouchDb extends \lithium\data\source\Http {
 	/**
 	 * Create new document.
 	 *
-	 * @param string $query
+	 * @param object $query
 	 * @param array $options
 	 * @return boolean
 	 * @filter
@@ -222,7 +222,7 @@ class CouchDb extends \lithium\data\source\Http {
 	/**
 	 * Read from document.
 	 *
-	 * @param string $query
+	 * @param object $query
 	 * @param array $options
 	 * @return object
 	 * @filter

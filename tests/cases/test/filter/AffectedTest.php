@@ -15,6 +15,8 @@ use lithium\test\Report;
 
 class AffectedTest extends \lithium\test\Unit {
 
+	public $report;
+
 	public function setUp() {
 		$this->report = new Report();
 	}

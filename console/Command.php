@@ -114,7 +114,9 @@ class Command extends \lithium\core\ObjectDeprecated {
 		$params = array_diff_key((array) $this->request->params, $default);
 
 		foreach ($params as $key => $param) {
-			$this->{$key} = $param;
+			if (property_exists($this, $key)) {
+				$this->{$key} = $param;
+			}
 		}
 		$this->response = $this->_config['response'];
 

@@ -26,7 +26,7 @@ class Test extends \lithium\console\command\Create {
 	/**
 	 * Get the namespace for the test case.
 	 *
-	 * @param string $request
+	 * @param object $request
 	 * @param array $options
 	 * @return string
 	 */
@@ -64,7 +64,7 @@ class Test extends \lithium\console\command\Create {
 	 */
 	protected function _methods($request) {
 		$use = $this->_use($request);
-		$path = Libraries::path($use);
+		$path = Libraries::path($use) ?? "";
 
 		if (!file_exists($path)) {
 			return "";
@@ -81,7 +81,7 @@ class Test extends \lithium\console\command\Create {
 	/**
 	 * Get the class to be tested
 	 *
-	 * @param string $request
+	 * @param object $request
 	 * @return string
 	 */
 	protected function _name($request) {

@@ -153,7 +153,7 @@ class Debugger {
 		}
 		list($class,) = explode('::', $reference);
 
-		if (!class_exists($class)) {
+		if (!$class || !class_exists($class)) {
 			return;
 		}
 

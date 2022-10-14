@@ -18,6 +18,8 @@ use lithium\tests\mocks\analysis\MockLoggerAdapter;
  */
 class LoggerTest extends \lithium\test\Unit {
 
+	protected $_testPath;
+
 	public function skip() {
 		$path = Libraries::get(true, 'resources');
 

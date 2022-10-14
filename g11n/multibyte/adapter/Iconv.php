@@ -37,7 +37,7 @@ class Iconv extends \lithium\core\ObjectDeprecated {
 	 * @return integer|boolean
 	 */
 	public function strlen($string) {
-		return iconv_strlen($string, 'UTF-8');
+		return iconv_strlen($string ?? '', 'UTF-8');
 	}
 
 	/**

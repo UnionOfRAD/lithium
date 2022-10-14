@@ -196,8 +196,8 @@ class Password {
 		} while (1);
 
 		$result = '$2a$';
-		$result .= chr(ord('0') + $count / static::BF);
-		$result .= chr(ord('0') + $count % static::BF);
+		$result .= chr((int) (ord('0') + $count / static::BF));
+		$result .= chr((int) (ord('0') + $count % static::BF));
 		$result .= '$' . $output;
 
 		return $result;

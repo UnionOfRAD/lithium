@@ -476,7 +476,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			if (is_array($value)) {
 				return array_map($filter, $value);
 			}
-			$value = strtr($value, ["\\'" => "'", "\\\\" => "\\", "\r\n" => "\n"]);
+			$value = strtr($value ?? '', ["\\'" => "'", "\\\\" => "\\", "\r\n" => "\n"]);
 			$value = addcslashes($value, "\0..\37\\\"");
 			return $value;
 		};
@@ -516,7 +516,7 @@ class Gettext extends \lithium\g11n\catalog\Adapter {
 			if (is_array($value)) {
 				return array_map($filter, $value);
 			}
-			return stripcslashes($value);
+			return stripcslashes($value ?? '');
 		};
 		$fields = ['id', 'ids', 'translated', 'context'];
 

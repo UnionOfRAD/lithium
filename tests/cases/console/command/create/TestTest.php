@@ -17,6 +17,8 @@ class TestTest extends \lithium\test\Unit {
 
 	public $request;
 
+	public $classes = [];
+
 	protected $_backup = [];
 
 	protected $_testPath = null;
@@ -52,7 +54,6 @@ class TestTest extends \lithium\test\Unit {
 		$test = new Test([
 			'request' => $this->request, 'classes' => $this->classes
 		]);
-		$test->path = $this->_testPath;
 		$test->run('test');
 		$expected = "PostsTest created in tests/cases/models/PostsTest.php.\n";
 		$result = $test->response->output;
@@ -103,7 +104,6 @@ EOD;
 			'model', "Post{$id}s"
 		]];
 		$test = new Test(['request' => $this->request, 'classes' => $this->classes]);
-		$test->path = $this->_testPath;
 		$test->run('test');
 		$expected = "Post{$id}sTest created in tests/cases/models/Post{$id}sTest.php.\n";
 		$result = $test->response->output;

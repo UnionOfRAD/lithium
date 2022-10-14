@@ -376,7 +376,7 @@ abstract class Database extends \lithium\data\Source {
 
 		if ($first) {
 			$result = "{$open}{$first}{$close}.{$open}{$second}{$close}";
-		} elseif (preg_match('/^[a-z0-9_-]+$/iS', $name)) {
+		} elseif (preg_match('/^[a-z0-9_-]+$/iS', $name ?? '')) {
 			$result = "{$open}{$name}{$close}";
 		} else {
 			$result = $name;
@@ -394,7 +394,7 @@ abstract class Database extends \lithium\data\Source {
 	protected function _splitFieldname($field) {
 		$regex = '/^([a-z0-9_-]+)\.([a-z 0-9_-]+|\*)$/iS';
 
-		if (strpos($field, '.') !== false && preg_match($regex, $field, $matches)) {
+		if (strpos($field ?? '', '.') !== false && preg_match($regex, $field ?? '', $matches)) {
 			return [$matches[1], $matches[2]];
 		}
 		return [null, $field];
@@ -502,7 +502,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	protected function _formatters() {
 		$datetime = $timestamp = $date = $time = function($format, $value) {
-			if ($format && (($time = strtotime($value)) !== false)) {
+			if ($format && $value && (($time = strtotime($value)) !== false)) {
 				$value = date($format, $time);
 			} else {
 				return false;
@@ -1558,9 +1558,9 @@ abstract class Database extends \lithium\data\Source {
 		switch (true) {
 			case (is_bool($value)):
 				return 'boolean';
-			case (is_float($value) || preg_match('/^\d+\.\d+$/', $value)):
+			case (is_float($value) || preg_match('/^\d+\.\d+$/', $value ?? '')):
 				return 'float';
-			case (is_int($value) || preg_match('/^\d+$/', $value)):
+			case (is_int($value) || preg_match('/^\d+$/', $value ?? '')):
 				return 'integer';
 			case (is_string($value) && strlen($value) <= $this->_columns['string']['length']):
 				return 'string';

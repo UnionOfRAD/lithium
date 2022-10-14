@@ -279,7 +279,7 @@ class Relationship extends \lithium\core\ObjectDeprecated {
 		$hasType = ($config['type'] === 'hasOne' || $config['type'] === 'hasMany');
 		$related = Libraries::locate('models', $config[$hasType ? 'from' : 'to']);
 
-		if (!class_exists($related)) {
+		if (!$related || !class_exists($related)) {
 			throw new ClassNotFoundException("Related model class '{$related}' not found.");
 		}
 		if (!$related::key()) {

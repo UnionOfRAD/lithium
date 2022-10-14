@@ -36,6 +36,8 @@ use lithium\storage\Cache;
  */
 class Memory extends \lithium\storage\cache\Adapter {
 
+	public $Memory;
+
 	/**
 	 * Array used to store cached data by this adapter
 	 *
