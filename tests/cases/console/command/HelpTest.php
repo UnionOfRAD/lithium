@@ -52,7 +52,8 @@ class HelpTest extends \lithium\test\Unit {
 
 	public function testRunWithName() {
 		$command = new Help([
-			'request' => $this->request, 'classes' => $this->classes
+			'request' => $this->request,
+			'classes' => $this->classes
 		]);
 
 		$result = $command->run('Test');

@@ -19,7 +19,7 @@ trait AutoConfigurable {
 	 *
 	 * For example, given the following:
 	 * ```
-	 * class Bar{
+	 * class Bar {
 	 * 	protected $_foo;
 	 *
 	 * 	public function __construct(array $config = []) {

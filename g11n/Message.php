@@ -149,9 +149,10 @@ class Message extends \lithium\core\StaticObjectDeprecated {
 			return Message::translate($message, $options + ['default' => $message]);
 		};
 		$tn = function($message1, $message2, $count, array $options = []) {
-			return Message::translate($message1, $options + compact('count') + [
+			$opts = is_array($count) ? $count : $options + compact('count') + [
 				'default' => $count === 1 ? $message1 : $message2
-			]);
+			];
+			return Message::translate($message1, $opts);
 		};
 		return compact('t', 'tn');
 	}

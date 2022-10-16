@@ -48,7 +48,7 @@ class FixturesTest extends \lithium\test\Unit {
 			'fixture_test' => $config
 		]);
 		$callable = Fixtures::adapter('fixture_test');
-		$expected = $config + ['filters' => []];
+		$expected = $config;
 		$this->assertEqual($expected, $callable->construct[0]);
 	}
 

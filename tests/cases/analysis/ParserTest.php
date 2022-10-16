@@ -127,7 +127,7 @@ class ParserTest extends \lithium\test\Unit {
 				'return'      => 'content',
 				'lineBreaks'  => true,
 				'startOfLine' => true,
-				'capture'     => ['T_STRING', 'T_NS_SEPARATOR']
+				'capture'     => ['T_NAME_QUALIFIED', 'T_NAME_FULLY_QUALIFIED']
 			])
 		);
 		$this->assertEqual($expected, $results);
@@ -159,8 +159,8 @@ if (false) {
 }
 EOD;
 		$tokens = Parser::tokenize($code);
-		$this->assertIdentical('}', $tokens[9]['content']);
-		$this->assertIdentical(3, $tokens[9]['line']);
+		$this->assertIdentical('}', $tokens[10]['content']);
+		$this->assertIdentical(3, $tokens[10]['line']);
 	}
 
 }

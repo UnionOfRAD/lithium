@@ -10,6 +10,7 @@
 namespace lithium\analysis;
 
 use Exception;
+use RuntimeException;
 use ReflectionClass;
 use ReflectionProperty;
 use ReflectionException;
@@ -520,7 +521,7 @@ class Inspector {
 				'return'      => 'content',
 				'lineBreaks'  => true,
 				'startOfLine' => true,
-				'capture'     => ['T_STRING', 'T_NS_SEPARATOR']
+				'capture'     => ['T_STRING', 'T_NAME_QUALIFIED', 'T_NAME_FULLY_QUALIFIED']
 			]));
 
 			if ($classes) {
@@ -554,6 +555,7 @@ class Inspector {
 		if (!class_exists($class)) {
 			throw new RuntimeException(sprintf('Class `%s` could not be found.', $class));
 		}
+		$class = ltrim($class, "\\");
 		return unserialize(sprintf('O:%d:"%s":0:{}', strlen($class), $class));
 	}
 

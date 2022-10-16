@@ -450,6 +450,10 @@ class Set {
 			}
 			list($path, $key) = explode($options['separator'], $key, 2);
 			$path = is_numeric($path) ? (integer) $path : $path;
+
+			if (!isset($result[$path]) || !is_array($result[$path])) {
+				$result[$path] = [];
+			}
 			$result[$path][$key] = $val;
 		}
 		foreach ($result as $key => $value) {
