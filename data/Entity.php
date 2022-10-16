@@ -567,6 +567,14 @@ class Entity extends \lithium\core\ObjectDeprecated implements \Serializable {
 			$this->{$key} = $value;
 		}
 	}
+
+	public function __serialize() {
+		return $this->serialize();
+	}
+
+	public function __unserialize($data) {
+		return $this->__unserialize($data);
+	}
 }
 
 ?>

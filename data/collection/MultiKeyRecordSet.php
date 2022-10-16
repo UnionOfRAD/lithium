@@ -9,6 +9,8 @@
 
 namespace lithium\data\collection;
 
+use ReturnTypeWillChange;
+
 class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 
 	/**
@@ -57,7 +59,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 * @param mixed $offset The ID of the record to check for.
 	 * @return boolean Returns true if the record's ID is found in the set, otherwise false.
 	 */
-	public function offsetExists($offset) {
+	public function offsetExists($offset): bool {
 		$offset = (!$offset || $offset === true) ? 0 : $offset;
 		$this->offsetGet($offset);
 		if (in_array($offset, $this->_index)) {
@@ -82,7 +84,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 * @return object Returns a `Record` object if a record is found with a key that matches the
 	 *                value of `$offset`, otheriwse returns `null`.
 	 */
-	public function offsetGet($offset) {
+	public function offsetGet($offset): mixed {
 		$offset = (!$offset || $offset === true) ? 0 : $offset;
 		if (in_array($offset, $this->_index)) {
 			return $this->_data[array_search($offset, $this->_index)];
@@ -103,6 +105,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 			}
 		}
 		$this->close();
+		return null;
 	}
 
 	/**
@@ -112,7 +115,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 * @param mixed $data The value to set.
 	 * @return mixed The value which was set.
 	 */
-	public function offsetUnset($offset) {
+	public function offsetUnset($offset): void {
 		$offset = (!$offset || $offset === true) ? 0 : $offset;
 		$this->offsetGet($offset);
 		unset($this->_index[$index = array_search($offset, $this->_index)]);
@@ -129,7 +132,8 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 * @param boolean $full If true, returns the complete key.
 	 * @return mixed
 	 */
-	public function key($full = false) {
+	#[ReturnTypeWillChange]
+	public function key($full = false): mixed {
 		if ($this->_started === false) {
 			$this->current();
 		}

@@ -477,7 +477,7 @@ class Collection extends \lithium\core\ObjectDeprecated implements \ArrayAccess,
 	 *
 	 * @return scalar Scalar on success or `null` on failure.
 	 */
-	public function key(): string | int | null {
+	public function key(): mixed {
 		return key($this->_data);
 	}
 

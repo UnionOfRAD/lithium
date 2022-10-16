@@ -9,6 +9,7 @@
 
 namespace lithium\data\entity;
 
+use ReturnTypeWillChange;
 use RuntimeException;
 
 /**
@@ -298,7 +299,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @param string $name The name of the field to remove.
 	 * @return void
 	 */
-	public function __unset($name) {
+	public function __unset($name): void {
 		$parts = explode('.', $name, 2);
 
 		if (isset($parts[1])) {
@@ -356,7 +357,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *              or the name of a field in an individual document.
 	 * @return mixed Returns either a sub-object in the document, or a scalar field value.
 	 */
-	public function offsetGet($offset) {
+	#[ReturnTypeWillChange]
+	public function offsetGet($offset): mixed {
 		return $this->__get($offset);
 	}
 
@@ -368,6 +370,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @param mixed $value The value to assign to the field.
 	 * @return void
 	 */
+	#[ReturnTypeWillChange]
 	public function offsetSet($offset, $value) {
 		return $this->set([$offset => $value]);
 	}
@@ -379,7 +382,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *              individual document.
 	 * @return boolean Returns `true` if `$offset` is a field in the document, otherwise `false`.
 	 */
-	public function offsetExists($offset) {
+	public function offsetExists($offset): bool {
 		return $this->__isset($offset);
 	}
 
@@ -389,6 +392,7 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @param string $key The name of a field in an individual document.
 	 * @return void
 	 */
+	#[ReturnTypeWillChange]
 	public function offsetUnset($key) {
 		return $this->__unset($key);
 	}
@@ -398,7 +402,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *
 	 * @return mixed The current item after rewinding.
 	 */
-	public function rewind() {
+	#[ReturnTypeWillChange]
+	public function rewind(): mixed {
 		reset($this->_data);
 		reset($this->_updated);
 		$this->_valid = (count($this->_updated) > 0);
@@ -411,16 +416,18 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 *
 	 * @return boolean
 	 */
-	public function valid() {
+	public function valid(): bool {
 		return $this->_valid;
 	}
 
-	public function current() {
+	#[ReturnTypeWillChange]
+	public function current(): mixed {
 		$current = current($this->_data);
 		return isset($this->_removed[key($this->_data)]) ? null : $current;
 	}
 
-	public function key() {
+	#[ReturnTypeWillChange]
+	public function key(): string | int | false {
 		$key = key($this->_data);
 		return isset($this->_removed[$key]) ? false : $key;
 	}
@@ -445,7 +452,8 @@ class Document extends \lithium\data\Entity implements \Iterator, \ArrayAccess {
 	 * @return mixed Returns the next record in the set, or `null`, if no more records are
 	 *         available.
 	 */
-	public function next() {
+	#[ReturnTypeWillChange]
+	public function next(): mixed {
 		$prev = key($this->_data);
 		$this->_valid = (next($this->_data) !== false);
 		$cur = key($this->_data);

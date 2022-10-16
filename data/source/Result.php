@@ -9,6 +9,8 @@
 
 namespace lithium\data\source;
 
+use ReturnTypeWillChange;
+
 /**
  * The `Result` class is a wrapper around a forward-only data soure result cursor and can be
  * used to iterate over it.
@@ -114,7 +116,7 @@ abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterato
 	 *
 	 * @return array The current result (or `null` if there is none).
 	 */
-	public function current() {
+	public function current(): mixed {
 		return $this->_current;
 	}
 
@@ -123,7 +125,7 @@ abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterato
 	 *
 	 * @return integer|null The current key position or `null` if there is none.
 	 */
-	public function key() {
+	public function key(): int | null {
 		return $this->_key;
 	}
 
@@ -132,7 +134,8 @@ abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterato
 	 *
 	 * @return mixed The next result (or `null` if there is none).
 	 */
-	public function next() {
+	#[ReturnTypeWillChange]
+	public function next(): mixed {
 		if ($this->_buffer) {
 			list($this->_key, $this->_current) = array_shift($this->_buffer);
 			return $this->_current;
@@ -173,14 +176,14 @@ abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterato
 	 *
 	 * @return void
 	 */
-	public function rewind() {}
+	public function rewind(): void {}
 
 	/**
 	 * Checks if current position is valid.
 	 *
 	 * @return boolean `true` if valid, `false` otherwise.
 	 */
-	public function valid() {
+	public function valid(): bool {
 		return $this->_valid;
 	}
 
