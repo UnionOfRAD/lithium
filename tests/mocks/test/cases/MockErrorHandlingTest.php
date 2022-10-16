@@ -11,6 +11,12 @@ namespace lithium\tests\mocks\test\cases;
 
 class MockErrorHandlingTest extends \lithium\test\Unit {
 
+	public $enabled = false;
+
+	public function methods() {
+		return $this->enabled ? ['testNotEnoughParams'] : [];
+	}
+
 	public function testNotEnoughParams() {
 		array_shift();
 	}

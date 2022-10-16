@@ -13,8 +13,12 @@ use Exception;
 
 class MockSkipThrowsExceptionTest extends \lithium\test\Unit {
 
+	public $testing = false;
+
 	public function skip() {
-		throw new Exception('skip throws exception');
+		if ($this->testing) {
+			throw new Exception('skip throws exception');
+		}
 	}
 }
 

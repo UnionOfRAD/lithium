@@ -556,6 +556,7 @@ class UnitTest extends \lithium\test\Unit {
 
 	public function testExceptionCatching() {
 		$test = new MockSkipThrowsExceptionTest();
+		$test->testing = true;
 		$test->run();
 		$expected = 'skip throws exception';
 		$results = $test->results();
@@ -568,6 +569,7 @@ class UnitTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $results[0]['message']);
 
 		$test = new MockTearDownThrowsExceptionTest();
+		$test->testing = true;
 		$test->run();
 		$expected = 'tearDown throws exception';
 		$results = $test->results();
@@ -579,10 +581,10 @@ class UnitTest extends \lithium\test\Unit {
 		error_reporting(E_ALL);
 
 		$test = new MockErrorHandlingTest();
-
+		$test->enabled = true;
 		$test->run();
 
-		$expected = '/expects exactly 1 parameter/';
+		$expected = '/expects exactly 1/';
 		$results = $test->results();
 		$this->assertPattern($expected, $results[0]['message']);
 

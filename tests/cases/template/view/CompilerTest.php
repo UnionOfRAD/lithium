@@ -87,14 +87,14 @@ class CompilerTest extends \lithium\test\Unit {
 		$path = $this->_path;
 		$file = $this->_file;
 
-		$this->assertException('/failed to open stream/', function() use ($path, $file) {
+		$this->assertException('/failed to open stream/i', function() use ($path, $file) {
 			Compiler::template("{$path}/{$file}", [
 				'path' => Libraries::get(true, 'path') . '/foo',
 				'fallback' => true
 			]);
 		});
 
-		$expected = '/(Could not write compiled template|failed to open stream)/';
+		$expected = '/(Could not write compiled template|failed to open stream)/i';
 		$this->assertException($expected, function() use ($path, $file) {
 			$result = Compiler::template("{$path}/{$file}", [
 				'path' => Libraries::get(true, 'path') . '/foo',

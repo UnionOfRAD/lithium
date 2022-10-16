@@ -11,6 +11,7 @@ namespace lithium\tests\cases\security;
 
 use lithium\security\Hash;
 use stdClass;
+use Exception;
 
 class HashTest extends \lithium\test\Unit {
 
@@ -131,7 +132,7 @@ class HashTest extends \lithium\test\Unit {
 
 	public function testCompare() {
 		$backup = error_reporting();
-		error_reporting(E_ALL);
+		error_reporting(E_ALL & ~E_DEPRECATED);
 
 		$this->assertTrue(Hash::compare('Foo', 'Foo'));
 		$this->assertFalse(Hash::compare('Foo', 'foo'));
@@ -141,21 +142,21 @@ class HashTest extends \lithium\test\Unit {
 		$this->assertFalse(Hash::compare('', '0'));
 		$this->assertFalse(Hash::compare('0', ''));
 
-		$this->assertException('/to be (a )?string/', function() {
+		$this->assertException('/must be of type string/', function() {
 			Hash::compare(null, null);
 		});
-		$this->assertException('/to be (a )?string/', function() {
+		$this->assertException('/must be of type string/', function() {
 			Hash::compare(null, '');
 		});
-		$this->assertException('/to be (a )?string/', function() {
+		$this->assertException('/must be of type string/', function() {
 			Hash::compare('', null);
 		});
 
 		$this->assertTrue(Hash::compare('1', '1'));
-		$this->assertException('/to be (a )?string/', function() {
+		$this->assertException('/must be of type string/', function() {
 			Hash::compare('1', 1);
 		});
-		$this->assertException('/to be (a )?string/', function() {
+		$this->assertException('/must be of type string/', function() {
 			Hash::compare(1, '1');
 		});
 

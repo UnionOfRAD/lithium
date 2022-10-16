@@ -155,8 +155,7 @@ class TestTest extends \lithium\test\Unit {
 		$path = $lithium . '/tests/mocks/test/cases';
 		$command->run($path);
 
-		$expected = "4 exceptions";
-		$expected = preg_quote($expected, '/');
+		$expected = preg_quote('setUp throws exception', '/');
 		$result = $command->response->output;
 		$this->assertPattern("/{$expected}/", $result);
 

@@ -102,7 +102,8 @@ class ControllerTest extends \lithium\test\Unit {
 	 */
 	public function testRenderWithAlternateTemplate() {
 		$postsController = new MockPostsController(['classes' => [
-			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+			'media' => 'lithium\tests\mocks\action\MockMediaClass',
+			'response' => 'lithium\tests\mocks\action\MockResponse'
 		]]);
 
 		$result = $postsController(null, ['action' => 'view2']);
@@ -123,7 +124,8 @@ class ControllerTest extends \lithium\test\Unit {
 		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
 
 		$controller = new MockPostsController(compact('request') + ['classes' => [
-			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+			'media' => 'lithium\tests\mocks\action\MockMediaClass',
+			'response' => 'lithium\tests\mocks\action\MockResponse'
 		]]);
 
 		$controller->render();
@@ -138,7 +140,8 @@ class ControllerTest extends \lithium\test\Unit {
 		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
 
 		$controller = new MockPostsController(compact('request') + ['classes' => [
-			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+			'media' => 'lithium\tests\mocks\action\MockMediaClass',
+			'response' => 'lithium\tests\mocks\action\MockResponse'
 		]]);
 
 		$controller->set(['set' => 'data']);
@@ -160,7 +163,8 @@ class ControllerTest extends \lithium\test\Unit {
 		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
 
 		$controller = new MockPostsController(compact('request') + ['classes' => [
-			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+			'media' => 'lithium\tests\mocks\action\MockMediaClass',
+			'response' => 'lithium\tests\mocks\action\MockResponse'
 		]]);
 
 		$expected = [['id' => 1]];
@@ -266,7 +270,8 @@ class ControllerTest extends \lithium\test\Unit {
 	 */
 	public function testManuallySettingTemplate() {
 		$postsController = new MockPostsController(['classes' => [
-			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+			'media' => 'lithium\tests\mocks\action\MockMediaClass',
+			'response' => 'lithium\tests\mocks\action\MockResponse'
 		]]);
 		$postsController(new Request(), ['action' => 'changeTemplate']);
 		$result = $postsController->access('_render');
@@ -362,7 +367,8 @@ class ControllerTest extends \lithium\test\Unit {
 		$request->params['controller'] = 'lithium\tests\mocks\action\MockPostsController';
 
 		$controller = new MockPostsController(compact('request') + ['classes' => [
-			'media' => 'lithium\tests\mocks\action\MockMediaClass'
+			'media' => 'lithium\tests\mocks\action\MockMediaClass',
+			'response' => 'lithium\tests\mocks\action\MockResponse'
 		]]);
 
 		$controller->render();

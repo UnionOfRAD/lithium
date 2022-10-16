@@ -114,7 +114,7 @@ class InspectorTest extends \lithium\test\Unit {
 		$expected = [2 => 'And this the second.'];
 		$this->assertEqual($expected, $result);
 
-		$this->assertException('/(Missing argument 2|Too few arguments.*1 passed.*2 expected)/', function() {
+		$this->assertException('/(Missing argument 2|Too few arguments.*1 passed.*2 expected)/i', function() {
 			Inspector::lines('lithium\core\Foo');
 		});
 		$this->assertNull(Inspector::lines(__CLASS__, []));

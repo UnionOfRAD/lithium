@@ -621,7 +621,7 @@ EOD;
 	public function testLocateWithLithiumLibrary() {
 		$expected = (array) Libraries::find('lithium', [
 			'path' => '/tests',
-			'preFilter' => '/[A-Z][A-Za-z0-9]+\Test\./',
+			'preFilter' => '/[A-Z][A-Za-z0-9]+Test\./',
 			'recursive' => true,
 			'filter' => '/cases|integration|functional|mocks/'
 		]);

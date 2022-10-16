@@ -18,6 +18,10 @@ use lithium\util\Inflector;
 
 class DispatcherTest extends \lithium\test\Unit {
 
+	public function setUp() {
+		$this->tearDown();
+	}
+
 	public function tearDown() {
 		Router::reset();
 		MockDispatcher::reset();

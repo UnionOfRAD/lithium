@@ -10,6 +10,7 @@
 namespace lithium\test;
 
 use Error;
+use Throwable;
 use Exception;
 use ErrorException;
 use ReflectionClass;
@@ -205,7 +206,7 @@ class Unit extends \lithium\core\ObjectDeprecated {
 
 		try {
 			$this->skip();
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			$this->_handleException($e);
 			return $this->_results;
 		}
@@ -470,9 +471,7 @@ class Unit extends \lithium\core\ObjectDeprecated {
 			$closure();
 			$message = sprintf('An exception "%s" was expected but not thrown.', $expected);
 			return $this->assert(false, $message, compact('expected', 'result'));
-		} catch (Exception $e) {
-			// fallthrough
-		} catch (Error $e) {
+		} catch (Throwable $e) {
 			// fallthrough
 		}
 		$class = get_class($e);
@@ -1614,7 +1613,7 @@ class Unit extends \lithium\core\ObjectDeprecated {
 	protected function _runTestMethod($method, $options) {
 		try {
 			$this->setUp();
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			$this->_handleException($e, __LINE__ - 2);
 			return $this->_results;
 		}
@@ -1625,13 +1624,13 @@ class Unit extends \lithium\core\ObjectDeprecated {
 				$method = $params['method'];
 				$lineFlag = __LINE__ + 1;
 				$this->{$method}();
-			} catch (Exception $e) {
+			} catch (Throwable $e) {
 				$this->_handleException($e);
 			}
 		});
 		try {
 			$this->tearDown();
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
 			$this->_handleException($e, __LINE__ - 2);
 		}
 		return $passed;

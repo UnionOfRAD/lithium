@@ -47,7 +47,7 @@ class FileTest extends \lithium\test\Unit {
 		$file = new File(['extract' => false]);
 		$path = $this->_path;
 
-		$this->assertException('Undefined variable: foo', function()  use ($file, $path) {
+		$this->assertException('Undefined variable $foo', function()  use ($file, $path) {
 			$file->render("{$path}/template1.html.php", ['foo' => 'bar']);
 		});
 

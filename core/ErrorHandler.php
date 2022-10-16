@@ -11,6 +11,7 @@ namespace lithium\core;
 
 use Exception;
 use ErrorException;
+use Throwable;
 use lithium\aop\Filters;
 
 /**
@@ -155,7 +156,7 @@ class ErrorHandler extends \lithium\core\StaticObjectDeprecated {
 				return preg_match($config['message'], $info['message']);
 			}
 		];
-		static::$_exceptionHandler = function($exception, $return = false) {
+		static::$_exceptionHandler = function(Throwable $exception, $return = false) {
 			if (ob_get_length()) {
 				ob_end_clean();
 			}
@@ -236,7 +237,7 @@ class ErrorHandler extends \lithium\core\StaticObjectDeprecated {
 	}
 
 	public static function apply($object, array $conditions, $handler) {
-		$conditions = $conditions ?: ['type' => 'Exception'];
+		$conditions = $conditions ?: ['type' => 'Throwable'];
 		list($class, $method) = is_string($object) ? explode('::', $object) : $object;
 
 		Filters::apply($class, $method, function($params, $next) use ($conditions, $handler) {
@@ -244,7 +245,7 @@ class ErrorHandler extends \lithium\core\StaticObjectDeprecated {
 
 			try {
 				return $next($params);
-			} catch (Exception $e) {
+			} catch (Throwable $e) {
 				if (!static::matches($e, $conditions)) {
 					throw $e;
 				}

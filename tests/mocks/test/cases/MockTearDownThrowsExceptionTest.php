@@ -13,12 +13,16 @@ use Exception;
 
 class MockTearDownThrowsExceptionTest extends \lithium\test\Unit {
 
+	public $testing = false;
+
 	public function testNothing() {
 		$this->assert(true);
 	}
 
 	public function tearDown() {
-		throw new Exception('tearDown throws exception');
+		if ($this->testing) {
+			throw new Exception('tearDown throws exception');
+		}
 	}
 }
 

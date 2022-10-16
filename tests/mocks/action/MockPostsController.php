@@ -9,6 +9,8 @@
 
 namespace lithium\tests\mocks\action;
 
+use Exception;
+
 class MockPostsController extends \lithium\action\Controller {
 
 	public $stopped = false;

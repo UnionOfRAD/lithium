@@ -306,7 +306,7 @@ class MessageTest extends \lithium\test\Unit {
 		$this->assertNotEqual($expected, $result);
 
 		$expected = Message::translate('house', ['locale' => 'de', 'count' => 3]);
-		$result = $tn('house', 'houses', ['locale' => 'de']);
+		$result = $tn('house', 'houses', 3, ['locale' => 'de']);
 		$this->assertNotEqual($expected, $result);
 	}
 
