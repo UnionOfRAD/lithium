@@ -44,9 +44,7 @@ class Dispatcher extends \lithium\core\StaticObjectDeprecated {
 	 *        - `'filters'`: An array of filters that the test output should be run through.
 	 *        - `'format'`: The format of the template to use, defaults to `'txt'`.
 	 *        - `'reporter'`: The reporter to use.
-	 * @return array A compact array of the title, an array of the results, as well
-	 *         as an additional array of the results after the $options['filters']
-	 *         have been applied.
+	 * @return object A Report object.
 	 * @filter
 	 */
 	public static function run($group = null, array $options = []) {
