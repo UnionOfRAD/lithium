@@ -251,7 +251,7 @@ class Dispatcher extends \lithium\core\StaticObjectDeprecated {
 			try {
 				return Libraries::instance('controllers', $controller, $options);
 			} catch (ClassNotFoundException $e) {
-				throw new DispatchException("Controller `{$controller}` not found.", null, $e);
+				throw new DispatchException("Controller `{$controller}` not found.", 2001, $e);
 			}
 		});
 	}

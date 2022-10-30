@@ -338,14 +338,14 @@ abstract class Database extends \lithium\data\Source {
 			switch (true) {
 				case $code === 'HY000' || substr($code, 0, 2) === '08':
 					$msg = "Unable to connect to host `{$config['host']}`.";
-					throw new NetworkException($msg, null, $e);
+					throw new NetworkException($msg, 3001, $e);
 				break;
 				case in_array($code, ['28000', '42000']):
 					$msg = "Host connected, but could not access database `{$config['database']}`.";
-					throw new ConfigException($msg, null, $e);
+					throw new ConfigException($msg, 3002, $e);
 				break;
 			}
-			throw new ConfigException($e->getMessage(), null, $e);
+			throw new ConfigException($e->getMessage(), 3003, $e);
 		}
 		$this->_isConnected = true;
 
