@@ -75,7 +75,7 @@ class CommandTest extends \lithium\test\Unit {
 		$result = $command('testReturn3')->status;
 		$this->assertEqual($expected, $result);
 
-		$expected = 'this is a string';
+		$expected = 0;
 		$result = $command('testReturnString');
 		$this->assertEqual($expected, $result->status);
 
