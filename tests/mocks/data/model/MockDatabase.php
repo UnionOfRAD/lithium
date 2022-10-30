@@ -108,6 +108,10 @@ class MockDatabase extends \lithium\data\source\Database {
 		return parent::schema($query, $resource = null, $context = null);
 	}
 
+	protected function _buildColumn($field) {
+		return $field['name'];
+	}
+
 	protected function _insertId($query) {
 		$query = $query->export($this);
 		ksort($query);

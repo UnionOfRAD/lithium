@@ -300,6 +300,15 @@ abstract class Database extends \lithium\data\Source {
 	}
 
 	/**
+	 * Adapter-specific method for building column definitions. Helper for `Database::column()`
+	 *
+	 * @see lithium\data\Database::column()
+	 * @param array $field A field array.
+	 * @return string The SQL column string.
+	 */
+	abstract protected function _buildColumn($field);
+
+	/**
 	 * Connects to the database by creating a PDO intance using the constructed DSN string.
 	 * Will set general options on the connection as provided (persistence, encoding).
 	 *
@@ -1819,6 +1828,7 @@ abstract class Database extends \lithium\data\Source {
 	 */
 	public function createSchema($source, $schema) {
 		if (!$schema instanceof $this->_classes['schema']) {
+			$class = $this->_classes['schema'];
 			throw new InvalidArgumentException("Passed schema is not a valid `{$class}` instance.");
 		}
 

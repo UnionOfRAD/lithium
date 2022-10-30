@@ -148,6 +148,10 @@ class MockAdapter extends \lithium\data\source\Database {
 		return $sql;
 	}
 
+	protected function _buildColumn($field) {
+		return $field['name'];
+	}
+
 	protected function _insertId($query) {}
 
 	public static function enabled($feature = null) {
