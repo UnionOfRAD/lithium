@@ -52,7 +52,7 @@ class RouteTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_config['routes'] = "{$this->_testPath}/routes.php";
 
-		$testParams = 'array("controller" => "lithium\test\Controller")';
+		$testParams = '["controller" => "lithium\test\Controller"]';
 		$content = [
 			'<?php',
 			'use lithium\net\http\Router;',

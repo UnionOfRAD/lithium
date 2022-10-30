@@ -18,7 +18,7 @@ class MultiKeyRecordSet extends \lithium\data\collection\RecordSet {
 	 * with composite keys, i.e.:
 	 *
 	 * ```
-	 * $payment = $records[array('client_id' => 42, 'invoice_id' => 21)];
+	 * $payment = $records[['client_id' => 42, 'invoice_id' => 21]];
 	 * ```
 	 *
 	 * @var array

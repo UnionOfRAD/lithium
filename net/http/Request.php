@@ -67,8 +67,8 @@ class Request extends \lithium\net\http\Message {
 	 *        options are inherited from the parent classes.
 	 *        - `'method'` _string_: Defaults to `'GET'`.
 	 *        - `'path'` _string_: Defaults to `null`.
-	 *        - `'query'` _array_: Defaults to `array()`.
-	 *        - `'cookies'` _array_: Defaults to `array()`.
+	 *        - `'query'` _array_: Defaults to `[]`.
+	 *        - `'cookies'` _array_: Defaults to `[]`.
 	 *        - `'type'` _string_: Defaults to `null`.
 	 *        - `'auth'` _mixed_: Defaults to `null`.
 	 *        - `'proxy'` _string_: Defaults to `null`.

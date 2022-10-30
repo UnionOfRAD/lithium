@@ -217,7 +217,7 @@ class RouterTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests that routes can be created with shorthand strings, i.e. `'Controller::action'` and
-	 * `array('Controller::action', 'id' => '...')`.
+	 * `['Controller::action', 'id' => '...']`.
 	 */
 	public function testStringParameterConnect() {
 		Router::connect('/posts/{:id:[0-9a-f]{24}}', 'Posts::edit');

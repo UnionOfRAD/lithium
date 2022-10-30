@@ -92,7 +92,7 @@ class ObjectDeprecated {
 	 * ```
 	 *
 	 * The `$_foo` property of `$instance` would automatically be set to `'value'`. If `$_foo` was
-	 * an array, `$_autoConfig` could be set to `array('foo' => 'merge')`, and the constructor value
+	 * an array, `$_autoConfig` could be set to `['foo' => 'merge']`, and the constructor value
 	 * of `'foo'` would be merged with the default value of `$_foo` and assigned to it.
 	 *
 	 * @see lithium\core\Object::$_autoConfig

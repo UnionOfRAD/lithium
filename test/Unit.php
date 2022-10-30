@@ -1956,7 +1956,7 @@ class Unit extends \lithium\core\ObjectDeprecated {
 	 *
 	 * @param mixed $expected
 	 * @param mixed $result
-	 * @return array Array with the normalized elements i.e. `array($expected, $result)`.
+	 * @return array Array with the normalized elements i.e. `[$expected, $result]`.
 	 */
 	protected function _normalizeLineEndings($expected, $result) {
 		if (is_string($expected) && is_string($result)) {

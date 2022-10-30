@@ -398,7 +398,7 @@ class Set {
 
 	/**
 	 * Collapses a multi-dimensional array into a single dimension, using a delimited array path
-	 * for each array element's key, i.e. [array('Foo' => ['Bar' => 'Far'])] becomes
+	 * for each array element's key, i.e. [['Foo' => ['Bar' => 'Far']]] becomes
 	 * ['0.Foo.Bar' => 'Far'].
 	 *
 	 * @param array $data array to flatten

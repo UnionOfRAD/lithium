@@ -62,7 +62,7 @@ class Message extends \lithium\net\Message {
 	 *        - `'protocol'` _string_: Defaults to `null`.
 	 *        - `'version'` _string_: Defaults to `'1.1'`.
 	 *        - `'scheme'` _string_: Overridden and defaulting to `'http'`.
-	 *        - `'headers'` _array_: Defaults to `array()`.
+	 *        - `'headers'` _array_: Defaults to `[]`.
 	 * @return void
 	 */
 	public function __construct(array $config = []) {
@@ -158,7 +158,7 @@ class Message extends \lithium\net\Message {
 	 * @return mixed When called with just $key provided, the value of a single header or an array
 	 *         of values in case there is multiple headers with this key.
 	 *         When calling the method without any arguments, an array of compiled headers in the
-	 *         form `array('<key>: <value>', ...)` is returned. All set and replace operations
+	 *         form `['<key>: <value>', ...]` is returned. All set and replace operations
 	 *         return no value for performance reasons.
 	 */
 	public function headers($key = null, $value = null, $replace = true) {

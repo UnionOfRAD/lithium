@@ -58,7 +58,7 @@ class Dispatcher extends \lithium\core\StaticObjectDeprecated {
 	 *
 	 * For example, to implement action prefixes (i.e. `admin_index`), set a rule named
 	 * `'admin'`, with a value array containing a modifier key for the `action` element of
-	 * a route, i.e.: `array('action' => 'admin_{:action}')`. Now, if the `'admin'` key is
+	 * a route, i.e.: `['action' => 'admin_{:action}']`. Now, if the `'admin'` key is
 	 * present and not empty in the parameters returned from routing, the value of `'action'`
 	 * will be rewritten per the settings in the rule:
 	 * ```

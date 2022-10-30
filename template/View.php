@@ -161,8 +161,8 @@ class View extends \lithium\core\ObjectDeprecated {
 	 *
 	 * - `'capture'` _array_: If specified, allows the results of this rendering step to be assigned
 	 *   to a template variable used in subsequent steps, or to the templating context for use in
-	 *   subsequent steps. If can be specified in the form of `array('context' => '<var-name>')` or
-	 *   `array('data' => '<var-name>')`. If the `'context'` key is used, the results are captured
+	 *   subsequent steps. If can be specified in the form of `['context' => '<var-name>']` or
+	 *   `['data' => '<var-name>']`. If the `'context'` key is used, the results are captured
 	 *   to the rendering context. Likewise with the `'data'` key, results are captured to a
 	 *   template variable.
 	 *

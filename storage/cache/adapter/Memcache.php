@@ -85,8 +85,8 @@ class Memcache extends \lithium\storage\cache\Adapter {
 	 *          `':<port>'` indicating the host and/or port to connect to. When one or both are
 	 *          not provided uses general server defaults.
 	 *          Use the array format for multiple hosts (optionally with server selection weights):
-	 *          `array('167.221.1.5:11222', '167.221.1.6')`
-	 *          `array('167.221.1.5:11222' => 200, '167.221.1.6')`
+	 *          `['167.221.1.5:11222', '167.221.1.6']`
+	 *          `['167.221.1.5:11222' => 200, '167.221.1.6']`
 	 * @return void
 	 */
 	public function __construct(array $config = []) {

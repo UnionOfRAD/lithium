@@ -59,11 +59,11 @@ class Fixture extends \lithium\data\Schema {
 	 *
 	 * Example:
 	 * {{{
-	 * protected $_fields = array(
-	 *     'id'  => array('type' => 'id'),
-	 *     'firstname' => array('type' => 'string', 'default' => 'foo', 'null' => false),
-	 *     'lastname' => array('type' => 'string', 'default' => 'bar', 'null' => false)
-	 * );
+	 * protected $_fields = [
+	 *     'id'  => ['type' => 'id'],
+	 *     'firstname' => ['type' => 'string', 'default' => 'foo', 'null' => false],
+	 *     'lastname' => ['type' => 'string', 'default' => 'bar', 'null' => false]
+	 * ];
 	 * }}}
 	 *
 	 * @var array
@@ -82,17 +82,17 @@ class Fixture extends \lithium\data\Schema {
 	 *
 	 * Example:
 	 * {{{
-	 * protected $_meta = array(
-	 *     'constraints' => array(
-	 *         array(
+	 * protected $_meta = [
+	 *     'constraints' => [
+	 *         [
 	 *             'type' => 'foreign_key',
 	 *             'column' => 'id',
 	 *             'toColumn' => 'id',
 	 *             'to' => 'other_table'
-	 *         )
-	 *      ),
-	 *     'table' => array('charset' => 'utf8', 'engine' => 'InnoDB')
-	 * );
+	 *         ]
+	 *      ],
+	 *     'table' => ['charset' => 'utf8', 'engine' => 'InnoDB']
+	 * ];
 	 * }}}
 	 *
 	 * @var array
@@ -105,12 +105,12 @@ class Fixture extends \lithium\data\Schema {
 	 *
 	 * Example:
 	 * {{{
-	 * protected $_records = array(
-	 *     array('id' => 1, 'firstname' => 'John', 'lastname' => 'Doe'),
-	 *     array('id' => 2, 'firstname' => 'Pamela', 'lastname' => 'A.'),
-	 *     array('id' => 6, 'firstname' => 'Jay', 'lastname' => 'Miner'),
-	 *     array('id' => 9, 'firstname' => 'Obi-Wan', 'lastname' => 'Kenobi')
-	 * );
+	 * protected $_records = [
+	 *     ['id' => 1, 'firstname' => 'John', 'lastname' => 'Doe'],
+	 *     ['id' => 2, 'firstname' => 'Pamela', 'lastname' => 'A.'],
+	 *     ['id' => 6, 'firstname' => 'Jay', 'lastname' => 'Miner'],
+	 *     ['id' => 9, 'firstname' => 'Obi-Wan', 'lastname' => 'Kenobi']
+	 * ];
 	 * }}}
 	 *
 	 * @var array

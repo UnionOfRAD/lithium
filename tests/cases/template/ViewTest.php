@@ -230,7 +230,7 @@ class ViewTest extends \lithium\test\Unit {
 
 		$body = "<?php ";
 		$body .= "echo \$this->_render('element', 'element2', [], ";
-		$body .= "array('library' => 'test_app2'));";
+		$body .= "['library' => 'test_app2']);";
 		$body .= "echo \$this->_render('element', 'element1');";
 		$body .= "?>";
 
@@ -258,7 +258,7 @@ class ViewTest extends \lithium\test\Unit {
 		$body = "<?php ";
 		$body .= "echo \$this->_render('element', 'element1');";
 		$body .= "echo \$this->_render('element', 'element2', [], ";
-		$body .= "array('library' => 'test_app2'));";
+		$body .= "['library' => 'test_app2']);";
 		$body .= "?>";
 
 		file_put_contents($viewDir . '/template.html.php', $body);

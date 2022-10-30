@@ -127,7 +127,7 @@ class Cache extends \lithium\core\Adaptable {
 	 * Cache::key('default', 'post', 2);
 	 * // returns `'post:1ad5be0d'`
 	 *
-	 * Cache::key('default', 'post', array(2, 'json'));
+	 * Cache::key('default', 'post', [2, 'json']);
 	 * // returns `'post:723f0e19'`
 	 *
 	 * Cache::key('default', ['posts', 'banners'], 'json');

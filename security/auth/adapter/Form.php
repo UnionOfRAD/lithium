@@ -72,7 +72,7 @@ use lithium\util\Inflector;
  * As mentioned, prior to any queries being executed, the request data is modified by any filters
  * configured. Filters are callbacks which accept the value of a submitted form field as input, and
  * return a modified version of the value as output. Filters can be any PHP callable, i.e. a closure
- * or `array('ClassName', 'method')`.
+ * or `['ClassName', 'method']`.
  *
  * For example, if you're doing simple password hashing against a legacy application, you can
  * configure the adapter as follows:
@@ -178,7 +178,7 @@ class Form extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * Additional data to apply to the model query conditions when looking up users, i.e.
-	 * `array('active' => true)` to disallow authenticating against inactive user accounts.
+	 * `['active' => true]` to disallow authenticating against inactive user accounts.
 	 *
 	 * @var array
 	 */

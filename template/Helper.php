@@ -210,7 +210,7 @@ abstract class Helper extends \lithium\core\ObjectDeprecated {
 	 *              via `$this->_context->applyHandler()`).
 	 *              The `'handlers'` option allow to set custom mapping beetween `$params`'s key and
 	 *              `$this->_context`'s handlers. e.g. the following handler:
-	 *              `'handlers' => array('url' => 'path')` will make `$params['url']` to be
+	 *              `'handlers' => ['url' => 'path']` will make `$params['url']` to be
 	 *              processed by the `'path'` handler instead of the `'url'` one.
 	 * @return string Rendered HTML
 	 */

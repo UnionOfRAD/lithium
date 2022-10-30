@@ -158,11 +158,11 @@ class Request extends \lithium\net\http\Request {
 	 *        - `'base'` _string_: Defaults to `null`.
 	 *        - `'url'` _string_: Defaults to `null`.
 	 *        - `'data'` _array_: Additional data to use when initializing
-	 *          the request. Defaults to `array()`.
+	 *          the request. Defaults to `[]`.
 	 *        - `'stream'` _resource_: Stream to read from in order to get the message
 	 *          body when method is POST, PUT or PATCH and data is empty. When not provided
 	 *          `php://input` will be used for reading.
-	 *        - `'env'` _array_: Defaults to `array()`.
+	 *        - `'env'` _array_: Defaults to `[]`.
 	 *        - `'globals'` _boolean_: Use global variables for populating
 	 *          the request's environment and data; defaults to `true`.
 	 *        - `'drain'` _boolean_: Enables/disables automatic reading of streams.

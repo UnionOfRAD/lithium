@@ -187,7 +187,7 @@ class Model extends \lithium\core\StaticObjectDeprecated {
 	 * - `connection`: The name of the connection (as defined in `Connections::add()`) to which the
 	 *   model should bind
 	 * - `key`: The primary key or identifier key for records / documents this model produces,
-	 *   i.e. `'id'` or `array('_id', '_rev')`. Defaults to `'id'`.
+	 *   i.e. `'id'` or `['_id', '_rev']`. Defaults to `'id'`.
 	 * - `name`: The canonical name of this model. Defaults to the class name.
 	 * - `source`: The name of the database table or document collection to bind to. Defaults to the
 	 *   lower-cased and underscored name of the class, i.e. `class UserProfile` maps to
@@ -575,13 +575,13 @@ class Model extends \lithium\core\StaticObjectDeprecated {
 	 * @param array $options Options for the query.
 	 *        Common options accepted are:
 	 *        - `'conditions'` _array_: The conditions for the query
-	 *           i.e. `'array('is_published' => true)`.
+	 *           i.e. `['is_published' => true]`.
 	 *        - `'fields'` _array|null_: The fields that should be retrieved. When set to
 	 *          `null` or `'*'` and by default, uses all fields. To optimize query performance,
 	 *          limit the fields to just the ones actually needed.
 	 *        - `'order'` _array|string_: The order in which the data will be returned,
 	 *           i.e. `'created ASC'` sorts by created date in ascending order. To sort by
-	 *           multiple fields use the array syntax `array('title' => 'ASC', 'id' => 'ASC)`.
+	 *           multiple fields use the array syntax `['title' => 'ASC', 'id' => 'ASC']`.
 	 *        - `'limit'` _integer_: The maximum number of records to return.
 	 *        - `'page'` _integer_: Allows to paginate data sets. Specifies the page of the set
 	 *          together with the limit option specifying the number of records per page. The first

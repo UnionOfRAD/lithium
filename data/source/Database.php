@@ -1926,7 +1926,7 @@ abstract class Database extends \lithium\data\Source {
 	 * Generate a database-native column schema string
 	 *
 	 * @param array $column A field array structured like the following:
-	 *        `array('name' => 'value', 'type' => 'value' [, options])`, where options can
+	 *        `['name' => 'value', 'type' => 'value' [, options]]`, where options can
 	 *        be `'default'`, `'null'`, `'length'` or `'precision'`.
 	 * @return string SQL string
 	 */

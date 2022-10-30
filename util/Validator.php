@@ -415,7 +415,7 @@ class Validator extends \lithium\core\StaticObjectDeprecated {
 	 *        validation rule in one of the allowable formats. For example, if you are
 	 *        validating a data set containing a `'credit_card'` key, possible values for
 	 *        `$rules` would be as follows:
-	 *        - `array('credit_card' => 'You must include a credit card number')`: This is the
+	 *        - `['credit_card' => 'You must include a credit card number']`: This is the
 	 *          simplest form of validation rule, in which the value is simply a message to
 	 *          display if the rule fails. Using this format, all other validation settings
 	 *          inherit from the defaults, including the validation rule itself, which only
@@ -424,7 +424,7 @@ class Validator extends \lithium\core\StaticObjectDeprecated {
 	 *          When specifying messages, it may be preferable to use a code string (i.e.
 	 *          `'ERR_NO_TITLE'`) instead of the full text of the validation error. These code
 	 *          strings may then be translated by the appropriate tools in the templating layer.
-	 *         - `array('credit_card' => ['creditCard', 'message' => 'Invalid CC #'])`:
+	 *         - `['credit_card' => ['creditCard', 'message' => 'Invalid CC #']]`:
 	 *           In the second format, the validation rule (in this case `creditCard`) and
 	 *           associated configuration are specified as an array, where the rule to use is
 	 *           the first value in the array (no key), and additional settings are specified
@@ -432,10 +432,10 @@ class Validator extends \lithium\core\StaticObjectDeprecated {
 	 *           allowed keys.
 	 *         - The final format allows you to apply multiple validation rules to a single
 	 *           value, and it is specified as follows:
-	 *           `array('credit_card' => [
+	 *           `['credit_card' => [
 	 *                ['notEmpty', 'message' => 'You must include credit card number'],
 	 *                ['creditCard', 'message' => 'Your credit card number must be valid']
-	 *           ]);`
+	 *           ]];`
 	 * @param array $options Validator-specific options.
 	 *        Each rule defined as an array can contain any of the following settings
 	 *        (in addition to the first value, which represents the rule to be used):

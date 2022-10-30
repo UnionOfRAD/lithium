@@ -592,15 +592,15 @@ class Router extends \lithium\core\StaticObjectDeprecated {
 	 *
 	 * For example:
 	 * ```
-	 * Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', array(), array(
-	 * 	'persist' => array('controller', 'id')
-	 * ));
+	 * Router::connect('/{:controller}/{:action}/{:id:[0-9]+}', [], [
+	 * 	'persist' => ['controller', 'id']
+	 * ]);
 	 *
 	 * // URLs generated with $request will now have the 'controller' and 'id'
 	 * // parameters copied to new URLs.
-	 * $request = Router::process(new Request(array('url' => 'posts/view/1138')));
+	 * $request = Router::process(new Request(['url' => 'posts/view/1138']));
 	 *
-	 * $params = array('action' => 'edit');
+	 * $params = ['action' => 'edit'];
 	 * $url = Router::match($params, $request); // Returns: '/posts/edit/1138'
 	 * ```
 	 *

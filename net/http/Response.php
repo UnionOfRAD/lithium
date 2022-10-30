@@ -111,7 +111,7 @@ class Response extends \lithium\net\http\Message {
 	 *        - `'message'` _string_: Defaults to `null`.
 	 *        - `'status'` _mixed_: Defaults to `null`.
 	 *        - `'type'` _string_: Defaults to `null`.
-	 *        - `'cookies'` _array_: Defaults to `array()`.
+	 *        - `'cookies'` _array_: Defaults to `[]`.
 	 * @return void
 	 */
 	public function __construct(array $config = []) {

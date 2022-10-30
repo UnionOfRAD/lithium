@@ -241,8 +241,8 @@ class FormTest extends \lithium\test\Unit {
 
 	/**
 	 * Tests configuration of the `'fields'` setting where some form fields are mapped directly to
-	 * database fields (i.e. `array('field')`) and some are mapped manually (i.e.
-	 * `array('form_field' => 'database_field')`) in a single mixed array.
+	 * database fields (i.e. `['field']`) and some are mapped manually (i.e.
+	 * `['form_field' => 'database_field']`) in a single mixed array.
 	 */
 	public function testMixedFieldMapping() {
 		$subject = new Form([
