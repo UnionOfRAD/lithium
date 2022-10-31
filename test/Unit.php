@@ -881,8 +881,8 @@ class Unit extends \lithium\core\ObjectDeprecated {
 		if (isset($expected['expires'])) {
 			$expectedExpires = strtotime($expected['expires']);
 
-			$expires = gmdate('D, d M Y H:i:s \G\M\T', $expectedExpires);
-			$expires = preg_quote($expires, '/');
+			$expires = gmdate('D, d[\- ]M[\- ]Y', $expectedExpires);
+			$expires .= ' ' . gmdate('H:i:s', $expectedExpires) . ' GMT';
 			$maxAge = $expectedExpires - time();
 		} else {
 			$expires = '(?:.+?)';
