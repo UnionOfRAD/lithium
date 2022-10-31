@@ -49,7 +49,7 @@ class CurlTest extends \lithium\test\Integration {
 		$this->assertNotEmpty($result);
 
 		$result = $stream->resource();
-		$this->assertInternalType('resource', $result);
+		$this->assertInternalType('object', $result);
 	}
 
 	public function testClose() {
@@ -67,7 +67,7 @@ class CurlTest extends \lithium\test\Integration {
 		$this->assertTrue($result);
 
 		$result = $stream->resource();
-		$this->assertNotInternalType('resource', $result);
+		$this->assertNotInternalType('object', $result);
 	}
 
 	public function testTimeout() {
@@ -75,7 +75,7 @@ class CurlTest extends \lithium\test\Integration {
 		$result = $stream->open();
 		$stream->timeout(10);
 		$result = $stream->resource();
-		$this->assertInternalType('resource', $result);
+		$this->assertInternalType('object', $result);
 	}
 
 	public function testEncoding() {
@@ -83,25 +83,25 @@ class CurlTest extends \lithium\test\Integration {
 		$result = $stream->open();
 		$stream->encoding('UTF-8');
 		$result = $stream->resource();
-		$this->assertInternalType('resource', $result);
+		$this->assertInternalType('object', $result);
 
 		$stream = new Curl($this->_testConfig + ['encoding' => 'UTF-8']);
 		$result = $stream->open();
 		$result = $stream->resource();
-		$this->assertInternalType('resource', $result);
+		$this->assertInternalType('object', $result);
 	}
 
 	public function testWriteAndRead() {
 		$stream = new Curl($this->_testConfig);
-		$this->assertInternalType('resource', $stream->open());
-		$this->assertInternalType('resource', $stream->resource());
+		$this->assertInternalType('object', $stream->open());
+		$this->assertInternalType('object', $stream->resource());
 		$this->assertEqual(1, $stream->write());
 		$this->assertPattern("/^HTTP/", (string) $stream->read());
 	}
 
 	public function testSendWithNull() {
 		$stream = new Curl($this->_testConfig);
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$result = $stream->send(
 			new Request($this->_testConfig),
 			['response' => 'lithium\net\http\Response']
@@ -112,7 +112,7 @@ class CurlTest extends \lithium\test\Integration {
 
 	public function testSendWithArray() {
 		$stream = new Curl($this->_testConfig);
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$result = $stream->send($this->_testConfig,
 			['response' => 'lithium\net\http\Response']
 		);
@@ -122,7 +122,7 @@ class CurlTest extends \lithium\test\Integration {
 
 	public function testSendWithObject() {
 		$stream = new Curl($this->_testConfig);
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$result = $stream->send(
 			new Request($this->_testConfig),
 			['response' => 'lithium\net\http\Response']
@@ -154,12 +154,12 @@ class CurlTest extends \lithium\test\Integration {
 	public function testSendPostThenGet() {
 		$postConfig = ['method' => 'POST', 'body' => '{"body"}'];
 		$stream = new Curl($this->_testConfig);
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$this->assertTrue($stream->write(new Request($postConfig + $this->_testConfig)));
 		$this->assertTrue(isset($stream->options[CURLOPT_POST]));
 		$this->assertTrue($stream->close());
 
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$this->assertTrue($stream->write(new Request($this->_testConfig)));
 		$this->assertFalse(isset($stream->options[CURLOPT_POST]));
 		$this->assertTrue($stream->close());
@@ -168,7 +168,7 @@ class CurlTest extends \lithium\test\Integration {
 	public function testSendPutThenGet() {
 		$postConfig = ['method' => 'PUT', 'body' => '{"body"}'];
 		$stream = new Curl($this->_testConfig);
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$this->assertTrue($stream->write(new Request($postConfig + $this->_testConfig)));
 		$this->assertTrue(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
 		$this->assertEqual($stream->options[CURLOPT_CUSTOMREQUEST],'PUT');
@@ -176,7 +176,7 @@ class CurlTest extends \lithium\test\Integration {
 		$this->assertEqual($stream->options[CURLOPT_POSTFIELDS],$postConfig['body']);
 		$this->assertTrue($stream->close());
 
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$this->assertTrue($stream->write(new Request($this->_testConfig)));
 		$this->assertFalse(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
 		$this->assertTrue($stream->close());
@@ -185,7 +185,7 @@ class CurlTest extends \lithium\test\Integration {
 	public function testSendPatchThenGet() {
 		$postConfig = ['method' => 'PATCH', 'body' => '{"body"}'];
 		$stream = new Curl($this->_testConfig);
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$this->assertTrue($stream->write(new Request($postConfig + $this->_testConfig)));
 		$this->assertTrue(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
 		$this->assertEqual($stream->options[CURLOPT_CUSTOMREQUEST],'PATCH');
@@ -193,7 +193,7 @@ class CurlTest extends \lithium\test\Integration {
 		$this->assertEqual($stream->options[CURLOPT_POSTFIELDS],$postConfig['body']);
 		$this->assertTrue($stream->close());
 
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$this->assertTrue($stream->write(new Request($this->_testConfig)));
 		$this->assertFalse(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
 		$this->assertTrue($stream->close());
@@ -202,7 +202,7 @@ class CurlTest extends \lithium\test\Integration {
 	public function testSendDeleteThenGet() {
 		$postConfig = ['method' => 'DELETE', 'body' => ''];
 		$stream = new Curl($this->_testConfig);
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$this->assertTrue($stream->write(new Request($postConfig + $this->_testConfig)));
 		$this->assertTrue(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
 		$this->assertEqual($stream->options[CURLOPT_CUSTOMREQUEST],'DELETE');
@@ -210,7 +210,7 @@ class CurlTest extends \lithium\test\Integration {
 		$this->assertEqual($stream->options[CURLOPT_POSTFIELDS],$postConfig['body']);
 		$this->assertTrue($stream->close());
 
-		$this->assertInternalType('resource', $stream->open());
+		$this->assertInternalType('object', $stream->open());
 		$this->assertTrue($stream->write(new Request($this->_testConfig)));
 		$this->assertFalse(isset($stream->options[CURLOPT_CUSTOMREQUEST]));
 		$this->assertTrue($stream->close());

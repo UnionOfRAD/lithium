@@ -21,7 +21,7 @@ abstract class Socket extends \lithium\core\ObjectDeprecated {
 	/**
 	 * The resource for the current connection.
 	 *
-	 * @var resource
+	 * @var object
 	 */
 	protected $_resource = null;
 
