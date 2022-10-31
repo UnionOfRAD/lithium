@@ -195,7 +195,7 @@ class MemcacheTest extends \lithium\test\Integration {
 		$this->memcache->write(['expire0' => 'data0'], '+1 second');
 		$this->memcache->write(['expire1' => 'data1'], 1);
 
-		sleep(5);
+		sleep(3);
 
 		$result = $this->_conn->get('expire0');
 		$this->assertFalse($result);
@@ -502,23 +502,6 @@ class MemcacheTest extends \lithium\test\Integration {
 		$this->assertTrue($result);
 	}
 
-	public function testDecrementNonIntegerValue() {
-		$time = strtotime('+1 minute');
-		$key = 'non_integer';
-		$value = 'no';
-
-		$result = $this->_conn->set($key, $value, $time);
-		$this->assertTrue($result);
-
-		$this->memcache->decrement($key);
-
-		$result = $this->_conn->get($key);
-		$this->assertEqual(0, $result);
-
-		$result = $this->_conn->delete($key);
-		$this->assertTrue($result);
-	}
-
 	public function testDecrementWithScope() {
 		$adapter = new Memcache(['scope' => 'primary']);
 
@@ -546,23 +529,6 @@ class MemcacheTest extends \lithium\test\Integration {
 		$result = $this->memcache->increment($key);
 		$this->assertEqual($value + 1, $result);
 		$this->assertEqual($value + 1, $this->_conn->get($key));
-
-		$result = $this->_conn->delete($key);
-		$this->assertTrue($result);
-	}
-
-	public function testIncrementNonIntegerValue() {
-		$time = strtotime('+1 minute');
-		$key = 'non_integer_increment';
-		$value = 'yes';
-
-		$result = $this->_conn->set($key, $value, $time);
-		$this->assertTrue($result);
-
-		$this->memcache->increment($key);
-
-		$result = $this->_conn->get($key);
-		$this->assertEqual(0, $result);
 
 		$result = $this->_conn->delete($key);
 		$this->assertTrue($result);
