@@ -37,7 +37,7 @@ class CookieTest extends \lithium\test\Unit {
 		$cookies = array_keys($_COOKIE);
 
 		foreach ($cookies as $cookie) {
-			setcookie($cookie, "", time()-1);
+			setcookie($cookie, "", time() - 1);
 		}
 	}
 
@@ -46,14 +46,18 @@ class CookieTest extends \lithium\test\Unit {
 			$name = session_name();
 		}
 		$settings = session_get_cookie_params();
+
 		setcookie(
 			$name, '', time() - 1000, $settings['path'], $settings['domain'],
 			$settings['secure'], $settings['httponly']
 		);
+
 		if (session_id()) {
 			session_destroy();
 		}
-		$_COOKIE = [];
+		foreach ($_COOKIE as $key => $val) {
+			unset($_COOKIE[$key]);
+		}
 	}
 
 	public function testEnabled() {
