@@ -874,7 +874,7 @@ class Unit extends \lithium\core\ObjectDeprecated {
 		$expected += $defaults;
 
 		$headers = ($headers) ?: headers_list();
-		$value = preg_quote(urlencode($expected['value']), '/');
+		$value = preg_quote(rawurlencode($expected['value']), '/');
 
 		$key = explode('.', $expected['key']);
 		$key = (count($key) === 1) ? '[' . current($key) . ']' : ('[' . join('][', $key) . ']');
@@ -883,7 +883,7 @@ class Unit extends \lithium\core\ObjectDeprecated {
 		if (isset($expected['expires'])) {
 			$expectedExpires = strtotime($expected['expires']);
 
-			$expires = gmdate('D, d-M-Y H:i:s \G\M\T', $expectedExpires);
+			$expires = gmdate('D, d M Y H:i:s \G\M\T', $expectedExpires);
 			$expires = preg_quote($expires, '/');
 			$maxAge = $expectedExpires - time();
 		} else {
@@ -891,10 +891,10 @@ class Unit extends \lithium\core\ObjectDeprecated {
 			$maxAge = '([0-9]+)';
 		}
 		$path = preg_quote($expected['path'], '/');
-		$pattern  = "/^Set\-Cookie:\s{$expected['name']}$key=$value;";
-		$pattern .= "\sexpires=$expires;";
-		$pattern .= "\sMax-Age=$maxAge;";
-		$pattern .= "\spath=$path/";
+		$pattern  = "/^Set-Cookie:\s{$expected['name']}{$key}={$value};";
+		$pattern .= "\sexpires={$expires};";
+		$pattern .= "\sMax-Age={$maxAge};";
+		$pattern .= "\spath={$path}/";
 		$match = false;
 
 		foreach ($headers as $header) {

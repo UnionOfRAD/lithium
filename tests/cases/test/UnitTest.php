@@ -527,8 +527,8 @@ class UnitTest extends \lithium\test\Unit {
 	public function testAssertCookieWithHeaders() {
 		$maxAge = 60;
 		$time = time() + $maxAge;
-		$gmt = gmdate('D, d-M-Y H:i:s \G\M\T', $time);
-		$est = date('D, d-M-Y H:i:s \E\S\T', $time - (5 * 60 * 60));
+		$gmt = gmdate('D, d M Y H:i:s \G\M\T', $time);
+		$est = date('D, d M Y H:i:s \E\S\T', $time - (5 * 60 * 60));
 
 		$headers = [
 			'Set-Cookie: name[key]=value; expires=Tue, 04-May-2010 19:02:36 GMT; Max-Age=12; path=/',
