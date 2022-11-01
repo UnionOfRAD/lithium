@@ -26,8 +26,8 @@ class GettextTest extends \lithium\test\Unit {
 
 	public function setUp() {
 		$this->_path = $path = Libraries::get(true, 'resources') . '/tmp/tests';
-		mkdir("{$this->_path}/en/LC_MESSAGES", 0755, true);
-		mkdir("{$this->_path}/de/LC_MESSAGES", 0755, true);
+		is_dir("{$this->_path}/en/LC_MESSAGES") || mkdir("{$this->_path}/en/LC_MESSAGES", 0755, true);
+		is_dir("{$this->_path}/de/LC_MESSAGES") || mkdir("{$this->_path}/de/LC_MESSAGES", 0755, true);
 		$this->adapter = new MockGettext(compact('path'));
 	}
 
@@ -56,37 +56,6 @@ class GettextTest extends \lithium\test\Unit {
 	public function testReadNonExistent() {
 		$result = $this->adapter->read('messageTemplate', 'root', null);
 		$this->assertEmpty($result);
-	}
-
-	public function testReadUnreadable() {
-		$message = 'Permissions cannot be modified on Windows.';
-		$this->skipIf(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN', $message);
-
-		$data = [
-			'singular 1' => [
-				'id' => 'singular 1',
-				'ids' => ['singular' => 'singular 1', 'plural' => 'plural 1'],
-				'flags' => ['fuzzy' => true],
-				'translated' => [],
-				'occurrences' => [
-					['file' => 'test.php', 'line' => 1]
-				],
-				'comments' => [
-					'comment 1'
-				],
-				'context' => null
-			]
-		];
-
-		$this->adapter->mo = false;
-		$this->adapter->write('messageTemplate', 'root', null, $data);
-		chmod("{$this->_path}/message_default.pot", 0222);
-		$this->adapter->mo = true;
-
-		$result = $this->adapter->read('messageTemplate', 'root', null);
-		$this->assertNull($result);
-
-		chmod("{$this->_path}/message_default.pot", 0666);
 	}
 
 	public function testReadPoSingleItem() {
