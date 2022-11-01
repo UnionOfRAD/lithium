@@ -502,7 +502,7 @@ class ExporterTest extends \lithium\test\Unit {
 	 */
 	public function testSubObjectCastingOnSave() {
 		$model = $this->_model;
-		$model::schema([
+		$schema = $model::schema([
 			'_id' => ['type' => 'id'],
 			'sub.foo' => ['type' => 'boolean'],
 			'bar' => ['type' => 'boolean']

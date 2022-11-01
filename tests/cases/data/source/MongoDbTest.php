@@ -66,14 +66,13 @@ class MongoDbTest extends \lithium\test\Unit {
 	public function setUp() {
 		$this->_db = new MongoDb($this->_testConfig);
 		$this->_db->manager = new MockMongoManager();
+		$model = $this->_model;
 
 		Connections::add('mockconn', ['object' => $this->_db]);
 		MockMongoPost::config(['meta' => ['key' => '_id', 'connection' => 'mockconn']]);
 
 		$type = 'create';
-		$this->_query = new Query(compact('model', 'type') + [
-			'entity' => new Document(['model' => $this->_model])
-		]);
+		$this->_query = new Query(compact('model', 'type') + ['entity' => new Document(compact('model'))]);
 	}
 
 	public function tearDown() {
@@ -100,6 +99,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	public function testConnectInvalidDsn() {
 		$config = $this->_testConfig;
 		$config['dsn'] = 'foobar://user:pass@example.org';
+
 		$this->assertException('lithium\core\ConfigException', function() use ($config) {
 			$db = new MongoDb($config);
 		});
@@ -233,7 +233,7 @@ class MongoDbTest extends \lithium\test\Unit {
 	}
 
 	public function testSources() {
-		$this->_db->manager->results = [[(object)['name' => 'images']]];
+		$this->_db->manager->results = [[(object) ['name' => 'images']]];
 		$this->assertEqual(['images'], $this->_db->sources());
 	}
 
@@ -736,7 +736,7 @@ class MongoDbTest extends \lithium\test\Unit {
 
 		$fields = ['updated' => ['type' => 'MongoDB\BSON\UTCDateTime']];
 		$schema = new Schema(compact('fields'));
-		$entity = new Document(compact('data', 'schema', 'model') + ['exists' => true]);
+		$entity = new Document(compact('data', 'schema') + ['exists' => true]);
 		$entity->updated = time();
 		$entity->list[] = 'dib';
 
