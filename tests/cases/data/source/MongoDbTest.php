@@ -86,13 +86,13 @@ class MongoDbTest extends \lithium\test\Unit {
 		$config = $this->_testConfig;
 		$config['host'] = '';
 		$this->assertException('lithium\core\ConfigException', function() use ($config) {
-			$db = new MongoDb($config);
+			new MongoDb($config);
 		});
 
 		$config = $this->_testConfig;
 		$config['host'] = null;
 		$this->assertException('lithium\core\ConfigException', function() use ($config) {
-			$db = new MongoDb($config);
+			new MongoDb($config);
 		});
 	}
 
@@ -101,7 +101,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$config['dsn'] = 'foobar://user:pass@example.org';
 
 		$this->assertException('lithium\core\ConfigException', function() use ($config) {
-			$db = new MongoDb($config);
+				$db = new MongoDb($config + ['autoConnect' => false]);
 		});
 
 		$config = $this->_testConfig;
@@ -115,7 +115,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$config = $this->_testConfig;
 		$config['dsn'] = 'mongodb://user:pass@cluster0-shard-00-00-foo.mongodb.net:27017,cluster0-shard-00-01-foo.mongodb.net:27017,cluster0-shard-00-02-foo.mongodb.net:27017/testdb';
 
-		$db = new MongoDb($config);
+		$db = new MongoDb($config + ['autoConnect' => false]);
 		$this->assertEqual($db->_config['login'], 'user');
 		$this->assertEqual($db->_config['password'], 'pass');
 		$this->assertEqual($db->_config['database'], 'testdb');
@@ -128,7 +128,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$config = $this->_testConfig;
 		$config['dsn'] = 'mongodb://cluster0-shard-00-00-foo.mongodb.net:27017,cluster0-shard-00-01-foo.mongodb.net:27017,cluster0-shard-00-02-foo.mongodb.net:27017/testdb';
 
-		$db = new MongoDb($config);
+		$db = new MongoDb($config + ['autoConnect' => false]);
 		$this->assertEqual($db->_config['database'], 'testdb');
 		$this->assertEqual($db->_config['host'], [
 			'cluster0-shard-00-00-foo.mongodb.net:27017',
@@ -139,7 +139,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$config = $this->_testConfig;
 		$config['dsn'] = 'mongodb+srv://user:pass@cluster0-foo.mongodb.net/testdb';
 
-		$db = new MongoDb($config);
+		$db = new MongoDb($config + ['autoConnect' => false]);
 		$this->assertEqual($db->_config['login'], 'user');
 		$this->assertEqual($db->_config['password'], 'pass');
 		$this->assertEqual($db->_config['database'], 'testdb');
@@ -158,7 +158,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$config = $this->_testConfig;
 		$config['dsn'] = 'mongodb://user:pass@cluster0-shard-00-00-foo.mongodb.net:27017,cluster0-shard-00-01-foo.mongodb.net:27017,cluster0-shard-00-02-foo.mongodb.net:27017/testdb?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
 
-		$db = new MongoDb($config);
+		$db = new MongoDb($config + ['autoConnect' => false]);
 		$this->assertEqual($db->_config['login'], 'user');
 		$this->assertEqual($db->_config['password'], 'pass');
 		$this->assertEqual($db->_config['database'], 'testdb');
@@ -183,7 +183,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$config = $this->_testConfig;
 		$config['dsn'] = 'mongodb://user:pass@cluster0-shard-00-00-foo.mongodb.net:27017,cluster0-shard-00-01-foo.mongodb.net:27017,cluster0-shard-00-02-foo.mongodb.net:27017/testdb?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&connectTimeoutMS=500';
 
-		$db = new MongoDb($config);
+		$db = new MongoDb($config + ['autoConnect' => false]);
 		$this->assertEqual($db->_config['login'], 'user');
 		$this->assertEqual($db->_config['password'], 'pass');
 		$this->assertEqual($db->_config['database'], 'testdb');
@@ -209,7 +209,7 @@ class MongoDbTest extends \lithium\test\Unit {
 		$config['dsn'] = 'mongodb://user:pass@cluster0-shard-00-00-foo.mongodb.net:27017,cluster0-shard-00-01-foo.mongodb.net:27017,cluster0-shard-00-02-foo.mongodb.net:27017/testdb?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin';
 		$config['uriOptions']['journal'] = false;
 
-		$db = new MongoDb($config);
+		$db = new MongoDb($config + ['autoConnect' => false]);
 		$this->assertEqual($db->_config['login'], 'user');
 		$this->assertEqual($db->_config['password'], 'pass');
 		$this->assertEqual($db->_config['database'], 'testdb');
