@@ -10,7 +10,6 @@
 namespace lithium\tests\integration\data;
 
 use lithium\core\Libraries;
-use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\tests\fixture\model\mongodb\Images;
 use lithium\tests\fixture\model\mongodb\Galleries;
@@ -104,15 +103,16 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 	}
 
 	public function testSorting() {
-		$asc = Galleries::find('all', ['order' => ['name']]);
+		$prop = function($name) {
+			return function ($obj) use ($name) {
+				return $obj[$name];
+			};
+		};
+		$asc = Galleries::find('all', ['order' => ['name']])->map($prop('name'))->data();
+		$this->assertEqual([2 => 'Bar Gallery', 1 => 'Foo Gallery'], $asc);
 
-		$this->assertEqual('Bar Gallery', $asc->first()->name);
-		$this->assertEqual('Foo Gallery', $asc->next()->name);
-
-		$desc = Galleries::find('all', ['order' => ['name' => 'desc']]);
-
-		$this->assertEqual('Foo Gallery', $desc->first()->name);
-		$this->assertEqual('Bar Gallery', $desc->next()->name);
+		$desc = Galleries::find('all', ['order' => ['name' => 'desc']])->map($prop('name'))->data();
+		$this->assertEqual([1 => 'Foo Gallery', 2 => 'Bar Gallery'], $desc);
 	}
 
 	public function testCountOnEmptyResultSet() {
@@ -125,9 +125,7 @@ class MongoDbTest extends \lithium\tests\integration\data\Base {
 
 	public function testIterateOverEmptyResultSet() {
 		$data = Galleries::find('all', ['conditions' => ['name' => 'no match']]);
-
-		$result = next($data);
-		$this->assertNull($result);
+		$this->assertFalse($data->next());
 	}
 
 	public function testDateCastingUsingExists() {

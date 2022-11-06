@@ -38,6 +38,8 @@ class Curl extends \lithium\net\Socket {
 	 */
 	public $options = [];
 
+	protected $_isConnected = false;
+
 	/**
 	 * Constructor.
 	 *

@@ -31,7 +31,7 @@ class Base extends \lithium\test\Integration {
 	}
 
 	public function with($adapters) {
-		$type = isset($this->_dbConfig['adapter']) ? $this->_dbConfig['type'] : null;
+		$type = ($this->_dbConfig['adapter'] ?? $this->_dbConfig['type']) ?? null;
 
 		foreach ((array) $adapters as $adapter) {
 			if ($type === $adapter) {

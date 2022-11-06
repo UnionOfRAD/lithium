@@ -15,6 +15,10 @@ use lithium\storage\cache\adapter\Memcache;
 
 class MemcacheTest extends \lithium\test\Integration {
 
+	public $server = null;
+
+	public $memcache = null;
+
 	protected $_conn = null;
 
 	/**

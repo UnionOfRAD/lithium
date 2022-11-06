@@ -215,7 +215,7 @@ class Sqlite3 extends \lithium\data\source\Database {
 				$schema = $this->_column($column['type']);
 				$default = $column['dflt_value'];
 
-				if (preg_match("/^'(.*)'/", $default, $match)) {
+				if (preg_match("/^'(.*)'/", $default ?? '', $match)) {
 					$default = $match[1];
 				} elseif ($schema['type'] === 'boolean') {
 					$default = !!$default;
