@@ -646,14 +646,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return string Serialized properties of the object.
 	 */
 	public function serialize() {
-		$this->offsetGet(null);
-		static::__destruct();
-
-		$vars = get_object_vars($this);
-		unset($vars['_result']);
-		unset($vars['_handlers']);
-
-		return serialize($vars);
+		return serialize($this->__serialize());
 	}
 
 	/**
@@ -666,20 +659,25 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @return void
 	 */
 	public function unserialize($data) {
-		$vars = unserialize($data);
-		parent::_init();
-
-		foreach ($vars as $key => $value) {
-			$this->{$key} = $value;
-		}
+		return $this->__unserialize(unserialize($data));
 	}
 
 	public function __serialize() {
-		return $this->serialize();
+		$this->offsetGet(null);
+		static::__destruct();
+
+		$vars = get_object_vars($this);
+		unset($vars['_result']);
+		unset($vars['_handlers']);
+		return $vars;
 	}
 
 	public function __unserialize($data) {
-		return $this->__unserialize($data);
+		parent::_init();
+
+		foreach ($data as $key => $value) {
+			$this->{$key} = $value;
+		}
 	}
 
 	/**

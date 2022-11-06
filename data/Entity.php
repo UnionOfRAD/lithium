@@ -542,12 +542,7 @@ class Entity extends \lithium\core\ObjectDeprecated implements \Serializable {
 	 * @return string Serialized properties of the object.
 	 */
 	public function serialize() {
-		$vars = get_object_vars($this);
-		unset($vars['_schema']);
-		unset($vars['_config']['schema']);
-		unset($vars['_handlers']);
-
-		return serialize($vars);
+		return serialize($this->__serialize());
 	}
 
 	/**
@@ -560,20 +555,23 @@ class Entity extends \lithium\core\ObjectDeprecated implements \Serializable {
 	 * @return void
 	 */
 	public function unserialize($data) {
-		$data = unserialize($data);
+		$this->__unserialize(unserialize($data));
+	}
+
+	public function __serialize() {
+		$vars = get_object_vars($this);
+		unset($vars['_schema']);
+		unset($vars['_config']['schema']);
+		unset($vars['_handlers']);
+		return $vars;
+	}
+
+	public function __unserialize($data) {
 		static::_init();
 
 		foreach ($data as $key => $value) {
 			$this->{$key} = $value;
 		}
-	}
-
-	public function __serialize() {
-		return $this->serialize();
-	}
-
-	public function __unserialize($data) {
-		return $this->__unserialize($data);
 	}
 }
 
