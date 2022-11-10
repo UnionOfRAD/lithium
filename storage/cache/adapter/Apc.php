@@ -15,8 +15,8 @@ use lithium\storage\Cache;
  * An Alternative PHP Cache (APC) cache adapter implementation leveraging the user-
  * space caching features (not the opcode caching features) of the cache.
  *
- * This adapter requires `pecl/apc` or `pecl/apcu` to be installed. The extension
- * and user-space caching must be enabled according to the extension documention.
+ * This adapter requires `pecl/apcu` to be installed. The extension and user-space
+ * caching must be enabled according to the extension documention.
  *
  * This adapter natively handles multi-key reads/writes/deletes, natively
  * provides serialization features and supports atomic increment/decrement
@@ -35,8 +35,7 @@ use lithium\storage\Cache;
  * ```
  *
  * @link http://pecl.php.net/package/APCu
- * @link http://pecl.php.net/package/APC
- * @link http://php.net/book.apc.php
+ * @link https://www.php.net/manual/en/book.apcu.php
  * @see lithium\storage\Cache::key()
  */
 class Apc extends \lithium\storage\cache\Adapter {
@@ -84,7 +83,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 		if ($this->_config['scope']) {
 			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
 		}
-		return apc_store($keys, null, $ttl) === [];
+		return apcu_store($keys, null, $ttl) === [];
 	}
 
 	/**
@@ -100,7 +99,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 		if ($this->_config['scope']) {
 			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
 		}
-		$results = apc_fetch($keys);
+		$results = apcu_fetch($keys);
 
 		if ($this->_config['scope']) {
 			$results = $this->_removeScopePrefix($this->_config['scope'], $results);
@@ -118,7 +117,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 		if ($this->_config['scope']) {
 			$keys = $this->_addScopePrefix($this->_config['scope'], $keys);
 		}
-		return apc_delete($keys) === [];
+		return apcu_delete($keys) === [];
 	}
 
 	/**
@@ -133,7 +132,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * @return integer|boolean The item's new value on successful decrement, else `false`.
 	 */
 	public function decrement($key, $offset = 1) {
-		return apc_dec(
+		return apcu_dec(
 			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
 		);
 	}
@@ -150,7 +149,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * @return integer|boolean The item's new value on successful increment, else `false`.
 	 */
 	public function increment($key, $offset = 1) {
-		return apc_inc(
+		return apcu_inc(
 			$this->_config['scope'] ? "{$this->_config['scope']}:{$key}" : $key, $offset
 		);
 	}
@@ -165,7 +164,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * @return boolean `true` on successful clearing, `false` otherwise.
 	 */
 	public function clear() {
-		return apc_clear_cache('user');
+		return apcu_clear_cache();
 	}
 
 	/**
@@ -175,7 +174,7 @@ class Apc extends \lithium\storage\cache\Adapter {
 	 * @return boolean `true` if enabled, `false` otherwise.
 	 */
 	public static function enabled() {
-		$loaded = extension_loaded('apc');
+		$loaded = extension_loaded('apcu');
 		$isCli = (php_sapi_name() === 'cli');
 		$enabled = (!$isCli && ini_get('apc.enabled')) || ($isCli && ini_get('apc.enable_cli'));
 		return ($loaded && $enabled);

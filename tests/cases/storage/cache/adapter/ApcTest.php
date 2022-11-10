@@ -14,6 +14,8 @@ use lithium\storage\cache\adapter\Apc;
 
 class ApcTest extends \lithium\test\Unit {
 
+	public $Apc;
+
 	/**
 	 * Skip the test if APC extension is unavailable.
 	 */
@@ -22,12 +24,12 @@ class ApcTest extends \lithium\test\Unit {
 	}
 
 	public function setUp() {
-		apc_clear_cache('user');
+		apcu_clear_cache();
 		$this->Apc = new Apc();
 	}
 
 	public function tearDown() {
-		apc_clear_cache('user');
+		apcu_clear_cache();
 		unset($this->Apc);
 	}
 
@@ -46,10 +48,10 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$expected = $data;
-		$result = apc_fetch($key);
+		$result = apcu_fetch($key);
 		$this->assertEqual($expected, $result);
 
-		$result = apc_delete($key);
+		$result = apcu_delete($key);
 		$this->assertTrue($result);
 
 		$key = 'another_key';
@@ -62,10 +64,10 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$expected = $data;
-		$result = apc_fetch($key);
+		$result = apcu_fetch($key);
 		$this->assertEqual($expected, $result);
 
-		$result = apc_delete($key);
+		$result = apcu_delete($key);
 		$this->assertTrue($result);
 	}
 
@@ -85,7 +87,7 @@ class ApcTest extends \lithium\test\Unit {
 		$result = $apc->write($keys, $expiry);
 		$this->assertTrue($result);
 
-		$result = apc_exists('key1');
+		$result = apcu_exists('key1');
 		$this->assertTrue($result);
 	}
 
@@ -97,10 +99,10 @@ class ApcTest extends \lithium\test\Unit {
 		$result = $apc->write($keys, $expiry);
 		$this->assertTrue($result);
 
-		$result = apc_exists('key1');
+		$result = apcu_exists('key1');
 		$this->assertTrue($result);
 
-		apc_delete('key1');
+		apcu_delete('key1');
 
 		$apc = new Apc(['expiry' => Cache::PERSIST]);
 		$expiry = Cache::PERSIST;
@@ -108,17 +110,17 @@ class ApcTest extends \lithium\test\Unit {
 		$result = $apc->write($keys, $expiry);
 		$this->assertTrue($result);
 
-		$result = apc_exists('key1');
+		$result = apcu_exists('key1');
 		$this->assertTrue($result);
 
-		apc_delete('key1');
+		apcu_delete('key1');
 
 		$apc = new Apc();
 		$expiry = Cache::PERSIST;
 		$result = $apc->write($keys, $expiry);
 		$this->assertTrue($result);
 
-		$result = apc_exists('key1');
+		$result = apcu_exists('key1');
 		$this->assertTrue($result);
 	}
 
@@ -135,7 +137,7 @@ class ApcTest extends \lithium\test\Unit {
 		$expiry = '+5 seconds';
 		$this->Apc->write($keys, $expiry);
 
-		$result = apc_exists('key1');
+		$result = apcu_exists('key1');
 		$this->assertTrue($result);
 	}
 
@@ -152,7 +154,7 @@ class ApcTest extends \lithium\test\Unit {
 		$expiry = 5;
 		$this->Apc->write($keys, $expiry);
 
-		$result = apc_exists('key1');
+		$result = apcu_exists('key1');
 		$this->assertTrue($result);
 	}
 
@@ -166,10 +168,10 @@ class ApcTest extends \lithium\test\Unit {
 		$result = $this->Apc->write($keys, $expiry);
 		$this->assertTrue($result);
 
-		$result = apc_fetch(array_keys($keys));
+		$result = apcu_fetch(array_keys($keys));
 		$this->assertEqual($keys, $result);
 
-		$result = apc_delete(array_keys($keys));
+		$result = apcu_delete(array_keys($keys));
 		$this->assertEqual([], $result);
 	}
 
@@ -178,28 +180,28 @@ class ApcTest extends \lithium\test\Unit {
 		$data = 'read data';
 		$keys = [$key];
 
-		$result = apc_store($key, $data, 60);
+		$result = apcu_store($key, $data, 60);
 		$this->assertTrue($result);
 
 		$expected = [$key => $data];
 		$result = $this->Apc->read($keys);
 		$this->assertEqual($expected, $result);
 
-		$result = apc_delete($key);
+		$result = apcu_delete($key);
 		$this->assertTrue($result);
 
 		$key = 'another_read_key';
 		$data = 'read data';
 		$keys = [$key];
 
-		$result = apc_store($key, $data, 60);
+		$result = apcu_store($key, $data, 60);
 		$this->assertTrue($result);
 
 		$expected = [$key => $data];
 		$result = $this->Apc->read($keys);
 		$this->assertEqual($expected, $result);
 
-		$result = apc_delete($key);
+		$result = apcu_delete($key);
 		$this->assertTrue($result);
 	}
 
@@ -209,7 +211,7 @@ class ApcTest extends \lithium\test\Unit {
 			'key2' => 'data2',
 			'key3' => 'data3'
 		];
-		apc_store($keys, null, 60);
+		apcu_store($keys, null, 60);
 
 		$expected = [
 			'key1' => 'data1',
@@ -224,7 +226,7 @@ class ApcTest extends \lithium\test\Unit {
 		$result = $this->Apc->read($keys);
 		$this->assertEqual($expected, $result);
 
-		$result = apc_delete($keys);
+		$result = apcu_delete($keys);
 		$this->assertEqual([], $result);
 	}
 
@@ -240,8 +242,8 @@ class ApcTest extends \lithium\test\Unit {
 	public function testReadWithScope() {
 		$adapter = new Apc(['scope' => 'primary']);
 
-		apc_store('primary:key1', 'test1', 60);
-		apc_store('key1', 'test2', 60);
+		apcu_store('primary:key1', 'test1', 60);
+		apcu_store('key1', 'test2', 60);
 
 		$keys = ['key1'];
 		$expected = ['key1' => 'test1'];
@@ -304,10 +306,10 @@ class ApcTest extends \lithium\test\Unit {
 		$adapter->write($keys, $expiry);
 
 		$expected = 'test1';
-		$result = apc_fetch('primary:key1');
+		$result = apcu_fetch('primary:key1');
 		$this->assertEqual($expected, $result);
 
-		$result = apc_fetch('key1');
+		$result = apcu_fetch('key1');
 		$this->assertFalse($result);
 	}
 
@@ -316,7 +318,7 @@ class ApcTest extends \lithium\test\Unit {
 		$data = 'data to delete';
 		$keys = [$key];
 
-		$result = apc_store($key, $data, 60);
+		$result = apcu_store($key, $data, 60);
 		$this->assertTrue($result);
 
 		$result = $this->Apc->delete($keys);
@@ -330,7 +332,7 @@ class ApcTest extends \lithium\test\Unit {
 			'key2' => 'data2',
 			'key3' => 'data3'
 		];
-		apc_store($keys, null, 60);
+		apcu_store($keys, null, 60);
 
 		$keys = [
 			'key1',
@@ -340,7 +342,7 @@ class ApcTest extends \lithium\test\Unit {
 		$result = $this->Apc->delete($keys);
 		$this->assertTrue($result);
 
-		$result = apc_delete($keys);
+		$result = apcu_delete($keys);
 		$this->assertEqual($keys, $result);
 	}
 
@@ -356,17 +358,17 @@ class ApcTest extends \lithium\test\Unit {
 	public function testDeleteWithScope() {
 		$adapter = new Apc(['scope' => 'primary']);
 
-		apc_store('primary:key1', 'test1', 60);
-		apc_store('key1', 'test2', 60);
+		apcu_store('primary:key1', 'test1', 60);
+		apcu_store('key1', 'test2', 60);
 
 		$keys = ['key1'];
 		$expected = ['key1' => 'test1'];
 		$adapter->delete($keys);
 
-		$result = apc_exists('key1');
+		$result = apcu_exists('key1');
 		$this->assertTrue($result);
 
-		$result = apc_exists('primary:key1');
+		$result = apcu_exists('primary:key1');
 		$this->assertFalse($result);
 	}
 
@@ -380,7 +382,7 @@ class ApcTest extends \lithium\test\Unit {
 		$this->assertTrue($result);
 
 		$expected = $data;
-		$result = apc_fetch($key);
+		$result = apcu_fetch($key);
 		$this->assertEqual($expected, $result);
 
 		$expected = $keys;
@@ -395,33 +397,33 @@ class ApcTest extends \lithium\test\Unit {
 		$key1 = 'key_clear_1';
 		$key2 = 'key_clear_2';
 
-		$result = apc_store($key1, 'data that will no longer exist', 60);
+		$result = apcu_store($key1, 'data that will no longer exist', 60);
 		$this->assertTrue($result);
 
-		$result = apc_store($key2, 'more dead data', 60);
+		$result = apcu_store($key2, 'more dead data', 60);
 		$this->assertTrue($result);
 
 		$result = $this->Apc->clear();
 		$this->assertTrue($result);
 
-		$this->assertFalse(apc_fetch($key1));
-		$this->assertFalse(apc_fetch($key2));
+		$this->assertFalse(apcu_fetch($key1));
+		$this->assertFalse(apcu_fetch($key2));
 	}
 
 	public function testDecrement() {
 		$key = 'decrement';
 		$value = 10;
 
-		$result = apc_store($key, $value, 60);
+		$result = apcu_store($key, $value, 60);
 		$this->assertTrue($result);
 
 		$result = $this->Apc->decrement($key);
 		$this->assertEqual($value - 1, $result);
 
-		$result = apc_fetch($key);
+		$result = apcu_fetch($key);
 		$this->assertEqual($value - 1, $result);
 
-		$result = apc_delete($key);
+		$result = apcu_delete($key);
 		$this->assertTrue($result);
 	}
 
@@ -429,32 +431,32 @@ class ApcTest extends \lithium\test\Unit {
 		$key = 'non_integer';
 		$value = 'no';
 
-		$result = apc_store($key, $value, 60);
+		$result = apcu_store($key, $value, 60);
 		$this->assertTrue($result);
 
 		$this->Apc->decrement($key);
 
-		$result = apc_fetch($key);
+		$result = apcu_fetch($key);
 		$this->assertEqual('no', $result);
 
-		$result = apc_delete($key);
+		$result = apcu_delete($key);
 		$this->assertTrue($result);
 	}
 
 	public function testDecrementWithScope() {
 		$adapter = new Apc(['scope' => 'primary']);
 
-		apc_store('primary:key1', 1, 60);
-		apc_store('key1', 1, 60);
+		apcu_store('primary:key1', 1, 60);
+		apcu_store('key1', 1, 60);
 
 		$adapter->decrement('key1');
 
 		$expected = 1;
-		$result = apc_fetch('key1');
+		$result = apcu_fetch('key1');
 		$this->assertEqual($expected, $result);
 
 		$expected = 0;
-		$result = apc_fetch('primary:key1');
+		$result = apcu_fetch('primary:key1');
 		$this->assertEqual($expected, $result);
 	}
 
@@ -462,16 +464,16 @@ class ApcTest extends \lithium\test\Unit {
 		$key = 'increment';
 		$value = 10;
 
-		$result = apc_store($key, $value, 60);
+		$result = apcu_store($key, $value, 60);
 		$this->assertTrue($result);
 
 		$result = $this->Apc->increment($key);
 		$this->assertEqual($value + 1, $result);
 
-		$result = apc_fetch($key);
+		$result = apcu_fetch($key);
 		$this->assertEqual($value + 1, $result);
 
-		$result = apc_delete($key);
+		$result = apcu_delete($key);
 		$this->assertTrue($result);
 	}
 
@@ -479,32 +481,32 @@ class ApcTest extends \lithium\test\Unit {
 		$key = 'non_integer_increment';
 		$value = 'yes';
 
-		$result = apc_store($key, $value, 60);
+		$result = apcu_store($key, $value, 60);
 		$this->assertTrue($result);
 
 		$this->Apc->increment($key);
 
-		$result = apc_fetch($key);
+		$result = apcu_fetch($key);
 		$this->assertEqual('yes', $result);
 
-		$result = apc_delete($key);
+		$result = apcu_delete($key);
 		$this->assertTrue($result);
 	}
 
 	public function testIncrementWithScope() {
 		$adapter = new Apc(['scope' => 'primary']);
 
-		apc_store('primary:key1', 1, 60);
-		apc_store('key1', 1, 60);
+		apcu_store('primary:key1', 1, 60);
+		apcu_store('key1', 1, 60);
 
 		$adapter->increment('key1');
 
 		$expected = 1;
-		$result = apc_fetch('key1');
+		$result = apcu_fetch('key1');
 		$this->assertEqual($expected, $result);
 
 		$expected = 2;
-		$result = apc_fetch('primary:key1');
+		$result = apcu_fetch('primary:key1');
 		$this->assertEqual($expected, $result);
 	}
 }
