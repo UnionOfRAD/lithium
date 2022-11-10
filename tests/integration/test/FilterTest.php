@@ -14,6 +14,8 @@ use lithium\test\Report;
 
 class FilterTest extends \lithium\test\Integration {
 
+	public $report;
+
 	/**
 	 * Skip the tests if the xdebug extension is not loaded. The `Coverage`
 	 * filter depends on the extension.

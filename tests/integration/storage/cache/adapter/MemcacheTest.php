@@ -212,8 +212,7 @@ class MemcacheTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteMulti() {
-		$expiry = '+1 minute';
-		$time = strtotime($expiry);
+		$expiry = '+1 seconds';
 		$keys = [
 			'key1' => 'data1',
 			'key2' => 'data2',
