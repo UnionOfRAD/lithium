@@ -144,7 +144,7 @@ use InvalidArgumentException;
  * done, having this feature enabled in PCRE isn't optional. Please ensure
  * you've got PCRE compiled with UTF-8 support.
  */
-class Validator extends \lithium\core\StaticObjectDeprecated {
+class Validator {
 
 	/**
 	 * An array of validation rules.  May contain a single regular expression, an array of regular

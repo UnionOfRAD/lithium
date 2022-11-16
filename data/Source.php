@@ -9,6 +9,7 @@
 
 namespace lithium\data;
 
+use lithium\core\AutoConfigurable;
 use lithium\core\NetworkException;
 use lithium\util\Inflector;
 
@@ -24,7 +25,9 @@ use lithium\util\Inflector;
  * Subclasses may implement any other non-standard functionality, but the above methods define the
  * requirements for interacting with `Model` objects, and other classes within `lithium\data`.
  */
-abstract class Source extends \lithium\core\ObjectDeprecated {
+abstract class Source {
+
+	use AutoConfigurable;
 
 	/**
 	 * The list of object properties to be automatically assigned from configuration passed to
@@ -91,7 +94,8 @@ abstract class Source extends \lithium\core\ObjectDeprecated {
 	 */
 	public function __construct(array $config = []) {
 		$defaults = ['autoConnect' => true];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
+		$this->_autoInit($config);
 	}
 
 	/**
@@ -106,7 +110,6 @@ abstract class Source extends \lithium\core\ObjectDeprecated {
 	}
 
 	protected function _init() {
-		parent::_init();
 		if ($this->_config['autoConnect']) {
 			$this->connect();
 		}

@@ -129,20 +129,6 @@ class HelperTest extends \lithium\test\Unit {
 		$this->assertEqual($expected, $result);
 	}
 
-	/**
-	 * @deprecated
-	 */
-	public function testDeprecatedAttributes() {
-		error_reporting(($backup = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$attributes = ['value' => 1, 'title' => 'one'];
-		$expected = ' value="1" title="one"';
-		$result = $this->helper->testProtectedAttributes($attributes);
-		$this->assertEqual($expected, $result);
-
-		error_reporting($backup);
-	}
-
 	public function testInstantiationWithNoContext() {
 		$this->helper = new MockHelper();
 		$result = $this->helper->testRender(null, "foo {:bar}", ['bar' => 'baz']);

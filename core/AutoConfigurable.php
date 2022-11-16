@@ -14,6 +14,33 @@ namespace lithium\core;
  */
 trait AutoConfigurable {
 
+	public const AUTO_INIT_CLASS = 'lithium\core\AutoConfigurable::AUTO_INIT_CLASS';
+
+	/**
+	 * Stores configuration information for object instances at time of construction.
+	 *
+	 * @var array
+	 */
+	protected $_config = [];
+
+	/**
+	 * Default constructor implementation. Initializes class configuration (`$_config`), and
+	 * assigns object properties using the `_init()` method, unless otherwise specified by
+	 * configuration. See below for details.
+	 *
+	 * @see lithium\core\AutoConfigurable::$_config
+	 * @see lithium\core\AutoConfigurable::_init()
+	 * @param array $config The configuration options which will be assigned to the `$_config`
+	 *        property. This method accepts one configuration option:
+	 *        - `'init'` _boolean_: Controls constructor behavior for calling the `_init()`
+	 *          method. If `false`, the method is not called, otherwise it is. Defaults to `true`.
+	 * @return void
+	 */
+	public function __construct(array $config = []) {
+		$this->_autoConfig($config, isset($this->_autoConfig) ? $this->_autoConfig : []);
+		$this->_autoInit($config);
+	}
+
 	/**
 	 * Assigns configuration values to object properties.
 	 *
@@ -42,6 +69,8 @@ trait AutoConfigurable {
 	 * @return void
 	 */
 	protected function _autoConfig(array $config, array $auto) {
+		$this->_config = $config;
+
 		foreach ($auto as $key => $flag) {
 			if (!isset($config[$key]) && !isset($config[$flag])) {
 				continue;
@@ -53,6 +82,19 @@ trait AutoConfigurable {
 			}
 		}
 	}
+
+	protected function _autoInit($config) {
+		if (!isset($config[static::AUTO_INIT_CLASS]) || $config[static::AUTO_INIT_CLASS] !== false) {
+			$this->_init();
+		}
+	}
+
+	/**
+	 * Empty `_init()` method, intended to be overridden if needed.
+	 *
+	 * @return void
+	 */
+	protected function _init() {}
 }
 
 ?>

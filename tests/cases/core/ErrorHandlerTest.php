@@ -14,7 +14,7 @@ use Exception;
 use UnexpectedValueException;
 use lithium\core\ErrorHandler;
 use lithium\aop\Filters;
-use lithium\tests\mocks\core\MockStaticObjectDeprecated;
+use lithium\tests\mocks\core\MockStatic;
 use lithium\tests\mocks\core\MockErrorHandler;
 
 class ErrorHandlerTest extends \lithium\test\Unit {
@@ -106,14 +106,14 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 	}
 
 	public function testApply() {
-		$class = 'lithium\tests\mocks\core\MockStaticObjectDeprecated';
+		$class = 'lithium\tests\mocks\core\MockStatic';
 
 		ErrorHandler::apply("{$class}::throwException", [], function($details) {
 			return $details['exception']->getMessage();
 		});
-		$this->assertEqual('foo', MockStaticObjectDeprecated::throwException());
+		$this->assertEqual('foo', MockStatic::throwException());
 
-		Filters::clear('lithium\tests\mocks\core\MockStaticObjectDeprecated');
+		Filters::clear('lithium\tests\mocks\core\MockStatic');
 	}
 
 	public function testTrace() {
@@ -169,12 +169,12 @@ class ErrorHandlerTest extends \lithium\test\Unit {
 	}
 
 	public function testRenderedOutput() {
-		$class = 'lithium\tests\mocks\core\MockStaticObjectDeprecated';
+		$class = 'lithium\tests\mocks\core\MockStatic';
 
 		ob_start();
 		echo 'Some Output';
 		ErrorHandler::apply("{$class}::throwException", [], function($details) {});
-		MockStaticObjectDeprecated::throwException();
+		MockStatic::throwException();
 		$this->assertEmpty(ob_get_length());
 	}
 }

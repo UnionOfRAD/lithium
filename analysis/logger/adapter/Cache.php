@@ -10,6 +10,7 @@
 namespace lithium\analysis\logger\adapter;
 
 use lithium\util\Text;
+use lithium\core\AutoConfigurable;
 
 /**
  * The `Cache` logger allows log messages to be written to cache configurations set up in
@@ -34,7 +35,9 @@ use lithium\util\Text;
  *
  * @see lithium\storage\Cache
  */
-class Cache extends \lithium\core\ObjectDeprecated {
+class Cache {
+
+	use AutoConfigurable;
 
 	/**
 	 * Classes used by `Cache`.
@@ -67,7 +70,8 @@ class Cache extends \lithium\core\ObjectDeprecated {
 			'expiry' => $cache::PERSIST,
 			'key' => 'log_{:priority}_{:timestamp}'
 		];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, []);
+		$this->_autoInit($config);
 	}
 
 	/**

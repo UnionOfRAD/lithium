@@ -9,6 +9,7 @@
 
 namespace lithium\storage\session\strategy;
 
+use lithium\core\AutoConfigurable;
 use lithium\core\ConfigException;
 use lithium\security\Random;
 
@@ -44,7 +45,9 @@ use lithium\security\Random;
  *
  * @link http://php.net/book.openssl.php
  */
-class Encrypt extends \lithium\core\ObjectDeprecated {
+class Encrypt {
+
+	use AutoConfigurable;
 
 	/**
 	 * Default configuration.
@@ -66,7 +69,8 @@ class Encrypt extends \lithium\core\ObjectDeprecated {
 		if (!extension_loaded('openssl')) {
 			throw new ConfigException('The `openssl` extension is not installed or enabled.');
 		}
-		parent::__construct($config + $this->_defaults);
+		$this->_autoConfig($config + $this->_defaults, []);
+		$this->_autoInit($config);
 	}
 
 	/**

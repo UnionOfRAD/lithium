@@ -73,6 +73,7 @@ class Php extends \lithium\g11n\catalog\Adapter {
 	 */
 	protected function _init() {
 		parent::_init();
+
 		if (!is_dir($this->_config['path'])) {
 			$message = "Php directory does not exist at path `{$this->_config['path']}`.";
 			throw new ConfigException($message);

@@ -9,10 +9,13 @@
 
 namespace lithium\test\fixtures\adapter;
 
+use lithium\core\AutoConfigurable;
 use lithium\core\ConfigException;
 use UnexpectedValueException;
 
-class Connection extends \lithium\core\ObjectDeprecated {
+class Connection {
+
+	use AutoConfigurable;
 
 	/**
 	 * Auto configuration properties.
@@ -51,7 +54,8 @@ class Connection extends \lithium\core\ObjectDeprecated {
 	 */
 	public function __construct(array $config = []) {
 		$defaults = ['alters' => []];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
+		$this->_autoInit($config);
 	}
 
 	/**
@@ -61,8 +65,6 @@ class Connection extends \lithium\core\ObjectDeprecated {
 	 * @throws ConfigException
 	 */
 	protected function _init() {
-		parent::_init();
-
 		if (!$this->_connection) {
 			throw new ConfigException("The `'connection'` option must be set.");
 		}

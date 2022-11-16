@@ -29,7 +29,7 @@ use lithium\core\ConfigException;
  *
  * This static class should **never** be called explicitly.
  */
-class Adaptable extends \lithium\core\StaticObjectDeprecated {
+class Adaptable {
 
 	/**
 	 * Must always be re-defined in sub-classes. Can provide initial

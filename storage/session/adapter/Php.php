@@ -12,6 +12,7 @@ namespace lithium\storage\session\adapter;
 use lithium\util\Set;
 use RuntimeException;
 use lithium\core\ConfigException;
+use lithium\core\AutoConfigurable;
 use lithium\core\Libraries;
 
 /**
@@ -21,7 +22,9 @@ use lithium\core\Libraries;
  * session handling, as well as allowing these three methods to be filtered as
  * per the Lithium filtering system.
  */
-class Php extends \lithium\core\ObjectDeprecated {
+class Php {
+
+	use AutoConfigurable;
 
 	/**
 	 * Default ini settings for this session adapter. Will disabl cookie lifetime,
@@ -57,7 +60,8 @@ class Php extends \lithium\core\ObjectDeprecated {
 		if (empty($config['session.name'])) {
 			$config['session.name'] = basename(Libraries::get(true, 'path'));
 		}
-		parent::__construct($config + $this->_defaults);
+		$this->_autoConfig($config + $this->_defaults, []);
+		$this->_autoInit($config);
 	}
 
 	/**

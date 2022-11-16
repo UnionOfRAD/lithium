@@ -9,7 +9,7 @@
 
 namespace lithium\tests\mocks\storage\session\strategy;
 
-class MockCookieSession extends \lithium\core\ObjectDeprecated {
+class MockCookieSession {
 
 	protected static $_secret = 'foobar';
 

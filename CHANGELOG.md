@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Dropped support for PHP 7.0
+- Dropped support for PHP 7.x
 
 - The `Mongo` data source adapter has been updated to work with the `mongodb` extension
   instead of the old `mongo` extension. This brings back full li₃ support for MongoDB 
@@ -38,7 +38,7 @@
 	- Support for generally using `respondsTo()`.
 	- Support for generally using `invokeMethod()`.
 	- Support for generally using `_instance()`.
-
+- The `Apc` adapter has been migrated from the traditional, now-unsupported APC extension, to [APCu](https://www.php.net/manual/en/book.apcu.php). No code changes are required—simply upgrade to the new extension.
 
 ## v1.2.0
 
@@ -145,7 +145,7 @@
   | old | new |
   | --- | --- |
   | `*Object::$_autoConfig` | use `lithium\core\AutoConfigurable` |
-  | `*Object::_init()` | _no replacement_ |
+  | `*Object::_init()` | use `lithium\core\AutoConfigurable` |
   | `*Object::_instance()` | replaced, use `lithium\core\Libraries::instance()` |
   | `analysis\Inspector::_instance()` |  replaced, use `lithium\core\Libraries::instance()` |
   | `data\Model::_instance()` |  replaced, use `lithium\core\Libraries::instance()` |

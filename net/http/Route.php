@@ -9,6 +9,8 @@
 
 namespace lithium\net\http;
 
+use lithium\core\AutoConfigurable;
+
 /**
  * The `Route` class represents a single URL pattern which is matched against incoming requests, in
  * order to determine the correct controller and action that an HTTP request should be dispatched
@@ -51,7 +53,9 @@ namespace lithium\net\http;
  * @see lithium\net\http\Route::compile()
  * @see lithium\net\http\Router
  */
-class Route extends \lithium\core\ObjectDeprecated {
+class Route {
+
+	use AutoConfigurable;
 
 	/**
 	 * The URL template string that the route matches, i.e.
@@ -224,12 +228,11 @@ class Route extends \lithium\core\ObjectDeprecated {
 			'formatters' => [],
 			'unicode'  => true
 		];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
+		$this->_autoInit($config);
 	}
 
 	protected function _init() {
-		parent::_init();
-
 		if (!$this->_config['continue'] && strpos($this->_template, '{:action:') === false) {
 			$this->_params += ['action' => 'index'];
 		}

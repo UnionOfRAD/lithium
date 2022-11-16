@@ -9,10 +9,14 @@
 
 namespace lithium\g11n\catalog;
 
+use lithium\core\AutoConfigurable;
+
 /**
  * This is the foundation class for all g11n catalog adapters.
  */
-class Adapter extends \lithium\core\ObjectDeprecated {
+class Adapter {
+
+	use AutoConfigurable;
 
 	/**
 	 * Reads data.

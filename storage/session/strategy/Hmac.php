@@ -40,7 +40,7 @@ use lithium\security\Hash;
  *
  * @link http://en.wikipedia.org/wiki/HMAC Wikipedia: Hash-based Message Authentication Code
  */
-class Hmac extends \lithium\core\ObjectDeprecated {
+class Hmac {
 
 	/**
 	 * The HMAC secret.

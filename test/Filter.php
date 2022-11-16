@@ -12,7 +12,7 @@ namespace lithium\test;
 /**
  * `Filter` is the base class for all test filters.
  */
-abstract class Filter extends \lithium\core\StaticObjectDeprecated {
+abstract class Filter {
 
 	/**
 	 * Takes an instance of an object (usually a Collection object) containing test

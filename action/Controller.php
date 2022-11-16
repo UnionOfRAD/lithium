@@ -13,6 +13,8 @@ use lithium\action\DispatchException;
 use lithium\aop\Filters;
 use lithium\core\Libraries;
 use lithium\util\Inflector;
+use lithium\core\AutoConfigurable;
+use lithium\core\MergeInheritable;
 
 /**
  * The `Controller` class is the fundamental building block of your application's request/response
@@ -41,9 +43,10 @@ use lithium\util\Inflector;
  * @see lithium\action\Dispatcher
  * @see lithium\action\Controller::$_render
  */
-class Controller extends \lithium\core\ObjectDeprecated {
+class Controller {
 
-	use \lithium\core\MergeInheritable;
+	use AutoConfigurable;
+	use MergeInheritable;
 
 	/**
 	 * Contains an instance of the `Request` object with all the details of the HTTP request that
@@ -124,13 +127,6 @@ class Controller extends \lithium\core\ObjectDeprecated {
 	];
 
 	/**
-	 * Auto configuration properties.
-	 *
-	 * @var array
-	 */
-	protected $_autoConfig = ['render' => 'merge', 'classes' => 'merge'];
-
-	/**
 	 * Constructor.
 	 *
 	 * @see lithium\action\Controller::$request
@@ -151,7 +147,8 @@ class Controller extends \lithium\core\ObjectDeprecated {
 			'render' => [],
 			'classes' => []
 		];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, ['render' => 'merge', 'classes' => 'merge']);
+		$this->_autoInit($config);
 	}
 
 	/**
@@ -161,8 +158,6 @@ class Controller extends \lithium\core\ObjectDeprecated {
 	 * @return void
 	 */
 	protected function _init() {
-		parent::_init();
-
 		$this->_inherit(['_render']);
 
 		$this->request = $this->request ?: $this->_config['request'];

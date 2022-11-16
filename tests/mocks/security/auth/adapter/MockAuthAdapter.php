@@ -9,7 +9,7 @@
 
 namespace lithium\tests\mocks\security\auth\adapter;
 
-class MockAuthAdapter extends \lithium\core\ObjectDeprecated {
+class MockAuthAdapter {
 
 	public function check($credentials, array $options = []) {
 		switch (true) {

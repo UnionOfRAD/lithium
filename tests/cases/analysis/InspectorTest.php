@@ -26,8 +26,8 @@ class InspectorTest extends \lithium\test\Unit {
 	 * Tests that basic method lists and information are queried properly.
 	 */
 	public function testBasicMethodInspection() {
-		$class = 'lithium\analysis\Debugger';
-		$parent = 'lithium\core\StaticObjectDeprecated';
+		$class = 'lithium\console\command\Test';
+		$parent = 'lithium\console\Command';
 
 		$expected = array_diff(get_class_methods($class), get_class_methods($parent));
 		$result = array_keys(Inspector::methods($class, 'extents'));
@@ -48,7 +48,7 @@ class InspectorTest extends \lithium\test\Unit {
 		$result = Inspector::methods($this, null);
 		$this->assertInstanceOf('ReflectionMethod', $result[0]);
 
-		$result = Inspector::info('lithium\core\ObjectDeprecated::_init()');
+		$result = Inspector::info('lithium\core\AutoConfigurable::_init()');
 		$expected = '_init';
 		$this->assertEqual($expected, $result['name']);
 

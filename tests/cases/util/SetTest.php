@@ -1499,58 +1499,6 @@ class SetTest extends \lithium\test\Unit {
 		$this->assertEqual(['key1' => 'val1', 'key3' => ['foo' => 'bar']], $removed);
 		$this->assertEqual(['key2' => 'val2'], $kept);
 	}
-
-	/* Deprecated / BC */
-
-	public function testExtractInNonFlattenMode() {
-		error_reporting(($original = error_reporting()) & ~E_USER_DEPRECATED);
-
-		$a = [
-			[
-				'User' => [
-					'id' => '1', 'user' => 'mariano',
-					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
-					'created' => '2007-03-17 01:16:23',
-					'updated' => '2007-03-17 01:18:31'
-				],
-			],
-			[
-				'User' => [
-					'id' => '2', 'user' => 'mariano',
-					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
-					'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'
-				],
-			],
-			[
-				'User' => [
-					'id' => '3', 'user' => 'mariano',
-					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
-					'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'
-				],
-			],
-			[
-				'User' => [
-					'id' => '4', 'user' => 'mariano',
-					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
-					'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'
-				],
-			],
-			[
-				'User' => [
-					'id' => '5', 'user' => 'mariano',
-					'password' => '5f4dcc3b5aa765d61d8327deb882cf99',
-					'created' => '2007-03-17 01:16:23', 'updated' => '2007-03-17 01:18:31'
-				],
-			]
-		];
-		$expected = [
-			['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4], ['id' => 5]
-		];
-		$result = Set::extract($a, '/User/id', ['flatten' => false]);
-		$this->assertEqual($expected, $result);
-
-		error_reporting($original);
-	}
 }
 
 ?>

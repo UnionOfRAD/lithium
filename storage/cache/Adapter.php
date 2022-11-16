@@ -9,6 +9,8 @@
 
 namespace lithium\storage\cache;
 
+use lithium\core\AutoConfigurable;
+
 /**
  * This is the foundation class for all cache adapters.
  *
@@ -32,7 +34,9 @@ namespace lithium\storage\cache;
  *
  * Adapters may handle serialization and/or multi-keys natively others only synthetically.
  */
-abstract class Adapter extends \lithium\core\ObjectDeprecated {
+abstract class Adapter {
+
+	use AutoConfigurable;
 
 	/**
 	 * Generates safe cache keys.

@@ -12,6 +12,7 @@ namespace lithium\template\view;
 use RuntimeException;
 use lithium\aop\Filters;
 use lithium\core\Libraries;
+use lithium\core\AutoConfigurable;
 use lithium\core\ClassNotFoundException;
 
 /**
@@ -27,7 +28,9 @@ use lithium\core\ClassNotFoundException;
  * @see lithium\template\adapter\File
  * @see lithium\template\adapter\Simple
  */
-abstract class Renderer extends \lithium\core\ObjectDeprecated {
+abstract class Renderer {
+
+	use AutoConfigurable;
 
 	/**
 	 * These configuration variables will automatically be assigned to their corresponding protected
@@ -185,7 +188,8 @@ abstract class Renderer extends \lithium\core\ObjectDeprecated {
 				'styles' => [], 'head' => []
 			]
 		];
-		parent::__construct((array) $config + $defaults);
+		$this->_autoConfig((array) $config + $defaults, $this->_autoConfig);
+		$this->_autoInit($config);
 	}
 
 	/**
@@ -210,8 +214,6 @@ abstract class Renderer extends \lithium\core\ObjectDeprecated {
 	 * @return void
 	 */
 	protected function _init() {
-		parent::_init();
-
 		$req =& $this->_request;
 		$ctx =& $this->_context;
 		$classes =& $this->_classes;

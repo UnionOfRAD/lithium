@@ -10,6 +10,7 @@
 namespace lithium\util;
 
 use ReturnTypeWillChange;
+use lithium\core\AutoConfigurable;
 
 /**
  * The parent class for all collection objects. Contains methods for collection iteration,
@@ -77,7 +78,9 @@ use ReturnTypeWillChange;
  * @link http://php.net/class.iterator.php PHP Manual: Iterator Interface
  * @link http://php.net/class.countable.php PHP Manual: Countable Interface
  */
-class Collection extends \lithium\core\ObjectDeprecated implements \ArrayAccess, \Iterator, \Countable {
+class Collection implements \ArrayAccess, \Iterator, \Countable {
+
+	use AutoConfigurable;
 
 	/**
 	 * A central registry of global format handlers for `Collection` objects and subclasses.
@@ -167,7 +170,6 @@ class Collection extends \lithium\core\ObjectDeprecated implements \ArrayAccess,
 	 * @return void
 	 */
 	protected function _init() {
-		parent::_init();
 		unset($this->_config['data']);
 	}
 

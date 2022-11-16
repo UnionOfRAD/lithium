@@ -11,12 +11,16 @@ namespace lithium\net;
 
 use lithium\core\Libraries;
 
+use lithium\core\AutoConfigurable;
+
 /**
  * Abstract class for connecting to sockets with various adapters.
  *
  * Currently, Curl, Stream and Context adapters are available.
  */
-abstract class Socket extends \lithium\core\ObjectDeprecated {
+abstract class Socket {
+
+	use AutoConfigurable;
 
 	/**
 	 * The resource for the current connection.
@@ -63,7 +67,8 @@ abstract class Socket extends \lithium\core\ObjectDeprecated {
 			'port'       => 80,
 			'timeout'    => 30
 		];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
+		$this->_autoInit($config);
 	}
 
 	/**
@@ -73,7 +78,7 @@ abstract class Socket extends \lithium\core\ObjectDeprecated {
 	 * @return mixed The open resource on success, `false` otherwise.
 	 */
 	public function open(array $options = []) {
-		parent::__construct($options + $this->_config);
+		$this->_autoConfig($options + $this->_config, $this->_autoConfig);
 		return false;
 	}
 

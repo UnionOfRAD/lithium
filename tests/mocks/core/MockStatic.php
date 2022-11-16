@@ -12,10 +12,7 @@ namespace lithium\tests\mocks\core;
 use Exception;
 use lithium\aop\Filters;
 
-/**
- * @deprecated
- */
-class MockStaticObjectDeprecated extends \lithium\core\StaticObjectDeprecated {
+class MockStatic {
 
 	public static function throwException() {
 		return Filters::run(get_called_class(), __FUNCTION__, [], function($params) {

@@ -11,6 +11,7 @@ namespace lithium\analysis\logger\adapter;
 
 use lithium\util\Text;
 use lithium\core\Libraries;
+use lithium\core\AutoConfigurable;
 
 /**
  * A simple log adapter that writes messages to files. By default, messages are written to
@@ -31,7 +32,9 @@ use lithium\core\Libraries;
  *
  * @see lithium\analysis\logger\adapter\File::__construct()
  */
-class File extends \lithium\core\ObjectDeprecated {
+class File {
+
+	use AutoConfigurable;
 
 	/**
 	 * Constructor.
@@ -59,7 +62,8 @@ class File extends \lithium\core\ObjectDeprecated {
 			'file' => function($data, $config) { return "{$data['priority']}.log"; },
 			'format' => "{:timestamp} {:message}\n"
 		];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, []);
+		$this->_autoInit($config);
 	}
 
 	/**

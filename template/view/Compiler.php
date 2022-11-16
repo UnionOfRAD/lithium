@@ -24,7 +24,7 @@ use lithium\template\TemplateException;
  * @see lithium\template\View
  * @see lithium\template\view\adapter
  */
-class Compiler extends \lithium\core\StaticObjectDeprecated {
+class Compiler {
 
 	/**
 	 * The list of syntax replacements to apply to compiled templates.

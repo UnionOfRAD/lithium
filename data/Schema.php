@@ -10,12 +10,15 @@
 namespace lithium\data;
 
 use RuntimeException;
+use lithium\core\AutoConfigurable;
 
 /**
  * This class encapsulates a schema definition, usually for a model class, and is comprised
  * of named fields and types.
  */
-class Schema extends \lithium\core\ObjectDeprecated implements \ArrayAccess {
+class Schema implements \ArrayAccess {
+
+	use AutoConfigurable;
 
 	protected $_fields = [];
 
@@ -36,12 +39,11 @@ class Schema extends \lithium\core\ObjectDeprecated implements \ArrayAccess {
 	 */
 	public function __construct(array $config = []) {
 		$defaults = ['fields' => []];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
+		$this->_autoInit($config);
 	}
 
 	protected function _init() {
-		parent::_init();
-
 		foreach ($this->_fields as $key => $type) {
 			if (is_string($type)) {
 				$this->_fields[$key] = compact('type');

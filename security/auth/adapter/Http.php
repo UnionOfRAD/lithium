@@ -11,6 +11,8 @@ namespace lithium\security\auth\adapter;
 
 use lithium\core\Libraries;
 
+use lithium\core\AutoConfigurable;
+
 /**
  * The `Http` adapter provides basic and digest authentication based on the HTTP protocol.
  * By default, the adapter uses Http Digest based authentication.
@@ -39,7 +41,9 @@ use lithium\core\Libraries;
  * @see lithium\action\Request
  * @see lithium\action\Request::env
  */
-class Http extends \lithium\core\ObjectDeprecated {
+class Http {
+
+	use AutoConfigurable;
 
 	/**
 	 * Dynamic class dependencies.
@@ -61,10 +65,9 @@ class Http extends \lithium\core\ObjectDeprecated {
 	 */
 	public function __construct(array $config = []) {
 		$realm = basename(Libraries::get(true, 'path'));
-		$defaults = [
-			'method' => 'digest', 'realm' => $realm, 'users' => []
-		];
-		parent::__construct($config + $defaults);
+		$defaults = ['method' => 'digest', 'realm' => $realm, 'users' => []];
+		$this->_autoConfig($config + $defaults, []);
+		$this->_autoInit($config);
 	}
 
 	/**

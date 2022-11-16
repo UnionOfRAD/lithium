@@ -11,6 +11,7 @@ namespace lithium\net;
 
 use ReflectionClass;
 use ReflectionProperty;
+use lithium\core\AutoConfigurable;
 
 /**
  * Base message class for any URI based request/response.
@@ -18,7 +19,9 @@ use ReflectionProperty;
  * @link http://tools.ietf.org/html/rfc3986#section-1.1.1
  * @link http://en.wikipedia.org/wiki/URI_scheme#Generic_syntax
  */
-class Message extends \lithium\core\ObjectDeprecated {
+class Message {
+
+	use AutoConfigurable;
 
 	/**
 	 * The URI scheme.
@@ -94,10 +97,12 @@ class Message extends \lithium\core\ObjectDeprecated {
 		];
 		$config += $defaults;
 
+		$this->_autoConfig($config, isset($this->_autoConfig) ? $this->_autoConfig : []);
+
 		foreach (array_intersect_key(array_filter($config), $defaults) as $key => $value) {
 			$this->{$key} = $value;
 		}
-		parent::__construct($config);
+		$this->_autoInit($config);
 	}
 
 	/**

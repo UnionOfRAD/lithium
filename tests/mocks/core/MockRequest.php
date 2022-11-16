@@ -9,7 +9,11 @@
 
 namespace lithium\tests\mocks\core;
 
-class MockRequest extends \lithium\core\ObjectDeprecated {
+use lithium\core\AutoConfigurable;
+
+class MockRequest {
+
+	use AutoConfigurable;
 
 	public $url = null;
 

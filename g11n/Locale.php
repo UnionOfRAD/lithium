@@ -44,7 +44,7 @@ use lithium\console\Request as ConsoleRequest;
  * @link http://www.rfc-editor.org/rfc/bcp/bcp47.txt
  * @link http://www.iana.org/assignments/language-subtag-registry
  */
-class Locale extends \lithium\core\StaticObjectDeprecated {
+class Locale {
 
 	/**
 	 * Properties for locale tags.

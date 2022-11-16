@@ -10,6 +10,7 @@
 namespace lithium\template;
 
 use lithium\util\Text;
+use lithium\core\AutoConfigurable;
 
 /**
  * Abstract class for template helpers to extend.
@@ -17,7 +18,9 @@ use lithium\util\Text;
  * as well as escaping.
  *
  */
-abstract class Helper extends \lithium\core\ObjectDeprecated {
+abstract class Helper {
+
+	use AutoConfigurable;
 
 	/**
 	 * Maps helper method names to content types as defined by the `Media` class, where key are
@@ -74,7 +77,8 @@ abstract class Helper extends \lithium\core\ObjectDeprecated {
 	 */
 	public function __construct(array $config = []) {
 		$defaults = ['handlers' => [], 'context' => null];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
+		$this->_autoInit($config);
 	}
 
 	/**
@@ -83,8 +87,6 @@ abstract class Helper extends \lithium\core\ObjectDeprecated {
 	 * @return void
 	 */
 	protected function _init() {
-		parent::_init();
-
 		if (!$this->_context) {
 			return;
 		}
@@ -232,14 +234,6 @@ abstract class Helper extends \lithium\core\ObjectDeprecated {
 			$strings = $this->_context->strings();
 		}
 		return Text::insert(isset($strings[$string]) ? $strings[$string] : $string, $params);
-	}
-
-	/* Deprecated / BC */
-
-	protected function _attributes($params, $method = null, array $options = []) {
-		$message  = '`' . __METHOD__ . '()` has been made public, use `Helper::attributes()`.';
-		trigger_error($message, E_USER_DEPRECATED);
-		return $this->attributes($params, $method, $options);
 	}
 }
 

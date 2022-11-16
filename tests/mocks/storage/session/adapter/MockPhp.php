@@ -11,6 +11,10 @@ namespace lithium\tests\mocks\storage\session\adapter;
 
 class MockPhp extends \lithium\storage\session\adapter\Php {
 
+	public function config() {
+		return $this->_config;
+	}
+
 	/**
 	 * Overridden method for testing.
 	 *

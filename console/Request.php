@@ -9,13 +9,17 @@
 
 namespace lithium\console;
 
+use lithium\core\AutoConfigurable;
+
 /**
  * The `Request` class represents a console request and holds information about its
  * environment as well as passed arguments.
  *
  * @see lithium\console\Dispatcher
  */
-class Request extends \lithium\core\ObjectDeprecated {
+class Request {
+
+	use AutoConfigurable;
 
 	/**
 	 * The raw data passed from the command line
@@ -78,8 +82,8 @@ class Request extends \lithium\core\ObjectDeprecated {
 			'input' => null,
 			'globals' => true
 		];
-		$config += $defaults;
-		parent::__construct($config);
+		$this->_config = $config + $defaults;
+		$this->_autoInit($config);
 	}
 
 	/**
@@ -106,7 +110,7 @@ class Request extends \lithium\core\ObjectDeprecated {
 		if (!is_resource($this->_config['input'])) {
 			$this->input = fopen('php://stdin', 'r');
 		}
-		parent::_init();
+		$this->_autoConfig($this->_config, $this->_autoConfig);
 	}
 
 	/**

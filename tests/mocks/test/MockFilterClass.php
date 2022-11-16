@@ -9,7 +9,8 @@
 
 namespace lithium\tests\mocks\test;
 
-class MockFilterClass extends \lithium\core\ObjectDeprecated {
+class MockFilterClass {
+
 	public function __construct($all = false) {
 		if ($all) {
 			return true;

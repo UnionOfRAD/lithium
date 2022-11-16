@@ -20,7 +20,7 @@ use lithium\core\Environment;
  * This Dispatcher is used exclusively for the purpose of running, organizing and compiling
  * statistics for the built-in Lithium test suite.
  */
-class Dispatcher extends \lithium\core\StaticObjectDeprecated {
+class Dispatcher {
 
 	/**
 	 * Composed classes used by the Dispatcher.
@@ -84,9 +84,7 @@ class Dispatcher extends \lithium\core\StaticObjectDeprecated {
 	 * @return object Group object constructed with `$data`.
 	 */
 	protected static function _group($data) {
-		return Libraries::instance(
-			'test', static::$_classes['group'], compact('data')
-		);
+		return Libraries::instance('test', static::$_classes['group'], compact('data'));
 	}
 
 	/**
@@ -100,9 +98,7 @@ class Dispatcher extends \lithium\core\StaticObjectDeprecated {
 	 * @return object Group object constructed with the test case or group passed in $options.
 	 */
 	protected static function _report($group, $options) {
-		return Libraries::instance(
-			'test', static::$_classes['report'], compact('group') + $options
-		);
+		return Libraries::instance('test', static::$_classes['report'], compact('group') + $options);
 	}
 }
 

@@ -24,7 +24,7 @@ use UnexpectedValueException;
  * parameters passed to the script. `Dispatcher` then invokes `lithium\console\Router` to determine
  * the correct `Command` class to invoke, and which method should be called.
  */
-class Dispatcher extends \lithium\core\StaticObjectDeprecated {
+class Dispatcher {
 
 	/**
 	 * Fully-namespaced router class reference.

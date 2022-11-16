@@ -10,13 +10,16 @@
 namespace lithium\console;
 
 use lithium\util\Text;
+use lithium\core\AutoConfigurable;
 
 /**
  * The `Response` class is used by other console classes to generate output. It contains stream
  * resources for writing output and errors, as well as shell coloring information, and the response
  * status code for the currently-executing command.
  */
-class Response extends \lithium\core\ObjectDeprecated {
+class Response {
+
+	use AutoConfigurable;
 
 	/**
 	 * Output stream, STDOUT
@@ -78,7 +81,8 @@ class Response extends \lithium\core\ObjectDeprecated {
 		}
 		$this->plain = $config['plain'];
 
-		parent::__construct($config);
+		$this->_autoConfig($config, []);
+		$this->_autoInit($config);
 	}
 
 	/**

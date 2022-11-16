@@ -16,7 +16,7 @@ use lithium\util\Collection;
  * The parser class uses PHP's tokenizer to provide methods and tools for performing static analysis
  * on PHP code.
  */
-class Parser extends \lithium\core\StaticObjectDeprecated {
+class Parser {
 
 	/**
 	 * Convenience method to get the token name of a PHP code string. If multiple tokens are

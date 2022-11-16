@@ -791,17 +791,6 @@ EOD;
 		$result = $object->testMe();
 		$this->assertEqual('patched class', $result);
 	}
-
-	/* Deprecated / BC */
-
-	/**
-	 * @deprecated
-	 */
-	public function testDeprectatedInit() {
-		$this->assertException("/has been removed/i", function() {
-			MockInitMethod::li3();
-		});
-	}
 }
 
 ?>

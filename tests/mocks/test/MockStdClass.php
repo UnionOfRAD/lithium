@@ -9,7 +9,7 @@
 
 namespace lithium\tests\mocks\test;
 
-class MockStdClass extends \lithium\core\ObjectDeprecated {
+class MockStdClass {
 
 	protected $_data = [];
 

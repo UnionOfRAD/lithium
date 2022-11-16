@@ -20,7 +20,7 @@ namespace lithium\g11n\multibyte\adapter;
  *
  * @link http://php.net/book.intl.php
  */
-class Intl extends \lithium\core\ObjectDeprecated {
+class Intl {
 
 	/**
 	 * Determines if this adapter is enabled by checking if the `intl` extension is loaded.

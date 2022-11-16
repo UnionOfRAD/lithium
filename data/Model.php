@@ -75,7 +75,7 @@ use lithium\util\Set;
  * @see lithium\data\collection\DocumentSet
  * @see lithium\data\Connections
  */
-class Model extends \lithium\core\StaticObjectDeprecated {
+class Model {
 
 	use \lithium\core\MergeInheritable;
 
@@ -498,31 +498,6 @@ class Model extends \lithium\core\StaticObjectDeprecated {
 		}
 		$message = "Unhandled method call `{$method}`.";
 		throw new BadMethodCallException($message);
-	}
-
-	/**
-	 * Determines if a given method can be called.
-	 *
-	 * @deprecated
-	 * @param string $method Name of the method.
-	 * @param boolean $internal Provide `true` to perform check from inside the
-	 *                class/object. When `false` checks also for public visibility;
-	 *                defaults to `false`.
-	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
-	 */
-	public static function respondsTo($method, $internal = false) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
-		$message .= "Use `Model::hasFinder()` instead.";
-		trigger_error($message, E_USER_DEPRECATED);
-
-
-		$self = static::object();
-		$methods = static::instanceMethods();
-		$isFinder = isset($self->_finders[$method]);
-		preg_match('/^findBy(?P<field>\w+)$|^find(?P<type>\w+)By(?P<fields>\w+)$/', $method, $args);
-		$staticRepondsTo = $isFinder || $method === 'all' || !!$args;
-		$instanceRespondsTo = isset($methods[$method]);
-		return $instanceRespondsTo || $staticRepondsTo || parent::respondsTo($method, $internal);
 	}
 
 	/**

@@ -65,7 +65,7 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 	 * Tests that the object is initialized with the correct default values.
 	 */
 	public function testConstructorDefaults() {
-		$db = new MockPostgreSql(['autoConnect' => false, 'init' =>  false]);
+		$db = new MockPostgreSql(['autoConnect' => false, MockPostgreSql::AUTO_INIT_CLASS =>  false]);
 		$result = $db->get('_config');
 		$expected = [
 			'autoConnect' => false,

@@ -13,7 +13,7 @@ namespace lithium\tests\mocks\storage\cache\strategy;
  * Mock strategy.
  * For testing strategies that need construct-time parameters.
  */
-class MockConfigurizer extends \lithium\core\ObjectDeprecated {
+class MockConfigurizer {
 
 	public static $parameters = [];
 

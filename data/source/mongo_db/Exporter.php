@@ -11,7 +11,7 @@ namespace lithium\data\source\mongo_db;
 
 use lithium\util\Set;
 
-class Exporter extends \lithium\core\StaticObjectDeprecated {
+class Exporter {
 
 	protected static $_classes = [
 		'set' => 'lithium\data\collection\DocumentSet',

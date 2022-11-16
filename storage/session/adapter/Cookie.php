@@ -9,6 +9,7 @@
 
 namespace lithium\storage\session\adapter;
 
+use lithium\core\AutoConfigurable;
 use RuntimeException;
 use lithium\util\Set;
 use lithium\core\Libraries;
@@ -21,7 +22,9 @@ use lithium\core\Libraries;
  * per the Lithium filtering system.
  *
  */
-class Cookie extends \lithium\core\ObjectDeprecated {
+class Cookie {
+
+	use AutoConfigurable;
 
 	/**
 	 * Default settings for this session adapter.
@@ -59,7 +62,8 @@ class Cookie extends \lithium\core\ObjectDeprecated {
 		if (empty($config['name'])) {
 			$config['name'] = basename(Libraries::get(true, 'path')) . 'cookie';
 		}
-		parent::__construct($config + $this->_defaults);
+		$this->_autoConfig($config + $this->_defaults, []);
+		$this->_autoInit($config);
 	}
 
 	/**
@@ -254,7 +258,7 @@ class Cookie extends \lithium\core\ObjectDeprecated {
 					$this->_config['httponly']
 				);
 				if (!$result) {
-					throw new RuntimeException("There was an error clearing {$cookie} cookie.");
+					throw new RuntimeException("There was an error clearing {$name} cookie.");
 				}
 			}
 			unset($_COOKIE[$this->_config['name']]);

@@ -9,7 +9,7 @@
 
 namespace lithium\tests\mocks\g11n\multibyte\adapter;
 
-class MockAdapter extends \lithium\core\ObjectDeprecated {
+class MockAdapter {
 
 	public $testStrlenArgs = [];
 

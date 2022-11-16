@@ -9,7 +9,7 @@
 
 namespace lithium\tests\mocks\util;
 
-class MockCollectionObject extends \lithium\core\ObjectDeprecated {
+class MockCollectionObject {
 
 	public $data = [1 => 2];
 

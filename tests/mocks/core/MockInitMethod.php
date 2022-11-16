@@ -9,7 +9,7 @@
 
 namespace lithium\tests\mocks\core;
 
-class MockInitMethod extends \lithium\core\StaticObjectDeprecated {
+class MockInitMethod {
 
 	public static function __init() {}
 

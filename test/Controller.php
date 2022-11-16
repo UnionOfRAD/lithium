@@ -15,12 +15,15 @@ use lithium\core\Libraries;
 use lithium\test\Group;
 use lithium\util\Set;
 use lithium\net\http\Router;
+use lithium\core\AutoConfigurable;
 
 /**
  * The Test Controller for running the html version of the test suite
  *
  */
-class Controller extends \lithium\core\ObjectDeprecated {
+class Controller {
+
+	use AutoConfigurable;
 
 	/**
 	 * Saved context.

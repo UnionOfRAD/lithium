@@ -10,6 +10,7 @@
 namespace lithium\data\model;
 
 use InvalidArgumentException;
+use lithium\core\AutoConfigurable;
 use lithium\core\ConfigException;
 use lithium\core\Libraries;
 use lithium\data\Source;
@@ -29,7 +30,9 @@ use lithium\util\Set;
  * @see lithium\data\Model
  * @see lithium\data\Source
  */
-class Query extends \lithium\core\ObjectDeprecated {
+class Query {
+
+	use AutoConfigurable;
 
 	/**
 	 * Array containing mappings of relationship and field names, which allow database results to
@@ -195,12 +198,11 @@ class Query extends \lithium\core\ObjectDeprecated {
 			'map' => [],
 			'relationships' => []
 		];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
+		$this->_autoInit($config);
 	}
 
 	protected function _init() {
-		parent::_init();
-
 		foreach ($this->_initializers as $key) {
 			if (($value = $this->_config[$key]) !== null) {
 				$this->_config[$key] = is_array($value) ? [] : null;
@@ -221,7 +223,7 @@ class Query extends \lithium\core\ObjectDeprecated {
 		}
 		$this->fields($this->_config['fields']);
 
-		unset($this->_config['entity'], $this->_config['init']);
+		unset($this->_config['entity']);
 	}
 
 	/**
@@ -750,24 +752,6 @@ class Query extends \lithium\core\ObjectDeprecated {
 			return $this;
 		}
 		return isset($this->_config[$method]) ? $this->_config[$method] : null;
-	}
-
-	/**
-	 * Determines if a given method can be called.
-	 *
-	 * @deprecated
-	 * @param string $method Name of the method.
-	 * @param boolean $internal Provide `true` to perform check from inside the
-	 *                class/object. When `false` checks also for public visibility;
-	 *                defaults to `false`.
-	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
-	 */
-	public function respondsTo($method, $internal = false) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
-		$message .= "Use `is_callable([<class>, '<method>'])` instead.";
-		trigger_error($message, E_USER_DEPRECATED);
-
-		return isset($this->_config[$method]) || parent::respondsTo($method, $internal);
 	}
 
 	/**

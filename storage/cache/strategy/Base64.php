@@ -12,7 +12,7 @@ namespace lithium\storage\cache\strategy;
 /**
  * A PHP base64-encoding strategy.
  */
-class Base64 extends \lithium\core\ObjectDeprecated {
+class Base64 {
 
 	/**
 	 * Write strategy method.

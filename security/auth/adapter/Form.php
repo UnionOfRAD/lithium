@@ -9,6 +9,7 @@
 
 namespace lithium\security\auth\adapter;
 
+use lithium\core\AutoConfigurable;
 use lithium\core\Libraries;
 use UnexpectedValueException;
 use lithium\security\Password;
@@ -140,7 +141,9 @@ use lithium\util\Inflector;
  * @see lithium\data\Model::find()
  * @see lithium\security\Hash::calculate()
  */
-class Form extends \lithium\core\ObjectDeprecated {
+class Form {
+
+	use AutoConfigurable;
 
 	/**
 	 * The name of the model class to query against. This can either be a model name (i.e.
@@ -296,7 +299,8 @@ class Form extends \lithium\core\ObjectDeprecated {
 		};
 		$config['validators'] = array_filter($config['validators'] + compact('password'));
 
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, $this->_autoConfig);
+		$this->_autoInit($config);
 	}
 
 	/**
@@ -305,8 +309,6 @@ class Form extends \lithium\core\ObjectDeprecated {
 	 * @return void
 	 */
 	protected function _init() {
-		parent::_init();
-
 		foreach ($this->_fields as $key => $val) {
 			if (is_int($key)) {
 				unset($this->_fields[$key]);

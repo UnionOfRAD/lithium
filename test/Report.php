@@ -12,6 +12,7 @@ namespace lithium\test;
 use lithium\aop\Filters;
 use lithium\core\Libraries;
 use lithium\util\Inflector;
+use lithium\core\AutoConfigurable;
 use lithium\core\ClassNotFoundException;
 use lithium\template\TemplateException;
 
@@ -62,7 +63,9 @@ use lithium\template\TemplateException;
  * @see lithium\test\filter
  * @see lithium\test\templates
  */
-class Report extends \lithium\core\ObjectDeprecated {
+class Report {
+
+	use AutoConfigurable;
 
 	/**
 	 * Contains an instance of `lithium\test\Group`, which contains all unit tests to be executed
@@ -120,7 +123,8 @@ class Report extends \lithium\core\ObjectDeprecated {
 			'format' => 'txt',
 			'reporter' => null
 		];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, []);
+		$this->_autoInit($config);
 	}
 
 	/**

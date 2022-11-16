@@ -12,7 +12,7 @@ namespace lithium\storage\cache\strategy;
 /**
  * An PHP Serialization strategy.
  */
-class Serializer extends \lithium\core\ObjectDeprecated {
+class Serializer {
 
 	/**
 	 * Write strategy method.

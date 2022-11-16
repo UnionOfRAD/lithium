@@ -9,13 +9,25 @@
 
 namespace lithium\analysis\logger\adapter;
 
+use lithium\core\AutoConfigurable;
+
+trait HackilyExposeConfig {
+
+	public function hackilyExposeConfig() {
+		return $this->_config;
+	}
+}
+
 /**
  * The Syslog adapter facilitates logging messages to a `syslogd` backend. See the constructor for
  * information on configuring this adapter.
  *
  * @see lithium\analysis\logger\adapter\Syslog::__construct()
  */
-class Syslog extends \lithium\core\ObjectDeprecated {
+class Syslog {
+
+	use AutoConfigurable;
+	use HackilyExposeConfig;
 
 	/**
 	 * Flag indicating whether or not the connection to `syslogd` has been opened yet.
@@ -58,7 +70,8 @@ class Syslog extends \lithium\core\ObjectDeprecated {
 	 */
 	public function __construct(array $config = []) {
 		$defaults = ['identity' => false, 'options'  => LOG_ODELAY, 'facility' => LOG_USER];
-		parent::__construct($config + $defaults);
+		$this->_autoConfig($config + $defaults, []);
+		$this->_autoInit($config);
 	}
 
 	/**

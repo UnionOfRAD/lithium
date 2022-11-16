@@ -17,7 +17,7 @@ class ResponseTest extends \lithium\test\Unit {
 	public $response = null;
 
 	public function setUp() {
-		$this->response = new MockResponse(['init' => false]);
+		$this->response = new MockResponse([MockResponse::AUTO_INIT_CLASS => false]);
 	}
 
 	public function testTypeManipulation() {
@@ -157,7 +157,7 @@ class ResponseTest extends \lithium\test\Unit {
 		$this->response->status('foobar');
 		ob_start();
 		$this->response->render();
-		$result = ob_get_clean();
+		ob_get_clean();
 		$expected = ['HTTP/1.1 500 Internal Server Error'];
 		$this->assertEqual($expected, $this->response->testHeaders);
 	}

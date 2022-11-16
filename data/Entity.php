@@ -13,6 +13,7 @@ use BadMethodCallException;
 use UnexpectedValueException;
 use lithium\data\Collection;
 use lithium\analysis\Inspector;
+use lithium\core\AutoConfigurable;
 
 /**
  * `Entity` is a smart data object which represents data such as a row or document in a
@@ -29,7 +30,9 @@ use lithium\analysis\Inspector;
  * @see lithium\template\helper\Form
  * @see lithium\data\Entity::serialize()
  */
-class Entity extends \lithium\core\ObjectDeprecated implements \Serializable {
+class Entity implements \Serializable {
+
+	use AutoConfigurable;
 
 	/**
 	 * Fully-namespaced class name of model that this record is bound to. Instance methods declared
@@ -138,7 +141,6 @@ class Entity extends \lithium\core\ObjectDeprecated implements \Serializable {
 	];
 
 	protected function _init() {
-		parent::_init();
 		$this->_updated = $this->_data;
 	}
 
@@ -200,32 +202,6 @@ class Entity extends \lithium\core\ObjectDeprecated implements \Serializable {
 		}
 		$message = "No model bound to call `{$method}`.";
 		throw new BadMethodCallException($message);
-	}
-
-	/**
-	 * Determines if a given method can be called.
-	 *
-	 * @deprecated
-	 * @param string $method Name of the method.
-	 * @param boolean $internal Provide `true` to perform check from inside the
-	 *                class/object. When `false` checks also for public visibility;
-	 *                defaults to `false`.
-	 * @return boolean Returns `true` if the method can be called, `false` otherwise.
-	 */
-	public function respondsTo($method, $internal = false) {
-		$message  = '`' . __METHOD__ . '()` has been deprecated. ';
-		$message .= "Use `is_callable([<class>, '<method>'])` instead.";
-		trigger_error($message, E_USER_DEPRECATED);
-
-		if (method_exists($class = $this->_model, 'object')) {
-			$result = $class::object()->respondsTo($method);
-		} else {
-			$result = Inspector::isCallable($class, $method, $internal);
-		}
-		$result = $result || parent::respondsTo($method, $internal);
-		$result = $result || $class::respondsTo($method, $internal);
-
-		return $result;
 	}
 
 	/**

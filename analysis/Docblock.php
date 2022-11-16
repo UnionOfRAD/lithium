@@ -16,7 +16,7 @@ namespace lithium\analysis;
  * a reflection-based API generator, a code metrics analyzer, and various other code or structural
  * analysis tools.
  */
-class Docblock extends \lithium\core\StaticObjectDeprecated {
+class Docblock {
 
 	/**
 	 * List of supported docblock tags.

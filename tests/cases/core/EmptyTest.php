@@ -9,23 +9,12 @@
 
 namespace lithium\tests\cases\core;
 
-use lithium\aop\Filters;
-use lithium\tests\mocks\core\MockRequest;
-use lithium\tests\mocks\core\MockStaticObjectDeprecated;
-
-/**
- * @deprecated
- */
-class StaticObjectDeprecatedTest extends \lithium\test\Unit {
-
-	protected $_backup = null;
+class EmptyTest extends \lithium\test\Unit {
 
 	public function setUp() {
-		error_reporting(($this->_backup = error_reporting()) & ~E_USER_DEPRECATED);
 	}
 
 	public function tearDown() {
-		error_reporting($this->_backup);
 	}
 }
 

@@ -10,13 +10,16 @@
 namespace lithium\core;
 
 use lithium\core\Environment;
+use lithium\core\AutoConfigurable;
 
 /**
  * The `Configuration` class allow to store `Environement` based configurations.
  *
  * @see lithium\core\Environment
  */
-class Configuration extends \lithium\core\ObjectDeprecated {
+class Configuration {
+
+	use AutoConfigurable;
 
 	/**
 	 * Can provide configurations based on the environment,

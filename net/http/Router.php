@@ -57,7 +57,7 @@ use lithium\util\Inflector;
  * @see lithium\net\http\Router::parse()
  * @see lithium\net\http\Router::match()
  */
-class Router extends \lithium\core\StaticObjectDeprecated {
+class Router {
 
 	/**
 	 * Contain the configuration of scopes.

@@ -9,7 +9,7 @@
 
 namespace lithium\tests\mocks\analysis;
 
-class MockLoggerAdapter extends \lithium\core\ObjectDeprecated {
+class MockLoggerAdapter {
 
 	public function write($name, $value) {
 		return function($params) {

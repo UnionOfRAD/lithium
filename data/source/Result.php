@@ -10,6 +10,7 @@
 namespace lithium\data\source;
 
 use ReturnTypeWillChange;
+use lithium\core\AutoConfigurable;
 
 /**
  * The `Result` class is a wrapper around a forward-only data soure result cursor and can be
@@ -40,7 +41,9 @@ use ReturnTypeWillChange;
  * @link http://php.net/manual/class.iterator.php The Iterator interface.
  * @link http://php.net/manual/norewinditerator.rewind.php
  */
-abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterator {
+abstract class Result implements \Iterator {
+
+	use AutoConfigurable;
 
 	/**
 	 * The current position of the iterator.
@@ -107,7 +110,6 @@ abstract class Result extends \lithium\core\ObjectDeprecated implements \Iterato
 	 * @return void
 	 */
 	protected function _init() {
-		parent::_init();
 		$this->next();
 	}
 

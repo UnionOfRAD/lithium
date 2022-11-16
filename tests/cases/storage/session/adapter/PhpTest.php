@@ -75,8 +75,8 @@ class PhpTest extends \lithium\test\Unit {
 		$this->assertNotEmpty((integer) $result);
 
 		$name = 'this-is-a-custom-name';
-		$php = new Php(['session.name' => $name]);
-		$this->assertNotInternalType('numeric', $php->_config['session.name']);
+		$php = new MockPhp(['session.name' => $name]);
+		$this->assertNotInternalType('numeric', $php->config()['session.name']);
 	}
 
 	public function testCustomConfiguration() {
