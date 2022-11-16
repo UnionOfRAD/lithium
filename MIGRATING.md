@@ -137,7 +137,7 @@ Any base class helper methods used in application code may be swapped out per th
 
 By virtue of `$_config` being defined in a base class common to all framework and application classes, a class could ‘reach across’ to any other class' `$_config` property and read data (or write, though this has always been against convention). This is no longer possible.
 
-Workarounds include redefining `$_config` as `public` in affected subclasses (not recommended), providing access through a public method, 
+Workarounds include redefining `$_config` as `public` in affected subclasses (not recommended), providing access through a public method, or designing a proper interface to expose the specific values needed in a given context (recommended).
 
 ### Application config changes
 
