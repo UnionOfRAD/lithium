@@ -109,10 +109,10 @@ class MyClass {
 
 ### Defering class initialization
 
-Prior to 2.0, class initialization (auto-dispatching to the `_init()` method) could be suppressed by passing `'init' => false` to the constructor. This has been replaced with a constant that is mixed in from the trait, and can be accessed by the class name, i.e.:
+Prior to 2.0, class initialization (auto-dispatching to the `_init()` method) could be suppressed by passing `'init' => false` to the constructor. This has been replaced with a global constant that is defined in the `AutoConfigurable` trait:
 
 ```php
-new MyClass([MyClass::AUTO_INIT_CLASS => false])
+new MyClass([AUTO_INIT_CLASS => false])
 ```
 
 Finally, as a result of this change, the `'init'` key is no longer automatically merged into the `$_config` property. Tests or other application logic depending on this behavior should be changed.
