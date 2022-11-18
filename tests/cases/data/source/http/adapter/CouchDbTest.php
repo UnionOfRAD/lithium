@@ -25,7 +25,7 @@ class CouchDbTest extends \lithium\test\Unit {
 		'database' => 'lithium-test',
 		'persistent' => false,
 		'scheme' => 'tcp',
-		'host' => 'localhost',
+		'host' => 'couchdb',
 		'login' => 'root',
 		'password' => '',
 		'port' => 80,

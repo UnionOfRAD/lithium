@@ -22,7 +22,7 @@ class RedisTest extends \lithium\test\Integration {
 
 	public function __construct(array $config = []) {
 		$defaults = [
-			'host' => '127.0.0.1',
+			'host' => 'redis',
 			'port' => 6379
 		];
 		parent::__construct($config + $defaults);
@@ -50,7 +50,7 @@ class RedisTest extends \lithium\test\Integration {
 	public function setUp() {
 		$this->_redis = new RedisCore();
 		$this->_redis->connect($this->_config['host'], $this->_config['port']);
-		$this->redis = new Redis();
+		$this->redis = new Redis(['host' => 'redis:6379']);
 	}
 
 	public function tearDown() {
@@ -63,18 +63,18 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testInit() {
-		$redis = new Redis();
+		$redis = new Redis(['host' => 'redis:6379']);
 		$this->assertTrue($redis->connection instanceof RedisCore);
 	}
 
 	public function testHostPort() {
 		$this->assertNotException('RedisException', function() {
-			$redis = new Redis();
+			$redis = new Redis(['host' => 'redis:6379']);
 			$redis->info();
 		});
 
 		$this->assertNotException('RedisException', function() {
-			$redis = new Redis(['host' => '127.0.0.1']);
+			$redis = new Redis(['host' => 'redis:6379']);
 			$redis->info();
 		});
 	}
@@ -131,7 +131,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteExpiryDefault() {
-		$redis = new Redis(['expiry' => '+5 seconds']);
+		$redis = new Redis(['host' => 'redis:6379', 'expiry' => '+5 seconds']);
 		$key = 'default_key';
 		$data = 'value';
 		$keys = [$key => $data];
@@ -156,7 +156,7 @@ class RedisTest extends \lithium\test\Integration {
 		$data = 'value';
 		$keys = [$key => $data];
 
-		$redis = new Redis(['expiry' => null]);
+		$redis = new Redis(['host' => 'redis:6379', 'expiry' => null]);
 		$expiry = null;
 
 		$result = $redis->write($keys, $expiry);
@@ -171,7 +171,7 @@ class RedisTest extends \lithium\test\Integration {
 
 		$this->_redis->del($key);
 
-		$redis = new Redis(['expiry' => Cache::PERSIST]);
+		$redis = new Redis(['host' => 'redis:6379', 'expiry' => Cache::PERSIST]);
 		$expiry = Cache::PERSIST;
 
 		$result = $redis->write($keys, $expiry);
@@ -186,7 +186,7 @@ class RedisTest extends \lithium\test\Integration {
 
 		$this->_redis->del($key);
 
-		$redis = new Redis();
+		$redis = new Redis(['host' => 'redis:6379']);
 		$expiry = Cache::PERSIST;
 
 		$result = $redis->write($keys, $expiry);
@@ -243,7 +243,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testWriteWithScope() {
-		$adapter = new Redis(['scope' => 'primary']);
+		$adapter = new Redis(['host' => 'redis:6379', 'scope' => 'primary']);
 
 		$keys = ['key1' => 'test1'];
 		$expiry = '+1 minute';
@@ -365,7 +365,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testReadWithScope() {
-		$adapter = new Redis(['scope' => 'primary']);
+		$adapter = new Redis(['host' => 'redis:6379', 'scope' => 'primary']);
 
 		$this->_redis->set('primary:key1', 'test1', 60);
 		$this->_redis->set('key1', 'test2', 60);
@@ -400,7 +400,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testDeleteWithScope() {
-		$adapter = new Redis(['scope' => 'primary']);
+		$adapter = new Redis(['host' => 'redis:6379', 'scope' => 'primary']);
 
 		$this->_redis->set('primary:key1', 'test1', 60);
 		$this->_redis->set('key1', 'test2', 60);
@@ -490,7 +490,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testDecrementWithScope() {
-		$adapter = new Redis(['scope' => 'primary']);
+		$adapter = new Redis(['host' => 'redis:6379', 'scope' => 'primary']);
 
 		$this->_redis->set('primary:key1', 1, 60);
 		$this->_redis->set('key1', 1, 60);
@@ -541,7 +541,7 @@ class RedisTest extends \lithium\test\Integration {
 	}
 
 	public function testIncrementWithScope() {
-		$adapter = new Redis(['scope' => 'primary']);
+		$adapter = new Redis(['host' => 'redis:6379', 'scope' => 'primary']);
 
 		$this->_redis->set('primary:key1', 1, 60);
 		$this->_redis->set('key1', 1, 60);
