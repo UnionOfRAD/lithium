@@ -9,12 +9,12 @@
 
 namespace lithium\core;
 
+define('AUTO_INIT_CLASS', 'AUTO_INIT_CLASS');
+
 /**
  * Provides methods to configure an object.
  */
 trait AutoConfigurable {
-
-	public const AUTO_INIT_CLASS = 'lithium\core\AutoConfigurable::AUTO_INIT_CLASS';
 
 	/**
 	 * Stores configuration information for object instances at time of construction.
@@ -84,7 +84,7 @@ trait AutoConfigurable {
 	}
 
 	protected function _autoInit($config) {
-		if (!isset($config[static::AUTO_INIT_CLASS]) || $config[static::AUTO_INIT_CLASS] !== false) {
+		if (!isset($config[AUTO_INIT_CLASS]) || $config[AUTO_INIT_CLASS] !== false) {
 			$this->_init();
 		}
 	}
