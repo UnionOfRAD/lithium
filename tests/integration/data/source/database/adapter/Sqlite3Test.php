@@ -79,7 +79,7 @@ class Sqlite3Test extends \lithium\tests\integration\data\Base {
 			'password' => '',
 			'dsn' => null,
 			'options' => [],
-			'init' => false
+			AUTO_INIT_CLASS => false
 		];
 		$this->assertEqual($expected, $result);
 	}

@@ -77,7 +77,7 @@ class PostgreSqlTest extends \lithium\tests\integration\data\Base {
 			'database' => null,
 			'dsn' => null,
 			'options' => [],
-			'init' => false,
+			AUTO_INIT_CLASS => false,
 			'schema' => 'public',
 			'timezone' => null
 		];
