@@ -147,7 +147,7 @@ class Response extends \lithium\net\http\Message {
 		$header = is_array($header) ? end($header) : $header;
 		preg_match('/([-\w\/\.+]+)(;\s*?charset=(.+))?/i', $header, $match);
 
-		if (isset($match[1])) {
+		if (!$this->_type && isset($match[1])) {
 			$this->type(trim($match[1]));
 		}
 		if (isset($match[3])) {

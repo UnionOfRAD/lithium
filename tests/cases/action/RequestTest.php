@@ -11,6 +11,7 @@ namespace lithium\tests\cases\action;
 
 use lithium\core\Libraries;
 use lithium\action\Request;
+use lithium\net\http\Media;
 
 class RequestTest extends \lithium\test\Unit {
 
@@ -83,6 +84,7 @@ class RequestTest extends \lithium\test\Unit {
 		foreach ($this->_superglobals as $varname) {
 			$GLOBALS[$varname] = $this->_env[$varname];
 		}
+		Media::reset();
 	}
 
 	public function testInitData() {
@@ -486,6 +488,34 @@ class RequestTest extends \lithium\test\Unit {
 		$this->assertTrue($request->is('json'));
 		$this->assertFalse($request->is('html'));
 		$this->assertFalse($request->is('foo'));
+	}
+
+	public function testContentTypeDetectionWithMultipleChoices() {
+		Media::type('json_base64', ['application/json'], [
+			'encode' => function ($data) {
+				return base64_encode(json_encode($data));
+			},
+			'decode' => function ($data) {
+				return json_decode(base64_decode($data), true);
+			},
+			'cast' => true,
+			'conditions' => [
+				'http:content_transfer_encoding' => 'base64'
+			]
+		]);
+		$request = new Request(['env' => [
+			'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+			'REQUEST_METHOD' => 'POST'
+		]]);
+		$this->assertTrue($request->is('json'));
+		$this->assertFalse($request->is('json_base64'));
+		$request = new Request(['env' => [
+			'CONTENT_TYPE' => 'application/json; charset=UTF-8',
+			'REQUEST_METHOD' => 'POST',
+			'HTTP_CONTENT_TRANSFER_ENCODING' => 'base64'
+		]]);
+		$this->assertTrue($request->is('json_base64'));
+		$this->assertFalse($request->is('json'));
 	}
 
 	public function testIsMobile() {
