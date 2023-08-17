@@ -338,6 +338,17 @@ class DatabaseTest extends \lithium\tests\integration\data\Base {
 		}
 	}
 
+	public function testNoResultsWithLimitAndHasMany() {
+		$galleries = Galleries::find('all', [
+			'conditions' => [
+				'name' => 'not found'
+			],
+			'with' => 'Images',
+			'limit' => 1,
+		]);
+		$this->assertEqual([], $galleries->to('array'));
+	}
+
 	public function testRemove() {
 		$this->assertTrue(Galleries::remove());
 		$this->assertTrue(Images::remove());
