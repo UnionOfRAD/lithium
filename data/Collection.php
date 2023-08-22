@@ -219,7 +219,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * ]);
 	 * ```
 	 *
-	 * @param arary $values An associative array of fields and values to assign to the `Collection`.
+	 * @param array $values An associative array of fields and values to assign to the `Collection`.
 	 * @return void
 	 */
 	public function set($values) {

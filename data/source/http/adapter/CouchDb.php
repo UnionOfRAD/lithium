@@ -97,7 +97,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @see lithium\data\Model::$_meta
 	 * @see lithium\data\Model::$_classes
 	 * @param string $class The fully-namespaced model class name to be configured.
-	 * @return Returns an array containing keys `'classes'` and `'meta'`, which will be merged with
+	 * @return array Returns an array containing keys `'classes'` and `'meta'`, which will be merged with
 	 *         their respective properties in `Model`.
 	 */
 	public function configureClass($class) {
@@ -211,7 +211,7 @@ class CouchDb extends \lithium\data\source\Http {
 			} while ($retry);
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
-				$result = $this->_format($result, $options);
+				$result = $this->_format($result);
 				$query->entity()->sync($result['id'], $result);
 				return true;
 			}
@@ -304,7 +304,7 @@ class CouchDb extends \lithium\data\source\Http {
 			} while ($retry);
 
 			if (isset($result['_id']) || (isset($result['ok']) && $result['ok'] === true)) {
-				$result = $this->_format($result, $options);
+				$result = $this->_format($result);
 				$query->entity()->sync($result['id'], ['rev' => $result['rev']]);
 				return true;
 			}
@@ -374,7 +374,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param mixed $query The query to be executed.
 	 * @param array $options Optional arguments for the `read()` query that will be executed
 	 *        to obtain the calculation result.
-	 * @return integer Result of the calculation.
+	 * @return integer|null Result of the calculation.
 	 */
 	public function calculation($type, $query, array $options = []) {
 		switch ($type) {
