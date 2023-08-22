@@ -138,7 +138,7 @@ class CouchDb extends \lithium\data\source\Http {
 	 * @param string $entity
 	 * @param array $schema Any schema data pre-defined by the model.
 	 * @param array $meta
-	 * @return lithium\data\Schema
+	 * @return \lithium\data\Schema
 	 */
 	public function describe($entity, $schema = [], array $meta = []) {
 		$database = $this->_config['database'];

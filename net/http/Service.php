@@ -24,7 +24,7 @@ class Service {
 	/**
 	 * The `Socket` instance used to send `Service` calls.
 	 *
-	 * @var lithium\net\Socket
+	 * @var \lithium\net\Socket
 	 */
 	public $connection = null;
 

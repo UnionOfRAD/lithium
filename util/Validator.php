@@ -572,7 +572,7 @@ class Validator {
 	 * @see lithium\util\Validator::$_rules
 	 * @param mixed $name The name of the validation rule (string), or an array of key/value pairs
 	 *        of names and rules.
-	 * @param string $rule If $name is a string, this should be a string regular expression, or a
+	 * @param string|callback $rule If $name is a string, this should be a string regular expression, or a
 	 *        closure that returns a boolean indicating success. Should be left blank if
 	 *        `$name` is an array.
 	 * @param array $options The default options for validating this rule. An option which applies
