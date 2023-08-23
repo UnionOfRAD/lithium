@@ -119,7 +119,7 @@ class Dispatcher {
 	 * @param object $request An instance of a `Request` object.
 	 * @param array $params Request params that can be accessed inside the filter.
 	 * @param array $options
-	 * @return class lithium\console\Command Returns the instantiated command object.
+	 * @return \lithium\console\Command Returns the instantiated command object.
 	 * @filter
 	 */
 	protected static function _callable($request, $params, $options) {

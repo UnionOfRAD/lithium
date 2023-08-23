@@ -99,7 +99,7 @@ class Group extends \lithium\util\Collection {
 	 *
 	 * @param string|array $params
 	 * @param array $options
-	 * @return lithium\util\Collection
+	 * @return \lithium\util\Collection
 	 */
 	public function tests($params = [], array $options = []) {
 		$tests = new Collection();

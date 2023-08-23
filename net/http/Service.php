@@ -24,7 +24,7 @@ class Service {
 	/**
 	 * The `Socket` instance used to send `Service` calls.
 	 *
-	 * @var lithium\net\Socket
+	 * @var \lithium\net\Socket
 	 */
 	public $connection = null;
 
@@ -221,7 +221,7 @@ class Service {
 	 * @param array $data the parameters for the request. For GET/DELETE this is the query string
 	 *        for POST/PUT this is the body
 	 * @param array $options passed to request and socket
-	 * @return string
+	 * @return string|void
 	 */
 	public function send($method, $path = null, $data = [], array $options = []) {
 		$defaults = ['return' => 'body'];
@@ -256,8 +256,8 @@ class Service {
 	 * @param string $method The HTTP method of the request, i.e. `'GET'`, `'HEAD'`, `'OPTIONS'`,
 	 *        etc. Can be passed in upper- or lower-case.
 	 * @param string $path The
-	 * @param string $data
-	 * @param string $options
+	 * @param array $data
+	 * @param array $options
 	 * @return object Returns an instance of `http\Request`, configured with an HTTP method, query
 	 *         string or POST/PUT/PATCH data, and URL.
 	 */

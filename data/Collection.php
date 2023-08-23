@@ -104,7 +104,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * will be assigned here.
 	 *
 	 * @see lithium\data\Schema
-	 * @var lithium\data\Schema
+	 * @var \lithium\data\Schema
 	 */
 	protected $_schema = null;
 
@@ -219,7 +219,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * ]);
 	 * ```
 	 *
-	 * @param arary $values An associative array of fields and values to assign to the `Collection`.
+	 * @param array $values An associative array of fields and values to assign to the `Collection`.
 	 * @return void
 	 */
 	public function set($values) {
@@ -493,7 +493,7 @@ abstract class Collection extends \lithium\util\Collection {
 	 * @param string|callable $field The field to sort the data on, can also be a callback
 	 *        to a custom sort function.
 	 * @param array $options Reserved for future use.
-	 * @return lithium\data\Collection Returns itself.
+	 * @return \lithium\data\Collection Returns itself.
 	 */
 	public function sort($field = 'id', array $options = []) {
 		$this->offsetGet(null);

@@ -40,7 +40,7 @@ abstract class Helper {
 	/**
 	 * The Renderer object this Helper is bound to.
 	 *
-	 * @var lithium\template\view\Renderer
+	 * @var \lithium\template\view\Renderer
 	 * @see lithium\template\view\Renderer
 	 */
 	protected $_context = null;

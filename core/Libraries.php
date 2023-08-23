@@ -673,7 +673,7 @@ class Libraries {
 	 * @param array $classes Map of short names to fully namespaced classes or instantiated objects,
 	 *        to use for resolving short names.
 	 * @return object If the class is found, returns an instance of it.
-	 * @throws lithium\core\ClassNotFoundException Throws an exception if the class can't be found.
+	 * @throws \lithium\core\ClassNotFoundException Throws an exception if the class can't be found.
 	 * @filter
 	 */
 	public static function instance($type, $name, array $options = [], array $classes = []) {

@@ -43,7 +43,7 @@ class Code extends \lithium\g11n\catalog\Adapter {
 	/**
 	 * Initializer.  Checks if the configured path exists.
 	 *
-	 * @throws lithium\core\ConfigException
+	 * @throws \lithium\core\ConfigException
 	 */
 	protected function _init() {
 		parent::_init();

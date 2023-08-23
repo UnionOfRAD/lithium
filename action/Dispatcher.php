@@ -266,7 +266,7 @@ class Dispatcher {
 	 * @param array $params An array of parameters to pass to `$callable`, along with `$request`.
 	 * @return mixed Returns the return value of `$callable`, usually an instance of
 	 *         `lithium\action\Response`.
-	 * @throws lithium\action\DispatchException Throws an exception if `$callable` is not a
+	 * @throws \lithium\action\DispatchException Throws an exception if `$callable` is not a
 	 *         `Closure`, or does not declare the PHP magic `__invoke()` method.
 	 * @filter
 	 */
