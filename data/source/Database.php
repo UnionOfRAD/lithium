@@ -165,7 +165,7 @@ abstract class Database extends \lithium\data\Source {
 	 * Get the last insert id from the database.
 	 * Abstract. Must be defined by child class.
 	 *
-	 * @param $query lithium\data\model\Query $context The given query.
+	 * @param \lithium\data\model\Query $query The given query.
 	 * @return void
 	 */
 	abstract protected function _insertId($query);

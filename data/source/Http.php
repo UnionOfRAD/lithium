@@ -22,7 +22,7 @@ class Http extends \lithium\data\Source {
 	/**
 	 * Service connection
 	 *
-	 * @var object lithium\net\http\Service
+	 * @var \lithium\net\http\Service
 	 */
 	public $connection = null;
 

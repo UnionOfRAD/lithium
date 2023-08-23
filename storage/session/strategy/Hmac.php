@@ -102,7 +102,7 @@ class Hmac {
 	 * attempt.
 	 *
 	 * @throws RuntimeException On possible data tampering.
-	 * @throws lithium\storage\session\strategy\MissingSignatureException On missing singature.
+	 * @throws \lithium\storage\session\strategy\MissingSignatureException On missing singature.
 	 * @param array $data The data being read.
 	 * @param array $options Options for this method.
 	 * @return array Validated data.
