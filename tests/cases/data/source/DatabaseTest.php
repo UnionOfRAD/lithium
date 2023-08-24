@@ -1111,7 +1111,7 @@ class DatabaseTest extends \lithium\test\Unit {
 			'limit' => 1
 		];
 		$result = $this->_db->read(new Query($options), $options);
-		$this->assertNotInstanceOf('lithium\data\collection\RecordSet', $result);
+		$this->assertInstanceOf('lithium\data\collection\RecordSet', $result);
 	}
 
 	public function testGroup() {

@@ -601,6 +601,11 @@ abstract class Database extends \lithium\data\Source {
 				$sql = Text::insert($query, $this->value($args));
 			} else {
 				if (!$data = $this->_queryExport($query)) {
+					if ($return === 'item') {
+						return $model::create([], compact('query') + [
+							'class' => 'set', 'defaults' => false
+						]);
+					}
 					return false;
 				}
 				$sql = $this->renderCommand($data['type'], $data);
