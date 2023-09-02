@@ -18,7 +18,8 @@ include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php';
 use lithium\core\Libraries;
 
 Libraries::add('lithium');
-Libraries::add('app', ['default' => true]);
+Libraries::add('app', ['default' => true, 'resources' => '/tmp']);
+
 
 if (file_exists($file = LITHIUM_LIBRARY_PATH . '/autoload.php')) {
 	require_once $file;
@@ -38,7 +39,7 @@ switch (getenv('DB')) {
 			'test' => [
 				'type' => 'http',
 				'adapter' => 'CouchDb',
-				'host' => 'localhost',
+				'host' => 'couchdb',
 				'database' => 'lithium_test'
 			]
 		]);
@@ -47,7 +48,7 @@ switch (getenv('DB')) {
 		Connections::add('test', [
 			'test' => [
 				'type' => 'MongoDb',
-				'host' => 'localhost',
+				'host' => 'mongodb',
 				'database' => 'lithium_test'
 			]
 		]);
@@ -57,20 +58,22 @@ switch (getenv('DB')) {
 			'test' => [
 				'type' => 'database',
 				'adapter' => 'MySql',
-				'host' => 'localhost',
+				'host' => 'mysql',
 				'login' => 'root',
-				'password' => '',
-				'database' => 'lithium_test'
+				'password' => 'password',
+				'database' => 'lithium_test',
+				'strict' => false
 			]
 		]);
 		Connections::add('test_alternative', [
 			'test' => [
 				'type' => 'database',
 				'adapter' => 'MySql',
-				'host' => 'localhost',
+				'host' => 'mysql',
 				'login' => 'root',
-				'password' => '',
-				'database' => 'lithium_test_alternative'
+				'password' => 'password',
+				'database' => 'lithium_test_alternative',
+				'strict' => false
 			]
 		]);
 	break;
@@ -79,7 +82,7 @@ switch (getenv('DB')) {
 			'test' => [
 				'type' => 'database',
 				'adapter' => 'PostgreSql',
-				'host' => 'localhost',
+				'host' => 'postgres',
 				'login' => 'postgres',
 				'password' => '',
 				'encoding' => 'UTF-8',
@@ -90,7 +93,7 @@ switch (getenv('DB')) {
 			'test' => [
 				'type' => 'database',
 				'adapter' => 'PostgreSql',
-				'host' => 'localhost',
+				'host' => 'postgres',
 				'login' => 'postgres',
 				'password' => '',
 				'database' => 'lithium_test_alternative',

@@ -70,7 +70,7 @@ class MySqlTest extends \lithium\tests\integration\data\Base {
 		$expected = [
 			'autoConnect' => false, 'encoding' => null,'persistent' => true,
 			'host' => 'localhost:3306', 'strict' => null, 'login' => 'root', 'password' => '',
-			'database' => null, 'dsn' => null, 'options' => [], 'init' => false
+			'database' => null, 'dsn' => null, 'options' => [], AUTO_INIT_CLASS => false
 		];
 		$this->assertEqual($expected, $result);
 	}
