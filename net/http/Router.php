@@ -710,7 +710,7 @@ class Router {
 	 * @return mixed If `$name` is `null` returns the default used scope, otherwise
 	 *         returns the previous named scope. Once `$closure` is used, returns `null`.
 	 */
-	public static function scope($name = null, \Closure $closure = null) {
+	public static function scope($name = null, ?\Closure $closure = null) {
 		if ($name === null) {
 			return static::$_scope;
 		}

@@ -719,7 +719,7 @@ class Query {
 	 * @param \lithium\data\Source $source Instance of the data source to use for conversion.
 	 * @return array Map between aliases and their corresponding dotted relation paths.
 	 */
-	public function paths(Source $source = null) {
+	public function paths(?Source $source = null) {
 		if ($source) {
 			$this->applyStrategy($source);
 		}
@@ -732,7 +732,7 @@ class Query {
 	 * @param \lithium\data\Source $source Instance of the data source to use for conversion.
 	 * @return array Map between aliases and their corresponding fully-namespaced model names.
 	 */
-	public function models(Source $source = null) {
+	public function models(?Source $source = null) {
 		if ($source) {
 			$this->applyStrategy($source);
 		}
