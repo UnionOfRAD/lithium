@@ -31,6 +31,9 @@ class Base extends \lithium\test\Integration {
 	}
 
 	public function with($adapters) {
+		if (!$this->_dbConfig) {
+			return false;
+		}
 		$type = ($this->_dbConfig['adapter'] ?? $this->_dbConfig['type']) ?? null;
 
 		foreach ((array) $adapters as $adapter) {

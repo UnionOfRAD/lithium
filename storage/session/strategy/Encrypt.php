@@ -167,6 +167,9 @@ class Encrypt {
 	 * @return array The cleartext data.
 	 */
 	protected function _decrypt($encrypted) {
+		if (!$encrypted) {
+			return null;
+		}
 		$secret = $this->_hashSecret($this->_config['secret']);
 
 		$vectorSize = strlen(base64_encode(str_repeat(' ', $this->_vectorSize())));
@@ -177,10 +180,10 @@ class Encrypt {
 			$data,
 			'aes-256-cbc',
 			$secret,
-			OPENSSL_RAW_DATA|OPENSSL_ZERO_PADDING,
+			OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,
 			$vector
 		);
-		return unserialize(trim($decrypted));
+		return $decrypted ? @unserialize(trim($decrypted)) : null;
 	}
 
 	/**
