@@ -303,6 +303,54 @@ class FormSignatureTest extends \lithium\test\Unit {
 		]);
 		$this->assertNotIdentical($signature0, $signature1);
 	}
+
+	public function testFailMalformedSignaturePayload() {
+		$signature = FormSignature::key([
+			'fields' => ['email' => 'foo@baz']
+		]);
+
+		$parts = explode('::', $signature, 3);
+		$excludedRaw = $parts[1];
+		$signaturePart = $parts[2];
+
+		$malformedLocked = serialize('not_an_array');
+		$malformedLockedRaw = urlencode($malformedLocked);
+		$tamperedSignature = "{$malformedLockedRaw}::{$excludedRaw}::{$signaturePart}";
+
+		$request = new Request(['data' => [
+			'email' => 'foo@baz',
+			'security' => ['signature' => $tamperedSignature]
+		]]);
+
+		$this->assertException('Possible data tampering: malformed form signature payload.', function() use ($request) {
+			FormSignature::check($request);
+		});
+	}
+
+	public function testFailInvalidLockedFieldType() {
+		$validSignature = FormSignature::key([
+			'fields' => ['email' => 'foo@baz'],
+			'locked' => ['active' => 'true']
+		]);
+
+		$parts = explode('::', $validSignature, 3);
+		$excludedRaw = $parts[1];
+		$signaturePart = $parts[2];
+
+		$malformedLocked = serialize([123 => 'value']);
+		$malformedLockedRaw = urlencode($malformedLocked);
+
+		$malformedSignature = "{$malformedLockedRaw}::{$excludedRaw}::{$signaturePart}";
+
+		$request = new Request(['data' => [
+			'email' => 'foo@baz',
+			'security' => ['signature' => $malformedSignature]
+		]]);
+
+		$this->assertException('Invalid locked payload value type.', function() use ($request) {
+			FormSignature::check($request);
+		});
+	}
 }
 
 ?>
