@@ -9,7 +9,7 @@
 
 namespace lithium\security\validation;
 
-use Exception;
+use RuntimeException;
 use lithium\core\ConfigException;
 use lithium\util\Set;
 
@@ -103,7 +103,7 @@ class FormSignature {
 			$data = $data->data;
 		}
 		if (!isset($data['security']['signature'])) {
-			throw new Exception('Unable to check form signature. Cannot find signature in data.');
+			throw new RuntimeException('Unable to check form signature. Cannot find signature in data.');
 		}
 		$signature = $data['security']['signature'];
 		unset($data['security']);
@@ -199,15 +199,28 @@ class FormSignature {
 	 * @return array
 	 */
 	protected static function _parse($string) {
-		if (substr_count($string, '::') !== 2) {
-			throw new Exception('Possible data tampering: form signature string has wrong format.');
-		}
-		list($locked, $excluded) = explode('::', $string, 3);
+		$parts = explode('::', $string, 3);
 
-		return [
-			'locked' => unserialize(urldecode($locked)),
-			'excluded' => unserialize(urldecode($excluded))
-		];
+		if (count($parts) !== 3) {
+			throw new RuntimeException('Possible data tampering: form signature string has wrong format.');
+		}
+		[$lockedRaw, $excludedRaw] = $parts;
+
+		$opts = ['allowed_classes' => false];
+		$locked = unserialize(urldecode($lockedRaw), $opts);
+		$excluded = unserialize(urldecode($excludedRaw), $opts);
+
+		if (!is_array($locked) || !is_array($excluded)) {
+			throw new RuntimeException('Possible data tampering: malformed form signature payload.');
+		}
+
+		foreach ($locked as $k => $v) {
+			if (!is_string($k) || (!is_null($v) && !is_scalar($v))) {
+				throw new RuntimeException('Invalid locked payload value type.');
+			}
+		}
+
+		return compact('locked', 'excluded');
 	}
 }
 
