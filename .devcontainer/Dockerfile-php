@@ -1,0 +1,5 @@
+# Note: You can use any Debian/Ubuntu based image you want. 
+FROM php:8-cli-bullseye
+
+COPY *.sh /tmp/
+RUN /tmp/build.sh
