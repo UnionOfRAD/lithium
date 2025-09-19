@@ -17,10 +17,10 @@ $message  = "lithium\util\String has been deprecated in favor of ";
 $message .= "lithium\util\Text and lithium\security\{Hash,Random}. ";
 $message .= "The old class and methods continue to work and redirect calls ";
 $message .= "to the new classes. However it is not possible to use the String ";
-$message .= "class with PHP >=7.0.";
+$message .= "class with PHP >=8.3.";
 trigger_error($message, E_USER_DEPRECATED);
 
-if (PHP_VERSION_ID < 70000) {
+if (PHP_VERSION_ID < 80300) {
     class_alias('StringDeprecated', 'String');
 }
 

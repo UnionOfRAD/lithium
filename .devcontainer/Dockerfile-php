@@ -1,4 +1,4 @@
-FROM php:7.4.27-cli-buster
+FROM php:8.3-cli
 
 COPY *.sh /tmp/
 RUN /tmp/build.sh
