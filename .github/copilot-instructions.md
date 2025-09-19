@@ -1,15 +1,15 @@
 # li₃ PHP Framework
 
-li₃ is a fast, flexible PHP framework built for PHP 7.4+ with support for PHP 8.x. It provides a comprehensive MVC architecture with support for multiple databases including MySQL, PostgreSQL, SQLite, MongoDB, CouchDB, Redis, and Memcached.
+li₃ is a fast, flexible PHP framework built for PHP 8.3+. It provides a comprehensive MVC architecture with support for multiple databases including MySQL, PostgreSQL, SQLite, MongoDB, CouchDB, Redis, and Memcached.
 
 Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
 
 ## Working Effectively
 
 ### Initial Setup
-- Verify PHP version: `php --version` (supports PHP 7.4-8.x)
+- Verify PHP version: `php --version` (requires PHP 8.3+)
 - Framework is operational without any installation - just clone and use
-- **DO NOT run `composer install`** - the framework currently requires PHP 7.4 in composer.json but works with PHP 8.x
+- **DO NOT run `composer install`** - the framework currently requires PHP 7.4 in composer.json but the system now requires PHP 8.3+
 
 ### Console Commands (li₃)
 - Navigate to framework root or application root 
@@ -148,7 +148,7 @@ tests/            - Framework test suite
 
 ### Common Issues
 - **Test errors**: Some framework tests may fail due to method signature mismatches - this is known and doesn't affect functionality
-- **Composer conflicts**: Framework works with PHP 8.x despite composer.json requiring 7.4
+- **Composer conflicts**: Framework works with PHP 8.3+ despite composer.json requiring 7.4
 - **Missing routes**: Applications need route configuration in `config/routes.php`
 - **Database connections**: Use environment variables like `DB=sqlite` to configure test database connections
 
