@@ -1,5 +1,23 @@
 # Change Log
 
+## v1.4.0
+
+This is an API-compatible upgrade of Li3 1.3 for all users of PHP 8.3.
+
+### Added
+
+- PHP 8.3 support
+
+### Changed
+
+- Updated Docker configuration to use PHP 8.3
+- Updated deprecation messages to reference PHP 8.3 compatibility
+- Updated PHP version checks for PHP 8.3 compatibility
+
+### Removed
+
+- PHP 7.4 support (and below)
+
 ## v1.3.0
 
 This is an API-compatible upgrade of Li3 1.2 for all users of PHP 7.4.

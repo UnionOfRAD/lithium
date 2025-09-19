@@ -11,10 +11,10 @@ namespace lithium\core;
 
 $message  = "lithium\core\Object has been deprecated.";
 $message .= "The old class and methods continue to work and redirect calls. ";
-$message .= "It is possible to use this class as `ObjectDeprecated` with PHP >=7.2.";
+$message .= "It is possible to use this class as `ObjectDeprecated` with PHP >=8.3.";
 trigger_error($message, E_USER_DEPRECATED);
 
-if (PHP_VERSION_ID < 70200) {
+if (PHP_VERSION_ID < 80300) {
 	class_alias('ObjectDeprecated', 'Object');
 }
 

@@ -6,10 +6,12 @@ li₃ is the fast, flexible and the most RAD development framework for PHP.
 
 ### A framework of firsts
 
-li₃ is the first and only major PHP framework built from the ground up for PHP
-5.3+, and the first to break ground into major new technologies, including
+li₃ is the first and only major PHP framework built from the ground up for modern PHP,
+and the first to break ground into major new technologies, including
 bridging the gap between relational and non-relational databases through a
 single, unified API.
+
+**Requirements:** PHP 8.3+
 
 ### Promiscuously opinionated
 
